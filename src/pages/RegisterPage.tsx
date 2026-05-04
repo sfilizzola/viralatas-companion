@@ -44,30 +44,40 @@ export default function RegisterPage() {
       }
 
       // Trigger's handle_new_user() creates the users table record automatically.
-      // We verify it exists before navigating, with a short retry for trigger latency.
+      // We verify it exists before navigating, with retry for trigger latency.
       let userExists = false;
       let lastError: any = null;
-      for (let attempt = 0; attempt < 3; attempt++) {
-        const { data: userRecord, error: queryError } = await supabase
-          .from('users')
-          .select('id')
-          .eq('id', data.user.id)
-          .single();
+      for (let attempt = 0; attempt < 4; attempt++) {
+        try {
+          const { data: userRecord, error: queryError } = await supabase
+            .from('users')
+            .select('id')
+            .eq('id', data.user.id)
+            .single();
 
-        if (!queryError && userRecord) {
-          userExists = true;
-          break;
+          if (!queryError && userRecord) {
+            userExists = true;
+            break;
+          }
+
+          lastError = queryError;
+        } catch (err) {
+          // .single() throws if 0 or multiple rows returned
+          lastError = err;
+          console.error(`Profile check attempt ${attempt + 1}/4 failed:`, err);
         }
 
-        lastError = queryError;
-        if (attempt < 2) {
-          await new Promise((resolve) => setTimeout(resolve, 150));
+        if (attempt < 3) {
+          const delay = 200 + attempt * 100; // 200ms, 300ms, 400ms
+          await new Promise((resolve) => setTimeout(resolve, delay));
         }
       }
 
       if (!userExists) {
+        const errorMsg =
+          lastError?.message ||
+          'User registration completed but profile synchronization failed. Please refresh and try logging in.';
         console.error('User profile creation failed:', lastError);
-        const errorMsg = lastError?.message || 'User profile creation failed. Please try again.';
         setError(errorMsg);
         setLoading(false);
         return;

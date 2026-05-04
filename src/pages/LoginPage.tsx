@@ -35,17 +35,37 @@ export default function LoginPage() {
         return;
       }
 
-      // Verify user profile exists
-      const { data: userRecord, error: profileError } = await supabase
-        .from('users')
-        .select('id, role, preferred_language')
-        .eq('id', data.user.id)
-        .single();
+      // Verify user profile exists with retry for trigger latency
+      let userProfile = null;
+      let profileError = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const { data: userRecord, error: queryError } = await supabase
+            .from('users')
+            .select('id, role, preferred_language')
+            .eq('id', data.user.id)
+            .single();
 
-      if (profileError || !userRecord) {
+          if (!queryError && userRecord) {
+            userProfile = userRecord;
+            break;
+          }
+
+          profileError = queryError;
+        } catch (err) {
+          profileError = err;
+        }
+
+        if (attempt < 2) {
+          await new Promise((resolve) => setTimeout(resolve, 200 + attempt * 100));
+        }
+      }
+
+      if (profileError || !userProfile) {
         setError(
           'User profile not found. Please contact support if this persists.'
         );
+        console.error('Profile load failed:', profileError);
         // Sign out to prevent stale session
         await supabase.auth.signOut();
         setLoading(false);
