@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import BottomNav from '../components/BottomNav';
 import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
@@ -59,6 +60,9 @@ export default function ProfilePage() {
           </button>
         </form>
       </main>
+
+      <div style={{ height: 56 }} />
+      <BottomNav />
     </div>
   );
 }

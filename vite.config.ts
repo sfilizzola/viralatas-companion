@@ -48,6 +48,16 @@ export default defineConfig({
               expiration: { maxEntries: 50, maxAgeSeconds: 24 * 60 * 60 },
             },
           },
+          {
+            // Wacken band thumbnails — cross-origin, allow opaque (status 0) responses
+            urlPattern: /^https:\/\/www\.wacken\.com\/fileadmin\//i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'band-images',
+              expiration: { maxEntries: 200, maxAgeSeconds: 30 * 24 * 60 * 60 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
         ],
       },
     }),

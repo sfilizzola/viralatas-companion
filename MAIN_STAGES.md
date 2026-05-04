@@ -19,19 +19,19 @@ Works fully offline after first load. LLM features (Claude API) sync opportunist
 
 ---
 
-### Phase 1 — Foundation `[CURRENT]`
+### Phase 1 — Foundation `[DONE]`
 
 **Goal:** A working app shell with auth and offline baseline. Nothing fancy — just the skeleton every other phase builds on.
 
 **Deliverables:**
 
-- [ ] Supabase project initialised with schema migration for `users`, `bands`, `user_picks`
-- [ ] React + Vite project scaffolded with TypeScript
-- [ ] `vite-plugin-pwa` installed and configured — Service Worker caches app shell on install
-- [ ] Supabase Auth wired up: register, login, logout
-- [ ] JWT session persisted in IndexedDB (survives app close)
-- [ ] Basic profile screen: display name, avatar initial
-- [ ] App renders and navigates with zero network after first visit
+- [x] Supabase project initialised with schema migration for `users`, `bands`, `user_picks`
+- [x] React + Vite project scaffolded with TypeScript
+- [x] `vite-plugin-pwa` installed and configured — Service Worker caches app shell on install
+- [x] Supabase Auth wired up: register, login, logout
+- [x] JWT session persisted in IndexedDB (survives app close)
+- [x] Basic profile screen: display name, avatar initial
+- [x] App renders and navigates with zero network after first visit
 
 **Acceptance criteria:**
 - User can register and log in
@@ -42,7 +42,7 @@ Works fully offline after first load. LLM features (Claude API) sync opportunist
 
 ---
 
-### Phase 2 — Band schedule
+### Phase 2 — Band schedule `[CURRENT]`
 
 **Goal:** The full Wacken lineup is in the app and browsable offline.
 
