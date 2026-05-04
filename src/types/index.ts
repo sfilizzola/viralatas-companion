@@ -6,6 +6,8 @@ export type User = {
   created_at: string;
 };
 
+export type CrewUser = Pick<User, 'id' | 'display_name' | 'avatar_url'>;
+
 export type Band = {
   id: string;
   name: string;

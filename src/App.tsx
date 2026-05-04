@@ -10,6 +10,7 @@ import PrivateRoute from './components/PrivateRoute';
 import { useAuth } from './hooks/useAuth';
 import { syncBands } from './lib/sync';
 import { flushOfflineQueue, syncCrewPicks } from './lib/picks';
+import { syncCrewUsers } from './lib/users';
 
 function BandSync() {
   const { session } = useAuth();
@@ -33,7 +34,7 @@ function PickSync() {
 
     async function syncNow() {
       await flushOfflineQueue();
-      await syncCrewPicks();
+      await Promise.all([syncCrewPicks(), syncCrewUsers()]);
     }
 
     syncNow().catch(() => {});

@@ -1,10 +1,11 @@
 import { openDB, type IDBPDatabase } from 'idb';
-import type { Band, UserPick } from '../types';
+import type { Band, CrewUser, UserPick } from '../types';
 
 const DB_NAME = 'viralatas-db';
-const DB_VERSION = 2;
+const DB_VERSION = 3;
 
 export const PICKS_CHANGED_EVENT = 'viralatas:picks-changed';
+export const CREW_USERS_CHANGED_EVENT = 'viralatas:crew-users-changed';
 
 type OfflinePickOp = {
   id: string;
@@ -22,6 +23,10 @@ type ViralatasDB = {
   bands: {
     key: string;
     value: Band;
+  };
+  crew_users: {
+    key: string;
+    value: CrewUser;
   };
   user_picks: {
     key: [string, string];
@@ -46,6 +51,9 @@ function getDB() {
         if (!db.objectStoreNames.contains('bands')) {
           db.createObjectStore('bands', { keyPath: 'id' });
         }
+        if (!db.objectStoreNames.contains('crew_users')) {
+          db.createObjectStore('crew_users', { keyPath: 'id' });
+        }
         if (!db.objectStoreNames.contains('user_picks')) {
           const picksStore = db.createObjectStore('user_picks', {
             keyPath: ['user_id', 'band_id'],
@@ -64,6 +72,12 @@ function getDB() {
 function emitPicksChanged() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(PICKS_CHANGED_EVENT));
+  }
+}
+
+function emitCrewUsersChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(CREW_USERS_CHANGED_EVENT));
   }
 }
 
@@ -92,6 +106,19 @@ export async function saveBands(bands: Band[]) {
 export async function loadBands(): Promise<Band[]> {
   const db = await getDB();
   return db.getAll('bands');
+}
+
+export async function saveCrewUsers(users: CrewUser[]) {
+  const db = await getDB();
+  const tx = db.transaction('crew_users', 'readwrite');
+  await Promise.all(users.map((user) => tx.store.put(user)));
+  await tx.done;
+  emitCrewUsersChanged();
+}
+
+export async function loadCrewUsers(): Promise<CrewUser[]> {
+  const db = await getDB();
+  return db.getAll('crew_users');
 }
 
 export async function saveUserPick(pick: UserPick) {

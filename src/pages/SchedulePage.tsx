@@ -178,9 +178,10 @@ type BandCardProps = {
   isPicked: boolean;
   count: number;
   onToggle: () => void;
+  children?: React.ReactNode;
 };
 
-export function BandCard({ band, isPicked, count, onToggle }: BandCardProps) {
+export function BandCard({ band, isPicked, count, onToggle, children }: BandCardProps) {
   const stageColor = STAGE_COLORS[band.stage] ?? 'var(--accent)';
   const initial = band.name.charAt(0).toUpperCase();
 
@@ -222,6 +223,7 @@ export function BandCard({ band, isPicked, count, onToggle }: BandCardProps) {
           </span>
           <span className={styles.goingCount}>{count} indo</span>
         </div>
+        {children}
       </div>
 
       <button
