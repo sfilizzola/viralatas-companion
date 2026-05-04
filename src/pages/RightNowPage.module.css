@@ -338,6 +338,21 @@
   line-height: 1.45;
 }
 
+.announcementHero {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.announcementContent {
+  font-size: 1.2rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+
 .navSpacer {
   height: 56px;
   flex-shrink: 0;

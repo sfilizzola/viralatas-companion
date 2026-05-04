@@ -25,5 +25,6 @@
   "nextPick": "Next pick: {band}, {time}",
   "lostCamping": "LOST at camping",
   "noPickQueued": "No pick queued",
-  "after": "After: {band} - {time}"
+  "after": "After: {band} - {time}",
+  "latestNews": "Latest crew news"
 }

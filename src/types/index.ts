@@ -1,3 +1,5 @@
+export type UserRole = 'normal' | 'manager' | 'godlike';
+
 export type User = {
   id: string;
   email: string;
@@ -5,6 +7,7 @@ export type User = {
   avatar_url: string | null;
   preferred_language: 'br' | 'en';
   is_test_user: boolean;
+  role: UserRole;
   created_at: string;
 };
 
@@ -30,6 +33,20 @@ export type UserPresence = {
   user_id: string;
   is_camping: boolean;
   updated_at: string;
+};
+
+export type Announcement = {
+  id: string;
+  author_id: string;
+  content: string;
+  created_at: string;
+  deleted_at: string | null;
+};
+
+export type BlockedPoster = {
+  user_id: string;
+  blocked_by: string;
+  blocked_at: string;
 };
 
 export type AlertContext = {

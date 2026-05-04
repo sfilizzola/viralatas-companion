@@ -15,6 +15,8 @@ import rightNowBr from '../i18n/RightNowPage_br.json';
 import rightNowEn from '../i18n/RightNowPage_en.json';
 import profileBr from '../i18n/ProfilePage_br.json';
 import profileEn from '../i18n/ProfilePage_en.json';
+import announcementsBr from '../i18n/AnnouncementsPage_br.json';
+import announcementsEn from '../i18n/AnnouncementsPage_en.json';
 
 export type Language = 'br' | 'en';
 
@@ -26,7 +28,8 @@ type TranslationFile =
   | 'MyPicksPage'
   | 'PopularPage'
   | 'RightNowPage'
-  | 'ProfilePage';
+  | 'ProfilePage'
+  | 'AnnouncementsPage';
 
 type Translations = Record<Language, Record<TranslationFile, Record<string, string>>>;
 
@@ -42,6 +45,7 @@ const translations: Translations = {
     PopularPage: popularBr,
     RightNowPage: rightNowBr,
     ProfilePage: profileBr,
+    AnnouncementsPage: announcementsBr,
   },
   en: {
     App: appEn,
@@ -52,6 +56,7 @@ const translations: Translations = {
     PopularPage: popularEn,
     RightNowPage: rightNowEn,
     ProfilePage: profileEn,
+    AnnouncementsPage: announcementsEn,
   },
 };
 

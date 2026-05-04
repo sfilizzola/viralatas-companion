@@ -1,12 +1,13 @@
 import { openDB, type IDBPDatabase } from 'idb';
-import type { Band, CrewUser, UserPick, UserPresence } from '../types';
+import type { Announcement, Band, CrewUser, UserPick, UserPresence } from '../types';
 
 const DB_NAME = 'viralatas-db';
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 
 export const PICKS_CHANGED_EVENT = 'viralatas:picks-changed';
 export const CREW_USERS_CHANGED_EVENT = 'viralatas:crew-users-changed';
 export const PRESENCE_CHANGED_EVENT = 'viralatas:presence-changed';
+export const ANNOUNCEMENTS_CHANGED_EVENT = 'viralatas:announcements-changed';
 
 type OfflinePickOp = {
   id: string;
@@ -50,6 +51,14 @@ type ViralatasDB = {
     key: string;
     value: OfflinePresenceOp;
   };
+  announcements: {
+    key: string;
+    value: Announcement;
+  };
+  pending_announcements: {
+    key: string;
+    value: Announcement;
+  };
 };
 
 let dbPromise: Promise<IDBPDatabase<ViralatasDB>> | null = null;
@@ -82,6 +91,12 @@ function getDB() {
         if (!db.objectStoreNames.contains('offline_presence')) {
           db.createObjectStore('offline_presence', { keyPath: 'id' });
         }
+        if (!db.objectStoreNames.contains('announcements')) {
+          db.createObjectStore('announcements', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('pending_announcements')) {
+          db.createObjectStore('pending_announcements', { keyPath: 'id' });
+        }
       },
     });
   }
@@ -103,6 +118,12 @@ function emitCrewUsersChanged() {
 function emitPresenceChanged() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(PRESENCE_CHANGED_EVENT));
+  }
+}
+
+function emitAnnouncementsChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(ANNOUNCEMENTS_CHANGED_EVENT));
   }
 }
 
@@ -239,4 +260,55 @@ export async function loadOfflinePresenceQueue(): Promise<OfflinePresenceOp[]> {
 export async function removeFromOfflinePresenceQueue(id: string) {
   const db = await getDB();
   await db.delete('offline_presence', id);
+}
+
+// --- Announcements ---
+
+export async function saveAnnouncements(announcements: Announcement[]) {
+  const db = await getDB();
+  const tx = db.transaction('announcements', 'readwrite');
+  await tx.store.clear();
+  await Promise.all(announcements.map((a) => tx.store.put(a)));
+  await tx.done;
+  emitAnnouncementsChanged();
+}
+
+export async function saveAnnouncement(announcement: Announcement) {
+  const db = await getDB();
+  await db.put('announcements', announcement);
+  emitAnnouncementsChanged();
+}
+
+export async function removeAnnouncementFromCache(id: string) {
+  const db = await getDB();
+  await db.delete('announcements', id);
+  emitAnnouncementsChanged();
+}
+
+export async function loadAnnouncementsFromCache(): Promise<Announcement[]> {
+  const db = await getDB();
+  const all = await db.getAll('announcements');
+  return all.sort((a, b) => b.created_at.localeCompare(a.created_at));
+}
+
+export async function loadLatestAnnouncement(): Promise<Announcement | undefined> {
+  const db = await getDB();
+  const all = await db.getAll('announcements');
+  if (all.length === 0) return undefined;
+  return all.reduce((latest, a) => (a.created_at > latest.created_at ? a : latest));
+}
+
+export async function enqueueOfflineAnnouncement(announcement: Announcement) {
+  const db = await getDB();
+  await db.put('pending_announcements', announcement);
+}
+
+export async function loadOfflineAnnouncementsQueue(): Promise<Announcement[]> {
+  const db = await getDB();
+  return db.getAll('pending_announcements');
+}
+
+export async function removeFromOfflineAnnouncementsQueue(id: string) {
+  const db = await getDB();
+  await db.delete('pending_announcements', id);
 }

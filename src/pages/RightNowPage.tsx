@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Band, CrewUser, UserPick, UserPresence } from '../types';
+import type { Announcement, Band, CrewUser, UserPick, UserPresence } from '../types';
 import {
+  ANNOUNCEMENTS_CHANGED_EVENT,
   CREW_USERS_CHANGED_EVENT,
   PICKS_CHANGED_EVENT,
   PRESENCE_CHANGED_EVENT,
@@ -8,6 +9,7 @@ import {
   loadAllUserPresence,
   loadBands,
   loadCrewUsers,
+  loadLatestAnnouncement,
   saveUserPresence,
 } from '../lib/db';
 import {
@@ -113,21 +115,24 @@ export default function RightNowPage() {
   const [picks, setPicks] = useState<UserPick[]>([]);
   const [crewUsers, setCrewUsers] = useState<CrewUser[]>([]);
   const [presence, setPresence] = useState<UserPresence[]>([]);
+  const [latestAnnouncement, setLatestAnnouncement] = useState<Announcement | null>(null);
   const [now, setNow] = useState(() => new Date());
   const [loading, setLoading] = useState(true);
 
   const refreshFromCache = useCallback(async () => {
     try {
-      const [cachedBands, cachedPicks, cachedUsers, cachedPresence] = await Promise.all([
+      const [cachedBands, cachedPicks, cachedUsers, cachedPresence, ann] = await Promise.all([
         loadBands(),
         loadAllUserPicks(),
         loadCrewUsers(),
         loadAllUserPresence(),
+        loadLatestAnnouncement(),
       ]);
       setBands(cachedBands.sort((a, b) => a.start_time.localeCompare(b.start_time)));
       setPicks(cachedPicks);
       setCrewUsers(cachedUsers);
       setPresence(cachedPresence);
+      setLatestAnnouncement(ann ?? null);
     } finally {
       setLoading(false);
     }
@@ -143,12 +148,14 @@ export default function RightNowPage() {
     window.addEventListener(PICKS_CHANGED_EVENT, handleCacheChange);
     window.addEventListener(CREW_USERS_CHANGED_EVENT, handleCacheChange);
     window.addEventListener(PRESENCE_CHANGED_EVENT, handleCacheChange);
+    window.addEventListener(ANNOUNCEMENTS_CHANGED_EVENT, handleCacheChange);
 
     return () => {
       window.clearInterval(tick);
       window.removeEventListener(PICKS_CHANGED_EVENT, handleCacheChange);
       window.removeEventListener(CREW_USERS_CHANGED_EVENT, handleCacheChange);
       window.removeEventListener(PRESENCE_CHANGED_EVENT, handleCacheChange);
+      window.removeEventListener(ANNOUNCEMENTS_CHANGED_EVENT, handleCacheChange);
     };
   }, [refreshFromCache]);
 
@@ -243,35 +250,45 @@ export default function RightNowPage() {
         ) : (
           <>
             <section className={styles.hero} aria-live="polite">
-              <div className={styles.heroImage}>
-                {myPlan.band?.image_url ? (
-                  <img src={myPlan.band.image_url} alt="" loading="lazy" />
-                ) : (
-                  <div className={styles.placeholder} aria-hidden>
-                    {myPlan.band?.name.charAt(0).toUpperCase() ?? 'V'}
+              {(myPlan.status === 'lost' || myPlan.status === 'empty') && latestAnnouncement ? (
+                <div className={styles.announcementHero}>
+                  <span className={styles.eyebrow}>{t('latestNews')}</span>
+                  <p className={styles.announcementContent}>{latestAnnouncement.content}</p>
+                </div>
+              ) : (
+                <>
+                  <div className={styles.heroImage}>
+                    {myPlan.band?.image_url ? (
+                      <img src={myPlan.band.image_url} alt="" loading="lazy" />
+                    ) : (
+                      <div className={styles.placeholder} aria-hidden>
+                        {myPlan.band?.name.charAt(0).toUpperCase() ?? 'V'}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-              <div>
-                <span className={styles.eyebrow}>{planLabel(myPlan, t)}</span>
-                {myPlan.band ? (
-                  <>
-                    <h1 className={styles.bandName}>{myPlan.band.name}</h1>
-                    <p className={styles.empty}>{planHint(myPlan, t)}</p>
-                    <div className={styles.meta}>
-                      <span className={styles.stage}>{myPlan.band.stage}</span>
-                      <span className={styles.time}>
-                        {formatFestivalTime(myPlan.band.start_time)} - {formatFestivalTime(myPlan.band.end_time)}
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <p className={styles.empty}>{planHint(myPlan, t)}</p>
-                )}
-                {myPlan.status === 'lost' && nextHint(myPlan, t) && (
-                  <p className={styles.nextHint}>{nextHint(myPlan, t)}</p>
-                )}
-              </div>
+                  <div>
+                    <span className={styles.eyebrow}>{planLabel(myPlan, t)}</span>
+                    {myPlan.band ? (
+                      <>
+                        <h1 className={styles.bandName}>{myPlan.band.name}</h1>
+                        <p className={styles.empty}>{planHint(myPlan, t)}</p>
+                        <div className={styles.meta}>
+                          <span className={styles.stage}>{myPlan.band.stage}</span>
+                          <span className={styles.time}>
+                            {formatFestivalTime(myPlan.band.start_time)} -{' '}
+                            {formatFestivalTime(myPlan.band.end_time)}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <p className={styles.empty}>{planHint(myPlan, t)}</p>
+                    )}
+                    {myPlan.status === 'lost' && nextHint(myPlan, t) && (
+                      <p className={styles.nextHint}>{nextHint(myPlan, t)}</p>
+                    )}
+                  </div>
+                </>
+              )}
             </section>
 
             <h2 className={styles.sectionTitle}>{t('crewNow')}</h2>

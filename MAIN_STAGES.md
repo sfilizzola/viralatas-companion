@@ -105,17 +105,17 @@ user picks band
 
 ---
 
-### Phase 4 — Live preview `[CURRENT]`
+### Phase 4 — Live preview `[DONE]`
 
 **Goal:** At any moment during the festival, a user can see where they planned to be and where the crew is right now.
 
 **Deliverables:**
 
-- [ ] "Right now" screen — hero card showing the band the current user should be watching based on their picks and current time
-- [ ] If no pick overlaps current time: show next upcoming pick
-- [ ] Crew grid: one tile per crew member, showing their current or next band
-- [ ] All logic runs from cached picks + schedule — no network required
-- [ ] Make an importable lineup file so final adjusted bands, stages, and times are easy to update and reseed; previous test picks may be erased when this runs.
+- [x] "Right now" screen — hero card showing the band the current user should be watching based on their picks and current time
+- [x] If no pick overlaps current time: show next upcoming pick
+- [x] Crew grid: one tile per crew member, showing their current or next band
+- [x] All logic runs from cached picks + schedule — no network required
+- [x] Make an importable lineup file so final adjusted bands, stages, and times are easy to update and reseed; previous test picks may be erased when this runs.
 
 **Time logic:**
 ```typescript
@@ -131,7 +131,7 @@ user picks band
 
 ---
 
-### Phase 4B — Camping / LOST live state `[CURRENT]`
+### Phase 4B — Camping / LOST live state `[DONE]`
 
 **Goal:** The live view is the first thing crew members see, with a quick way to say they are at camping.
 
@@ -153,7 +153,103 @@ user picks band
 
 ---
 
-### Phase 5 — LLM proactive alerts
+### Phase 5 — Announcements & user roles
+
+**Goal:** Give the crew a mural-style board for big crew-wide messages, with a simple trust hierarchy so managers can moderate.
+
+---
+
+**User roles**
+
+| Role | Who | Powers |
+|---|---|---|
+| `normal` | Everyone by default | Post announcements |
+| `manager` | Promoted by godlike | Delete any announcement; block/unblock users from posting |
+| `godlike` | `sfilizzola@gmail.com` only (hard-coded) | All manager powers + promote/demote managers |
+
+Role is stored in the `users` table (`role` column, enum `normal / manager / godlike`). The `godlike` role is seeded at first-login and cannot be granted or revoked through the UI — only through a migration or seed script.
+
+---
+
+**Schema additions**
+
+```sql
+-- add to users table
+ALTER TABLE users ADD COLUMN role TEXT NOT NULL DEFAULT 'normal'
+  CHECK (role IN ('normal', 'manager', 'godlike'));
+
+-- announcements mural
+CREATE TABLE announcements (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  author_id   UUID NOT NULL REFERENCES users(id),
+  content     TEXT NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  deleted_at  TIMESTAMPTZ               -- soft-delete; managers / godlike set this
+);
+
+-- per-user posting block
+CREATE TABLE blocked_posters (
+  user_id     UUID PRIMARY KEY REFERENCES users(id),
+  blocked_by  UUID NOT NULL REFERENCES users(id),
+  blocked_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+```
+
+Row-level security:
+- Any authenticated user can INSERT into `announcements` unless their `user_id` is in `blocked_posters`
+- Only `manager` / `godlike` can set `deleted_at` on any row (soft-delete)
+- `blocked_posters` inserts/deletes require `manager` or `godlike`
+- `users.role` can only be updated by `godlike` (enforced via RLS policy checking caller's role)
+
+---
+
+**Deliverables**
+
+- [ ] Migration: `role` column on `users`, `announcements` table, `blocked_posters` table, RLS policies
+- [ ] Seed: set `role = 'godlike'` for `sfilizzola@gmail.com` on every upsert (trigger or seed script)
+- [ ] Announcements page (`/announcements`): full-width mural cards, large text, newest-first
+- [ ] Post box at the top of the mural: large textarea, submit button; hidden if user is blocked
+- [ ] Delete button on each card visible only to `manager` / `godlike` (soft-delete sets `deleted_at`)
+- [ ] Offline-first: announcements written to IndexedDB on fetch; new posts queued if offline and flushed on reconnect (same pattern as picks)
+- [ ] Supabase Realtime subscription on `announcements` — new and deleted announcements propagate live
+- [ ] Profile page — godlike section: searchable list of registered users with a toggle to promote/demote to `manager`
+- [ ] Profile page — manager section: list of currently blocked users with an unblock button
+- [ ] Live page: replace the "LOST / Lost at camp…" static card header with the most recent non-deleted announcement card (falls back to the LOST card if no announcements exist)
+
+---
+
+**Offline behaviour**
+
+```
+fetch announcements on load
+  → cache full list in IndexedDB (keyed by created_at DESC)
+  → display from cache when offline
+
+post announcement
+  → if online: write to Supabase immediately
+  → if offline: queue in IndexedDB pending-posts store
+  → on reconnect: flush queue in order, then pull latest
+
+delete announcement (managers / godlike)
+  → optimistic soft-delete in local cache
+  → sync to Supabase when online
+```
+
+---
+
+**Acceptance criteria**
+
+- Any logged-in, non-blocked user can post; message appears immediately for all online users
+- A manager can delete any announcement; it disappears for all clients within 3 s
+- A blocked user sees no post box and cannot post (enforced client-side and RLS)
+- Godlike profile section shows all registered users; promoting to manager works immediately
+- `/announcements` renders from IndexedDB with no network after first load
+- Live page shows the latest announcement instead of the LOST card header when at least one announcement exists
+- Soft-deleted announcements never reappear after a cache refresh
+
+---
+
+### Phase 6 — LLM proactive alerts
 
 **Goal:** Claude proactively taps the crew on the shoulder at key festival moments. No user needs to ask — the app just knows.
 
@@ -232,7 +328,7 @@ Regras:
 
 ---
 
-### Phase 6 — Polish and pre-festival
+### Phase 7 — Polish and pre-festival
 
 **Goal:** Production-ready. Installable. Dark. Fast.
 

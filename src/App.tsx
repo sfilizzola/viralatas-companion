@@ -7,12 +7,14 @@ import SchedulePage from './pages/SchedulePage';
 import MyPicksPage from './pages/MyPicksPage';
 import PopularPage from './pages/PopularPage';
 import RightNowPage from './pages/RightNowPage';
+import AnnouncementsPage from './pages/AnnouncementsPage';
 import PrivateRoute from './components/PrivateRoute';
 import { useAuth } from './hooks/useAuth';
 import { syncBands } from './lib/sync';
 import { flushOfflineQueue, syncCrewPicks } from './lib/picks';
 import { syncCrewUsers } from './lib/users';
 import { flushPresenceQueue, syncCrewPresence } from './lib/presence';
+import { flushPendingAnnouncements, syncAnnouncements } from './lib/announcements';
 
 function BandSync() {
   const { session } = useAuth();
@@ -53,11 +55,37 @@ function PickSync() {
   return null;
 }
 
+function AnnouncementSync() {
+  const { session } = useAuth();
+  const userId = session?.user?.id;
+
+  useEffect(() => {
+    if (!userId) return;
+
+    async function syncNow() {
+      await flushPendingAnnouncements();
+      await syncAnnouncements();
+    }
+
+    syncNow().catch(() => {});
+
+    function handleOnline() {
+      syncNow().catch(() => {});
+    }
+
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [userId]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <BandSync />
       <PickSync />
+      <AnnouncementSync />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -90,6 +118,14 @@ export default function App() {
           element={
             <PrivateRoute>
               <RightNowPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/announcements"
+          element={
+            <PrivateRoute>
+              <AnnouncementsPage />
             </PrivateRoute>
           }
         />

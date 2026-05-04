@@ -1,0 +1,16 @@
+{
+  "title": "Mural",
+  "placeholder": "Write a message for the crew...",
+  "post": "Post",
+  "posting": "Posting...",
+  "blocked": "You have been blocked from posting.",
+  "empty": "No messages yet. Be the first!",
+  "loading": "Loading mural...",
+  "delete": "Delete",
+  "deleteConfirm": "Delete this message?",
+  "justNow": "just now",
+  "minutesAgo": "{n}min ago",
+  "hoursAgo": "{n}h ago",
+  "daysAgo": "{n}d ago",
+  "anonymous": "Crew member"
+}

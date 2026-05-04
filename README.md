@@ -139,6 +139,16 @@ Delete only those disposable users:
 npm run seed:test-users:delete
 ```
 
+## Live Preview Fixture
+
+To test the "Right now" screen with the real lineup while the festival is not actually happening, shift a handful of bands around the current device time:
+
+```sh
+npm run seed:live-now
+```
+
+This reseeds `bands`, which cascades and replaces `user_picks`. If disposable test users already exist, it also gives them deterministic current, next, camping, and lost states for the live crew view.
+
 ## Available Scripts
 
 ```sh
@@ -147,6 +157,7 @@ npm run build    # Type-check and build production assets
 npm run preview  # Preview the production build locally
 npm run lint     # Run ESLint
 npm run seed:bands
+npm run seed:live-now
 npm run seed:test-users
 npm run seed:test-users:delete
 ```

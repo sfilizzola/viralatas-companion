@@ -1,24 +1,19 @@
-# CURRENT_STAGE.md — Phase 4B: Camping / LOST live state
+# CURRENT_STAGE.md — Phase 5: Announcements & user roles
 
-**Goal:** The live view is the first thing crew members see, with live band cards first, then a fun Camping card, then a fun `LOST` card.  
-**Status:** Phase 4B implemented. Manual Airplane Mode run-through and live two-device Supabase verification are still recommended.
+**Goal:** Mural-style board for big crew-wide messages with a three-tier trust hierarchy (normal / manager / godlike).  
+**Status:** Scaffold complete — migration, types, DB stores, data layer, and page all created. Run the migration and test the full flow.
 
 ---
 
-## Phase 4 acceptance criteria (from MAIN_STAGES.md)
+## Acceptance criteria
 
-- [x] "Right now" screen is accurate to current device time
-- [x] Works in Airplane Mode after prior sync
-- [x] Crew grid updates automatically as time passes (no manual refresh)
-
-## Phase 4B acceptance criteria
-
-- [x] Login/register sends the user to `/now`
-- [x] Camping switch works offline and flushes on reconnect
-- [x] A user with camping enabled and no current band appears in the Camping card
-- [x] A user with camping disabled and no current band appears as `LOST` in the live view
-- [x] A current picked band overrides camping and turns camping off
-- [x] Multiple live picked bands render as separate cards before Camping and `LOST`
+- [ ] Any logged-in, non-blocked user can post; message appears immediately for all online users
+- [ ] A manager can delete any announcement; it disappears for all clients within 3 s
+- [ ] A blocked user sees no post box and cannot post (enforced client-side and by RLS)
+- [ ] Godlike profile section shows all registered users; promoting to manager works immediately
+- [ ] `/announcements` renders from IndexedDB with no network after first load
+- [ ] Live page shows the latest announcement in the hero when the user is in "lost" or "empty" state
+- [ ] Soft-deleted announcements never reappear after a cache refresh
 
 ---
 
@@ -26,44 +21,77 @@
 
 | # | Task | Status |
 |---|---|---|
-| 1 | "Right now" screen hero for current user's current/next picked band | Done |
-| 2 | If no current pick overlaps device time, show next upcoming pick | Done |
-| 3 | Crew grid showing each member's current/next band | Done |
-| 4 | All logic reads cached `bands`, `user_picks`, and `crew_users` from IndexedDB | Done |
-| 5 | Importable lineup source for final schedule updates and test-data reset | Done |
-| 6 | Authenticated landing page opens the live view | Done |
-| 7 | Offline-first camping presence cache and sync | Done |
-| 8 | Live state cards ordered as band(s), Camping, then `LOST` | Done |
+| 1 | Migration: `role` column, `announcements` table, `blocked_posters` table, RLS, RPC | Done |
+| 2 | `users.role` seeded as `godlike` for sfilizzola@gmail.com (migration + handle_new_user trigger) | Done |
+| 3 | `src/types/index.ts` — `UserRole`, `Announcement`, `BlockedPoster`, updated `User` | Done |
+| 4 | `src/lib/supabase.types.ts` — new tables and role column | Done |
+| 5 | `src/lib/db.ts` — version 5; `announcements` + `pending_announcements` IDB stores | Done |
+| 6 | `src/lib/announcements.ts` — full data layer (sync, post, delete, flush, role, block, setRole) | Done |
+| 7 | `src/pages/AnnouncementsPage.tsx` — mural UI with post box, cards, delete for managers | Done |
+| 8 | `src/pages/AnnouncementsPage.module.css` — mural styles | Done |
+| 9 | `src/lib/i18n.ts` — `AnnouncementsPage` added to registry | Done |
+| 10 | i18n: `AnnouncementsPage_br.json`, `AnnouncementsPage_en.json` | Done |
+| 11 | `src/components/BottomNav.tsx` — Mural tab added | Done |
+| 12 | `src/App.tsx` — `/announcements` route + `AnnouncementSync` component | Done |
+| 13 | `src/pages/RightNowPage.tsx` — latest announcement shown in hero when lost/empty | Done |
+| 14 | Profile page — godlike section: promote/demote managers | **Pending** |
+| 15 | Profile page — manager section: view and unblock blocked users | **Pending** |
+
+Items 14 and 15 extend `ProfilePage.tsx`. The data layer functions (`setUserRole`, `blockUser`, `unblockUser`, `fetchAllUsers`, `fetchBlockedPosters`) are already in `src/lib/announcements.ts`.
 
 ---
 
-## Time logic
+## Files created / modified this phase
 
-```typescript
-// Current band = pick whose startTime <= now < endTime
-// Next band = pick with earliest startTime > now
-// If multiple overlapping picks: show the one with latest startTime (most recently started)
-```
+### New files
+- `supabase/migrations/20260504000004_phase5_announcements.sql`
+- `src/lib/announcements.ts`
+- `src/pages/AnnouncementsPage.tsx`
+- `src/pages/AnnouncementsPage.module.css`
+- `src/i18n/AnnouncementsPage_br.json`
+- `src/i18n/AnnouncementsPage_en.json`
 
----
-
-## Files to create / modify
-
-### New files expected
-- `src/lib/livePreview.ts` — pure current/next pick logic from cached schedule + picks
-- `src/pages/RightNowPage.tsx` — "Right now" screen
-- `src/pages/RightNowPage.module.css` — live preview layout
-
-### Files to modify
-- `src/components/BottomNav.tsx` — add "Agora" tab
-- `src/App.tsx` — add `/now` route
-- `supabase/seed/bands.ts` — export lineup data so the schedule can be updated/imported safely
+### Modified files
+- `src/types/index.ts` — added `UserRole`, `Announcement`, `BlockedPoster`; updated `User`
+- `src/lib/supabase.types.ts` — added `announcements`, `blocked_posters`; added `role` to `users`
+- `src/lib/db.ts` — version 4 → 5; new stores + CRUD helpers
+- `src/lib/i18n.ts` — `AnnouncementsPage` added to `TranslationFile` union and translations map
+- `src/App.tsx` — `/announcements` route + `AnnouncementSync`
+- `src/components/BottomNav.tsx` — Mural tab
+- `src/i18n/BottomNav_br.json` / `BottomNav_en.json` — `mural` key
+- `src/pages/RightNowPage.tsx` — latest announcement in lost/empty hero
+- `src/pages/RightNowPage.module.css` — announcement hero card styles
+- `src/i18n/RightNowPage_br.json` / `RightNowPage_en.json` — `latestNews` key
 
 ---
 
 ## Offline contract
 
-- `RightNowPage` must render from IndexedDB only after initial sync.
-- Time updates happen locally with `setInterval`; no network refresh is required.
-- Realtime/pick sync may improve cached freshness, but the live preview cannot depend on it.
-- Camping presence is cached in IndexedDB first and synced to `user_presence` when online.
+```
+Fetch announcements on load
+  → cache full list in IndexedDB announcements store (newest first)
+  → display from cache when offline
+
+Post announcement
+  → if online: write to Supabase; server ID lands via Realtime INSERT
+  → if offline: save with local UUID to announcements + pending_announcements
+  → on reconnect: flushPendingAnnouncements() → syncAnnouncements() corrects IDs
+
+Delete announcement (managers / godlike)
+  → optimistic remove from IDB immediately
+  → supabase UPDATE deleted_at when online
+  → Realtime UPDATE event removes from other clients' caches
+```
+
+---
+
+## Step to run after pulling
+
+```bash
+supabase db push   # or paste migration into Supabase SQL editor
+```
+
+Then verify:
+1. `users` table has a `role` column; your row shows `godlike`
+2. `announcements` and `blocked_posters` tables exist
+3. `set_user_role` RPC appears in Supabase Functions

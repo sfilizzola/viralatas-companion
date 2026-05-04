@@ -11,6 +11,7 @@ export type Database = {
           avatar_url: string | null;
           preferred_language: 'br' | 'en';
           is_test_user: boolean;
+          role: 'normal' | 'manager' | 'godlike';
           created_at: string;
         };
         Insert: {
@@ -20,6 +21,7 @@ export type Database = {
           avatar_url?: string | null;
           preferred_language?: 'br' | 'en';
           is_test_user?: boolean;
+          role?: 'normal' | 'manager' | 'godlike';
           created_at?: string;
         };
         Update: {
@@ -29,6 +31,7 @@ export type Database = {
           avatar_url?: string | null;
           preferred_language?: 'br' | 'en';
           is_test_user?: boolean;
+          role?: 'normal' | 'manager' | 'godlike';
           created_at?: string;
         };
         Relationships: [];
@@ -99,9 +102,56 @@ export type Database = {
         };
         Relationships: [];
       };
+      announcements: {
+        Row: {
+          id: string;
+          author_id: string;
+          content: string;
+          created_at: string;
+          deleted_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          author_id: string;
+          content: string;
+          created_at?: string;
+          deleted_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          author_id?: string;
+          content?: string;
+          created_at?: string;
+          deleted_at?: string | null;
+        };
+        Relationships: [];
+      };
+      blocked_posters: {
+        Row: {
+          user_id: string;
+          blocked_by: string;
+          blocked_at: string;
+        };
+        Insert: {
+          user_id: string;
+          blocked_by: string;
+          blocked_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          blocked_by?: string;
+          blocked_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      set_user_role: {
+        Args: { target_user_id: string; new_role: string };
+        Returns: void;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

@@ -1,0 +1,16 @@
+{
+  "title": "Mural",
+  "placeholder": "Escreva um recado para a crew...",
+  "post": "Postar",
+  "posting": "Postando...",
+  "blocked": "Voce foi bloqueado de postar no mural.",
+  "empty": "Nenhum recado no mural ainda. Seja o primeiro!",
+  "loading": "Carregando mural...",
+  "delete": "Apagar",
+  "deleteConfirm": "Apagar este recado?",
+  "justNow": "agora mesmo",
+  "minutesAgo": "ha {n} min",
+  "hoursAgo": "ha {n}h",
+  "daysAgo": "ha {n}d",
+  "anonymous": "Tripulante"
+}
