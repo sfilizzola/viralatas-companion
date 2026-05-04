@@ -43,6 +43,41 @@ Comprehensive unit test suite created to prevent breaking changes in user authen
 
 ---
 
+## Critical Production Bug Found & Fixed ⚠️
+
+### Issue 0: Database Trigger Boolean Coercion (CRITICAL)
+
+**This explains the "Database error saving new user" issue.**
+
+**Problem:** The `handle_new_user()` trigger was failing silently when `is_test_user` wasn't in signup metadata.
+
+```sql
+-- BROKEN:
+new.raw_user_meta_data->>'is_test_user' = 'true'  
+-- When field missing: null = 'true' → null (violates NOT NULL constraint!)
+```
+
+**Impact:**
+1. Auth user created successfully
+2. Trigger tries to create profile in users table
+3. Trigger fails silently (null constraint violation)
+4. RegisterPage polls for user profile, finds nothing
+5. User gets "User profile creation failed" error
+
+**Fix Applied:**
+```sql
+-- FIXED:
+coalesce(new.raw_user_meta_data->>'is_test_user' = 'true', false)
+-- When field missing: null → coalesce → false ✓
+```
+
+**Action Required:**
+1. Apply new migration: `supabase/migrations/20260504000005_fix_handle_new_user_trigger.sql`
+2. Test registration in staging
+3. Deploy to production
+
+---
+
 ## Key Issues Identified & Fixed
 
 ### Issue 1: Race Condition in RegisterPage
@@ -269,16 +304,17 @@ npm test:coverage
 
 Before deploying, verify:
 
-- [ ] All 92 tests pass: `npm test -- --run`
+- [ ] All 97 tests pass: `npm test -- --run`
 - [ ] Build succeeds: `npm run build`
 - [ ] No TypeScript errors: `npm run build`
 - [ ] Lint passes: `npm run lint`
+- [ ] **Apply migration 20260504000005** in production (fixes is_test_user bug)
 - [ ] Test user seeding works: `npm run seed:test-users`
-- [ ] Migration applied in production Supabase project
-- [ ] `handle_new_user` trigger verified in Supabase dashboard
-- [ ] User registration works end-to-end in staging
+- [ ] User registration works end-to-end in staging (multiple attempts)
 - [ ] User login works end-to-end in staging
 - [ ] Godlike user role assignment verified for sfilizzola@gmail.com
+- [ ] Monitor server logs after deploy for "User profile creation failed" errors
+- [ ] Test registration with various network conditions (slow network, offline then online)
 
 ---
 
