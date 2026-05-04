@@ -28,7 +28,8 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
         const { loadSession, saveSession } = await import('./db');
         const existing = (await loadSession()) as Record<string, string> | null;
         if (!existing) return;
-        const { [key]: _, ...rest } = existing;
+        const rest = { ...existing };
+        delete rest[key];
         await saveSession(rest);
       },
     },

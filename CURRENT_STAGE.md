@@ -1,15 +1,15 @@
-# CURRENT_STAGE.md — Phase 2: Band Schedule
+# CURRENT_STAGE.md — Phase 3: Picks and social counts
 
-**Goal:** The full Wacken lineup is in the app and browsable offline.  
-**Status:** Complete. Moving to Phase 3.
+**Goal:** Users pick bands. The crew can see who's going where. Live counts update in real time.  
+**Status:** Implementation complete. Live two-device Supabase verification still recommended.
 
 ---
 
-## Phase 2 acceptance criteria (from MAIN_STAGES.md)
+## Phase 3 acceptance criteria (from MAIN_STAGES.md)
 
-- [x] All bands visible in schedule view
-- [x] Filtering works without network
-- [x] Images are cached (precached or lazy-cached by Service Worker)
+- [x] Picking a band on one device reflects within 3 seconds on another (Realtime path implemented)
+- [x] Picking while offline queues correctly and syncs on reconnect (queue + `online` flush implemented)
+- [x] Pick count never goes negative (counts derive from cached rows)
 
 ---
 
@@ -17,44 +17,72 @@
 
 | # | Task | Status |
 |---|---|---|
-| 1 | Seed script `supabase/seed/bands.ts` — 77 Wacken 2026 bands | Done |
-| 2 | Schedule view — band cards with name, image placeholder, stage badge, start/end time | Done |
-| 3 | Filter bar — by stage, by day, by "próximas bandas" (upcoming) | Done |
-| 4 | On first authenticated load, write full band list to IndexedDB via `syncBands()` | Done |
-| 5 | Schedule renders from IndexedDB — works offline after first sync | Done |
+| 1 | Tap band card to toggle pick on/off | Done |
+| 2 | Pick written to IndexedDB immediately (optimistic) | Done |
+| 3 | Pick synced to `user_picks` in Supabase when online | Done |
+| 4 | Offline pick queue — unpersisted picks flushed on reconnect | Done |
+| 5 | Supabase Realtime subscription on `user_picks` → update local pick counts | Done |
+| 6 | Each band card shows "X going" count | Done |
+| 7 | "My picks" view — filtered list of current user's picks | Done |
+| 8 | "Most popular" view — bands sorted by total crew picks, live-updated | Done |
 
 ---
 
-## What was built
+## Realtime architecture
 
-### New files
-- `supabase/seed/bands.ts` — seed script; run with `npx tsx supabase/seed/bands.ts` (needs `SUPABASE_SERVICE_ROLE_KEY`)
-- `src/lib/sync.ts` — `syncBands()` fetches from Supabase and writes to IndexedDB
-- `src/pages/SchedulePage.tsx` + `SchedulePage.module.css` — band list with filter bar
-- `src/components/BottomNav.tsx` + `BottomNav.module.css` — bottom tab nav (Agenda / Perfil)
-
-### Modified files
-- `src/App.tsx` — added `/schedule` route, `BandSync` component (calls `syncBands()` on auth), default redirect now goes to `/schedule`
-- `src/pages/ProfilePage.tsx` — added `BottomNav`
-- `vite.config.ts` — added `CacheFirst` Workbox rule for images (30-day expiry, 200 entries)
+```
+user picks band
+  → write IndexedDB (instant)
+  → if online: write Supabase user_picks
+  → Supabase broadcasts change via Realtime
+  → all connected clients update their local count
+```
 
 ---
 
-## Seed data notes
+## Files to create / modify
 
-- 77 bands across 3 festival days (Thu 30 Jul, Fri 31 Jul, Sat 1 Aug 2026)
-- 4 stages: W:STAGE, HARDER STAGE, LOUDER STAGE, FASTER STAGE
-- Stage times and assignments are **placeholder** — update seed when official running order drops
-- Image URLs are `null` — fill in from wacken.com once schedule is published
-- Run `npx tsx supabase/seed/bands.ts` to (re)seed; destructive, deletes all bands first
+### New files expected
+- `src/lib/picks.ts` — toggle pick (IndexedDB write + Supabase sync), offline queue flush logic
+- `src/hooks/usePickCounts.ts` — Supabase Realtime subscription, keeps per-band pick counts in memory
+- `src/pages/MyPicksPage.tsx` — "My picks" view
+- `src/pages/PopularPage.tsx` — "Most popular" view (or tab within SchedulePage)
+
+### Files to modify
+- `src/lib/db.ts` — add `user_picks` store to IndexedDB schema; add offline queue store
+- `src/pages/SchedulePage.tsx` — wire pick toggle on card tap; render "X going" badge
+- `src/components/BottomNav.tsx` — add "Meus picks" / "Popular" tabs as needed
+- `src/App.tsx` — add routes for new views; subscribe to Realtime on mount
 
 ---
 
-## Ready to move to Phase 3?
+## Offline queue contract
 
-Phase 3 deliverables:
-- Tap a band card to toggle pick on/off
-- Picks written to IndexedDB immediately (optimistic) and synced to Supabase
-- Offline pick queue flushed on reconnect
-- Supabase Realtime subscription → live "X going" count on each card
-- "My picks" and "Most popular" views
+Picks made offline are stored in an `offline_picks` IndexedDB store:
+
+```typescript
+type OfflinePick = {
+  id: string;           // uuid generated locally
+  user_id: string;
+  band_id: string;
+  action: 'add' | 'remove';
+  created_at: string;   // ISO 8601
+};
+```
+
+On reconnect, flush queue in order. Last write wins per `(userId, bandId)` pair — collapse redundant add/remove pairs before sending.
+
+---
+
+## Supabase Realtime notes
+
+- Subscribe to `user_picks` table with `postgres_changes` event (`INSERT` + `DELETE`)
+- Update in-memory pick count map; re-render affected band cards
+- Do not re-fetch full table on each change — apply delta from the event payload
+
+---
+
+## What Phase 4 needs from this phase
+
+- Pick data reliably in IndexedDB (Phase 4 "right now" logic reads from there)
+- `syncBands()` already in place from Phase 2 — picks sync must follow the same pattern

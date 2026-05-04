@@ -90,14 +90,21 @@
 
 .card {
   display: flex;
+  align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border);
   transition: background 0.1s;
+  cursor: pointer;
 }
 
 .card:active {
   background: var(--bg-elevated);
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }
 
 .cardImage {
@@ -170,6 +177,43 @@
   font-size: 0.8rem;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
+}
+
+/* ── Pick button ─────────────────────────────────────────────── */
+
+.pickBtn {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  transition: color 0.15s, background 0.15s;
+}
+
+.pickBtn:hover {
+  color: var(--text);
+  background: var(--bg-elevated);
+}
+
+.pickBtnActive {
+  color: var(--accent-hover);
+}
+
+.pickBtnActive:hover {
+  color: var(--accent-hover);
+}
+
+/* ── Going count badge ───────────────────────────────────────── */
+
+.goingCount {
+  font-size: 0.7rem;
+  color: var(--accent-hover);
+  font-weight: 600;
 }
 
 /* ── Spacer so last card isn't hidden behind nav ─────────────── */

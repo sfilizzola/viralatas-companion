@@ -2,7 +2,9 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { Band, UserPick } from '../types';
 
 const DB_NAME = 'viralatas-db';
-const DB_VERSION = 1;
+const DB_VERSION = 2;
+
+export const PICKS_CHANGED_EVENT = 'viralatas:picks-changed';
 
 type OfflinePickOp = {
   id: string;
@@ -26,7 +28,7 @@ type ViralatasDB = {
     value: UserPick;
     indexes: { by_user: string };
   };
-  offline_queue: {
+  offline_picks: {
     key: string;
     value: OfflinePickOp;
   };
@@ -38,17 +40,31 @@ function getDB() {
   if (!dbPromise) {
     dbPromise = openDB<ViralatasDB>(DB_NAME, DB_VERSION, {
       upgrade(db) {
-        db.createObjectStore('session');
-        db.createObjectStore('bands', { keyPath: 'id' });
-        const picksStore = db.createObjectStore('user_picks', {
-          keyPath: ['user_id', 'band_id'],
-        });
-        picksStore.createIndex('by_user', 'user_id');
-        db.createObjectStore('offline_queue', { keyPath: 'id' });
+        if (!db.objectStoreNames.contains('session')) {
+          db.createObjectStore('session');
+        }
+        if (!db.objectStoreNames.contains('bands')) {
+          db.createObjectStore('bands', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('user_picks')) {
+          const picksStore = db.createObjectStore('user_picks', {
+            keyPath: ['user_id', 'band_id'],
+          });
+          picksStore.createIndex('by_user', 'user_id');
+        }
+        if (!db.objectStoreNames.contains('offline_picks')) {
+          db.createObjectStore('offline_picks', { keyPath: 'id' });
+        }
       },
     });
   }
   return dbPromise;
+}
+
+function emitPicksChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(PICKS_CHANGED_EVENT));
+  }
 }
 
 export async function saveSession(session: unknown) {
@@ -81,11 +97,13 @@ export async function loadBands(): Promise<Band[]> {
 export async function saveUserPick(pick: UserPick) {
   const db = await getDB();
   await db.put('user_picks', pick);
+  emitPicksChanged();
 }
 
 export async function removeUserPick(userId: string, bandId: string) {
   const db = await getDB();
   await db.delete('user_picks', [userId, bandId]);
+  emitPicksChanged();
 }
 
 export async function loadUserPicks(userId: string): Promise<UserPick[]> {
@@ -93,17 +111,36 @@ export async function loadUserPicks(userId: string): Promise<UserPick[]> {
   return db.getAllFromIndex('user_picks', 'by_user', userId);
 }
 
+export async function loadAllUserPicks(): Promise<UserPick[]> {
+  const db = await getDB();
+  return db.getAll('user_picks');
+}
+
+export async function replaceUserPicks(picks: UserPick[], userId?: string) {
+  const db = await getDB();
+  const tx = db.transaction('user_picks', 'readwrite');
+  if (userId) {
+    const existing = await tx.store.index('by_user').getAll(userId);
+    await Promise.all(existing.map((pick) => tx.store.delete([pick.user_id, pick.band_id])));
+  } else {
+    await tx.store.clear();
+  }
+  await Promise.all(picks.map((pick) => tx.store.put(pick)));
+  await tx.done;
+  emitPicksChanged();
+}
+
 export async function enqueueOfflinePick(op: OfflinePickOp) {
   const db = await getDB();
-  await db.put('offline_queue', op);
+  await db.put('offline_picks', op);
 }
 
 export async function loadOfflineQueue(): Promise<OfflinePickOp[]> {
   const db = await getDB();
-  return db.getAll('offline_queue');
+  return db.getAll('offline_picks');
 }
 
 export async function removeFromOfflineQueue(id: string) {
   const db = await getDB();
-  await db.delete('offline_queue', id);
+  await db.delete('offline_picks', id);
 }

@@ -42,17 +42,17 @@ Works fully offline after first load. LLM features (Claude API) sync opportunist
 
 ---
 
-### Phase 2 — Band schedule `[CURRENT]`
+### Phase 2 — Band schedule `[DONE]`
 
 **Goal:** The full Wacken lineup is in the app and browsable offline.
 
 **Deliverables:**
 
-- [ ] `bands` table seeded via import script (`supabase/seed/bands.ts`)
-- [ ] Schedule view: cards with band name, image, stage badge, start/end time
-- [ ] Filter bar: by stage, by day, by time window
-- [ ] On first authenticated load, full band list written to IndexedDB
-- [ ] Schedule renders from IndexedDB — works offline after first sync
+- [x] `bands` table seeded via import script (`supabase/seed/bands.ts`)
+- [x] Schedule view: cards with band name, image, stage badge, start/end time
+- [x] Filter bar: by stage, by day, by time window
+- [x] On first authenticated load, full band list written to IndexedDB
+- [x] Schedule renders from IndexedDB — works offline after first sync
 
 **Data shape per band:**
 ```typescript
@@ -74,20 +74,20 @@ type Band = {
 
 ---
 
-### Phase 3 — Picks and social counts
+### Phase 3 — Picks and social counts `[CURRENT]`
 
 **Goal:** Users pick bands. The crew can see who's going where. Live counts update in real time.
 
 **Deliverables:**
 
-- [ ] Tap a band card to toggle pick on/off
-- [ ] Pick written to IndexedDB immediately (optimistic)
-- [ ] Pick synced to `user_picks` in Supabase when online
-- [ ] Offline pick queue: unpersisted picks flushed on reconnect
-- [ ] Supabase Realtime subscription on `user_picks` → updates local band pick counts
-- [ ] Each band card shows count: "X going"
-- [ ] "Most popular" view: bands sorted by total crew picks, live-updated
-- [ ] "My picks" view: filtered list of the current user's picks
+- [x] Tap a band card to toggle pick on/off
+- [x] Pick written to IndexedDB immediately (optimistic)
+- [x] Pick synced to `user_picks` in Supabase when online
+- [x] Offline pick queue: unpersisted picks flushed on reconnect
+- [x] Supabase Realtime subscription on `user_picks` → updates local band pick counts
+- [x] Each band card shows count: "X going"
+- [x] "Most popular" view: bands sorted by total crew picks, live-updated
+- [x] "My picks" view: filtered list of the current user's picks
 
 **Realtime architecture:**
 ```
