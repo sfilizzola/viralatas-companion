@@ -1,16 +1,30 @@
-import type { Band, CrewUser, UserPick } from '../types';
+import type { Band, CrewUser, UserPick, UserPresence } from '../types';
 
-export type LivePlanStatus = 'current' | 'next' | 'empty';
+export type LivePlanStatus = 'current' | 'next' | 'empty' | 'lost';
 
 export type LivePlan = {
   status: LivePlanStatus;
   band: Band | null;
+  nextBand?: Band | null;
 };
 
 export type CrewLivePlan = CrewUser & {
   label: string;
   plan: LivePlan;
+  isCamping: boolean;
 };
+
+export type CrewLiveGroup =
+  | {
+      kind: 'band';
+      band: Band;
+      members: CrewLivePlan[];
+    }
+  | {
+      kind: 'camping' | 'lost';
+      band: null;
+      members: CrewLivePlan[];
+    };
 
 export function findLivePlan(bands: Band[], pickedBandIds: Set<string>, now: Date): LivePlan {
   const pickedBands = bands
@@ -29,10 +43,19 @@ export function findLivePlan(bands: Band[], pickedBandIds: Set<string>, now: Dat
   return { status: 'empty', band: null };
 }
 
+export function applyPresenceToLivePlan(plan: LivePlan, isCamping: boolean): LivePlan {
+  if (plan.status === 'current') return plan;
+  if (isCamping || plan.status === 'next') {
+    return { status: 'lost', band: null, nextBand: plan.band };
+  }
+  return { status: 'lost', band: null, nextBand: null };
+}
+
 export function mapCrewLivePlans(
   bands: Band[],
   picks: UserPick[],
   users: CrewUser[],
+  presence: UserPresence[],
   now: Date,
 ): CrewLivePlan[] {
   const picksByUser = new Map<string, Set<string>>();
@@ -49,19 +72,77 @@ export function mapCrewLivePlans(
     }
   }
 
+  const presenceByUser = new Map(presence.map((item) => [item.user_id, item]));
+  for (const item of presenceByUser.values()) {
+    if (!usersById.has(item.user_id)) {
+      usersById.set(item.user_id, { id: item.user_id, display_name: null, avatar_url: null });
+    }
+  }
+
   return [...usersById.values()]
-    .map((user) => ({
-      ...user,
-      label: user.display_name?.trim() || `Crew ${user.id.slice(0, 4).toUpperCase()}`,
-      plan: findLivePlan(bands, picksByUser.get(user.id) ?? new Set(), now),
-    }))
+    .map((user) => {
+      const isCamping = presenceByUser.get(user.id)?.is_camping ?? false;
+      const plan = findLivePlan(bands, picksByUser.get(user.id) ?? new Set(), now);
+      return {
+        ...user,
+        isCamping,
+        label: user.display_name?.trim() || `Crew ${user.id.slice(0, 4).toUpperCase()}`,
+        plan: applyPresenceToLivePlan(plan, isCamping),
+      };
+    })
     .sort((a, b) => {
-      const aTime = a.plan.band?.start_time ?? '';
-      const bTime = b.plan.band?.start_time ?? '';
+      const aTime = a.plan.band?.start_time ?? a.plan.nextBand?.start_time ?? '';
+      const bTime = b.plan.band?.start_time ?? b.plan.nextBand?.start_time ?? '';
       if (aTime && bTime && aTime !== bTime) return aTime.localeCompare(bTime);
       if (aTime !== bTime) return aTime ? -1 : 1;
       return a.label.localeCompare(b.label);
     });
+}
+
+export function groupCrewLivePlans(crewPlans: CrewLivePlan[]): CrewLiveGroup[] {
+  const bandGroups = new Map<string, CrewLiveGroup & { kind: 'band' }>();
+  const campingMembers: CrewLivePlan[] = [];
+  const lostMembers: CrewLivePlan[] = [];
+
+  for (const crew of crewPlans) {
+    if (crew.plan.status === 'current' && crew.plan.band) {
+      const group = bandGroups.get(crew.plan.band.id) ?? {
+        kind: 'band',
+        band: crew.plan.band,
+        members: [],
+      };
+      group.members.push(crew);
+      bandGroups.set(crew.plan.band.id, group);
+      continue;
+    }
+
+    if (crew.isCamping) {
+      campingMembers.push(crew);
+    } else {
+      lostMembers.push(crew);
+    }
+  }
+
+  const sortMembers = (members: CrewLivePlan[]) =>
+    members.sort((a, b) => a.label.localeCompare(b.label));
+
+  const liveBandGroups = [...bandGroups.values()]
+    .map((group) => ({
+      ...group,
+      members: sortMembers(group.members),
+    }))
+    .sort((a, b) => {
+      if (a.band.start_time !== b.band.start_time) {
+        return a.band.start_time.localeCompare(b.band.start_time);
+      }
+      return a.band.name.localeCompare(b.band.name);
+    });
+
+  return [
+    ...liveBandGroups,
+    { kind: 'camping', band: null, members: sortMembers(campingMembers) },
+    { kind: 'lost', band: null, members: sortMembers(lostMembers) },
+  ];
 }
 
 export function formatFestivalTime(iso: string): string {

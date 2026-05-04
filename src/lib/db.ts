@@ -1,11 +1,12 @@
 import { openDB, type IDBPDatabase } from 'idb';
-import type { Band, CrewUser, UserPick } from '../types';
+import type { Band, CrewUser, UserPick, UserPresence } from '../types';
 
 const DB_NAME = 'viralatas-db';
-const DB_VERSION = 3;
+const DB_VERSION = 4;
 
 export const PICKS_CHANGED_EVENT = 'viralatas:picks-changed';
 export const CREW_USERS_CHANGED_EVENT = 'viralatas:crew-users-changed';
+export const PRESENCE_CHANGED_EVENT = 'viralatas:presence-changed';
 
 type OfflinePickOp = {
   id: string;
@@ -13,6 +14,10 @@ type OfflinePickOp = {
   band_id: string;
   action: 'add' | 'remove';
   created_at: string;
+};
+
+type OfflinePresenceOp = UserPresence & {
+  id: string;
 };
 
 type ViralatasDB = {
@@ -36,6 +41,14 @@ type ViralatasDB = {
   offline_picks: {
     key: string;
     value: OfflinePickOp;
+  };
+  user_presence: {
+    key: string;
+    value: UserPresence;
+  };
+  offline_presence: {
+    key: string;
+    value: OfflinePresenceOp;
   };
 };
 
@@ -63,6 +76,12 @@ function getDB() {
         if (!db.objectStoreNames.contains('offline_picks')) {
           db.createObjectStore('offline_picks', { keyPath: 'id' });
         }
+        if (!db.objectStoreNames.contains('user_presence')) {
+          db.createObjectStore('user_presence', { keyPath: 'user_id' });
+        }
+        if (!db.objectStoreNames.contains('offline_presence')) {
+          db.createObjectStore('offline_presence', { keyPath: 'id' });
+        }
       },
     });
   }
@@ -78,6 +97,12 @@ function emitPicksChanged() {
 function emitCrewUsersChanged() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(CREW_USERS_CHANGED_EVENT));
+  }
+}
+
+function emitPresenceChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(PRESENCE_CHANGED_EVENT));
   }
 }
 
@@ -157,6 +182,35 @@ export async function replaceUserPicks(picks: UserPick[], userId?: string) {
   emitPicksChanged();
 }
 
+export async function saveUserPresence(presence: UserPresence) {
+  const db = await getDB();
+  await db.put('user_presence', presence);
+  emitPresenceChanged();
+}
+
+export async function loadUserPresence(userId: string): Promise<UserPresence | undefined> {
+  const db = await getDB();
+  return db.get('user_presence', userId);
+}
+
+export async function loadAllUserPresence(): Promise<UserPresence[]> {
+  const db = await getDB();
+  return db.getAll('user_presence');
+}
+
+export async function replaceUserPresence(presence: UserPresence[], userId?: string) {
+  const db = await getDB();
+  const tx = db.transaction('user_presence', 'readwrite');
+  if (userId) {
+    await tx.store.delete(userId);
+  } else {
+    await tx.store.clear();
+  }
+  await Promise.all(presence.map((item) => tx.store.put(item)));
+  await tx.done;
+  emitPresenceChanged();
+}
+
 export async function enqueueOfflinePick(op: OfflinePickOp) {
   const db = await getDB();
   await db.put('offline_picks', op);
@@ -170,4 +224,19 @@ export async function loadOfflineQueue(): Promise<OfflinePickOp[]> {
 export async function removeFromOfflineQueue(id: string) {
   const db = await getDB();
   await db.delete('offline_picks', id);
+}
+
+export async function enqueueOfflinePresence(op: OfflinePresenceOp) {
+  const db = await getDB();
+  await db.put('offline_presence', op);
+}
+
+export async function loadOfflinePresenceQueue(): Promise<OfflinePresenceOp[]> {
+  const db = await getDB();
+  return db.getAll('offline_presence');
+}
+
+export async function removeFromOfflinePresenceQueue(id: string) {
+  const db = await getDB();
+  await db.delete('offline_presence', id);
 }

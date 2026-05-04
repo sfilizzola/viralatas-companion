@@ -1,0 +1,17 @@
+{
+  "appTitle": "Viralatas Metaleiros 🤘",
+  "loginTitle": "Entrar",
+  "registerTitle": "Criar conta",
+  "crewName": "Nome na crew",
+  "crewNamePlaceholder": "ex: Ferreiro, Gordao, Diabao...",
+  "email": "Email",
+  "password": "Senha",
+  "loginLoading": "Entrando...",
+  "loginAction": "Entrar",
+  "registerLoading": "Criando conta...",
+  "registerAction": "Criar conta",
+  "needAccount": "Ainda nao tem conta?",
+  "createAccount": "Criar conta",
+  "hasAccount": "Ja tem conta?",
+  "loginLink": "Entrar"
+}

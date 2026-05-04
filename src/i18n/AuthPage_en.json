@@ -1,0 +1,17 @@
+{
+  "appTitle": "Viralatas Metaleiros 🤘",
+  "loginTitle": "Sign in",
+  "registerTitle": "Create account",
+  "crewName": "Crew name",
+  "crewNamePlaceholder": "ex: Iron Mike, Stage Diver, Pit Boss...",
+  "email": "Email",
+  "password": "Password",
+  "loginLoading": "Signing in...",
+  "loginAction": "Sign in",
+  "registerLoading": "Creating account...",
+  "registerAction": "Create account",
+  "needAccount": "No account yet?",
+  "createAccount": "Create account",
+  "hasAccount": "Already have an account?",
+  "loginLink": "Sign in"
+}

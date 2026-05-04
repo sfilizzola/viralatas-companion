@@ -131,6 +131,28 @@ user picks band
 
 ---
 
+### Phase 4B — Camping / LOST live state `[CURRENT]`
+
+**Goal:** The live view is the first thing crew members see, with a quick way to say they are at camping.
+
+**Deliverables:**
+
+- [x] Initial authenticated landing page opens the live "Agora" view
+- [x] "Estou no camping" switch on the live page
+- [x] Camping status is stored offline-first and synced through Supabase when online
+- [x] Crew state cards group users as live band(s), Camping, then `LOST`
+- [x] If a current picked band overlaps the current time, that band overrides camping and turns camping off
+
+**Acceptance criteria:**
+- Login/register sends the user to `/now`
+- Camping switch works offline and flushes on reconnect
+- A user with camping enabled and no current band appears in the Camping card
+- A user with camping disabled and no current band appears as `LOST` in the live view
+- A user with camping enabled and a current picked band appears on the band, with camping set back to off
+- Multiple live picked bands render as separate band cards before Camping and `LOST`
+
+---
+
 ### Phase 5 — LLM proactive alerts
 
 **Goal:** Claude proactively taps the crew on the shoulder at key festival moments. No user needs to ask — the app just knows.

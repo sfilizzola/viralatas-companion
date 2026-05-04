@@ -3,6 +3,7 @@ export type User = {
   email: string;
   display_name: string | null;
   avatar_url: string | null;
+  preferred_language: 'br' | 'en';
   created_at: string;
 };
 
@@ -22,6 +23,12 @@ export type UserPick = {
   user_id: string;
   band_id: string;
   created_at: string;
+};
+
+export type UserPresence = {
+  user_id: string;
+  is_camping: boolean;
+  updated_at: string;
 };
 
 export type AlertContext = {

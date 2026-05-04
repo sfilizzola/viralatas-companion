@@ -1,0 +1,13 @@
+{
+  "title": "Schedule 🤘",
+  "thursday": "Thu 07/30",
+  "friday": "Fri 07/31",
+  "saturday": "Sat 08/01",
+  "upcomingBands": "Upcoming bands",
+  "clearFilters": "Clear filters",
+  "loadingSchedule": "Loading schedule...",
+  "emptySchedule": "No bands found.",
+  "goingCount": "{count} going",
+  "removePick": "Remove pick",
+  "addPick": "Add pick"
+}

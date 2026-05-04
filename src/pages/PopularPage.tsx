@@ -6,11 +6,13 @@ import { useAuth } from '../hooks/useAuth';
 import { useBandAttendees } from '../hooks/useBandAttendees';
 import { useMyPicks } from '../hooks/useMyPicks';
 import { usePickCounts } from '../hooks/usePickCounts';
+import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
 import { BandCard } from './SchedulePage';
 import styles from './SchedulePage.module.css';
 
 export default function PopularPage() {
+  const { t } = useI18n('PopularPage');
   const { session } = useAuth();
   const userId = session?.user?.id ?? null;
 
@@ -62,13 +64,13 @@ export default function PopularPage() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <span className={styles.title}>Popular</span>
+        <span className={styles.title}>{t('title')}</span>
       </header>
 
       <main className={styles.list}>
-        {loading && <p className={styles.empty}>Carregando popularidade...</p>}
+        {loading && <p className={styles.empty}>{t('loading')}</p>}
         {!loading && popularBands.length === 0 && (
-          <p className={styles.empty}>Agenda vazia por enquanto.</p>
+          <p className={styles.empty}>{t('empty')}</p>
         )}
         {popularBands.map((band) => {
           const attendees = attendeesByBand[band.id] ?? [];
@@ -94,7 +96,7 @@ export default function PopularPage() {
                     toggleAttendees(band.id);
                   }}
                 >
-                  {count === 0 ? 'Ninguém da crew ainda' : isExpanded ? 'Ocultar crew' : 'Ver crew'}
+                  {count === 0 ? t('noCrewYet') : isExpanded ? t('hideCrew') : t('showCrew')}
                 </button>
               </div>
 
@@ -121,7 +123,7 @@ export default function PopularPage() {
                       ))}
                     </ul>
                   ) : (
-                    <p className={styles.attendeeEmpty}>Sincronizando nomes da crew...</p>
+                    <p className={styles.attendeeEmpty}>{t('syncingCrew')}</p>
                   )}
                 </div>
               )}

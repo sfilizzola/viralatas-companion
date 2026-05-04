@@ -1,0 +1,15 @@
+{
+  "logout": "Sign out",
+  "crewName": "Crew name",
+  "language": "Language",
+  "portuguese": "Portuguese",
+  "english": "English",
+  "photo": "Profile photo",
+  "photoHelp": "JPG, PNG or WebP. Max 2 MB.",
+  "choosePhoto": "Choose photo",
+  "uploadingPhoto": "Uploading photo...",
+  "photoError": "Could not upload that photo.",
+  "saveDone": "Saved",
+  "saveLoading": "Saving...",
+  "saveProfile": "Save profile"
+}

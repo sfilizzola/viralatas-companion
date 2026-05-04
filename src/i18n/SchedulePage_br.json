@@ -1,0 +1,13 @@
+{
+  "title": "Agenda 🤘",
+  "thursday": "Qui 30/07",
+  "friday": "Sex 31/07",
+  "saturday": "Sab 01/08",
+  "upcomingBands": "Proximas bandas",
+  "clearFilters": "Limpar filtros",
+  "loadingSchedule": "Carregando agenda...",
+  "emptySchedule": "Nenhuma banda encontrada.",
+  "goingCount": "{count} indo",
+  "removePick": "Remover pick",
+  "addPick": "Adicionar pick"
+}

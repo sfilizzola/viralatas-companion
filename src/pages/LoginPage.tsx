@@ -1,9 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useI18n } from '../lib/i18n';
 import styles from './AuthPage.module.css';
 
 export default function LoginPage() {
+  const { t } = useI18n('AuthPage');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,18 +25,18 @@ export default function LoginPage() {
       return;
     }
 
-    navigate('/profile');
+    navigate('/now');
   }
 
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Viralatas Metaleiros 🤘</h1>
-        <p className={styles.subtitle}>Entrar</p>
+        <h1 className={styles.title}>{t('appTitle')}</h1>
+        <p className={styles.subtitle}>{t('loginTitle')}</p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <label className={styles.label}>
-            Email
+            {t('email')}
             <input
               className={styles.input}
               type="email"
@@ -46,7 +48,7 @@ export default function LoginPage() {
           </label>
 
           <label className={styles.label}>
-            Senha
+            {t('password')}
             <input
               className={styles.input}
               type="password"
@@ -60,13 +62,13 @@ export default function LoginPage() {
           {error && <p className={styles.error}>{error}</p>}
 
           <button className={styles.button} type="submit" disabled={loading}>
-            {loading ? 'Entrando...' : 'Entrar'}
+            {loading ? t('loginLoading') : t('loginAction')}
           </button>
         </form>
 
         <p className={styles.footer}>
-          Ainda não tem conta?{' '}
-          <Link to="/register">Criar conta</Link>
+          {t('needAccount')}{' '}
+          <Link to="/register">{t('createAccount')}</Link>
         </p>
       </div>
     </div>

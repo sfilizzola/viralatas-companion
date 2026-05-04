@@ -1,9 +1,11 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useI18n } from '../lib/i18n';
 import styles from './AuthPage.module.css';
 
 export default function RegisterPage() {
+  const { language, t } = useI18n('AuthPage');
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +21,7 @@ export default function RegisterPage() {
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,
       password,
-      options: { data: { display_name: displayName } },
+      options: { data: { display_name: displayName, preferred_language: language } },
     });
 
     if (signUpError) {
@@ -33,33 +35,34 @@ export default function RegisterPage() {
         id: data.user.id,
         email,
         display_name: displayName || null,
+        preferred_language: language,
       });
     }
 
-    navigate('/profile');
+    navigate('/now');
   }
 
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1 className={styles.title}>Viralatas Metaleiros 🤘</h1>
-        <p className={styles.subtitle}>Criar conta</p>
+        <h1 className={styles.title}>{t('appTitle')}</h1>
+        <p className={styles.subtitle}>{t('registerTitle')}</p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
           <label className={styles.label}>
-            Nome na crew
+            {t('crewName')}
             <input
               className={styles.input}
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="ex: Ferreiro, Gordão, Diabão..."
+              placeholder={t('crewNamePlaceholder')}
               autoComplete="nickname"
             />
           </label>
 
           <label className={styles.label}>
-            Email
+            {t('email')}
             <input
               className={styles.input}
               type="email"
@@ -71,7 +74,7 @@ export default function RegisterPage() {
           </label>
 
           <label className={styles.label}>
-            Senha
+            {t('password')}
             <input
               className={styles.input}
               type="password"
@@ -86,13 +89,13 @@ export default function RegisterPage() {
           {error && <p className={styles.error}>{error}</p>}
 
           <button className={styles.button} type="submit" disabled={loading}>
-            {loading ? 'Criando conta...' : 'Criar conta'}
+            {loading ? t('registerLoading') : t('registerAction')}
           </button>
         </form>
 
         <p className={styles.footer}>
-          Já tem conta?{' '}
-          <Link to="/login">Entrar</Link>
+          {t('hasAccount')}{' '}
+          <Link to="/login">{t('loginLink')}</Link>
         </p>
       </div>
     </div>

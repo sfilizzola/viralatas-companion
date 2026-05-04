@@ -1,0 +1,15 @@
+{
+  "logout": "Sair",
+  "crewName": "Nome na crew",
+  "language": "Idioma",
+  "portuguese": "Portugues",
+  "english": "English",
+  "photo": "Foto do perfil",
+  "photoHelp": "JPG, PNG ou WebP. Maximo 2 MB.",
+  "choosePhoto": "Escolher foto",
+  "uploadingPhoto": "Enviando foto...",
+  "photoError": "Nao foi possivel enviar essa foto.",
+  "saveDone": "Salvo",
+  "saveLoading": "Salvando...",
+  "saveProfile": "Salvar perfil"
+}

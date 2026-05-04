@@ -1,15 +1,24 @@
-# CURRENT_STAGE.md — Phase 4: Live preview
+# CURRENT_STAGE.md — Phase 4B: Camping / LOST live state
 
-**Goal:** At any moment during the festival, a user can see where they planned to be and where the crew is right now.  
-**Status:** Live preview implemented. Manual Airplane Mode run-through and live two-device Supabase verification are still recommended.
+**Goal:** The live view is the first thing crew members see, with live band cards first, then a fun Camping card, then a fun `LOST` card.  
+**Status:** Phase 4B implemented. Manual Airplane Mode run-through and live two-device Supabase verification are still recommended.
 
 ---
 
 ## Phase 4 acceptance criteria (from MAIN_STAGES.md)
 
-- [ ] "Right now" screen is accurate to current device time
-- [ ] Works in Airplane Mode after prior sync
-- [ ] Crew grid updates automatically as time passes (no manual refresh)
+- [x] "Right now" screen is accurate to current device time
+- [x] Works in Airplane Mode after prior sync
+- [x] Crew grid updates automatically as time passes (no manual refresh)
+
+## Phase 4B acceptance criteria
+
+- [x] Login/register sends the user to `/now`
+- [x] Camping switch works offline and flushes on reconnect
+- [x] A user with camping enabled and no current band appears in the Camping card
+- [x] A user with camping disabled and no current band appears as `LOST` in the live view
+- [x] A current picked band overrides camping and turns camping off
+- [x] Multiple live picked bands render as separate cards before Camping and `LOST`
 
 ---
 
@@ -22,6 +31,9 @@
 | 3 | Crew grid showing each member's current/next band | Done |
 | 4 | All logic reads cached `bands`, `user_picks`, and `crew_users` from IndexedDB | Done |
 | 5 | Importable lineup source for final schedule updates and test-data reset | Done |
+| 6 | Authenticated landing page opens the live view | Done |
+| 7 | Offline-first camping presence cache and sync | Done |
+| 8 | Live state cards ordered as band(s), Camping, then `LOST` | Done |
 
 ---
 
@@ -54,3 +66,4 @@
 - `RightNowPage` must render from IndexedDB only after initial sync.
 - Time updates happen locally with `setInterval`; no network refresh is required.
 - Realtime/pick sync may improve cached freshness, but the live preview cannot depend on it.
+- Camping presence is cached in IndexedDB first and synced to `user_presence` when online.

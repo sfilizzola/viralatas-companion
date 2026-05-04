@@ -5,6 +5,7 @@ import { togglePick } from '../lib/picks';
 import { useAuth } from '../hooks/useAuth';
 import { useMyPicks } from '../hooks/useMyPicks';
 import { usePickCounts } from '../hooks/usePickCounts';
+import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
 import styles from './SchedulePage.module.css';
 
@@ -14,12 +15,6 @@ const STAGE_COLORS: Record<string, string> = {
   'LOUDER STAGE':  '#8e44ad',
   'FASTER STAGE':  '#2980b9',
 };
-
-const FESTIVAL_DAYS = [
-  { label: 'Qui 30/07', date: '2026-07-30' },
-  { label: 'Sex 31/07', date: '2026-07-31' },
-  { label: 'Sáb 01/08', date: '2026-08-01' },
-];
 
 function bandDay(band: Band): string {
   const d = new Date(band.start_time);
@@ -44,6 +39,7 @@ type Filters = {
 };
 
 export default function SchedulePage() {
+  const { t } = useI18n('SchedulePage');
   const { session } = useAuth();
   const userId = session?.user?.id ?? null;
 
@@ -53,6 +49,14 @@ export default function SchedulePage() {
 
   const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
   const pickCounts = usePickCounts();
+  const festivalDays = useMemo(
+    () => [
+      { label: t('thursday'), date: '2026-07-30' },
+      { label: t('friday'), date: '2026-07-31' },
+      { label: t('saturday'), date: '2026-08-01' },
+    ],
+    [t],
+  );
 
   useEffect(() => {
     loadBands().then((data) => {
@@ -100,12 +104,12 @@ export default function SchedulePage() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <span className={styles.title}>Agenda 🤘</span>
+        <span className={styles.title}>{t('title')}</span>
       </header>
 
       <div className={styles.filters}>
         <div className={styles.filterRow}>
-          {FESTIVAL_DAYS.map(({ label, date }) => (
+          {festivalDays.map(({ label, date }) => (
             <button
               key={date}
               className={`${styles.pill} ${filters.day === date ? styles.pillActive : ''}`}
@@ -138,23 +142,23 @@ export default function SchedulePage() {
             className={`${styles.pill} ${filters.upcoming ? styles.pillActive : ''}`}
             onClick={toggleUpcoming}
           >
-            Próximas bandas
+            {t('upcomingBands')}
           </button>
           {(filters.day || filters.stage || filters.upcoming) && (
             <button
               className={styles.clearBtn}
               onClick={() => setFilters({ day: null, stage: null, upcoming: false })}
             >
-              Limpar filtros
+              {t('clearFilters')}
             </button>
           )}
         </div>
       </div>
 
       <main className={styles.list}>
-        {loading && <p className={styles.empty}>Carregando agenda...</p>}
+        {loading && <p className={styles.empty}>{t('loadingSchedule')}</p>}
         {!loading && filtered.length === 0 && (
-          <p className={styles.empty}>Nenhuma banda encontrada.</p>
+          <p className={styles.empty}>{t('emptySchedule')}</p>
         )}
         {filtered.map((band) => (
           <BandCard
@@ -182,6 +186,7 @@ type BandCardProps = {
 };
 
 export function BandCard({ band, isPicked, count, onToggle, children }: BandCardProps) {
+  const { t } = useI18n('SchedulePage');
   const stageColor = STAGE_COLORS[band.stage] ?? 'var(--accent)';
   const initial = band.name.charAt(0).toUpperCase();
 
@@ -221,7 +226,7 @@ export function BandCard({ band, isPicked, count, onToggle, children }: BandCard
           <span className={styles.time}>
             {formatTime(band.start_time)} – {formatTime(band.end_time)}
           </span>
-          <span className={styles.goingCount}>{count} indo</span>
+          <span className={styles.goingCount}>{t('goingCount', { count })}</span>
         </div>
         {children}
       </div>
@@ -232,7 +237,7 @@ export function BandCard({ band, isPicked, count, onToggle, children }: BandCard
           event.stopPropagation();
           onToggle();
         }}
-        aria-label={isPicked ? 'Remover pick' : 'Adicionar pick'}
+        aria-label={isPicked ? t('removePick') : t('addPick')}
         aria-pressed={isPicked}
       >
         <StarIcon filled={isPicked} />

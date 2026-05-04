@@ -1,0 +1,9 @@
+{
+  "title": "Popular",
+  "loading": "Carregando popularidade...",
+  "empty": "Agenda vazia por enquanto.",
+  "noCrewYet": "Ninguem da crew ainda",
+  "hideCrew": "Ocultar crew",
+  "showCrew": "Ver crew",
+  "syncingCrew": "Sincronizando nomes da crew..."
+}

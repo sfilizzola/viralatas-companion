@@ -9,6 +9,10 @@
   padding: 1rem 1.5rem 0.75rem;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
 }
 
 .title {
@@ -22,6 +26,60 @@
   margin-top: 0.2rem;
   color: var(--text-muted);
   font-size: 0.78rem;
+}
+
+.campingSwitch {
+  display: inline-grid;
+  grid-template-columns: auto 44px;
+  gap: 0.55rem;
+  align-items: center;
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.campingSwitch input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.switchTrack {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+
+.switchTrack::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: transform 0.16s ease, background 0.16s ease;
+}
+
+.campingSwitch input:checked + .switchTrack {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.campingSwitch input:checked + .switchTrack::after {
+  transform: translateX(20px);
+  background: #fff;
+}
+
+.campingSwitch input:focus-visible + .switchTrack {
+  outline: 2px solid var(--accent-hover);
+  outline-offset: 2px;
 }
 
 .main {
@@ -114,6 +172,13 @@
   line-height: 1.45;
 }
 
+.nextHint {
+  margin-top: 0.55rem;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
 .sectionTitle {
   margin: 1.25rem 0 0.75rem;
   font-size: 0.9rem;
@@ -122,30 +187,114 @@
   letter-spacing: 0.08em;
 }
 
-.crewGrid {
+.crewGroups {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 0.65rem;
+  gap: 0.8rem;
 }
 
-.crewTile {
+.groupCard {
+  position: relative;
   min-width: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--bg-surface);
-  padding: 0.75rem;
+  padding: 0.85rem;
+  overflow: hidden;
 }
 
-.crewTop {
+.band {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.camping {
+  border-color: rgba(234, 179, 8, 0.42);
+  background:
+    linear-gradient(135deg, rgba(234, 179, 8, 0.14), transparent 52%),
+    var(--bg-surface);
+}
+
+.lost {
+  border-color: rgba(244, 63, 94, 0.42);
+  background:
+    linear-gradient(135deg, rgba(244, 63, 94, 0.12), transparent 54%),
+    var(--bg-surface);
+}
+
+.groupImage {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius);
+  object-fit: cover;
+  grid-row: span 2;
   display: flex;
-  gap: 0.55rem;
   align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 800;
+}
+
+.groupHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-items: flex-start;
   min-width: 0;
 }
 
+.groupKicker {
+  color: var(--text-muted);
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.groupTitle {
+  margin-top: 0.18rem;
+  font-size: 1.05rem;
+  line-height: 1.15;
+}
+
+.groupCount {
+  flex-shrink: 0;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.24rem 0.45rem;
+  white-space: nowrap;
+}
+
+.memberList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  list-style: none;
+  margin-top: 0.75rem;
+  padding: 0;
+}
+
+.memberPill {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  padding: 0.25rem 0.55rem 0.25rem 0.25rem;
+}
+
 .avatar {
-  width: 34px;
-  height: 34px;
+  width: 28px;
+  height: 28px;
   flex-shrink: 0;
   border-radius: 50%;
   overflow: hidden;
@@ -158,35 +307,35 @@
   font-weight: 800;
 }
 
+.memberText {
+  min-width: 0;
+  display: grid;
+  gap: 0.05rem;
+}
+
 .crewName,
-.crewBand,
-.crewMeta {
+.memberMeta {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .crewName {
-  font-size: 0.86rem;
+  font-size: 0.8rem;
   font-weight: 800;
 }
 
-.status {
+.memberMeta {
   color: var(--text-muted);
-  font-size: 0.7rem;
+  font-size: 0.68rem;
+  max-width: 180px;
 }
 
-.crewBand {
+.groupEmpty {
   margin-top: 0.65rem;
-  font-size: 0.9rem;
-  font-weight: 800;
-}
-
-.crewMeta {
-  margin-top: 0.2rem;
   color: var(--text-muted);
-  font-size: 0.74rem;
-  font-variant-numeric: tabular-nums;
+  font-size: 0.86rem;
+  line-height: 1.45;
 }
 
 .navSpacer {
@@ -195,6 +344,16 @@
 }
 
 @media (max-width: 430px) {
+  .header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .campingSwitch {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .hero {
     grid-template-columns: 72px 1fr;
   }
@@ -208,7 +367,21 @@
     font-size: 1.3rem;
   }
 
-  .crewGrid {
+  .crewGroups {
     grid-template-columns: 1fr;
+  }
+
+  .band {
+    grid-template-columns: 56px 1fr;
+  }
+
+  .groupImage {
+    width: 56px;
+    height: 56px;
+  }
+
+  .groupHeader {
+    flex-direction: column;
+    gap: 0.45rem;
   }
 }

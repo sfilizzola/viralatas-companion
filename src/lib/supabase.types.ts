@@ -9,6 +9,7 @@ export type Database = {
           email: string;
           display_name: string | null;
           avatar_url: string | null;
+          preferred_language: 'br' | 'en';
           created_at: string;
         };
         Insert: {
@@ -16,6 +17,7 @@ export type Database = {
           email: string;
           display_name?: string | null;
           avatar_url?: string | null;
+          preferred_language?: 'br' | 'en';
           created_at?: string;
         };
         Update: {
@@ -23,6 +25,7 @@ export type Database = {
           email?: string;
           display_name?: string | null;
           avatar_url?: string | null;
+          preferred_language?: 'br' | 'en';
           created_at?: string;
         };
         Relationships: [];
@@ -72,6 +75,24 @@ export type Database = {
           user_id?: string;
           band_id?: string;
           created_at?: string;
+        };
+        Relationships: [];
+      };
+      user_presence: {
+        Row: {
+          user_id: string;
+          is_camping: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          is_camping?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          is_camping?: boolean;
+          updated_at?: string;
         };
         Relationships: [];
       };

@@ -5,11 +5,13 @@ import { togglePick } from '../lib/picks';
 import { useAuth } from '../hooks/useAuth';
 import { useMyPicks } from '../hooks/useMyPicks';
 import { usePickCounts } from '../hooks/usePickCounts';
+import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
 import { BandCard } from './SchedulePage';
 import styles from './SchedulePage.module.css';
 
 export default function MyPicksPage() {
+  const { t } = useI18n('MyPicksPage');
   const { session } = useAuth();
   const userId = session?.user?.id ?? null;
 
@@ -42,13 +44,13 @@ export default function MyPicksPage() {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <span className={styles.title}>Meus picks</span>
+        <span className={styles.title}>{t('title')}</span>
       </header>
 
       <main className={styles.list}>
-        {loading && <p className={styles.empty}>Carregando picks...</p>}
+        {loading && <p className={styles.empty}>{t('loading')}</p>}
         {!loading && myBands.length === 0 && (
-          <p className={styles.empty}>Nenhum pick ainda. Marca umas bandas na agenda.</p>
+          <p className={styles.empty}>{t('empty')}</p>
         )}
         {myBands.map((band) => (
           <BandCard
