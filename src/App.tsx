@@ -6,6 +6,7 @@ import ProfilePage from './pages/ProfilePage';
 import SchedulePage from './pages/SchedulePage';
 import MyPicksPage from './pages/MyPicksPage';
 import PopularPage from './pages/PopularPage';
+import RightNowPage from './pages/RightNowPage';
 import PrivateRoute from './components/PrivateRoute';
 import { useAuth } from './hooks/useAuth';
 import { syncBands } from './lib/sync';
@@ -83,6 +84,14 @@ export default function App() {
           }
         />
         <Route
+          path="/now"
+          element={
+            <PrivateRoute>
+              <RightNowPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/profile"
           element={
             <PrivateRoute>
@@ -90,7 +99,7 @@ export default function App() {
             </PrivateRoute>
           }
         />
-        <Route path="*" element={<Navigate to="/schedule" replace />} />
+        <Route path="*" element={<Navigate to="/now" replace />} />
       </Routes>
     </BrowserRouter>
   );

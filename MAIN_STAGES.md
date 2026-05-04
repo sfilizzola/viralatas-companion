@@ -74,7 +74,7 @@ type Band = {
 
 ---
 
-### Phase 3 — Picks and social counts `[CURRENT]`
+### Phase 3 — Picks and social counts `[DONE]`
 
 **Goal:** Users pick bands. The crew can see who's going where. Live counts update in real time.
 
@@ -105,7 +105,7 @@ user picks band
 
 ---
 
-### Phase 4 — Live preview
+### Phase 4 — Live preview `[CURRENT]`
 
 **Goal:** At any moment during the festival, a user can see where they planned to be and where the crew is right now.
 
@@ -115,6 +115,7 @@ user picks band
 - [ ] If no pick overlaps current time: show next upcoming pick
 - [ ] Crew grid: one tile per crew member, showing their current or next band
 - [ ] All logic runs from cached picks + schedule — no network required
+- [ ] Make an importable lineup file so final adjusted bands, stages, and times are easy to update and reseed; previous test picks may be erased when this runs.
 
 **Time logic:**
 ```typescript

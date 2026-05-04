@@ -37,20 +37,6 @@ function loadEnvFile() {
   }
 }
 
-loadEnvFile();
-
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseUrl || !serviceRoleKey) {
-  console.error('Missing VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
-  process.exit(1);
-}
-
-const supabase = createClient(supabaseUrl, serviceRoleKey, {
-  auth: { persistSession: false },
-});
-
 // ---------------------------------------------------------------------------
 // Schedule helpers
 // ---------------------------------------------------------------------------
@@ -69,7 +55,7 @@ const D3n = '2026-08-02'; // After-midnight slots of Day 3
 
 const WOA = 'https://www.wacken.com'; // base for all thumbnail URLs
 
-type BandSeed = {
+export type BandSeed = {
   name: string;
   stage: string;
   start_time: string;
@@ -84,7 +70,7 @@ type BandSeed = {
 // Stage times are placeholder — update when official running order drops
 // ---------------------------------------------------------------------------
 
-const bands: BandSeed[] = [
+export const bands: BandSeed[] = [
   // ═══════════════════════════════════════════════════════
   // DAY 1 — Thursday 30 July
   // ═══════════════════════════════════════════════════════
@@ -204,6 +190,20 @@ const bands: BandSeed[] = [
 // ---------------------------------------------------------------------------
 
 async function seed() {
+  loadEnvFile();
+
+  const supabaseUrl = process.env.VITE_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !serviceRoleKey) {
+    console.error('Missing VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
+    process.exit(1);
+  }
+
+  const supabase = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { persistSession: false },
+  });
+
   console.log(`Seeding ${bands.length} bands into Wacken 2026 schedule…`);
 
   // Remove existing data — CASCADE takes care of user_picks FK
@@ -222,4 +222,6 @@ async function seed() {
   console.log('Done 🤘');
 }
 
-seed();
+if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').href) {
+  seed();
+}

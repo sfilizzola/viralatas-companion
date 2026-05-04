@@ -5,6 +5,17 @@ export default function BottomNav() {
   return (
     <nav className={styles.nav}>
       <NavLink
+        to="/now"
+        className={({ isActive }) => `${styles.tab} ${isActive ? styles.active : ''}`}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v5l3 2" />
+        </svg>
+        <span>Agora</span>
+      </NavLink>
+
+      <NavLink
         to="/schedule"
         className={({ isActive }) => `${styles.tab} ${isActive ? styles.active : ''}`}
       >
