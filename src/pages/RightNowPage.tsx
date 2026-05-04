@@ -117,17 +117,20 @@ export default function RightNowPage() {
   const [loading, setLoading] = useState(true);
 
   const refreshFromCache = useCallback(async () => {
-    const [cachedBands, cachedPicks, cachedUsers, cachedPresence] = await Promise.all([
-      loadBands(),
-      loadAllUserPicks(),
-      loadCrewUsers(),
-      loadAllUserPresence(),
-    ]);
-    setBands(cachedBands.sort((a, b) => a.start_time.localeCompare(b.start_time)));
-    setPicks(cachedPicks);
-    setCrewUsers(cachedUsers);
-    setPresence(cachedPresence);
-    setLoading(false);
+    try {
+      const [cachedBands, cachedPicks, cachedUsers, cachedPresence] = await Promise.all([
+        loadBands(),
+        loadAllUserPicks(),
+        loadCrewUsers(),
+        loadAllUserPresence(),
+      ]);
+      setBands(cachedBands.sort((a, b) => a.start_time.localeCompare(b.start_time)));
+      setPicks(cachedPicks);
+      setCrewUsers(cachedUsers);
+      setPresence(cachedPresence);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {

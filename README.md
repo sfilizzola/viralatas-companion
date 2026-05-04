@@ -43,7 +43,7 @@ The app lets crew members log in, browse the Wacken schedule, pick bands, see wh
 │   └── main.tsx          # React entrypoint
 ├── supabase/
 │   ├── migrations/       # Database schema and policy migrations
-│   └── seed/bands.ts     # Importable Wacken lineup and seed script
+│   └── seed/             # Band lineup and disposable test-user seed scripts
 ├── MAIN_STAGES.md        # Full feature plan and acceptance criteria
 ├── CURRENT_STAGE.md      # Current phase status
 └── vite.config.ts        # Vite and PWA configuration
@@ -118,10 +118,26 @@ The schedule seed lives in `supabase/seed/bands.ts`.
 Run it after migrations and after adding `SUPABASE_SERVICE_ROLE_KEY` to `.env.local`:
 
 ```sh
-npx tsx supabase/seed/bands.ts
+npm run seed:bands
 ```
 
 Warning: the seed script deletes existing bands before inserting the lineup, which cascades to `user_picks`. Use it only for dev or staging data unless you are intentionally resetting picks.
+
+## Disposable Test Users
+
+Test crew users are marked with `users.is_test_user = true` and use emails at `viralatas-test.example.com`, so they are easy to remove from Auth and public tables.
+
+Create or recreate the fixed test crew with random band picks and random camping states:
+
+```sh
+npm run seed:test-users
+```
+
+Delete only those disposable users:
+
+```sh
+npm run seed:test-users:delete
+```
 
 ## Available Scripts
 
@@ -130,6 +146,9 @@ npm run dev      # Start local dev server
 npm run build    # Type-check and build production assets
 npm run preview  # Preview the production build locally
 npm run lint     # Run ESLint
+npm run seed:bands
+npm run seed:test-users
+npm run seed:test-users:delete
 ```
 
 ## Offline Behavior

@@ -10,6 +10,7 @@ export type Database = {
           display_name: string | null;
           avatar_url: string | null;
           preferred_language: 'br' | 'en';
+          is_test_user: boolean;
           created_at: string;
         };
         Insert: {
@@ -18,6 +19,7 @@ export type Database = {
           display_name?: string | null;
           avatar_url?: string | null;
           preferred_language?: 'br' | 'en';
+          is_test_user?: boolean;
           created_at?: string;
         };
         Update: {
@@ -26,6 +28,7 @@ export type Database = {
           display_name?: string | null;
           avatar_url?: string | null;
           preferred_language?: 'br' | 'en';
+          is_test_user?: boolean;
           created_at?: string;
         };
         Relationships: [];

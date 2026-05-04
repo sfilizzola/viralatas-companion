@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "seed:bands": "tsx supabase/seed/bands.ts",
+    "seed:test-users": "tsx supabase/seed/test-users.ts reset",
+    "seed:test-users:delete": "tsx supabase/seed/test-users.ts delete"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",
@@ -25,6 +28,7 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.1",
     "vite": "^7.3.2",

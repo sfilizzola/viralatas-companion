@@ -16,15 +16,27 @@ export function useAuth(): AuthState {
   });
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setState({ session, user: session?.user ?? null, loading: false });
-    });
+    let active = true;
+
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        if (!active) return;
+        setState({ session, user: session?.user ?? null, loading: false });
+      })
+      .catch(() => {
+        if (!active) return;
+        setState({ session: null, user: null, loading: false });
+      });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setState({ session, user: session?.user ?? null, loading: false });
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   return state;

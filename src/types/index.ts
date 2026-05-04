@@ -4,6 +4,7 @@ export type User = {
   display_name: string | null;
   avatar_url: string | null;
   preferred_language: 'br' | 'en';
+  is_test_user: boolean;
   created_at: string;
 };
 
