@@ -3,7 +3,8 @@
     "allow": [
       "Bash(curl -sL \"https://www.wacken.com/fileadmin/Json/bandlist-concert.json\")",
       "Bash(python3 -c ' *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(npm test *)"
     ]
   }
 }
