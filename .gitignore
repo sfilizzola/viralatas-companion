@@ -25,3 +25,6 @@ Thumbs.db
 # Supabase
 .branches/
 supabase/.temp/
+
+# Claude memory
+memory/
