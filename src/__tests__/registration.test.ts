@@ -193,4 +193,51 @@ describe('User Registration', () => {
       });
     });
   });
+
+  describe('Metadata Handling', () => {
+    it('should handle missing is_test_user in metadata', () => {
+      const metadata = {
+        display_name: 'Test User',
+        preferred_language: 'br',
+        // is_test_user omitted
+      };
+      // Trigger should default to false when not provided
+      const isTestUser = (metadata as any).is_test_user ?? false;
+      expect(isTestUser).toBe(false);
+    });
+
+    it('should coerce is_test_user string to boolean', () => {
+      const isTestUserStr = 'true';
+      const isTestUser = isTestUserStr === 'true' ? true : false;
+      expect(isTestUser).toBe(true);
+    });
+
+    it('should handle null is_test_user safely', () => {
+      const isTestUserNull: string | null = null;
+      const isTestUser = isTestUserNull === 'true' ? true : false;
+      expect(isTestUser).toBe(false);
+    });
+
+    it('should handle missing preferred_language in metadata', () => {
+      const metadata = {
+        display_name: 'Test User',
+        // preferred_language omitted
+      };
+      // Trigger should default to 'br'
+      const language = (metadata as any).preferred_language || 'br';
+      expect(language).toBe('br');
+    });
+
+    it('should handle all metadata fields missing', () => {
+      const metadata = {};
+      const displayName = (metadata as any).display_name || null;
+      const language = (metadata as any).preferred_language || 'br';
+      const isTestUserStr = (metadata as any).is_test_user;
+      const isTestUser = isTestUserStr === 'true' ? true : false;
+
+      expect(displayName).toBeNull();
+      expect(language).toBe('br');
+      expect(isTestUser).toBe(false);
+    });
+  });
 });

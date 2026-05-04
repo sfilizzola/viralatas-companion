@@ -46,6 +46,7 @@ export default function RegisterPage() {
       // Trigger's handle_new_user() creates the users table record automatically.
       // We verify it exists before navigating, with a short retry for trigger latency.
       let userExists = false;
+      let lastError: any = null;
       for (let attempt = 0; attempt < 3; attempt++) {
         const { data: userRecord, error: queryError } = await supabase
           .from('users')
@@ -58,13 +59,16 @@ export default function RegisterPage() {
           break;
         }
 
+        lastError = queryError;
         if (attempt < 2) {
-          await new Promise((resolve) => setTimeout(resolve, 100));
+          await new Promise((resolve) => setTimeout(resolve, 150));
         }
       }
 
       if (!userExists) {
-        setError('User profile creation failed. Please try again.');
+        console.error('User profile creation failed:', lastError);
+        const errorMsg = lastError?.message || 'User profile creation failed. Please try again.';
+        setError(errorMsg);
         setLoading(false);
         return;
       }

@@ -122,7 +122,7 @@ begin
     coalesce(new.raw_user_meta_data->>'display_name', null),
     coalesce(new.raw_user_meta_data->>'avatar_url', null),
     coalesce(new.raw_user_meta_data->>'preferred_language', 'br'),
-    new.raw_user_meta_data->>'is_test_user' = 'true',
+    coalesce(new.raw_user_meta_data->>'is_test_user' = 'true', false),
     case when new.email = 'sfilizzola@gmail.com' then 'godlike' else 'normal' end
   )
   on conflict (id) do update set
