@@ -18,28 +18,62 @@ export default function RegisterPage() {
     setError(null);
     setLoading(true);
 
-    const { data, error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: { data: { display_name: displayName, preferred_language: language } },
-    });
-
-    if (signUpError) {
-      setError(signUpError.message);
-      setLoading(false);
-      return;
-    }
-
-    if (data.user) {
-      await supabase.from('users').upsert({
-        id: data.user.id,
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email,
-        display_name: displayName || null,
-        preferred_language: language,
+        password,
+        options: {
+          data: {
+            display_name: displayName || null,
+            preferred_language: language,
+            is_test_user: false,
+          },
+        },
       });
-    }
 
-    navigate('/now');
+      if (signUpError) {
+        setError(signUpError.message);
+        setLoading(false);
+        return;
+      }
+
+      if (!data.user) {
+        setError('Registration failed: no user data returned');
+        setLoading(false);
+        return;
+      }
+
+      // Trigger's handle_new_user() creates the users table record automatically.
+      // We verify it exists before navigating, with a short retry for trigger latency.
+      let userExists = false;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        const { data: userRecord, error: queryError } = await supabase
+          .from('users')
+          .select('id')
+          .eq('id', data.user.id)
+          .single();
+
+        if (!queryError && userRecord) {
+          userExists = true;
+          break;
+        }
+
+        if (attempt < 2) {
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+      }
+
+      if (!userExists) {
+        setError('User profile creation failed. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      navigate('/now');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      setLoading(false);
+    }
   }
 
   return (

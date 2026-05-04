@@ -17,15 +17,46 @@ export default function LoginPage() {
     setError(null);
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
+      if (signInError) {
+        setError(signInError.message);
+        setLoading(false);
+        return;
+      }
+
+      if (!data.user) {
+        setError('Login failed: no user data returned');
+        setLoading(false);
+        return;
+      }
+
+      // Verify user profile exists
+      const { data: userRecord, error: profileError } = await supabase
+        .from('users')
+        .select('id, role, preferred_language')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError || !userRecord) {
+        setError(
+          'User profile not found. Please contact support if this persists.'
+        );
+        // Sign out to prevent stale session
+        await supabase.auth.signOut();
+        setLoading(false);
+        return;
+      }
+
+      navigate('/now');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
       setLoading(false);
-      return;
     }
-
-    navigate('/now');
   }
 
   return (
