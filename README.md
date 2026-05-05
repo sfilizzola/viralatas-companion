@@ -190,4 +190,4 @@ Unknown routes redirect to `/now`.
 - Check `CURRENT_STAGE.md` for current phase status.
 - Put Supabase schema changes in `supabase/migrations/`.
 - Keep Claude or other API keys out of the client bundle.
-- Keep offline-first behavior intact: IndexedDB is the primary UI data source, Supabase is the sync target.
+- Keep offline-first behavior intact: IndexedDB is the primary UI data source, Supabase is the sync target..
