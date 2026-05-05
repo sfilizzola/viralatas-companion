@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { Band } from '../types';
 import { loadBands } from '../lib/db';
-import { togglePick } from '../lib/picks';
 import { useAuth } from '../hooks/useAuth';
 import { useBandAttendees } from '../hooks/useBandAttendees';
 import { useMyPicks } from '../hooks/useMyPicks';
@@ -40,14 +39,6 @@ export default function PopularPage() {
     [bands, pickCounts],
   );
 
-  const handleToggle = useCallback(
-    async (bandId: string) => {
-      if (!userId) return;
-      await togglePick(userId, bandId, pickedIds.has(bandId));
-      await refreshPicks();
-    },
-    [userId, pickedIds, refreshPicks],
-  );
 
   function toggleAttendees(bandId: string) {
     setExpandedBandIds((current) => {
@@ -83,7 +74,8 @@ export default function PopularPage() {
               band={band}
               isPicked={pickedIds.has(band.id)}
               count={count}
-              onToggle={() => handleToggle(band.id)}
+              onToggle={() => {}}
+              hidePickButton={true}
             >
               <div className={styles.attendeeTools}>
                 <button

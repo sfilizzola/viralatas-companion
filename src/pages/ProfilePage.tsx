@@ -148,6 +148,7 @@ function ProfileForm({
             type="text"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
+            maxLength={30}
           />
         </label>
         <label className={styles.label}>

@@ -60,7 +60,7 @@ export default function SchedulePage() {
 
   useEffect(() => {
     loadBands().then((data) => {
-      setBands(data.sort((a, b) => a.start_time.localeCompare(b.start_time)));
+      setBands(data.sort((a, b) => a.name.localeCompare(b.name)));
       setLoading(false);
     });
   }, []);
@@ -183,9 +183,10 @@ type BandCardProps = {
   count: number;
   onToggle: () => void;
   children?: React.ReactNode;
+  hidePickButton?: boolean;
 };
 
-export function BandCard({ band, isPicked, count, onToggle, children }: BandCardProps) {
+export function BandCard({ band, isPicked, count, onToggle, children, hidePickButton = false }: BandCardProps) {
   const { t } = useI18n('SchedulePage');
   const stageColor = STAGE_COLORS[band.stage] ?? 'var(--accent)';
   const initial = band.name.charAt(0).toUpperCase();
@@ -231,17 +232,19 @@ export function BandCard({ band, isPicked, count, onToggle, children }: BandCard
         {children}
       </div>
 
-      <button
-        className={`${styles.pickBtn} ${isPicked ? styles.pickBtnActive : ''}`}
-        onClick={(event) => {
-          event.stopPropagation();
-          onToggle();
-        }}
-        aria-label={isPicked ? t('removePick') : t('addPick')}
-        aria-pressed={isPicked}
-      >
-        <StarIcon filled={isPicked} />
-      </button>
+      {!hidePickButton && (
+        <button
+          className={`${styles.pickBtn} ${isPicked ? styles.pickBtnActive : ''}`}
+          onClick={(event) => {
+            event.stopPropagation();
+            onToggle();
+          }}
+          aria-label={isPicked ? t('removePick') : t('addPick')}
+          aria-pressed={isPicked}
+        >
+          <StarIcon filled={isPicked} />
+        </button>
+      )}
     </article>
   );
 }

@@ -106,6 +106,7 @@ export default function RegisterPage() {
               onChange={(e) => setDisplayName(e.target.value)}
               placeholder={t('crewNamePlaceholder')}
               autoComplete="nickname"
+              maxLength={30}
             />
           </label>
 
