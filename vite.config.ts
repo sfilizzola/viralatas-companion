@@ -7,25 +7,36 @@ import { execSync } from 'child_process';
 // we need to unshallow first. If that fails, fall back to timestamp-based monotonic patch.
 // Note: VERCEL_GIT_COMMIT_COUNT is not a standard env var; unshallowing is more reliable.
 const getPatch = (): string => {
+  const isCI = process.env.VERCEL || process.env.NETLIFY || process.env.CI;
+
   // For Vercel and Netlify: try to unshallow then count
   if (process.env.VERCEL || process.env.NETLIFY) {
     try {
-      execSync('git fetch --unshallow', { stdio: 'ignore' });
-    } catch {
-      /* already full clone or fetch failed */
+      console.log('[vite-config] Attempting git fetch --unshallow...');
+      execSync('git fetch --unshallow', { stdio: 'pipe' });
+      console.log('[vite-config] Successfully unshallowed git repository');
+    } catch (err) {
+      console.log('[vite-config] Unshallow failed (already full clone or offline):', err instanceof Error ? err.message : err);
     }
   }
+
   // Try git count (works locally and on full clones)
   try {
-    return execSync('git rev-list --count HEAD').toString().trim();
-  } catch {
+    const count = execSync('git rev-list --count HEAD').toString().trim();
+    console.log(`[vite-config] Git commit count: ${count} (isCI: ${isCI})`);
+    return count;
+  } catch (err) {
+    console.log('[vite-config] git rev-list failed:', err instanceof Error ? err.message : err);
     // Last resort: days since project epoch (monotonically increasing)
     const epoch = new Date('2025-01-01').getTime();
-    return String(Math.floor((Date.now() - epoch) / 86_400_000));
+    const patch = String(Math.floor((Date.now() - epoch) / 86_400_000));
+    console.log(`[vite-config] Using timestamp-based patch: ${patch}`);
+    return patch;
   }
 };
 
 const commitCount = getPatch();
+console.log(`[vite-config] Final PATCH version: ${commitCount}`);
 
 export default defineConfig({
   define: {
