@@ -22,7 +22,7 @@ export default function MyPicksPage() {
 
   useEffect(() => {
     loadBands().then((data) => {
-      setBands(data.sort((a, b) => a.name.localeCompare(b.name)));
+      setBands(data.sort((a, b) => a.start_time.localeCompare(b.start_time)));
       setLoading(false);
     });
   }, []);
