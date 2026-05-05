@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, type KeyboardEvent } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef, type KeyboardEvent } from 'react';
 import type { Band } from '../types';
 import { loadBands } from '../lib/db';
 import { togglePick } from '../lib/picks';
@@ -50,6 +50,11 @@ export default function SchedulePage() {
   const [bands, setBands] = useState<Band[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>({ day: null, stage: null, upcoming: false });
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const touchStartY = useRef<number>(0);
 
   const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
   const pickCounts = usePickCounts();
@@ -78,6 +83,18 @@ export default function SchedulePage() {
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    if (!sheetOpen) return;
+    const handleEsc = (e: Event) => {
+      const ke = e as unknown as KeyboardEvent;
+      if (ke.key === 'Escape') {
+        closeSheet();
+      }
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [sheetOpen]);
 
   const stages = useMemo(
     () => [...new Set(bands.map((b) => b.stage))].sort(),
@@ -115,59 +132,152 @@ export default function SchedulePage() {
     setFilters((f) => ({ ...f, upcoming: !f.upcoming }));
   }
 
+  const hasActiveFilters = filters.day || filters.stage || filters.upcoming;
+
+  function closeSheet() {
+    setSheetOpen(false);
+  }
+
+  function handleBackdropClick(e: React.MouseEvent) {
+    if (e.target === backdropRef.current) {
+      closeSheet();
+    }
+  }
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartY.current = e.touches[0].clientY;
+  }
+
+  function handleTouchEnd(e: React.TouchEvent) {
+    const touchEndY = e.changedTouches[0].clientY;
+    if (touchEndY > touchStartY.current + 50) {
+      closeSheet();
+    }
+  }
+
+  function getActiveFilterTags() {
+    const tags: string[] = [];
+    if (filters.day) {
+      const dayLabel = festivalDays.find((d) => d.date === filters.day)?.label;
+      if (dayLabel) tags.push(dayLabel);
+    }
+    if (filters.stage) tags.push(filters.stage);
+    if (filters.upcoming) tags.push(t('upcomingBands'));
+    return tags;
+  }
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
         <span className={styles.title}>{t('title')}</span>
       </header>
 
-      <div className={styles.filters}>
-        <div className={styles.filterRow}>
-          {festivalDays.map(({ label, date }) => (
-            <button
-              key={date}
-              className={`${styles.pill} ${filters.day === date ? styles.pillActive : ''}`}
-              onClick={() => toggleDay(date)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+      <div className={styles.stickyBar}>
+        <button className={styles.filtersButton} onClick={() => setSheetOpen(true)}>
+          <FunnelIcon />
+          <span>{t('filtros')}</span>
+        </button>
 
-        <div className={styles.filterRow}>
-          {stages.map((stage) => (
-            <button
-              key={stage}
-              className={`${styles.pill} ${filters.stage === stage ? styles.pillActive : ''}`}
-              style={
-                filters.stage === stage
-                  ? { background: STAGE_COLORS[stage] ?? 'var(--accent)', borderColor: 'transparent' }
-                  : {}
-              }
-              onClick={() => toggleStage(stage)}
-            >
-              {stage}
-            </button>
-          ))}
-        </div>
+        {hasActiveFilters && (
+          <div className={styles.activeTags}>
+            {getActiveFilterTags().map((tag, i) => (
+              <span key={i} className={styles.tag}>
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
 
-        <div className={styles.filterRow}>
-          <button
-            className={`${styles.pill} ${filters.upcoming ? styles.pillActive : ''}`}
-            onClick={toggleUpcoming}
-          >
-            {t('upcomingBands')}
+        {hasActiveFilters && (
+          <button className={styles.clearLink} onClick={() => setFilters({ day: null, stage: null, upcoming: false })}>
+            {t('limpar')}
           </button>
-          {(filters.day || filters.stage || filters.upcoming) && (
-            <button
-              className={styles.clearBtn}
-              onClick={() => setFilters({ day: null, stage: null, upcoming: false })}
-            >
-              {t('clearFilters')}
-            </button>
-          )}
-        </div>
+        )}
       </div>
+
+      {sheetOpen && (
+        <div
+          className={styles.backdrop}
+          ref={backdropRef}
+          onClick={handleBackdropClick}
+          role="presentation"
+        >
+          <div
+            className={styles.bottomSheet}
+            ref={sheetRef}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            role="dialog"
+            aria-modal="true"
+          >
+            <div className={styles.sheetHandle} />
+
+            <div className={styles.sheetContent}>
+              <h2 className={styles.sectionTitle}>{t('dia')}</h2>
+              <div className={styles.dayChips}>
+                <button
+                  className={`${styles.pill} ${!filters.day ? styles.pillActive : ''}`}
+                  onClick={() => setFilters((f) => ({ ...f, day: null }))}
+                >
+                  {t('todos')}
+                </button>
+                {festivalDays.map(({ label, date }) => (
+                  <button
+                    key={date}
+                    className={`${styles.pill} ${filters.day === date ? styles.pillActive : ''}`}
+                    onClick={() => toggleDay(date)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              <h2 className={styles.sectionTitle}>{t('palco')}</h2>
+              <div className={styles.stageChips}>
+                {stages.map((stage) => (
+                  <button
+                    key={stage}
+                    className={`${styles.pill} ${filters.stage === stage ? styles.pillActive : ''}`}
+                    style={
+                      filters.stage === stage
+                        ? { background: STAGE_COLORS[stage] ?? 'var(--accent)', borderColor: 'transparent' }
+                        : {}
+                    }
+                    onClick={() => toggleStage(stage)}
+                  >
+                    {stage}
+                  </button>
+                ))}
+              </div>
+
+              <div className={styles.advancedToggle}>
+                <button
+                  className={`${styles.advancedButton} ${showAdvanced ? styles.advancedActive : ''}`}
+                  onClick={() => setShowAdvanced(!showAdvanced)}
+                >
+                  {t('avancado')}
+                </button>
+              </div>
+
+              {showAdvanced && (
+                <div className={styles.advancedContent}>
+                  <h2 className={styles.sectionTitle}>{t('upcomingBands')}</h2>
+                  <button
+                    className={`${styles.pill} ${filters.upcoming ? styles.pillActive : ''}`}
+                    onClick={toggleUpcoming}
+                  >
+                    {t('upcomingBands')}
+                  </button>
+                </div>
+              )}
+
+              <button className={styles.verBandasBtn} onClick={closeSheet}>
+                {t('verBandas')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <main className={styles.list}>
         {loading && <p className={styles.empty}>{t('loadingSchedule')}</p>}
@@ -260,6 +370,24 @@ export function BandCard({ band, isPicked, count, onToggle, children, hidePickBu
         </button>
       )}
     </article>
+  );
+}
+
+function FunnelIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={18}
+      height={18}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+    </svg>
   );
 }
 

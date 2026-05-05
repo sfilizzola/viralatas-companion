@@ -13,5 +13,12 @@
   "emptySchedule": "No bands found.",
   "goingCount": "{count} going",
   "removePick": "Remove pick",
-  "addPick": "Add pick"
+  "addPick": "Add pick",
+  "filtros": "Filters",
+  "limpar": "Clear",
+  "verBandas": "Show bands",
+  "todos": "All",
+  "dia": "Day",
+  "palco": "Stage",
+  "avancado": "Advanced"
 }

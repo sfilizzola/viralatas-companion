@@ -13,5 +13,12 @@
   "emptySchedule": "Nenhuma banda encontrada.",
   "goingCount": "{count} indo",
   "removePick": "Remover pick",
-  "addPick": "Adicionar pick"
+  "addPick": "Adicionar pick",
+  "filtros": "Filtros",
+  "limpar": "Limpar",
+  "verBandas": "Ver bandas",
+  "todos": "Todos",
+  "dia": "Dia",
+  "palco": "Palco",
+  "avancado": "Avançado"
 }
