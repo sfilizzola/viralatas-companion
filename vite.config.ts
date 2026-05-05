@@ -3,20 +3,16 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { execSync } from 'child_process';
 
-// If PATCH keeps showing as 0 or 1 on Vercel:
-// Go to Project Settings → Git → enable "Include all branches' commit history"
-// OR check that VERCEL_GIT_COMMIT_COUNT is available under Settings → Environment Variables
+// Get commit count for version patch number. On Vercel/Netlify with shallow clones,
+// we need to unshallow first. If that fails, fall back to timestamp-based monotonic patch.
+// Note: VERCEL_GIT_COMMIT_COUNT is not a standard env var; unshallowing is more reliable.
 const getPatch = (): string => {
-  // Vercel injects this — most reliable
-  if (process.env.VERCEL_GIT_COMMIT_COUNT) {
-    return process.env.VERCEL_GIT_COMMIT_COUNT;
-  }
-  // Netlify: try to unshallow then count
-  if (process.env.NETLIFY) {
+  // For Vercel and Netlify: try to unshallow then count
+  if (process.env.VERCEL || process.env.NETLIFY) {
     try {
       execSync('git fetch --unshallow', { stdio: 'ignore' });
     } catch {
-      /* already full clone */
+      /* already full clone or fetch failed */
     }
   }
   // Try git count (works locally and on full clones)
