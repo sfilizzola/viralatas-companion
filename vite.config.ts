@@ -1,39 +1,17 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
-import { execSync } from 'child_process';
 
-// Get commit count for version patch number. On Vercel/Netlify with shallow clones,
-// we need to unshallow first. If that fails, fall back to timestamp-based monotonic patch.
-// Note: VERCEL_GIT_COMMIT_COUNT is not a standard env var; unshallowing is more reliable.
+// Get build version: timestamp in hex for compact, monotonically increasing identifier.
+// Hex format is smaller than decimal and can be converted back:
+//   1746993000 (decimal) = 6797c5a8 (hex)
+// To decode: parseInt('6797c5a8', 16) = 1746993000 (seconds since unix epoch)
 const getPatch = (): string => {
-  const isCI = process.env.VERCEL || process.env.NETLIFY || process.env.CI;
-
-  // For Vercel and Netlify: fetch full history from origin
-  if (process.env.VERCEL || process.env.NETLIFY) {
-    try {
-      console.log('[vite-config] Attempting to fetch full git history...');
-      // Use --deepen with large number to convert shallow clone to full, or --depth for full fetch
-      execSync('git fetch --depth=2147483647 origin main', { stdio: 'pipe' });
-      console.log('[vite-config] Successfully fetched full git history');
-    } catch (err) {
-      console.log('[vite-config] Fetch failed (already full clone or offline):', err instanceof Error ? err.message : err);
-    }
-  }
-
-  // Try git count (works locally and on full clones)
-  try {
-    const count = execSync('git rev-list --count HEAD').toString().trim();
-    console.log(`[vite-config] Git commit count: ${count} (isCI: ${isCI})`);
-    return count;
-  } catch (err) {
-    console.log('[vite-config] git rev-list failed:', err instanceof Error ? err.message : err);
-    // Last resort: days since project epoch (monotonically increasing)
-    const epoch = new Date('2025-01-01').getTime();
-    const patch = String(Math.floor((Date.now() - epoch) / 86_400_000));
-    console.log(`[vite-config] Using timestamp-based patch: ${patch}`);
-    return patch;
-  }
+  // Use current timestamp in seconds, convert to hex for compact representation
+  const timestampSeconds = Math.floor(Date.now() / 1000);
+  const hexPatch = timestampSeconds.toString(16);
+  console.log(`[vite-config] Build timestamp: ${timestampSeconds} (hex: ${hexPatch})`);
+  return hexPatch;
 };
 
 const commitCount = getPatch();
