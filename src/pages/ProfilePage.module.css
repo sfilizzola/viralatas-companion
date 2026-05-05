@@ -424,3 +424,69 @@
   background: var(--border);
   border-color: var(--text-muted);
 }
+
+/* Godlike section */
+.godlikeSection {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 2rem;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 1.5rem;
+}
+
+.godlikeSectionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+.godlikeTitle {
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: 0;
+}
+
+.resetButton {
+  background: #dc2626;
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.75rem 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.15s;
+  cursor: pointer;
+  font-family: inherit;
+  width: 100%;
+}
+
+.resetButton:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.resetButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.resetButton.resetting {
+  opacity: 0.7;
+}
+
+.resetMessage {
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: var(--radius);
+  background: var(--bg-elevated);
+  color: var(--text);
+}

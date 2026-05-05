@@ -18,5 +18,10 @@
   "conflictCardTitle": "{bandA} vs {bandB}",
   "keepBand": "Manter {band}",
   "conflictModalTitle": "Qual palco você vai rolar?",
-  "close": "Fechar"
+  "close": "Fechar",
+  "resetAllData": "RESET ALL DATA",
+  "resetting": "Apagando cache",
+  "resetConfirm": "Isso vai apagar o cache local de TODOS os usuários. Eles vão re-sincronizar no próximo acesso. Tem certeza?",
+  "resetSuccess": "Cache invalidado. Todos vão re-sincronizar. 🤘",
+  "resetError": "Erro ao resetar. Tenta de novo."
 }

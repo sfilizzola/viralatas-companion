@@ -15,6 +15,20 @@ import { flushOfflineQueue, syncCrewPicks } from './lib/picks';
 import { syncCrewUsers } from './lib/users';
 import { flushPresenceQueue, syncCrewPresence } from './lib/presence';
 import { flushPendingAnnouncements, syncAnnouncements } from './lib/announcements';
+import { checkAndApplyCacheVersion } from './lib/cache';
+
+function CacheVersionCheck() {
+  const { session } = useAuth();
+  const userId = session?.user?.id;
+
+  useEffect(() => {
+    if (userId) {
+      checkAndApplyCacheVersion().catch(() => {});
+    }
+  }, [userId]);
+
+  return null;
+}
 
 function BandSync() {
   const { session } = useAuth();
@@ -83,6 +97,7 @@ function AnnouncementSync() {
 export default function App() {
   return (
     <BrowserRouter>
+      <CacheVersionCheck />
       <BandSync />
       <PickSync />
       <AnnouncementSync />

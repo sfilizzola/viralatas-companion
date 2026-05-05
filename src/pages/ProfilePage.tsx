@@ -1,12 +1,14 @@
 import { useState, type ChangeEvent, type FormEvent, useEffect, useCallback, useMemo } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
-import type { Band, UserPick } from '../types';
+import type { Band, UserPick, UserRole } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';
 import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../lib/db';
 import { togglePick } from '../lib/picks';
+import { fetchCurrentUserRole, fetchAllUsers } from '../lib/announcements';
+import { invalidateCacheForAllUsers } from '../lib/cache';
 import BottomNav from '../components/BottomNav';
 import styles from './ProfilePage.module.css';
 
@@ -189,6 +191,7 @@ function ProfileForm({
       </form>
 
       <ConflictSection userId={userId} t={t} />
+      <GodlikeSection userId={userId} t={t} />
     </main>
   );
 }
@@ -399,5 +402,70 @@ function ConflictSection({ userId, t }: ConflictSectionProps) {
         </div>
       )}
     </>
+  );
+}
+
+type GodlikeSectionProps = {
+  userId: string;
+  t: (key: string, values?: Record<string, string | number>) => string;
+};
+
+function GodlikeSection({ userId, t }: GodlikeSectionProps) {
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [resetting, setResetting] = useState(false);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadRole() {
+      const role = await fetchCurrentUserRole(userId);
+      setUserRole(role);
+      setLoading(false);
+    }
+    loadRole();
+  }, [userId]);
+
+  const handleResetAllData = useCallback(async () => {
+    const confirmMsg = t('resetConfirm');
+    if (!window.confirm(confirmMsg)) return;
+
+    setResetting(true);
+    setResetMessage(null);
+
+    try {
+      await invalidateCacheForAllUsers();
+      setResetMessage(t('resetSuccess'));
+      setTimeout(() => setResetMessage(null), 4000);
+    } catch (error) {
+      console.error('Reset failed:', error);
+      setResetMessage(t('resetError'));
+      setTimeout(() => setResetMessage(null), 4000);
+    } finally {
+      setResetting(false);
+    }
+  }, [t]);
+
+  if (loading || userRole !== 'godlike') {
+    return null;
+  }
+
+  return (
+    <div className={styles.godlikeSection}>
+      <div className={styles.divider} />
+      <div className={styles.godlikeSectionContent}>
+        <h3 className={styles.godlikeTitle}>🤘 GODLIKE POWERS</h3>
+
+        <button
+          className={`${styles.resetButton} ${resetting ? styles.resetting : ''}`}
+          onClick={handleResetAllData}
+          disabled={resetting}
+          type="button"
+        >
+          {resetting ? `${t('resetting')} ⏳` : t('resetAllData')}
+        </button>
+
+        {resetMessage && <p className={styles.resetMessage}>{resetMessage}</p>}
+      </div>
+    </div>
   );
 }

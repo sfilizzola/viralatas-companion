@@ -2,7 +2,7 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { Announcement, Band, CrewUser, UserPick, UserPresence } from '../types';
 
 const DB_NAME = 'viralatas-db';
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 
 export const PICKS_CHANGED_EVENT = 'viralatas:picks-changed';
 export const CREW_USERS_CHANGED_EVENT = 'viralatas:crew-users-changed';
@@ -59,6 +59,10 @@ type ViralatasDB = {
     key: string;
     value: Announcement;
   };
+  meta: {
+    key: string;
+    value: { cache_version: string };
+  };
 };
 
 let dbPromise: Promise<IDBPDatabase<ViralatasDB>> | null = null;
@@ -96,6 +100,9 @@ function getDB() {
         }
         if (!db.objectStoreNames.contains('pending_announcements')) {
           db.createObjectStore('pending_announcements', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('meta')) {
+          db.createObjectStore('meta');
         }
       },
     });
@@ -311,4 +318,38 @@ export async function loadOfflineAnnouncementsQueue(): Promise<Announcement[]> {
 export async function removeFromOfflineAnnouncementsQueue(id: string) {
   const db = await getDB();
   await db.delete('pending_announcements', id);
+}
+
+// --- Cache version invalidation ---
+
+export async function wipeAllLocalData() {
+  const db = await getDB();
+  const tx = db.transaction(
+    ['bands', 'crew_users', 'user_picks', 'offline_picks', 'user_presence', 'offline_presence', 'announcements', 'pending_announcements'],
+    'readwrite',
+  );
+
+  await Promise.all([
+    tx.objectStore('bands').clear(),
+    tx.objectStore('crew_users').clear(),
+    tx.objectStore('user_picks').clear(),
+    tx.objectStore('offline_picks').clear(),
+    tx.objectStore('user_presence').clear(),
+    tx.objectStore('offline_presence').clear(),
+    tx.objectStore('announcements').clear(),
+    tx.objectStore('pending_announcements').clear(),
+  ]);
+
+  await tx.done;
+}
+
+export async function saveCacheVersion(version: string) {
+  const db = await getDB();
+  await db.put('meta', { cache_version: version }, 'cache_version');
+}
+
+export async function loadCacheVersion(): Promise<string | null> {
+  const db = await getDB();
+  const meta = await db.get('meta', 'cache_version');
+  return meta?.cache_version ?? null;
 }

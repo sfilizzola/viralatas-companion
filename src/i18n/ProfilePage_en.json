@@ -18,5 +18,10 @@
   "conflictCardTitle": "{bandA} vs {bandB}",
   "keepBand": "Keep {band}",
   "conflictModalTitle": "Which stage will you check out?",
-  "close": "Close"
+  "close": "Close",
+  "resetAllData": "RESET ALL DATA",
+  "resetting": "Wiping cache",
+  "resetConfirm": "This will wipe the local cache of ALL users. They will re-sync on their next access. Are you sure?",
+  "resetSuccess": "Cache invalidated. Everyone will re-sync. 🤘",
+  "resetError": "Reset failed. Try again."
 }
