@@ -1,8 +1,22 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { execSync } from 'child_process';
+
+const commitCount = (() => {
+  try {
+    return execSync('git rev-list --count HEAD').toString().trim();
+  } catch {
+    // Fallback for environments with no git (e.g., shallow clone on some CI systems)
+    // If deploy shows 0.9.0, enable "Full git history" in Vercel/Netlify platform settings
+    return '0';
+  }
+})();
 
 export default defineConfig({
+  define: {
+    'import.meta.env.VITE_COMMIT_COUNT': JSON.stringify(commitCount),
+  },
   plugins: [
     react(),
     VitePWA({

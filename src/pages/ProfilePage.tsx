@@ -9,6 +9,7 @@ import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../lib/db';
 import { togglePick } from '../lib/picks';
 import { fetchCurrentUserRole } from '../lib/announcements';
 import { invalidateCacheForAllUsers } from '../lib/cache';
+import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
 import styles from './ProfilePage.module.css';
 
@@ -43,6 +44,10 @@ export default function ProfilePage() {
           userId={user.id}
         />
       )}
+
+      <div style={{ textAlign: 'center', padding: '2rem 1rem 1rem', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+        Caramelo Tech v{VERSION}
+      </div>
 
       <div style={{ height: 56 }} />
       <BottomNav />
