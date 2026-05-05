@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';
 import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../lib/db';
 import { togglePick } from '../lib/picks';
-import { fetchCurrentUserRole, fetchAllUsers, setUserRole } from '../lib/announcements';
+import { fetchCurrentUserRole, fetchAllUsers, setUserRole as updateUserRole } from '../lib/announcements';
 import { invalidateCacheForAllUsers } from '../lib/cache';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
@@ -496,7 +496,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
       );
 
       try {
-        await setUserRole(targetUserId, newRole as 'normal' | 'manager');
+        await updateUserRole(targetUserId, newRole as 'normal' | 'manager');
       } catch (error) {
         console.error('Failed to update user role:', error);
         setAllUsers(originalUsers);
