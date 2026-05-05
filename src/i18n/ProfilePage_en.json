@@ -11,5 +11,12 @@
   "photoError": "Could not upload that photo.",
   "saveDone": "Saved",
   "saveLoading": "Saving...",
-  "saveProfile": "Save profile"
+  "saveProfile": "Save profile",
+  "conflicts": "Conflicts",
+  "noConflicts": "No conflicts in your picks 🤘",
+  "day": "Day {day}",
+  "conflictCardTitle": "{bandA} vs {bandB}",
+  "keepBand": "Keep {band}",
+  "conflictModalTitle": "Which stage will you check out?",
+  "close": "Close"
 }

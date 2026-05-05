@@ -11,5 +11,12 @@
   "photoError": "Nao foi possivel enviar essa foto.",
   "saveDone": "Salvo",
   "saveLoading": "Salvando...",
-  "saveProfile": "Salvar perfil"
+  "saveProfile": "Salvar perfil",
+  "conflicts": "Conflitos",
+  "noConflicts": "Sem conflitos nos seus picks 🤘",
+  "day": "Dia {day}",
+  "conflictCardTitle": "{bandA} vs {bandB}",
+  "keepBand": "Manter {band}",
+  "conflictModalTitle": "Qual palco você vai rolar?",
+  "close": "Fechar"
 }

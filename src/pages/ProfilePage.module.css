@@ -152,3 +152,255 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* Conflicts section */
+.conflictsSection {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 2rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.conflictsHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background: var(--bg-elevated);
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.conflictsHeader:hover {
+  background: var(--bg-elevated-hover, var(--bg-elevated));
+}
+
+.conflictsTitle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.conflictBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: #fff;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  transition: transform 0.2s;
+}
+
+.chevron.open {
+  transform: rotate(180deg);
+}
+
+.conflictsContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.conflictsContent.open {
+  max-height: 10000px;
+  transition: max-height 0.3s ease-in;
+}
+
+.conflictsInner {
+  padding: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.dayGroup {
+  margin-bottom: 1.5rem;
+}
+
+.dayGroup:last-child {
+  margin-bottom: 0;
+}
+
+.dayGroupTitle {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.conflictCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-bottom: 0.75rem;
+}
+
+.conflictCard:last-child {
+  margin-bottom: 0;
+}
+
+.conflictCard:hover {
+  background: var(--bg-elevated);
+}
+
+.conflictCardBands {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.bandName {
+  flex: 1;
+  min-width: 0;
+}
+
+.conflictIndicator {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.conflictCardTimes {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  gap: 0.5rem;
+}
+
+.bandTime {
+  flex: 1;
+  min-width: 0;
+}
+
+.emptyConflicts {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+/* Conflict modal/panel */
+.conflictModal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.conflictModalContent {
+  width: 100%;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  border-radius: 1rem 1rem 0 0;
+  padding: 1.5rem 1.5rem 2rem;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.conflictModalTitle {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.conflictBandOption {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  background: var(--bg-elevated);
+}
+
+.conflictBandOption:last-of-type {
+  margin-bottom: 1.5rem;
+}
+
+.conflictBandName {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.conflictBandInfo {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.conflictButtonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.conflictButton {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+
+.conflictButton:hover {
+  background: var(--accent-hover);
+}
+
+.conflictCloseButton {
+  background: var(--bg-elevated);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.conflictCloseButton:hover {
+  background: var(--bg-elevated-hover, var(--bg-elevated));
+}
