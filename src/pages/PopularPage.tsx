@@ -18,7 +18,7 @@ export default function PopularPage() {
   const [bands, setBands] = useState<Band[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedBandIds, setExpandedBandIds] = useState<Set<string>>(new Set());
-  const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
+  const { pickedIds } = useMyPicks(userId);
   const attendeesByBand = useBandAttendees();
   const pickCounts = usePickCounts();
 
