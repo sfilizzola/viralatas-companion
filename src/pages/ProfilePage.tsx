@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';
 import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../lib/db';
 import { togglePick } from '../lib/picks';
-import { fetchCurrentUserRole } from '../lib/announcements';
+import { fetchCurrentUserRole, fetchAllUsers, setUserRole } from '../lib/announcements';
 import { invalidateCacheForAllUsers } from '../lib/cache';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
@@ -415,11 +415,23 @@ type GodlikeSectionProps = {
   t: (key: string, values?: Record<string, string | number>) => string;
 };
 
+type UserWithLoading = {
+  id: string;
+  email: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  role: string;
+  loading?: boolean;
+  error?: string;
+};
+
 function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
   const [resetting, setResetting] = useState(false);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
+  const [allUsers, setAllUsers] = useState<UserWithLoading[]>([]);
+  const [usersLoading, setUsersLoading] = useState(true);
 
   useEffect(() => {
     async function loadRole() {
@@ -429,6 +441,23 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
     }
     loadRole();
   }, [userId]);
+
+  useEffect(() => {
+    async function loadUsers() {
+      try {
+        const users = await fetchAllUsers();
+        setAllUsers(users as UserWithLoading[]);
+      } catch (error) {
+        console.error('Failed to load users:', error);
+      } finally {
+        setUsersLoading(false);
+      }
+    }
+
+    if (userRole === 'godlike') {
+      loadUsers();
+    }
+  }, [userRole]);
 
   const handleResetAllData = useCallback(async () => {
     const confirmMsg = t('resetConfirm');
@@ -450,9 +479,68 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
     }
   }, [t]);
 
+  const handlePromoteOrDemote = useCallback(
+    async (targetUserId: string, currentRole: string) => {
+      const newRole = currentRole === 'normal' ? 'manager' : 'normal';
+
+      setAllUsers((prev) =>
+        prev.map((u) =>
+          u.id === targetUserId ? { ...u, loading: true, error: undefined } : u,
+        ),
+      );
+
+      const originalUsers = [...allUsers];
+
+      setAllUsers((prev) =>
+        prev.map((u) => (u.id === targetUserId ? { ...u, role: newRole } : u)),
+      );
+
+      try {
+        await setUserRole(targetUserId, newRole as 'normal' | 'manager');
+      } catch (error) {
+        console.error('Failed to update user role:', error);
+        setAllUsers(originalUsers);
+        setAllUsers((prev) =>
+          prev.map((u) =>
+            u.id === targetUserId
+              ? { ...u, role: currentRole, error: t('erroRole') }
+              : u,
+          ),
+        );
+
+        setTimeout(() => {
+          setAllUsers((prev) =>
+            prev.map((u) => (u.id === targetUserId ? { ...u, error: undefined } : u)),
+          );
+        }, 3000);
+      } finally {
+        setAllUsers((prev) =>
+          prev.map((u) => (u.id === targetUserId ? { ...u, loading: false } : u)),
+        );
+      }
+    },
+    [allUsers, t],
+  );
+
   if (loading || userRole !== 'godlike') {
     return null;
   }
+
+  const getInitial = (displayName: string | null, email: string): string => {
+    if (displayName) return displayName.charAt(0).toUpperCase();
+    return email.charAt(0).toUpperCase();
+  };
+
+  const getRoleBadgeColor = (role: string): string => {
+    switch (role) {
+      case 'godlike':
+        return '#d97706';
+      case 'manager':
+        return '#3b82f6';
+      default:
+        return 'var(--text-muted)';
+    }
+  };
 
   return (
     <div className={styles.godlikeSection}>
@@ -470,6 +558,71 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
         </button>
 
         {resetMessage && <p className={styles.resetMessage}>{resetMessage}</p>}
+
+        <div className={styles.userManagementSection}>
+          <h4 className={styles.userManagementTitle}>Registered Users</h4>
+          {usersLoading ? (
+            <p className={styles.userListLoading}>Loading users...</p>
+          ) : allUsers.length === 0 ? (
+            <p className={styles.emptyUserList}>No users found</p>
+          ) : (
+            <div className={styles.userList}>
+              {allUsers.map((user) => (
+                <div key={user.id} className={styles.userRow}>
+                  <div className={styles.userInfo}>
+                    <div
+                      className={styles.userAvatar}
+                      style={{
+                        backgroundColor: 'var(--accent)',
+                      }}
+                    >
+                      {user.avatar_url ? (
+                        <img src={user.avatar_url} alt="" className={styles.userAvatarImg} />
+                      ) : (
+                        <span>{getInitial(user.display_name, user.email)}</span>
+                      )}
+                    </div>
+                    <div className={styles.userDetails}>
+                      <div className={styles.userDisplayName}>
+                        {user.display_name || user.email}
+                      </div>
+                      <div className={styles.userEmail}>{user.email}</div>
+                    </div>
+                  </div>
+
+                  <div className={styles.userActionArea}>
+                    <div
+                      className={styles.roleBadge}
+                      style={{ color: getRoleBadgeColor(user.role) }}
+                    >
+                      {user.role === 'godlike' ? '🤘' : user.role === 'manager' ? '🔧' : '👤'}
+                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                    </div>
+
+                    {user.role !== 'godlike' && (
+                      <button
+                        className={`${styles.userActionButton} ${user.loading ? styles.loading : ''}`}
+                        onClick={() => handlePromoteOrDemote(user.id, user.role)}
+                        disabled={user.loading}
+                        type="button"
+                      >
+                        {user.loading ? (
+                          <span className={styles.spinner}>⏳</span>
+                        ) : user.role === 'normal' ? (
+                          t('promoverManager')
+                        ) : (
+                          t('removerManager')
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {user.error && <p className={styles.userRowError}>{user.error}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

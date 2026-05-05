@@ -23,5 +23,8 @@
   "resetting": "Wiping cache",
   "resetConfirm": "This will wipe the local cache of ALL users. They will re-sync on their next access. Are you sure?",
   "resetSuccess": "Cache invalidated. Everyone will re-sync. 🤘",
-  "resetError": "Reset failed. Try again."
+  "resetError": "Reset failed. Try again.",
+  "promoverManager": "Promote to Manager",
+  "removerManager": "Remove Manager",
+  "erroRole": "Update failed. Try again."
 }

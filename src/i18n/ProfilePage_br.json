@@ -23,5 +23,8 @@
   "resetting": "Apagando cache",
   "resetConfirm": "Isso vai apagar o cache local de TODOS os usuários. Eles vão re-sincronizar no próximo acesso. Tem certeza?",
   "resetSuccess": "Cache invalidado. Todos vão re-sincronizar. 🤘",
-  "resetError": "Erro ao resetar. Tenta de novo."
+  "resetError": "Erro ao resetar. Tenta de novo.",
+  "promoverManager": "Promover a Manager",
+  "removerManager": "Remover Manager",
+  "erroRole": "Erro ao atualizar. Tenta de novo."
 }
