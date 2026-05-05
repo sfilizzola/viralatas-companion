@@ -118,6 +118,13 @@ export default function RightNowPage() {
   const [latestAnnouncement, setLatestAnnouncement] = useState<Announcement | null>(null);
   const [now, setNow] = useState(() => new Date());
   const [loading, setLoading] = useState(true);
+  const [skippedBandIds, setSkippedBandIds] = useState<Set<string>>(new Set());
+  const [undoState, setUndoState] = useState<{
+    bandId: string;
+    bandName: string;
+    prevBandId: string | null;
+  } | null>(null);
+  const [undoTimerId, setUndoTimerId] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const refreshFromCache = useCallback(async () => {
     try {
@@ -156,8 +163,9 @@ export default function RightNowPage() {
       window.removeEventListener(CREW_USERS_CHANGED_EVENT, handleCacheChange);
       window.removeEventListener(PRESENCE_CHANGED_EVENT, handleCacheChange);
       window.removeEventListener(ANNOUNCEMENTS_CHANGED_EVENT, handleCacheChange);
+      if (undoTimerId) clearTimeout(undoTimerId);
     };
-  }, [refreshFromCache]);
+  }, [refreshFromCache, undoTimerId]);
 
   useEffect(() => {
     syncCrewPresence().catch(() => {});
@@ -181,12 +189,14 @@ export default function RightNowPage() {
 
   const myRawPlan = useMemo(() => {
     if (!userId) return { status: 'empty', band: null } satisfies LivePlan;
-    return findLivePlan(
-      bands,
-      new Set(picks.filter((pick) => pick.user_id === userId).map((pick) => pick.band_id)),
-      now,
+    const userPickBandIds = new Set(
+      picks
+        .filter((pick) => pick.user_id === userId)
+        .map((pick) => pick.band_id)
+        .filter((bandId) => !skippedBandIds.has(bandId)),
     );
-  }, [bands, picks, userId, now]);
+    return findLivePlan(bands, userPickBandIds, now);
+  }, [bands, picks, userId, now, skippedBandIds]);
 
   const myPresence = useMemo(
     () => (userId ? presence.find((item) => item.user_id === userId) : undefined),
@@ -214,6 +224,49 @@ export default function RightNowPage() {
   }, [bands, picks, crewUsers, presence, userId, userDisplayName, now]);
 
   const crewGroups = useMemo(() => groupCrewLivePlans(crewPlans), [crewPlans]);
+
+  function handleSkip() {
+    if (!myPlan.band) return;
+    const bandId = myPlan.band.id;
+    const bandName = myPlan.band.name;
+
+    // Clear any existing undo timer
+    if (undoTimerId) clearTimeout(undoTimerId);
+
+    // Add band to skipped set
+    const newSkipped = new Set(skippedBandIds);
+    newSkipped.add(bandId);
+    setSkippedBandIds(newSkipped);
+
+    // Show undo toast for 5 seconds
+    setUndoState({
+      bandId,
+      bandName,
+      prevBandId: myRawPlan.band?.id ?? null,
+    });
+
+    const timerId = setTimeout(() => {
+      setUndoState(null);
+    }, 5000);
+
+    setUndoTimerId(timerId);
+  }
+
+  function handleUndo() {
+    if (!undoState) return;
+
+    // Clear timer
+    if (undoTimerId) clearTimeout(undoTimerId);
+    setUndoTimerId(null);
+
+    // Remove from skipped set
+    const newSkipped = new Set(skippedBandIds);
+    newSkipped.delete(undoState.bandId);
+    setSkippedBandIds(newSkipped);
+
+    // Close toast
+    setUndoState(null);
+  }
 
   function handleCampingToggle(checked: boolean) {
     if (!userId) return;
@@ -286,6 +339,11 @@ export default function RightNowPage() {
                     {myPlan.status === 'lost' && nextHint(myPlan, t) && (
                       <p className={styles.nextHint}>{nextHint(myPlan, t)}</p>
                     )}
+                    {myPlan.status === 'current' && myPlan.band && (
+                      <button className={styles.skipButton} onClick={handleSkip}>
+                        {t('souFraco')}
+                      </button>
+                    )}
                   </div>
                 </>
               )}
@@ -335,6 +393,17 @@ export default function RightNowPage() {
           </>
         )}
       </main>
+
+      {undoState && (
+        <div className={styles.undoToast}>
+          <span className={styles.undoToastText}>
+            {t('saiuDe', { band: undoState.bandName })}
+          </span>
+          <button className={styles.undoToastButton} onClick={handleUndo}>
+            {t('desfazer')}
+          </button>
+        </div>
+      )}
 
       <div className={styles.navSpacer} />
       <BottomNav />

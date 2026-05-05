@@ -26,5 +26,8 @@
   "lostCamping": "LOST no camping",
   "noPickQueued": "Sem pick na fila",
   "after": "Depois: {band} - {time}",
-  "latestNews": "Ultimo recado da crew"
+  "latestNews": "Ultimo recado da crew",
+  "souFraco": "Sou fraco 🤘",
+  "saiuDe": "Saiu de {band}",
+  "desfazer": "Desfazer"
 }

@@ -353,6 +353,81 @@
   margin: 0;
 }
 
+.skipButton {
+  margin-top: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease;
+  display: inline-block;
+}
+
+.skipButton:hover {
+  background: var(--bg);
+  border-color: var(--accent-hover);
+}
+
+.skipButton:active {
+  background: rgba(234, 179, 8, 0.1);
+}
+
+.undoToast {
+  position: fixed;
+  bottom: 64px;
+  left: 1rem;
+  right: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.9rem;
+  animation: slideUp 0.24s ease;
+  z-index: 10;
+}
+
+.undoToastText {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.undoToastButton {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--accent);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.undoToastButton:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .navSpacer {
   height: 56px;
   flex-shrink: 0;
