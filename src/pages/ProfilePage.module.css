@@ -169,9 +169,14 @@
   justify-content: space-between;
   padding: 1rem;
   background: var(--bg-elevated);
+  border: none;
+  color: var(--text);
   cursor: pointer;
   user-select: none;
   transition: background 0.15s;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
 }
 
 .conflictsHeader:hover {
@@ -238,9 +243,11 @@
 
 .dayGroupTitle {
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
   margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -250,13 +257,18 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 0.75rem;
-  background: var(--bg);
+  background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   border-radius: var(--radius);
   cursor: pointer;
   transition: background 0.15s;
   margin-bottom: 0.75rem;
+  color: var(--text);
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+  width: 100%;
 }
 
 .conflictCard:last-child {
@@ -264,7 +276,7 @@
 }
 
 .conflictCard:hover {
-  background: var(--bg-elevated);
+  background: var(--border);
 }
 
 .conflictCardBands {
@@ -336,6 +348,8 @@
   padding: 1.5rem 1.5rem 2rem;
   max-height: 80vh;
   overflow-y: auto;
+  position: relative;
+  z-index: 1001;
 }
 
 .conflictModalTitle {
@@ -352,8 +366,9 @@
   padding: 1rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  margin-bottom: 1rem;
-  background: var(--bg-elevated);
+  margin-bottom: 0.75rem;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .conflictBandOption:last-of-type {
@@ -363,6 +378,7 @@
 .conflictBandName {
   font-weight: 600;
   font-size: 1rem;
+  color: var(--text);
 }
 
 .conflictBandInfo {
@@ -384,11 +400,13 @@
   color: #fff;
   border: none;
   border-radius: var(--radius);
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   font-size: 0.95rem;
   font-weight: 600;
   transition: background 0.15s;
   cursor: pointer;
+  font-family: inherit;
+  margin-bottom: 0.75rem;
 }
 
 .conflictButton:hover {
@@ -399,8 +417,10 @@
   background: var(--bg-elevated);
   color: var(--text);
   border: 1px solid var(--border);
+  margin-bottom: 0;
 }
 
 .conflictCloseButton:hover {
-  background: var(--bg-elevated-hover, var(--bg-elevated));
+  background: var(--border);
+  border-color: var(--text-muted);
 }
