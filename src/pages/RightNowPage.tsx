@@ -23,6 +23,7 @@ import {
   type LivePlan,
 } from '../lib/livePreview';
 import { setCampingStatus, syncCrewPresence } from '../lib/presence';
+import { togglePick } from '../lib/picks';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../lib/i18n';
@@ -118,11 +119,9 @@ export default function RightNowPage() {
   const [latestAnnouncement, setLatestAnnouncement] = useState<Announcement | null>(null);
   const [now, setNow] = useState(() => new Date());
   const [loading, setLoading] = useState(true);
-  const [skippedBandIds, setSkippedBandIds] = useState<string[]>([]);
   const [undoState, setUndoState] = useState<{
     bandId: string;
     bandName: string;
-    prevBandId: string | null;
   } | null>(null);
   const [undoTimerId, setUndoTimerId] = useState<ReturnType<typeof setTimeout> | null>(null);
 
@@ -189,17 +188,12 @@ export default function RightNowPage() {
 
   const myRawPlan = useMemo(() => {
     if (!userId) return { status: 'empty', band: null } satisfies LivePlan;
-
-    // Get user's picks that haven't been skipped
-    const userPickBandIds = new Set(
-      picks
-        .filter((pick) => pick.user_id === userId)
-        .map((pick) => pick.band_id)
-        .filter((bandId) => !skippedBandIds.includes(bandId)),
+    return findLivePlan(
+      bands,
+      new Set(picks.filter((pick) => pick.user_id === userId).map((pick) => pick.band_id)),
+      now,
     );
-
-    return findLivePlan(bands, userPickBandIds, now);
-  }, [bands, picks, userId, now, skippedBandIds]);
+  }, [bands, picks, userId, now]);
 
   const myPresence = useMemo(
     () => (userId ? presence.find((item) => item.user_id === userId) : undefined),
@@ -228,23 +222,21 @@ export default function RightNowPage() {
 
   const crewGroups = useMemo(() => groupCrewLivePlans(crewPlans), [crewPlans]);
 
-  function handleSkip() {
-    if (!myPlan.band) return;
+  async function handleSkip() {
+    if (!myPlan.band || !userId) return;
     const bandId = myPlan.band.id;
     const bandName = myPlan.band.name;
 
     // Clear any existing undo timer
     if (undoTimerId) clearTimeout(undoTimerId);
 
-    // Add band to skipped array
-    const newSkipped = [...skippedBandIds, bandId];
-    setSkippedBandIds(newSkipped);
+    // Remove the pick from IndexedDB
+    await togglePick(userId, bandId, true);
 
     // Show undo toast for 5 seconds
     setUndoState({
       bandId,
       bandName,
-      prevBandId: myRawPlan.band?.id ?? null,
     });
 
     const timerId = setTimeout(() => {
@@ -254,16 +246,15 @@ export default function RightNowPage() {
     setUndoTimerId(timerId);
   }
 
-  function handleUndo() {
-    if (!undoState) return;
+  async function handleUndo() {
+    if (!undoState || !userId) return;
 
     // Clear timer
     if (undoTimerId) clearTimeout(undoTimerId);
     setUndoTimerId(null);
 
-    // Remove from skipped array
-    const newSkipped = skippedBandIds.filter((id) => id !== undoState.bandId);
-    setSkippedBandIds(newSkipped);
+    // Restore the pick to IndexedDB
+    await togglePick(userId, undoState.bandId, false);
 
     // Close toast
     setUndoState(null);
@@ -341,7 +332,7 @@ export default function RightNowPage() {
                       <p className={styles.nextHint}>{nextHint(myPlan, t)}</p>
                     )}
                     {myPlan.status === 'current' && myPlan.band && (
-                      <button className={styles.skipButton} onClick={handleSkip}>
+                      <button className={styles.skipButton} onClick={() => handleSkip()}>
                         {t('souFraco')}
                       </button>
                     )}
@@ -400,7 +391,7 @@ export default function RightNowPage() {
           <span className={styles.undoToastText}>
             {t('saiuDe', { band: undoState.bandName })}
           </span>
-          <button className={styles.undoToastButton} onClick={handleUndo}>
+          <button className={styles.undoToastButton} onClick={() => handleUndo()}>
             {t('desfazer')}
           </button>
         </div>
