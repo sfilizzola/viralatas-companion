@@ -118,7 +118,7 @@ export default function RightNowPage() {
   const [latestAnnouncement, setLatestAnnouncement] = useState<Announcement | null>(null);
   const [now, setNow] = useState(() => new Date());
   const [loading, setLoading] = useState(true);
-  const [skippedBandIds, setSkippedBandIds] = useState<Set<string>>(new Set());
+  const [skippedBandIds, setSkippedBandIds] = useState<string[]>([]);
   const [undoState, setUndoState] = useState<{
     bandId: string;
     bandName: string;
@@ -189,12 +189,15 @@ export default function RightNowPage() {
 
   const myRawPlan = useMemo(() => {
     if (!userId) return { status: 'empty', band: null } satisfies LivePlan;
+
+    // Get user's picks that haven't been skipped
     const userPickBandIds = new Set(
       picks
         .filter((pick) => pick.user_id === userId)
         .map((pick) => pick.band_id)
-        .filter((bandId) => !skippedBandIds.has(bandId)),
+        .filter((bandId) => !skippedBandIds.includes(bandId)),
     );
+
     return findLivePlan(bands, userPickBandIds, now);
   }, [bands, picks, userId, now, skippedBandIds]);
 
@@ -233,9 +236,8 @@ export default function RightNowPage() {
     // Clear any existing undo timer
     if (undoTimerId) clearTimeout(undoTimerId);
 
-    // Add band to skipped set
-    const newSkipped = new Set(skippedBandIds);
-    newSkipped.add(bandId);
+    // Add band to skipped array
+    const newSkipped = [...skippedBandIds, bandId];
     setSkippedBandIds(newSkipped);
 
     // Show undo toast for 5 seconds
@@ -259,9 +261,8 @@ export default function RightNowPage() {
     if (undoTimerId) clearTimeout(undoTimerId);
     setUndoTimerId(null);
 
-    // Remove from skipped set
-    const newSkipped = new Set(skippedBandIds);
-    newSkipped.delete(undoState.bandId);
+    // Remove from skipped array
+    const newSkipped = skippedBandIds.filter((id) => id !== undoState.bandId);
     setSkippedBandIds(newSkipped);
 
     // Close toast
