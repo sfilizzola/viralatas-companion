@@ -9,14 +9,15 @@ import { execSync } from 'child_process';
 const getPatch = (): string => {
   const isCI = process.env.VERCEL || process.env.NETLIFY || process.env.CI;
 
-  // For Vercel and Netlify: try to unshallow then count
+  // For Vercel and Netlify: fetch full history from origin
   if (process.env.VERCEL || process.env.NETLIFY) {
     try {
-      console.log('[vite-config] Attempting git fetch --unshallow...');
-      execSync('git fetch --unshallow', { stdio: 'pipe' });
-      console.log('[vite-config] Successfully unshallowed git repository');
+      console.log('[vite-config] Attempting to fetch full git history...');
+      // Use --deepen with large number to convert shallow clone to full, or --depth for full fetch
+      execSync('git fetch --depth=2147483647 origin main', { stdio: 'pipe' });
+      console.log('[vite-config] Successfully fetched full git history');
     } catch (err) {
-      console.log('[vite-config] Unshallow failed (already full clone or offline):', err instanceof Error ? err.message : err);
+      console.log('[vite-config] Fetch failed (already full clone or offline):', err instanceof Error ? err.message : err);
     }
   }
 
