@@ -10,10 +10,14 @@ import BottomNav from '../components/BottomNav';
 import styles from './SchedulePage.module.css';
 
 const STAGE_COLORS: Record<string, string> = {
-  'W:STAGE':       '#c0392b',
-  'HARDER STAGE':  '#e67e22',
-  'LOUDER STAGE':  '#8e44ad',
-  'FASTER STAGE':  '#2980b9',
+  'W.E.T.':              '#c0392b',
+  'Harder':              '#e67e22',
+  'Louder':              '#8e44ad',
+  'Faster':              '#2980b9',
+  'Headbangers':         '#16a085',
+  'Wasteland':           '#2c3e50',
+  'Wackinger':           '#95a5a6',
+  'Welcome to the Jungle': '#f39c12',
 };
 
 function bandDay(band: Band): string {
@@ -49,13 +53,23 @@ export default function SchedulePage() {
 
   const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
   const pickCounts = usePickCounts();
+
+  const getDayLabel = (dateStr: string): string => {
+    const date = new Date(dateStr);
+    const dayOfWeek = date.getUTCDay();
+    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] as const;
+    return t(dayNames[dayOfWeek]);
+  };
+
   const festivalDays = useMemo(
-    () => [
-      { label: t('thursday'), date: '2026-07-30' },
-      { label: t('friday'), date: '2026-07-31' },
-      { label: t('saturday'), date: '2026-08-01' },
-    ],
-    [t],
+    () => {
+      const uniqueDays = [...new Set(bands.map(bandDay))].sort();
+      return uniqueDays.map((date) => ({
+        label: getDayLabel(date),
+        date,
+      }));
+    },
+    [bands, t],
   );
 
   useEffect(() => {
