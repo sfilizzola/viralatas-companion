@@ -8,7 +8,11 @@ import { syncAnnouncements } from './announcements';
 
 export async function checkAndApplyCacheVersion(): Promise<void> {
   try {
-    const { data } = await supabase.from('app_config').select('value').eq('key', 'cache_version').single();
+    const { data } = await supabase
+      .from('app_config')
+      .select('*')
+      .eq('key', 'cache_version')
+      .single();
 
     if (!data) return;
 

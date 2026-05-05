@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';
 import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../lib/db';
 import { togglePick } from '../lib/picks';
-import { fetchCurrentUserRole, fetchAllUsers } from '../lib/announcements';
+import { fetchCurrentUserRole } from '../lib/announcements';
 import { invalidateCacheForAllUsers } from '../lib/cache';
 import BottomNav from '../components/BottomNav';
 import styles from './ProfilePage.module.css';
