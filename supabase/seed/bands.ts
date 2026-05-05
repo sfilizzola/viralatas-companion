@@ -68,7 +68,7 @@ const STAGES = {
 };
 
 const WOA = 'https://www.wacken.com'; // base for all thumbnail URLs
-const PLACEHOLDER = 'https://play-lh.googleusercontent.com/jwsjnueIfjyYZtVZCTLmHrUEHUmvZwE7-TXhXNA3TtrcdrAIv3M-a62VtFoVdwFfmenqn2iMbv6kS';
+const PLACEHOLDER = 'https://www.wacken.com/_assets/3fb8fb6daec87d7565c05103aa89d6b0/2026/Images/news_list_dummy%401x.png';
 
 export type BandSeed = {
   name: string;
