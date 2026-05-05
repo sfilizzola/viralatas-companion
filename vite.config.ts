@@ -3,15 +3,33 @@ import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { execSync } from 'child_process';
 
-const commitCount = (() => {
+// If PATCH keeps showing as 0 or 1 on Vercel:
+// Go to Project Settings → Git → enable "Include all branches' commit history"
+// OR check that VERCEL_GIT_COMMIT_COUNT is available under Settings → Environment Variables
+const getPatch = (): string => {
+  // Vercel injects this — most reliable
+  if (process.env.VERCEL_GIT_COMMIT_COUNT) {
+    return process.env.VERCEL_GIT_COMMIT_COUNT;
+  }
+  // Netlify: try to unshallow then count
+  if (process.env.NETLIFY) {
+    try {
+      execSync('git fetch --unshallow', { stdio: 'ignore' });
+    } catch {
+      /* already full clone */
+    }
+  }
+  // Try git count (works locally and on full clones)
   try {
     return execSync('git rev-list --count HEAD').toString().trim();
   } catch {
-    // Fallback for environments with no git (e.g., shallow clone on some CI systems)
-    // If deploy shows 0.9.0, enable "Full git history" in Vercel/Netlify platform settings
-    return '0';
+    // Last resort: days since project epoch (monotonically increasing)
+    const epoch = new Date('2025-01-01').getTime();
+    return String(Math.floor((Date.now() - epoch) / 86_400_000));
   }
-})();
+};
+
+const commitCount = getPatch();
 
 export default defineConfig({
   define: {
