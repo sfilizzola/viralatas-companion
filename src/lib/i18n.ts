@@ -17,6 +17,8 @@ import profileBr from '../i18n/ProfilePage_br.json';
 import profileEn from '../i18n/ProfilePage_en.json';
 import announcementsBr from '../i18n/AnnouncementsPage_br.json';
 import announcementsEn from '../i18n/AnnouncementsPage_en.json';
+import badgesBr from '../i18n/Badges_br.json';
+import badgesEn from '../i18n/Badges_en.json';
 
 export type Language = 'br' | 'en';
 
@@ -29,7 +31,8 @@ type TranslationFile =
   | 'PopularPage'
   | 'RightNowPage'
   | 'ProfilePage'
-  | 'AnnouncementsPage';
+  | 'AnnouncementsPage'
+  | 'Badges';
 
 type Translations = Record<Language, Record<TranslationFile, Record<string, string>>>;
 
@@ -46,6 +49,7 @@ const translations: Translations = {
     RightNowPage: rightNowBr,
     ProfilePage: profileBr,
     AnnouncementsPage: announcementsBr,
+    Badges: badgesBr,
   },
   en: {
     App: appEn,
@@ -57,6 +61,7 @@ const translations: Translations = {
     RightNowPage: rightNowEn,
     ProfilePage: profileEn,
     AnnouncementsPage: announcementsEn,
+    Badges: badgesEn,
   },
 };
 

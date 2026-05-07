@@ -13,6 +13,8 @@ export type Database = {
           is_test_user: boolean;
           role: 'normal' | 'manager' | 'godlike';
           created_at: string;
+          wacken_years: number[];
+          country: string | null;
         };
         Insert: {
           id?: string;
@@ -23,6 +25,8 @@ export type Database = {
           is_test_user?: boolean;
           role?: 'normal' | 'manager' | 'godlike';
           created_at?: string;
+          wacken_years?: number[];
+          country?: string | null;
         };
         Update: {
           id?: string;
@@ -33,6 +37,8 @@ export type Database = {
           is_test_user?: boolean;
           role?: 'normal' | 'manager' | 'godlike';
           created_at?: string;
+          wacken_years?: number[];
+          country?: string | null;
         };
         Relationships: [];
       };

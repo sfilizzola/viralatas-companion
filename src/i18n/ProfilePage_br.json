@@ -35,5 +35,15 @@
   "userUnblocked": "Usuário desbloqueado com sucesso",
   "blockError": "Erro ao bloquear usuário",
   "unblockError": "Erro ao desbloquear",
-  "cantUnblockSelf": "Peça a outro manager"
+  "cantUnblockSelf": "Peça a outro manager",
+  "wackenYears": "Anos no Wacken",
+  "country": "País",
+  "countryPlaceholder": "Selecione seu país",
+  "countryDe": "Alemanha",
+  "countryEs": "Espanha",
+  "countryBr": "Brasil",
+  "countryUs": "EUA",
+  "countryCo": "Colômbia",
+  "countryBe": "Bélgica",
+  "countryOther": "Outro"
 }

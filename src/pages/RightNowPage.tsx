@@ -28,6 +28,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
+import BadgesDisplay from '../components/BadgesDisplay';
 import styles from './RightNowPage.module.css';
 
 function nowLabel(date: Date, language: 'br' | 'en') {
@@ -340,6 +341,8 @@ export default function RightNowPage() {
                 </>
               )}
             </section>
+
+            {user && <BadgesDisplay user={user} />}
 
             <h2 className={styles.sectionTitle}>{t('crewNow')}</h2>
             {crewPlans.length === 0 ? (

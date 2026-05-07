@@ -124,8 +124,8 @@ band_attendance — view: counts picks per band (computed, not stored)
 | `Faster` | Main Infield | `#2980b9` (Blue) | ✅ | ✅ | ✅ | ✅ |
 | `Harder` | Main Infield | `#e67e22` (Orange) | ✅ | ✅ | ✅ | ✅ |
 | `Louder` | Main Infield | `#8e44ad` (Purple) | ✅ | ✅ | ✅ | ✅ |
-| `W.E.T.` | Tent | `#c0392b` (Red) | ✅ | ✅ | ✅ | ✅ |
-| `Headbangers` | Specialized | `#16a085` (Teal) | ✅ | ✅ | ✅ | ✅ |
+| `W.E.T.` | Outside Infield | `#c0392b` (Red) | ✅ | ✅ | ✅ | ✅ |
+| `Headbangers` | Outside Infield | `#16a085` (Teal) | ✅ | ✅ | ✅ | ✅ |
 | `Wasteland` | Specialized | `#2c3e50` (Dark Blue) | ✅ | ✅ | ✅ | ✅ |
 | `Wackinger` | Specialized | `#95a5a6` (Gray) | ✅ | ✅ | ✅ | ✅ |
 | `Welcome to the Jungle` | Specialized | `#f39c12` (Gold) | ✅ | ✅ | ✅ | ✅ |
