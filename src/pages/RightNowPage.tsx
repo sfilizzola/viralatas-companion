@@ -31,6 +31,11 @@ import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
 import styles from './RightNowPage.module.css';
 
+function truncateDisplayName(name: string): string {
+  if (name.length <= 17) return name;
+  return name.slice(0, 17) + '...';
+}
+
 function nowLabel(date: Date, language: 'br' | 'en') {
   return new Intl.DateTimeFormat(language === 'br' ? 'pt-BR' : 'en-US', {
     weekday: 'short',
@@ -95,7 +100,7 @@ function CrewMember({ crew }: { crew: CrewLivePlan }) {
         )}
       </span>
       <span className={styles.memberText}>
-        <span className={styles.crewName}>{crew.label}</span>
+        <span className={styles.crewName}>{truncateDisplayName(crew.label)}</span>
         {!crew.plan.band && crew.plan.nextBand && (
           <span className={styles.memberMeta}>
             {formatFestivalTime(crew.plan.nextBand.start_time)} - {crew.plan.nextBand.name}
