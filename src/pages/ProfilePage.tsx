@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent, useEffect, useCallback, useMemo } from 'react';
+import { useState, type ChangeEvent, type FormEvent, useEffect, useCallback, useMemo, useRef } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
 import type { Band, UserPick, UserRole } from '../types';
@@ -10,7 +10,7 @@ import { togglePick } from '../lib/picks';
 import { fetchCurrentUserRole, fetchAllUsers, fetchBlockedPostersWithUserDetails, setUserRole as updateUserRole, unblockUser } from '../lib/announcements';
 import { invalidateCacheForAllUsers } from '../lib/cache';
 import { getRegistrationEnabled, setRegistrationEnabled } from '../lib/appSettings';
-import { saveMetalPlaceConfigRemote } from '../lib/presence';
+import { saveMetalPlaceConfigRemote, autoCheckoutAllUsersFromMetalPlace } from '../lib/presence';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
@@ -259,7 +259,7 @@ function ProfileForm({
 }
 
 // Helper functions for conflict detection
-const WACKEN_START = new Date('2025-08-01T00:00:00Z');
+const WACKEN_START = new Date('2026-07-29T00:00:00Z');
 const DAY_DURATION_MS = 24 * 60 * 60 * 1000;
 
 function getFestivalDay(isoTime: string): number {
@@ -500,6 +500,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   const [metalPlaceDay, setMetalPlaceDay] = useState<number | ''>(1);
   const [metalPlaceStartTime, setMetalPlaceStartTime] = useState('12:00');
   const [metalPlaceEndTime, setMetalPlaceEndTime] = useState('23:00');
+  const previousTestModeRef = useRef(false);
 
   useEffect(() => {
     async function loadRole() {
@@ -554,7 +555,9 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
           setMetalPlaceDay(config.festival_day || '');
           setMetalPlaceStartTime(config.start_time || '12:00');
           setMetalPlaceEndTime(config.end_time || '23:00');
-          setTestModeEnabled(config.test_override_day === 1);
+          const isTestModeOn = config.test_override_day !== null && config.test_override_day !== undefined;
+          setTestModeEnabled(isTestModeOn);
+          previousTestModeRef.current = isTestModeOn;
         }
       } catch (error) {
         console.error('Failed to load Metal Place config:', error);
@@ -796,42 +799,46 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                     onChange={(e) => setTestModeEnabled(e.target.checked)}
                     disabled={metalPlaceSaving}
                   />
-                  Test Mode
+                  Test Mode (sets Metal Place day to today)
                 </label>
               </div>
-              {testModeEnabled && (
-                <div className={styles.formGroup}>
-                  <label className={styles.formLabel}>Test Day (1-4)</label>
-                  <select
-                    defaultValue={1}
-                    className={styles.formInput}
-                    disabled={metalPlaceSaving}
-                  >
-                    <option value={1}>Day 1</option>
-                    <option value={2}>Day 2</option>
-                    <option value={3}>Day 3</option>
-                    <option value={4}>Day 4</option>
-                  </select>
-                </div>
-              )}
               <button
                 className={styles.saveButton}
                 onClick={async () => {
                   setMetalPlaceSaving(true);
                   setMetalPlaceError(null);
                   try {
+                    const wasTestModeOn = previousTestModeRef.current;
+                    const isTestModeNowOff = !testModeEnabled && wasTestModeOn;
+
+                    let festivalDay = metalPlaceDay === '' ? null : metalPlaceDay;
+                    let startTime = metalPlaceStartTime || null;
+                    let endTime = metalPlaceEndTime || null;
+
+                    if (testModeEnabled) {
+                      festivalDay = 1;
+                      startTime = '00:00';
+                      endTime = '23:59';
+                    }
+
                     await saveMetalPlaceConfigRemote({
-                      festival_day: metalPlaceDay === '' ? null : metalPlaceDay,
-                      start_time: metalPlaceStartTime || null,
-                      end_time: metalPlaceEndTime || null,
+                      festival_day: festivalDay,
+                      start_time: startTime,
+                      end_time: endTime,
                       test_override_day: testModeEnabled ? 1 : null,
                     });
                     await saveMetalPlaceConfig({
-                      festival_day: metalPlaceDay === '' ? null : metalPlaceDay,
-                      start_time: metalPlaceStartTime || null,
-                      end_time: metalPlaceEndTime || null,
+                      festival_day: festivalDay,
+                      start_time: startTime,
+                      end_time: endTime,
                       test_override_day: testModeEnabled ? 1 : null,
                     });
+
+                    if (isTestModeNowOff) {
+                      await autoCheckoutAllUsersFromMetalPlace();
+                    }
+
+                    previousTestModeRef.current = testModeEnabled;
                   } catch (err) {
                     setMetalPlaceError(err instanceof Error ? err.message : 'Save failed');
                   } finally {

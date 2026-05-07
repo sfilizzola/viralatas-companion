@@ -22,7 +22,9 @@ import {
   type CrewLivePlan,
   type LivePlan,
 } from '../lib/livePreview';
-import { setCampingStatus, syncCrewPresence } from '../lib/presence';
+import { setCampingStatus, setMetalPlaceStatus, syncCrewPresence, isTimeWithinMetalPlaceWindow, validateAndAutoCheckoutOutsideMetalPlaceWindow } from '../lib/presence';
+import { loadMetalPlaceConfig, METAL_PLACE_CONFIG_CHANGED_EVENT } from '../lib/db';
+import type { MetalPlaceConfig } from '../types';
 import { togglePick } from '../lib/picks';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
@@ -69,6 +71,7 @@ function nextHint(plan: LivePlan, t: (key: string, values?: Record<string, strin
 
 function groupTitle(group: CrewLiveGroup, t: (key: string, values?: Record<string, string | number>) => string) {
   if (group.kind === 'band') return group.band.name;
+  if (group.kind === 'metal_place') return t('metalPlaceGroupTitle');
   if (group.kind === 'camping') return t('campingGroupTitle');
   return t('lostGroupTitle');
 }
@@ -81,13 +84,16 @@ function groupKicker(group: CrewLiveGroup, t: (key: string, values?: Record<stri
       end: formatFestivalTime(group.band.end_time),
     });
   }
+  if (group.kind === 'metal_place') return t('metalPlaceGroupKicker');
   if (group.kind === 'camping') return t('campingGroupKicker');
   return t('lostGroupKicker');
 }
 
 function emptyGroupMessage(group: CrewLiveGroup, t: (key: string) => string) {
+  if (group.kind === 'metal_place') return t('metalPlaceGroupEmpty');
   return group.kind === 'camping' ? t('campingGroupEmpty') : t('lostGroupEmpty');
 }
+
 
 function CrewMember({ crew }: { crew: CrewLivePlan }) {
   return (
@@ -130,6 +136,9 @@ export default function RightNowPage() {
     bandName: string;
   } | null>(null);
   const [undoTimerId, setUndoTimerId] = useState<ReturnType<typeof setTimeout> | null>(null);
+  const [metalPlaceCheckingIn, setMetalPlaceCheckingIn] = useState(false);
+  const [metalPlaceCheckedIn, setMetalPlaceCheckedIn] = useState(false);
+  const [metalPlaceConfig, setMetalPlaceConfig] = useState<MetalPlaceConfig | null>(null);
 
   const refreshFromCache = useCallback(async () => {
     try {
@@ -192,6 +201,26 @@ export default function RightNowPage() {
     };
   }, []);
 
+  useEffect(() => {
+    async function loadMetalPlaceConfigFromDB() {
+      const config = await loadMetalPlaceConfig();
+      setMetalPlaceConfig(config);
+    }
+
+    loadMetalPlaceConfigFromDB();
+
+    function handleConfigChange() {
+      loadMetalPlaceConfigFromDB();
+    }
+
+    window.addEventListener(METAL_PLACE_CONFIG_CHANGED_EVENT, handleConfigChange);
+    return () => window.removeEventListener(METAL_PLACE_CONFIG_CHANGED_EVENT, handleConfigChange);
+  }, []);
+
+  useEffect(() => {
+    validateAndAutoCheckoutOutsideMetalPlaceWindow(metalPlaceConfig).catch(() => {});
+  }, [now, metalPlaceConfig]);
+
   const myRawPlan = useMemo(() => {
     if (!userId) return { status: 'empty', band: null } satisfies LivePlan;
     return findLivePlan(
@@ -207,6 +236,7 @@ export default function RightNowPage() {
   );
 
   const isCamping = myPresence?.is_camping ?? false;
+  const isAtMetalPlace = myPresence?.is_at_metal_place ?? false;
 
   const myPlan = useMemo(
     () => applyPresenceToLivePlan(myRawPlan, isCamping),
@@ -346,6 +376,90 @@ export default function RightNowPage() {
                 </>
               )}
             </section>
+
+            {(() => {
+              return userId && isTimeWithinMetalPlaceWindow(metalPlaceConfig, now) ? (
+                <div className={styles.metalPlaceCard}>
+                  <div className={styles.metalPlaceContainer}>
+                    <div className={styles.metalPlaceLeft}>
+                      <div className={styles.metalPlaceIcon} aria-hidden>🍺</div>
+                      <div className={styles.metalPlaceInfo}>
+                        <div className={styles.metalPlaceTitle}>{t('metalPlaceGroupTitle')}</div>
+                        <div className={styles.metalPlaceSubtitle}>
+                          {t('metalPlaceGroupKicker')}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className={styles.metalPlaceRight}>
+                      {isAtMetalPlace ? (
+                        <button
+                          className={styles.checkoutButton}
+                          onClick={async () => {
+                            setMetalPlaceCheckingIn(true);
+                            try {
+                              await setMetalPlaceStatus(userId, false);
+                              setMetalPlaceCheckedIn(true);
+                              console.log('[RightNow] Successfully checked out from Metal Place');
+                              setTimeout(() => setMetalPlaceCheckedIn(false), 3000);
+                            } catch (error) {
+                              console.error('Failed to check out from Metal Place:', error);
+                            } finally {
+                              setMetalPlaceCheckingIn(false);
+                            }
+                          }}
+                          disabled={metalPlaceCheckingIn}
+                        >
+                          {metalPlaceCheckingIn
+                            ? '⏳'
+                            : metalPlaceCheckedIn
+                              ? '✅'
+                              : '👋'}
+                          <span className={styles.buttonText}>
+                            {metalPlaceCheckingIn
+                              ? 'Checking out...'
+                              : metalPlaceCheckedIn
+                                ? 'Checked out!'
+                                : 'Check out'}
+                          </span>
+                        </button>
+                      ) : (
+                        <button
+                          className={styles.checkinButton}
+                          onClick={async () => {
+                            setMetalPlaceCheckingIn(true);
+                            try {
+                              await setMetalPlaceStatus(userId, true);
+                              setMetalPlaceCheckedIn(true);
+                              console.log('[RightNow] Successfully checked in to Metal Place');
+                              setTimeout(() => setMetalPlaceCheckedIn(false), 3000);
+                            } catch (error) {
+                              console.error('Failed to check in to Metal Place:', error);
+                            } finally {
+                              setMetalPlaceCheckingIn(false);
+                            }
+                          }}
+                          disabled={metalPlaceCheckingIn || metalPlaceCheckedIn}
+                        >
+                          {metalPlaceCheckingIn
+                            ? '⏳'
+                            : metalPlaceCheckedIn
+                              ? '✅'
+                              : '🍺'}
+                          <span className={styles.buttonText}>
+                            {metalPlaceCheckingIn
+                              ? 'Checking in...'
+                              : metalPlaceCheckedIn
+                                ? 'You are in!'
+                                : 'Check in'}
+                          </span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : null;
+            })()}
 
             {user && <BadgesDisplay user={user} />}
 

@@ -120,3 +120,49 @@ export async function syncMetalPlaceConfig(): Promise<void> {
 
   await saveMetalPlaceConfig(data as MetalPlaceConfig);
 }
+
+export function isTimeWithinMetalPlaceWindow(config: MetalPlaceConfig | null, now: Date): boolean {
+  if (!config || config.festival_day === null || !config.start_time || !config.end_time) {
+    return false;
+  }
+
+  const WACKEN_START = new Date('2026-07-29T00:00:00Z');
+  const DAY_DURATION_MS = 24 * 60 * 60 * 1000;
+  const dayOffset = Math.floor((now.getTime() - WACKEN_START.getTime()) / DAY_DURATION_MS);
+  const currentFestivalDay = dayOffset + 1;
+
+  if (currentFestivalDay !== config.festival_day) {
+    return false;
+  }
+
+  const [startHour, startMin] = config.start_time.split(':').map(Number);
+  const [endHour, endMin] = config.end_time.split(':').map(Number);
+
+  const nowHours = now.getUTCHours();
+  const nowMinutes = now.getUTCMinutes();
+  const nowTotalMinutes = nowHours * 60 + nowMinutes;
+
+  const startTotalMinutes = startHour * 60 + startMin;
+  const endTotalMinutes = endHour * 60 + endMin;
+
+  return nowTotalMinutes >= startTotalMinutes && nowTotalMinutes < endTotalMinutes;
+}
+
+export async function autoCheckoutAllUsersFromMetalPlace(): Promise<void> {
+  const { data, error } = await supabase.from('user_presence').select('*');
+  if (error || !data) return;
+
+  const usersAtMetalPlace = (data as UserPresence[]).filter((p) => p.is_at_metal_place);
+
+  for (const presence of usersAtMetalPlace) {
+    await setMetalPlaceStatus(presence.user_id, false);
+  }
+}
+
+export async function validateAndAutoCheckoutOutsideMetalPlaceWindow(config: MetalPlaceConfig | null): Promise<void> {
+  if (isTimeWithinMetalPlaceWindow(config, new Date())) {
+    return;
+  }
+
+  await autoCheckoutAllUsersFromMetalPlace();
+}
