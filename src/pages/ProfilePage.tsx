@@ -11,6 +11,7 @@ import { fetchCurrentUserRole, fetchAllUsers, fetchBlockedPostersWithUserDetails
 import { invalidateCacheForAllUsers } from '../lib/cache';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
+import BadgesDisplay from '../components/BadgesDisplay';
 import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
@@ -82,6 +83,14 @@ function ProfileForm({
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [saved, setSaved] = useState(false);
   const [photoError, setPhotoError] = useState(false);
+  const [newWackenYears, setNewWackenYears] = useState<number[]>(
+    Array.isArray(user.user_metadata?.['wacken_years'])
+      ? (user.user_metadata['wacken_years'] as number[])
+      : []
+  );
+  const [newCountry, setNewCountry] = useState<string>(
+    (user.user_metadata?.['country'] as string | undefined) ?? ''
+  );
 
   async function handleSave(e: FormEvent) {
     e.preventDefault();
@@ -93,6 +102,8 @@ function ProfileForm({
         display_name: newName,
         preferred_language: newLanguage,
         avatar_url: newAvatarUrl,
+        wacken_years: newWackenYears,
+        country: newCountry || null,
       },
     });
     await supabase
@@ -101,6 +112,8 @@ function ProfileForm({
         display_name: newName,
         preferred_language: newLanguage,
         avatar_url: newAvatarUrl,
+        wacken_years: newWackenYears,
+        country: newCountry || null,
       })
       .eq('id', user.id);
 
@@ -141,6 +154,12 @@ function ProfileForm({
     event.target.value = '';
   }
 
+  function handleYearToggle(year: number, checked: boolean) {
+    setNewWackenYears((prev) =>
+      checked ? [...prev, year] : prev.filter((y) => y !== year)
+    );
+  }
+
   return (
     <main className={styles.main}>
       <div className={styles.avatar}>
@@ -152,6 +171,8 @@ function ProfileForm({
       </div>
       <h2 className={styles.name}>{displayName}</h2>
       <p className={styles.email}>{user.email}</p>
+
+      <BadgesDisplay user={user} />
 
       <form onSubmit={handleSave} className={styles.form}>
         <label className={styles.label}>
@@ -190,6 +211,38 @@ function ProfileForm({
           </span>
         </label>
         {photoError && <p className={styles.error}>{t('photoError')}</p>}
+
+        <fieldset className={styles.fieldset}>
+          <legend className={styles.legend}>{t('wackenYears')}</legend>
+          {[2022, 2023, 2024, 2025, 2026].map((year) => (
+            <label key={year} className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={newWackenYears.includes(year)}
+                onChange={(e) => handleYearToggle(year, e.target.checked)}
+              />
+              {year}
+            </label>
+          ))}
+        </fieldset>
+
+        <label className={styles.label}>
+          {t('country')}
+          <select
+            className={styles.input}
+            value={newCountry}
+            onChange={(e) => setNewCountry(e.target.value)}
+          >
+            <option value="">{t('countryPlaceholder')}</option>
+            <option value="de">{t('countryDe')}</option>
+            <option value="es">{t('countryEs')}</option>
+            <option value="br">{t('countryBr')}</option>
+            <option value="us">{t('countryUs')}</option>
+            <option value="co">{t('countryCo')}</option>
+            <option value="other">{t('countryOther')}</option>
+          </select>
+        </label>
+
         <button className={styles.button} type="submit" disabled={saving}>
           {saved ? `${t('saveDone')} ✓` : saving ? t('saveLoading') : t('saveProfile')}
         </button>

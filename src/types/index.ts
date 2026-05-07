@@ -1,5 +1,7 @@
 export type UserRole = 'normal' | 'manager' | 'godlike';
 
+export type Country = 'de' | 'es' | 'br' | 'us' | 'co' | 'other';
+
 export type User = {
   id: string;
   email: string;
@@ -9,6 +11,8 @@ export type User = {
   is_test_user: boolean;
   role: UserRole;
   created_at: string;
+  wacken_years: number[];
+  country: Country | null;
 };
 
 export type CrewUser = Pick<User, 'id' | 'display_name' | 'avatar_url'>;

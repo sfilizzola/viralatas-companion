@@ -35,5 +35,14 @@
   "userUnblocked": "User unblocked successfully",
   "blockError": "Failed to block user",
   "unblockError": "Failed to unblock",
-  "cantUnblockSelf": "Ask another manager"
+  "cantUnblockSelf": "Ask another manager",
+  "wackenYears": "Years at Wacken",
+  "country": "Country",
+  "countryPlaceholder": "Select your country",
+  "countryDe": "Germany",
+  "countryEs": "Spain",
+  "countryBr": "Brazil",
+  "countryUs": "USA",
+  "countryCo": "Colombia",
+  "countryOther": "Other"
 }
