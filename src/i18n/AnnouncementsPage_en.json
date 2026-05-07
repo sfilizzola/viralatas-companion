@@ -12,5 +12,9 @@
   "minutesAgo": "{n}min ago",
   "hoursAgo": "{n}h ago",
   "daysAgo": "{n}d ago",
-  "anonymous": "Crew member"
+  "anonymous": "Crew member",
+  "block": "Block",
+  "blockingUser": "Blocking...",
+  "userBlocked": "User blocked",
+  "blocked": "You've said enough for today, buddy... 🤘"
 }

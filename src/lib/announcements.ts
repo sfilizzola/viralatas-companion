@@ -110,6 +110,25 @@ export async function fetchBlockedPosters(): Promise<BlockedPoster[]> {
   return (data as BlockedPoster[]) ?? [];
 }
 
+export async function fetchBlockedPostersWithUserDetails(): Promise<Array<BlockedPoster & { user_email: string; user_display_name: string | null; user_avatar_url: string | null }>> {
+  const blocked = await fetchBlockedPosters();
+  if (blocked.length === 0) return [];
+
+  const { data: users } = await supabase
+    .from('users')
+    .select('id, email, display_name, avatar_url')
+    .in('id', blocked.map(b => b.user_id));
+
+  const userMap = new Map((users || []).map(u => [u.id, u]));
+
+  return blocked.map(b => ({
+    ...b,
+    user_email: userMap.get(b.user_id)?.email || 'unknown',
+    user_display_name: userMap.get(b.user_id)?.display_name || null,
+    user_avatar_url: userMap.get(b.user_id)?.avatar_url || null,
+  }));
+}
+
 export async function blockUser(userId: string, blockedBy: string): Promise<void> {
   await supabase
     .from('blocked_posters')

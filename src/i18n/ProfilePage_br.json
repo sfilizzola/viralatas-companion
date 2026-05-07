@@ -26,5 +26,14 @@
   "resetError": "Erro ao resetar. Tenta de novo.",
   "promoverManager": "Promover a Manager",
   "removerManager": "Remover Manager",
-  "erroRole": "Erro ao atualizar. Tenta de novo."
+  "erroRole": "Erro ao atualizar. Tenta de novo.",
+  "blockedUsers": "Usuários Bloqueados",
+  "noBlockedUsers": "Nenhum usuário bloqueado",
+  "unblockUser": "Desbloquear",
+  "unblockConfirm": "Desbloquear este usuário?",
+  "userBlocked": "Usuário bloqueado com sucesso",
+  "userUnblocked": "Usuário desbloqueado com sucesso",
+  "blockError": "Erro ao bloquear usuário",
+  "unblockError": "Erro ao desbloquear",
+  "cantUnblockSelf": "Peça a outro manager"
 }

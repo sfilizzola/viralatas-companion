@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';
 import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../lib/db';
 import { togglePick } from '../lib/picks';
-import { fetchCurrentUserRole, fetchAllUsers, setUserRole as updateUserRole } from '../lib/announcements';
+import { fetchCurrentUserRole, fetchAllUsers, fetchBlockedPostersWithUserDetails, setUserRole as updateUserRole, unblockUser } from '../lib/announcements';
 import { invalidateCacheForAllUsers } from '../lib/cache';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
@@ -197,6 +197,7 @@ function ProfileForm({
 
       <ConflictSection userId={userId} t={t} />
       <GodlikeSection userId={userId} t={t} />
+      <ManagerSection userId={userId} t={t} />
     </main>
   );
 }
@@ -432,6 +433,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   const [resetMessage, setResetMessage] = useState<string | null>(null);
   const [allUsers, setAllUsers] = useState<UserWithLoading[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
+  const [blockedPosters, setBlockedPosters] = useState<Array<{ user_id: string }>>([]);
 
   useEffect(() => {
     async function loadRole() {
@@ -445,8 +447,12 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   useEffect(() => {
     async function loadUsers() {
       try {
-        const users = await fetchAllUsers();
+        const [users, blocked] = await Promise.all([
+          fetchAllUsers(),
+          fetchBlockedPostersWithUserDetails(),
+        ]);
         setAllUsers(users as UserWithLoading[]);
+        setBlockedPosters(blocked.map(b => ({ user_id: b.user_id })));
       } catch (error) {
         console.error('Failed to load users:', error);
       } finally {
@@ -520,6 +526,44 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
       }
     },
     [allUsers, t],
+  );
+
+  const handleUnblock = useCallback(
+    async (targetUserId: string) => {
+      const confirmMsg = t('unblockConfirm');
+      if (!window.confirm(confirmMsg)) return;
+
+      setAllUsers((prev) =>
+        prev.map((u) =>
+          u.id === targetUserId ? { ...u, loading: true, error: undefined } : u,
+        ),
+      );
+
+      try {
+        await unblockUser(targetUserId);
+        setBlockedPosters((prev) => prev.filter((bp) => bp.user_id !== targetUserId));
+      } catch (error) {
+        console.error('Unblock failed:', error);
+        setAllUsers((prev) =>
+          prev.map((u) =>
+            u.id === targetUserId
+              ? { ...u, error: t('unblockError') }
+              : u,
+          ),
+        );
+
+        setTimeout(() => {
+          setAllUsers((prev) =>
+            prev.map((u) => (u.id === targetUserId ? { ...u, error: undefined } : u)),
+          );
+        }, 3000);
+      } finally {
+        setAllUsers((prev) =>
+          prev.map((u) => (u.id === targetUserId ? { ...u, loading: false } : u)),
+        );
+      }
+    },
+    [t],
   );
 
   if (loading || userRole !== 'godlike') {
@@ -615,7 +659,166 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                         )}
                       </button>
                     )}
+
+                    {blockedPosters.some((bp) => bp.user_id === user.id) && (
+                      <button
+                        className={`${styles.userActionButton} ${user.loading ? styles.loading : ''}`}
+                        onClick={() => handleUnblock(user.id)}
+                        disabled={user.loading}
+                        type="button"
+                      >
+                        {user.loading ? (
+                          <span className={styles.spinner}>⏳</span>
+                        ) : (
+                          t('unblockUser')
+                        )}
+                      </button>
+                    )}
                   </div>
+
+                  {user.error && <p className={styles.userRowError}>{user.error}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+type ManagerSectionProps = {
+  userId: string;
+  t: (key: string, values?: Record<string, string | number>) => string;
+};
+
+function ManagerSection({ userId, t }: ManagerSectionProps) {
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [blockedUsers, setBlockedUsers] = useState<UserWithLoading[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadRole() {
+      const role = await fetchCurrentUserRole(userId);
+      setUserRole(role);
+    }
+    loadRole();
+  }, [userId]);
+
+  useEffect(() => {
+    async function loadBlocked() {
+      if (userRole === 'manager' || userRole === 'godlike') {
+        try {
+          const blocked = await fetchBlockedPostersWithUserDetails();
+          setBlockedUsers(blocked.map(bp => ({
+            id: bp.user_id,
+            email: bp.user_email,
+            display_name: bp.user_display_name,
+            avatar_url: bp.user_avatar_url,
+            role: 'blocked',
+          })));
+        } catch (error) {
+          console.error('Failed to load blocked users:', error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    }
+    loadBlocked();
+  }, [userRole]);
+
+  const handleUnblock = useCallback(
+    async (blockedUserId: string) => {
+      const confirmMsg = t('unblockConfirm');
+      if (!window.confirm(confirmMsg)) return;
+
+      setBlockedUsers((prev) =>
+        prev.map((u) =>
+          u.id === blockedUserId ? { ...u, loading: true, error: undefined } : u,
+        ),
+      );
+
+      try {
+        await unblockUser(blockedUserId);
+        setBlockedUsers((prev) => prev.filter((u) => u.id !== blockedUserId));
+      } catch (error) {
+        console.error('Unblock failed:', error);
+        setBlockedUsers((prev) =>
+          prev.map((u) =>
+            u.id === blockedUserId
+              ? { ...u, error: t('unblockError') }
+              : u,
+          ),
+        );
+        setTimeout(() => {
+          setBlockedUsers((prev) =>
+            prev.map((u) => (u.id === blockedUserId ? { ...u, error: undefined } : u)),
+          );
+        }, 3000);
+      } finally {
+        setBlockedUsers((prev) =>
+          prev.map((u) =>
+            u.id === blockedUserId ? { ...u, loading: false } : u,
+          ),
+        );
+      }
+    },
+    [t],
+  );
+
+  if (loading || userRole !== 'manager') {
+    return null;
+  }
+
+  const getInitial = (displayName: string | null, email: string): string => {
+    if (displayName) return displayName.charAt(0).toUpperCase();
+    return email.charAt(0).toUpperCase();
+  };
+
+  return (
+    <div className={styles.managerSection}>
+      <div className={styles.divider} />
+      <div className={styles.managerSectionContent}>
+        <h3 className={styles.managerTitle}>🔧 MANAGER POWERS</h3>
+
+        <div className={styles.blockedUsersSection}>
+          <h4 className={styles.blockedUsersTitle}>{t('blockedUsers')}</h4>
+          {blockedUsers.length === 0 ? (
+            <p className={styles.emptyBlockedList}>{t('noBlockedUsers')}</p>
+          ) : (
+            <div className={styles.blockedUserList}>
+              {blockedUsers.map((user) => (
+                <div key={user.id} className={styles.blockedUserRow}>
+                  <div className={styles.userInfo}>
+                    <div className={styles.userAvatar} style={{ backgroundColor: 'var(--accent)' }}>
+                      {user.avatar_url ? (
+                        <img src={user.avatar_url} alt="" className={styles.userAvatarImg} />
+                      ) : (
+                        <span>{getInitial(user.display_name, user.email)}</span>
+                      )}
+                    </div>
+                    <div className={styles.userDetails}>
+                      <div className={styles.userDisplayName}>
+                        {user.display_name || user.email}
+                      </div>
+                      <div className={styles.userEmail}>{user.email}</div>
+                    </div>
+                  </div>
+
+                  {user.id === userId ? (
+                    <div className={styles.cantUnblockSelf}>
+                      {t('cantUnblockSelf') || 'Ask another manager'}
+                    </div>
+                  ) : (
+                    <button
+                      className={`${styles.userActionButton} ${user.loading ? styles.loading : ''}`}
+                      onClick={() => handleUnblock(user.id)}
+                      disabled={user.loading}
+                      type="button"
+                    >
+                      {user.loading ? <span className={styles.spinner}>⏳</span> : t('unblockUser')}
+                    </button>
+                  )}
 
                   {user.error && <p className={styles.userRowError}>{user.error}</p>}
                 </div>
