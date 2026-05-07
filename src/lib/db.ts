@@ -8,6 +8,7 @@ export const PICKS_CHANGED_EVENT = 'viralatas:picks-changed';
 export const CREW_USERS_CHANGED_EVENT = 'viralatas:crew-users-changed';
 export const PRESENCE_CHANGED_EVENT = 'viralatas:presence-changed';
 export const ANNOUNCEMENTS_CHANGED_EVENT = 'viralatas:announcements-changed';
+export const METAL_PLACE_CONFIG_CHANGED_EVENT = 'viralatas:metal-place-config-changed';
 
 type OfflinePickOp = {
   id: string;
@@ -138,6 +139,12 @@ function emitPresenceChanged() {
 function emitAnnouncementsChanged() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(ANNOUNCEMENTS_CHANGED_EVENT));
+  }
+}
+
+function emitMetalPlaceConfigChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(METAL_PLACE_CONFIG_CHANGED_EVENT));
   }
 }
 
@@ -338,6 +345,7 @@ export async function loadMetalPlaceConfig(): Promise<MetalPlaceConfig | null> {
 export async function saveMetalPlaceConfig(config: MetalPlaceConfig) {
   const db = await getDB();
   await db.put('metal_place_config', config, 'current');
+  emitMetalPlaceConfigChanged();
 }
 
 export async function clearMetalPlaceConfig() {

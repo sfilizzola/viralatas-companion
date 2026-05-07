@@ -12,6 +12,7 @@ export type CrewLivePlan = CrewUser & {
   label: string;
   plan: LivePlan;
   isCamping: boolean;
+  isAtMetalPlace: boolean;
 };
 
 export type CrewLiveGroup =
@@ -21,7 +22,7 @@ export type CrewLiveGroup =
       members: CrewLivePlan[];
     }
   | {
-      kind: 'camping' | 'lost';
+      kind: 'metal_place' | 'camping' | 'lost';
       band: null;
       members: CrewLivePlan[];
     };
@@ -81,11 +82,14 @@ export function mapCrewLivePlans(
 
   return [...usersById.values()]
     .map((user) => {
-      const isCamping = presenceByUser.get(user.id)?.is_camping ?? false;
+      const presence = presenceByUser.get(user.id);
+      const isCamping = presence?.is_camping ?? false;
+      const isAtMetalPlace = presence?.is_at_metal_place ?? false;
       const plan = findLivePlan(bands, picksByUser.get(user.id) ?? new Set(), now);
       return {
         ...user,
         isCamping,
+        isAtMetalPlace,
         label: user.display_name?.trim() || `Crew ${user.id.slice(0, 4).toUpperCase()}`,
         plan: applyPresenceToLivePlan(plan, isCamping),
       };
@@ -101,10 +105,16 @@ export function mapCrewLivePlans(
 
 export function groupCrewLivePlans(crewPlans: CrewLivePlan[]): CrewLiveGroup[] {
   const bandGroups = new Map<string, CrewLiveGroup & { kind: 'band' }>();
+  const metalPlaceMembers: CrewLivePlan[] = [];
   const campingMembers: CrewLivePlan[] = [];
   const lostMembers: CrewLivePlan[] = [];
 
   for (const crew of crewPlans) {
+    if (crew.isAtMetalPlace) {
+      metalPlaceMembers.push(crew);
+      continue;
+    }
+
     if (crew.plan.status === 'current' && crew.plan.band) {
       const group = bandGroups.get(crew.plan.band.id) ?? {
         kind: 'band',
@@ -138,11 +148,18 @@ export function groupCrewLivePlans(crewPlans: CrewLivePlan[]): CrewLiveGroup[] {
       return a.band.name.localeCompare(b.band.name);
     });
 
-  return [
+  const result: CrewLiveGroup[] = [
     ...liveBandGroups,
     { kind: 'camping', band: null, members: sortMembers(campingMembers) },
-    { kind: 'lost', band: null, members: sortMembers(lostMembers) },
   ];
+
+  if (metalPlaceMembers.length > 0) {
+    result.push({ kind: 'metal_place', band: null, members: sortMembers(metalPlaceMembers) });
+  }
+
+  result.push({ kind: 'lost', band: null, members: sortMembers(lostMembers) });
+
+  return result;
 }
 
 export function formatFestivalTime(iso: string): string {
