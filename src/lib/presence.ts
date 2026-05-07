@@ -149,13 +149,29 @@ export function isTimeWithinMetalPlaceWindow(config: MetalPlaceConfig | null, no
 }
 
 export async function autoCheckoutAllUsersFromMetalPlace(): Promise<void> {
-  const { data, error } = await supabase.from('user_presence').select('*');
-  if (error || !data) return;
+  try {
+    const { data, error } = await supabase.from('user_presence').select('*');
+    if (error || !data) return;
 
-  const usersAtMetalPlace = (data as UserPresence[]).filter((p) => p.is_at_metal_place);
+    const usersAtMetalPlace = (data as UserPresence[]).filter((p) => p.is_at_metal_place);
 
-  for (const presence of usersAtMetalPlace) {
-    await setMetalPlaceStatus(presence.user_id, false);
+    for (const presence of usersAtMetalPlace) {
+      try {
+        await setMetalPlaceStatus(presence.user_id, false);
+      } catch (err) {
+        // Continue with other users if one fails
+        if (err instanceof Error && err.name !== 'InvalidStateError') {
+          console.error(`Failed to checkout user ${presence.user_id}:`, err);
+        }
+      }
+    }
+  } catch (error) {
+    // Silently handle IDB connection errors during batch operations
+    if (error instanceof Error && error.name === 'InvalidStateError') {
+      console.debug('[Metal Place] Auto-checkout skipped due to DB connection closing');
+      return;
+    }
+    throw error;
   }
 }
 
@@ -164,5 +180,15 @@ export async function validateAndAutoCheckoutOutsideMetalPlaceWindow(config: Met
     return;
   }
 
-  await autoCheckoutAllUsersFromMetalPlace();
+  try {
+    await autoCheckoutAllUsersFromMetalPlace();
+  } catch (error) {
+    // Ignore InvalidStateError from closing IDB connections
+    // This can happen when Service Worker cache operations conflict with app DB operations
+    if (error instanceof Error && error.name === 'InvalidStateError') {
+      console.debug('[Metal Place] Skipping auto-checkout due to DB connection closing', error);
+      return;
+    }
+    throw error;
+  }
 }
