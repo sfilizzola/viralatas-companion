@@ -7,7 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';
 import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../lib/db';
 import { togglePick } from '../lib/picks';
-import { fetchCurrentUserRole, fetchAllUsers, fetchBlockedPosters, setUserRole as updateUserRole, unblockUser } from '../lib/announcements';
+import { fetchCurrentUserRole, fetchAllUsers, fetchBlockedPostersWithUserDetails, setUserRole as updateUserRole, unblockUser } from '../lib/announcements';
 import { invalidateCacheForAllUsers } from '../lib/cache';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
@@ -449,10 +449,10 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
       try {
         const [users, blocked] = await Promise.all([
           fetchAllUsers(),
-          fetchBlockedPosters(),
+          fetchBlockedPostersWithUserDetails(),
         ]);
         setAllUsers(users as UserWithLoading[]);
-        setBlockedPosters(blocked as Array<{ user_id: string }>);
+        setBlockedPosters(blocked.map(b => ({ user_id: b.user_id })));
       } catch (error) {
         console.error('Failed to load users:', error);
       } finally {
@@ -709,13 +709,13 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
     async function loadBlocked() {
       if (userRole === 'manager' || userRole === 'godlike') {
         try {
-          const blocked = await fetchBlockedPosters();
-          setBlockedUsers((blocked as unknown as Array<{ user_id: string; email: string; display_name: string | null; avatar_url: string | null; role: string }>).map(bp => ({
+          const blocked = await fetchBlockedPostersWithUserDetails();
+          setBlockedUsers(blocked.map(bp => ({
             id: bp.user_id,
-            email: bp.email,
-            display_name: bp.display_name,
-            avatar_url: bp.avatar_url,
-            role: bp.role,
+            email: bp.user_email,
+            display_name: bp.user_display_name,
+            avatar_url: bp.user_avatar_url,
+            role: 'blocked',
           })));
         } catch (error) {
           console.error('Failed to load blocked users:', error);
@@ -805,14 +805,20 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
                     </div>
                   </div>
 
-                  <button
-                    className={`${styles.userActionButton} ${user.loading ? styles.loading : ''}`}
-                    onClick={() => handleUnblock(user.id)}
-                    disabled={user.loading}
-                    type="button"
-                  >
-                    {user.loading ? <span className={styles.spinner}>⏳</span> : t('unblockUser')}
-                  </button>
+                  {user.id === userId ? (
+                    <div className={styles.cantUnblockSelf}>
+                      {t('cantUnblockSelf') || 'Ask another manager'}
+                    </div>
+                  ) : (
+                    <button
+                      className={`${styles.userActionButton} ${user.loading ? styles.loading : ''}`}
+                      onClick={() => handleUnblock(user.id)}
+                      disabled={user.loading}
+                      type="button"
+                    >
+                      {user.loading ? <span className={styles.spinner}>⏳</span> : t('unblockUser')}
+                    </button>
+                  )}
 
                   {user.error && <p className={styles.userRowError}>{user.error}</p>}
                 </div>

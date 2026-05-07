@@ -10,6 +10,7 @@ import {
 import {
   blockUser,
   deleteAnnouncement,
+  fetchBlockedPosters,
   fetchCurrentUserRole,
   fetchIsBlocked,
   postAnnouncement,
@@ -41,12 +42,14 @@ export default function AnnouncementsPage() {
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [crewUsers, setCrewUsers] = useState<CrewUser[]>([]);
+  const [userRoles, setUserRoles] = useState<Record<string, UserRole>>({});
   const [role, setRole] = useState<UserRole>('normal');
   const [isBlocked, setIsBlocked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState('');
   const [posting, setPosting] = useState(false);
   const [blocking, setBlocking] = useState<string | null>(null);
+  const [blockedUserIds, setBlockedUserIds] = useState<Set<string>>(new Set());
 
   const refreshFromCache = useCallback(async () => {
     const [cached, users] = await Promise.all([
@@ -55,6 +58,18 @@ export default function AnnouncementsPage() {
     ]);
     setAnnouncements(cached);
     setCrewUsers(users);
+
+    // Load user roles
+    const { data: allUsers } = await supabase
+      .from('users')
+      .select('id, role');
+    if (allUsers) {
+      const rolesMap = Object.fromEntries(
+        allUsers.map(u => [u.id, u.role as UserRole])
+      );
+      setUserRoles(rolesMap);
+    }
+
     setLoading(false);
   }, []);
 
@@ -75,6 +90,11 @@ export default function AnnouncementsPage() {
   useEffect(() => {
     syncAnnouncements().catch(() => {});
 
+    // Load blocked users
+    fetchBlockedPosters().then((blocked) => {
+      setBlockedUserIds(new Set(blocked.map(b => b.user_id)));
+    });
+
     const channel = supabase
       .channel('announcements_live')
       .on(
@@ -92,6 +112,26 @@ export default function AnnouncementsPage() {
           if (updated.deleted_at) {
             await removeAnnouncementFromCache(updated.id);
           }
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'blocked_posters' },
+        async (payload) => {
+          const blocked = payload.new as { user_id: string };
+          setBlockedUserIds(prev => new Set([...prev, blocked.user_id]));
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'blocked_posters' },
+        async (payload) => {
+          const unblocked = payload.old as { user_id: string };
+          setBlockedUserIds(prev => {
+            const next = new Set(prev);
+            next.delete(unblocked.user_id);
+            return next;
+          });
         },
       )
       .subscribe();
@@ -185,15 +225,15 @@ export default function AnnouncementsPage() {
                       </div>
                     </div>
                     <div className={styles.cardActions}>
-                      {canModerate && a.author_id !== userId && (
+                      {canModerate && userRoles[a.author_id] !== 'godlike' && (
                         <button
-                          className={`${styles.blockBtn} ${blocking === a.author_id ? styles.blocking : ''}`}
+                          className={`${styles.blockBtn} ${blocking === a.author_id ? styles.blocking : ''} ${blockedUserIds.has(a.author_id) ? styles.blocked : ''}`}
                           onClick={() => handleBlock(a.author_id)}
-                          disabled={blocking === a.author_id}
+                          disabled={blocking === a.author_id || blockedUserIds.has(a.author_id)}
                           aria-label={t('block')}
                           type="button"
                         >
-                          {blocking === a.author_id ? `${t('blockingUser')}` : `🚫 ${t('block')}`}
+                          {blocking === a.author_id ? `${t('blockingUser')}` : blockedUserIds.has(a.author_id) ? `✓ ${t('block')}` : `🚫 ${t('block')}`}
                         </button>
                       )}
                       {canModerate && (

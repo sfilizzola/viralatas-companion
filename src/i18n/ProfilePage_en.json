@@ -34,5 +34,6 @@
   "userBlocked": "User blocked successfully",
   "userUnblocked": "User unblocked successfully",
   "blockError": "Failed to block user",
-  "unblockError": "Failed to unblock"
+  "unblockError": "Failed to unblock",
+  "cantUnblockSelf": "Ask another manager"
 }

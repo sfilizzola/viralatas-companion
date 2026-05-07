@@ -34,5 +34,6 @@
   "userBlocked": "Usuário bloqueado com sucesso",
   "userUnblocked": "Usuário desbloqueado com sucesso",
   "blockError": "Erro ao bloquear usuário",
-  "unblockError": "Erro ao desbloquear"
+  "unblockError": "Erro ao desbloquear",
+  "cantUnblockSelf": "Peça a outro manager"
 }
