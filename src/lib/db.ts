@@ -1,5 +1,5 @@
 import { openDB, type IDBPDatabase } from 'idb';
-import type { Announcement, Band, CrewUser, UserPick, UserPresence } from '../types';
+import type { Announcement, Band, CrewUser, MetalPlaceConfig, UserPick, UserPresence } from '../types';
 
 const DB_NAME = 'viralatas-db';
 const DB_VERSION = 6;
@@ -59,6 +59,10 @@ type ViralatasDB = {
     key: string;
     value: Announcement;
   };
+  metal_place_config: {
+    key: string;
+    value: MetalPlaceConfig;
+  };
   meta: {
     key: string;
     value: { cache_version: string };
@@ -100,6 +104,9 @@ function getDB() {
         }
         if (!db.objectStoreNames.contains('pending_announcements')) {
           db.createObjectStore('pending_announcements', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('metal_place_config')) {
+          db.createObjectStore('metal_place_config');
         }
         if (!db.objectStoreNames.contains('meta')) {
           db.createObjectStore('meta');
@@ -318,6 +325,23 @@ export async function loadOfflineAnnouncementsQueue(): Promise<Announcement[]> {
 export async function removeFromOfflineAnnouncementsQueue(id: string) {
   const db = await getDB();
   await db.delete('pending_announcements', id);
+}
+
+// --- Metal Place Configuration ---
+
+export async function loadMetalPlaceConfig(): Promise<MetalPlaceConfig | null> {
+  const db = await getDB();
+  return db.get('metal_place_config', 'current');
+}
+
+export async function saveMetalPlaceConfig(config: MetalPlaceConfig) {
+  const db = await getDB();
+  await db.put('metal_place_config', config, 'current');
+}
+
+export async function clearMetalPlaceConfig() {
+  const db = await getDB();
+  await db.delete('metal_place_config', 'current');
 }
 
 // --- Cache version invalidation ---

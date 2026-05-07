@@ -36,6 +36,7 @@ export type UserPick = {
 export type UserPresence = {
   user_id: string;
   is_camping: boolean;
+  is_at_metal_place?: boolean;
   updated_at: string;
 };
 
@@ -51,6 +52,17 @@ export type BlockedPoster = {
   user_id: string;
   blocked_by: string;
   blocked_at: string;
+};
+
+export type MetalPlaceConfig = {
+  id?: number;
+  festival_day?: number | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  label?: string;
+  test_override_day?: number | null;
+  updated_by?: string;
+  updated_at?: string;
 };
 
 export type AlertContext = {

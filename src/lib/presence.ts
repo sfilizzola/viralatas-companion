@@ -1,9 +1,12 @@
-import type { UserPresence } from '../types';
+import type { MetalPlaceConfig, UserPresence } from '../types';
 import {
+  clearMetalPlaceConfig,
   enqueueOfflinePresence,
+  loadMetalPlaceConfig,
   loadOfflinePresenceQueue,
   removeFromOfflinePresenceQueue,
   replaceUserPresence,
+  saveMetalPlaceConfig,
   saveUserPresence,
 } from './db';
 import { supabase } from './supabase';
@@ -73,4 +76,49 @@ export async function flushPresenceQueue(): Promise<void> {
       await Promise.all(allIds.map((id) => removeFromOfflinePresenceQueue(id)));
     }
   }
+}
+
+// --- Metal Place ---
+
+export async function saveMetalPlaceConfigRemote(config: MetalPlaceConfig): Promise<void> {
+  if (!navigator.onLine) {
+    await saveMetalPlaceConfig(config);
+    return;
+  }
+
+  const { error } = await supabase.from('metal_place_config').upsert(config);
+  if (error) {
+    console.error('Failed to save Metal Place config remotely:', error);
+    throw error;
+  }
+
+  await saveMetalPlaceConfig(config);
+}
+
+export async function setMetalPlaceStatus(userId: string, isAtMetalPlace: boolean): Promise<void> {
+  const presence: UserPresence = {
+    user_id: userId,
+    is_camping: false,
+    is_at_metal_place: isAtMetalPlace,
+    updated_at: new Date().toISOString(),
+  };
+
+  await saveUserPresence(presence);
+
+  if (!navigator.onLine) {
+    await queuePresence(presence);
+    return;
+  }
+
+  const { error } = await supabase.from('user_presence').upsert(presence);
+  if (error) {
+    await queuePresence(presence);
+  }
+}
+
+export async function syncMetalPlaceConfig(): Promise<void> {
+  const { data, error } = await supabase.from('metal_place_config').select('*').single();
+  if (error || !data) return;
+
+  await saveMetalPlaceConfig(data as MetalPlaceConfig);
 }
