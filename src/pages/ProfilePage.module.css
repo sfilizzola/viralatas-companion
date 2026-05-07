@@ -491,6 +491,66 @@
   color: var(--text);
 }
 
+.registrationControlContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.registrationControlLabel {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.registrationToggleButton {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.registrationToggleButton.enabled {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.registrationToggleButton.enabled:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.registrationToggleButton.disabled {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.registrationToggleButton.disabled:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.registrationToggleButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.registrationError {
+  font-size: 0.875rem;
+  color: #ef4444;
+  margin: 0;
+  text-align: center;
+}
+
 /* User management section */
 .userManagementSection {
   width: 100%;

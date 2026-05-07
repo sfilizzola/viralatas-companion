@@ -9,6 +9,7 @@ import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../lib/db';
 import { togglePick } from '../lib/picks';
 import { fetchCurrentUserRole, fetchAllUsers, fetchBlockedPostersWithUserDetails, setUserRole as updateUserRole, unblockUser } from '../lib/announcements';
 import { invalidateCacheForAllUsers } from '../lib/cache';
+import { getRegistrationEnabled, setRegistrationEnabled } from '../lib/appSettings';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
@@ -488,6 +489,9 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   const [allUsers, setAllUsers] = useState<UserWithLoading[]>([]);
   const [usersLoading, setUsersLoading] = useState(true);
   const [blockedPosters, setBlockedPosters] = useState<Array<{ user_id: string }>>([]);
+  const [registrationEnabled, setRegistrationEnabledState] = useState(true);
+  const [registrationLoading, setRegistrationLoading] = useState(false);
+  const [registrationError, setRegistrationError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadRole() {
@@ -519,6 +523,21 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
     }
   }, [userRole]);
 
+  useEffect(() => {
+    async function loadRegistrationStatus() {
+      try {
+        const enabled = await getRegistrationEnabled();
+        setRegistrationEnabledState(enabled);
+      } catch (error) {
+        console.error('Failed to load registration status:', error);
+      }
+    }
+
+    if (userRole === 'godlike') {
+      loadRegistrationStatus();
+    }
+  }, [userRole]);
+
   const handleResetAllData = useCallback(async () => {
     const confirmMsg = t('resetConfirm');
     if (!window.confirm(confirmMsg)) return;
@@ -538,6 +557,23 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
       setResetting(false);
     }
   }, [t]);
+
+  const handleToggleRegistration = useCallback(async () => {
+    setRegistrationLoading(true);
+    setRegistrationError(null);
+
+    try {
+      const newValue = !registrationEnabled;
+      await setRegistrationEnabled(newValue);
+      setRegistrationEnabledState(newValue);
+    } catch (error) {
+      console.error('Failed to toggle registration:', error);
+      setRegistrationError(t('registrationToggleError'));
+      setTimeout(() => setRegistrationError(null), 3000);
+    } finally {
+      setRegistrationLoading(false);
+    }
+  }, [registrationEnabled, t]);
 
   const handlePromoteOrDemote = useCallback(
     async (targetUserId: string, currentRole: string) => {
@@ -656,6 +692,27 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
         </button>
 
         {resetMessage && <p className={styles.resetMessage}>{resetMessage}</p>}
+
+        <div className={styles.registrationControlContainer}>
+          <label className={styles.registrationControlLabel}>
+            {t('registrationToggle')}
+            <button
+              className={`${styles.registrationToggleButton} ${registrationEnabled ? styles.enabled : styles.disabled}`}
+              onClick={handleToggleRegistration}
+              disabled={registrationLoading}
+              type="button"
+            >
+              {registrationLoading ? (
+                '⏳'
+              ) : registrationEnabled ? (
+                `${t('registrationEnabled')} ✓`
+              ) : (
+                `${t('registrationDisabled')} ✗`
+              )}
+            </button>
+          </label>
+          {registrationError && <p className={styles.registrationError}>{registrationError}</p>}
+        </div>
 
         <div className={styles.userManagementSection}>
           <h4 className={styles.userManagementTitle}>Registered Users</h4>

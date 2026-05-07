@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useI18n } from '../lib/i18n';
+import { getRegistrationEnabled } from '../lib/appSettings';
 import styles from './AuthPage.module.css';
 
 export default function LoginPage() {
@@ -11,6 +12,11 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [registrationEnabled, setRegistrationEnabled] = useState(true);
+
+  useEffect(() => {
+    getRegistrationEnabled().then(setRegistrationEnabled);
+  }, []);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -117,10 +123,12 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className={styles.footer}>
-          {t('needAccount')}{' '}
-          <Link to="/register">{t('createAccount')}</Link>
-        </p>
+        {registrationEnabled && (
+          <p className={styles.footer}>
+            {t('needAccount')}{' '}
+            <Link to="/register">{t('createAccount')}</Link>
+          </p>
+        )}
       </div>
     </div>
   );

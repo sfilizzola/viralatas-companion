@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useI18n } from '../lib/i18n';
+import { getRegistrationEnabled } from '../lib/appSettings';
 import styles from './AuthPage.module.css';
 
 export default function RegisterPage() {
@@ -12,6 +13,14 @@ export default function RegisterPage() {
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    getRegistrationEnabled().then((enabled) => {
+      if (!enabled) {
+        navigate('/login');
+      }
+    });
+  }, [navigate]);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();

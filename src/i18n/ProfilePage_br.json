@@ -45,5 +45,9 @@
   "countryUs": "EUA",
   "countryCo": "Colômbia",
   "countryBe": "Bélgica",
-  "countryOther": "Outro"
+  "countryOther": "Outro",
+  "registrationToggle": "Registro",
+  "registrationEnabled": "Aberto",
+  "registrationDisabled": "Fechado",
+  "registrationToggleError": "Erro ao atualizar. Tenta de novo."
 }

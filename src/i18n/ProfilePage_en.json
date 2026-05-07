@@ -45,5 +45,9 @@
   "countryUs": "USA",
   "countryCo": "Colombia",
   "countryBe": "Belgium",
-  "countryOther": "Other"
+  "countryOther": "Other",
+  "registrationToggle": "Registration",
+  "registrationEnabled": "Open",
+  "registrationDisabled": "Closed",
+  "registrationToggleError": "Update failed. Try again."
 }
