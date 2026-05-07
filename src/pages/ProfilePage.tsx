@@ -493,7 +493,6 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   const [registrationEnabled, setRegistrationEnabledState] = useState(true);
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
-  const [metalPlaceConfig, setMetalPlaceConfig] = useState<MetalPlaceConfig | null>(null);
   const [metalPlaceLoading, setMetalPlaceLoading] = useState(true);
   const [metalPlaceSaving, setMetalPlaceSaving] = useState(false);
   const [metalPlaceError, setMetalPlaceError] = useState<string | null>(null);
@@ -552,7 +551,6 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
       try {
         const config = await loadMetalPlaceConfig();
         if (config) {
-          setMetalPlaceConfig(config);
           setMetalPlaceDay(config.festival_day || '');
           setMetalPlaceStartTime(config.start_time || '12:00');
           setMetalPlaceEndTime(config.end_time || '23:00');

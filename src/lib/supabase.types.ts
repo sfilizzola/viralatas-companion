@@ -94,16 +94,19 @@ export type Database = {
         Row: {
           user_id: string;
           is_camping: boolean;
+          is_at_metal_place?: boolean;
           updated_at: string;
         };
         Insert: {
           user_id: string;
           is_camping?: boolean;
+          is_at_metal_place?: boolean;
           updated_at?: string;
         };
         Update: {
           user_id?: string;
           is_camping?: boolean;
+          is_at_metal_place?: boolean;
           updated_at?: string;
         };
         Relationships: [];
@@ -147,6 +150,39 @@ export type Database = {
           user_id?: string;
           blocked_by?: string;
           blocked_at?: string;
+        };
+        Relationships: [];
+      };
+      metal_place_config: {
+        Row: {
+          id?: number;
+          festival_day?: number | null;
+          start_time?: string | null;
+          end_time?: string | null;
+          label?: string;
+          test_override_day?: number | null;
+          updated_by?: string;
+          updated_at?: string;
+        };
+        Insert: {
+          id?: number;
+          festival_day?: number | null;
+          start_time?: string | null;
+          end_time?: string | null;
+          label?: string;
+          test_override_day?: number | null;
+          updated_by?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: number;
+          festival_day?: number | null;
+          start_time?: string | null;
+          end_time?: string | null;
+          label?: string;
+          test_override_day?: number | null;
+          updated_by?: string;
+          updated_at?: string;
         };
         Relationships: [];
       };
