@@ -13,7 +13,6 @@ export async function syncAnnouncements(): Promise<void> {
   const { data, error } = await supabase
     .from('announcements')
     .select('*')
-    .is('deleted_at', null)
     .order('created_at', { ascending: false });
 
   if (error || !data) return;
@@ -56,21 +55,20 @@ export async function postAnnouncement(userId: string, content: string): Promise
 }
 
 export async function deleteAnnouncement(id: string): Promise<void> {
-  if (!navigator.onLine) {
-    // Offline: optimistic delete only
-    await removeAnnouncementFromCache(id);
-    return;
-  }
+  // Optimistically remove from cache
+  await removeAnnouncementFromCache(id);
 
-  // Online: sync to Supabase first, then remove from cache
+  if (!navigator.onLine) return;
+
+  // Online: hard delete from Supabase
   const { error } = await supabase
     .from('announcements')
-    .update({ deleted_at: new Date().toISOString() })
+    .delete()
     .eq('id', id);
 
-  // Only remove from cache if the server update succeeded
-  if (!error) {
-    await removeAnnouncementFromCache(id);
+  if (error) {
+    console.error('Delete failed:', error);
+    throw new Error(`Delete failed: ${error.message}`);
   }
 }
 

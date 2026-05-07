@@ -106,12 +106,9 @@ export default function AnnouncementsPage() {
       )
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'announcements' },
+        { event: 'DELETE', schema: 'public', table: 'announcements' },
         async (payload) => {
-          const updated = payload.new as Announcement;
-          if (updated.deleted_at) {
-            await removeAnnouncementFromCache(updated.id);
-          }
+          await removeAnnouncementFromCache(payload.old.id);
         },
       )
       .on(
@@ -152,7 +149,12 @@ export default function AnnouncementsPage() {
 
   async function handleDelete(id: string) {
     if (!confirm(t('deleteConfirm'))) return;
-    await deleteAnnouncement(id);
+    try {
+      await deleteAnnouncement(id);
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert(`Failed to delete: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
   }
 
   async function handleBlock(authorId: string) {
