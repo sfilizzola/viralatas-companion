@@ -56,15 +56,22 @@ export async function postAnnouncement(userId: string, content: string): Promise
 }
 
 export async function deleteAnnouncement(id: string): Promise<void> {
-  // Optimistic: remove from local cache immediately
-  await removeAnnouncementFromCache(id);
+  if (!navigator.onLine) {
+    // Offline: optimistic delete only
+    await removeAnnouncementFromCache(id);
+    return;
+  }
 
-  if (!navigator.onLine) return;
-
-  await supabase
+  // Online: sync to Supabase first, then remove from cache
+  const { error } = await supabase
     .from('announcements')
     .update({ deleted_at: new Date().toISOString() })
     .eq('id', id);
+
+  // Only remove from cache if the server update succeeded
+  if (!error) {
+    await removeAnnouncementFromCache(id);
+  }
 }
 
 export async function flushPendingAnnouncements(): Promise<void> {
