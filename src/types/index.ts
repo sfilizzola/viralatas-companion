@@ -1,6 +1,6 @@
 export type UserRole = 'normal' | 'manager' | 'godlike';
 
-export type Country = 'de' | 'es' | 'br' | 'us' | 'co' | 'other';
+export type Country = 'de' | 'es' | 'br' | 'us' | 'co' | 'be' | 'other';
 
 export type User = {
   id: string;

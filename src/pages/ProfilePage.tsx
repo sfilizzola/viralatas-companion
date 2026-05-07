@@ -239,6 +239,7 @@ function ProfileForm({
             <option value="br">{t('countryBr')}</option>
             <option value="us">{t('countryUs')}</option>
             <option value="co">{t('countryCo')}</option>
+            <option value="be">{t('countryBe')}</option>
             <option value="other">{t('countryOther')}</option>
           </select>
         </label>
