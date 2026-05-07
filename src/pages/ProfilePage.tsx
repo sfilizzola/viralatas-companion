@@ -1,7 +1,7 @@
 import { useState, type ChangeEvent, type FormEvent, useEffect, useCallback, useMemo } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
-import type { Band, MetalPlaceConfig, UserPick, UserRole } from '../types';
+import type { Band, UserPick, UserRole } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';

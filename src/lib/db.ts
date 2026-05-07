@@ -331,7 +331,8 @@ export async function removeFromOfflineAnnouncementsQueue(id: string) {
 
 export async function loadMetalPlaceConfig(): Promise<MetalPlaceConfig | null> {
   const db = await getDB();
-  return db.get('metal_place_config', 'current');
+  const config = await db.get('metal_place_config', 'current');
+  return config ?? null;
 }
 
 export async function saveMetalPlaceConfig(config: MetalPlaceConfig) {

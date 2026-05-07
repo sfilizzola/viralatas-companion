@@ -186,6 +186,24 @@ export type Database = {
         };
         Relationships: [];
       };
+      app_settings: {
+        Row: {
+          id: string;
+          registration_enabled: boolean;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          registration_enabled?: boolean;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          registration_enabled?: boolean;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       app_config: {
         Row: {
           key: string;

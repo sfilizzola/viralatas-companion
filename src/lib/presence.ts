@@ -1,8 +1,6 @@
 import type { MetalPlaceConfig, UserPresence } from '../types';
 import {
-  clearMetalPlaceConfig,
   enqueueOfflinePresence,
-  loadMetalPlaceConfig,
   loadOfflinePresenceQueue,
   removeFromOfflinePresenceQueue,
   replaceUserPresence,
