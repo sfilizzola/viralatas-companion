@@ -26,5 +26,13 @@
   "resetError": "Reset failed. Try again.",
   "promoverManager": "Promote to Manager",
   "removerManager": "Remove Manager",
-  "erroRole": "Update failed. Try again."
+  "erroRole": "Update failed. Try again.",
+  "blockedUsers": "Blocked Users",
+  "noBlockedUsers": "No blocked users",
+  "unblockUser": "Unblock",
+  "unblockConfirm": "Unblock this user?",
+  "userBlocked": "User blocked successfully",
+  "userUnblocked": "User unblocked successfully",
+  "blockError": "Failed to block user",
+  "unblockError": "Failed to unblock"
 }

@@ -8,6 +8,7 @@ import {
   saveAnnouncement,
 } from '../lib/db';
 import {
+  blockUser,
   deleteAnnouncement,
   fetchCurrentUserRole,
   fetchIsBlocked,
@@ -45,6 +46,7 @@ export default function AnnouncementsPage() {
   const [loading, setLoading] = useState(true);
   const [draft, setDraft] = useState('');
   const [posting, setPosting] = useState(false);
+  const [blocking, setBlocking] = useState<string | null>(null);
 
   const refreshFromCache = useCallback(async () => {
     const [cached, users] = await Promise.all([
@@ -113,6 +115,19 @@ export default function AnnouncementsPage() {
     await deleteAnnouncement(id);
   }
 
+  async function handleBlock(authorId: string) {
+    if (!userId) return;
+    setBlocking(authorId);
+    try {
+      await blockUser(authorId, userId);
+      await syncAnnouncements();
+    } catch (error) {
+      console.error('Block failed:', error);
+    } finally {
+      setBlocking(null);
+    }
+  }
+
   const canModerate = role === 'manager' || role === 'godlike';
 
   return (
@@ -169,15 +184,29 @@ export default function AnnouncementsPage() {
                         <span className={styles.timestamp}>{relativeTime(a.created_at, t)}</span>
                       </div>
                     </div>
-                    {canModerate && (
-                      <button
-                        className={styles.deleteBtn}
-                        onClick={() => handleDelete(a.id)}
-                        aria-label={t('delete')}
-                      >
-                        {t('delete')}
-                      </button>
-                    )}
+                    <div className={styles.cardActions}>
+                      {canModerate && a.author_id !== userId && (
+                        <button
+                          className={`${styles.blockBtn} ${blocking === a.author_id ? styles.blocking : ''}`}
+                          onClick={() => handleBlock(a.author_id)}
+                          disabled={blocking === a.author_id}
+                          aria-label={t('block')}
+                          type="button"
+                        >
+                          {blocking === a.author_id ? `${t('blockingUser')}` : `🚫 ${t('block')}`}
+                        </button>
+                      )}
+                      {canModerate && (
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={() => handleDelete(a.id)}
+                          aria-label={t('delete')}
+                          type="button"
+                        >
+                          {t('delete')}
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <p className={styles.content}>{a.content}</p>
                 </li>

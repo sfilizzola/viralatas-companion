@@ -8,19 +8,24 @@ Current phase and upcoming work for Viralatas Metaleiros. Refer to CLAUDE.md for
 
 **Goal:** Mural-style board for crew-wide messages with a three-tier trust hierarchy (normal / manager / godlike).
 
-**Status:** ✅ Scaffold complete — migration, types, DB stores, data layer, and page created. Remaining: ProfilePage godlike/manager sections.
+**Status:** 🔄 Near complete — migration, types, DB stores, data layer, AnnouncementsPage, and godlike section all done. Remaining: ProfilePage manager section (view blocked users, unblock button).
 
 ---
 
 ### Acceptance criteria
 
-- [ ] Any logged-in, non-blocked user can post; message appears immediately for all online users
-- [ ] A manager can delete any announcement; it disappears for all clients within 3 s
-- [ ] A blocked user sees no post box and cannot post (enforced client-side and by RLS)
-- [ ] Godlike profile section shows all registered users; promoting to manager works immediately
+- [x] Any logged-in, non-blocked user can post; message appears immediately for all online users
+- [x] A manager can delete any announcement; it disappears for all clients within 3 s
+- [x] A blocked user sees no post box and cannot post (enforced client-side and by RLS)
+- [ ] A manager/godlike can block a user by clicking a "block" button on their announcement card
+- [ ] A blocked user's previous announcements remain visible, but they cannot post new ones
+- [ ] Godlike profile section shows all users; can promote/demote managers AND unblock any user
+- [ ] Manager profile section shows ONLY blocked users; can unblock from there
+- [ ] Blocking/unblocking works immediately (optimistic + server sync)
 - [ ] `/announcements` renders from IndexedDB with no network after first load
 - [ ] Live page shows the latest announcement in the hero when the user is in "lost" or "empty" state
 - [ ] Soft-deleted announcements never reappear after a cache refresh
+- [ ] Blocked users can still view schedule, picks, live preview, and announcements (only posting blocked)
 
 ---
 
@@ -41,10 +46,11 @@ Current phase and upcoming work for Viralatas Metaleiros. Refer to CLAUDE.md for
 | 11 | `src/components/BottomNav.tsx` — Mural tab added | ✅ Done |
 | 12 | `src/App.tsx` — `/announcements` route + `AnnouncementSync` component | ✅ Done |
 | 13 | `src/pages/RightNowPage.tsx` — latest announcement shown in hero when lost/empty | ✅ Done |
-| 14 | Profile page — godlike section: promote/demote managers | **Pending** |
-| 15 | Profile page — manager section: view and unblock blocked users | **Pending** |
+| 14 | Profile page — godlike section: promote/demote managers, plus unblock button for each user | ✅ Done |
+| 15 | Profile page — manager section: view blocked users only, with unblock button | **Pending** |
+| 16 | AnnouncementsPage — block user button on each card (managers/godlike only) | **Pending** |
 
-Data layer functions (`setUserRole`, `blockUser`, `unblockUser`, `fetchAllUsers`, `fetchBlockedPosters`) are already in `src/lib/announcements.ts`.
+Data layer functions (`setUserRole`, `blockUser`, `unblockUser`, `fetchAllUsers`, `fetchBlockedPosters`) are already in `src/lib/announcements.ts`. GodlikeSection is fully implemented in ProfilePage.tsx.
 
 ---
 

@@ -12,5 +12,8 @@
   "minutesAgo": "ha {n} min",
   "hoursAgo": "ha {n}h",
   "daysAgo": "ha {n}d",
-  "anonymous": "Tripulante"
+  "anonymous": "Tripulante",
+  "block": "Bloquear",
+  "blockingUser": "Bloqueando...",
+  "userBlocked": "Usuário bloqueado"
 }
