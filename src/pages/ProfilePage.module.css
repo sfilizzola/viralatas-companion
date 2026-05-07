@@ -551,6 +551,98 @@
   text-align: center;
 }
 
+.metalPlaceSection {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid rgba(184, 134, 11, 0.3);
+  border-radius: var(--radius);
+  background: rgba(184, 134, 11, 0.06);
+}
+
+.metalPlaceSectionTitle {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(218, 165, 32, 0.95);
+}
+
+.metalPlaceError {
+  font-size: 0.875rem;
+  color: #ef4444;
+  margin-bottom: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 4px;
+}
+
+.metalPlaceForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.formLabel {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.formInput {
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 0.875rem;
+  font-family: inherit;
+}
+
+.formInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.checkboxLabel input {
+  cursor: pointer;
+}
+
+.saveButton {
+  padding: 0.5rem 1rem;
+  background: rgba(184, 134, 11, 0.2);
+  border: 1px solid rgba(184, 134, 11, 0.5);
+  border-radius: 4px;
+  color: rgba(218, 165, 32, 0.95);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.saveButton:hover:not(:disabled) {
+  background: rgba(184, 134, 11, 0.3);
+  border-color: rgba(184, 134, 11, 0.7);
+}
+
+.saveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* User management section */
 .userManagementSection {
   width: 100%;

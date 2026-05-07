@@ -1,15 +1,16 @@
 import { useState, type ChangeEvent, type FormEvent, useEffect, useCallback, useMemo } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
-import type { Band, UserPick, UserRole } from '../types';
+import type { Band, MetalPlaceConfig, UserPick, UserRole } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';
-import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../lib/db';
+import { loadBands, loadMetalPlaceConfig, loadUserPicks, PICKS_CHANGED_EVENT, saveMetalPlaceConfig } from '../lib/db';
 import { togglePick } from '../lib/picks';
 import { fetchCurrentUserRole, fetchAllUsers, fetchBlockedPostersWithUserDetails, setUserRole as updateUserRole, unblockUser } from '../lib/announcements';
 import { invalidateCacheForAllUsers } from '../lib/cache';
 import { getRegistrationEnabled, setRegistrationEnabled } from '../lib/appSettings';
+import { saveMetalPlaceConfigRemote } from '../lib/presence';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
@@ -492,6 +493,14 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   const [registrationEnabled, setRegistrationEnabledState] = useState(true);
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
+  const [metalPlaceConfig, setMetalPlaceConfig] = useState<MetalPlaceConfig | null>(null);
+  const [metalPlaceLoading, setMetalPlaceLoading] = useState(true);
+  const [metalPlaceSaving, setMetalPlaceSaving] = useState(false);
+  const [metalPlaceError, setMetalPlaceError] = useState<string | null>(null);
+  const [testModeEnabled, setTestModeEnabled] = useState(false);
+  const [metalPlaceDay, setMetalPlaceDay] = useState<number | ''>(1);
+  const [metalPlaceStartTime, setMetalPlaceStartTime] = useState('12:00');
+  const [metalPlaceEndTime, setMetalPlaceEndTime] = useState('23:00');
 
   useEffect(() => {
     async function loadRole() {
@@ -535,6 +544,29 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
 
     if (userRole === 'godlike') {
       loadRegistrationStatus();
+    }
+  }, [userRole]);
+
+  useEffect(() => {
+    async function loadMetalPlaceConfigFromDB() {
+      try {
+        const config = await loadMetalPlaceConfig();
+        if (config) {
+          setMetalPlaceConfig(config);
+          setMetalPlaceDay(config.festival_day || '');
+          setMetalPlaceStartTime(config.start_time || '12:00');
+          setMetalPlaceEndTime(config.end_time || '23:00');
+          setTestModeEnabled(config.test_override_day === 1);
+        }
+      } catch (error) {
+        console.error('Failed to load Metal Place config:', error);
+      } finally {
+        setMetalPlaceLoading(false);
+      }
+    }
+
+    if (userRole === 'godlike') {
+      loadMetalPlaceConfigFromDB();
     }
   }, [userRole]);
 
@@ -713,6 +745,108 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
           </label>
           {registrationError && <p className={styles.registrationError}>{registrationError}</p>}
         </div>
+
+        {!metalPlaceLoading && (
+          <div className={styles.metalPlaceSection}>
+            <h4 className={styles.metalPlaceSectionTitle}>🍺 Metal Place</h4>
+            {metalPlaceError && (
+              <div className={styles.metalPlaceError}>
+                ⚠️ {metalPlaceError}
+              </div>
+            )}
+            <div className={styles.metalPlaceForm}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Festival Day (1-4)</label>
+                <select
+                  value={metalPlaceDay}
+                  onChange={(e) => setMetalPlaceDay(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
+                  className={styles.formInput}
+                  disabled={metalPlaceSaving}
+                >
+                  <option value="">Not Set</option>
+                  <option value={1}>Day 1 (Wed, Jul 29)</option>
+                  <option value={2}>Day 2 (Thu, Jul 30)</option>
+                  <option value={3}>Day 3 (Fri, Jul 31)</option>
+                  <option value={4}>Day 4 (Sat, Aug 1)</option>
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Start Time</label>
+                <input
+                  type="time"
+                  value={metalPlaceStartTime}
+                  onChange={(e) => setMetalPlaceStartTime(e.target.value)}
+                  className={styles.formInput}
+                  disabled={metalPlaceSaving}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>End Time</label>
+                <input
+                  type="time"
+                  value={metalPlaceEndTime}
+                  onChange={(e) => setMetalPlaceEndTime(e.target.value)}
+                  className={styles.formInput}
+                  disabled={metalPlaceSaving}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={testModeEnabled}
+                    onChange={(e) => setTestModeEnabled(e.target.checked)}
+                    disabled={metalPlaceSaving}
+                  />
+                  Test Mode
+                </label>
+              </div>
+              {testModeEnabled && (
+                <div className={styles.formGroup}>
+                  <label className={styles.formLabel}>Test Day (1-4)</label>
+                  <select
+                    defaultValue={1}
+                    className={styles.formInput}
+                    disabled={metalPlaceSaving}
+                  >
+                    <option value={1}>Day 1</option>
+                    <option value={2}>Day 2</option>
+                    <option value={3}>Day 3</option>
+                    <option value={4}>Day 4</option>
+                  </select>
+                </div>
+              )}
+              <button
+                className={styles.saveButton}
+                onClick={async () => {
+                  setMetalPlaceSaving(true);
+                  setMetalPlaceError(null);
+                  try {
+                    await saveMetalPlaceConfigRemote({
+                      festival_day: metalPlaceDay === '' ? null : metalPlaceDay,
+                      start_time: metalPlaceStartTime || null,
+                      end_time: metalPlaceEndTime || null,
+                      test_override_day: testModeEnabled ? 1 : null,
+                    });
+                    await saveMetalPlaceConfig({
+                      festival_day: metalPlaceDay === '' ? null : metalPlaceDay,
+                      start_time: metalPlaceStartTime || null,
+                      end_time: metalPlaceEndTime || null,
+                      test_override_day: testModeEnabled ? 1 : null,
+                    });
+                  } catch (err) {
+                    setMetalPlaceError(err instanceof Error ? err.message : 'Save failed');
+                  } finally {
+                    setMetalPlaceSaving(false);
+                  }
+                }}
+                disabled={metalPlaceSaving}
+              >
+                {metalPlaceSaving ? 'Saving...' : 'Save Metal Place Config'}
+              </button>
+            </div>
+          </div>
+        )}
 
         <div className={styles.userManagementSection}>
           <h4 className={styles.userManagementTitle}>Registered Users</h4>
