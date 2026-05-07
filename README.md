@@ -44,8 +44,8 @@ The app lets crew members log in, browse the Wacken schedule, pick bands, see wh
 ├── supabase/
 │   ├── migrations/       # Database schema and policy migrations
 │   └── seed/             # Band lineup and disposable test-user seed scripts
-├── MAIN_STAGES.md        # Full feature plan and acceptance criteria
-├── CURRENT_STAGE.md      # Current phase status
+├── CLAUDE.md             # LLM/agent context and project guidelines
+├── PHASES.md             # Remaining development phases 5–7
 └── vite.config.ts        # Vite and PWA configuration
 ```
 
@@ -186,8 +186,8 @@ Unknown routes redirect to `/now`.
 
 ## Development Notes
 
-- Read `MAIN_STAGES.md` before changing feature behavior.
-- Check `CURRENT_STAGE.md` for current phase status.
+- Read `CLAUDE.md` for project context and constraints.
+- Check `PHASES.md` for current phase and acceptance criteria.
 - Put Supabase schema changes in `supabase/migrations/`.
 - Keep Claude or other API keys out of the client bundle.
-- Keep offline-first behavior intact: IndexedDB is the primary UI data source, Supabase is the sync target..
+- Keep offline-first behavior intact: IndexedDB is the primary UI data source, Supabase is the sync target.
