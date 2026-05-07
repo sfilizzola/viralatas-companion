@@ -68,18 +68,50 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
 // - Accessibility: all images must have transparent backgrounds for dark theme compatibility
 export const BADGES: BadgeConfig[] = [
   {
-    slug: 'new-puppy',
+    slug: 'puppy',
     imagePath: '/badges/badge_new-puppy.png',
-    labelKey: 'badgeNewPuppy',
+    labelKey: 'badgePuppy',
     // Exclusive — only 2026 checked. Adding any other year removes this badge.
     condition: { type: 'wacken_years_exactly', years: [2026] },
   },
   {
-    slug: 'vira-latas-pack',
+    slug: 'pack-member',
     imagePath: '/badges/badge_vira-latas-pack.png',
-    labelKey: 'badgeViraLatasPack',
-    // Earned when at least one of your picks has 10+ crew members also attending
+    labelKey: 'badgePackMember',
+    // Earned when you're attending a concert with 10+ crew members
     condition: { type: 'band_attendance_min', count: 10 },
+  },
+  {
+    slug: 'pais-tropical',
+    imagePath: '/badges/badge_br.png',
+    labelKey: 'badgePaisTropical',
+    condition: { type: 'country_is', country: 'br' },
+  },
+  {
+    slug: 'deutscher',
+    imagePath: '/badges/badge_de.png',
+    labelKey: 'badgeDeutscher',
+    condition: { type: 'country_is', country: 'de' },
+  },
+  {
+    slug: 'america-fuck-yeah',
+    imagePath: '/badges/badge_usa.png',
+    labelKey: 'badgeAmericaFuckYeah',
+    condition: { type: 'country_is', country: 'us' },
+  },
+  {
+    slug: 'og',
+    imagePath: '/badges/badge_og.png',
+    labelKey: 'badgeOG',
+    // Original — founded the Vira-latas. Must have attended 2022 (founding year)
+    condition: { type: 'wacken_years_includes', years: [2022] },
+  },
+  {
+    slug: 'mud-survivor',
+    imagePath: '/badges/badge_mud-warrior.png',
+    labelKey: 'badgeMudSurvivor',
+    // Veteran who survived both 2023 and 2025 (may have attended other years too)
+    condition: { type: 'wacken_years_includes', years: [2023, 2025] },
   },
 ];
 
