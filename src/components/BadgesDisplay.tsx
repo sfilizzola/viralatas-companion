@@ -19,6 +19,7 @@ type BadgesDisplayProps = {
 export default function BadgesDisplay({ user }: BadgesDisplayProps) {
   const { t } = useI18n('Badges');
   const [ctx, setCtx] = useState<BadgeContext>(EMPTY_CTX);
+  const [selectedBadgeSlug, setSelectedBadgeSlug] = useState<string | null>(null);
 
   const loadCtx = useCallback(async () => {
     const [userPicks, allPicks] = await Promise.all([
@@ -43,22 +44,56 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
   }, [loadCtx]);
 
   const earned = getEarnedBadges(ctx);
+  const selectedBadge = earned.find((b) => b.slug === selectedBadgeSlug);
 
   if (earned.length === 0) {
     return null;
   }
 
   return (
-    <div className={styles.badgesRow}>
-      {earned.map((badge) => (
-        <img
-          key={badge.slug}
-          src={badge.imagePath}
-          alt={t(badge.labelKey)}
-          title={t(badge.labelKey)}
-          className={styles.badge}
-        />
-      ))}
-    </div>
+    <>
+      <div className={styles.badgesRow}>
+        {earned.map((badge) => (
+          <button
+            key={badge.slug}
+            className={styles.badgeButton}
+            onClick={() => setSelectedBadgeSlug(badge.slug)}
+            type="button"
+          >
+            <img
+              src={badge.imagePath}
+              alt={t(badge.labelKey)}
+              title={t(badge.labelKey)}
+              className={styles.badge}
+            />
+          </button>
+        ))}
+      </div>
+
+      {selectedBadge && (
+        <div
+          className={styles.modal}
+          onClick={() => setSelectedBadgeSlug(null)}
+          role="presentation"
+        >
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button
+              className={styles.closeButton}
+              onClick={() => setSelectedBadgeSlug(null)}
+              type="button"
+              aria-label="Close"
+            >
+              ✕
+            </button>
+            <img
+              src={selectedBadge.imagePath}
+              alt={t(selectedBadge.labelKey)}
+              className={styles.badgePreview}
+            />
+            <h3 className={styles.badgeTitle}>{t(selectedBadge.labelKey)}</h3>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

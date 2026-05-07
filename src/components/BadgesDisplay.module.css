@@ -5,12 +5,32 @@
   padding: 0.75rem 0;
 }
 
+.badgeButton {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s;
+}
+
+.badgeButton:hover {
+  transform: scale(1.1);
+}
+
+.badgeButton:active {
+  transform: scale(0.95);
+}
+
 .badge {
   width: 40px;
   height: 40px;
   border-radius: var(--radius);
   overflow: hidden;
   flex-shrink: 0;
+  display: block;
 }
 
 .badgeImg {
@@ -18,4 +38,89 @@
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 999;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContent {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem 1.5rem;
+  max-width: 280px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text);
+  font-size: 1.2rem;
+  transition: background 0.15s, border-color 0.15s;
+  font-family: inherit;
+}
+
+.closeButton:hover {
+  background: var(--border);
+  border-color: var(--text-muted);
+}
+
+.badgePreview {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius);
+  display: block;
+  margin-top: 0.5rem;
+}
+
+.badgeTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  margin: 0;
 }
