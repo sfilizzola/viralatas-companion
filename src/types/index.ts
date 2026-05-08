@@ -65,6 +65,14 @@ export type MetalPlaceConfig = {
   updated_at?: string;
 };
 
+export type LiveBandTestConfig = {
+  id?: number;
+  band_id?: string | null;
+  enabled?: boolean;
+  updated_by?: string;
+  updated_at?: string;
+};
+
 export type AlertContext = {
   currentTime: string;
   festivalDay: number;

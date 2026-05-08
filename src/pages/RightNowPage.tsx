@@ -23,8 +23,16 @@ import {
   type LivePlan,
 } from '../lib/livePreview';
 import { setCampingStatus, setMetalPlaceStatus, syncCrewPresence, syncMetalPlaceConfig, isTimeWithinMetalPlaceWindow, validateAndAutoCheckoutOutsideMetalPlaceWindow } from '../lib/presence';
-import { loadMetalPlaceConfig, METAL_PLACE_CONFIG_CHANGED_EVENT, saveMetalPlaceConfig } from '../lib/db';
-import type { MetalPlaceConfig } from '../types';
+import { syncLiveBandTestConfig } from '../lib/liveBandTest';
+import {
+  loadLiveBandTestConfig,
+  loadMetalPlaceConfig,
+  LIVE_BAND_TEST_CONFIG_CHANGED_EVENT,
+  METAL_PLACE_CONFIG_CHANGED_EVENT,
+  saveLiveBandTestConfig,
+  saveMetalPlaceConfig,
+} from '../lib/db';
+import type { LiveBandTestConfig, MetalPlaceConfig } from '../types';
 import { togglePick } from '../lib/picks';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
@@ -161,6 +169,7 @@ export default function RightNowPage() {
   const [metalPlaceCheckingIn, setMetalPlaceCheckingIn] = useState(false);
   const [metalPlaceCheckedIn, setMetalPlaceCheckedIn] = useState(false);
   const [metalPlaceConfig, setMetalPlaceConfig] = useState<MetalPlaceConfig | null>(null);
+  const [liveBandTestConfig, setLiveBandTestConfig] = useState<LiveBandTestConfig | null>(null);
 
   const refreshFromCache = useCallback(async () => {
     try {
@@ -264,6 +273,52 @@ export default function RightNowPage() {
   );
 
   useEffect(() => {
+    async function loadFromDB() {
+      const config = await loadLiveBandTestConfig();
+      setLiveBandTestConfig(config);
+    }
+
+    loadFromDB();
+    syncLiveBandTestConfig().catch(() => {});
+
+    function handleConfigChange() {
+      loadFromDB();
+    }
+
+    window.addEventListener(LIVE_BAND_TEST_CONFIG_CHANGED_EVENT, handleConfigChange);
+
+    const channel = supabase
+      .channel('live_band_test_config_live')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'live_band_test_config' },
+        async (payload) => {
+          const next = (payload.new ?? payload.old) as LiveBandTestConfig | undefined;
+          if (next) await saveLiveBandTestConfig(next);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      window.removeEventListener(LIVE_BAND_TEST_CONFIG_CHANGED_EVENT, handleConfigChange);
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const liveTestBandId = useMemo(
+    () =>
+      liveBandTestConfig?.enabled && liveBandTestConfig.band_id
+        ? liveBandTestConfig.band_id
+        : null,
+    [liveBandTestConfig],
+  );
+
+  const liveTestBand = useMemo(
+    () => (liveTestBandId ? bands.find((b) => b.id === liveTestBandId) ?? null : null),
+    [bands, liveTestBandId],
+  );
+
+  useEffect(() => {
     // Skip until both config and userId are available, otherwise the very first
     // run with config=null would force-checkout the user on every mount.
     // Re-runs when isMetalPlaceWindowActive flips false (config change OR time
@@ -279,8 +334,9 @@ export default function RightNowPage() {
       bands,
       new Set(picks.filter((pick) => pick.user_id === userId).map((pick) => pick.band_id)),
       now,
+      liveTestBandId,
     );
-  }, [bands, picks, userId, now]);
+  }, [bands, picks, userId, now, liveTestBandId]);
 
   const myPresence = useMemo(
     () => (userId ? presence.find((item) => item.user_id === userId) : undefined),
@@ -305,8 +361,8 @@ export default function RightNowPage() {
     if (userId && !users.some((crewUser) => crewUser.id === userId)) {
       users.push({ id: userId, display_name: userDisplayName, avatar_url: null });
     }
-    return mapCrewLivePlans(bands, picks, users, presence, now);
-  }, [bands, picks, crewUsers, presence, userId, userDisplayName, now]);
+    return mapCrewLivePlans(bands, picks, users, presence, now, liveTestBandId);
+  }, [bands, picks, crewUsers, presence, userId, userDisplayName, now, liveTestBandId]);
 
   const crewGroups = useMemo(
     () => groupCrewLivePlans(crewPlans, { metalPlaceWindowActive: isMetalPlaceWindowActive }),
@@ -379,6 +435,12 @@ export default function RightNowPage() {
           <span className={styles.switchTrack} aria-hidden />
         </label>
       </header>
+
+      {liveTestBand && (
+        <div className={styles.liveTestBanner} role="status">
+          {t('liveTestBanner', { band: liveTestBand.name })}
+        </div>
+      )}
 
       <main className={styles.main}>
         {loading ? (

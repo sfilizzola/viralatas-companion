@@ -27,8 +27,51 @@ export type CrewLiveGroup =
       members: CrewLivePlan[];
     };
 
-export function findLivePlan(bands: Band[], pickedBandIds: Set<string>, now: Date): LivePlan {
-  const pickedBands = bands
+/**
+ * Godlike "Live Band Test": when active, splice a virtual copy of the test band
+ * into `bands` with start/end times shifted to wrap `now` (preserving the band's
+ * original duration). Crew members who picked this band will see it as `current`;
+ * everyone else falls through normal logic.
+ *
+ * Returns the bands array unchanged when no override is active or the test band
+ * is not found.
+ */
+export function applyLiveBandTestOverride(
+  bands: Band[],
+  liveTestBandId: string | null | undefined,
+  now: Date,
+): Band[] {
+  if (!liveTestBandId) return bands;
+
+  const idx = bands.findIndex((band) => band.id === liveTestBandId);
+  if (idx === -1) return bands;
+
+  const original = bands[idx];
+  const durationMs =
+    new Date(original.end_time).getTime() - new Date(original.start_time).getTime();
+  const FIVE_MIN_MS = 5 * 60 * 1000;
+  const newStart = new Date(now.getTime() - FIVE_MIN_MS);
+  const newEnd = new Date(newStart.getTime() + durationMs);
+
+  const shifted: Band = {
+    ...original,
+    start_time: newStart.toISOString(),
+    end_time: newEnd.toISOString(),
+  };
+
+  const next = bands.slice();
+  next[idx] = shifted;
+  return next;
+}
+
+export function findLivePlan(
+  bands: Band[],
+  pickedBandIds: Set<string>,
+  now: Date,
+  liveTestBandId?: string | null,
+): LivePlan {
+  const effectiveBands = applyLiveBandTestOverride(bands, liveTestBandId, now);
+  const pickedBands = effectiveBands
     .filter((band) => pickedBandIds.has(band.id))
     .sort((a, b) => a.start_time.localeCompare(b.start_time));
 
@@ -58,7 +101,9 @@ export function mapCrewLivePlans(
   users: CrewUser[],
   presence: UserPresence[],
   now: Date,
+  liveTestBandId?: string | null,
 ): CrewLivePlan[] {
+  const effectiveBands = applyLiveBandTestOverride(bands, liveTestBandId, now);
   const picksByUser = new Map<string, Set<string>>();
   for (const pick of picks) {
     const bandIds = picksByUser.get(pick.user_id) ?? new Set<string>();
@@ -85,7 +130,7 @@ export function mapCrewLivePlans(
       const presence = presenceByUser.get(user.id);
       const isCamping = presence?.is_camping ?? false;
       const isAtMetalPlace = presence?.is_at_metal_place ?? false;
-      const plan = findLivePlan(bands, picksByUser.get(user.id) ?? new Set(), now);
+      const plan = findLivePlan(effectiveBands, picksByUser.get(user.id) ?? new Set(), now);
       return {
         ...user,
         isCamping,

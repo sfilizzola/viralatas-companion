@@ -650,6 +650,72 @@
   cursor: not-allowed;
 }
 
+.liveBandTestSection {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  border-radius: var(--radius);
+  background: rgba(217, 119, 6, 0.06);
+}
+
+.liveBandTestSectionTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(251, 191, 36, 0.95);
+}
+
+.liveBandTestDescription {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.liveBandTestActive {
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(251, 191, 36, 0.95);
+  background: rgba(217, 119, 6, 0.12);
+  border-left: 3px solid rgba(217, 119, 6, 0.7);
+  border-radius: 4px;
+}
+
+.liveBandTestButtonRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.liveBandTestButtonRow .saveButton {
+  flex: 1;
+}
+
+.liveBandTestClearButton {
+  padding: 0.5rem 1rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.liveBandTestClearButton:hover:not(:disabled) {
+  background: var(--border);
+  border-color: var(--text-muted);
+}
+
+.liveBandTestClearButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 /* User management section */
 .userManagementSection {
   width: 100%;

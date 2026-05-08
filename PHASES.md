@@ -163,14 +163,14 @@ Godlike can toggle test mode in the Profile Metal Place config section:
 
 **Goal:** Round out the profile experience with a richer badge modal, godlike-only band live-test tooling, collapsible admin sections, and a JSON-driven "useful links" surface. None of these depend on each other — each stage ships independently.
 
-**Status:** 🚧 Stage 7.1 complete; 7.2–7.4 not started.
+**Status:** 🚧 Stages 7.1–7.2 complete; 7.3–7.4 not started.
 
 **Stages overview:**
 
 | Stage | Topic | Touches | Risk | Status |
 |---|---|---|---|---|
 | 7.1 | Badge modal redesign + funny texts | `BadgesDisplay.tsx`, `badges.ts`, `Badges_*.json` | Low (cosmetic + i18n) | ✅ Done |
-| 7.2 | Godlike Live Band Test | New migration, `presence.ts` style, `RightNowPage.tsx`, `ProfilePage.tsx` | Medium (new table + Realtime) | ⏳ Planned |
+| 7.2 | Godlike Live Band Test | New migration, `liveBandTest.ts`, `livePreview.ts`, `RightNowPage.tsx`, `ProfilePage.tsx` | Medium (new table + Realtime) | ✅ Done |
 | 7.3 | Collapsible Godlike & Manager sections | `ProfilePage.tsx`, `ProfilePage.module.css` | Low (UI only) | ⏳ Planned |
 | 7.4 | Useful Viralatas Links | `public/useful-links.json`, `AnnouncementsPage.tsx` + CSS, i18n | Low (static fetch) | ⏳ Planned |
 
@@ -232,7 +232,9 @@ For each new badge added in the future the only requirement is to define both `l
 
 ---
 
-### Stage 7.2 — Godlike "Live Band Test"
+### Stage 7.2 — Godlike "Live Band Test" `[COMPLETE]`
+
+**Status:** ✅ Done. Migration + IDB v7 store added; `livePreview.ts` exposes `applyLiveBandTestOverride()` and threads `liveTestBandId` through `findLivePlan()` / `mapCrewLivePlans()`. `ProfilePage` shows a popularity-sorted band picker with mutual-exclusion confirmation against Metal Place test mode; `RightNowPage` loads/realtime-syncs the config and shows a 🧪 banner while active. Verified with `npm test` (128 tests passing) and `npm run build`.
 
 **Goal:** Godlike picks a band from a popularity-sorted list and toggles "make it live now." All clients see that band as the user's/crew's current band — useful to validate `RightNowPage` behavior, crew grid grouping, and (in Phase 8+) LLM alert flows without waiting for the festival.
 
@@ -316,14 +318,14 @@ This keeps the override **purely derived** — no DB writes to `bands`, no migra
 
 #### Acceptance criteria
 
-- [ ] Migration creates `live_band_test_config` with godlike-only RLS and Realtime
-- [ ] Godlike sees a "Live Band Test" block in Profile, listing all bands ordered by current popularity (most picks first)
-- [ ] Selecting a band + saving makes that band appear as `current` for every crew member who picked it (across all open browser tabs within ~3s)
-- [ ] Crew members who didn't pick it remain on their real status (no false-positives)
-- [ ] Clearing the override returns the app to real-time-driven `RightNowPage` logic
-- [ ] Cannot enable simultaneously with Metal Place test mode — saving one disables the other with confirmation
-- [ ] Non-godlike users have no UI surface for this feature
-- [ ] Offline: config persists in IndexedDB and applies on reload; queue not needed (godlike-only writes)
+- [x] Migration creates `live_band_test_config` with godlike-only RLS and Realtime
+- [x] Godlike sees a "Live Band Test" block in Profile, listing all bands ordered by current popularity (most picks first)
+- [x] Selecting a band + saving makes that band appear as `current` for every crew member who picked it (across all open browser tabs within ~3s)
+- [x] Crew members who didn't pick it remain on their real status (no false-positives)
+- [x] Clearing the override returns the app to real-time-driven `RightNowPage` logic
+- [x] Cannot enable simultaneously with Metal Place test mode — saving one disables the other with confirmation
+- [x] Non-godlike users have no UI surface for this feature
+- [x] Offline: config persists in IndexedDB and applies on reload; queue not needed (godlike-only writes)
 
 ---
 
