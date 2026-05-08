@@ -49,5 +49,22 @@
   "registrationToggle": "Registro",
   "registrationEnabled": "Aberto",
   "registrationDisabled": "Fechado",
-  "registrationToggleError": "Erro ao atualizar. Tenta de novo."
+  "registrationToggleError": "Erro ao atualizar. Tenta de novo.",
+  "metalPlaceTitle": "🍺 Metal Place",
+  "metalPlaceFestivalDay": "Dia do Festival (1-4)",
+  "metalPlaceDayUnset": "Não definido",
+  "metalPlaceDay1": "Dia 1 (Qua, 29 Jul)",
+  "metalPlaceDay2": "Dia 2 (Qui, 30 Jul)",
+  "metalPlaceDay3": "Dia 3 (Sex, 31 Jul)",
+  "metalPlaceDay4": "Dia 4 (Sáb, 01 Ago)",
+  "metalPlaceStartTime": "Hora de início",
+  "metalPlaceEndTime": "Hora de término",
+  "metalPlaceTestMode": "🧪 Modo Teste (libera Metal Place hoje)",
+  "metalPlaceTestModeHint": "Modo teste ativo: Metal Place vai aparecer como se hoje fosse o dia configurado.",
+  "metalPlaceSave": "Salvar configuração",
+  "metalPlaceSaving": "Salvando...",
+  "metalPlaceSaveError": "Falha ao salvar configuração",
+  "registeredUsers": "Usuários cadastrados",
+  "registeredUsersLoading": "Carregando usuários...",
+  "registeredUsersEmpty": "Nenhum usuário encontrado"
 }

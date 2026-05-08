@@ -32,5 +32,12 @@
   "desfazer": "Desfazer",
   "metalPlaceGroupTitle": "Metal Place",
   "metalPlaceGroupKicker": "o melhor beergarden do mundo",
-  "metalPlaceGroupEmpty": "Ninguém no Metal Place ainda"
+  "metalPlaceGroupKickerWithTime": "🍺 {start} - {end}",
+  "metalPlaceGroupEmpty": "Ninguém no Metal Place ainda",
+  "metalPlaceCheckIn": "Bora pro Metal",
+  "metalPlaceCheckInActive": "Você está no Metal 🍺",
+  "metalPlaceCheckingIn": "Entrando...",
+  "metalPlaceCheckOut": "Voltei pro festival",
+  "metalPlaceCheckedOut": "De volta!",
+  "metalPlaceCheckingOut": "Saindo..."
 }

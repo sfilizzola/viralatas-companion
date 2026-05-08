@@ -151,13 +151,14 @@ export function groupCrewLivePlans(crewPlans: CrewLivePlan[]): CrewLiveGroup[] {
   const result: CrewLiveGroup[] = [
     ...liveBandGroups,
     { kind: 'camping', band: null, members: sortMembers(campingMembers) },
+    { kind: 'lost', band: null, members: sortMembers(lostMembers) },
   ];
 
+  // Metal Place is conditional: only renders when ≥1 member is checked in.
+  // It sits at the end of the crew grid, below the lost card.
   if (metalPlaceMembers.length > 0) {
     result.push({ kind: 'metal_place', band: null, members: sortMembers(metalPlaceMembers) });
   }
-
-  result.push({ kind: 'lost', band: null, members: sortMembers(lostMembers) });
 
   return result;
 }
