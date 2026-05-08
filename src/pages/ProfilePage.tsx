@@ -493,6 +493,7 @@ type UserWithLoading = {
 function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
   const [allUsers, setAllUsers] = useState<UserWithLoading[]>([]);
@@ -766,9 +767,19 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   return (
     <div className={styles.godlikeSection}>
       <div className={styles.divider} />
-      <div className={styles.godlikeSectionContent}>
-        <h3 className={styles.godlikeTitle}>🤘 GODLIKE POWERS</h3>
-
+      <div className={styles.collapsibleCard}>
+        <button
+          className={styles.conflictsHeader}
+          onClick={() => setIsOpen(!isOpen)}
+          type="button"
+          aria-expanded={isOpen}
+        >
+          <h3 className={styles.godlikeTitle}>🤘 GODLIKE POWERS</h3>
+          <div className={`${styles.chevron} ${isOpen ? styles.open : ''}`}>▼</div>
+        </button>
+        <div className={`${styles.conflictsContent} ${isOpen ? styles.open : ''}`}>
+          <div className={styles.conflictsInner}>
+            <div className={styles.godlikeSectionContent}>
         <button
           className={`${styles.resetButton} ${resetting ? styles.resetting : ''}`}
           onClick={handleResetAllData}
@@ -1117,6 +1128,9 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
             </div>
           )}
         </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1131,6 +1145,7 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [blockedUsers, setBlockedUsers] = useState<UserWithLoading[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     async function loadRole() {
@@ -1213,9 +1228,19 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
   return (
     <div className={styles.managerSection}>
       <div className={styles.divider} />
-      <div className={styles.managerSectionContent}>
-        <h3 className={styles.managerTitle}>🔧 MANAGER POWERS</h3>
-
+      <div className={styles.collapsibleCard}>
+        <button
+          className={styles.conflictsHeader}
+          onClick={() => setIsOpen(!isOpen)}
+          type="button"
+          aria-expanded={isOpen}
+        >
+          <h3 className={styles.managerTitle}>🔧 MANAGER POWERS</h3>
+          <div className={`${styles.chevron} ${isOpen ? styles.open : ''}`}>▼</div>
+        </button>
+        <div className={`${styles.conflictsContent} ${isOpen ? styles.open : ''}`}>
+          <div className={styles.conflictsInner}>
+            <div className={styles.managerSectionContent}>
         <div className={styles.blockedUsersSection}>
           <h4 className={styles.blockedUsersTitle}>{t('blockedUsers')}</h4>
           {blockedUsers.length === 0 ? (
@@ -1260,6 +1285,9 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
               ))}
             </div>
           )}
+        </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

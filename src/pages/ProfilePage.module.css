@@ -438,6 +438,13 @@
   margin-bottom: 1.5rem;
 }
 
+.collapsibleCard {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
 .godlikeSectionContent {
   display: flex;
   flex-direction: column;

@@ -163,7 +163,7 @@ Godlike can toggle test mode in the Profile Metal Place config section:
 
 **Goal:** Round out the profile experience with a richer badge modal, godlike-only band live-test tooling, collapsible admin sections, and a JSON-driven "useful links" surface. None of these depend on each other — each stage ships independently.
 
-**Status:** 🚧 Stages 7.1–7.2 complete; 7.3–7.4 not started.
+**Status:** 🚧 Stages 7.1–7.3 complete; 7.4 not started.
 
 **Stages overview:**
 
@@ -171,7 +171,7 @@ Godlike can toggle test mode in the Profile Metal Place config section:
 |---|---|---|---|---|
 | 7.1 | Badge modal redesign + funny texts | `BadgesDisplay.tsx`, `badges.ts`, `Badges_*.json` | Low (cosmetic + i18n) | ✅ Done |
 | 7.2 | Godlike Live Band Test | New migration, `liveBandTest.ts`, `livePreview.ts`, `RightNowPage.tsx`, `ProfilePage.tsx` | Medium (new table + Realtime) | ✅ Done |
-| 7.3 | Collapsible Godlike & Manager sections | `ProfilePage.tsx`, `ProfilePage.module.css` | Low (UI only) | ⏳ Planned |
+| 7.3 | Collapsible Godlike & Manager sections | `ProfilePage.tsx`, `ProfilePage.module.css` | Low (UI only) | ✅ Done |
 | 7.4 | Useful Viralatas Links | `public/useful-links.json`, `AnnouncementsPage.tsx` + CSS, i18n | Low (static fetch) | ⏳ Planned |
 
 ---
@@ -329,7 +329,9 @@ This keeps the override **purely derived** — no DB writes to `bands`, no migra
 
 ---
 
-### Stage 7.3 — Collapsible Godlike & Manager sections
+### Stage 7.3 — Collapsible Godlike & Manager sections `[COMPLETE]`
+
+**Status:** ✅ Done. Both admin sections now collapse via the `ConflictSection` chevron pattern. Added shared `.collapsibleCard` CSS class; reused existing `.conflictsHeader`, `.chevron`, `.open`, `.conflictsContent`, `.conflictsInner` styles. Default state is collapsed for both. Verified with `npx tsc --noEmit` and `npm test -- --run` (128 tests passing).
 
 **Goal:** Both admin sections in `ProfilePage` are growing long. Wrap each in a simple chevron-expand container, mirroring the existing `ConflictSection` pattern at [ProfilePage.tsx:370-386](src/pages/ProfilePage.tsx#L370-L386).
 
@@ -350,11 +352,11 @@ This keeps the override **purely derived** — no DB writes to `bands`, no migra
 
 #### Acceptance criteria
 
-- [ ] Tapping the godlike header toggles its body open/closed; chevron rotates accordingly
-- [ ] Tapping the manager header toggles its body open/closed; chevron rotates accordingly
-- [ ] Both sections start collapsed on page load
-- [ ] All existing functionality inside each section continues to work unchanged when expanded
-- [ ] No visual regression when both are collapsed (page is noticeably shorter)
+- [x] Tapping the godlike header toggles its body open/closed; chevron rotates accordingly
+- [x] Tapping the manager header toggles its body open/closed; chevron rotates accordingly
+- [x] Both sections start collapsed on page load
+- [x] All existing functionality inside each section continues to work unchanged when expanded
+- [x] No visual regression when both are collapsed (page is noticeably shorter)
 
 ---
 
