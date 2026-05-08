@@ -1,14 +1,15 @@
 import { openDB, type IDBPDatabase } from 'idb';
-import type { Announcement, Band, CrewUser, MetalPlaceConfig, UserPick, UserPresence } from '../types';
+import type { Announcement, Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserPick, UserPresence } from '../types';
 
 const DB_NAME = 'viralatas-db';
-const DB_VERSION = 6;
+const DB_VERSION = 7;
 
 export const PICKS_CHANGED_EVENT = 'viralatas:picks-changed';
 export const CREW_USERS_CHANGED_EVENT = 'viralatas:crew-users-changed';
 export const PRESENCE_CHANGED_EVENT = 'viralatas:presence-changed';
 export const ANNOUNCEMENTS_CHANGED_EVENT = 'viralatas:announcements-changed';
 export const METAL_PLACE_CONFIG_CHANGED_EVENT = 'viralatas:metal-place-config-changed';
+export const LIVE_BAND_TEST_CONFIG_CHANGED_EVENT = 'viralatas:live-band-test-config-changed';
 
 type OfflinePickOp = {
   id: string;
@@ -64,6 +65,10 @@ type ViralatasDB = {
     key: string;
     value: MetalPlaceConfig;
   };
+  live_band_test_config: {
+    key: string;
+    value: LiveBandTestConfig;
+  };
   meta: {
     key: string;
     value: { cache_version: string };
@@ -109,6 +114,9 @@ function getDB() {
         if (!db.objectStoreNames.contains('metal_place_config')) {
           db.createObjectStore('metal_place_config');
         }
+        if (!db.objectStoreNames.contains('live_band_test_config')) {
+          db.createObjectStore('live_band_test_config');
+        }
         if (!db.objectStoreNames.contains('meta')) {
           db.createObjectStore('meta');
         }
@@ -145,6 +153,12 @@ function emitAnnouncementsChanged() {
 function emitMetalPlaceConfigChanged() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(METAL_PLACE_CONFIG_CHANGED_EVENT));
+  }
+}
+
+function emitLiveBandTestConfigChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(LIVE_BAND_TEST_CONFIG_CHANGED_EVENT));
   }
 }
 
@@ -351,6 +365,25 @@ export async function saveMetalPlaceConfig(config: MetalPlaceConfig) {
 export async function clearMetalPlaceConfig() {
   const db = await getDB();
   await db.delete('metal_place_config', 'current');
+}
+
+// --- Live Band Test Configuration ---
+
+export async function loadLiveBandTestConfig(): Promise<LiveBandTestConfig | null> {
+  const db = await getDB();
+  const config = await db.get('live_band_test_config', 'current');
+  return config ?? null;
+}
+
+export async function saveLiveBandTestConfig(config: LiveBandTestConfig) {
+  const db = await getDB();
+  await db.put('live_band_test_config', config, 'current');
+  emitLiveBandTestConfigChanged();
+}
+
+export async function clearLiveBandTestConfig() {
+  const db = await getDB();
+  await db.delete('live_band_test_config', 'current');
 }
 
 // --- Cache version invalidation ---

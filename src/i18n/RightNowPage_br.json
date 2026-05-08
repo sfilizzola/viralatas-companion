@@ -39,5 +39,6 @@
   "metalPlaceCheckingIn": "Entrando...",
   "metalPlaceCheckOut": "Voltei pro festival",
   "metalPlaceCheckedOut": "De volta!",
-  "metalPlaceCheckingOut": "Saindo..."
+  "metalPlaceCheckingOut": "Saindo...",
+  "liveTestBanner": "🧪 Live test: {band}"
 }

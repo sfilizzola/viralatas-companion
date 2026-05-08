@@ -186,6 +186,30 @@ export type Database = {
         };
         Relationships: [];
       };
+      live_band_test_config: {
+        Row: {
+          id?: number;
+          band_id?: string | null;
+          enabled?: boolean;
+          updated_by?: string;
+          updated_at?: string;
+        };
+        Insert: {
+          id?: number;
+          band_id?: string | null;
+          enabled?: boolean;
+          updated_by?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: number;
+          band_id?: string | null;
+          enabled?: boolean;
+          updated_by?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
       app_settings: {
         Row: {
           id: string;

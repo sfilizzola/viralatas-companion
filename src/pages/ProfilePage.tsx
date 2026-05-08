@@ -1,16 +1,24 @@
 import { useState, type ChangeEvent, type FormEvent, useEffect, useCallback, useMemo, useRef } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
-import type { Band, UserPick, UserRole } from '../types';
+import type { Band, LiveBandTestConfig, UserPick, UserRole } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';
-import { loadBands, loadMetalPlaceConfig, loadUserPicks, PICKS_CHANGED_EVENT } from '../lib/db';
+import {
+  loadAllUserPicks,
+  loadBands,
+  loadLiveBandTestConfig,
+  loadMetalPlaceConfig,
+  loadUserPicks,
+  PICKS_CHANGED_EVENT,
+} from '../lib/db';
 import { togglePick } from '../lib/picks';
 import { fetchCurrentUserRole, fetchAllUsers, fetchBlockedPostersWithUserDetails, setUserRole as updateUserRole, unblockUser } from '../lib/announcements';
 import { invalidateCacheForAllUsers } from '../lib/cache';
 import { getRegistrationEnabled, setRegistrationEnabled } from '../lib/appSettings';
 import { saveMetalPlaceConfigRemote, autoCheckoutAllUsersFromMetalPlace } from '../lib/presence';
+import { saveLiveBandTestConfigRemote } from '../lib/liveBandTest';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
@@ -485,6 +493,7 @@ type UserWithLoading = {
 function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [resetMessage, setResetMessage] = useState<string | null>(null);
   const [allUsers, setAllUsers] = useState<UserWithLoading[]>([]);
@@ -501,6 +510,13 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   const [metalPlaceStartTime, setMetalPlaceStartTime] = useState('12:00');
   const [metalPlaceEndTime, setMetalPlaceEndTime] = useState('23:00');
   const previousTestModeRef = useRef(false);
+  const [liveBandTestLoading, setLiveBandTestLoading] = useState(true);
+  const [liveBandTestSaving, setLiveBandTestSaving] = useState(false);
+  const [liveBandTestError, setLiveBandTestError] = useState<string | null>(null);
+  const [liveBandTestSelectedId, setLiveBandTestSelectedId] = useState<string>('');
+  const [liveBandTestEnabled, setLiveBandTestEnabled] = useState(false);
+  const [liveBandTestActiveBandId, setLiveBandTestActiveBandId] = useState<string | null>(null);
+  const [bandsByPopularity, setBandsByPopularity] = useState<Array<Band & { pickCount: number }>>([]);
 
   useEffect(() => {
     async function loadRole() {
@@ -568,6 +584,45 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
 
     if (userRole === 'godlike') {
       loadMetalPlaceConfigFromDB();
+    }
+  }, [userRole]);
+
+  useEffect(() => {
+    async function loadLiveBandTest() {
+      try {
+        const [allBands, allPicks, config] = await Promise.all([
+          loadBands(),
+          loadAllUserPicks(),
+          loadLiveBandTestConfig(),
+        ]);
+
+        const counts = new Map<string, number>();
+        for (const pick of allPicks) {
+          counts.set(pick.band_id, (counts.get(pick.band_id) ?? 0) + 1);
+        }
+
+        const sorted = allBands
+          .map((b) => ({ ...b, pickCount: counts.get(b.id) ?? 0 }))
+          .sort((a, b) => {
+            if (b.pickCount !== a.pickCount) return b.pickCount - a.pickCount;
+            return a.name.localeCompare(b.name);
+          });
+        setBandsByPopularity(sorted);
+
+        if (config) {
+          setLiveBandTestSelectedId(config.band_id ?? '');
+          setLiveBandTestEnabled(config.enabled ?? false);
+          setLiveBandTestActiveBandId(config.enabled && config.band_id ? config.band_id : null);
+        }
+      } catch (error) {
+        console.error('Failed to load Live Band Test config:', error);
+      } finally {
+        setLiveBandTestLoading(false);
+      }
+    }
+
+    if (userRole === 'godlike') {
+      loadLiveBandTest();
     }
   }, [userRole]);
 
@@ -712,9 +767,19 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   return (
     <div className={styles.godlikeSection}>
       <div className={styles.divider} />
-      <div className={styles.godlikeSectionContent}>
-        <h3 className={styles.godlikeTitle}>🤘 GODLIKE POWERS</h3>
-
+      <div className={styles.collapsibleCard}>
+        <button
+          className={styles.conflictsHeader}
+          onClick={() => setIsOpen(!isOpen)}
+          type="button"
+          aria-expanded={isOpen}
+        >
+          <h3 className={styles.godlikeTitle}>🤘 GODLIKE POWERS</h3>
+          <div className={`${styles.chevron} ${isOpen ? styles.open : ''}`}>▼</div>
+        </button>
+        <div className={`${styles.conflictsContent} ${isOpen ? styles.open : ''}`}>
+          <div className={styles.conflictsInner}>
+            <div className={styles.godlikeSectionContent}>
         <button
           className={`${styles.resetButton} ${resetting ? styles.resetting : ''}`}
           onClick={handleResetAllData}
@@ -813,7 +878,25 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                   try {
                     const wasTestModeOn = previousTestModeRef.current;
                     const isTestModeNowOff = !testModeEnabled && wasTestModeOn;
+                    const enablingTestMode = testModeEnabled && !wasTestModeOn;
                     const festivalDay = metalPlaceDay === '' ? null : metalPlaceDay;
+
+                    // Mutual safety: enabling Metal Place test mode disables Live Band Test.
+                    if (enablingTestMode && liveBandTestActiveBandId) {
+                      const ok = window.confirm(t('liveBandTestConflictWithMetalPlace'));
+                      if (!ok) {
+                        setMetalPlaceSaving(false);
+                        return;
+                      }
+                      await saveLiveBandTestConfigRemote({
+                        id: 1,
+                        band_id: null,
+                        enabled: false,
+                      });
+                      setLiveBandTestSelectedId('');
+                      setLiveBandTestEnabled(false);
+                      setLiveBandTestActiveBandId(null);
+                    }
 
                     // Test mode pins the active day via test_override_day; the real
                     // festival_day, start_time, and end_time stay as configured.
@@ -840,6 +923,128 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
               >
                 {metalPlaceSaving ? t('metalPlaceSaving') : t('metalPlaceSave')}
               </button>
+            </div>
+          </div>
+        )}
+
+        {!liveBandTestLoading && (
+          <div className={styles.liveBandTestSection}>
+            <h4 className={styles.liveBandTestSectionTitle}>{t('liveBandTestTitle')}</h4>
+            <p className={styles.liveBandTestDescription}>{t('liveBandTestDescription')}</p>
+            {liveBandTestActiveBandId && (
+              <p className={styles.liveBandTestActive}>
+                {t('liveBandTestActive', {
+                  band:
+                    bandsByPopularity.find((b) => b.id === liveBandTestActiveBandId)?.name ?? '?',
+                })}
+              </p>
+            )}
+            {liveBandTestError && (
+              <div className={styles.metalPlaceError}>⚠️ {liveBandTestError}</div>
+            )}
+            <div className={styles.metalPlaceForm}>
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>{t('liveBandTestSelect')}</label>
+                <select
+                  value={liveBandTestSelectedId}
+                  onChange={(e) => setLiveBandTestSelectedId(e.target.value)}
+                  className={styles.formInput}
+                  disabled={liveBandTestSaving}
+                >
+                  <option value="">{t('liveBandTestUnset')}</option>
+                  {bandsByPopularity.map((band) => (
+                    <option key={band.id} value={band.id}>
+                      {band.name} — {band.pickCount}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className={styles.formGroup}>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={liveBandTestEnabled}
+                    onChange={(e) => setLiveBandTestEnabled(e.target.checked)}
+                    disabled={liveBandTestSaving || !liveBandTestSelectedId}
+                  />
+                  {t('liveBandTestEnable')}
+                </label>
+              </div>
+              <div className={styles.liveBandTestButtonRow}>
+                <button
+                  className={styles.saveButton}
+                  onClick={async () => {
+                    setLiveBandTestSaving(true);
+                    setLiveBandTestError(null);
+                    try {
+                      const enabling = liveBandTestEnabled && !!liveBandTestSelectedId;
+                      // Mutual safety: enabling Live Band Test disables Metal Place test mode.
+                      if (enabling && previousTestModeRef.current) {
+                        const ok = window.confirm(t('liveBandTestConflictWithMetalPlace'));
+                        if (!ok) {
+                          setLiveBandTestSaving(false);
+                          return;
+                        }
+                        const festivalDay = metalPlaceDay === '' ? null : metalPlaceDay;
+                        await saveMetalPlaceConfigRemote({
+                          id: 1,
+                          festival_day: festivalDay,
+                          start_time: metalPlaceStartTime || null,
+                          end_time: metalPlaceEndTime || null,
+                          test_override_day: null,
+                        });
+                        setTestModeEnabled(false);
+                        previousTestModeRef.current = false;
+                        await autoCheckoutAllUsersFromMetalPlace();
+                      }
+
+                      const config: LiveBandTestConfig = {
+                        id: 1,
+                        band_id: liveBandTestSelectedId || null,
+                        enabled: enabling,
+                      };
+                      await saveLiveBandTestConfigRemote(config);
+                      setLiveBandTestActiveBandId(enabling ? liveBandTestSelectedId : null);
+                    } catch (err) {
+                      setLiveBandTestError(
+                        err instanceof Error ? err.message : t('liveBandTestSaveError'),
+                      );
+                    } finally {
+                      setLiveBandTestSaving(false);
+                    }
+                  }}
+                  disabled={liveBandTestSaving}
+                >
+                  {liveBandTestSaving ? t('metalPlaceSaving') : t('liveBandTestSave')}
+                </button>
+                <button
+                  className={styles.liveBandTestClearButton}
+                  onClick={async () => {
+                    setLiveBandTestSaving(true);
+                    setLiveBandTestError(null);
+                    try {
+                      await saveLiveBandTestConfigRemote({
+                        id: 1,
+                        band_id: null,
+                        enabled: false,
+                      });
+                      setLiveBandTestSelectedId('');
+                      setLiveBandTestEnabled(false);
+                      setLiveBandTestActiveBandId(null);
+                    } catch (err) {
+                      setLiveBandTestError(
+                        err instanceof Error ? err.message : t('liveBandTestSaveError'),
+                      );
+                    } finally {
+                      setLiveBandTestSaving(false);
+                    }
+                  }}
+                  disabled={liveBandTestSaving}
+                  type="button"
+                >
+                  {t('liveBandTestClear')}
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -923,6 +1128,9 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
             </div>
           )}
         </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -937,6 +1145,7 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [blockedUsers, setBlockedUsers] = useState<UserWithLoading[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     async function loadRole() {
@@ -1019,9 +1228,19 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
   return (
     <div className={styles.managerSection}>
       <div className={styles.divider} />
-      <div className={styles.managerSectionContent}>
-        <h3 className={styles.managerTitle}>🔧 MANAGER POWERS</h3>
-
+      <div className={styles.collapsibleCard}>
+        <button
+          className={styles.conflictsHeader}
+          onClick={() => setIsOpen(!isOpen)}
+          type="button"
+          aria-expanded={isOpen}
+        >
+          <h3 className={styles.managerTitle}>🔧 MANAGER POWERS</h3>
+          <div className={`${styles.chevron} ${isOpen ? styles.open : ''}`}>▼</div>
+        </button>
+        <div className={`${styles.conflictsContent} ${isOpen ? styles.open : ''}`}>
+          <div className={styles.conflictsInner}>
+            <div className={styles.managerSectionContent}>
         <div className={styles.blockedUsersSection}>
           <h4 className={styles.blockedUsersTitle}>{t('blockedUsers')}</h4>
           {blockedUsers.length === 0 ? (
@@ -1066,6 +1285,9 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
               ))}
             </div>
           )}
+        </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

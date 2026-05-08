@@ -39,5 +39,6 @@
   "metalPlaceCheckingIn": "Checking in...",
   "metalPlaceCheckOut": "Back to the fest",
   "metalPlaceCheckedOut": "Welcome back!",
-  "metalPlaceCheckingOut": "Checking out..."
+  "metalPlaceCheckingOut": "Checking out...",
+  "liveTestBanner": "🧪 Live test: {band}"
 }

@@ -1,9 +1,16 @@
 {
   "badgePuppy": "Puppy",
+  "badgePuppyDescription": "First Wacken? Welcome to the pack, au.",
   "badgePackMember": "Pack Member",
+  "badgePackMemberDescription": "Wherever 10+ stray dogs gather, you're there.",
   "badgePaisTropical": "Pais Tropical",
+  "badgePaisTropicalDescription": "Brazil baby — sunshine, sweat, and heavy metal.",
   "badgeDeutscher": "Deutscher",
+  "badgeDeutscherDescription": "Ein Bier, bitte! You're playing on home turf.",
   "badgeAmericaFuckYeah": "America Fuck Yeah",
+  "badgeAmericaFuckYeahDescription": "Coming again to save the motherfucking day, yeah!",
   "badgeOG": "O.G. (Original)",
-  "badgeMudSurvivor": "Mud Survivor"
+  "badgeOGDescription": "You were there when it all started. Eternal respect.",
+  "badgeMudSurvivor": "Mud Survivor",
+  "badgeMudSurvivorDescription": "Survived the 2023 AND 2025 mud. Lived to tell the tale."
 }

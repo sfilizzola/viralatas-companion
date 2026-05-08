@@ -14,6 +14,7 @@ export type BadgeConfig = {
   slug: string;
   imagePath: string;
   labelKey: string;
+  descriptionKey: string;
   condition: BadgeCondition;
 };
 
@@ -71,6 +72,7 @@ export const BADGES: BadgeConfig[] = [
     slug: 'puppy',
     imagePath: '/badges/badge_new-puppy.png',
     labelKey: 'badgePuppy',
+    descriptionKey: 'badgePuppyDescription',
     // Exclusive — only 2026 checked. Adding any other year removes this badge.
     condition: { type: 'wacken_years_exactly', years: [2026] },
   },
@@ -78,6 +80,7 @@ export const BADGES: BadgeConfig[] = [
     slug: 'pack-member',
     imagePath: '/badges/badge_vira-latas-pack.png',
     labelKey: 'badgePackMember',
+    descriptionKey: 'badgePackMemberDescription',
     // Earned when you're attending a concert with 10+ crew members
     condition: { type: 'band_attendance_min', count: 10 },
   },
@@ -85,24 +88,28 @@ export const BADGES: BadgeConfig[] = [
     slug: 'pais-tropical',
     imagePath: '/badges/badge_br.png',
     labelKey: 'badgePaisTropical',
+    descriptionKey: 'badgePaisTropicalDescription',
     condition: { type: 'country_is', country: 'br' },
   },
   {
     slug: 'deutscher',
     imagePath: '/badges/badge_de.png',
     labelKey: 'badgeDeutscher',
+    descriptionKey: 'badgeDeutscherDescription',
     condition: { type: 'country_is', country: 'de' },
   },
   {
     slug: 'america-fuck-yeah',
     imagePath: '/badges/badge_usa.png',
     labelKey: 'badgeAmericaFuckYeah',
+    descriptionKey: 'badgeAmericaFuckYeahDescription',
     condition: { type: 'country_is', country: 'us' },
   },
   {
     slug: 'og',
     imagePath: '/badges/badge_og.png',
     labelKey: 'badgeOG',
+    descriptionKey: 'badgeOGDescription',
     // Original — founded the Vira-latas. Must have attended 2022 (founding year)
     condition: { type: 'wacken_years_includes', years: [2022] },
   },
@@ -110,6 +117,7 @@ export const BADGES: BadgeConfig[] = [
     slug: 'mud-survivor',
     imagePath: '/badges/badge_mud-warrior.png',
     labelKey: 'badgeMudSurvivor',
+    descriptionKey: 'badgeMudSurvivorDescription',
     // Veteran who survived both 2023 and 2025 (may have attended other years too)
     condition: { type: 'wacken_years_includes', years: [2023, 2025] },
   },
