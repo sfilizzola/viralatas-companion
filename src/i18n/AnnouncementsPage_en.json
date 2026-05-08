@@ -1,7 +1,7 @@
 {
   "title": "Mural",
   "usefulLinksTitle": "Useful Links",
-  "placeholder": "Write a message for the crew...",
+  "placeholder": "Write a message for the vira-latas...",
   "post": "Post",
   "posting": "Posting...",
   "empty": "No messages yet. Be the first!",
@@ -12,7 +12,7 @@
   "minutesAgo": "{n}min ago",
   "hoursAgo": "{n}h ago",
   "daysAgo": "{n}d ago",
-  "anonymous": "Crew member",
+  "anonymous": "Vira-latas member",
   "block": "Block",
   "blockingUser": "Blocking...",
   "userBlocked": "User blocked",

@@ -26,6 +26,6 @@
   "conflictChip": "Conflict",
   "attendeeOverflow": "+{count}",
   "closeModal": "Close",
-  "crewGoing": "{count} crew going",
-  "noCrewYet": "No one from the crew yet"
+  "crewGoing": "{count} vira-latas going",
+  "noCrewYet": "No vira-latas yet"
 }
