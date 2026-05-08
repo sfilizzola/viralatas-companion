@@ -197,16 +197,27 @@ export async function autoCheckoutAllUsersFromMetalPlace(): Promise<void> {
   }
 }
 
-export async function validateAndAutoCheckoutOutsideMetalPlaceWindow(config: MetalPlaceConfig | null): Promise<void> {
-  if (isTimeWithinMetalPlaceWindow(config, new Date())) {
-    return;
-  }
+export async function validateAndAutoCheckoutOutsideMetalPlaceWindow(
+  config: MetalPlaceConfig | null,
+  userId: string | null,
+): Promise<void> {
+  // No user, or config not loaded yet → don't act. Returning false from
+  // isTimeWithinMetalPlaceWindow when config is null would otherwise force a
+  // checkout on every page mount before the cached config arrives.
+  if (!userId || !config) return;
+
+  // No active window configured yet → nothing to enforce.
+  const hasDay = config.festival_day != null || config.test_override_day != null;
+  if (!hasDay || !config.start_time || !config.end_time) return;
+
+  if (isTimeWithinMetalPlaceWindow(config, new Date())) return;
 
   try {
-    await autoCheckoutAllUsersFromMetalPlace();
+    const presence = await loadUserPresence(userId);
+    if (presence?.is_at_metal_place) {
+      await setMetalPlaceStatus(userId, false);
+    }
   } catch (error) {
-    // Ignore InvalidStateError from closing IDB connections
-    // This can happen when Service Worker cache operations conflict with app DB operations
     if (error instanceof Error && error.name === 'InvalidStateError') {
       console.debug('[Metal Place] Skipping auto-checkout due to DB connection closing', error);
       return;

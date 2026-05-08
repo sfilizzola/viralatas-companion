@@ -259,10 +259,11 @@ export default function RightNowPage() {
   }, []);
 
   useEffect(() => {
-    // Only validate when Metal Place config changes, not on every time tick
-    // This prevents excessive IndexedDB access conflicts with Service Worker
-    validateAndAutoCheckoutOutsideMetalPlaceWindow(metalPlaceConfig).catch(() => {});
-  }, [metalPlaceConfig]);
+    // Skip until both config and userId are available, otherwise the very first
+    // run with config=null would force-checkout the user on every mount.
+    if (!metalPlaceConfig || !userId) return;
+    validateAndAutoCheckoutOutsideMetalPlaceWindow(metalPlaceConfig, userId).catch(() => {});
+  }, [metalPlaceConfig, userId]);
 
   const myRawPlan = useMemo(() => {
     if (!userId) return { status: 'empty', band: null } satisfies LivePlan;
