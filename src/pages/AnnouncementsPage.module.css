@@ -26,6 +26,75 @@
   padding: 16px;
 }
 
+/* Useful links */
+
+.usefulLinksRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.usefulLinksTitle {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.usefulLinksList {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: thin;
+}
+
+.usefulLinkPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  max-width: 100%;
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border: 1px solid rgba(229, 85, 85, 0.45);
+  border-radius: 999px;
+  background: rgba(229, 85, 85, 0.1);
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: none;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.usefulLinkPill:hover {
+  background: rgba(229, 85, 85, 0.18);
+  border-color: rgba(229, 85, 85, 0.85);
+  color: #fff;
+}
+
+@media (max-width: 520px) {
+  .usefulLinksList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow-x: visible;
+  }
+
+  .usefulLinkPill {
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: normal;
+  }
+}
+
 /* Post box */
 
 .postBox {

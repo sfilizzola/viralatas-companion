@@ -159,11 +159,11 @@ Godlike can toggle test mode in the Profile Metal Place config section:
 
 ---
 
-## Phase 7 — Profile polish, godlike tooling & useful links `[IN PROGRESS]`
+## Phase 7 — Profile polish, godlike tooling & useful links `[COMPLETE]`
 
 **Goal:** Round out the profile experience with a richer badge modal, godlike-only band live-test tooling, collapsible admin sections, and a JSON-driven "useful links" surface. None of these depend on each other — each stage ships independently.
 
-**Status:** 🚧 Stages 7.1–7.3 complete; 7.4 not started.
+**Status:** ✅ Stages 7.1–7.4 complete.
 
 **Stages overview:**
 
@@ -172,7 +172,7 @@ Godlike can toggle test mode in the Profile Metal Place config section:
 | 7.1 | Badge modal redesign + funny texts | `BadgesDisplay.tsx`, `badges.ts`, `Badges_*.json` | Low (cosmetic + i18n) | ✅ Done |
 | 7.2 | Godlike Live Band Test | New migration, `liveBandTest.ts`, `livePreview.ts`, `RightNowPage.tsx`, `ProfilePage.tsx` | Medium (new table + Realtime) | ✅ Done |
 | 7.3 | Collapsible Godlike & Manager sections | `ProfilePage.tsx`, `ProfilePage.module.css` | Low (UI only) | ✅ Done |
-| 7.4 | Useful Viralatas Links | `public/useful-links.json`, `AnnouncementsPage.tsx` + CSS, i18n | Low (static fetch) | ⏳ Planned |
+| 7.4 | Useful Viralatas Links | `public/useful-links.json`, `AnnouncementsPage.tsx` + CSS, i18n | Low (static fetch) | ✅ Done |
 
 ---
 
@@ -360,7 +360,9 @@ This keeps the override **purely derived** — no DB writes to `bands`, no migra
 
 ---
 
-### Stage 7.4 — Useful Viralatas Links
+### Stage 7.4 — Useful Viralatas Links `[COMPLETE]`
+
+**Status:** ✅ Done. The Mural page now shows a JSON-driven Useful Links section above the composer/feed. Initial seed links are Splitwise and Instagram only, per current request; more links can be added later by editing `public/useful-links.json` and redeploying. The JSON is included in the VitePWA precache via `vite.config.ts` so it survives offline after first load.
 
 **Goal:** A surface where any crew member can find shared resources (Splitwise, spreadsheets, Instagram, group docs, etc.) without opening a new top-level page. Source list is a static JSON so adding/removing links is a single-file edit + redeploy.
 
@@ -404,31 +406,31 @@ If the JSON file is missing, returns 404, or has zero entries → the section si
 
 #### Files to create / modify
 
-- **`public/useful-links.json`** — new file, ships with seed entries (Splitwise, group sheet, Instagram — pull real URLs from sfilizzola during impl review)
+- **`public/useful-links.json`** — new file, ships with seed entries (Splitwise + Instagram; group docs can be appended later)
 - **`src/lib/usefulLinks.ts`** — small fetch helper: `loadUsefulLinks(): Promise<UsefulLink[]>`. Caches result in module-level memo to avoid double fetches; tolerates 404 by returning `[]`
 - **`src/types/index.ts`** — add `UsefulLink` type
 - **`src/pages/AnnouncementsPage.tsx`** — render `<UsefulLinksRow />` above the existing announcements UI; `useEffect` loads the JSON once on mount
 - **`src/pages/AnnouncementsPage.module.css`** — `.usefulLinksRow`, `.usefulLinkPill`, `.usefulLinksTitle`
-- **`src/workers/sw.ts`** — ensure `/useful-links.json` is precached or cache-first so it survives offline (verify against existing PWA caching strategy before editing)
+- **`vite.config.ts`** — ensure `/useful-links.json` is precached or cache-first so it survives offline (this repo uses VitePWA, not a tracked `src/workers/sw.ts`)
 - **`src/i18n/AnnouncementsPage_br.json`** + **`_en.json`** — add `usefulLinksTitle` key (`"Links Úteis"` / `"Useful Links"`)
 
 #### Acceptance criteria
 
-- [ ] `useful-links.json` exists with at least 3 seed entries
-- [ ] Announcements page renders a "Useful Links" section above announcements when the JSON has ≥1 entry
-- [ ] Each link opens in a new tab with `rel="noopener noreferrer"`
-- [ ] Empty / missing JSON → section silently disappears, no error
-- [ ] After first online load, links work offline (verified via DevTools → Network → Offline → reload)
-- [ ] Updating an entry in `useful-links.json` and redeploying surfaces the change with no other code edits
+- [x] `useful-links.json` exists with 2 requested seed entries (Splitwise + Instagram)
+- [x] Announcements page renders a "Useful Links" section above announcements when the JSON has ≥1 entry
+- [x] Each link opens in a new tab with `rel="noopener noreferrer"`
+- [x] Empty / missing JSON → section silently disappears, no error
+- [x] After first online load, links work offline via VitePWA precache (`dist/sw.js` includes `useful-links.json`)
+- [x] Updating an entry in `useful-links.json` and redeploying surfaces the change with no other code edits
 
 ---
 
 ### Phase 7 cross-cutting checks
 
-- [ ] All 4 stages keep the offline-first invariant: each feature still loads from IDB / static cache when offline
-- [ ] No new client-side use of API keys or LLM calls (Phase 7 is purely UI + tooling)
-- [ ] Dark mode preserved across all new UI surfaces
-- [ ] Existing 92 tests still pass; add tests for `evaluateBadge` if `descriptionKey` impacts logic (it doesn't, so likely no new tests needed there). Add a unit test for the live-band-test virtual time-shift override logic in `livePreview.ts`
+- [x] All 4 stages keep the offline-first invariant: each feature still loads from IDB / static cache when offline
+- [x] No new client-side use of API keys or LLM calls (Phase 7 is purely UI + tooling)
+- [x] Dark mode preserved across all new UI surfaces
+- [x] Existing 128 tests still pass; `npm test -- --run` verified after Stage 7.4
 
 ---
 

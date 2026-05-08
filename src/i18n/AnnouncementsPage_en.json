@@ -1,9 +1,9 @@
 {
   "title": "Mural",
+  "usefulLinksTitle": "Useful Links",
   "placeholder": "Write a message for the crew...",
   "post": "Post",
   "posting": "Posting...",
-  "blocked": "You have been blocked from posting.",
   "empty": "No messages yet. Be the first!",
   "loading": "Loading mural...",
   "delete": "Delete",
