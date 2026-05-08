@@ -1,5 +1,6 @@
 {
   "title": "My picks",
   "loading": "Loading picks...",
-  "empty": "No picks yet. Mark some bands on the schedule."
+  "empty": "You haven't picked any bands yet. Head to the schedule 🤘",
+  "summary": "{bands} bands across {days} days · {conflicts} conflicts"
 }

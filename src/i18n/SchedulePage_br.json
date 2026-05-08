@@ -20,5 +20,12 @@
   "todos": "Todos",
   "dia": "Dia",
   "palco": "Palco",
-  "avancado": "Avançado"
+  "genero": "Gênero",
+  "avancado": "Avançado",
+  "searchPlaceholder": "Buscar banda...",
+  "conflictChip": "Conflito",
+  "attendeeOverflow": "+{count}",
+  "closeModal": "Fechar",
+  "crewGoing": "{count} da crew indo",
+  "noCrewYet": "Ninguém da crew ainda"
 }

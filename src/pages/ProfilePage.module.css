@@ -723,6 +723,47 @@
   cursor: not-allowed;
 }
 
+/* Time-travel quick-jump chips */
+.timeTravelChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.timeTravelChip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  min-width: 56px;
+  padding: 0.4rem 0.5rem;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.timeTravelChip:hover {
+  border-color: var(--accent);
+  background: var(--bg-surface);
+}
+
+.timeTravelChip strong {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.timeTravelChip span {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 /* User management section */
 .userManagementSection {
   width: 100%;

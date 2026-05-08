@@ -48,7 +48,7 @@ A festival companion PWA for **Viralatas Metaleiros** — a Brazilian metal crew
 │   ├── migrations/       # SQL migrations (source of truth)
 │   └── functions/        # Edge Functions (one folder per function)
 ├── CLAUDE.md             # ← you are here
-├── PHASES.md             # Remaining development phases 5–7
+├── PHASES.md             # Current and upcoming development phases
 └── README.md             # User-facing setup & features
 ```
 
@@ -72,9 +72,9 @@ Unknown routes redirect to `/now`.
 ## Database schema (source of truth)
 
 ```sql
-users           — id (uuid), email, display_name, avatar_url, created_at, 
+users           — id (uuid), email, display_name, avatar_url, created_at,
                   role (normal|manager|godlike), preferred_language (br|en),
-                  is_test_user (bool), camping (bool)
+                  is_test_user (bool), wacken_years (int[]), country
 
 bands           — id (uuid), name, stage (text), start_time (timestamptz), 
                   end_time (timestamptz), image_url, genre
@@ -87,10 +87,21 @@ announcements   — id (uuid), author_id (fk), content, created_at,
 
 blocked_posters — user_id (fk), blocked_by (fk), blocked_at
 
+user_presence   — user_id (fk), is_camping (bool), is_at_metal_place (bool),
+                  updated_at
+
+metal_place_config
+                — single-row godlike config for Metal Place festival day,
+                  time range, and test_override_day
+
+live_band_test_config
+                — single-row godlike config for pinning one band as live now
+                  during testing
+
 band_attendance — view: counts picks per band (computed, not stored)
 ```
 
-**Realtime:** Enabled on `user_picks` and `announcements`. Band counts computed dynamically.
+**Realtime:** Enabled on `user_picks`, `announcements`, `user_presence`, `metal_place_config`, and `live_band_test_config`. Band counts computed dynamically.
 
 ---
 
@@ -207,6 +218,35 @@ The trigger also:
 
 ---
 
+## Badge system
+
+Badges are fully client-side and use the existing `BadgeConfig` structure in `src/lib/badges.ts`.
+
+**Current badge contract:**
+
+```ts
+type BadgeConfig = {
+  slug: string;
+  imagePath: string;       // public path, usually /badges/badge_*.png
+  labelKey: string;        // src/i18n/Badges_*.json
+  descriptionKey: string;  // src/i18n/Badges_*.json
+  condition: BadgeCondition;
+};
+```
+
+**Supported conditions only:**
+- `wacken_years_exactly`
+- `wacken_years_includes`
+- `country_is`
+- `bands_picked_min`
+- `band_attendance_min`
+
+To add a badge without changing behavior elsewhere: add the PNG to `public/badges/`, append one `BADGES` entry in `src/lib/badges.ts`, and add matching label + description keys to both `src/i18n/Badges_br.json` and `src/i18n/Badges_en.json`.
+
+Phase 8 will use this structure to inventory unassociated images in `public/badges/` and add only the badges approved by user input.
+
+---
+
 ## Phases at a glance
 
 **Completed:**
@@ -216,9 +256,10 @@ The trigger also:
 - ✅ **Phase 4B** — Live preview: Camping state, crew grid, LOST detection
 - ✅ **Phase 5** — Announcements & user roles: Mural board, manager blocking, godlike powers
 - ✅ **Phase 6** — Metal Place: Festival-day check-in, crew grid card, test mode
-
-**Upcoming:**
-- ⏳ **Phase 7** — LLM proactive alerts & Polish (see FUTURE_IDEAS.md)
+- ✅ **Phase 7** — Profile polish: badge modal, live band test, collapsible admin sections, useful links
+- ✅ **Phase 8** — Badge asset intake: added Belgian (`belga`) and Colombian (`cafetero`) country badges
+- ✅ **Phase 9** — Differentiate Schedule / My Picks / Popular + extracted shared bones (`BandCard`, `BandFilters`, `BandDetailModal`, `useBandConflicts`); Schedule got search + genre filter, My Picks became a day-grouped timeline with conflict chips, Popular gained avatar clusters and the detail modal
+- ✅ **Phase 9.B** — Godlike time travel: `now()` helper + `useNow` hook backed by a localStorage override, with quick-jump chips for D-1 / D1–D4 / D+1 in the Profile admin panel
 
 See **PHASES.md** for detailed acceptance criteria and current status.
 
@@ -247,7 +288,7 @@ Specialized agents for isolated tasks live in `.claude/agents/`. Each agent read
 
 ## Testing
 
-- **Unit tests:** `src/__tests__/` (92 tests, all passing)
+- **Unit tests:** `src/__tests__/` (128 tests verified after Phase 7)
   - Registration validation, login flows, auth integration, RLS enforcement
   - Run with `npm test` or `npm test:coverage`
 
@@ -265,7 +306,7 @@ Specialized agents for isolated tasks live in `.claude/agents/`. Each agent read
 
 ## References
 
-- **PHASES.md** — Phases 5–7: acceptance criteria, deliverables, deadlines
+- **PHASES.md** — Current phases: acceptance criteria, deliverables, deadlines
 - **README.md** — Setup instructions, scripts, environment variables
 - **supabase/migrations/** — Database schema (source of truth)
 - **src/types/index.ts** — TypeScript type definitions

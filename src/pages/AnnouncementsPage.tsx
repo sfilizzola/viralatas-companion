@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import type { Announcement, CrewUser, UserRole } from '../types';
+import type { Announcement, CrewUser, UserRole, UsefulLink } from '../types';
 import {
   ANNOUNCEMENTS_CHANGED_EVENT,
   loadAnnouncementsFromCache,
@@ -17,6 +17,7 @@ import {
   syncAnnouncements,
 } from '../lib/announcements';
 import { supabase } from '../lib/supabase';
+import { loadUsefulLinks } from '../lib/usefulLinks';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
@@ -50,6 +51,7 @@ export default function AnnouncementsPage() {
   const [posting, setPosting] = useState(false);
   const [blocking, setBlocking] = useState<string | null>(null);
   const [blockedUserIds, setBlockedUserIds] = useState<Set<string>>(new Set());
+  const [usefulLinks, setUsefulLinks] = useState<UsefulLink[]>([]);
 
   const refreshFromCache = useCallback(async () => {
     const [cached, users] = await Promise.all([
@@ -78,6 +80,18 @@ export default function AnnouncementsPage() {
     window.addEventListener(ANNOUNCEMENTS_CHANGED_EVENT, refreshFromCache);
     return () => window.removeEventListener(ANNOUNCEMENTS_CHANGED_EVENT, refreshFromCache);
   }, [refreshFromCache]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    loadUsefulLinks().then((links) => {
+      if (isMounted) setUsefulLinks(links);
+    });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     if (!userId) return;
@@ -179,6 +193,28 @@ export default function AnnouncementsPage() {
       </header>
 
       <main className={styles.main}>
+        {usefulLinks.length > 0 && (
+          <section className={styles.usefulLinksRow} aria-labelledby="useful-links-title">
+            <h2 className={styles.usefulLinksTitle} id="useful-links-title">
+              🔗 {t('usefulLinksTitle')}
+            </h2>
+            <div className={styles.usefulLinksList}>
+              {usefulLinks.map((link) => (
+                <a
+                  className={styles.usefulLinkPill}
+                  href={link.url}
+                  key={`${link.title}-${link.url}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {link.icon && <span aria-hidden>{link.icon}</span>}
+                  <span>{link.title}</span>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
+
         {isBlocked ? (
           <p className={styles.blockedMsg}>{t('blocked')}</p>
         ) : (

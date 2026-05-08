@@ -54,6 +54,16 @@ export type BlockedPoster = {
   blocked_at: string;
 };
 
+export type UsefulLink = {
+  title: string;
+  url: string;
+  icon?: string;
+};
+
+export type UsefulLinksFile = {
+  links: UsefulLink[];
+};
+
 export type MetalPlaceConfig = {
   id?: number;
   festival_day?: number | null;

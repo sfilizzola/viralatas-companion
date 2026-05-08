@@ -1,9 +1,5 @@
 {
   "title": "Popular",
   "loading": "Loading popularity...",
-  "empty": "Schedule is empty for now.",
-  "noCrewYet": "No one from the crew yet",
-  "hideCrew": "Hide crew",
-  "showCrew": "Show crew",
-  "syncingCrew": "Syncing crew names..."
+  "empty": "Schedule is empty for now."
 }
