@@ -10,7 +10,7 @@ A festival companion PWA for **Viralatas Metaleiros** — a Brazilian metal crew
 
 **Core loop:** Each crew member logs in, picks bands they want to watch, sees live attendance counts and who's going where, and receives proactive AI alerts powered by Claude. The app works fully offline after first load — Wacken has terrible signal.
 
-**Who:** ~7 person metal crew from Brazil. Team lead: `sfilizzola@gmail.com` (godlike role, hard-coded).
+**Who:** ~20 person metal crew mostly from Brazil but people from All Over the World. Team lead: `sfilizzola@gmail.com` (godlike role, hard-coded).
 
 ---
 
@@ -214,13 +214,11 @@ The trigger also:
 - ✅ **Phase 2** — Schedule: Band data, filters, offline browsing
 - ✅ **Phase 3** — Picks: Pick bands, live crew counts via Realtime
 - ✅ **Phase 4B** — Live preview: Camping state, crew grid, LOST detection
-
-**In progress:**
-- 🔄 **Phase 5** — Announcements & user roles (see PHASES.md)
+- ✅ **Phase 5** — Announcements & user roles: Mural board, manager blocking, godlike powers
+- ✅ **Phase 6** — Metal Place: Festival-day check-in, crew grid card, test mode
 
 **Upcoming:**
-- ⏳ **Phase 6** — LLM proactive alerts (see PHASES.md)
-- ⏳ **Phase 7** — Polish & pre-festival (see PHASES.md)
+- ⏳ **Phase 7** — LLM proactive alerts & Polish (see FUTURE_IDEAS.md)
 
 See **PHASES.md** for detailed acceptance criteria and current status.
 

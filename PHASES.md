@@ -4,204 +4,161 @@ Current phase and upcoming work for Viralatas Metaleiros. Refer to CLAUDE.md for
 
 ---
 
-## Phase 5 — Announcements & user roles `[CURRENT]`
+## Phase 6 — Metal Place `[COMPLETE]`
 
-**Goal:** Mural-style board for crew-wide messages with a three-tier trust hierarchy (normal / manager / godlike).
+**Goal:** Festival-day feature for crew members at Metal Place (beer garden in Wacken city). Godlike controls when Metal Place is "active" (which festival day); crew can flag attendance and see who else is there.
 
-**Status:** 🔄 Near complete — migration, types, DB stores, data layer, AnnouncementsPage, and godlike section all done. Remaining: ProfilePage manager section (view blocked users, unblock button).
+**Context:** Viralatas attends Wacken Open Air with a weak festival lineup on certain days. Metal Place is a popular off-site beer garden for the crew during those days. The feature is one-off, event-specific — not a recurring camping/band-tracking system.
+
+**Status:** ✅ All acceptance criteria met. End-to-end verification in test mode pending real-world walkthrough; revisit if issues surface during the festival.
+
+---
+
+### Feature Design
+
+#### Data model
+
+**`user_presence` table** — add one column:
+```sql
+ALTER TABLE user_presence ADD COLUMN is_at_metal_place boolean NOT NULL DEFAULT false;
+```
+
+**New `metal_place_config` table** (single-row config, godlike-only editable):
+```sql
+CREATE TABLE metal_place_config (
+  id                integer PRIMARY KEY DEFAULT 1,
+  festival_day      integer,                        -- 1|2|3|4 or null (not active)
+  start_time        time,                           -- e.g. '12:00'
+  end_time          time,                           -- e.g. '23:00'
+  label             text DEFAULT 'Metal Place',
+  test_override_day integer,                        -- 1|2|3|4 or null (testing mode off)
+  updated_by        uuid REFERENCES users(id),
+  updated_at        timestamptz DEFAULT now()
+);
+-- RLS: everyone SELECT; only godlike can INSERT/UPDATE
+```
+
+**Test mode logic:**
+- If `test_override_day IS NOT NULL` → use it as the active festival day (for testing)
+- If `test_override_day IS NULL` → use actual festival day matching (normal mode)
+
+**IndexedDB** — version bump to 6, add `metal_place_config` store.
+
+---
+
+#### Mutual exclusion
+
+Setting `is_at_metal_place = true` clears `is_camping = false`, and vice versa — enforced in the client layer (presence.ts).
+
+---
+
+#### Card behavior
+
+- Card only renders in the crew grid when **at least 1 person** has `is_at_metal_place = true`.
+- Unlike camping/lost (which always render), Metal Place card is **conditional**.
+- Card shows below the lost card (end of crew grid).
+
+**Style — Party/Metal vibes:**
+- Dark amber/beer colors: border `rgba(184, 134, 11, 0.8)`, gradient background with golden accents
+- Card header: 🍺 emoji + "Metal Place" label + time range (if configured)
+- Shimmer animation for festive effect
+- Each crew member shows as a pill avatar (same pattern as camping/lost pills)
+
+---
+
+#### Dedicated check-in card
+
+A prominent card renders above the crew grid **only when Metal Place is active** (configured day matches today OR test mode enabled):
+- Large "🍺 Metal Place" title with time display
+- "Check In" button — toggles user's Metal Place status
+- Button shows active state when user is checked in
+- Supports the same dark amber beer aesthetic as the crew grid card
+
+---
+
+#### Test mode (for godlike)
+
+Godlike can toggle test mode in the Profile Metal Place config section:
+- **Normal mode:** Toggle/card only shows on the configured `festival_day` when that day is today
+- **Test mode:** Toggle/card appears as if today is the configured day, regardless of actual date
+- Shows hint: "🧪 Testing as Day X" when test mode is active
+- Allows godlike to verify functionality before the actual event
+
+---
+
+### Files to Create / Modify
+
+#### Migration
+`supabase/migrations/20260507000008_phase6_metal_place.sql`
+- `ALTER TABLE user_presence ADD COLUMN is_at_metal_place boolean NOT NULL DEFAULT false;`
+- `CREATE TABLE metal_place_config (...)` with RLS (godlike-only writes)
+- `metal_place_config` added to `supabase_realtime` publication
+
+#### Types — `src/types/index.ts`
+- Add `is_at_metal_place: boolean` to `UserPresence`
+- Add `MetalPlaceConfig` type
+
+#### DB layer — `src/lib/db.ts`
+- Bump to version 6
+- Add `metal_place_config` store (keyPath: `'id'`)
+- Add `saveMetalPlaceConfig(config)`, `loadMetalPlaceConfig()` helpers
+
+#### Presence layer — `src/lib/presence.ts`
+- Update `setCampingStatus()` to auto-clear `is_at_metal_place` when enabling camping
+- Add `setMetalPlaceStatus(userId, isAt: boolean)`: mirrors setCampingStatus
+- Add `syncMetalPlaceConfig()`: fetch from Supabase → save to IDB
+- Add `saveMetalPlaceConfigRemote(config)`: godlike-only upsert to Supabase
+- Update `flushPresenceQueue()` to include `is_at_metal_place` field
+
+#### Live preview — `src/lib/livePreview.ts`
+- Add `isAtMetalPlace: boolean` to `CrewLivePlan`
+- Update `mapCrewLivePlans()` to read presence `is_at_metal_place`
+- Update `groupCrewLivePlans()`: add `metalPlace` group kind (conditional, only when ≥1 member)
+
+#### RightNowPage — `src/pages/RightNowPage.tsx`
+- Load Metal Place config from IDB on mount; subscribe to Realtime config changes
+- Render dedicated Metal Place check-in card when active
+- Handle check-in button → `setMetalPlaceStatus()` + mutual exclusion with camping
+- Render Metal Place card in crew grid when `metalPlace` group is non-empty
+- Display time range from config in both cards
+
+#### RightNowPage CSS — `src/pages/RightNowPage.module.css`
+- Add `.metalPlace` card style (crew grid): dark amber borders, gradient background, shimmer animation
+- Add `.metalPlaceCheckInCard`, `.metalPlaceCheckInButton`, `.metalPlaceCheckInTitle` styles for dedicated card
+
+#### ProfilePage — `src/pages/ProfilePage.tsx`
+- In the godlike section: Metal Place config block with:
+  - Day selector (1–4 or unset)
+  - Start time + end time inputs
+  - Test mode toggle: simple boolean "🧪 Enable for Today (Test Mode)"
+  - Save / Clear buttons
+  - When test mode is on, shows hint: "Metal Place will appear as if it's Day X today"
+
+#### ProfilePage CSS — `src/pages/ProfilePage.module.css`
+- Add `.metalPlaceSection`, `.metalPlaceForm`, input styles, button styles
+
+#### i18n — `src/i18n/RightNowPage_br.json`, `RightNowPage_en.json`
+- Add keys: `metalPlace`, `metalPlaceGroupTitle`, `metalPlaceGroupEmpty`, `metalPlaceCheckIn`, etc.
 
 ---
 
 ### Acceptance criteria
 
-- [x] Any logged-in, non-blocked user can post; message appears immediately for all online users
-- [x] A manager can delete any announcement; it disappears for all clients within 3 s
-- [x] A blocked user sees no post box and cannot post (enforced client-side and by RLS)
-- [ ] A manager/godlike can block a user by clicking a "block" button on their announcement card
-- [ ] A blocked user's previous announcements remain visible, but they cannot post new ones
-- [ ] Godlike profile section shows all users; can promote/demote managers AND unblock any user
-- [ ] Manager profile section shows ONLY blocked users; can unblock from there
-- [ ] Blocking/unblocking works immediately (optimistic + server sync)
-- [ ] `/announcements` renders from IndexedDB with no network after first load
-- [ ] Live page shows the latest announcement in the hero when the user is in "lost" or "empty" state
-- [ ] Soft-deleted announcements never reappear after a cache refresh
-- [ ] Blocked users can still view schedule, picks, live preview, and announcements (only posting blocked)
+- [x] Migration creates `metal_place_config` table and adds column to `user_presence`
+- [x] Godlike can configure Metal Place day, start time, end time via Profile
+- [x] Godlike can enable test mode to preview Metal Place on any day
+- [x] Check-in card appears only when Metal Place is active (configured day OR test mode)
+- [x] Check-in button toggles user's Metal Place status
+- [x] Toggling Metal Place on auto-disables camping, and vice versa
+- [x] Metal Place crew card appears only when ≥1 crew member is checked in
+- [x] Crew grid card displays time range from config
+- [x] Card styling is dark amber/beer aesthetic, distinct from camping (yellow) and lost (red)
+- [x] Realtime subscription syncs config changes across browser tabs/windows within 3s
+- [x] Offline: Metal Place status and config persist in IndexedDB; queue flushes on reconnect
+- [x] Test team can verify functionality without waiting for actual festival day (test mode)
 
 ---
 
-### Deliverables
+## Later ideas
 
-| # | Task | Status |
-|---|---|---|
-| 1 | Migration: `role` column, `announcements` table, `blocked_posters` table, RLS, RPC | ✅ Done |
-| 2 | `users.role` seeded as `godlike` for sfilizzola@gmail.com (migration + trigger) | ✅ Done |
-| 3 | `src/types/index.ts` — `UserRole`, `Announcement`, `BlockedPoster`, updated `User` | ✅ Done |
-| 4 | `src/lib/supabase.types.ts` — new tables and role column | ✅ Done |
-| 5 | `src/lib/db.ts` — version 5; `announcements` + `pending_announcements` IDB stores | ✅ Done |
-| 6 | `src/lib/announcements.ts` — full data layer (sync, post, delete, flush, role, block, setRole) | ✅ Done |
-| 7 | `src/pages/AnnouncementsPage.tsx` — mural UI with post box, cards, delete for managers | ✅ Done |
-| 8 | `src/pages/AnnouncementsPage.module.css` — mural styles | ✅ Done |
-| 9 | `src/lib/i18n.ts` — `AnnouncementsPage` added to registry | ✅ Done |
-| 10 | i18n: `AnnouncementsPage_br.json`, `AnnouncementsPage_en.json` | ✅ Done |
-| 11 | `src/components/BottomNav.tsx` — Mural tab added | ✅ Done |
-| 12 | `src/App.tsx` — `/announcements` route + `AnnouncementSync` component | ✅ Done |
-| 13 | `src/pages/RightNowPage.tsx` — latest announcement shown in hero when lost/empty | ✅ Done |
-| 14 | Profile page — godlike section: promote/demote managers, plus unblock button for each user | ✅ Done |
-| 15 | Profile page — manager section: view blocked users only, with unblock button | **Pending** |
-| 16 | AnnouncementsPage — block user button on each card (managers/godlike only) | **Pending** |
-
-Data layer functions (`setUserRole`, `blockUser`, `unblockUser`, `fetchAllUsers`, `fetchBlockedPosters`) are already in `src/lib/announcements.ts`. GodlikeSection is fully implemented in ProfilePage.tsx.
-
----
-
-### Offline contract
-
-```
-Fetch announcements on load
-  → cache full list in IndexedDB (newest first)
-  → display from cache when offline
-
-Post announcement
-  → if online: write to Supabase; server ID lands via Realtime INSERT
-  → if offline: save with local UUID to announcements + pending_announcements
-  → on reconnect: flushPendingAnnouncements() → syncAnnouncements() corrects IDs
-
-Delete announcement (managers / godlike)
-  → optimistic remove from IDB immediately
-  → Supabase UPDATE deleted_at when online
-  → Realtime UPDATE event removes from other clients' caches
-```
-
----
-
-### How to run the migration
-
-```bash
-supabase db push
-```
-
-Or paste `supabase/migrations/20260504000004_phase5_announcements.sql` into Supabase SQL editor.
-
-Verify:
-1. `users` table has a `role` column; your row shows `godlike`
-2. `announcements` and `blocked_posters` tables exist
-3. `set_user_role` RPC appears in Supabase Functions
-
----
-
-## Phase 6 — LLM proactive alerts
-
-**Goal:** Claude proactively taps the crew on the shoulder at key festival moments. No user needs to ask — the app just knows.
-
-**Architecture:**
-```
-Client (Service Worker timer or Realtime event)
-  → POST /functions/v1/check-alerts
-  → Edge Function builds AlertContext
-  → Calls Claude API (claude-sonnet-4-6)
-  → Returns alert payload { type, message, targetUserIds }
-  → Client displays push notification or in-app banner
-```
-
----
-
-### Alert types
-
-#### 5a — Conflict alert
-- **Trigger:** 30 minutes before a time slot where the user has two picks on different stages simultaneously
-- **Offline capable:** Yes — runs from cached picks + schedule, no API call needed
-- **Cooldown:** Once per conflicting pair per festival day
-- **Example message:** "Você marcou Blind Guardian e Powerwolf ao mesmo tempo. Qual palco vai rolar? 🤘"
-
-#### 5b — Crew split alert
-- **Trigger:** When crew picks for the next time slot split across 3 or more stages
-- **Offline capable:** No — requires Claude API
-- **Cooldown:** Once per hour
-- **Example message:** "Crew dividida em 4 palcos agora. Ponto de encontro: portão principal às 22h? 🤘"
-
-#### 5c — Discovery nudge
-- **Trigger:** User has a gap of 45+ minutes with no picks; a band the crew loves is starting soon
-- **Offline capable:** No — requires Claude API
-- **Cooldown:** Once per gap window
-- **Example message:** "Você tem 50 min livre. Fernanda e Beto adoraram Bloodbath — começam em 10 min no HARDER STAGE 🤘"
-
-#### 5d — Day recap
-- **Trigger:** 30 minutes after the last scheduled band on each festival day
-- **Offline capable:** No — requires Claude API, cached for offline reading after delivery
-- **Cooldown:** Once per festival day
-- **Example message:** "Viralatas viram 14 bandas hoje. Mais popular: Rammstein (6/7). Mais dividida: Tool (4 foram, 3 fugiram) 🤘"
-
----
-
-### Edge Function prompt template
-
-```
-Você é o assistente da crew Viralatas Metaleiros no Wacken.
-Hora atual: {currentTime}. Dia do festival: {festivalDay}.
-
-PICKS DA CREW:
-{crewPicks as compact JSON}
-
-SCHEDULE COMPLETO:
-{fullSchedule as compact JSON}
-
-Tipo de alerta solicitado: {alertType}
-
-Regras:
-- Responda APENAS com a mensagem de notificação
-- Máximo 2 frases
-- Tom: direto, divertido, metal
-- Idioma: português brasileiro
-- Termine com 🤘
-```
-
----
-
-### Deliverables
-
-- [ ] `supabase/functions/check-alerts/index.ts` Edge Function
-- [ ] Alert cooldown tracking in `user_alerts` table (alert_type, user_id, fired_at)
-- [ ] Client-side alert scheduler (Service Worker periodic sync or polling fallback)
-- [ ] In-app alert banner component (non-blocking, dismissible)
-- [ ] Web Push notification support (when app is backgrounded)
-- [ ] Offline conflict alert runs without API call
-
-### Acceptance criteria
-
-- [ ] Conflict alert fires correctly 30 min before a clash
-- [ ] No alert fires twice within its cooldown window
-- [ ] API key is never present in client bundle (verify with `grep -r "ANTHROPIC" src/`)
-- [ ] Alerts arrive in Brazilian Portuguese
-
----
-
-## Phase 7 — Polish and pre-festival
-
-**Goal:** Production-ready. Installable. Dark. Fast.
-
-### Deliverables
-
-- [ ] PWA install prompt on first visit (tested on iOS Safari + Android Chrome)
-- [ ] Dark mode (mandatory — it's a metal app)
-- [ ] Loading skeletons on band cards
-- [ ] Error boundary with friendly fallback
-- [ ] Final Wacken 2026 lineup imported and verified
-- [ ] Lighthouse PWA score ≥ 90
-- [ ] README with setup instructions for the crew
-
-### Acceptance criteria
-
-- [ ] App installs cleanly on an iPhone via Safari
-- [ ] App installs cleanly on Android via Chrome
-- [ ] Full offline run-through: install → pick bands → enter Airplane Mode → browse schedule → check "right now" — no crashes
-
----
-
-## Alert cooldown reference
-
-| Alert | Cooldown |
-|---|---|
-| Conflict alert | Once per conflicting pair per day |
-| Crew split | Once per hour |
-| Discovery nudge | Once per gap window |
-| Day recap | Once per festival day |
+See **[FUTURE_IDEAS.md](FUTURE_IDEAS.md)** for Phase 6+ features (LLM proactive alerts, Polish & pre-festival) that are nice-to-have and will be implemented if time permits after Phase 5 and Phase 6 (Metal Place) are complete.
