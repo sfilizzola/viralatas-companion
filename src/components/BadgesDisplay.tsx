@@ -85,12 +85,15 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
             >
               ✕
             </button>
-            <img
-              src={selectedBadge.imagePath}
-              alt={t(selectedBadge.labelKey)}
-              className={styles.badgePreview}
-            />
             <h3 className={styles.badgeTitle}>{t(selectedBadge.labelKey)}</h3>
+            <div className={styles.modalCardLayout}>
+              <img
+                src={selectedBadge.imagePath}
+                alt={t(selectedBadge.labelKey)}
+                className={styles.modalImageLarge}
+              />
+              <p className={styles.modalDescription}>{t(selectedBadge.descriptionKey)}</p>
+            </div>
           </div>
         </div>
       )}
