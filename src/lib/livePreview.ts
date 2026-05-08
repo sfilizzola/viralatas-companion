@@ -103,14 +103,21 @@ export function mapCrewLivePlans(
     });
 }
 
-export function groupCrewLivePlans(crewPlans: CrewLivePlan[]): CrewLiveGroup[] {
+export function groupCrewLivePlans(
+  crewPlans: CrewLivePlan[],
+  options?: { metalPlaceWindowActive?: boolean },
+): CrewLiveGroup[] {
+  const metalPlaceWindowActive = options?.metalPlaceWindowActive ?? true;
   const bandGroups = new Map<string, CrewLiveGroup & { kind: 'band' }>();
   const metalPlaceMembers: CrewLivePlan[] = [];
   const campingMembers: CrewLivePlan[] = [];
   const lostMembers: CrewLivePlan[] = [];
 
   for (const crew of crewPlans) {
-    if (crew.isAtMetalPlace) {
+    // When the Metal Place window has ended, ignore the stale check-in flag
+    // and route the member to their current band, camping, or lost as usual.
+    // Each user's own session also clears the flag in DB via auto-checkout.
+    if (crew.isAtMetalPlace && metalPlaceWindowActive) {
       metalPlaceMembers.push(crew);
       continue;
     }
@@ -151,14 +158,15 @@ export function groupCrewLivePlans(crewPlans: CrewLivePlan[]): CrewLiveGroup[] {
   const result: CrewLiveGroup[] = [
     ...liveBandGroups,
     { kind: 'camping', band: null, members: sortMembers(campingMembers) },
-    { kind: 'lost', band: null, members: sortMembers(lostMembers) },
   ];
 
   // Metal Place is conditional: only renders when ≥1 member is checked in.
-  // It sits at the end of the crew grid, below the lost card.
+  // It sits between camping and lost.
   if (metalPlaceMembers.length > 0) {
     result.push({ kind: 'metal_place', band: null, members: sortMembers(metalPlaceMembers) });
   }
+
+  result.push({ kind: 'lost', band: null, members: sortMembers(lostMembers) });
 
   return result;
 }

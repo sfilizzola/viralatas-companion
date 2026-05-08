@@ -258,12 +258,20 @@ export default function RightNowPage() {
     };
   }, []);
 
+  const isMetalPlaceWindowActive = useMemo(
+    () => isTimeWithinMetalPlaceWindow(metalPlaceConfig, now),
+    [metalPlaceConfig, now],
+  );
+
   useEffect(() => {
     // Skip until both config and userId are available, otherwise the very first
     // run with config=null would force-checkout the user on every mount.
+    // Re-runs when isMetalPlaceWindowActive flips false (config change OR time
+    // crossing end_time during the 30s `now` tick), so the local user gets
+    // checked out when the test event ends or the real schedule expires.
     if (!metalPlaceConfig || !userId) return;
     validateAndAutoCheckoutOutsideMetalPlaceWindow(metalPlaceConfig, userId).catch(() => {});
-  }, [metalPlaceConfig, userId]);
+  }, [metalPlaceConfig, userId, isMetalPlaceWindowActive]);
 
   const myRawPlan = useMemo(() => {
     if (!userId) return { status: 'empty', band: null } satisfies LivePlan;
@@ -300,7 +308,10 @@ export default function RightNowPage() {
     return mapCrewLivePlans(bands, picks, users, presence, now);
   }, [bands, picks, crewUsers, presence, userId, userDisplayName, now]);
 
-  const crewGroups = useMemo(() => groupCrewLivePlans(crewPlans), [crewPlans]);
+  const crewGroups = useMemo(
+    () => groupCrewLivePlans(crewPlans, { metalPlaceWindowActive: isMetalPlaceWindowActive }),
+    [crewPlans, isMetalPlaceWindowActive],
+  );
 
   async function handleSkip() {
     if (!myPlan.band || !userId) return;
@@ -421,7 +432,7 @@ export default function RightNowPage() {
               )}
             </section>
 
-            {userId && isTimeWithinMetalPlaceWindow(metalPlaceConfig, now) && (
+            {userId && isMetalPlaceWindowActive && (
               <div className={styles.metalPlaceCard}>
                 <div className={styles.metalPlaceContainer}>
                   <div className={styles.metalPlaceLeft}>
