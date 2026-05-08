@@ -106,6 +106,20 @@ export const BADGES: BadgeConfig[] = [
     condition: { type: 'country_is', country: 'us' },
   },
   {
+    slug: 'belga',
+    imagePath: '/badges/badge_be.png',
+    labelKey: 'badgeBelga',
+    descriptionKey: 'badgeBelgaDescription',
+    condition: { type: 'country_is', country: 'be' },
+  },
+  {
+    slug: 'cafetero',
+    imagePath: '/badges/badge_co.png',
+    labelKey: 'badgeCafetero',
+    descriptionKey: 'badgeCafeteroDescription',
+    condition: { type: 'country_is', country: 'co' },
+  },
+  {
     slug: 'og',
     imagePath: '/badges/badge_og.png',
     labelKey: 'badgeOG',

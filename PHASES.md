@@ -4,11 +4,11 @@ Current phase and upcoming work for Viralatas Metaleiros. Refer to CLAUDE.md for
 
 ---
 
-## Phase 8 — Badge asset intake & new badge definitions `[PLANNED]`
+## Phase 8 — Badge asset intake & new badge definitions `[COMPLETED 2026-05-08]`
 
 **Goal:** Read `public/badges/`, identify badge image files that are not currently associated with a `BADGES` entry, then use user input to create new badge definitions and conditions using the existing badge structure only.
 
-**Status:** Planning only. Do not execute yet. Current planning-time inventory shows all existing PNG badge files are already associated with `BADGES`; ignore non-badge files such as `.DS_Store`. Re-run the inventory when Phase 8 execution starts because new files may be added later.
+**Status:** Completed 2026-05-08. Inventory at execution time found two unassociated assets: `badge_be.png` and `badge_co.png`. Both added as `country_is` badges (BE → `belga`, CO → `cafetero`) with bilingual i18n entries grouped with the existing country badges. No DB, UI, or condition-engine changes.
 
 **Non-goals / constraints:**
 - Do not change badge display UI, modal behavior, profile metadata forms, or unrelated app behavior.
@@ -96,13 +96,13 @@ No other files should change unless Phase 8 execution discovers a necessary issu
 
 ### Acceptance criteria
 
-- [ ] `public/badges/` inventory is documented before edits are made
-- [ ] Every unassociated badge image is either added as an approved badge or explicitly deferred
-- [ ] New badge entries use the existing `BadgeConfig` shape
-- [ ] New badge conditions use only existing `BadgeCondition` types
-- [ ] Every new badge has BR + EN label and description keys
-- [ ] No unrelated UI, database, or badge-display behavior changes
-- [ ] TypeScript/tests pass after implementation
+- [x] `public/badges/` inventory is documented before edits are made
+- [x] Every unassociated badge image is either added as an approved badge or explicitly deferred
+- [x] New badge entries use the existing `BadgeConfig` shape
+- [x] New badge conditions use only existing `BadgeCondition` types
+- [x] Every new badge has BR + EN label and description keys
+- [x] No unrelated UI, database, or badge-display behavior changes
+- [x] TypeScript/tests pass after implementation
 
 ---
 

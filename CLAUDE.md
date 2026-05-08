@@ -257,9 +257,7 @@ Phase 8 will use this structure to inventory unassociated images in `public/badg
 - ✅ **Phase 5** — Announcements & user roles: Mural board, manager blocking, godlike powers
 - ✅ **Phase 6** — Metal Place: Festival-day check-in, crew grid card, test mode
 - ✅ **Phase 7** — Profile polish: badge modal, live band test, collapsible admin sections, useful links
-
-**Upcoming:**
-- ⏳ **Phase 8** — Badge asset intake: map unassociated `public/badges/` images to new badge configs with user-approved conditions
+- ✅ **Phase 8** — Badge asset intake: added Belgian (`belga`) and Colombian (`cafetero`) country badges
 
 See **PHASES.md** for detailed acceptance criteria and current status.
 
