@@ -5,7 +5,7 @@ import type { Band, UserPick, UserRole } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';
-import { loadBands, loadMetalPlaceConfig, loadUserPicks, PICKS_CHANGED_EVENT, saveMetalPlaceConfig } from '../lib/db';
+import { loadBands, loadMetalPlaceConfig, loadUserPicks, PICKS_CHANGED_EVENT } from '../lib/db';
 import { togglePick } from '../lib/picks';
 import { fetchCurrentUserRole, fetchAllUsers, fetchBlockedPostersWithUserDetails, setUserRole as updateUserRole, unblockUser } from '../lib/announcements';
 import { invalidateCacheForAllUsers } from '../lib/cache';
@@ -749,7 +749,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
 
         {!metalPlaceLoading && (
           <div className={styles.metalPlaceSection}>
-            <h4 className={styles.metalPlaceSectionTitle}>🍺 Metal Place</h4>
+            <h4 className={styles.metalPlaceSectionTitle}>{t('metalPlaceTitle')}</h4>
             {metalPlaceError && (
               <div className={styles.metalPlaceError}>
                 ⚠️ {metalPlaceError}
@@ -757,22 +757,22 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
             )}
             <div className={styles.metalPlaceForm}>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Festival Day (1-4)</label>
+                <label className={styles.formLabel}>{t('metalPlaceFestivalDay')}</label>
                 <select
                   value={metalPlaceDay}
                   onChange={(e) => setMetalPlaceDay(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
                   className={styles.formInput}
                   disabled={metalPlaceSaving}
                 >
-                  <option value="">Not Set</option>
-                  <option value={1}>Day 1 (Wed, Jul 29)</option>
-                  <option value={2}>Day 2 (Thu, Jul 30)</option>
-                  <option value={3}>Day 3 (Fri, Jul 31)</option>
-                  <option value={4}>Day 4 (Sat, Aug 1)</option>
+                  <option value="">{t('metalPlaceDayUnset')}</option>
+                  <option value={1}>{t('metalPlaceDay1')}</option>
+                  <option value={2}>{t('metalPlaceDay2')}</option>
+                  <option value={3}>{t('metalPlaceDay3')}</option>
+                  <option value={4}>{t('metalPlaceDay4')}</option>
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Start Time</label>
+                <label className={styles.formLabel}>{t('metalPlaceStartTime')}</label>
                 <input
                   type="time"
                   value={metalPlaceStartTime}
@@ -782,7 +782,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>End Time</label>
+                <label className={styles.formLabel}>{t('metalPlaceEndTime')}</label>
                 <input
                   type="time"
                   value={metalPlaceEndTime}
@@ -799,8 +799,11 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                     onChange={(e) => setTestModeEnabled(e.target.checked)}
                     disabled={metalPlaceSaving}
                   />
-                  Test Mode (sets Metal Place day to today)
+                  {t('metalPlaceTestMode')}
                 </label>
+                {testModeEnabled && (
+                  <p className={styles.testModeHint}>{t('metalPlaceTestModeHint')}</p>
+                )}
               </div>
               <button
                 className={styles.saveButton}
@@ -810,28 +813,16 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                   try {
                     const wasTestModeOn = previousTestModeRef.current;
                     const isTestModeNowOff = !testModeEnabled && wasTestModeOn;
+                    const festivalDay = metalPlaceDay === '' ? null : metalPlaceDay;
 
-                    let festivalDay = metalPlaceDay === '' ? null : metalPlaceDay;
-                    let startTime = metalPlaceStartTime || null;
-                    let endTime = metalPlaceEndTime || null;
-
-                    if (testModeEnabled) {
-                      festivalDay = 1;
-                      startTime = '00:00';
-                      endTime = '23:59';
-                    }
-
+                    // Test mode pins the active day via test_override_day; the real
+                    // festival_day, start_time, and end_time stay as configured.
                     await saveMetalPlaceConfigRemote({
+                      id: 1,
                       festival_day: festivalDay,
-                      start_time: startTime,
-                      end_time: endTime,
-                      test_override_day: testModeEnabled ? 1 : null,
-                    });
-                    await saveMetalPlaceConfig({
-                      festival_day: festivalDay,
-                      start_time: startTime,
-                      end_time: endTime,
-                      test_override_day: testModeEnabled ? 1 : null,
+                      start_time: metalPlaceStartTime || null,
+                      end_time: metalPlaceEndTime || null,
+                      test_override_day: testModeEnabled ? (festivalDay ?? 1) : null,
                     });
 
                     if (isTestModeNowOff) {
@@ -840,25 +831,25 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
 
                     previousTestModeRef.current = testModeEnabled;
                   } catch (err) {
-                    setMetalPlaceError(err instanceof Error ? err.message : 'Save failed');
+                    setMetalPlaceError(err instanceof Error ? err.message : t('metalPlaceSaveError'));
                   } finally {
                     setMetalPlaceSaving(false);
                   }
                 }}
                 disabled={metalPlaceSaving}
               >
-                {metalPlaceSaving ? 'Saving...' : 'Save Metal Place Config'}
+                {metalPlaceSaving ? t('metalPlaceSaving') : t('metalPlaceSave')}
               </button>
             </div>
           </div>
         )}
 
         <div className={styles.userManagementSection}>
-          <h4 className={styles.userManagementTitle}>Registered Users</h4>
+          <h4 className={styles.userManagementTitle}>{t('registeredUsers')}</h4>
           {usersLoading ? (
-            <p className={styles.userListLoading}>Loading users...</p>
+            <p className={styles.userListLoading}>{t('registeredUsersLoading')}</p>
           ) : allUsers.length === 0 ? (
-            <p className={styles.emptyUserList}>No users found</p>
+            <p className={styles.emptyUserList}>{t('registeredUsersEmpty')}</p>
           ) : (
             <div className={styles.userList}>
               {allUsers.map((user) => (

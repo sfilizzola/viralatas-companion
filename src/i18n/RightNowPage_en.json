@@ -32,5 +32,12 @@
   "desfazer": "Undo",
   "metalPlaceGroupTitle": "Metal Place",
   "metalPlaceGroupKicker": "the best beergarden in the world",
-  "metalPlaceGroupEmpty": "Nobody at Metal Place yet"
+  "metalPlaceGroupKickerWithTime": "🍺 {start} - {end}",
+  "metalPlaceGroupEmpty": "Nobody at Metal Place yet",
+  "metalPlaceCheckIn": "Heading to Metal",
+  "metalPlaceCheckInActive": "You're at Metal 🍺",
+  "metalPlaceCheckingIn": "Checking in...",
+  "metalPlaceCheckOut": "Back to the fest",
+  "metalPlaceCheckedOut": "Welcome back!",
+  "metalPlaceCheckingOut": "Checking out..."
 }

@@ -2,6 +2,7 @@ import type { MetalPlaceConfig, UserPresence } from '../types';
 import {
   enqueueOfflinePresence,
   loadOfflinePresenceQueue,
+  loadUserPresence,
   removeFromOfflinePresenceQueue,
   replaceUserPresence,
   saveMetalPlaceConfig,
@@ -19,9 +20,11 @@ async function queuePresence(presence: UserPresence) {
 }
 
 export async function setCampingStatus(userId: string, isCamping: boolean): Promise<void> {
+  // Mutual exclusion with Metal Place: enabling camping clears Metal Place attendance.
   const presence: UserPresence = {
     user_id: userId,
     is_camping: isCamping,
+    is_at_metal_place: isCamping ? false : (await loadUserPresence(userId))?.is_at_metal_place ?? false,
     updated_at: new Date().toISOString(),
   };
 
@@ -54,9 +57,10 @@ export async function flushPresenceQueue(): Promise<void> {
   const latestByUser = new Map<string, { allIds: string[]; presence: UserPresence }>();
   for (const item of queue) {
     const existing = latestByUser.get(item.user_id);
-    const presence = {
+    const presence: UserPresence = {
       user_id: item.user_id,
       is_camping: item.is_camping,
+      is_at_metal_place: item.is_at_metal_place ?? false,
       updated_at: item.updated_at,
     };
 
@@ -94,9 +98,12 @@ export async function saveMetalPlaceConfigRemote(config: MetalPlaceConfig): Prom
 }
 
 export async function setMetalPlaceStatus(userId: string, isAtMetalPlace: boolean): Promise<void> {
+  // Mutual exclusion with camping: checking in to Metal Place clears camping; checking out
+  // preserves the prior camping state.
+  const existing = await loadUserPresence(userId);
   const presence: UserPresence = {
     user_id: userId,
-    is_camping: false,
+    is_camping: isAtMetalPlace ? false : existing?.is_camping ?? false,
     is_at_metal_place: isAtMetalPlace,
     updated_at: new Date().toISOString(),
   };
@@ -122,25 +129,40 @@ export async function syncMetalPlaceConfig(): Promise<void> {
 }
 
 export function isTimeWithinMetalPlaceWindow(config: MetalPlaceConfig | null, now: Date): boolean {
-  if (!config || config.festival_day === null || !config.start_time || !config.end_time) {
+  if (!config || !config.start_time || !config.end_time) {
     return false;
   }
 
-  const WACKEN_START = new Date('2026-07-29T00:00:00Z');
-  const DAY_DURATION_MS = 24 * 60 * 60 * 1000;
-  const dayOffset = Math.floor((now.getTime() - WACKEN_START.getTime()) / DAY_DURATION_MS);
-  const currentFestivalDay = dayOffset + 1;
+  // Test mode: when test_override_day is set, treat today as that festival day
+  // regardless of the actual date. Otherwise check the configured festival_day.
+  const isTestMode = config.test_override_day !== null && config.test_override_day !== undefined;
 
-  if (currentFestivalDay !== config.festival_day) {
-    return false;
+  if (!isTestMode) {
+    if (config.festival_day === null || config.festival_day === undefined) {
+      return false;
+    }
+    const WACKEN_START = new Date('2026-07-29T00:00:00Z');
+    const DAY_DURATION_MS = 24 * 60 * 60 * 1000;
+    const dayOffset = Math.floor((now.getTime() - WACKEN_START.getTime()) / DAY_DURATION_MS);
+    const currentFestivalDay = dayOffset + 1;
+    if (currentFestivalDay !== config.festival_day) {
+      return false;
+    }
   }
 
   const [startHour, startMin] = config.start_time.split(':').map(Number);
   const [endHour, endMin] = config.end_time.split(':').map(Number);
 
-  const nowHours = now.getUTCHours();
-  const nowMinutes = now.getUTCMinutes();
-  const nowTotalMinutes = nowHours * 60 + nowMinutes;
+  // Compare against local Wacken (Europe/Berlin) wall-clock time, since admins
+  // configure start/end as wall-clock times, not UTC.
+  const wallClock = new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'Europe/Berlin',
+  }).format(now);
+  const [nowHourStr, nowMinStr] = wallClock.split(':');
+  const nowTotalMinutes = parseInt(nowHourStr, 10) * 60 + parseInt(nowMinStr, 10);
 
   const startTotalMinutes = startHour * 60 + startMin;
   const endTotalMinutes = endHour * 60 + endMin;

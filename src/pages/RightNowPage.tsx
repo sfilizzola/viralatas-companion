@@ -22,8 +22,8 @@ import {
   type CrewLivePlan,
   type LivePlan,
 } from '../lib/livePreview';
-import { setCampingStatus, setMetalPlaceStatus, syncCrewPresence, isTimeWithinMetalPlaceWindow, validateAndAutoCheckoutOutsideMetalPlaceWindow } from '../lib/presence';
-import { loadMetalPlaceConfig, METAL_PLACE_CONFIG_CHANGED_EVENT } from '../lib/db';
+import { setCampingStatus, setMetalPlaceStatus, syncCrewPresence, syncMetalPlaceConfig, isTimeWithinMetalPlaceWindow, validateAndAutoCheckoutOutsideMetalPlaceWindow } from '../lib/presence';
+import { loadMetalPlaceConfig, METAL_PLACE_CONFIG_CHANGED_EVENT, saveMetalPlaceConfig } from '../lib/db';
 import type { MetalPlaceConfig } from '../types';
 import { togglePick } from '../lib/picks';
 import { supabase } from '../lib/supabase';
@@ -76,7 +76,11 @@ function groupTitle(group: CrewLiveGroup, t: (key: string, values?: Record<strin
   return t('lostGroupTitle');
 }
 
-function groupKicker(group: CrewLiveGroup, t: (key: string, values?: Record<string, string | number>) => string) {
+function groupKicker(
+  group: CrewLiveGroup,
+  t: (key: string, values?: Record<string, string | number>) => string,
+  metalPlaceConfig?: MetalPlaceConfig | null,
+) {
   if (group.kind === 'band') {
     return t('bandGroupKicker', {
       stage: group.band.stage,
@@ -84,7 +88,7 @@ function groupKicker(group: CrewLiveGroup, t: (key: string, values?: Record<stri
       end: formatFestivalTime(group.band.end_time),
     });
   }
-  if (group.kind === 'metal_place') return t('metalPlaceGroupKicker');
+  if (group.kind === 'metal_place') return metalPlaceSubtitle(metalPlaceConfig ?? null, t);
   if (group.kind === 'camping') return t('campingGroupKicker');
   return t('lostGroupKicker');
 }
@@ -92,6 +96,24 @@ function groupKicker(group: CrewLiveGroup, t: (key: string, values?: Record<stri
 function emptyGroupMessage(group: CrewLiveGroup, t: (key: string) => string) {
   if (group.kind === 'metal_place') return t('metalPlaceGroupEmpty');
   return group.kind === 'camping' ? t('campingGroupEmpty') : t('lostGroupEmpty');
+}
+
+function formatHmTime(value?: string | null): string | null {
+  if (!value) return null;
+  // Postgres TIME ("12:00:00") or HTML <input type="time"> ("12:00").
+  return value.slice(0, 5);
+}
+
+function metalPlaceSubtitle(
+  config: MetalPlaceConfig | null,
+  t: (key: string, values?: Record<string, string | number>) => string,
+): string {
+  const start = formatHmTime(config?.start_time);
+  const end = formatHmTime(config?.end_time);
+  if (start && end) {
+    return t('metalPlaceGroupKickerWithTime', { start, end });
+  }
+  return t('metalPlaceGroupKicker');
 }
 
 
@@ -208,13 +230,32 @@ export default function RightNowPage() {
     }
 
     loadMetalPlaceConfigFromDB();
+    syncMetalPlaceConfig().catch(() => {});
 
     function handleConfigChange() {
       loadMetalPlaceConfigFromDB();
     }
 
     window.addEventListener(METAL_PLACE_CONFIG_CHANGED_EVENT, handleConfigChange);
-    return () => window.removeEventListener(METAL_PLACE_CONFIG_CHANGED_EVENT, handleConfigChange);
+
+    // Realtime: when godlike updates Metal Place config from another tab/device,
+    // mirror to IDB so this view picks it up via the cache-changed event above.
+    const channel = supabase
+      .channel('metal_place_config_live')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'metal_place_config' },
+        async (payload) => {
+          const next = (payload.new ?? payload.old) as MetalPlaceConfig | undefined;
+          if (next) await saveMetalPlaceConfig(next);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      window.removeEventListener(METAL_PLACE_CONFIG_CHANGED_EVENT, handleConfigChange);
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   useEffect(() => {
@@ -379,89 +420,73 @@ export default function RightNowPage() {
               )}
             </section>
 
-            {(() => {
-              return userId && isTimeWithinMetalPlaceWindow(metalPlaceConfig, now) ? (
-                <div className={styles.metalPlaceCard}>
-                  <div className={styles.metalPlaceContainer}>
-                    <div className={styles.metalPlaceLeft}>
-                      <div className={styles.metalPlaceIcon} aria-hidden>🍺</div>
-                      <div className={styles.metalPlaceInfo}>
-                        <div className={styles.metalPlaceTitle}>{t('metalPlaceGroupTitle')}</div>
-                        <div className={styles.metalPlaceSubtitle}>
-                          {t('metalPlaceGroupKicker')}
-                        </div>
+            {userId && isTimeWithinMetalPlaceWindow(metalPlaceConfig, now) && (
+              <div className={styles.metalPlaceCard}>
+                <div className={styles.metalPlaceContainer}>
+                  <div className={styles.metalPlaceLeft}>
+                    <div className={styles.metalPlaceIcon} aria-hidden>🍺</div>
+                    <div className={styles.metalPlaceInfo}>
+                      <div className={styles.metalPlaceTitle}>{t('metalPlaceGroupTitle')}</div>
+                      <div className={styles.metalPlaceSubtitle}>
+                        {metalPlaceSubtitle(metalPlaceConfig, t)}
                       </div>
                     </div>
+                  </div>
 
-                    <div className={styles.metalPlaceRight}>
-                      {isAtMetalPlace ? (
-                        <button
-                          className={styles.checkoutButton}
-                          onClick={async () => {
-                            setMetalPlaceCheckingIn(true);
-                            try {
-                              await setMetalPlaceStatus(userId, false);
-                              setMetalPlaceCheckedIn(true);
-                              console.log('[RightNow] Successfully checked out from Metal Place');
-                              setTimeout(() => setMetalPlaceCheckedIn(false), 3000);
-                            } catch (error) {
-                              console.error('Failed to check out from Metal Place:', error);
-                            } finally {
-                              setMetalPlaceCheckingIn(false);
-                            }
-                          }}
-                          disabled={metalPlaceCheckingIn}
-                        >
+                  <div className={styles.metalPlaceRight}>
+                    {isAtMetalPlace ? (
+                      <button
+                        className={styles.checkoutButton}
+                        onClick={async () => {
+                          setMetalPlaceCheckingIn(true);
+                          try {
+                            await setMetalPlaceStatus(userId, false);
+                            setMetalPlaceCheckedIn(true);
+                            setTimeout(() => setMetalPlaceCheckedIn(false), 3000);
+                          } finally {
+                            setMetalPlaceCheckingIn(false);
+                          }
+                        }}
+                        disabled={metalPlaceCheckingIn}
+                      >
+                        {metalPlaceCheckingIn ? '⏳' : metalPlaceCheckedIn ? '✅' : '👋'}
+                        <span className={styles.buttonText}>
                           {metalPlaceCheckingIn
-                            ? '⏳'
+                            ? t('metalPlaceCheckingOut')
                             : metalPlaceCheckedIn
-                              ? '✅'
-                              : '👋'}
-                          <span className={styles.buttonText}>
-                            {metalPlaceCheckingIn
-                              ? 'Checking out...'
-                              : metalPlaceCheckedIn
-                                ? 'Checked out!'
-                                : 'Check out'}
-                          </span>
-                        </button>
-                      ) : (
-                        <button
-                          className={styles.checkinButton}
-                          onClick={async () => {
-                            setMetalPlaceCheckingIn(true);
-                            try {
-                              await setMetalPlaceStatus(userId, true);
-                              setMetalPlaceCheckedIn(true);
-                              console.log('[RightNow] Successfully checked in to Metal Place');
-                              setTimeout(() => setMetalPlaceCheckedIn(false), 3000);
-                            } catch (error) {
-                              console.error('Failed to check in to Metal Place:', error);
-                            } finally {
-                              setMetalPlaceCheckingIn(false);
-                            }
-                          }}
-                          disabled={metalPlaceCheckingIn || metalPlaceCheckedIn}
-                        >
+                              ? t('metalPlaceCheckedOut')
+                              : t('metalPlaceCheckOut')}
+                        </span>
+                      </button>
+                    ) : (
+                      <button
+                        className={styles.checkinButton}
+                        onClick={async () => {
+                          setMetalPlaceCheckingIn(true);
+                          try {
+                            await setMetalPlaceStatus(userId, true);
+                            setMetalPlaceCheckedIn(true);
+                            setTimeout(() => setMetalPlaceCheckedIn(false), 3000);
+                          } finally {
+                            setMetalPlaceCheckingIn(false);
+                          }
+                        }}
+                        disabled={metalPlaceCheckingIn || metalPlaceCheckedIn}
+                      >
+                        {metalPlaceCheckingIn ? '⏳' : metalPlaceCheckedIn ? '✅' : '🍺'}
+                        <span className={styles.buttonText}>
                           {metalPlaceCheckingIn
-                            ? '⏳'
+                            ? t('metalPlaceCheckingIn')
                             : metalPlaceCheckedIn
-                              ? '✅'
-                              : '🍺'}
-                          <span className={styles.buttonText}>
-                            {metalPlaceCheckingIn
-                              ? 'Checking in...'
-                              : metalPlaceCheckedIn
-                                ? 'You are in!'
-                                : 'Check in'}
-                          </span>
-                        </button>
-                      )}
-                    </div>
+                              ? t('metalPlaceCheckInActive')
+                              : t('metalPlaceCheckIn')}
+                        </span>
+                      </button>
+                    )}
                   </div>
                 </div>
-              ) : null;
-            })()}
+              </div>
+            )}
 
             {user && <BadgesDisplay user={user} />}
 
@@ -486,7 +511,7 @@ export default function RightNowPage() {
                     )}
                     <div className={styles.groupHeader}>
                       <div>
-                        <span className={styles.groupKicker}>{groupKicker(group, t)}</span>
+                        <span className={styles.groupKicker}>{groupKicker(group, t, metalPlaceConfig)}</span>
                         <h3 className={styles.groupTitle}>{groupTitle(group, t)}</h3>
                       </div>
                       <span className={styles.groupCount}>

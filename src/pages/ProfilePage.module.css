@@ -621,6 +621,13 @@
   cursor: pointer;
 }
 
+.testModeHint {
+  margin: 0.4rem 0 0;
+  font-size: 0.75rem;
+  color: rgba(218, 165, 32, 0.85);
+  font-style: italic;
+}
+
 .saveButton {
   padding: 0.5rem 1rem;
   background: rgba(184, 134, 11, 0.2);
