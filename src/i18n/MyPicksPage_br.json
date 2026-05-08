@@ -1,6 +1,6 @@
 {
-  "title": "Meus picks",
-  "loading": "Carregando picks...",
+  "title": "Minhas escolhas",
+  "loading": "Carregando escolhas...",
   "empty": "Você ainda não escolheu nenhuma banda. Vá para a programação 🤘",
-  "summary": "{bands} bandas em {days} dias · {conflicts} conflitos"
+  "summary": "{bands} bandas em {days} dias · {conflicts} conflito(s)"
 }
