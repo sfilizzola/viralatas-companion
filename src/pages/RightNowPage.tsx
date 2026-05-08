@@ -36,6 +36,7 @@ import type { LiveBandTestConfig, MetalPlaceConfig } from '../types';
 import { togglePick } from '../lib/picks';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
+import { useNow } from '../hooks/useNow';
 import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
@@ -159,7 +160,7 @@ export default function RightNowPage() {
   const [crewUsers, setCrewUsers] = useState<CrewUser[]>([]);
   const [presence, setPresence] = useState<UserPresence[]>([]);
   const [latestAnnouncement, setLatestAnnouncement] = useState<Announcement | null>(null);
-  const [now, setNow] = useState(() => new Date());
+  const now = useNow(30_000);
   const [loading, setLoading] = useState(true);
   const [undoState, setUndoState] = useState<{
     bandId: string;
@@ -196,14 +197,12 @@ export default function RightNowPage() {
     }
 
     window.queueMicrotask(handleCacheChange);
-    const tick = window.setInterval(() => setNow(new Date()), 30_000);
     window.addEventListener(PICKS_CHANGED_EVENT, handleCacheChange);
     window.addEventListener(CREW_USERS_CHANGED_EVENT, handleCacheChange);
     window.addEventListener(PRESENCE_CHANGED_EVENT, handleCacheChange);
     window.addEventListener(ANNOUNCEMENTS_CHANGED_EVENT, handleCacheChange);
 
     return () => {
-      window.clearInterval(tick);
       window.removeEventListener(PICKS_CHANGED_EVENT, handleCacheChange);
       window.removeEventListener(CREW_USERS_CHANGED_EVENT, handleCacheChange);
       window.removeEventListener(PRESENCE_CHANGED_EVENT, handleCacheChange);

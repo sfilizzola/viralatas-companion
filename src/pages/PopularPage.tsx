@@ -1,13 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Band } from '../types';
 import { loadBands } from '../lib/db';
+import { togglePick } from '../lib/picks';
 import { useAuth } from '../hooks/useAuth';
 import { useBandAttendees } from '../hooks/useBandAttendees';
 import { useMyPicks } from '../hooks/useMyPicks';
 import { usePickCounts } from '../hooks/usePickCounts';
 import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
-import { BandCard } from './SchedulePage';
+import BandCard from '../components/BandCard';
+import BandDetailModal from '../components/BandDetailModal';
 import styles from './SchedulePage.module.css';
 
 export default function PopularPage() {
@@ -17,8 +19,8 @@ export default function PopularPage() {
 
   const [bands, setBands] = useState<Band[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedBandIds, setExpandedBandIds] = useState<Set<string>>(new Set());
-  const { pickedIds } = useMyPicks(userId);
+  const [activeBandId, setActiveBandId] = useState<string | null>(null);
+  const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
   const attendeesByBand = useBandAttendees();
   const pickCounts = usePickCounts();
 
@@ -39,18 +41,19 @@ export default function PopularPage() {
     [bands, pickCounts],
   );
 
+  const activeBand = useMemo(
+    () => (activeBandId ? bands.find((b) => b.id === activeBandId) ?? null : null),
+    [activeBandId, bands],
+  );
 
-  function toggleAttendees(bandId: string) {
-    setExpandedBandIds((current) => {
-      const next = new Set(current);
-      if (next.has(bandId)) {
-        next.delete(bandId);
-      } else {
-        next.add(bandId);
-      }
-      return next;
-    });
-  }
+  const handleToggle = useCallback(
+    async (bandId: string) => {
+      if (!userId) return;
+      await togglePick(userId, bandId, pickedIds.has(bandId));
+      await refreshPicks();
+    },
+    [userId, pickedIds, refreshPicks],
+  );
 
   return (
     <div className={styles.page}>
@@ -66,7 +69,6 @@ export default function PopularPage() {
         {popularBands.map((band) => {
           const attendees = attendeesByBand[band.id] ?? [];
           const count = pickCounts[band.id] ?? 0;
-          const isExpanded = expandedBandIds.has(band.id);
 
           return (
             <BandCard
@@ -75,54 +77,23 @@ export default function PopularPage() {
               isPicked={pickedIds.has(band.id)}
               count={count}
               onToggle={() => {}}
-              hidePickButton={true}
-            >
-              <div className={styles.attendeeTools}>
-                <button
-                  className={styles.attendeeToggle}
-                  type="button"
-                  disabled={count === 0}
-                  aria-expanded={isExpanded}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    toggleAttendees(band.id);
-                  }}
-                >
-                  {count === 0 ? t('noCrewYet') : isExpanded ? t('hideCrew') : t('showCrew')}
-                </button>
-              </div>
-
-              {isExpanded && (
-                <div className={styles.attendeePanel}>
-                  {attendees.length > 0 ? (
-                    <ul className={styles.attendeeList}>
-                      {attendees.map((attendee) => (
-                        <li className={styles.attendee} key={attendee.id}>
-                          {attendee.avatar_url ? (
-                            <img
-                              className={styles.attendeeAvatar}
-                              src={attendee.avatar_url}
-                              alt=""
-                              loading="lazy"
-                            />
-                          ) : (
-                            <span className={styles.attendeeAvatar} aria-hidden>
-                              {attendee.label.charAt(0).toUpperCase()}
-                            </span>
-                          )}
-                          <span className={styles.attendeeName}>{attendee.label}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className={styles.attendeeEmpty}>{t('syncingCrew')}</p>
-                  )}
-                </div>
-              )}
-            </BandCard>
+              onClick={() => setActiveBandId(band.id)}
+              hidePickButton
+              attendeeCluster={count > 0 ? { attendees, max: 4 } : undefined}
+            />
           );
         })}
       </main>
+
+      {activeBand && (
+        <BandDetailModal
+          band={activeBand}
+          attendees={attendeesByBand[activeBand.id] ?? []}
+          isPicked={pickedIds.has(activeBand.id)}
+          onTogglePick={() => handleToggle(activeBand.id)}
+          onClose={() => setActiveBandId(null)}
+        />
+      )}
 
       <div className={styles.navSpacer} />
       <BottomNav />

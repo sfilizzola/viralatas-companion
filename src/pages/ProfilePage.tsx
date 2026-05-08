@@ -19,6 +19,12 @@ import { invalidateCacheForAllUsers } from '../lib/cache';
 import { getRegistrationEnabled, setRegistrationEnabled } from '../lib/appSettings';
 import { saveMetalPlaceConfigRemote, autoCheckoutAllUsersFromMetalPlace } from '../lib/presence';
 import { saveLiveBandTestConfigRemote } from '../lib/liveBandTest';
+import {
+  clearTimeOverride,
+  getTimeOverride,
+  setTimeOverride,
+  TIME_OVERRIDE_CHANGED_EVENT,
+} from '../lib/time';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
@@ -1049,6 +1055,8 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
           </div>
         )}
 
+        <TimeTravelSection />
+
         <div className={styles.userManagementSection}>
           <h4 className={styles.userManagementTitle}>{t('registeredUsers')}</h4>
           {usersLoading ? (
@@ -1130,6 +1138,148 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
         </div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function toDatetimeLocalValue(iso: string): string {
+  const d = new Date(iso);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function formatWackenLocal(iso: string, language: Language): string {
+  return new Intl.DateTimeFormat(language === 'br' ? 'pt-BR' : 'en-GB', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+    timeZone: 'Europe/Berlin',
+  }).format(new Date(iso));
+}
+
+// CEST = UTC+2, so 22:00 CEST = 20:00 UTC. Each entry is "festival day at 22:00 CEST".
+const TIME_TRAVEL_DAY_CHIPS: { key: string; label: string; date: string; iso: string }[] = [
+  { key: 'pre',  label: 'D-1', date: '28/07', iso: '2026-07-28T20:00:00Z' },
+  { key: 'd1',   label: 'D1',  date: '29/07', iso: '2026-07-29T20:00:00Z' },
+  { key: 'd2',   label: 'D2',  date: '30/07', iso: '2026-07-30T20:00:00Z' },
+  { key: 'd3',   label: 'D3',  date: '31/07', iso: '2026-07-31T20:00:00Z' },
+  { key: 'd4',   label: 'D4',  date: '01/08', iso: '2026-08-01T20:00:00Z' },
+  { key: 'post', label: 'D+1', date: '02/08', iso: '2026-08-02T20:00:00Z' },
+];
+
+// Replace the date portion of an existing local datetime string ("YYYY-MM-DDTHH:mm")
+// with the date implied by the chip's UTC instant, projected into the user's TZ.
+// Keeps whatever HH:mm the user has already typed.
+function chipDateWithCurrentTime(chipIso: string, currentInput: string): string {
+  const chipLocal = toDatetimeLocalValue(chipIso); // chip default at 22:00 CEST in local TZ
+  if (!currentInput || currentInput.length < 16) return chipLocal;
+  const [chipDate] = chipLocal.split('T');
+  const [, currentTime] = currentInput.split('T');
+  return `${chipDate}T${currentTime}`;
+}
+
+function TimeTravelSection() {
+  const { t, language } = useI18n('ProfilePage');
+  const [override, setOverride] = useState<string | null>(() => getTimeOverride());
+  const [inputValue, setInputValue] = useState<string>(() => {
+    const stored = getTimeOverride();
+    return stored ? toDatetimeLocalValue(stored) : '';
+  });
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    function handler() {
+      const next = getTimeOverride();
+      setOverride(next);
+      if (next) setInputValue(toDatetimeLocalValue(next));
+    }
+    window.addEventListener(TIME_OVERRIDE_CHANGED_EVENT, handler);
+    return () => window.removeEventListener(TIME_OVERRIDE_CHANGED_EVENT, handler);
+  }, []);
+
+  function applyLocalInput(value: string) {
+    setError(null);
+    try {
+      setTimeOverride(new Date(value).toISOString());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('timeTravelInvalid'));
+    }
+  }
+
+  function handleQuickDay(chipIso: string) {
+    const next = chipDateWithCurrentTime(chipIso, inputValue);
+    setInputValue(next);
+    applyLocalInput(next);
+  }
+
+  function handleSet() {
+    if (!inputValue) return;
+    applyLocalInput(inputValue);
+  }
+
+  function handleClear() {
+    setError(null);
+    clearTimeOverride();
+    setInputValue('');
+  }
+
+  return (
+    <div className={styles.liveBandTestSection}>
+      <h4 className={styles.liveBandTestSectionTitle}>{t('timeTravelTitle')}</h4>
+      <p className={styles.liveBandTestDescription}>{t('timeTravelDescription')}</p>
+      {override && (
+        <p className={styles.liveBandTestActive}>
+          {t('timeTravelActive', { time: formatWackenLocal(override, language) })}
+        </p>
+      )}
+      {error && <div className={styles.metalPlaceError}>⚠️ {error}</div>}
+
+      <div className={styles.formGroup}>
+        <label className={styles.formLabel}>{t('timeTravelQuickDay')}</label>
+        <div className={styles.timeTravelChipRow}>
+          {TIME_TRAVEL_DAY_CHIPS.map((chip) => (
+            <button
+              key={chip.key}
+              type="button"
+              className={styles.timeTravelChip}
+              onClick={() => handleQuickDay(chip.iso)}
+              title={t(`timeTravelChip_${chip.key}`)}
+            >
+              <strong>{chip.label}</strong>
+              <span>{chip.date}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className={styles.metalPlaceForm}>
+        <div className={styles.formGroup}>
+          <label className={styles.formLabel}>{t('timeTravelInputLabel')}</label>
+          <input
+            type="datetime-local"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            className={styles.formInput}
+          />
+        </div>
+        <div className={styles.liveBandTestButtonRow}>
+          <button
+            className={styles.saveButton}
+            onClick={handleSet}
+            disabled={!inputValue}
+            type="button"
+          >
+            {t('timeTravelSet')}
+          </button>
+          <button
+            className={styles.liveBandTestClearButton}
+            onClick={handleClear}
+            disabled={!override && !inputValue}
+            type="button"
+          >
+            {t('timeTravelClear')}
+          </button>
         </div>
       </div>
     </div>

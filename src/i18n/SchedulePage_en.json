@@ -20,5 +20,12 @@
   "todos": "All",
   "dia": "Day",
   "palco": "Stage",
-  "avancado": "Advanced"
+  "genero": "Genre",
+  "avancado": "Advanced",
+  "searchPlaceholder": "Search band...",
+  "conflictChip": "Conflict",
+  "attendeeOverflow": "+{count}",
+  "closeModal": "Close",
+  "crewGoing": "{count} crew going",
+  "noCrewYet": "No one from the crew yet"
 }

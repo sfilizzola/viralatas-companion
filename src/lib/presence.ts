@@ -9,6 +9,7 @@ import {
   saveUserPresence,
 } from './db';
 import { supabase } from './supabase';
+import { now } from './time';
 
 function presenceOpId(userId: string) {
   const unique = crypto.randomUUID?.() ?? `${Date.now()}:${Math.random()}`;
@@ -210,7 +211,7 @@ export async function validateAndAutoCheckoutOutsideMetalPlaceWindow(
   const hasDay = config.festival_day != null || config.test_override_day != null;
   if (!hasDay || !config.start_time || !config.end_time) return;
 
-  if (isTimeWithinMetalPlaceWindow(config, new Date())) return;
+  if (isTimeWithinMetalPlaceWindow(config, now())) return;
 
   try {
     const presence = await loadUserPresence(userId);

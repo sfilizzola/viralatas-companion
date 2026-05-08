@@ -258,6 +258,8 @@ Phase 8 will use this structure to inventory unassociated images in `public/badg
 - ✅ **Phase 6** — Metal Place: Festival-day check-in, crew grid card, test mode
 - ✅ **Phase 7** — Profile polish: badge modal, live band test, collapsible admin sections, useful links
 - ✅ **Phase 8** — Badge asset intake: added Belgian (`belga`) and Colombian (`cafetero`) country badges
+- ✅ **Phase 9** — Differentiate Schedule / My Picks / Popular + extracted shared bones (`BandCard`, `BandFilters`, `BandDetailModal`, `useBandConflicts`); Schedule got search + genre filter, My Picks became a day-grouped timeline with conflict chips, Popular gained avatar clusters and the detail modal
+- ✅ **Phase 9.B** — Godlike time travel: `now()` helper + `useNow` hook backed by a localStorage override, with quick-jump chips for D-1 / D1–D4 / D+1 in the Profile admin panel
 
 See **PHASES.md** for detailed acceptance criteria and current status.
 
