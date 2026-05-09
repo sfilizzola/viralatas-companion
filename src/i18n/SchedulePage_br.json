@@ -12,6 +12,7 @@
   "loadingSchedule": "Carregando agenda...",
   "emptySchedule": "Nenhuma banda encontrada.",
   "goingCount": "{count} indo",
+  "goingLabel": "indo",
   "removePick": "Remover escolha",
   "addPick": "Adicionar escolha",
   "filtros": "Filtros",

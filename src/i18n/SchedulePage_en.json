@@ -12,6 +12,7 @@
   "loadingSchedule": "Loading schedule...",
   "emptySchedule": "No bands found.",
   "goingCount": "{count} going",
+  "goingLabel": "going",
   "removePick": "Remove pick",
   "addPick": "Add pick",
   "filtros": "Filters",

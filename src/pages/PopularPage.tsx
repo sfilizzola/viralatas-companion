@@ -66,7 +66,7 @@ export default function PopularPage() {
         {!loading && popularBands.length === 0 && (
           <p className={styles.empty}>{t('empty')}</p>
         )}
-        {popularBands.map((band) => {
+        {popularBands.map((band, index) => {
           const attendees = attendeesByBand[band.id] ?? [];
           const count = pickCounts[band.id] ?? 0;
 
@@ -78,8 +78,9 @@ export default function PopularPage() {
               count={count}
               onToggle={() => {}}
               onClick={() => setActiveBandId(band.id)}
-              hidePickButton
-              attendeeCluster={count > 0 ? { attendees, max: 4 } : undefined}
+              variant="ranked"
+              rank={index + 1}
+              attendeeCluster={count > 0 ? { attendees, max: 5 } : undefined}
             />
           );
         })}
