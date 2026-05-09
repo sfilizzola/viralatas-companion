@@ -198,37 +198,165 @@
   letter-spacing: 0.08em;
 }
 
+/* ============================================================
+   CREW LOCATION CARDS  (/now — grouped by where crew are)
+   ============================================================ */
+
 .crewGroups {
   display: grid;
-  gap: 0.8rem;
+  gap: var(--s-3);
 }
 
 .groupCard {
-  position: relative;
-  min-width: 0;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   background: var(--bg-surface);
-  padding: 0.85rem;
   overflow: hidden;
 }
 
-.band {
-  display: grid;
-  grid-template-columns: 72px 1fr;
-  gap: 0.85rem;
-  align-items: start;
+/* 4px stage/status strip at top of each card */
+.locStrip {
+  height: 4px;
+  background: var(--text-muted);
 }
 
+.groupHeader {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--s-3);
+  padding: var(--s-3) var(--s-4);
+  align-items: end;
+}
+
+.groupKicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.groupTitle {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-top: 4px;
+}
+
+.groupCount {
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 6px 10px;
+  border-radius: var(--r-1);
+  border: 1px solid var(--border-strong);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.locCountLabel {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-top: 2px;
+}
+
+.memberList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  padding: 0 var(--s-4) var(--s-4);
+  margin: 0;
+}
+
+.memberPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 3px 10px 3px 3px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.avatar {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.memberText {
+  min-width: 0;
+  display: grid;
+  gap: 1px;
+}
+
+.crewName,
+.memberMeta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.crewName {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.memberMeta {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  max-width: 180px;
+}
+
+.groupEmpty {
+  padding: 0 var(--s-4) var(--s-4);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* — Metal Place — */
 .metal_place {
-  border-color: rgba(217, 119, 6, 0.5);
+  border-color: rgba(217, 119, 6, 0.55);
   background:
-    linear-gradient(135deg, rgba(217, 119, 6, 0.16) 0%, rgba(253, 224, 71, 0.08) 50%, transparent 70%),
+    linear-gradient(135deg, rgba(217, 119, 6, 0.18) 0%, rgba(253, 224, 71, 0.06) 50%, transparent 70%),
     var(--bg-surface);
 }
 
+.metal_place .locStrip {
+  background: rgba(217, 119, 6, 1);
+}
+
 .metal_place .groupKicker {
-  color: rgba(253, 224, 71, 0.9);
+  color: rgba(253, 224, 71, 0.95);
 }
 
 .metal_place .groupTitle {
@@ -238,7 +366,7 @@
 .metal_place .groupCount {
   background: rgba(217, 119, 6, 0.15);
   color: rgba(253, 224, 71, 0.95);
-  border: 1px solid rgba(217, 119, 6, 0.3);
+  border-color: rgba(217, 119, 6, 0.3);
 }
 
 .metal_place .memberPill {
@@ -251,43 +379,49 @@
   color: #fff;
 }
 
+/* — Camping — */
 .camping {
-  border-color: rgba(134, 239, 172, 0.5);
+  border-color: rgba(22, 160, 133, 0.45);
   background:
-    linear-gradient(135deg, rgba(74, 222, 128, 0.16) 0%, rgba(234, 179, 8, 0.08) 50%, transparent 70%),
+    linear-gradient(135deg, rgba(22, 160, 133, 0.16) 0%, transparent 70%),
     var(--bg-surface);
+}
+
+.camping .locStrip {
+  background: var(--signal-ok);
 }
 
 .camping .groupKicker {
-  color: rgba(134, 239, 172, 0.9);
-}
-
-.camping .groupTitle {
-  color: #fff;
+  color: #5fd0bb;
 }
 
 .camping .groupCount {
-  background: rgba(74, 222, 128, 0.15);
-  color: rgba(134, 239, 172, 0.95);
-  border: 1px solid rgba(74, 222, 128, 0.3);
+  background: rgba(22, 160, 133, 0.15);
+  color: #5fd0bb;
+  border-color: rgba(22, 160, 133, 0.3);
 }
 
 .camping .memberPill {
-  border-color: rgba(74, 222, 128, 0.35);
-  background: rgba(74, 222, 128, 0.08);
+  border-color: rgba(22, 160, 133, 0.35);
+  background: rgba(22, 160, 133, 0.08);
 }
 
 .camping .avatar {
-  background: rgba(74, 222, 128, 0.4);
+  background: rgba(22, 160, 133, 0.4);
   color: #fff;
 }
 
+/* — Lost — */
 .lost {
   border-color: rgba(168, 85, 247, 0.5);
   background:
-    linear-gradient(135deg, rgba(88, 28, 135, 0.35) 0%, rgba(168, 85, 247, 0.12) 50%, transparent 70%),
+    linear-gradient(135deg, rgba(88, 28, 135, 0.32) 0%, rgba(168, 85, 247, 0.06) 60%, transparent),
     var(--bg-surface);
-  box-shadow: 0 0 16px rgba(168, 85, 247, 0.12);
+  box-shadow: 0 0 18px rgba(168, 85, 247, 0.12);
+}
+
+.lost .locStrip {
+  background: var(--signal-lost);
 }
 
 .lost .groupKicker {
@@ -296,14 +430,14 @@
 
 .lost .groupTitle {
   color: rgba(233, 213, 255, 0.95);
-  letter-spacing: 0.03em;
   text-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
+  letter-spacing: 0.04em;
 }
 
 .lost .groupCount {
   background: rgba(88, 28, 135, 0.35);
   color: rgba(196, 148, 255, 0.95);
-  border: 1px solid rgba(168, 85, 247, 0.35);
+  border-color: rgba(168, 85, 247, 0.35);
 }
 
 .lost .memberPill {
@@ -314,121 +448,6 @@
 .lost .avatar {
   background: rgba(88, 28, 135, 0.6);
   color: rgba(233, 213, 255, 1);
-}
-
-.groupImage {
-  width: 72px;
-  height: 72px;
-  border-radius: var(--radius);
-  object-fit: cover;
-  grid-row: span 2;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--accent);
-  color: #fff;
-  font-size: 1.5rem;
-  font-weight: 800;
-}
-
-.groupHeader {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.8rem;
-  align-items: flex-start;
-  min-width: 0;
-}
-
-.groupKicker {
-  color: var(--text-muted);
-  display: block;
-  font-size: 0.68rem;
-  font-weight: 800;
-  line-height: 1.35;
-  text-transform: uppercase;
-}
-
-.groupTitle {
-  margin-top: 0.18rem;
-  font-size: 1.05rem;
-  line-height: 1.15;
-}
-
-.groupCount {
-  flex-shrink: 0;
-  border-radius: 4px;
-  background: var(--bg-elevated);
-  color: var(--text);
-  font-size: 0.72rem;
-  font-weight: 800;
-  padding: 0.24rem 0.45rem;
-  white-space: nowrap;
-}
-
-.memberList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  list-style: none;
-  margin-top: 0.75rem;
-  padding: 0;
-}
-
-.memberPill {
-  min-width: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.42rem;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  padding: 0.25rem 0.55rem 0.25rem 0.25rem;
-}
-
-.avatar {
-  width: 28px;
-  height: 28px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.8rem;
-  font-weight: 800;
-}
-
-.memberText {
-  min-width: 0;
-  display: grid;
-  gap: 0.05rem;
-}
-
-.crewName,
-.memberMeta {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.crewName {
-  font-size: 0.8rem;
-  font-weight: 800;
-}
-
-.memberMeta {
-  color: var(--text-muted);
-  font-size: 0.68rem;
-  max-width: 180px;
-}
-
-.groupEmpty {
-  margin-top: 0.65rem;
-  color: var(--text-muted);
-  font-size: 0.86rem;
-  line-height: 1.45;
 }
 
 .announcementHero {
@@ -663,19 +682,5 @@
 
   .crewGroups {
     grid-template-columns: 1fr;
-  }
-
-  .band {
-    grid-template-columns: 56px 1fr;
-  }
-
-  .groupImage {
-    width: 56px;
-    height: 56px;
-  }
-
-  .groupHeader {
-    flex-direction: column;
-    gap: 0.45rem;
   }
 }

@@ -40,5 +40,6 @@
   "metalPlaceCheckOut": "Voltei pro festival",
   "metalPlaceCheckedOut": "De volta!",
   "metalPlaceCheckingOut": "Saindo...",
-  "liveTestBanner": "🧪 Live test: {band}"
+  "liveTestBanner": "🧪 Live test: {band}",
+  "crewCountLabel": "vira-latas"
 }

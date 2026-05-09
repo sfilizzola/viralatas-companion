@@ -40,5 +40,6 @@
   "metalPlaceCheckOut": "Back to the fest",
   "metalPlaceCheckedOut": "Welcome back!",
   "metalPlaceCheckingOut": "Checking out...",
-  "liveTestBanner": "🧪 Live test: {band}"
+  "liveTestBanner": "🧪 Live test: {band}",
+  "crewCountLabel": "crew"
 }

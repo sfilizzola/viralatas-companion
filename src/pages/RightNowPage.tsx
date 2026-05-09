@@ -38,6 +38,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNow } from '../hooks/useNow';
 import { useI18n } from '../lib/i18n';
+import { stageColor } from '../lib/stageColors';
 import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
 import styles from './RightNowPage.module.css';
@@ -127,6 +128,7 @@ function metalPlaceSubtitle(
 
 
 function CrewMember({ crew }: { crew: CrewLivePlan }) {
+  const hasNext = !crew.plan.band && !!crew.plan.nextBand;
   return (
     <li className={styles.memberPill}>
       <span className={styles.avatar}>
@@ -136,14 +138,16 @@ function CrewMember({ crew }: { crew: CrewLivePlan }) {
           <span aria-hidden>{crew.label.charAt(0).toUpperCase()}</span>
         )}
       </span>
-      <span className={styles.memberText}>
-        <span className={styles.crewName}>{truncateDisplayName(crew.label)}</span>
-        {!crew.plan.band && crew.plan.nextBand && (
+      {hasNext ? (
+        <span className={styles.memberText}>
+          <span className={styles.crewName}>{truncateDisplayName(crew.label)}</span>
           <span className={styles.memberMeta}>
-            {formatFestivalTime(crew.plan.nextBand.start_time)} - {crew.plan.nextBand.name}
+            {formatFestivalTime(crew.plan.nextBand!.start_time)} · {crew.plan.nextBand!.name}
           </span>
-        )}
-      </span>
+        </span>
+      ) : (
+        <span className={styles.crewName}>{truncateDisplayName(crew.label)}</span>
+      )}
     </li>
   );
 }
@@ -573,23 +577,19 @@ export default function RightNowPage() {
                     className={`${styles.groupCard} ${styles[group.kind]}`}
                     key={group.kind === 'band' ? group.band.id : group.kind}
                   >
-                    {group.kind === 'band' && (
-                      group.band.image_url ? (
-                        <img className={styles.groupImage} src={group.band.image_url} alt="" loading="lazy" />
-                      ) : (
-                        <div className={styles.groupImage} aria-hidden>
-                          {group.band.name.charAt(0).toUpperCase()}
-                        </div>
-                      )
-                    )}
+                    <div
+                      className={styles.locStrip}
+                      style={group.kind === 'band' ? { background: stageColor(group.band.stage) } : undefined}
+                    />
                     <div className={styles.groupHeader}>
                       <div>
                         <span className={styles.groupKicker}>{groupKicker(group, t, metalPlaceConfig)}</span>
                         <h3 className={styles.groupTitle}>{groupTitle(group, t)}</h3>
                       </div>
-                      <span className={styles.groupCount}>
-                        {t('crewCount', { count: group.members.length })}
-                      </span>
+                      <div className={styles.groupCount}>
+                        {group.members.length}
+                        <small className={styles.locCountLabel}>{t('crewCountLabel')}</small>
+                      </div>
                     </div>
                     {group.members.length > 0 ? (
                       <ul className={styles.memberList}>
