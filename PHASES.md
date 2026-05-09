@@ -6,7 +6,7 @@ Current phase and upcoming work for Viralatas Metaleiros. Refer to CLAUDE.md for
 
 ---
 
-## Phase 10 — Badge expansion: characteristics, seen-tracking, year freeze `[PLANNED]`
+## Phase 10 — Badge expansion: characteristics, seen-tracking, year freeze `[10a engine done · content deferred]`
 
 **Goal:** Expand the badge system to reward (a) the *kind* of metal a user goes for via band-property filters, (b) bands actually attended (not just picked), and (c) badges that close at the end of each festival year so 2026 wins persist into 2027 alongside fresh content.
 
@@ -30,7 +30,11 @@ Three independent sub-phases:
 
 ---
 
-### Phase 10a — Characteristic badges (picks-based)
+### Phase 10a — Characteristic badges (picks-based) `[engine ✅ · content deferred]`
+
+Engine work shipped: four new condition types, `BadgeContext.pickedBands`, `buildBadgeContext` now takes a `Map<string, BadgeBand>` of the cached band catalog, `BadgesDisplay` joins picks against `loadBands()`. Covered by `src/__tests__/badges.test.ts` (15 cases). `bands_picked_before_hour_min` uses raw CEST hour `<` threshold (matches `bandTime.ts`'s simple `+02:00` offset).
+
+Content (BR/EN i18n + new PNG + concrete `BadgeConfig` entries) is deferred until new badge assets land in `public/badges/`.
 
 Pure additive extension to `src/lib/badges.ts` + i18n. No DB changes, no new UI surface.
 
@@ -165,7 +169,8 @@ Existing badges (`puppy`, `pais-tropical`, `belga`, etc.) leave `yearBound` unde
 
 ### Acceptance criteria for Phase 10
 
-- [ ] **10a:** Four new picks-based condition types implemented and tested. At least one new badge content shipped end-to-end (BR + EN i18n, image, condition).
+- [x] **10a engine:** Four new picks-based condition types implemented and tested.
+- [ ] **10a content:** At least one new badge shipped end-to-end (BR + EN i18n, image, condition) — deferred until new PNGs land.
 - [ ] **10b:** Migration applies on a clean Supabase project. IDB v7→v8 upgrade is non-destructive on a populated v7 DB. `BandDetailModal` shows crew breakdown, conflict warning, and missed toggle. New `bands_seen_*` conditions evaluate correctly. Offline mark/unmark syncs on reconnect. Two-window Realtime test passes.
 - [ ] **10c:** `historical_badges` migration applies cleanly. Godlike "Freeze year" action snapshots correctly and is idempotent. Frozen badges stay visible after their underlying live condition changes (e.g. user unpicks a band) with a "Wacken YYYY" chip.
 

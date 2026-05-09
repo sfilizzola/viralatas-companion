@@ -1204,7 +1204,7 @@
   .motion-alert { animation: alertSlide 3s ease infinite; }
 
   /* ============================================================
-     CAMPING STATUS CONTROL (segmented radio on /now)
+     PRESENCE TOGGLE (manual location on /now)
      ============================================================ */
   .where-am-i {
     background: var(--bg-surface);
@@ -1219,16 +1219,17 @@
     display: flex; justify-content: space-between; align-items: center;
   }
   .where-am-i .legend b { color: var(--text); font-family: var(--font-display); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
-  .seg {
+  .presence-toggle {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 1fr;
     background: var(--bg-sunken);
     border: 1px solid var(--border-strong);
     border-radius: var(--r-1);
     padding: 3px;
     gap: 3px;
   }
-  .seg button {
+  .presence-toggle.has-metal { grid-template-columns: repeat(2, 1fr); }
+  .presence-toggle button {
     background: transparent;
     border: 0;
     color: var(--text-muted);
@@ -1243,16 +1244,15 @@
     display: flex; align-items: center; justify-content: center; gap: 6px;
     transition: background 0.16s, color 0.16s;
   }
-  .seg button:hover { color: var(--text); }
-  .seg button.on {
+  .presence-toggle button:hover { color: var(--text); }
+  .presence-toggle button.on {
     background: var(--bg-elevated);
     color: var(--text);
     box-shadow: inset 0 0 0 1px var(--border-strong);
   }
-  .seg button.on.band { color: var(--accent-hover); }
-  .seg button.on.camping { color: #5fd0bb; }
-  .seg button.on.metal { color: rgba(253,224,71,0.95); }
-  .seg button .dot {
+  .presence-toggle button.on.camping { color: #5fd0bb; }
+  .presence-toggle button.on.metal { color: rgba(253,224,71,0.95); }
+  .presence-toggle button .dot {
     width: 6px; height: 6px; border-radius: 50%;
     background: currentColor;
     flex-shrink: 0;
@@ -1929,26 +1929,30 @@
     </div>
 
     <!-- CAMPING / LOCATION SELF-CONTROL -->
-    <div class="subhead">Camping status control &middot; the user's own location</div>
+    <div class="subhead">Presence toggle &middot; the user's manual location</div>
     <div class="demo">
       <div class="demo-stage">
         <div class="where-am-i">
-          <div class="legend"><b>Onde estou</b><span>self-set, syncs to crew grid</span></div>
-          <div class="seg">
-            <button class="on band"><span class="dot"></span>Na banda</button>
-            <button><span class="dot" style="color:#5fd0bb"></span>Estou no camping</button>
-            <button><span class="dot" style="color:rgba(253,224,71,0.95)"></span>Metal Place</button>
+          <div class="legend"><b>Onde estou</b><span>manual override, syncs to crew grid</span></div>
+          <div class="presence-toggle">
+            <button class="on camping"><span class="dot"></span>Estou no camping</button>
           </div>
-          <div class="help">Moves your avatar between location cards on /now. "Na banda" auto-resolves to your current pick; if you have none, you fall to <b>Lost 🤘</b>.</div>
+          <div class="help">When off, your location auto-resolves from your current pick. If you have no active pick, you fall to <b>Lost 🤘</b>.</div>
+          <div class="presence-toggle has-metal" style="margin-top:12px">
+            <button><span class="dot" style="color:#5fd0bb"></span>Camping</button>
+            <button class="on metal"><span class="dot" style="color:rgba(253,224,71,0.95)"></span>Metal Place</button>
+          </div>
+          <div class="help">Metal Place appears only while the configured event window is active. Camping and Metal Place are mutually exclusive; tapping the active option clears the manual override.</div>
         </div>
       </div>
       <div class="demo-notes">
         <h4>Behavior</h4>
         <ul>
-          <li>Three-state segmented control — single selection, never empty</li>
-          <li><b>Na banda</b> auto: pick → location, no pick → LOST</li>
-          <li><b>Estou no camping</b> manual override, persists until cleared</li>
-          <li><b>Metal Place</b> only available when the festival's special zone is open</li>
+          <li>Manual override is nullable: off means auto-resolve from the user's current band pick</li>
+          <li>Outside the Metal Place window, render only the Camping on/off toggle</li>
+          <li>During the Metal Place window, render Camping and Metal Place as two mutually exclusive options</li>
+          <li>Tapping the active option clears the manual location and returns the user to band/LOST resolution</li>
+          <li>Metal Place is never shown when the configured event window is inactive</li>
           <li>Sits prominently at the top of /now — not in a submenu</li>
         </ul>
       </div>
@@ -2481,10 +2485,9 @@
             </div>
             <div class="where-am-i" style="margin-bottom:var(--s-3)">
               <div class="legend"><b>Onde estou</b><span>self</span></div>
-              <div class="seg">
-                <button class="on band" style="font-size:11px;padding:7px 4px"><span class="dot"></span>Banda</button>
+              <div class="presence-toggle has-metal">
                 <button style="font-size:11px;padding:7px 4px"><span class="dot" style="color:#5fd0bb"></span>Camping</button>
-                <button style="font-size:11px;padding:7px 4px"><span class="dot" style="color:rgba(253,224,71,0.95)"></span>Metal Pl.</button>
+                <button class="on metal" style="font-size:11px;padding:7px 4px"><span class="dot" style="color:rgba(253,224,71,0.95)"></span>Metal Pl.</button>
               </div>
             </div>
             <div class="loc-stack">
@@ -2564,7 +2567,7 @@
             <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M3 21 c0 -5 4 -8 9 -8 s9 3 9 8"/></svg>Me</a>
           </nav>
         </div></div>
-        <div class="frame-label">/now &middot; <b>landing</b> &middot; camping toggle + locations (not crew grid)</div>
+        <div class="frame-label">/now &middot; <b>landing</b> &middot; presence toggle + locations (not crew grid)</div>
       </div>
 
       <!-- /schedule -->

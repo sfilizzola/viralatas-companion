@@ -42,7 +42,7 @@ These rules apply to every phase below. Read them before opening a single file.
 | C  | Band card restyle | `BandCard` + 3 variants (schedule / timeline / ranked) | med | ✅ completed |
 | D  | Filter chrome | `BandFilters` (pills + day tabs + bottom drawer) | med | ✅ completed |
 | **E**  | **Band detail modal + alert banner** | `BandDetailModal` + new alert component | med | **⛔ blocked by [Phase 10b](PHASES.md)** |
-| F  | `/now` visual polish (no structural change) | restyle existing crew grid in design language | med | — |
+| F  | `/now` visual polish (no structural change) | restyle existing location/group cards in design language | med | — |
 | **G**  | **`/profile` + patches grid** | profile head, badge grid, role chips, lang seg, collapsibles | med | **⚠️ partial — see [Phase 10a / 10c](PHASES.md)** |
 | H  | Announcements restyle | `AnnouncementsPage` mural cards | low | — |
 | I  | Auth pages + bottom nav + offline chrome | login/register, `BottomNav`, offline banner / pending chip / sync toast | low/med | — |
@@ -56,7 +56,7 @@ These rules apply to every phase below. Read them before opening a single file.
 
 | Phase | Title | Why deferred |
 |------|-------|--------------|
-| S1 | `/now` location-cards | Replaces crew grid with card-per-location. Schema change: `user_presence` becomes a single 3-state enum instead of two booleans. Migration + RLS + realtime work. |
+| S1 | `/now` explicit location state | Current UI already groups crew into card-per-location buckets. S1 is the structural rewrite behind that UI: `user_presence` becomes a single 3-state enum instead of two booleans. Migration + RLS + realtime work. |
 | S2 | "Onde estou" segmented control | Front of S1 — collapses `is_camping` / `is_at_metal_place` / current pick into one selector. |
 | S3 | "Não vi essa banda" + "actually saw" stats | New table or column for post-show check-ins; new band-detail UI; cooldown logic; impacts attendance count semantics. |
 | S4 | Languages: add ES + DE | i18n catalogs for two new languages; `users.preferred_language` enum widening; QA pass. |
@@ -152,7 +152,11 @@ Rebuilt `BandFilters` with a 4-column day tab bar (D1–D4: Oswald date number +
 
 ## Phase F — `/now` visual polish (no structural change)
 
-**Goal:** Apply the design system's visual language to the existing crew-grid layout on [`RightNowPage`](src/pages/RightNowPage.tsx). **Do not** convert it into the location-cards layout — that's S1.
+> **Premise check (2026-05-09):** The app already renders `/now` as grouped location cards: current-band cards, a Camping card, an optional Metal Place card, and a Lost card, with crew rendered as chips/pills inside each group. The stale wording that called this a "crew grid" meant the older implementation and should not drive the migration.
+>
+> Phase F is therefore a visual-only restyle of the **existing** `crewGroups.map(... groupCard ...)` structure toward the design system's `.loc` / `.loc-stack` rules. S1 remains deferred, but its scope is now the data-model cleanup and explicit "Onde estou" state, not introducing cards that already exist.
+
+**Goal:** Apply the design system's visual language to the existing location/group-card layout on [`RightNowPage`](src/pages/RightNowPage.tsx). **Do not** change the `user_presence` data shape or convert the current booleans into the S1 enum.
 
 **Files to read first:**
 - [`src/pages/RightNowPage.tsx`](src/pages/RightNowPage.tsx) (626 lines — read all of it)
@@ -161,23 +165,23 @@ Rebuilt `BandFilters` with a 4-column day tab bar (D1–D4: Oswald date number +
 
 **Changes:**
 1. Page header treatment: "Right Now" Oswald + day/time spec on the right.
-2. Crew cards: restyle current crew member card using the design system's `crew-card` rules — avatar 40px, name + status caps mono, "watching" row with stage-strip + Oswald band name + mono info.
+2. Location/group cards: restyle current `groupCard` cards using the design system's location-card rules — top stage/status strip, mono kicker, Oswald uppercase title, mono subtitle, count tile, crew chips inside.
 3. LOST state styling: purple tinted gradient background, purple border, no animation (per the design system motion rule).
 4. Camping state styling: teal tinted gradient + teal border.
-5. Metal Place crew card: orange-tinted gradient + orange border.
+5. Metal Place group card: orange-tinted gradient + orange border.
 6. Page header day/time/festival-day spec.
 7. **Do not** add the "Onde estou" segmented control.
-8. **Do not** convert the layout to per-location cards.
+8. Preserve the current separate Metal Place check-in card unless explicitly moved visually into the header/control area during this phase; no behavior changes.
 
 **Acceptance:**
 - All current behaviors preserved: crew presence, camping/metal-place state, LOST detection, godlike time travel still works.
-- Visual diff: crew member cards look like the design system's crew-card spec.
+- Visual diff: location/group cards look like the design system's `.loc` / `.loc-stack` spec.
 - No new data shape, no new RPCs.
 - Realtime updates still flow.
 - Tests green.
 
 **Ask before executing this phase:**
-- After reading the 626-line `RightNowPage.tsx`, list the sections currently displayed. The design system mockup of `/now` is the location-card layout (S1, deferred). For this visual phase we keep the crew-grid structure but skin it. Confirm with the user, section by section, what stays / what gets restyled / what gets postponed to S1.
+- After reading the 626-line `RightNowPage.tsx`, list the sections currently displayed. The design system mockup of `/now` is already close to the current grouped-card shape, but the schema/control model is not. Confirm with the user, section by section, what stays / what gets restyled / what gets postponed to S1/S2.
 - Confirm we do NOT render the "Onde estou" segmented control yet (that's S2, depends on schema change).
 - Page header: design system shows "Right Now" Oswald + "Day 3 · Fri Jul 31 · 22:14" mono spec on the right. Confirm the day/time spec uses `useNow()` (existing godlike time-travel hook) so the time-travel feature still appears live in the header.
 

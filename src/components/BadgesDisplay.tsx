@@ -1,7 +1,12 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
-import { buildBadgeContext, getEarnedBadges, type BadgeContext } from '../lib/badges';
-import { loadUserPicks, loadAllUserPicks, PICKS_CHANGED_EVENT } from '../lib/db';
+import {
+  buildBadgeContext,
+  getEarnedBadges,
+  type BadgeBand,
+  type BadgeContext,
+} from '../lib/badges';
+import { loadUserPicks, loadAllUserPicks, loadBands, PICKS_CHANGED_EVENT } from '../lib/db';
 import { useI18n } from '../lib/i18n';
 import styles from './BadgesDisplay.module.css';
 
@@ -10,6 +15,7 @@ const EMPTY_CTX: BadgeContext = {
   country: null,
   bandsPicked: 0,
   maxAttendanceInPicks: 0,
+  pickedBands: [],
 };
 
 type BadgesDisplayProps = {
@@ -21,27 +27,32 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
   const [ctx, setCtx] = useState<BadgeContext>(EMPTY_CTX);
   const [selectedBadgeSlug, setSelectedBadgeSlug] = useState<string | null>(null);
 
-  const loadCtx = useCallback(async () => {
-    const [userPicks, allPicks] = await Promise.all([
-      loadUserPicks(user.id),
-      loadAllUserPicks(),
-    ]);
-    const userPickBandIds = userPicks.map((p) => p.band_id);
-    const allPickCounts = new Map<string, number>();
-    allPicks.forEach((p) =>
-      allPickCounts.set(p.band_id, (allPickCounts.get(p.band_id) ?? 0) + 1),
-    );
-    setCtx(buildBadgeContext(user, userPickBandIds, allPickCounts));
+  useEffect(() => {
+    let active = true;
+
+    async function refresh() {
+      const [userPicks, allPicks, bands] = await Promise.all([
+        loadUserPicks(user.id),
+        loadAllUserPicks(),
+        loadBands(),
+      ]);
+      if (!active) return;
+      const userPickBandIds = userPicks.map((p) => p.band_id);
+      const allPickCounts = new Map<string, number>();
+      allPicks.forEach((p) =>
+        allPickCounts.set(p.band_id, (allPickCounts.get(p.band_id) ?? 0) + 1),
+      );
+      const bandsById = new Map<string, BadgeBand>(bands.map((b) => [b.id, b]));
+      setCtx(buildBadgeContext(user, userPickBandIds, allPickCounts, bandsById));
+    }
+
+    refresh();
+    window.addEventListener(PICKS_CHANGED_EVENT, refresh);
+    return () => {
+      active = false;
+      window.removeEventListener(PICKS_CHANGED_EVENT, refresh);
+    };
   }, [user]);
-
-  useEffect(() => {
-    loadCtx();
-  }, [loadCtx]);
-
-  useEffect(() => {
-    window.addEventListener(PICKS_CHANGED_EVENT, loadCtx);
-    return () => window.removeEventListener(PICKS_CHANGED_EVENT, loadCtx);
-  }, [loadCtx]);
 
   const earned = getEarnedBadges(ctx);
   const selectedBadge = earned.find((b) => b.slug === selectedBadgeSlug);
