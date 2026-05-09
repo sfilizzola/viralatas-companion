@@ -34,21 +34,23 @@ These rules apply to every phase below. Read them before opening a single file.
 
 ## Phase map (visual layer)
 
-| Phase | Title | Scope | Risk |
-|------|-------|-------|------|
-| A1 | Token foundation | `index.css` token set + stage color helper | low |
-| A2 | Self-hosted fonts | WOFF2 + `@font-face` + service-worker cache | low/med |
-| B  | Typography utilities | `t-display-*`, `t-body`, `t-label`, `t-time` classes | low |
-| C  | Band card restyle | `BandCard` + 3 variants (schedule / timeline / ranked) | med |
-| D  | Filter chrome | `BandFilters` (pills + day tabs + bottom drawer) | med |
-| E  | Band detail modal + alert banner | `BandDetailModal` + new alert component | med |
-| F  | `/now` visual polish (no structural change) | restyle existing crew grid in design language | med |
-| G  | `/profile` + patches grid | profile head, badge grid, role chips, lang seg, collapsibles | med |
-| H  | Announcements restyle | `AnnouncementsPage` mural cards | low |
-| I  | Auth pages + bottom nav + offline chrome | login/register, `BottomNav`, offline banner / pending chip / sync toast | low/med |
-| J  | Icon pass | replace ad-hoc icons with the geometric-line set | low |
+| Phase | Title | Scope | Risk | Feature dep |
+|------|-------|-------|------|-------------|
+| A1 | Token foundation | `index.css` token set + stage color helper | low | — |
+| A2 | Self-hosted fonts | WOFF2 + `@font-face` + service-worker cache | low/med | — |
+| B  | Typography utilities | `t-display-*`, `t-body`, `t-label`, `t-time` classes | low | — |
+| C  | Band card restyle | `BandCard` + 3 variants (schedule / timeline / ranked) | med | — |
+| D  | Filter chrome | `BandFilters` (pills + day tabs + bottom drawer) | med | — |
+| **E**  | **Band detail modal + alert banner** | `BandDetailModal` + new alert component | med | **⛔ blocked by [Phase 10b](PHASES.md)** |
+| F  | `/now` visual polish (no structural change) | restyle existing crew grid in design language | med | — |
+| **G**  | **`/profile` + patches grid** | profile head, badge grid, role chips, lang seg, collapsibles | med | **⚠️ partial — see [Phase 10a / 10c](PHASES.md)** |
+| H  | Announcements restyle | `AnnouncementsPage` mural cards | low | — |
+| I  | Auth pages + bottom nav + offline chrome | login/register, `BottomNav`, offline banner / pending chip / sync toast | low/med | — |
+| J  | Icon pass | replace ad-hoc icons with the geometric-line set | low | — |
 
 **Total: 10 visual phases.** Ship them in order — later phases assume tokens and typography from A/B exist.
+
+**Pause points:** After Phase D, stop the design migration and run [PHASES.md → Phase 10a + 10b](PHASES.md) (characteristic badges + seen-tracking). Then resume with Phase E. Phase G has a softer dependency on 10a (badge variety) and 10c (year chip — deferable). See the callouts on Phase E and Phase G below for details.
 
 ## Phase map (structural — deferred, do NOT start without re-approval)
 
@@ -225,6 +227,19 @@ Each structural phase will get its own plan in this file when the user approves 
 
 ## Phase E — Band detail modal + alert banner
 
+> **⛔ Blocked by feature work — pause the design migration here.**
+>
+> The design system mockup of this modal includes three surfaces that depend on data that does not yet exist in the schema:
+> - **"Vão ver / Viram" two-column attendees list** — the "Viram" column needs the `user_missed_bands` table.
+> - **"Actually saw" cell of the StatPair** — same dependency.
+> - **"Não vi essa banda" toggle** — same dependency.
+>
+> All three are planned in [PHASES.md → Phase 10b](PHASES.md) (seen-tracking + extended detail modal). The earlier text in this file calls these "S3"; that label is stale — Phase 10b is the actual implementation track and is more concrete.
+>
+> **Action:** Before starting Phase E, ship **Phase 10a** (low-risk additive characteristic-badge conditions) and **Phase 10b** (seen-tracking schema, IDB v8, missed-bands queue). Then return here and restyle the modal once with the full data shape in hand. Doing Phase E first means tearing the modal open a second time during 10b — wasted work and a higher chance of regressing the visual layer.
+>
+> When you return: re-read the questions block at the bottom of this phase, because the "render only Vão ver" question is no longer needed if 10b shipped first.
+
 **Goal:** Restyle [`BandDetailModal`](src/components/BandDetailModal.tsx) per design system spec. Add a new `<AlertBanner>` component for the AI-generated alert UI (visual only — alert generation logic is unchanged).
 
 **Files to read first:**
@@ -298,6 +313,17 @@ Each structural phase will get its own plan in this file when the user approves 
 ---
 
 ## Phase G — `/profile` + patches grid
+
+> **⛔ Partially blocked by feature work — read before starting.**
+>
+> The design system patches grid relies on data that doesn't fully exist yet:
+> - **Year chip on historical patches** (the `'25`-style mono chip in the bottom-right of unlocked patches) — depends on [PHASES.md → Phase 10c](PHASES.md) (`users.historical_badges` jsonb column + godlike freeze function). 10c is itself deferred until ~late July 2026.
+> - **Patch detail modal "Wacken YYYY" chip** — same dependency on 10c.
+> - **Variety in the grid** — the patches grid will look thin until [Phase 10a](PHASES.md) ships characteristic-badge conditions (`bands_picked_genre_min` etc.). This is not a hard block; the grid renders fine with current badges, just sparser.
+>
+> **Action:** Ideally ship **Phase 10a** before Phase G so the grid has more content to display. Phase 10c is OK to defer — when starting Phase G, **stub the year chip** behind a check for `historical_badges` presence and skip rendering it for now. Add a TODO pointing to 10c. Do **not** invent a placeholder year column or dual-source the year — wait for the schema.
+>
+> If Phase 10a has not yet shipped when you reach Phase G, surface the question to the user: ship Phase G against the current sparse badge set, or pause and do 10a first?
 
 **Goal:** Restyle [`ProfilePage`](src/pages/ProfilePage.tsx) (1445 lines — the heaviest file in the app) using the design system's profile layout. Replace [`BadgesDisplay`](src/components/BadgesDisplay.tsx) with the patches-grid (Variant A) treatment. Preserve the godlike admin and manager tools — just collapse them behind the new `pf-collapse` rows.
 
