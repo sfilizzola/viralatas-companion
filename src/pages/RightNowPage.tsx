@@ -59,29 +59,26 @@ function nowLabel(date: Date, language: 'br' | 'en') {
   }).format(date);
 }
 
-function planLabel(plan: LivePlan, t: (key: string) => string) {
-  if (plan.status === 'current') return t('current');
-  if (plan.status === 'next') return t('next');
-  if (plan.status === 'lost') return t('lost');
-  return t('empty');
+function relativeAnnouncementTime(
+  isoString: string,
+  t: (key: string, values?: Record<string, string | number>) => string,
+): string {
+  const date = new Date(isoString);
+  const diff = Date.now() - date.getTime();
+  const minutes = Math.floor(diff / 60_000);
+  if (minutes < 1) return t('justNow');
+  if (minutes < 60) return t('minutesAgo', { n: minutes });
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return t('hoursAgo', { n: hours });
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}`;
 }
 
-function planHint(plan: LivePlan, t: (key: string) => string) {
-  if (plan.status === 'current') return t('currentHint');
-  if (plan.status === 'next') return t('nextHint');
-  if (plan.status === 'lost') return t('lostHint');
-  return t('emptyHint');
-}
-
-function nextHint(plan: LivePlan, t: (key: string, values?: Record<string, string>) => string) {
-  if (!plan.nextBand) return null;
-  return t('nextPick', {
-    band: plan.nextBand.name,
-    time: formatFestivalTime(plan.nextBand.start_time),
-  });
-}
-
-function groupTitle(group: CrewLiveGroup, t: (key: string, values?: Record<string, string | number>) => string) {
+function groupTitle(
+  group: CrewLiveGroup,
+  t: (key: string, values?: Record<string, string | number>) => string,
+) {
   if (group.kind === 'band') return group.band.name;
   if (group.kind === 'metal_place') return t('metalPlaceGroupTitle');
   if (group.kind === 'camping') return t('campingGroupTitle');
@@ -91,18 +88,31 @@ function groupTitle(group: CrewLiveGroup, t: (key: string, values?: Record<strin
 function groupKicker(
   group: CrewLiveGroup,
   t: (key: string, values?: Record<string, string | number>) => string,
+  isUserHere: boolean,
+) {
+  if (group.kind === 'band') return isUserHere ? t('bandGroupKickerHere') : t('bandGroupKicker');
+  if (group.kind === 'metal_place') {
+    return isUserHere ? t('metalPlaceGroupKickerHere') : t('metalPlaceGroupKicker');
+  }
+  if (group.kind === 'camping') return isUserHere ? t('campingGroupKickerHere') : t('campingGroupKicker');
+  return isUserHere ? t('lostGroupKickerHere') : t('lostGroupKicker');
+}
+
+function groupSubtitle(
+  group: CrewLiveGroup,
+  t: (key: string, values?: Record<string, string | number>) => string,
   metalPlaceConfig?: MetalPlaceConfig | null,
 ) {
   if (group.kind === 'band') {
-    return t('bandGroupKicker', {
+    return t('bandGroupSubtitle', {
       stage: group.band.stage,
       start: formatFestivalTime(group.band.start_time),
       end: formatFestivalTime(group.band.end_time),
     });
   }
   if (group.kind === 'metal_place') return metalPlaceSubtitle(metalPlaceConfig ?? null, t);
-  if (group.kind === 'camping') return t('campingGroupKicker');
-  return t('lostGroupKicker');
+  if (group.kind === 'camping') return t('campingGroupSubtitle');
+  return t('lostGroupSubtitle');
 }
 
 function emptyGroupMessage(group: CrewLiveGroup, t: (key: string) => string) {
@@ -123,16 +133,16 @@ function metalPlaceSubtitle(
   const start = formatHmTime(config?.start_time);
   const end = formatHmTime(config?.end_time);
   if (start && end) {
-    return t('metalPlaceGroupKickerWithTime', { start, end });
+    return t('metalPlaceGroupSubtitleWithTime', { start, end });
   }
-  return t('metalPlaceGroupKicker');
+  return t('metalPlaceGroupSubtitle');
 }
 
 
-function CrewMember({ crew }: { crew: CrewLivePlan }) {
+function CrewMember({ crew, isCurrentUser }: { crew: CrewLivePlan; isCurrentUser: boolean }) {
   const hasNext = !crew.plan.band && !!crew.plan.nextBand;
   return (
-    <li className={styles.memberPill}>
+    <li className={`${styles.memberPill} ${isCurrentUser ? styles.me : ''}`}>
       <span className={styles.avatar}>
         {crew.avatar_url ? (
           <img className={styles.avatarImg} src={crew.avatar_url} alt="" loading="lazy" />
@@ -473,90 +483,101 @@ export default function RightNowPage() {
           <p className={styles.empty}>{t('loading')}</p>
         ) : (
           <>
-            <section className={styles.hero} aria-live="polite">
-              {(myPlan.status === 'lost' || myPlan.status === 'empty') && latestAnnouncement ? (
-                <div className={styles.announcementHero}>
-                  <span className={styles.eyebrow}>{t('latestNews')}</span>
-                  <p className={styles.announcementContent}>{latestAnnouncement.content}</p>
-                </div>
-              ) : (
-                <>
-                  <div className={styles.heroImage}>
-                    {myPlan.band?.image_url ? (
-                      <img src={myPlan.band.image_url} alt="" loading="lazy" />
-                    ) : (
-                      <div className={styles.placeholder} aria-hidden>
-                        {myPlan.band?.name.charAt(0).toUpperCase() ?? 'V'}
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <span className={styles.eyebrow}>{planLabel(myPlan, t)}</span>
-                    {myPlan.band ? (
+            {latestAnnouncement && myPlan.status !== 'current' && (
+              <section className={styles.latestSignal} aria-labelledby="latest-mural-signal">
+                <span className={styles.latestSignalKicker} id="latest-mural-signal">
+                  {t('latestNews')}
+                </span>
+                <div className={styles.latestSignalBody}>
+                  {(() => {
+                    const author = crewUsers.find((crewUser) => crewUser.id === latestAnnouncement.author_id);
+                    const authorName = author?.display_name?.trim() || t('anonymous');
+                    return (
                       <>
-                        <h1 className={styles.bandName}>{myPlan.band.name}</h1>
-                        <p className={styles.empty}>{planHint(myPlan, t)}</p>
-                        <div className={styles.meta}>
-                          <span className={styles.stage}>{myPlan.band.stage}</span>
-                          <span className={styles.time}>
-                            {formatFestivalTime(myPlan.band.start_time)} -{' '}
-                            {formatFestivalTime(myPlan.band.end_time)}
-                          </span>
+                        <span className={styles.latestAvatar}>
+                          {author?.avatar_url ? (
+                            <img src={author.avatar_url} alt="" loading="lazy" />
+                          ) : (
+                            <span aria-hidden>{authorName.charAt(0).toUpperCase()}</span>
+                          )}
+                        </span>
+                        <div className={styles.latestSignalContent}>
+                          <div className={styles.latestSignalHead}>
+                            <span className={styles.latestSignalName}>{authorName}</span>
+                            <span className={styles.latestSignalTime}>
+                              {relativeAnnouncementTime(latestAnnouncement.created_at, t)}
+                            </span>
+                          </div>
+                          <p className={styles.latestSignalText}>{latestAnnouncement.content}</p>
                         </div>
                       </>
-                    ) : (
-                      <p className={styles.empty}>{planHint(myPlan, t)}</p>
-                    )}
-                    {myPlan.status === 'lost' && nextHint(myPlan, t) && (
-                      <p className={styles.nextHint}>{nextHint(myPlan, t)}</p>
-                    )}
-                    {myPlan.status === 'current' && myPlan.band && (
-                      <button className={styles.skipButton} onClick={() => handleSkip()}>
-                        {t('souFraco')}
-                      </button>
-                    )}
-                  </div>
-                </>
-              )}
-            </section>
+                    );
+                  })()}
+                </div>
+              </section>
+            )}
 
-            {user && <BadgesDisplay user={user} />}
+            {user && <BadgesDisplay user={user} heading={t('patches')} />}
 
             <h2 className={styles.sectionTitle}>{t('crewNow')}</h2>
             {crewPlans.length === 0 ? (
               <p className={styles.empty}>{t('crewEmpty')}</p>
             ) : (
               <section className={styles.crewGroups} aria-label={t('crewGridLabel')}>
-                {crewGroups.map((group) => (
-                  <article
-                    className={`${styles.groupCard} ${styles[group.kind]}`}
-                    key={group.kind === 'band' ? group.band.id : group.kind}
-                  >
-                    <div
-                      className={styles.locStrip}
-                      style={group.kind === 'band' ? { background: stageColor(group.band.stage) } : undefined}
-                    />
-                    <div className={styles.groupHeader}>
-                      <div>
-                        <span className={styles.groupKicker}>{groupKicker(group, t, metalPlaceConfig)}</span>
-                        <h3 className={styles.groupTitle}>{groupTitle(group, t)}</h3>
+                {crewGroups.map((group) => {
+                  const isUserHere = !!userId && group.members.some((crew) => crew.id === userId);
+                  const showWeakButton =
+                    isUserHere &&
+                    group.kind === 'band' &&
+                    myPlan.status === 'current' &&
+                    myPlan.band?.id === group.band.id;
+
+                  return (
+                    <article
+                      className={`${styles.groupCard} ${styles[group.kind]} ${
+                        isUserHere ? styles.youAreHere : ''
+                      }`}
+                      key={group.kind === 'band' ? group.band.id : group.kind}
+                    >
+                      <div
+                        className={styles.locStrip}
+                        style={group.kind === 'band' ? { background: stageColor(group.band.stage) } : undefined}
+                      />
+                      <div className={styles.groupHeader}>
+                        <div>
+                          <span className={styles.groupKicker}>
+                            {group.kind === 'band' && isUserHere && (
+                              <span className={styles.liveDot} aria-hidden />
+                            )}
+                            {groupKicker(group, t, isUserHere)}
+                          </span>
+                          <h3 className={styles.groupTitle}>{groupTitle(group, t)}</h3>
+                          <p className={styles.groupSubtitle}>{groupSubtitle(group, t, metalPlaceConfig)}</p>
+                        </div>
+                        <div className={styles.groupCount}>
+                          {group.members.length}
+                          <small className={styles.locCountLabel}>{t('crewCountLabel')}</small>
+                        </div>
                       </div>
-                      <div className={styles.groupCount}>
-                        {group.members.length}
-                        <small className={styles.locCountLabel}>{t('crewCountLabel')}</small>
-                      </div>
-                    </div>
-                    {group.members.length > 0 ? (
-                      <ul className={styles.memberList}>
-                        {group.members.map((crew) => (
-                          <CrewMember crew={crew} key={crew.id} />
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className={styles.groupEmpty}>{emptyGroupMessage(group, t)}</p>
-                    )}
-                  </article>
-                ))}
+                      {group.members.length > 0 ? (
+                        <ul className={styles.memberList}>
+                          {group.members.map((crew) => (
+                            <CrewMember crew={crew} isCurrentUser={crew.id === userId} key={crew.id} />
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className={styles.groupEmpty}>{emptyGroupMessage(group, t)}</p>
+                      )}
+                      {showWeakButton && (
+                        <div className={styles.groupActions}>
+                          <button className={styles.skipButton} onClick={() => handleSkip()}>
+                            {t('souFraco')}
+                          </button>
+                        </div>
+                      )}
+                    </article>
+                  );
+                })}
               </section>
             )}
           </>

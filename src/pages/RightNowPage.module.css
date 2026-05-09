@@ -6,7 +6,7 @@
 }
 
 .header {
-  padding: 1rem 1.5rem 0.75rem;
+  padding: var(--s-4);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   display: flex;
@@ -17,15 +17,23 @@
 
 .title {
   display: block;
-  font-size: 1.1rem;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
   font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .timestamp {
   display: block;
-  margin-top: 0.2rem;
+  margin-top: var(--s-1);
   color: var(--text-muted);
-  font-size: 0.78rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .main {
@@ -36,6 +44,95 @@
 
 .presence {
   margin-bottom: var(--s-3);
+}
+
+.latestSignal {
+  display: grid;
+  gap: var(--s-2);
+  margin-bottom: var(--s-3);
+  padding: var(--s-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-2);
+  background: var(--bg-surface);
+}
+
+.latestSignalKicker {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.latestSignalBody {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: var(--s-3);
+  align-items: start;
+}
+
+.latestAvatar {
+  width: 40px;
+  height: 40px;
+  overflow: hidden;
+  border: 2px solid var(--bg);
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.latestAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.latestSignalContent {
+  min-width: 0;
+}
+
+.latestSignalHead {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+  min-width: 0;
+}
+
+.latestSignalName {
+  overflow: hidden;
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.latestSignalTime {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+}
+
+.latestSignalText {
+  display: -webkit-box;
+  margin: var(--s-1) 0 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
 }
 
 .liveTestBanner {
@@ -164,6 +261,10 @@
   overflow: hidden;
 }
 
+.youAreHere {
+  border-color: var(--border);
+}
+
 /* 4px stage/status strip at top of each card */
 .locStrip {
   height: 4px;
@@ -189,6 +290,15 @@
   gap: 6px;
 }
 
+.liveDot {
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 10px rgba(229, 85, 85, 0.45);
+}
+
 .groupTitle {
   font-family: var(--font-display);
   font-size: 22px;
@@ -196,6 +306,16 @@
   text-transform: uppercase;
   line-height: 1;
   margin-top: 4px;
+}
+
+.groupSubtitle {
+  margin: 5px 0 0;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.35;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .groupCount {
@@ -242,6 +362,17 @@
   padding: 3px 10px 3px 3px;
   font-size: 12px;
   font-weight: 600;
+}
+
+.memberPill.me {
+  border-color: rgba(229, 85, 85, 0.75);
+  background: rgba(229, 85, 85, 0.12);
+  color: var(--text);
+}
+
+.memberPill.me .avatar {
+  background: var(--accent);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
 }
 
 .avatar {
@@ -291,6 +422,16 @@
   color: var(--text-muted);
   font-size: 12px;
   font-style: italic;
+}
+
+.groupActions {
+  display: flex;
+  justify-content: flex-start;
+  padding: 0 var(--s-4) var(--s-4);
+}
+
+.groupActions .skipButton {
+  margin-top: 0;
 }
 
 /* — Metal Place — */

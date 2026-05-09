@@ -31,9 +31,15 @@
   "crewGoing": "{count} vira-latas indo",
   "noCrewYet": "Nenhum vira-lata ainda",
   "crewSaw": "{count} viram",
+  "pickedStat": "Escolheram",
+  "actuallySawStat": "Viram mesmo",
+  "whoPicked": "Vão ver",
+  "whoSaw": "Viram",
   "missedToggle": "Não vi essa banda",
   "missedMarked": "Marcada como não vista",
   "missedUndo": "Desfazer",
-  "conflictWarning": "⚠ Conflita com {name}",
+  "missedShort": "não viu",
+  "missedAvailableAfter": "Disponível depois das {time}",
+  "conflictWarning": "Conflita com {name}",
   "pendingSync": "Sync pendente"
 }

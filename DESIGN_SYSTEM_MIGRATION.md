@@ -4,9 +4,9 @@ Plan for porting the existing app to the design system defined in [`public/Desig
 
 ## Current State
 
-Phases A through J are implemented. The app has the design-system token base, fonts, typography utilities, band cards, filters, band detail modal, `/now` location cards, profile/badges, announcements, auth/nav/offline chrome, and shared icon primitive.
+Phases A through J and L are implemented. The app has the design-system token base, fonts, typography utilities, band cards, filters, the reconciled band detail modal, `/now` location cards, profile/badges, announcements, auth/nav/offline chrome, and shared icon primitive.
 
-This document now tracks only the remaining approved design-system work.
+This document now tracks only the remaining approved design-system work and any design-system reconciliation work discovered after the initial phases.
 
 ## Guardrails
 
@@ -71,5 +71,84 @@ This document now tracks only the remaining approved design-system work.
 - Camping does not override current-band state and cannot be enabled while the user is in a current-band state.
 - Clearing the active option returns to automatic current-pick/LOST resolution.
 - Presence updates still work offline and flush through the existing queue.
+- Text is localized for Portuguese and English.
+- Build/tests pass.
+
+## Phase L - Band Detail Modal Reconciliation
+
+**Status:** Implemented.
+
+**Goal:** Reconcile the existing `BandDetailModal` with the anatomy in [`public/Design System.html`](public/Design%20System.html). Phase J shipped the functional modal, but the current implementation remains image-first and does not yet match the design-system modal preview.
+
+**Design-system source:**
+- CSS anatomy: `public/Design System.html`, "BAND DETAIL MODAL"
+- Crew list anatomy: `public/Design System.html`, "WHO PICKED / SAW lists (band detail modal)"
+- Demo markup: `public/Design System.html`, "Band detail modal"
+
+**Scope:**
+- Update [`src/components/BandDetailModal.tsx`](src/components/BandDetailModal.tsx) structure to match the design-system modal:
+  - 8px stage-color hero strip.
+  - Header with stage, band name, date/time, and genre metadata.
+  - Picked / actually-saw stat pair.
+  - "Who picked" and "who saw" name/avatar lists.
+  - Conflict warning using the design-system warning treatment.
+  - Missed-band toggle rendered as a design-system seen-toggle row.
+  - Bottom action row with close and pick/unpick actions.
+- Update [`src/components/BandDetailModal.module.css`](src/components/BandDetailModal.module.css) with the corresponding modal, stat, list, warning, toggle, and action styles.
+- Add or adjust localized strings in:
+  - [`src/i18n/SchedulePage_en.json`](src/i18n/SchedulePage_en.json)
+  - [`src/i18n/SchedulePage_br.json`](src/i18n/SchedulePage_br.json)
+- Preserve the existing `children` slot so callers can still inject contextual content.
+- Didn't saw this band only appears after the band time is in the past.
+- vao ver e viram sections cannot exists at the same time one happens during and before the band plays the other only after 
+
+**Out of scope:**
+- Do not change pick, missed-band, conflict, or attendee data persistence.
+- Do not change `BandCard` behavior.
+- Do not add band images back into the modal unless the design-system reference is explicitly updated to include them.
+
+**Behavior to preserve:**
+1. Escape closes the modal.
+2. Backdrop click closes the modal.
+3. Pick/unpick continues to call `onTogglePick`.
+4. Missed toggle appears only when `isPicked && isBandEnded && onToggleMissed`.
+5. Conflict warning appears only when the selected band is picked and overlapping picks exist.
+6. Seen count is derived from attendees minus `missedUserIds` after the band has ended.
+7. Offline pick/missed flows remain untouched because this phase is presentational.
+
+**Implementation notes:**
+- Derive the "who saw" list from `attendees` plus `missedUserIds`:
+  - before the band ends, either omit the saw list or show an unavailable state only if the design needs it;
+  - after the band ends, attendees not in `missedUserIds` count as saw;
+  - attendees in `missedUserIds` render as no-show rows.
+- Keep labels localized. Likely new keys:
+  - `pickedStat`
+  - `actuallySawStat`
+  - `whoPicked`
+  - `whoSaw`
+  - `missedAvailableAfter`
+- Prefer existing shared primitives where available:
+  - `Icon` for close/warning/action icons.
+  - `stageColor` / stage color tokens for the hero strip and stage accent.
+  - `formatTime` and `bandDay`/existing date helpers for metadata.
+- Keep the modal body scrollable on small screens and avoid fixed heights that can hide actions behind mobile browser chrome.
+
+**Files to read first:**
+- [`src/components/BandDetailModal.tsx`](src/components/BandDetailModal.tsx)
+- [`src/components/BandDetailModal.module.css`](src/components/BandDetailModal.module.css)
+- [`src/hooks/useBandAttendees.ts`](src/hooks/useBandAttendees.ts)
+- [`src/hooks/useBandConflicts.ts`](src/hooks/useBandConflicts.ts)
+- [`src/lib/bandTime.ts`](src/lib/bandTime.ts)
+- [`src/i18n/SchedulePage_en.json`](src/i18n/SchedulePage_en.json)
+- [`src/i18n/SchedulePage_br.json`](src/i18n/SchedulePage_br.json)
+
+**Acceptance:**
+- The modal no longer uses an image-first hero layout.
+- The modal has the design-system 8px stage-color hero strip.
+- Header typography, stat pair, crew lists, conflict warning, missed toggle, and action row match the design-system anatomy.
+- Picked and actually-saw counts are visible as the headline stats.
+- Crew members are shown as names + avatars, not only as counts.
+- Missed users appear distinctly from users who actually saw the band.
+- Close, pick/unpick, missed toggle, escape key, and backdrop close still work.
 - Text is localized for Portuguese and English.
 - Build/tests pass.

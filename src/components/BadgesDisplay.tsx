@@ -26,13 +26,14 @@ const EMPTY_CTX: BadgeContext = {
 
 type BadgesDisplayProps = {
   user: AuthUser;
+  heading?: string;
 };
 
 function yearSuffix(year: number): string {
   return `'${String(year).slice(-2)}`;
 }
 
-export default function BadgesDisplay({ user }: BadgesDisplayProps) {
+export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
   const { t } = useI18n('Badges');
   const [ctx, setCtx] = useState<BadgeContext>(EMPTY_CTX);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
@@ -79,6 +80,7 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
 
   return (
     <>
+      {heading && <div className={styles.patchesHeading}>{heading}</div>}
       <div className={styles.patchesGrid}>
         {earned.map((badge) => (
           <button
