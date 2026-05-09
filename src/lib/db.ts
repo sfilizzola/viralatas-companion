@@ -1,8 +1,8 @@
 import { openDB, type IDBPDatabase } from 'idb';
-import type { Announcement, Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserPick, UserPresence } from '../types';
+import type { Announcement, Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserMissedBand, UserPick, UserPresence } from '../types';
 
 const DB_NAME = 'viralatas-db';
-const DB_VERSION = 7;
+const DB_VERSION = 8;
 
 export const PICKS_CHANGED_EVENT = 'viralatas:picks-changed';
 export const CREW_USERS_CHANGED_EVENT = 'viralatas:crew-users-changed';
@@ -10,6 +10,7 @@ export const PRESENCE_CHANGED_EVENT = 'viralatas:presence-changed';
 export const ANNOUNCEMENTS_CHANGED_EVENT = 'viralatas:announcements-changed';
 export const METAL_PLACE_CONFIG_CHANGED_EVENT = 'viralatas:metal-place-config-changed';
 export const LIVE_BAND_TEST_CONFIG_CHANGED_EVENT = 'viralatas:live-band-test-config-changed';
+export const MISSED_CHANGED_EVENT = 'viralatas:missed-changed';
 
 type OfflinePickOp = {
   id: string;
@@ -17,6 +18,14 @@ type OfflinePickOp = {
   band_id: string;
   action: 'add' | 'remove';
   created_at: string;
+};
+
+type OfflineMissedOp = {
+  id: string; // `${user_id}|${band_id}`
+  user_id: string;
+  band_id: string;
+  action: 'add' | 'remove';
+  marked_at: string;
 };
 
 type OfflinePresenceOp = UserPresence & {
@@ -73,6 +82,15 @@ type ViralatasDB = {
     key: string;
     value: { cache_version: string };
   };
+  user_missed_bands: {
+    key: [string, string];
+    value: UserMissedBand;
+    indexes: { by_user: string };
+  };
+  offline_missed_bands: {
+    key: string;
+    value: OfflineMissedOp;
+  };
 };
 
 let dbPromise: Promise<IDBPDatabase<ViralatasDB>> | null = null;
@@ -120,6 +138,15 @@ function getDB() {
         if (!db.objectStoreNames.contains('meta')) {
           db.createObjectStore('meta');
         }
+        if (!db.objectStoreNames.contains('user_missed_bands')) {
+          const missedStore = db.createObjectStore('user_missed_bands', {
+            keyPath: ['user_id', 'band_id'],
+          });
+          missedStore.createIndex('by_user', 'user_id');
+        }
+        if (!db.objectStoreNames.contains('offline_missed_bands')) {
+          db.createObjectStore('offline_missed_bands', { keyPath: 'id' });
+        }
       },
     });
   }
@@ -159,6 +186,12 @@ function emitMetalPlaceConfigChanged() {
 function emitLiveBandTestConfigChanged() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(LIVE_BAND_TEST_CONFIG_CHANGED_EVENT));
+  }
+}
+
+function emitMissedChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(MISSED_CHANGED_EVENT));
   }
 }
 
@@ -386,12 +419,61 @@ export async function clearLiveBandTestConfig() {
   await db.delete('live_band_test_config', 'current');
 }
 
+// --- User Missed Bands ---
+
+export async function saveMissedBand(record: UserMissedBand) {
+  const db = await getDB();
+  await db.put('user_missed_bands', record);
+  emitMissedChanged();
+}
+
+export async function removeMissedBand(userId: string, bandId: string) {
+  const db = await getDB();
+  await db.delete('user_missed_bands', [userId, bandId]);
+  emitMissedChanged();
+}
+
+export async function loadMissedBands(userId: string): Promise<UserMissedBand[]> {
+  const db = await getDB();
+  return db.getAllFromIndex('user_missed_bands', 'by_user', userId);
+}
+
+export async function loadAllMissedBands(): Promise<UserMissedBand[]> {
+  const db = await getDB();
+  return db.getAll('user_missed_bands');
+}
+
+export async function replaceUserMissedBands(records: UserMissedBand[], userId: string) {
+  const db = await getDB();
+  const tx = db.transaction('user_missed_bands', 'readwrite');
+  const existing = await tx.store.index('by_user').getAll(userId);
+  await Promise.all(existing.map((r) => tx.store.delete([r.user_id, r.band_id])));
+  await Promise.all(records.map((r) => tx.store.put(r)));
+  await tx.done;
+  emitMissedChanged();
+}
+
+export async function enqueueOfflineMissed(op: OfflineMissedOp) {
+  const db = await getDB();
+  await db.put('offline_missed_bands', op);
+}
+
+export async function loadOfflineMissedQueue(): Promise<OfflineMissedOp[]> {
+  const db = await getDB();
+  return db.getAll('offline_missed_bands');
+}
+
+export async function removeFromOfflineMissedQueue(id: string) {
+  const db = await getDB();
+  await db.delete('offline_missed_bands', id);
+}
+
 // --- Cache version invalidation ---
 
 export async function wipeAllLocalData() {
   const db = await getDB();
   const tx = db.transaction(
-    ['bands', 'crew_users', 'user_picks', 'offline_picks', 'user_presence', 'offline_presence', 'announcements', 'pending_announcements'],
+    ['bands', 'crew_users', 'user_picks', 'offline_picks', 'user_presence', 'offline_presence', 'announcements', 'pending_announcements', 'user_missed_bands', 'offline_missed_bands'],
     'readwrite',
   );
 
@@ -404,6 +486,8 @@ export async function wipeAllLocalData() {
     tx.objectStore('offline_presence').clear(),
     tx.objectStore('announcements').clear(),
     tx.objectStore('pending_announcements').clear(),
+    tx.objectStore('user_missed_bands').clear(),
+    tx.objectStore('offline_missed_bands').clear(),
   ]);
 
   await tx.done;

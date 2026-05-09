@@ -8,13 +8,18 @@
   "loading": "Loading mural...",
   "delete": "Delete",
   "deleteConfirm": "Delete this message?",
-  "justNow": "just now",
-  "minutesAgo": "{n}min ago",
-  "hoursAgo": "{n}h ago",
-  "daysAgo": "{n}d ago",
+  "justNow": "now",
+  "minutesAgo": "{n} min",
+  "hoursAgo": "{n}h",
   "anonymous": "Vira-latas member",
   "block": "Block",
   "blockingUser": "Blocking...",
   "userBlocked": "User blocked",
-  "blocked": "You've said enough for today, buddy... 🤘"
+  "blocked": "You've said enough for today, buddy... 🤘",
+  "role_normal": "Vira-latas",
+  "role_manager": "Manager",
+  "role_godlike": "Godlike",
+  "pendingSync": "Pending sync",
+  "blockedDone": "Blocked",
+  "blockAction": "Block"
 }

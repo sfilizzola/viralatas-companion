@@ -1,0 +1,3040 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Viralatas Metaleiros — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  /* ============================================================
+     TOKENS
+     ============================================================ */
+  :root {
+    /* ---- neutrals (dark first) ---- */
+    --bg:           #0a0a0a;
+    --bg-surface:   #141414;
+    --bg-elevated:  #1e1e1e;
+    --bg-sunken:    #050505;
+    --border:       #2a2a2a;
+    --border-strong:#3a3a3a;
+    --text:         #e8e8e8;
+    --text-muted:   #888;
+    --text-faint:   #555;
+
+    /* ---- brand accent (W.E.T. red, also semantic 'live/now') ---- */
+    --accent:       #c0392b;
+    --accent-hover: #e74c3c;
+
+    /* ---- semantic states ---- */
+    --signal-live:  #c0392b;  /* now / unread */
+    --signal-warn:  #f39c12;  /* conflict / queued */
+    --signal-ok:    #16a085;  /* synced / camping ok */
+    --signal-lost:  #a855f7;  /* LOST 🤘 */
+
+    /* ---- stages (canonical, never reinterpret) ---- */
+    --stage-faster:     #2980b9;
+    --stage-harder:     #e67e22;
+    --stage-louder:     #8e44ad;
+    --stage-wet:        #c0392b;
+    --stage-headbangers:#16a085;
+    --stage-wasteland:  #2c3e50;
+    --stage-wackinger:  #95a5a6;
+    --stage-jungle:     #f39c12;
+
+    /* ---- type ---- */
+    --font-display: 'Oswald', 'Helvetica Neue Condensed', 'Arial Narrow', sans-serif;
+    --font-sans:    'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono:    'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+    /* ---- spacing scale (4px base) ---- */
+    --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px;
+    --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px;
+
+    /* ---- radii ---- */
+    --r-0: 0;      /* hard edges, default for stripes/strips */
+    --r-1: 4px;    /* default — pills, badges, buttons */
+    --r-2: 8px;    /* cards */
+    --r-3: 12px;   /* modals */
+    --r-pill: 999px;
+  }
+
+  * , *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg); color: var(--text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  body { line-height: 1.5; }
+
+  /* ============================================================
+     PAGE CHROME
+     ============================================================ */
+  .page { max-width: 1280px; margin: 0 auto; padding: var(--s-12) var(--s-8) var(--s-12); }
+
+  .masthead {
+    border-top: 4px solid var(--accent);
+    padding-top: var(--s-8);
+    padding-bottom: var(--s-10);
+    border-bottom: 1px solid var(--border);
+    margin-bottom: var(--s-10);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--s-8);
+    align-items: end;
+  }
+  .masthead .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: var(--s-4);
+  }
+  .masthead .eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--signal-live);
+    margin-right: 8px;
+    transform: translateY(-1px);
+  }
+  .masthead h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(48px, 7vw, 96px);
+    line-height: 0.92;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+  }
+  .masthead h1 .horns { color: var(--accent); }
+  .masthead .lede {
+    color: var(--text-muted);
+    font-size: 15px;
+    max-width: 38ch;
+    margin-top: var(--s-4);
+  }
+  .masthead .specs {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: right;
+    line-height: 1.7;
+  }
+  .masthead .specs b { color: var(--text); font-weight: 500; }
+
+  /* ---- section headers ---- */
+  .section { padding: var(--s-12) 0; border-bottom: 1px solid var(--border); }
+  .section:last-of-type { border-bottom: 0; }
+  .section-head {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: var(--s-6);
+    align-items: baseline;
+    margin-bottom: var(--s-8);
+  }
+  .section-head .num {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-faint);
+  }
+  .section-head h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 36px;
+    text-transform: uppercase;
+    letter-spacing: 0.01em;
+  }
+  .section-head .desc {
+    grid-column: 2;
+    color: var(--text-muted);
+    font-size: 14px;
+    max-width: 70ch;
+    margin-top: var(--s-2);
+  }
+  .subhead {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.12em;
+    margin: var(--s-8) 0 var(--s-4);
+    border-top: 1px solid var(--border);
+    padding-top: var(--s-3);
+  }
+
+  /* ============================================================
+     COLOR TOKENS
+     ============================================================ */
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: var(--s-3);
+  }
+  .swatch {
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+    border-radius: var(--r-1);
+    overflow: hidden;
+  }
+  .swatch .chip {
+    height: 88px;
+    display: flex;
+    align-items: flex-end;
+    padding: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(255,255,255,0.6);
+    border-bottom: 1px solid var(--border);
+  }
+  .swatch .meta {
+    padding: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+  .swatch .meta .name { color: var(--text); font-weight: 500; }
+  .swatch .meta .tok  { color: var(--text-muted); }
+  .swatch .meta .hex  { color: var(--text-faint); }
+
+  /* ---- stage swatches ---- */
+  .stage-rail {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    border-radius: var(--r-1);
+  }
+  .stage-rail > div {
+    height: 96px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--s-3);
+    color: #fff;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+  }
+  .stage-rail .name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .stage-rail .hex { opacity: 0.85; }
+
+  /* ============================================================
+     TYPE
+     ============================================================ */
+  .type-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: var(--s-6);
+    padding: var(--s-5) 0;
+    border-bottom: 1px solid var(--border);
+    align-items: baseline;
+  }
+  .type-row:last-child { border-bottom: 0; }
+  .type-row .label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1.6;
+  }
+  .type-row .label b { color: var(--text); font-weight: 500; display: block; }
+  .type-row .sample { color: var(--text); }
+
+  .t-display-xl { font-family: var(--font-display); font-weight: 700; font-size: 80px; line-height: 0.9; text-transform: uppercase; letter-spacing: -0.01em; }
+  .t-display-l  { font-family: var(--font-display); font-weight: 600; font-size: 48px; line-height: 1.0; text-transform: uppercase; }
+  .t-display-m  { font-family: var(--font-display); font-weight: 600; font-size: 32px; line-height: 1.05; text-transform: uppercase; }
+  .t-band       { font-family: var(--font-display); font-weight: 700; font-size: 28px; line-height: 1.05; }
+  .t-h          { font-family: var(--font-sans); font-weight: 700; font-size: 18px; line-height: 1.3; }
+  .t-body       { font-family: var(--font-sans); font-weight: 400; font-size: 15px; line-height: 1.5; }
+  .t-small      { font-family: var(--font-sans); font-weight: 400; font-size: 13px; line-height: 1.45; color: var(--text-muted); }
+  .t-label      { font-family: var(--font-mono); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+  .t-time       { font-family: var(--font-mono); font-weight: 500; font-size: 14px; font-variant-numeric: tabular-nums; color: var(--text); }
+
+  /* ============================================================
+     SPACING + RADII
+     ============================================================ */
+  .scale-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--s-3);
+  }
+  .scale-card {
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
+    border-radius: var(--r-1);
+    padding: var(--s-4);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .scale-card .bar {
+    background: var(--accent);
+    height: 6px;
+    margin-bottom: var(--s-3);
+  }
+  .scale-card .box {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    height: 56px;
+    margin-bottom: var(--s-3);
+  }
+  .scale-card .label { color: var(--text); font-weight: 500; }
+  .scale-card .px    { color: var(--text-muted); }
+
+  /* ============================================================
+     DEMO COMPONENT STAGE
+     ============================================================ */
+  .demo {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: var(--s-6);
+    margin-bottom: var(--s-6);
+    align-items: start;
+  }
+  .demo-stage {
+    background:
+      linear-gradient(var(--bg-sunken), var(--bg-sunken)),
+      repeating-linear-gradient(45deg, transparent 0 11px, rgba(255,255,255,0.02) 11px 12px);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    padding: var(--s-6);
+    min-height: 200px;
+  }
+  .demo-stage.flush { padding: 0; overflow: hidden; }
+  .demo-notes {
+    border-left: 1px solid var(--border);
+    padding-left: var(--s-5);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+  .demo-notes h4 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text);
+    margin-bottom: var(--s-3);
+  }
+  .demo-notes ul { list-style: none; padding: 0; }
+  .demo-notes li {
+    padding: var(--s-2) 0;
+    border-bottom: 1px dashed var(--border);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .demo-notes li:last-child { border-bottom: 0; }
+  .demo-notes li b { color: var(--text); font-weight: 500; }
+
+  /* ============================================================
+     BAND CARD — schedule variant
+     ============================================================ */
+  .bcard {
+    display: grid;
+    grid-template-columns: 4px 56px 1fr auto;
+    gap: 0;
+    align-items: stretch;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    overflow: hidden;
+  }
+  .bcard + .bcard { margin-top: var(--s-2); }
+  .bcard.conflict { outline: 2px solid var(--signal-warn); outline-offset: -2px; }
+
+  .bcard .stripe { background: var(--accent); }
+  .bcard .thumb {
+    width: 56px; height: 56px;
+    margin: var(--s-3) 0 var(--s-3) var(--s-3);
+    background: var(--bg-elevated);
+    border-radius: var(--r-1);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 700;
+    color: #fff;
+  }
+  .bcard .body { padding: var(--s-3) var(--s-4); display: flex; flex-direction: column; justify-content: center; min-width: 0; }
+  .bcard .name { font-family: var(--font-display); font-weight: 700; font-size: 19px; line-height: 1.05; text-transform: uppercase; letter-spacing: 0.005em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .bcard .meta { display: flex; align-items: center; gap: var(--s-2); margin-top: 6px; flex-wrap: wrap; }
+  .bcard .stage {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #fff;
+    padding: 2px 6px;
+    border-radius: 2px;
+  }
+  .bcard .time { font-family: var(--font-mono); font-size: 12px; color: var(--text); font-variant-numeric: tabular-nums; }
+  .bcard .going { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+  .bcard .going b { color: var(--accent-hover); font-weight: 600; }
+
+  .bcard .pick {
+    width: 64px;
+    border-left: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-muted);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .bcard .pick:hover { background: var(--bg-elevated); color: var(--text); }
+  .bcard .pick.on { color: var(--accent-hover); background: rgba(192,57,43,0.1); }
+  .bcard .pick svg { width: 22px; height: 22px; }
+
+  .conflict-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(243,156,18,0.12);
+    color: #f9c66b;
+    border: 1px solid rgba(243,156,18,0.4);
+    border-radius: var(--r-pill);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* ---- band card variant: my-picks timeline ---- */
+  .bcard.timeline {
+    grid-template-columns: 4px 64px 1fr auto;
+  }
+  .bcard.timeline .when {
+    width: 64px;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: var(--s-3) 0;
+    background: rgba(255,255,255,0.02);
+  }
+  .bcard.timeline .when .h { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+  .bcard.timeline .when .end { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+
+  /* ---- band card variant: popular ranked ---- */
+  .bcard.ranked {
+    grid-template-columns: 4px 56px 1fr;
+  }
+  .bcard.ranked .rank {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 36px;
+    line-height: 1;
+    text-align: center;
+    padding: var(--s-4) 0 0;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .bcard.ranked .rank.top { color: var(--accent); }
+  .bcard.ranked .body { padding-bottom: var(--s-4); }
+
+  /* ============================================================
+     STAGE PILL
+     ============================================================ */
+  .pill-row { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+  .pill {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 6px 12px;
+    border-radius: var(--r-pill);
+    border: 1px solid currentColor;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .pill:hover { color: var(--text); }
+  .pill.on { color: #fff; }
+
+  /* ============================================================
+     DAY TAB BAR
+     ============================================================ */
+  .daytabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border: 1px solid var(--border);
+    border-radius: var(--r-1);
+    overflow: hidden;
+    background: var(--bg-surface);
+  }
+  .daytab {
+    padding: var(--s-3);
+    text-align: center;
+    border-right: 1px solid var(--border);
+    cursor: pointer;
+    background: transparent;
+    border-top: none; border-bottom: none; border-left: none;
+    color: var(--text-muted);
+    font-family: var(--font-sans);
+  }
+  .daytab:last-child { border-right: 0; }
+  .daytab.on {
+    background: var(--bg-elevated);
+    color: var(--text);
+    box-shadow: inset 0 -2px 0 var(--accent);
+  }
+  .daytab .dlabel { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; }
+  .daytab .ddate  { font-family: var(--font-display); font-size: 22px; font-weight: 600; line-height: 1; margin-top: 4px; }
+  .daytab .ddow   { font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); margin-top: 4px; text-transform: uppercase; }
+
+  /* ============================================================
+     CREW GRID CARD — /now
+     ============================================================ */
+  .crew-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: var(--s-3); }
+  .crew-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    padding: var(--s-4);
+    position: relative;
+  }
+  .crew-card.lost {
+    border-color: rgba(168,85,247,0.5);
+    background:
+      linear-gradient(135deg, rgba(88,28,135,0.32) 0%, rgba(168,85,247,0.1) 50%, transparent 75%),
+      var(--bg-surface);
+  }
+  .crew-card.camping {
+    border-color: rgba(22,160,133,0.4);
+    background:
+      linear-gradient(135deg, rgba(22,160,133,0.15) 0%, transparent 70%),
+      var(--bg-surface);
+  }
+  .crew-card .who { display: flex; align-items: center; gap: var(--s-3); margin-bottom: var(--s-3); }
+  .crew-card .who .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--accent); color: #fff;
+    font-family: var(--font-display); font-size: 18px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid var(--bg-surface);
+  }
+  .crew-card .who .name { font-family: var(--font-sans); font-weight: 700; font-size: 15px; }
+  .crew-card .who .status { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .crew-card.lost .who .status { color: rgba(196,148,255,0.85); }
+  .crew-card .watching { display: flex; align-items: center; gap: var(--s-2); padding-top: var(--s-3); border-top: 1px solid var(--border); }
+  .crew-card.lost .watching { border-color: rgba(168,85,247,0.25); }
+  .crew-card .watching .stage-strip { width: 4px; height: 36px; background: var(--accent); border-radius: 2px; }
+  .crew-card .watching .band { font-family: var(--font-display); font-weight: 700; font-size: 16px; line-height: 1.1; text-transform: uppercase; }
+  .crew-card .watching .info { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .crew-card .lost-msg {
+    margin-top: var(--s-2);
+    font-family: var(--font-display);
+    font-size: 22px; font-weight: 700;
+    color: rgba(233,213,255,0.95);
+    text-shadow: 0 0 18px rgba(168,85,247,0.45);
+    letter-spacing: 0.04em;
+  }
+
+  /* ============================================================
+     PICK TOGGLE (standalone)
+     ============================================================ */
+  .picktoggle {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    display: inline-flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .picktoggle:hover { color: var(--text); border-color: var(--border-strong); }
+  .picktoggle.on { color: var(--accent-hover); border-color: var(--accent); background: rgba(192,57,43,0.1); }
+  .picktoggle svg { width: 22px; height: 22px; }
+
+  /* ============================================================
+     AVATAR + CLUSTER
+     ============================================================ */
+  .avatar-row { display: flex; align-items: center; gap: var(--s-4); }
+  .av { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--accent); color: #fff; font-family: var(--font-display); font-weight: 700; border: 2px solid var(--bg); }
+  .av.s24 { width: 24px; height: 24px; font-size: 10px; }
+  .av.s32 { width: 32px; height: 32px; font-size: 13px; }
+  .av.s40 { width: 40px; height: 40px; font-size: 16px; }
+  .av.s56 { width: 56px; height: 56px; font-size: 22px; }
+  .cluster { display: inline-flex; align-items: center; }
+  .cluster .av + .av { margin-left: -8px; }
+  .cluster .more {
+    margin-left: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ============================================================
+     BAND DETAIL MODAL
+     ============================================================ */
+  .modal-frame {
+    background: rgba(5,5,5,0.78);
+    padding: var(--s-8);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+  }
+  .modal {
+    max-width: 460px;
+    margin: 0 auto;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-3);
+    overflow: hidden;
+    box-shadow: 0 24px 48px rgba(0,0,0,0.5);
+  }
+  .modal .hero {
+    height: 8px;
+    background: var(--accent);
+  }
+  .modal .head {
+    padding: var(--s-5) var(--s-5) var(--s-3);
+    border-bottom: 1px solid var(--border);
+  }
+  .modal .head .stage {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent-hover);
+    margin-bottom: var(--s-2);
+  }
+  .modal .head h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .modal .head .info {
+    margin-top: var(--s-3);
+    display: flex;
+    gap: var(--s-3);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .modal .body { padding: var(--s-5); display: grid; gap: var(--s-4); }
+  .modal .stat-pair {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border: 1px solid var(--border);
+    border-radius: var(--r-1);
+    overflow: hidden;
+  }
+  .modal .stat {
+    padding: var(--s-3);
+    background: var(--bg-elevated);
+  }
+  .modal .stat + .stat { border-left: 1px solid var(--border); }
+  .modal .stat .k { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.08em; }
+  .modal .stat .v { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--text); margin-top: 4px; line-height: 1; }
+  .modal .stat .v small { font-family: var(--font-mono); font-size: 12px; font-weight: 500; color: var(--text-muted); margin-left: 4px; }
+  .modal .conflict-warn {
+    background: rgba(243,156,18,0.1);
+    border: 1px solid rgba(243,156,18,0.3);
+    border-radius: var(--r-1);
+    padding: var(--s-3);
+    color: #f9c66b;
+    font-size: 13px;
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: var(--s-3);
+  }
+  .modal .seen-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--s-3);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--r-1);
+    font-size: 13px;
+  }
+  .modal .seen-toggle .label { font-family: var(--font-sans); }
+  .toggle-track {
+    width: 36px; height: 20px;
+    border-radius: var(--r-pill);
+    background: var(--bg-sunken); border: 1px solid var(--border-strong);
+    position: relative;
+    cursor: pointer;
+  }
+  .toggle-track::after {
+    content: ''; position: absolute;
+    width: 14px; height: 14px;
+    background: var(--text-muted);
+    top: 2px; left: 2px;
+    border-radius: 50%;
+    transition: all 0.15s;
+  }
+  .toggle-track.on { background: rgba(22,160,133,0.4); border-color: var(--signal-ok); }
+  .toggle-track.on::after { left: 18px; background: #fff; }
+
+  .modal .actions { display: flex; gap: var(--s-2); padding: var(--s-3) var(--s-5) var(--s-5); border-top: 1px solid var(--border); }
+  .btn {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 13px;
+    padding: 10px 16px;
+    border-radius: var(--r-1);
+    border: 1px solid var(--border-strong);
+    background: var(--bg-elevated);
+    color: var(--text);
+    cursor: pointer;
+  }
+  .btn:hover { background: var(--border); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { background: var(--accent-hover); }
+  .btn.ghost { background: transparent; }
+
+  /* ============================================================
+     ALERT BANNER
+     ============================================================ */
+  .alert {
+    display: grid;
+    grid-template-columns: 4px 28px 1fr auto;
+    gap: var(--s-3);
+    align-items: center;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-2);
+    padding: var(--s-3) var(--s-4) var(--s-3) 0;
+    margin-bottom: var(--s-2);
+  }
+  .alert .stripe { background: var(--accent); align-self: stretch; }
+  .alert.warn .stripe { background: var(--signal-warn); }
+  .alert.live .stripe { background: var(--signal-live); }
+  .alert.ok   .stripe { background: var(--signal-ok); }
+  .alert .icon {
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--text);
+  }
+  .alert .icon.warn { color: var(--signal-warn); }
+  .alert .icon.live { color: var(--signal-live); }
+  .alert .icon.ok   { color: var(--signal-ok); }
+  .alert .text { font-size: 14px; line-height: 1.4; padding: var(--s-1) 0; }
+  .alert .text b { font-family: var(--font-display); font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; font-size: 13px; display: block; margin-bottom: 2px; }
+  .alert .text small { color: var(--text-muted); font-family: var(--font-mono); font-size: 11px; }
+  .alert .dismiss {
+    background: transparent; border: 0;
+    color: var(--text-muted); cursor: pointer;
+    padding: var(--s-2);
+  }
+  .alert .dismiss:hover { color: var(--text); }
+
+  /* ============================================================
+     BADGE COMPONENT
+     ============================================================ */
+  .badge-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--s-3);
+  }
+  .badge {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    padding: var(--s-4);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .badge.locked { opacity: 0.45; }
+  .badge .medal {
+    width: 64px; height: 64px;
+    margin: 0 auto var(--s-3);
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bg-elevated), var(--border));
+    border: 2px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-size: 24px; font-weight: 700;
+    color: var(--text-muted);
+  }
+  .badge.unlocked .medal {
+    background: linear-gradient(135deg, var(--accent), #7d2419);
+    border-color: var(--accent-hover);
+    color: #fff;
+  }
+  .badge .label { font-family: var(--font-display); font-size: 13px; font-weight: 600; text-transform: uppercase; line-height: 1.15; letter-spacing: 0.02em; }
+  .badge .desc  { font-size: 11px; color: var(--text-muted); margin-top: 4px; line-height: 1.35; }
+  .badge .year-chip {
+    position: absolute;
+    top: var(--s-2);
+    right: var(--s-2);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    background: var(--bg-sunken);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 2px 5px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+  }
+
+  /* ============================================================
+     ANNOUNCEMENT CARD
+     ============================================================ */
+  .announce {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    padding: var(--s-4);
+    margin-bottom: var(--s-3);
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: var(--s-3);
+  }
+  .announce .head {
+    grid-column: 2;
+    display: flex;
+    align-items: baseline;
+    gap: var(--s-2);
+  }
+  .announce .head .name { font-weight: 700; font-size: 14px; }
+  .announce .head .role-chip {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .role-chip.normal   { background: var(--bg-elevated); color: var(--text-muted); }
+  .role-chip.manager  { background: rgba(41,128,185,0.15); color: #58a8e6; border: 1px solid rgba(41,128,185,0.4); }
+  .role-chip.godlike  { background: rgba(243,156,18,0.15); color: var(--signal-warn); border: 1px solid rgba(243,156,18,0.4); }
+  .announce .head .ts { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-left: auto; }
+  .announce .body { grid-column: 2; margin-top: var(--s-1); font-size: 14px; line-height: 1.5; }
+  .announce .actions { grid-column: 2; margin-top: var(--s-3); display: flex; gap: var(--s-3); }
+  .announce .action {
+    background: transparent; border: 0; padding: 0;
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-muted); cursor: pointer;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .announce .action:hover { color: var(--text); }
+  .announce .action.danger:hover { color: var(--signal-warn); }
+
+  /* ============================================================
+     OFFLINE / SYNC STATES
+     ============================================================ */
+  .offline-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 0;
+    padding: 6px var(--s-4);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .offline-banner::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 0.4; }
+    50%      { opacity: 1; }
+  }
+  .pending-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(243,156,18,0.12);
+    color: var(--signal-warn);
+    border: 1px solid rgba(243,156,18,0.3);
+    border-radius: var(--r-pill);
+    padding: 2px 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .pending-chip::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--signal-warn);
+    animation: pulse 1.4s infinite;
+  }
+  .sync-toast {
+    background: var(--bg-surface);
+    border: 1px solid var(--signal-ok);
+    border-left: 4px solid var(--signal-ok);
+    border-radius: var(--r-1);
+    padding: var(--s-3) var(--s-4);
+    color: var(--text);
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+
+  /* ============================================================
+     PHONE FRAME (page mockups)
+     ============================================================ */
+  .frames {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: var(--s-6);
+  }
+  .phone {
+    width: 100%;
+    max-width: 390px;
+    margin: 0 auto;
+    background: #000;
+    border: 1px solid var(--border-strong);
+    border-radius: 36px;
+    padding: 12px 8px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  }
+  .phone-screen {
+    background: var(--bg);
+    border-radius: 26px;
+    overflow: hidden;
+    aspect-ratio: 390 / 780;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  .status-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 24px 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text);
+    font-weight: 600;
+  }
+  .status-bar .right { display: flex; gap: 4px; align-items: center; }
+  .frame-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    margin-top: var(--s-3);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .frame-label b { color: var(--text); font-weight: 500; }
+
+  .nav-bar {
+    height: 56px;
+    border-top: 1px solid var(--border);
+    background: var(--bg-surface);
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    flex-shrink: 0;
+  }
+  .nav-bar .navi {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .nav-bar .navi.on { color: var(--accent-hover); }
+  .nav-bar .navi svg { width: 18px; height: 18px; }
+
+  .frame-body { flex: 1; overflow: hidden; padding: var(--s-3); }
+  .frame-body .hdr {
+    display: flex; justify-content: space-between; align-items: end;
+    padding: 0 var(--s-2) var(--s-3); border-bottom: 1px solid var(--border); margin-bottom: var(--s-3);
+  }
+  .frame-body .hdr h2 {
+    font-family: var(--font-display);
+    font-size: 24px; font-weight: 700; text-transform: uppercase; line-height: 1;
+  }
+  .frame-body .hdr .when {
+    font-family: var(--font-mono); font-size: 10px; color: var(--text-muted);
+    text-align: right;
+  }
+
+  /* now-page hero */
+  .now-hero {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: var(--r-2);
+    padding: var(--s-3);
+    margin-bottom: var(--s-3);
+  }
+  .now-hero .kicker {
+    font-family: var(--font-mono); font-size: 9px;
+    color: var(--accent-hover); text-transform: uppercase; letter-spacing: 0.12em;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .now-hero .kicker::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 1.6s infinite;
+  }
+  .now-hero h3 {
+    font-family: var(--font-display);
+    font-size: 28px; font-weight: 700; text-transform: uppercase; line-height: 1;
+    margin-top: 6px;
+  }
+  .now-hero .meta { display: flex; gap: var(--s-2); margin-top: var(--s-2); font-family: var(--font-mono); font-size: 11px; }
+  .now-hero .meta .stage {
+    color: #fff;
+    background: var(--accent);
+    padding: 2px 6px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-radius: 2px;
+  }
+  .now-hero .meta .time { color: var(--text-muted); }
+
+  .crew-mini {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+  }
+  .crew-mini .card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-1);
+    padding: 8px;
+    font-size: 11px;
+  }
+  .crew-mini .card.lost {
+    border-color: rgba(168,85,247,0.5);
+    background: linear-gradient(135deg, rgba(88,28,135,0.3) 0%, transparent 70%), var(--bg-surface);
+  }
+  .crew-mini .card .who { display: flex; align-items: center; gap: 6px; }
+  .crew-mini .card .who .av { width: 22px; height: 22px; font-size: 10px; border-width: 1px; }
+  .crew-mini .card .who .nm { font-weight: 700; font-size: 11px; }
+  .crew-mini .card .at { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .crew-mini .card .bn { font-family: var(--font-display); font-size: 12px; font-weight: 600; text-transform: uppercase; line-height: 1.1; margin-top: 1px; }
+  .crew-mini .card.lost .bn { color: rgba(233,213,255,0.95); text-shadow: 0 0 10px rgba(168,85,247,0.45); }
+
+  /* schedule frame */
+  .frame-search {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-1);
+    padding: 8px 10px;
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: var(--s-2);
+  }
+  .frame-pills {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    margin-bottom: var(--s-3);
+  }
+  .frame-pill {
+    font-family: var(--font-mono); font-size: 9px;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    padding: 3px 7px; border-radius: var(--r-pill);
+    border: 1px solid currentColor;
+    font-weight: 600;
+  }
+  .frame-bcard {
+    display: grid; grid-template-columns: 3px 36px 1fr auto; gap: 0;
+    background: var(--bg-surface); border: 1px solid var(--border);
+    border-radius: var(--r-1); margin-bottom: 4px;
+    align-items: stretch;
+  }
+  .frame-bcard .stripe { background: var(--accent); }
+  .frame-bcard .thumb { width: 36px; height: 36px; margin: 6px 0 6px 6px; border-radius: 3px; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #fff; }
+  .frame-bcard .body { padding: 6px 8px; min-width: 0; }
+  .frame-bcard .name { font-family: var(--font-display); font-size: 13px; font-weight: 700; text-transform: uppercase; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .frame-bcard .meta { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); margin-top: 3px; display: flex; gap: 6px; }
+  .frame-bcard .meta .stage { color: #fff; padding: 1px 4px; font-size: 8px; text-transform: uppercase; letter-spacing: 0.04em; border-radius: 1px; }
+  .frame-bcard .pick { width: 36px; border-left: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+  .frame-bcard .pick.on { color: var(--accent-hover); background: rgba(192,57,43,0.1); }
+  .frame-bcard .pick svg { width: 14px; height: 14px; }
+
+  /* timeline frame */
+  .timeline-day { font-family: var(--font-display); font-size: 14px; font-weight: 700; text-transform: uppercase; color: var(--text); margin: var(--s-3) 0 6px; padding-top: 6px; border-top: 2px solid var(--accent); display: flex; justify-content: space-between; }
+  .timeline-day small { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); font-weight: 400; }
+  .timeline-bcard {
+    display: grid; grid-template-columns: 48px 1fr; gap: 0;
+    background: var(--bg-surface); border: 1px solid var(--border);
+    border-radius: var(--r-1); margin-bottom: 4px;
+    align-items: stretch;
+  }
+  .timeline-bcard.conflict { border-color: var(--signal-warn); }
+  .timeline-bcard .when { padding: 8px 0; border-right: 1px solid var(--border); text-align: center; background: rgba(255,255,255,0.02); }
+  .timeline-bcard .when .h { font-family: var(--font-mono); font-size: 13px; font-weight: 700; line-height: 1; }
+  .timeline-bcard .when .e { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); margin-top: 3px; }
+  .timeline-bcard .body { padding: 6px 8px; }
+  .timeline-bcard .body .name { font-family: var(--font-display); font-size: 13px; font-weight: 700; text-transform: uppercase; line-height: 1.05; }
+  .timeline-bcard .body .meta { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); margin-top: 3px; }
+  .timeline-bcard .body .meta .stage { color: #fff; padding: 1px 4px; font-size: 8px; }
+  .timeline-bcard .body .conflict-mini { display: inline-block; margin-top: 3px; font-family: var(--font-mono); font-size: 9px; color: var(--signal-warn); border: 1px solid var(--signal-warn); padding: 1px 5px; border-radius: var(--r-pill); text-transform: uppercase; letter-spacing: 0.04em; }
+
+  /* popular frame */
+  .pop-bcard {
+    display: grid; grid-template-columns: 28px 36px 1fr; gap: 0;
+    background: var(--bg-surface); border: 1px solid var(--border);
+    border-radius: var(--r-1); margin-bottom: 4px;
+    align-items: center;
+    padding-right: 8px;
+  }
+  .pop-bcard .rk { font-family: var(--font-display); font-weight: 700; font-size: 18px; text-align: center; color: var(--text-muted); font-variant-numeric: tabular-nums; line-height: 1; }
+  .pop-bcard .rk.top { color: var(--accent); }
+  .pop-bcard .thumb { width: 32px; height: 32px; border-radius: 3px; margin: 6px 0; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #fff; }
+  .pop-bcard .body { padding: 6px 0 6px 8px; min-width: 0; }
+  .pop-bcard .body .name { font-family: var(--font-display); font-size: 12px; font-weight: 700; text-transform: uppercase; line-height: 1; }
+  .pop-bcard .body .meta { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); margin-top: 3px; display: flex; gap: 4px; align-items: center; }
+  .pop-bcard .body .meta .av { width: 16px; height: 16px; font-size: 8px; border-width: 1px; }
+  .pop-bcard .body .meta .av + .av { margin-left: -4px; }
+  .pop-bcard .body .meta .ct { color: var(--accent-hover); font-weight: 600; margin-left: 4px; }
+
+  /* profile frame */
+  .profile-head {
+    text-align: center; padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .profile-head .av { margin: 0 auto var(--s-2); }
+  .profile-head .nm { font-family: var(--font-display); font-size: 18px; font-weight: 700; text-transform: uppercase; }
+  .profile-head .em { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+  .profile-section {
+    padding: var(--s-3) 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .profile-section h4 {
+    font-family: var(--font-mono); font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-muted); margin-bottom: var(--s-2);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .profile-section .chev { color: var(--text-faint); }
+  .profile-badge-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .profile-badge {
+    aspect-ratio: 1;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: 11px; font-weight: 700;
+    color: var(--text-muted);
+  }
+  .profile-badge.unlocked {
+    background: linear-gradient(135deg, var(--accent), #7d2419);
+    border-color: var(--accent-hover); color: #fff;
+  }
+  .admin-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 8px;
+    background: rgba(243,156,18,0.06);
+    border: 1px solid rgba(243,156,18,0.2);
+    border-radius: 3px;
+    margin-bottom: 4px;
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--signal-warn);
+  }
+
+  /* ============================================================
+     ICON SHEET
+     ============================================================ */
+  .icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--s-3); }
+  .icon-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-1);
+    padding: var(--s-4);
+    text-align: center;
+  }
+  .icon-card svg { width: 28px; height: 28px; color: var(--text); margin: 0 auto var(--s-2); display: block; }
+  .icon-card .name { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* ============================================================
+     MOTION
+     ============================================================ */
+  .motion-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    padding: var(--s-5);
+    margin-bottom: var(--s-3);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-5);
+    align-items: center;
+  }
+  .motion-card h4 { font-family: var(--font-display); font-size: 18px; font-weight: 600; text-transform: uppercase; }
+  .motion-card .specs {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-top: var(--s-2);
+  }
+  .motion-card .specs b { color: var(--text); font-weight: 500; }
+  .motion-demo {
+    background: var(--bg-sunken);
+    border-radius: var(--r-1);
+    padding: var(--s-5);
+    display: flex; align-items: center; justify-content: center;
+    height: 120px;
+  }
+
+  /* hover demo: pick toggle */
+  @keyframes pickIn {
+    0%   { transform: scale(0.9); }
+    40%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+  .motion-pick {
+    animation: pickIn 0.32s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+    color: var(--accent-hover);
+  }
+
+  @keyframes alertSlide {
+    0%   { transform: translateY(-12px); opacity: 0; }
+    20%  { transform: translateY(0); opacity: 1; }
+    80%  { transform: translateY(0); opacity: 1; }
+    100% { transform: translateY(-12px); opacity: 0; }
+  }
+  .motion-alert { animation: alertSlide 3s ease infinite; }
+
+  /* ============================================================
+     PRESENCE TOGGLE (manual location on /now)
+     ============================================================ */
+  .where-am-i {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    padding: var(--s-3);
+  }
+  .where-am-i .legend {
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: var(--s-2);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .where-am-i .legend b { color: var(--text); font-family: var(--font-display); font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+  .presence-toggle {
+    display: grid;
+    grid-template-columns: 1fr;
+    background: var(--bg-sunken);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-1);
+    padding: 3px;
+    gap: 3px;
+  }
+  .presence-toggle.has-metal { grid-template-columns: repeat(2, 1fr); }
+  .presence-toggle button {
+    background: transparent;
+    border: 0;
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 9px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    transition: background 0.16s, color 0.16s;
+  }
+  .presence-toggle button:hover { color: var(--text); }
+  .presence-toggle button.on {
+    background: var(--bg-elevated);
+    color: var(--text);
+    box-shadow: inset 0 0 0 1px var(--border-strong);
+  }
+  .presence-toggle button.on.camping { color: #5fd0bb; }
+  .presence-toggle button.on.metal { color: rgba(253,224,71,0.95); }
+  .presence-toggle button .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+  .where-am-i .help {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  /* ============================================================
+     LOCATION CARD (/now — places, with crew inside)
+     ============================================================ */
+  .loc-stack { display: grid; gap: var(--s-3); }
+  .loc {
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    background: var(--bg-surface);
+    overflow: hidden;
+  }
+  .loc.you { border-color: var(--accent-hover); box-shadow: inset 0 0 0 1px rgba(192,57,43,0.18); }
+  .loc-strip { height: 4px; background: var(--text-muted); }
+  .loc-head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--s-3);
+    padding: var(--s-3) var(--s-4);
+    align-items: end;
+  }
+  .loc-head .kicker {
+    font-family: var(--font-mono); font-size: 10px;
+    color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .loc-head .title {
+    font-family: var(--font-display); font-size: 22px; font-weight: 700;
+    text-transform: uppercase; line-height: 1; margin-top: 4px;
+  }
+  .loc-head .sub {
+    font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-top: 4px;
+  }
+  .loc-count {
+    background: var(--bg-elevated);
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1;
+    padding: 6px 10px;
+    border-radius: var(--r-1);
+    border: 1px solid var(--border-strong);
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+  }
+  .loc-count small { display: block; font-family: var(--font-mono); font-size: 9px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 2px; }
+  .loc-people {
+    padding: 0 var(--s-4) var(--s-4);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .loc-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--r-pill);
+    padding: 3px 10px 3px 3px;
+    font-size: 12px; font-weight: 600;
+  }
+  .loc-chip.me { background: rgba(192,57,43,0.14); border-color: rgba(192,57,43,0.45); color: #fff; }
+  .loc-chip .av { width: 22px; height: 22px; font-size: 10px; }
+  .loc.lost { background: linear-gradient(135deg, rgba(88,28,135,0.32) 0%, rgba(168,85,247,0.06) 60%, transparent), var(--bg-surface); border-color: rgba(168,85,247,0.5); box-shadow: 0 0 18px rgba(168,85,247,0.12); }
+  .loc.lost .loc-strip { background: var(--signal-lost); }
+  .loc.lost .title { color: rgba(233,213,255,0.95); text-shadow: 0 0 12px rgba(168,85,247,0.5); letter-spacing: 0.04em; }
+  .loc.lost .kicker { color: rgba(196,148,255,0.85); }
+  .loc.camping { background: linear-gradient(135deg, rgba(22,160,133,0.16) 0%, transparent 70%), var(--bg-surface); border-color: rgba(22,160,133,0.45); }
+  .loc.camping .loc-strip { background: var(--signal-ok); }
+  .loc.camping .kicker { color: #5fd0bb; }
+  .loc.metal { background: linear-gradient(135deg, rgba(217,119,6,0.18) 0%, rgba(253,224,71,0.06) 50%, transparent 70%), var(--bg-surface); border-color: rgba(217,119,6,0.55); }
+  .loc.metal .loc-strip { background: rgba(217,119,6,1); }
+  .loc.metal .kicker { color: rgba(253,224,71,0.95); }
+  .loc.metal .title { color: #fff; }
+  .loc-empty {
+    padding: 0 var(--s-4) var(--s-4);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-style: italic;
+  }
+
+  /* ============================================================
+     WHO PICKED / SAW lists (band detail modal)
+     ============================================================ */
+  .who-list {
+    border-top: 1px solid var(--border);
+    padding-top: var(--s-3);
+    display: grid;
+    gap: var(--s-3);
+  }
+  .who-list h5 {
+    font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-muted); margin-bottom: 6px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .who-list h5 .ct { font-family: var(--font-display); font-size: 14px; color: var(--text); font-weight: 700; }
+  .who-list h5 b.label { font-weight: 700; color: var(--text); font-family: var(--font-display); font-size: 14px; }
+  .who-rows { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+  .who-row {
+    display: flex; align-items: center; gap: 8px;
+    padding: 4px 0;
+    font-size: 13px;
+  }
+  .who-row .av { width: 24px; height: 24px; font-size: 10px; flex-shrink: 0; }
+  .who-row .nm { font-weight: 600; color: var(--text); }
+  .who-row.saw .nm { color: var(--signal-ok); }
+  .who-row.no-show { opacity: 0.45; }
+
+  /* ============================================================
+     PATCH COLLECTION (vest-style badges)
+     ============================================================ */
+  .patch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: var(--s-4) var(--s-3);
+    justify-items: center;
+    padding: var(--s-3) 0;
+  }
+  .patch {
+    width: 88px; height: 88px;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+    border: 3px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-weight: 700;
+    font-size: 28px; color: #fff;
+    position: relative;
+    box-shadow: 0 2px 0 rgba(0,0,0,0.5), inset 0 0 0 2px rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: transform 0.16s ease;
+  }
+  .patch:hover { transform: scale(1.04); }
+  .patch.locked { opacity: 0.32; filter: grayscale(1); }
+  .patch.flag-br { background: #009c3b; }
+  .patch.flag-co { background: linear-gradient(180deg,#fcd116 0 50%, #003893 50% 75%, #ce1126 75%); }
+  .patch.flag-be { background: linear-gradient(90deg,#000 0 33%, #fae042 33% 66%, #ed2939 66%); }
+  .patch.flag-de { background: linear-gradient(180deg,#000 0 33%, #dd0000 33% 66%, #ffce00 66%); }
+  .patch.veteran { background: var(--accent); border-color: rgba(255,255,255,0.2); }
+  .patch.sniper { background: var(--stage-faster); }
+  .patch.wasteland-loyal { background: var(--stage-wasteland); }
+  .patch.headbang { background: var(--stage-louder); }
+  .patch.witness { background: var(--stage-headbangers); }
+  .patch.year-chip {
+    position: absolute;
+    bottom: -6px; right: -6px;
+    background: #0a0a0a;
+    color: var(--accent-hover);
+    font-family: var(--font-mono); font-size: 9px;
+    font-weight: 700;
+    padding: 2px 5px;
+    border: 1px solid var(--accent-hover);
+    border-radius: var(--r-1);
+    text-transform: uppercase; letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  /* organic vest layout */
+  .vest {
+    position: relative;
+    height: 360px;
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.012) 0 8px, transparent 8px 16px),
+      var(--bg-sunken);
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    overflow: hidden;
+  }
+  .vest::before, .vest::after {
+    content: '';
+    position: absolute; top: 8px; bottom: 8px;
+    width: 1px;
+    background: rgba(255,255,255,0.04);
+  }
+  .vest::before { left: 12%; }
+  .vest::after { right: 12%; }
+  .vest .patch {
+    position: absolute;
+    transform: rotate(var(--rot, 0deg));
+    box-shadow: 0 4px 8px rgba(0,0,0,0.55), inset 0 0 0 2px rgba(0,0,0,0.4);
+  }
+  .vest .patch:hover { transform: rotate(var(--rot, 0deg)) scale(1.06); }
+
+  /* Patch detail modal preview */
+  .patch-detail {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-3);
+    padding: var(--s-6);
+    text-align: center;
+    max-width: 280px;
+  }
+  .patch-detail .patch-big {
+    width: 132px; height: 132px;
+    margin: 0 auto var(--s-3);
+    font-size: 44px;
+  }
+  .patch-detail .pname {
+    font-family: var(--font-display); font-size: 22px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.02em;
+  }
+  .patch-detail .pdesc {
+    font-size: 13px; color: var(--text-muted); line-height: 1.5;
+    margin-top: 6px;
+  }
+  .patch-detail .wacken-chip {
+    display: inline-block;
+    margin-top: var(--s-3);
+    background: var(--bg-sunken);
+    border: 1px solid var(--accent);
+    color: var(--accent-hover);
+    font-family: var(--font-mono); font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border-radius: var(--r-1);
+  }
+
+  /* ============================================================
+     FILTER DRAWER (bottom sheet for /schedule)
+     ============================================================ */
+  .filter-trigger {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-1);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 8px 12px;
+    display: inline-flex; align-items: center; gap: 6px;
+    cursor: pointer;
+  }
+  .filter-trigger .ct {
+    background: var(--accent); color: #fff;
+    border-radius: var(--r-pill);
+    font-family: var(--font-display); font-size: 10px;
+    font-weight: 700;
+    min-width: 18px; height: 18px;
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0 5px;
+  }
+  .scrim {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(2px);
+  }
+  .drawer {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    background: var(--bg-surface);
+    border-top-left-radius: 14px;
+    border-top-right-radius: 14px;
+    border-top: 1px solid var(--border-strong);
+    padding: var(--s-3) var(--s-4) var(--s-4);
+    box-shadow: 0 -12px 30px rgba(0,0,0,0.5);
+  }
+  .drawer .grab {
+    width: 36px; height: 4px;
+    background: var(--border-strong);
+    border-radius: 2px;
+    margin: 0 auto var(--s-3);
+  }
+  .drawer h4 {
+    font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-muted); margin: var(--s-3) 0 6px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .drawer h4:first-of-type { margin-top: 0; }
+  .drawer h4 .clear { font-family: var(--font-mono); color: var(--accent-hover); font-size: 9px; cursor: pointer; }
+
+  /* unpick star inside timeline-bcard */
+  .timeline-bcard .pick {
+    width: 36px;
+    border-left: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent-hover);
+  }
+  .timeline-bcard .pick svg { width: 14px; height: 14px; }
+
+  /* profile row */
+  .pf-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .pf-row:last-child { border-bottom: 0; }
+  .pf-row .lbl { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+  .pf-row .val { font-weight: 600; color: var(--text); }
+  .lang-seg {
+    display: inline-flex; gap: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-1);
+    overflow: hidden;
+  }
+  .lang-seg button {
+    background: transparent;
+    border: 0;
+    color: var(--text-muted);
+    font-family: var(--font-mono); font-size: 10px; font-weight: 700;
+    padding: 5px 9px;
+    cursor: pointer;
+    border-right: 1px solid var(--border-strong);
+  }
+  .lang-seg button:last-child { border-right: 0; }
+  .lang-seg button.on { background: var(--accent); color: #fff; }
+  .pf-collapse {
+    border-top: 1px solid var(--border);
+    padding: 12px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer;
+  }
+  .pf-collapse .left { display: flex; align-items: center; gap: 8px; }
+  .pf-collapse .left svg { width: 14px; height: 14px; }
+  .pf-collapse .label { font-family: var(--font-display); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; }
+  .pf-collapse .chev { color: var(--text-muted); font-family: var(--font-mono); font-size: 10px; }
+  .pf-collapse.manager .label { color: #58a8e6; }
+  .pf-collapse.godlike .label { color: var(--signal-warn); }
+
+  /* ============================================================
+     UTILS
+     ============================================================ */
+  .row { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center; }
+  .col { display: grid; gap: var(--s-3); }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ============================================================
+       MASTHEAD
+       ============================================================ -->
+  <header class="masthead">
+    <div>
+      <div class="eyebrow">Design System &middot; v1.0 &middot; Wacken Open Air 2026</div>
+      <h1>Viralatas<br />Metaleiros<span class="horns"> 🤘</span></h1>
+      <p class="lede">A festival companion PWA for ~20 metalheads. Dark-first, offline-first. Feels like a backstage wristband, not a corporate app.</p>
+    </div>
+    <div class="specs">
+      <b>FOUNDATION</b><br />
+      tone &middot; gritty / legible<br />
+      mode &middot; dark primary<br />
+      density &middot; high<br />
+      <br />
+      <b>CONSTRAINTS</b><br />
+      no glow / no gradients*<br />
+      stage colors are fixed<br />
+      offline-first &mdash; no spinners<br />
+      <small style="color:var(--text-faint)">* gradients reserved for crew-state cards only</small>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       1. COLOR
+       ============================================================ -->
+  <section class="section" id="color">
+    <div class="section-head">
+      <div class="num">01</div>
+      <div>
+        <h2>Color</h2>
+        <p class="desc">Dark neutrals carry the entire surface area. The eight stage colors are the only saturated hues — they identify a band, a pick, a crew member's location. Semantic colors are reserved for state: live, conflict, sync, lost.</p>
+      </div>
+    </div>
+
+    <div class="subhead">Surfaces &middot; neutrals</div>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="chip" style="background:#0a0a0a">#0a0a0a</div><div class="meta"><div class="name">Background</div><div class="tok">--bg</div><div class="hex">canvas, body</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#141414">#141414</div><div class="meta"><div class="name">Surface</div><div class="tok">--bg-surface</div><div class="hex">cards, header</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#1e1e1e">#1e1e1e</div><div class="meta"><div class="name">Elevated</div><div class="tok">--bg-elevated</div><div class="hex">stat tile, btn rest</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#050505">#050505</div><div class="meta"><div class="name">Sunken</div><div class="tok">--bg-sunken</div><div class="hex">modal scrim, input</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#2a2a2a">#2a2a2a</div><div class="meta"><div class="name">Border</div><div class="tok">--border</div><div class="hex">hairlines</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#3a3a3a">#3a3a3a</div><div class="meta"><div class="name">Border Strong</div><div class="tok">--border-strong</div><div class="hex">btn, focus</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#e8e8e8;color:#0a0a0a">#e8e8e8</div><div class="meta"><div class="name">Text</div><div class="tok">--text</div><div class="hex">primary copy</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#888;color:#0a0a0a">#888888</div><div class="meta"><div class="name">Text Muted</div><div class="tok">--text-muted</div><div class="hex">secondary</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#555;color:#0a0a0a">#555555</div><div class="meta"><div class="name">Text Faint</div><div class="tok">--text-faint</div><div class="hex">disabled</div></div></div>
+    </div>
+
+    <div class="subhead">Stage palette &middot; canonical, never reinterpret</div>
+    <div class="stage-rail">
+      <div style="background:#2980b9"><div class="name">Faster</div><div><div>Main Infield</div><div class="hex">#2980B9</div></div></div>
+      <div style="background:#e67e22"><div class="name">Harder</div><div><div>Main Infield</div><div class="hex">#E67E22</div></div></div>
+      <div style="background:#8e44ad"><div class="name">Louder</div><div><div>Main Infield</div><div class="hex">#8E44AD</div></div></div>
+      <div style="background:#c0392b"><div class="name">W.E.T.</div><div><div>Outside Infield</div><div class="hex">#C0392B</div></div></div>
+      <div style="background:#16a085"><div class="name">Headbangers</div><div><div>Outside Infield</div><div class="hex">#16A085</div></div></div>
+      <div style="background:#2c3e50"><div class="name">Wasteland</div><div><div>Specialized</div><div class="hex">#2C3E50</div></div></div>
+      <div style="background:#95a5a6;color:#0a0a0a"><div class="name">Wackinger</div><div><div>Specialized</div><div class="hex">#95A5A6</div></div></div>
+      <div style="background:#f39c12"><div class="name">W.T.J.</div><div><div>Specialized</div><div class="hex">#F39C12</div></div></div>
+    </div>
+    <p class="t-small" style="margin-top:var(--s-3)">Use stage colors as solid fills (badges, stripes, pills, hero strips). When tinting at low alpha, target 8–18% over surface; never tint backgrounds above 25% — they stop reading as accent.</p>
+
+    <div class="subhead">Semantic state</div>
+    <div class="swatch-grid">
+      <div class="swatch"><div class="chip" style="background:#c0392b">#c0392b</div><div class="meta"><div class="name">Live / Now</div><div class="tok">--signal-live</div><div class="hex">also primary accent</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#f39c12">#f39c12</div><div class="meta"><div class="name">Warn / Conflict / Queued</div><div class="tok">--signal-warn</div><div class="hex">overlap, offline pending</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#16a085">#16a085</div><div class="meta"><div class="name">OK / Synced</div><div class="tok">--signal-ok</div><div class="hex">camping, sync restored</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#a855f7">#a855f7</div><div class="meta"><div class="name">Lost 🤘</div><div class="tok">--signal-lost</div><div class="hex">no current pick</div></div></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       2. TYPE
+       ============================================================ -->
+  <section class="section" id="type">
+    <div class="section-head">
+      <div class="num">02</div>
+      <div>
+        <h2>Type</h2>
+        <p class="desc">Three families. Oswald carries band names and section heads — condensed, loud, but never illegible. IBM Plex Sans handles body copy and UI labels. JetBrains Mono locks all times, IDs, and meta-data into tabular alignment so the schedule reads like a control board.</p>
+      </div>
+    </div>
+
+    <div class="type-row">
+      <div class="label"><b>Display XL</b>Oswald · 700 · 80/72</div>
+      <div class="sample t-display-xl">Blind Guardian</div>
+    </div>
+    <div class="type-row">
+      <div class="label"><b>Display L</b>Oswald · 600 · 48/48</div>
+      <div class="sample t-display-l">Right Now &middot; D2 22:30</div>
+    </div>
+    <div class="type-row">
+      <div class="label"><b>Display M</b>Oswald · 600 · 32/34</div>
+      <div class="sample t-display-m">Most-picked bands</div>
+    </div>
+    <div class="type-row">
+      <div class="label"><b>Band Name</b>Oswald · 700 · 28/30<br />Used on band cards</div>
+      <div class="sample t-band">POWERWOLF</div>
+    </div>
+    <div class="type-row">
+      <div class="label"><b>Heading</b>Plex Sans · 700 · 18/24</div>
+      <div class="sample t-h">Crew is split across 4 stages right now.</div>
+    </div>
+    <div class="type-row">
+      <div class="label"><b>Body</b>Plex Sans · 400 · 15/22</div>
+      <div class="sample t-body">Você marcou Blind Guardian e Powerwolf ao mesmo tempo. Qual palco vai rolar? 🤘</div>
+    </div>
+    <div class="type-row">
+      <div class="label"><b>Small</b>Plex Sans · 400 · 13/19</div>
+      <div class="sample t-small">Saved offline · will sync when signal returns</div>
+    </div>
+    <div class="type-row">
+      <div class="label"><b>Label / Mono</b>JetBrains Mono · 500 · 11/16<br />Caps + 0.10em tracking</div>
+      <div class="sample t-label">Stage &middot; Outside Infield</div>
+    </div>
+    <div class="type-row">
+      <div class="label"><b>Time / Tabular</b>JetBrains Mono · 500 · 14/18<br />Tabular numerals</div>
+      <div class="sample t-time">22:30 → 23:45</div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       3. SPACING + RADIUS
+       ============================================================ -->
+  <section class="section" id="space">
+    <div class="section-head">
+      <div class="num">03</div>
+      <div>
+        <h2>Spacing &amp; Radius</h2>
+        <p class="desc">4-px base scale. Default radius is 4 px — sharp, festival-ticket feel. Cards sit at 8 px. Modals at 12 px. Pills are full-round.</p>
+      </div>
+    </div>
+
+    <div class="subhead">Spacing scale</div>
+    <div class="scale-grid">
+      <div class="scale-card"><div class="bar" style="width:4px"></div><div class="label">--s-1</div><div class="px">4 px</div></div>
+      <div class="scale-card"><div class="bar" style="width:8px"></div><div class="label">--s-2</div><div class="px">8 px</div></div>
+      <div class="scale-card"><div class="bar" style="width:12px"></div><div class="label">--s-3</div><div class="px">12 px</div></div>
+      <div class="scale-card"><div class="bar" style="width:16px"></div><div class="label">--s-4</div><div class="px">16 px</div></div>
+      <div class="scale-card"><div class="bar" style="width:20px"></div><div class="label">--s-5</div><div class="px">20 px</div></div>
+      <div class="scale-card"><div class="bar" style="width:24px"></div><div class="label">--s-6</div><div class="px">24 px</div></div>
+      <div class="scale-card"><div class="bar" style="width:32px"></div><div class="label">--s-8</div><div class="px">32 px</div></div>
+      <div class="scale-card"><div class="bar" style="width:48px"></div><div class="label">--s-12</div><div class="px">48 px</div></div>
+    </div>
+
+    <div class="subhead">Radius</div>
+    <div class="scale-grid">
+      <div class="scale-card"><div class="box" style="border-radius:0"></div><div class="label">--r-0</div><div class="px">0 — strips, banners</div></div>
+      <div class="scale-card"><div class="box" style="border-radius:4px"></div><div class="label">--r-1</div><div class="px">4 px — pills, btn, badge</div></div>
+      <div class="scale-card"><div class="box" style="border-radius:8px"></div><div class="label">--r-2</div><div class="px">8 px — cards</div></div>
+      <div class="scale-card"><div class="box" style="border-radius:12px"></div><div class="label">--r-3</div><div class="px">12 px — modals</div></div>
+      <div class="scale-card"><div class="box" style="border-radius:999px"></div><div class="label">--r-pill</div><div class="px">full — pills, avatars</div></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       4. COMPONENTS
+       ============================================================ -->
+  <section class="section" id="components">
+    <div class="section-head">
+      <div class="num">04</div>
+      <div>
+        <h2>Components</h2>
+        <p class="desc">Dark mode is the only mode that matters. Everything has high contrast, hard edges, and lives in tight density. The pick toggle is a star — a single saved gesture, instantly visible across the schedule.</p>
+      </div>
+    </div>
+
+    <!-- BAND CARD: schedule -->
+    <div class="subhead">Band card &middot; schedule variant</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="bcard">
+          <div class="stripe" style="background:var(--stage-louder)"></div>
+          <div class="thumb" style="background:var(--stage-louder)">P</div>
+          <div class="body">
+            <div class="name">POWERWOLF</div>
+            <div class="meta">
+              <span class="stage" style="background:var(--stage-louder)">Louder</span>
+              <span class="time">22:30 — 23:45</span>
+              <span class="going"><b>7</b> going</span>
+            </div>
+          </div>
+          <button class="pick on" aria-label="Picked">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        </div>
+        <div class="bcard">
+          <div class="stripe" style="background:var(--stage-faster)"></div>
+          <div class="thumb" style="background:var(--stage-faster)">B</div>
+          <div class="body">
+            <div class="name">BLIND GUARDIAN</div>
+            <div class="meta">
+              <span class="stage" style="background:var(--stage-faster)">Faster</span>
+              <span class="time">22:00 — 23:30</span>
+              <span class="going"><b>11</b> going</span>
+            </div>
+          </div>
+          <button class="pick on">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        </div>
+        <div class="bcard">
+          <div class="stripe" style="background:var(--stage-jungle)"></div>
+          <div class="thumb" style="background:var(--stage-jungle)">A</div>
+          <div class="body">
+            <div class="name">AMORPHIS</div>
+            <div class="meta">
+              <span class="stage" style="background:var(--stage-jungle)">W.T.J.</span>
+              <span class="time">19:00 — 20:00</span>
+              <span class="going"><b>3</b> going</span>
+            </div>
+          </div>
+          <button class="pick">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Anatomy</h4>
+        <ul>
+          <li><b>Stage stripe</b> 4px hard color</li>
+          <li><b>Thumb</b> 56px, fallback = stage tint + monogram</li>
+          <li><b>Name</b> Oswald 19, uppercase, no wrap</li>
+          <li><b>Stage chip</b> Mono 10, hard radius</li>
+          <li><b>Time</b> Mono tabular, en-dash</li>
+          <li><b>Going count</b> red number = social proof</li>
+          <li><b>Pick</b> 64px hit area, rest of card opens detail</li>
+          <li><i>No conflict chip on this variant</i> — surfaced only on /my-picks</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- BAND CARD: my-picks timeline -->
+    <div class="subhead">Band card &middot; my-picks timeline variant</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="bcard timeline">
+          <div class="stripe" style="background:var(--stage-faster)"></div>
+          <div class="when"><div class="h">22:00</div><div class="end">23:30</div></div>
+          <div class="body">
+            <div class="name">BLIND GUARDIAN</div>
+            <div class="meta">
+              <span class="stage" style="background:var(--stage-faster)">Faster</span>
+              <span class="going"><b>11</b> crew going</span>
+              <span class="conflict-chip">⚠ Conflito</span>
+            </div>
+          </div>
+          <button class="pick on">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        </div>
+        <div class="bcard timeline">
+          <div class="stripe" style="background:var(--stage-louder)"></div>
+          <div class="when"><div class="h">22:30</div><div class="end">23:45</div></div>
+          <div class="body">
+            <div class="name">POWERWOLF</div>
+            <div class="meta">
+              <span class="stage" style="background:var(--stage-louder)">Louder</span>
+              <span class="going"><b>7</b> crew going</span>
+              <span class="conflict-chip">⚠ Conflito</span>
+            </div>
+          </div>
+          <button class="pick on">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Use</h4>
+        <ul>
+          <li>Sorted by start time, grouped by day</li>
+          <li><b>Time block</b> on the left replaces thumb</li>
+          <li><b>Conflict chip</b> single "Conflito" label — overlap details intentionally not computed</li>
+          <li>Star pick toggle on every card to unpick directly from this list</li>
+          <li>Day grouping uses a 2px accent rule (see /my-picks layout)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- BAND CARD: popular -->
+    <div class="subhead">Band card &middot; popular variant</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="bcard ranked">
+          <div class="stripe" style="background:var(--stage-louder)"></div>
+          <div class="rank top">01</div>
+          <div class="body" style="padding:var(--s-4)">
+            <div class="name">POWERWOLF</div>
+            <div class="meta">
+              <span class="stage" style="background:var(--stage-louder)">Louder</span>
+              <span class="time">D3 · 22:30</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--s-3);margin-top:var(--s-3)">
+              <div class="cluster">
+                <span class="av s32" style="background:#c0392b">SF</span>
+                <span class="av s32" style="background:#2980b9">JP</span>
+                <span class="av s32" style="background:#16a085">LM</span>
+                <span class="av s32" style="background:#8e44ad">RC</span>
+                <span class="av s32" style="background:#f39c12;color:#0a0a0a">VB</span>
+              </div>
+              <div class="t-label" style="color:var(--accent-hover)"><b style="color:#fff;font-family:var(--font-display);font-size:18px">14</b>&nbsp;going</div>
+            </div>
+          </div>
+        </div>
+        <div class="bcard ranked">
+          <div class="stripe" style="background:var(--stage-faster)"></div>
+          <div class="rank">02</div>
+          <div class="body" style="padding:var(--s-4)">
+            <div class="name">BLIND GUARDIAN</div>
+            <div class="meta">
+              <span class="stage" style="background:var(--stage-faster)">Faster</span>
+              <span class="time">D2 · 22:00</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:var(--s-3);margin-top:var(--s-3)">
+              <div class="cluster">
+                <span class="av s32" style="background:#16a085">LM</span>
+                <span class="av s32" style="background:#8e44ad">RC</span>
+                <span class="av s32" style="background:#e67e22">DK</span>
+                <span class="av s32" style="background:#2c3e50">FF</span>
+              </div>
+              <div class="t-label"><b style="color:#fff;font-family:var(--font-display);font-size:18px">11</b>&nbsp;going</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Anatomy</h4>
+        <ul>
+          <li><b>Rank</b> Oswald 36, top-3 in red</li>
+          <li><b>Avatar cluster</b> up to 5 visible, +N overflow</li>
+          <li>Tap → opens band detail modal</li>
+          <li>Day chip uses <code>D1</code>–<code>D4</code> shorthand</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- CAMPING / LOCATION SELF-CONTROL -->
+    <div class="subhead">Presence toggle &middot; the user's manual location</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="where-am-i">
+          <div class="legend"><b>Onde estou</b><span>manual override, syncs to crew grid</span></div>
+          <div class="presence-toggle">
+            <button class="on camping"><span class="dot"></span>Estou no camping</button>
+          </div>
+          <div class="help">When off, your location auto-resolves from your current pick. If you have no active pick, you fall to <b>Lost 🤘</b>.</div>
+          <div class="presence-toggle has-metal" style="margin-top:12px">
+            <button><span class="dot" style="color:#5fd0bb"></span>Camping</button>
+            <button class="on metal"><span class="dot" style="color:rgba(253,224,71,0.95)"></span>Metal Place</button>
+          </div>
+          <div class="help">Metal Place appears only while the configured event window is active. Camping and Metal Place are mutually exclusive; tapping the active option clears the manual override.</div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Behavior</h4>
+        <ul>
+          <li>Manual override is nullable: off means auto-resolve from the user's current band pick</li>
+          <li>Outside the Metal Place window, render only the Camping on/off toggle</li>
+          <li>During the Metal Place window, render Camping and Metal Place as two mutually exclusive options</li>
+          <li>Tapping the active option clears the manual location and returns the user to band/LOST resolution</li>
+          <li>Metal Place is never shown when the configured event window is inactive</li>
+          <li>Sits prominently at the top of /now — not in a submenu</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- LOCATION CARD -->
+    <div class="subhead">Location card &middot; /now is a list of <i>places</i>, not crew members</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="loc-stack">
+          <div class="loc you">
+            <div class="loc-strip" style="background:var(--stage-louder)"></div>
+            <div class="loc-head">
+              <div>
+                <div class="kicker"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block"></span>Live now &middot; you are here</div>
+                <div class="title">Powerwolf</div>
+                <div class="sub">Louder &middot; 22:30 — 23:45</div>
+              </div>
+              <div class="loc-count">7<small>crew</small></div>
+            </div>
+            <div class="loc-people">
+              <span class="loc-chip me"><span class="av" style="background:#c0392b">SF</span>Salvatore</span>
+              <span class="loc-chip"><span class="av" style="background:#8e44ad">RC</span>Rafael</span>
+              <span class="loc-chip"><span class="av" style="background:#e67e22">DK</span>Diogo</span>
+              <span class="loc-chip"><span class="av" style="background:#2c3e50">FF</span>Felipe</span>
+              <span class="loc-chip"><span class="av" style="background:#16a085">MM</span>Marina</span>
+            </div>
+          </div>
+          <div class="loc">
+            <div class="loc-strip" style="background:var(--stage-faster)"></div>
+            <div class="loc-head">
+              <div>
+                <div class="kicker">Playing now</div>
+                <div class="title">Blind Guardian</div>
+                <div class="sub">Faster &middot; 22:00 — 23:30</div>
+              </div>
+              <div class="loc-count">3<small>crew</small></div>
+            </div>
+            <div class="loc-people">
+              <span class="loc-chip"><span class="av" style="background:#2980b9">JP</span>Joana</span>
+              <span class="loc-chip"><span class="av" style="background:#16a085">LM</span>Lucas</span>
+              <span class="loc-chip"><span class="av" style="background:#f39c12;color:#0a0a0a">VB</span>Victor</span>
+            </div>
+          </div>
+          <div class="loc camping">
+            <div class="loc-strip"></div>
+            <div class="loc-head">
+              <div>
+                <div class="kicker">Resting</div>
+                <div class="title">Camping</div>
+                <div class="sub">checked-in &middot; sector H</div>
+              </div>
+              <div class="loc-count">4<small>crew</small></div>
+            </div>
+            <div class="loc-people">
+              <span class="loc-chip"><span class="av" style="background:#16a085">PP</span>Paula</span>
+              <span class="loc-chip"><span class="av" style="background:#c0392b">TG</span>Thiago</span>
+              <span class="loc-chip"><span class="av" style="background:#8e44ad">CM</span>Caio</span>
+              <span class="loc-chip"><span class="av" style="background:#2980b9">AN</span>Ana</span>
+            </div>
+          </div>
+          <div class="loc metal">
+            <div class="loc-strip"></div>
+            <div class="loc-head">
+              <div>
+                <div class="kicker">Special zone</div>
+                <div class="title">Metal Place</div>
+                <div class="sub">festival-day only &middot; check in to join</div>
+              </div>
+              <div class="loc-count">2<small>crew</small></div>
+            </div>
+            <div class="loc-people">
+              <span class="loc-chip"><span class="av" style="background:#e67e22">BG</span>Bruno</span>
+              <span class="loc-chip"><span class="av" style="background:#c0392b">EE</span>Erika</span>
+            </div>
+          </div>
+          <div class="loc lost">
+            <div class="loc-strip"></div>
+            <div class="loc-head">
+              <div>
+                <div class="kicker">No current location</div>
+                <div class="title">Lost 🤘</div>
+                <div class="sub">no active pick &middot; not at camping</div>
+              </div>
+              <div class="loc-count">2<small>crew</small></div>
+            </div>
+            <div class="loc-people">
+              <span class="loc-chip"><span class="av" style="background:#581c87">RG</span>Rodrigo</span>
+              <span class="loc-chip"><span class="av" style="background:#581c87">PR</span>Pedro</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Card-per-location</h4>
+        <ul>
+          <li>One card per <b>currently-playing band that has at least one crew member</b></li>
+          <li><b>Camping</b> &mdash; one card, crew who set themselves to camping</li>
+          <li><b>Metal Place</b> &mdash; one card, only on festival days</li>
+          <li><b>Lost 🤘</b> &mdash; always last, anyone with no location</li>
+          <li>The user's own card has an accent border + "you are here" kicker</li>
+          <li>Avatars are <b>chips inside</b>, never separate cards</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- BAND DETAIL MODAL -->
+    <div class="subhead">Band detail modal</div>
+    <div class="demo">
+      <div class="demo-stage" style="padding:0">
+        <div class="modal-frame">
+          <div class="modal">
+            <div class="hero" style="background:var(--stage-louder)"></div>
+            <div class="head">
+              <div class="stage" style="color:#c799eb">Louder &middot; Main Infield</div>
+              <h3>Powerwolf</h3>
+              <div class="info">
+                <span>D3 · Friday Jul 31</span>
+                <span>22:30 — 23:45</span>
+                <span>Power Metal</span>
+              </div>
+            </div>
+            <div class="body">
+              <div class="stat-pair">
+                <div class="stat"><div class="k">Picked</div><div class="v">7<small>/ 20</small></div></div>
+                <div class="stat"><div class="k">Actually saw</div><div class="v">5<small>/ 7</small></div></div>
+              </div>
+              <div class="who-list">
+                <div>
+                  <h5><b class="label">Vão ver</b><span class="ct">7</span></h5>
+                  <div class="who-rows">
+                    <div class="who-row"><span class="av s24" style="background:#c0392b">SF</span><span class="nm">Salvatore</span></div>
+                    <div class="who-row"><span class="av s24" style="background:#2980b9">JP</span><span class="nm">Joana</span></div>
+                    <div class="who-row"><span class="av s24" style="background:#16a085">LM</span><span class="nm">Lucas</span></div>
+                    <div class="who-row"><span class="av s24" style="background:#8e44ad">RC</span><span class="nm">Rafael</span></div>
+                    <div class="who-row"><span class="av s24" style="background:#e67e22">DK</span><span class="nm">Diogo</span></div>
+                    <div class="who-row"><span class="av s24" style="background:#f39c12;color:#0a0a0a">VB</span><span class="nm">Victor</span></div>
+                    <div class="who-row"><span class="av s24" style="background:#2c3e50">FF</span><span class="nm">Felipe</span></div>
+                  </div>
+                </div>
+                <div>
+                  <h5><b class="label" style="color:#5fd0bb">Viram</b><span class="ct" style="color:#5fd0bb">5</span></h5>
+                  <div class="who-rows">
+                    <div class="who-row saw"><span class="av s24" style="background:#c0392b">SF</span><span class="nm">Salvatore</span></div>
+                    <div class="who-row saw"><span class="av s24" style="background:#2980b9">JP</span><span class="nm">Joana</span></div>
+                    <div class="who-row saw"><span class="av s24" style="background:#16a085">LM</span><span class="nm">Lucas</span></div>
+                    <div class="who-row saw"><span class="av s24" style="background:#e67e22">DK</span><span class="nm">Diogo</span></div>
+                    <div class="who-row saw"><span class="av s24" style="background:#f39c12;color:#0a0a0a">VB</span><span class="nm">Victor</span></div>
+                    <div class="who-row no-show"><span class="av s24" style="background:#8e44ad">RC</span><span class="nm">Rafael &middot; não vi</span></div>
+                    <div class="who-row no-show"><span class="av s24" style="background:#2c3e50">FF</span><span class="nm">Felipe &middot; não vi</span></div>
+                  </div>
+                </div>
+              </div>
+              <div class="conflict-warn">
+                <span>⚠</span>
+                <div>You also picked <b>Blind Guardian</b> at 22:00 on Faster. One of these has to give.</div>
+              </div>
+              <div class="seen-toggle">
+                <div class="label">Não vi essa banda<br /><small style="color:var(--text-faint);font-family:var(--font-mono);font-size:10px">Available after 23:45</small></div>
+                <div class="toggle-track"></div>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="btn ghost">Close</button>
+              <button class="btn primary" style="margin-left:auto">★ Picked</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Anatomy</h4>
+        <ul>
+          <li><b>Hero strip</b> 8px stage color — only branding</li>
+          <li><b>Stat pair</b> picked / actually-saw — the headline number</li>
+          <li><b>Who picked / who saw</b> — names + avatars are the primary display, not just counts</li>
+          <li><b>Conflict warn</b> only when overlapping picks exist</li>
+          <li><b>"Não vi"</b> toggle activates after band's <code>end_time</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ALERT BANNER -->
+    <div class="subhead">Alert banner &middot; AI-generated, dismissible</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="alert warn">
+          <div class="stripe"></div>
+          <div class="icon warn">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2 L22 20 L2 20 Z"/><path d="M12 9 L12 14"/><circle cx="12" cy="17" r="0.6" fill="currentColor"/></svg>
+          </div>
+          <div class="text">
+            <b>Conflito de palco</b>
+            Você marcou Blind Guardian e Powerwolf ao mesmo tempo. Qual palco vai rolar? 🤘
+            <small>2 min ago · Faster vs Louder</small>
+          </div>
+          <button class="dismiss">✕</button>
+        </div>
+        <div class="alert live">
+          <div class="stripe"></div>
+          <div class="icon live">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>
+          </div>
+          <div class="text">
+            <b>Crew dividida</b>
+            Vocês estão em 4 palcos diferentes agora. 🤘
+            <small>just now</small>
+          </div>
+          <button class="dismiss">✕</button>
+        </div>
+        <div class="alert ok">
+          <div class="stripe"></div>
+          <div class="icon ok">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><polyline points="4 12 10 18 20 6"/></svg>
+          </div>
+          <div class="text">
+            <b>Sincronizado</b>
+            3 picks pendentes salvos. Tudo em dia. 🤘
+            <small>now · 3 actions flushed</small>
+          </div>
+          <button class="dismiss">✕</button>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Behavior</h4>
+        <ul>
+          <li>Slide in from top, auto-dismiss 6s, manual ✕</li>
+          <li>Stripe color = severity (live/warn/ok)</li>
+          <li>Stack order newest-on-top, max 3 visible</li>
+          <li>Always end copy with 🤘 — voice rule</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- BADGE -->
+    <div class="subhead">Badge collection &middot; circular patches, vest-style</div>
+    <p class="t-small" style="margin:-6px 0 var(--s-3)">Badges live as <b>patches on a metal vest</b>, not entries in a settings list. The default state is image-only — no captions visible. Tap any patch to open the detail modal with name, description, and (if historical) the Wacken year chip.</p>
+
+    <div class="subhead" style="font-size:11px;border-bottom:0;padding-bottom:0;margin-top:var(--s-5)">Variant A &middot; even circle grid</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="patch-grid">
+          <div class="patch flag-br">BR</div>
+          <div class="patch veteran">5<span style="font-size:14px;vertical-align:super">x</span></div>
+          <div class="patch sniper">42</div>
+          <div class="patch witness">25<span class="year-chip">'25</span></div>
+          <div class="patch headbang">🤘</div>
+          <div class="patch wasteland-loyal">⚒</div>
+          <div class="patch flag-co locked">CO</div>
+          <div class="patch flag-be locked">BE</div>
+          <div class="patch flag-de locked">DE</div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Coins on a display</h4>
+        <ul>
+          <li>Strict rows, equal sizing, equal spacing</li>
+          <li>Locked = grayscale + 32% opacity</li>
+          <li>Year chip pinned bottom-right of historical patches</li>
+          <li>Reads as a <b>collection</b> &mdash; orderly, comparable</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="subhead" style="font-size:11px;border-bottom:0;padding-bottom:0;margin-top:var(--s-5)">Variant B &middot; organic vest layout</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="vest">
+          <div class="patch flag-br" style="--rot:-8deg;left:6%;top:8%;width:96px;height:96px;font-size:30px">BR</div>
+          <div class="patch veteran" style="--rot:5deg;left:30%;top:4%;width:78px;height:78px;font-size:24px">5<span style="font-size:12px;vertical-align:super">x</span></div>
+          <div class="patch sniper" style="--rot:-3deg;left:54%;top:11%;width:84px;height:84px;font-size:26px">42</div>
+          <div class="patch witness" style="--rot:7deg;left:78%;top:6%;width:74px;height:74px;font-size:22px">25<span class="year-chip">'25</span></div>
+          <div class="patch headbang" style="--rot:-12deg;left:18%;top:42%;width:90px;height:90px;font-size:34px">🤘</div>
+          <div class="patch wasteland-loyal" style="--rot:8deg;left:46%;top:46%;width:86px;height:86px;font-size:32px">⚒</div>
+          <div class="patch flag-co locked" style="--rot:-5deg;left:70%;top:48%;width:70px;height:70px;font-size:22px">CO</div>
+          <div class="patch flag-be locked" style="--rot:11deg;left:8%;top:74%;width:74px;height:74px;font-size:22px">BE</div>
+          <div class="patch flag-de locked" style="--rot:-7deg;left:36%;top:78%;width:68px;height:68px;font-size:20px">DE</div>
+          <div class="patch sniper locked" style="--rot:6deg;left:62%;top:76%;width:78px;height:78px;font-size:24px">100</div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Sewn on, lived in</h4>
+        <ul>
+          <li>Varied sizes (68–96 px), slight rotation ±12°</li>
+          <li>Patches can overlap, not a strict grid</li>
+          <li>Subtle stitching lines hint at vest seams</li>
+          <li>Reads as an <b>identity</b> &mdash; this is mine, this is who I am</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="subhead" style="font-size:11px;border-bottom:0;padding-bottom:0;margin-top:var(--s-5)">Detail modal (any variant, on tap)</div>
+    <div class="demo">
+      <div class="demo-stage" style="justify-content:center;align-items:center;display:flex;background:rgba(0,0,0,0.7)">
+        <div class="patch-detail">
+          <div class="patch witness patch-big">25</div>
+          <div class="pname">All Pit, Always</div>
+          <div class="pdesc">25 bandas vistas em um único Wacken. Você não foi pra dormir.</div>
+          <div class="wacken-chip">Wacken 2025</div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Modal contents</h4>
+        <ul>
+          <li>Larger circular patch (132 px)</li>
+          <li>Badge name, description copy</li>
+          <li>"Wacken YYYY" chip on historical/frozen badges only</li>
+          <li>Tap scrim or close gesture to dismiss</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ANNOUNCEMENT -->
+    <div class="subhead">Announcement card &middot; mural board</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="announce">
+          <div class="av s40" style="background:#c0392b">SF</div>
+          <div class="head">
+            <span class="name">Salvatore</span>
+            <span class="role-chip godlike">Godlike</span>
+            <span class="ts">2 min</span>
+          </div>
+          <div class="body">Achei meia banda do Brasil acampando no setor H. Tem cerveja sobrando, tragam queijos. 🤘</div>
+          <div class="actions">
+            <button class="action danger">⚐ Delete</button>
+          </div>
+        </div>
+        <div class="announce">
+          <div class="av s40" style="background:#2980b9">JP</div>
+          <div class="head">
+            <span class="name">Joana</span>
+            <span class="role-chip manager">Manager</span>
+            <span class="ts">14 min</span>
+          </div>
+          <div class="body">Quem tá no portão sul agora? O ônibus do shuttle saiu cedo. Mandem pin no maps.</div>
+          <div class="actions">
+            <button class="action danger">⊘ Block user</button>
+          </div>
+        </div>
+        <div class="announce">
+          <div class="av s40" style="background:#16a085">LM</div>
+          <div class="head">
+            <span class="name">Lucas</span>
+            <span class="role-chip normal">Crew</span>
+            <span class="ts">1 h</span>
+          </div>
+          <div class="body">Powerwolf na Louder agora — venham, tá lotando.</div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Anatomy</h4>
+        <ul>
+          <li>Author avatar 40px, name + role chip + relative ts</li>
+          <li>Soft delete only — managers never see deleted posts; godlike does</li>
+          <li><b>Delete</b> shows on the user's own posts</li>
+          <li><b>Block user</b> only on Manager / Godlike views — affects the poster across the crew</li>
+          <li>No reply, no reactions — the mural is a one-way bulletin board</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- STAGE PILLS -->
+    <div class="subhead">Stage filter pill</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="pill-row">
+          <button class="pill on" style="background:#2980b9;border-color:#2980b9">Faster</button>
+          <button class="pill on" style="background:#e67e22;border-color:#e67e22">Harder</button>
+          <button class="pill" style="color:#8e44ad">Louder</button>
+          <button class="pill" style="color:#c0392b">W.E.T.</button>
+          <button class="pill on" style="background:#16a085;border-color:#16a085">Headbangers</button>
+          <button class="pill" style="color:#95a5a6">Wasteland</button>
+          <button class="pill" style="color:#95a5a6">Wackinger</button>
+          <button class="pill" style="color:#f39c12">Welcome to the Jungle</button>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Behavior</h4>
+        <ul>
+          <li><b>Outlined</b> = inactive, color = stage</li>
+          <li><b>Filled</b> = active</li>
+          <li>Multi-select: empty selection = all</li>
+          <li>Genre filter follows the same outline → fill rule, but uses neutral border</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- DAY TABS -->
+    <div class="subhead">Day tab bar</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="daytabs">
+          <button class="daytab"><div class="dlabel">Day 1</div><div class="ddate">29</div><div class="ddow">Wed · Jul</div></button>
+          <button class="daytab on"><div class="dlabel">Day 2</div><div class="ddate">30</div><div class="ddow">Thu · Jul</div></button>
+          <button class="daytab"><div class="dlabel">Day 3</div><div class="ddate">31</div><div class="ddow">Fri · Jul</div></button>
+          <button class="daytab"><div class="dlabel">Day 4</div><div class="ddate">01</div><div class="ddow">Sat · Aug</div></button>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Notes</h4>
+        <ul>
+          <li>Active = elevated bg + 2px accent underline</li>
+          <li>Date = Oswald 22, day-of-week monospace</li>
+          <li>Used on /schedule + /my-picks</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PICK TOGGLE -->
+    <div class="subhead">Pick toggle &middot; standalone</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="row">
+          <button class="picktoggle"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+          <button class="picktoggle on"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
+          <span class="t-label">unpicked &nbsp; / &nbsp; picked</span>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Tap rules</h4>
+        <ul>
+          <li>44px hit area minimum</li>
+          <li>Animates on toggle: scale 1 → 1.15 → 1, 320ms cubic-bezier(0.34, 1.56, 0.64, 1)</li>
+          <li>Persists offline; queued action appears as pending-chip in /my-picks</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- AVATAR + CLUSTER -->
+    <div class="subhead">Avatar &amp; cluster</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="avatar-row">
+          <span class="av s24" style="background:#2980b9">SF</span>
+          <span class="av s32" style="background:#c0392b">SF</span>
+          <span class="av s40" style="background:#8e44ad">SF</span>
+          <span class="av s56" style="background:#16a085">SF</span>
+        </div>
+        <div style="margin-top:var(--s-4)" class="cluster">
+          <span class="av s32" style="background:#c0392b">SF</span>
+          <span class="av s32" style="background:#2980b9">JP</span>
+          <span class="av s32" style="background:#16a085">LM</span>
+          <span class="av s32" style="background:#8e44ad">RC</span>
+          <span class="av s32" style="background:#f39c12;color:#0a0a0a">VB</span>
+          <span class="more">+9</span>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Sizes</h4>
+        <ul>
+          <li><b>s24</b> meta lines, popular card</li>
+          <li><b>s32</b> default cluster</li>
+          <li><b>s40</b> announcements, crew card</li>
+          <li><b>s56</b> profile</li>
+          <li>Background = user's chosen identity color (random from stage palette if not set)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- OFFLINE / SYNC -->
+    <div class="subhead">Offline &amp; sync states</div>
+    <div class="demo">
+      <div class="demo-stage" style="display:grid;gap:var(--s-3)">
+        <div class="offline-banner">offline · viewing cached schedule</div>
+        <div class="row">
+          <span class="pending-chip">↻ queued · pick</span>
+          <span class="pending-chip">↻ queued · post</span>
+          <span class="t-small">Pending sync chips appear inline on cards and announcements.</span>
+        </div>
+        <div class="sync-toast">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#16a085" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><polyline points="4 12 10 18 20 6"/></svg>
+          Sync restored · 3 actions flushed
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Rules</h4>
+        <ul>
+          <li><b>Offline banner</b> persists at top of /now, /schedule, /my-picks until reconnect</li>
+          <li><b>Pulsing dot</b> 2s ease — only animation allowed in chrome</li>
+          <li><b>Pending chip</b> on the artifact itself (pick, post)</li>
+          <li>No spinners ever — cached content shows instantly</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ROLE BADGES -->
+    <div class="subhead">Role chips</div>
+    <div class="demo">
+      <div class="demo-stage">
+        <div class="row">
+          <span class="role-chip normal">Crew</span>
+          <span class="role-chip manager">Manager</span>
+          <span class="role-chip godlike">Godlike</span>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Use</h4>
+        <ul>
+          <li>Inline next to display name on announcements + profile</li>
+          <li><b>Crew</b> default neutral</li>
+          <li><b>Manager</b> blue tint — moderation rights</li>
+          <li><b>Godlike</b> gold tint — admin powers, hard-coded to <code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d4a7b2bdb8bdaeaebbb8b594b3b9b5bdb8fab7bbb9">[email&#160;protected]</a></code></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       5. PAGE LAYOUTS (wireframes)
+       ============================================================ -->
+  <section class="section" id="layouts">
+    <div class="section-head">
+      <div class="num">05</div>
+      <div>
+        <h2>Page layouts</h2>
+        <p class="desc">All five primary routes, dark mode, at PWA phone size. Bottom nav is the same across the auth-walled app: <code>/now &middot; /schedule &middot; /my-picks &middot; /popular &middot; /profile</code>. Announcements are a sub-route of /profile or a top-tab from /now (open question — see notes).</p>
+      </div>
+    </div>
+
+    <div class="frames">
+
+      <!-- /now -->
+      <div>
+        <div class="phone"><div class="phone-screen">
+          <div class="status-bar"><span>22:14</span><span class="right">●●● 4G ◐</span></div>
+          <div class="frame-body" style="overflow-y:auto">
+            <div class="hdr">
+              <h2>Right Now</h2>
+              <div class="when">Day 3 &middot; Fri Jul 31<br />22:14</div>
+            </div>
+            <div class="where-am-i" style="margin-bottom:var(--s-3)">
+              <div class="legend"><b>Onde estou</b><span>self</span></div>
+              <div class="presence-toggle has-metal">
+                <button style="font-size:11px;padding:7px 4px"><span class="dot" style="color:#5fd0bb"></span>Camping</button>
+                <button class="on metal" style="font-size:11px;padding:7px 4px"><span class="dot" style="color:rgba(253,224,71,0.95)"></span>Metal Pl.</button>
+              </div>
+            </div>
+            <div class="loc-stack">
+              <div class="loc you">
+                <div class="loc-strip" style="background:var(--stage-louder)"></div>
+                <div class="loc-head" style="padding:10px 12px">
+                  <div>
+                    <div class="kicker" style="font-size:9px"><span style="width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block"></span>Live &middot; you here</div>
+                    <div class="title" style="font-size:18px;margin-top:3px">POWERWOLF</div>
+                    <div class="sub" style="font-size:10px">Louder &middot; 22:30</div>
+                  </div>
+                  <div class="loc-count" style="font-size:18px;padding:4px 7px">5</div>
+                </div>
+                <div class="loc-people" style="padding:0 12px 10px;gap:4px">
+                  <span class="loc-chip me" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#c0392b;width:18px;height:18px;font-size:9px">SF</span>Salv.</span>
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#8e44ad;width:18px;height:18px;font-size:9px">RC</span>Rafael</span>
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#e67e22;width:18px;height:18px;font-size:9px">DK</span>Diogo</span>
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#2c3e50;width:18px;height:18px;font-size:9px">FF</span>Felipe</span>
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#16a085;width:18px;height:18px;font-size:9px">MM</span>Marina</span>
+                </div>
+              </div>
+              <div class="loc">
+                <div class="loc-strip" style="background:var(--stage-faster)"></div>
+                <div class="loc-head" style="padding:10px 12px">
+                  <div>
+                    <div class="kicker" style="font-size:9px">Playing</div>
+                    <div class="title" style="font-size:18px;margin-top:3px">BLIND GUARDIAN</div>
+                    <div class="sub" style="font-size:10px">Faster &middot; 22:00</div>
+                  </div>
+                  <div class="loc-count" style="font-size:18px;padding:4px 7px">3</div>
+                </div>
+                <div class="loc-people" style="padding:0 12px 10px;gap:4px">
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#2980b9;width:18px;height:18px;font-size:9px">JP</span>Joana</span>
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#16a085;width:18px;height:18px;font-size:9px">LM</span>Lucas</span>
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#f39c12;color:#0a0a0a;width:18px;height:18px;font-size:9px">VB</span>Victor</span>
+                </div>
+              </div>
+              <div class="loc camping">
+                <div class="loc-strip"></div>
+                <div class="loc-head" style="padding:10px 12px">
+                  <div>
+                    <div class="kicker" style="font-size:9px">Resting</div>
+                    <div class="title" style="font-size:18px;margin-top:3px">CAMPING</div>
+                    <div class="sub" style="font-size:10px">sector H</div>
+                  </div>
+                  <div class="loc-count" style="font-size:18px;padding:4px 7px">4</div>
+                </div>
+                <div class="loc-people" style="padding:0 12px 10px;gap:4px">
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#16a085;width:18px;height:18px;font-size:9px">PP</span>Paula</span>
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#c0392b;width:18px;height:18px;font-size:9px">TG</span>Thiago</span>
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#8e44ad;width:18px;height:18px;font-size:9px">CM</span>Caio</span>
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#2980b9;width:18px;height:18px;font-size:9px">AN</span>Ana</span>
+                </div>
+              </div>
+              <div class="loc lost">
+                <div class="loc-strip"></div>
+                <div class="loc-head" style="padding:10px 12px">
+                  <div>
+                    <div class="kicker" style="font-size:9px">Nowhere</div>
+                    <div class="title" style="font-size:18px;margin-top:3px">LOST 🤘</div>
+                    <div class="sub" style="font-size:10px">no pick &middot; not camping</div>
+                  </div>
+                  <div class="loc-count" style="font-size:18px;padding:4px 7px">2</div>
+                </div>
+                <div class="loc-people" style="padding:0 12px 10px;gap:4px">
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#581c87;width:18px;height:18px;font-size:9px">RG</span>Rodrigo</span>
+                  <span class="loc-chip" style="font-size:10px;padding:2px 7px 2px 2px"><span class="av" style="background:#581c87;width:18px;height:18px;font-size:9px">PR</span>Pedro</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <nav class="nav-bar">
+            <a class="navi on"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>Now</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="1"/><path d="M3 9 H21"/><path d="M8 3 V7"/><path d="M16 3 V7"/></svg>Sched</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg>Picks</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18 V12"/><path d="M9 18 V8"/><path d="M15 18 V14"/><path d="M21 18 V4"/></svg>Popular</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M3 21 c0 -5 4 -8 9 -8 s9 3 9 8"/></svg>Me</a>
+          </nav>
+        </div></div>
+        <div class="frame-label">/now &middot; <b>landing</b> &middot; presence toggle + locations (not crew grid)</div>
+      </div>
+
+      <!-- /schedule -->
+      <div>
+        <div class="phone"><div class="phone-screen">
+          <div class="status-bar"><span>22:14</span><span class="right">●●● 4G ◐</span></div>
+          <div class="frame-body" style="position:relative;overflow:hidden">
+            <div class="hdr">
+              <h2>Schedule</h2>
+              <div class="when">78 bands<br />8 stages</div>
+            </div>
+            <div class="frame-search">⌕ &nbsp; search bands…</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s-3)">
+              <button class="filter-trigger">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6 H21"/><path d="M6 12 H18"/><path d="M9 18 H15"/></svg>
+                Filters <span class="ct">4</span>
+              </button>
+              <span class="t-label" style="font-size:9px">Day 3 &middot; Fri</span>
+            </div>
+            <div class="t-label" style="margin-bottom:6px;font-size:9px">Friday &middot; 22:00 →</div>
+            <div class="frame-bcard">
+              <div class="stripe" style="background:var(--stage-faster)"></div>
+              <div class="thumb" style="background:var(--stage-faster)">B</div>
+              <div class="body"><div class="name">BLIND GUARDIAN</div><div class="meta"><span class="stage" style="background:var(--stage-faster)">Faster</span><span>22:00 → 23:30</span></div></div>
+              <div class="pick on"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg></div>
+            </div>
+            <div class="frame-bcard">
+              <div class="stripe" style="background:var(--stage-louder)"></div>
+              <div class="thumb" style="background:var(--stage-louder)">P</div>
+              <div class="body"><div class="name">POWERWOLF</div><div class="meta"><span class="stage" style="background:var(--stage-louder)">Louder</span><span>22:30 → 23:45</span></div></div>
+              <div class="pick on"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg></div>
+            </div>
+            <div class="frame-bcard">
+              <div class="stripe" style="background:var(--stage-headbangers)"></div>
+              <div class="thumb" style="background:var(--stage-headbangers)">K</div>
+              <div class="body"><div class="name">KREATOR</div><div class="meta"><span class="stage" style="background:var(--stage-headbangers)">Headb.</span><span>23:00 → 00:30</span></div></div>
+              <div class="pick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg></div>
+            </div>
+
+            <!-- bottom drawer (open) -->
+            <div class="scrim"></div>
+            <div class="drawer">
+              <div class="grab"></div>
+              <h4>Day <span class="clear">all 4</span></h4>
+              <div class="daytabs" style="margin-bottom:0">
+                <button class="daytab"><div class="dlabel">D1</div><div class="ddate" style="font-size:14px">29</div></button>
+                <button class="daytab"><div class="dlabel">D2</div><div class="ddate" style="font-size:14px">30</div></button>
+                <button class="daytab on"><div class="dlabel">D3</div><div class="ddate" style="font-size:14px">31</div></button>
+                <button class="daytab"><div class="dlabel">D4</div><div class="ddate" style="font-size:14px">01</div></button>
+              </div>
+              <h4>Stage <span class="clear">clear</span></h4>
+              <div class="frame-pills" style="margin-bottom:0">
+                <span class="frame-pill" style="background:#2980b9;border-color:#2980b9;color:#fff">Faster</span>
+                <span class="frame-pill" style="color:#e67e22">Harder</span>
+                <span class="frame-pill" style="background:#8e44ad;border-color:#8e44ad;color:#fff">Louder</span>
+                <span class="frame-pill" style="color:#c0392b">W.E.T.</span>
+                <span class="frame-pill" style="background:#16a085;border-color:#16a085;color:#fff">Headb.</span>
+                <span class="frame-pill" style="color:#f39c12">W.T.J.</span>
+              </div>
+              <h4>Genre</h4>
+              <div class="frame-pills" style="margin-bottom:0">
+                <span class="frame-pill" style="color:var(--text-muted)">Power</span>
+                <span class="frame-pill" style="background:var(--bg-elevated);border-color:var(--text);color:var(--text)">Thrash</span>
+                <span class="frame-pill" style="color:var(--text-muted)">Death</span>
+                <span class="frame-pill" style="color:var(--text-muted)">Folk</span>
+              </div>
+              <button class="btn primary" style="width:100%;margin-top:14px">Apply &middot; 24 bands</button>
+            </div>
+          </div>
+          <nav class="nav-bar">
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="6"/></svg>Now</a>
+            <a class="navi on"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="5" width="18" height="16" rx="1"/></svg>Sched</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg>Picks</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18 V12"/><path d="M9 18 V8"/><path d="M15 18 V14"/><path d="M21 18 V4"/></svg>Popular</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M3 21 c0 -5 4 -8 9 -8 s9 3 9 8"/></svg>Me</a>
+          </nav>
+        </div></div>
+        <div class="frame-label">/schedule &middot; <b>filter drawer open</b> &middot; day + stage + genre, slides up on tap</div>
+      </div>
+
+      <!-- /my-picks -->
+      <div>
+        <div class="phone"><div class="phone-screen">
+          <div class="status-bar"><span>22:14</span><span class="right">⚠ offline</span></div>
+          <div class="frame-body">
+            <div class="hdr">
+              <h2>My Picks</h2>
+              <div class="when">12 picks<br />2 conflicts</div>
+            </div>
+            <div class="offline-banner" style="margin-bottom:var(--s-3)">offline · cached</div>
+            <div class="timeline-day">Day 3 · Friday <small>5 picks</small></div>
+            <div class="timeline-bcard conflict">
+              <div class="when"><div class="h">22:00</div><div class="e">23:30</div></div>
+              <div class="body">
+                <div class="name">BLIND GUARDIAN</div>
+                <div class="meta"><span class="stage" style="background:var(--stage-faster)">Faster</span><span>11 going</span></div>
+                <span class="conflict-mini">⚠ Conflito</span>
+              </div>
+              <div class="pick"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg></div>
+            </div>
+            <div class="timeline-bcard conflict">
+              <div class="when"><div class="h">22:30</div><div class="e">23:45</div></div>
+              <div class="body">
+                <div class="name">POWERWOLF</div>
+                <div class="meta"><span class="stage" style="background:var(--stage-louder)">Louder</span><span>7 going</span></div>
+                <span class="conflict-mini">⚠ Conflito</span>
+              </div>
+              <div class="pick"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg></div>
+            </div>
+            <div class="timeline-bcard">
+              <div class="when"><div class="h">23:00</div><div class="e">00:30</div></div>
+              <div class="body">
+                <div class="name">KREATOR</div>
+                <div class="meta"><span class="stage" style="background:var(--stage-headbangers)">Headb.</span><span>4 going</span></div>
+              </div>
+              <div class="pick"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg></div>
+            </div>
+            <div class="timeline-day">Day 4 &middot; Saturday <small>3 picks</small></div>
+            <div class="timeline-bcard">
+              <div class="when"><div class="h">19:30</div><div class="e">20:45</div></div>
+              <div class="body">
+                <div class="name">SABATON</div>
+                <div class="meta"><span class="stage" style="background:var(--stage-faster)">Faster</span><span>14 going</span></div>
+              </div>
+              <div class="pick"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg></div>
+            </div>
+            <div class="timeline-bcard">
+              <div class="when"><div class="h">21:00</div><div class="e">22:15</div></div>
+              <div class="body">
+                <div class="name">EPICA</div>
+                <div class="meta"><span class="stage" style="background:var(--stage-louder)">Louder</span><span>5 going</span></div>
+              </div>
+              <div class="pick"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg></div>
+            </div>
+          </div>
+          <nav class="nav-bar">
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="6"/></svg>Now</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="1"/></svg>Sched</a>
+            <a class="navi on"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg>Picks</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18 V12"/><path d="M9 18 V8"/><path d="M15 18 V14"/><path d="M21 18 V4"/></svg>Popular</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M3 21 c0 -5 4 -8 9 -8 s9 3 9 8"/></svg>Me</a>
+          </nav>
+        </div></div>
+        <div class="frame-label">/my-picks &middot; <b>day timeline</b> &middot; star-to-unpick + simple Conflito chips</div>
+      </div>
+
+      <!-- /popular -->
+      <div>
+        <div class="phone"><div class="phone-screen">
+          <div class="status-bar"><span>22:14</span><span class="right">●●● 4G ◐</span></div>
+          <div class="frame-body">
+            <div class="hdr">
+              <h2>Popular</h2>
+              <div class="when">crew of 20<br />sorted by picks</div>
+            </div>
+            <div class="t-label" style="margin-bottom:var(--s-2)">Top of the festival</div>
+            <div class="pop-bcard">
+              <div class="rk top">01</div>
+              <div class="thumb" style="background:var(--stage-louder)">P</div>
+              <div class="body">
+                <div class="name">POWERWOLF</div>
+                <div class="meta">
+                  <span class="stage" style="background:var(--stage-louder)">Louder</span>
+                  <span class="av s24" style="background:#c0392b">SF</span>
+                  <span class="av s24" style="background:#2980b9">JP</span>
+                  <span class="av s24" style="background:#16a085">LM</span>
+                  <span class="ct">+11</span>
+                </div>
+              </div>
+            </div>
+            <div class="pop-bcard">
+              <div class="rk top">02</div>
+              <div class="thumb" style="background:var(--stage-faster)">B</div>
+              <div class="body">
+                <div class="name">BLIND GUARDIAN</div>
+                <div class="meta">
+                  <span class="stage" style="background:var(--stage-faster)">Faster</span>
+                  <span class="av s24" style="background:#16a085">LM</span>
+                  <span class="av s24" style="background:#8e44ad">RC</span>
+                  <span class="ct">+9</span>
+                </div>
+              </div>
+            </div>
+            <div class="pop-bcard">
+              <div class="rk top">03</div>
+              <div class="thumb" style="background:var(--stage-faster)">S</div>
+              <div class="body">
+                <div class="name">SABATON</div>
+                <div class="meta">
+                  <span class="stage" style="background:var(--stage-faster)">Faster</span>
+                  <span class="av s24" style="background:#e67e22">DK</span>
+                  <span class="ct">+10</span>
+                </div>
+              </div>
+            </div>
+            <div class="pop-bcard">
+              <div class="rk">04</div>
+              <div class="thumb" style="background:var(--stage-headbangers)">K</div>
+              <div class="body">
+                <div class="name">KREATOR</div>
+                <div class="meta">
+                  <span class="stage" style="background:var(--stage-headbangers)">Headb.</span>
+                  <span class="ct">8 going</span>
+                </div>
+              </div>
+            </div>
+            <div class="pop-bcard">
+              <div class="rk">05</div>
+              <div class="thumb" style="background:var(--stage-louder)">E</div>
+              <div class="body">
+                <div class="name">EPICA</div>
+                <div class="meta">
+                  <span class="stage" style="background:var(--stage-louder)">Louder</span>
+                  <span class="ct">5 going</span>
+                </div>
+              </div>
+            </div>
+            <div class="pop-bcard">
+              <div class="rk">06</div>
+              <div class="thumb" style="background:var(--stage-jungle)">A</div>
+              <div class="body">
+                <div class="name">AMORPHIS</div>
+                <div class="meta">
+                  <span class="stage" style="background:var(--stage-jungle)">W.T.J.</span>
+                  <span class="ct">3 going</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <nav class="nav-bar">
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="6"/></svg>Now</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="1"/></svg>Sched</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg>Picks</a>
+            <a class="navi on"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="14" width="3" height="6"/><rect x="10" y="9" width="3" height="11"/><rect x="17" y="4" width="3" height="16"/></svg>Popular</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M3 21 c0 -5 4 -8 9 -8 s9 3 9 8"/></svg>Me</a>
+          </nav>
+        </div></div>
+        <div class="frame-label">/popular &middot; <b>ranked</b> · avatar clusters surface social proof</div>
+      </div>
+
+      <!-- /profile -->
+      <div>
+        <div class="phone"><div class="phone-screen">
+          <div class="status-bar"><span>22:14</span><span class="right">●●● 4G ◐</span></div>
+          <div class="frame-body" style="overflow-y:auto">
+            <div class="profile-head" style="padding-top:0">
+              <div class="av s56" style="background:#c0392b;margin-bottom:10px">SF</div>
+              <div class="nm">Salvatore</div>
+              <div class="em"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="fa899c939693808095969bba9d979b9396d4999597">[email&#160;protected]</a></div>
+              <div class="row" style="justify-content:center;margin-top:10px;gap:6px">
+                <span class="role-chip godlike">Godlike</span>
+                <span class="role-chip" style="background:#009c3b;color:#fff;border-color:#fae042">🇧🇷 Brasil</span>
+                <span class="role-chip" style="background:rgba(192,57,43,0.18);color:#e6735a;border:1px solid rgba(192,57,43,0.45)">5× Wacken</span>
+              </div>
+            </div>
+
+            <div class="profile-section">
+              <h4>Patches <span class="chev">14 / 22</span></h4>
+              <div class="patch-grid" style="grid-template-columns:repeat(4,1fr);gap:14px 8px">
+                <div class="patch flag-br" style="width:54px;height:54px;font-size:16px">BR</div>
+                <div class="patch veteran" style="width:54px;height:54px;font-size:16px">5<span style="font-size:9px;vertical-align:super">x</span></div>
+                <div class="patch sniper" style="width:54px;height:54px;font-size:16px">42</div>
+                <div class="patch witness" style="width:54px;height:54px;font-size:14px">25<span class="year-chip" style="font-size:7px;padding:1px 3px;bottom:-4px;right:-4px">'25</span></div>
+                <div class="patch headbang" style="width:54px;height:54px;font-size:20px">🤘</div>
+                <div class="patch wasteland-loyal" style="width:54px;height:54px;font-size:18px">⚒</div>
+                <div class="patch flag-co locked" style="width:54px;height:54px;font-size:14px">CO</div>
+                <div class="patch flag-be locked" style="width:54px;height:54px;font-size:14px">BE</div>
+              </div>
+            </div>
+
+            <div class="profile-section">
+              <h4>Preferences</h4>
+              <div class="pf-row">
+                <span class="lbl">Language</span>
+                <span class="lang-seg">
+                  <button class="on">PT</button>
+                  <button>EN</button>
+                  <button>ES</button>
+                  <button>DE</button>
+                </span>
+              </div>
+              <div class="pf-row">
+                <span class="lbl">Notifications</span>
+                <span class="val" style="color:#5fd0bb">● ON</span>
+              </div>
+            </div>
+
+            <div class="pf-collapse manager">
+              <div class="left">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#58a8e6" stroke-width="2.2"><path d="M12 2 L20 6 V12 c0 5 -4 9 -8 10 -4 -1 -8 -5 -8 -10 V6 Z"/></svg>
+                <span class="label">Manager tools</span>
+              </div>
+              <span class="chev">▾ expand</span>
+            </div>
+            <div class="pf-collapse godlike">
+              <div class="left">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#f39c12" stroke-width="2.2"><path d="M5 18 L7 4 L12 12 L17 4 L19 18 Z"/></svg>
+                <span class="label">Godlike admin</span>
+              </div>
+              <span class="chev">▾ expand</span>
+            </div>
+
+            <div class="profile-section" style="border-bottom:0">
+              <h4 style="color:var(--text-muted)">⚐ Sign out</h4>
+            </div>
+          </div>
+          <nav class="nav-bar">
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="6"/></svg>Now</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="1"/></svg>Sched</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg>Picks</a>
+            <a class="navi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18 V12"/><path d="M9 18 V8"/><path d="M15 18 V14"/><path d="M21 18 V4"/></svg>Popular</a>
+            <a class="navi on"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="8" r="4"/><path d="M3 21 c0 -5 4 -8 9 -8 s9 3 9 8" stroke="currentColor" stroke-width="2" fill="none"/></svg>Me</a>
+          </nav>
+        </div></div>
+        <div class="frame-label">/profile &middot; <b>everything visible</b> &middot; identity → patches → prefs → collapsed admin</div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       6. ICONOGRAPHY
+       ============================================================ -->
+  <section class="section" id="icons">
+    <div class="section-head">
+      <div class="num">06</div>
+      <div>
+        <h2>Iconography</h2>
+        <p class="desc">Single-stroke geometric line icons. 24 px frame, 2 px stroke, square caps, miter joins. No filled chunky icons (other than tab bar active states), no skeuomorphism, no genre clichés (skulls, flames, pentagrams) — the typography and stage palette already do the metal lifting. Lucide is the closest off-the-shelf match.</p>
+      </div>
+    </div>
+    <div class="icon-grid">
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg><div class="name">Pick</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="6"/></svg><div class="name">Live</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="3" y="5" width="18" height="16"/><path d="M3 9 H21"/><path d="M8 3 V7"/><path d="M16 3 V7"/></svg><div class="name">Schedule</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M3 18 V12"/><path d="M9 18 V8"/><path d="M15 18 V14"/><path d="M21 18 V4"/></svg><div class="name">Popular</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="8" r="4"/><path d="M3 21 c0 -5 4 -8 9 -8 s9 3 9 8"/></svg><div class="name">Profile</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="11" cy="11" r="6"/><path d="M21 21 L16 16"/></svg><div class="name">Search</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M3 6 H21"/><path d="M6 12 H18"/><path d="M9 18 H15"/></svg><div class="name">Filter</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M12 2 L22 20 L2 20 Z"/><path d="M12 9 V14"/><circle cx="12" cy="17" r="0.6" fill="currentColor"/></svg><div class="name">Conflict</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M3 12 a9 9 0 0 1 18 0"/><polyline points="21 7 21 12 16 12"/><path d="M12 6 V12 L16 14"/></svg><div class="name">Sync</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M2 12 a10 10 0 0 1 20 0"/><path d="M5 12 a7 7 0 0 1 14 0"/><path d="M9 12 a3 3 0 0 1 6 0"/><line x1="3" y1="3" x2="21" y2="21"/></svg><div class="name">Offline</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M3 3 L21 21"/><path d="M21 3 L3 21"/></svg><div class="name">Dismiss</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M5 8 L12 15 L19 8"/></svg><div class="name">Chevron</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M3 12 H21"/><path d="M14 5 L21 12 L14 19"/></svg><div class="name">Arrow</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="9"/><path d="M12 7 V12 L15 14"/></svg><div class="name">Time</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M3 21 L8 4 L16 4 L21 21"/><path d="M8 12 H16"/></svg><div class="name">Tent</div></div>
+      <div class="icon-card"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><circle cx="12" cy="12" r="9"/><path d="M9 9 H9.01"/><path d="M15 9 H15.01"/><path d="M8 15 c1 1 6 3 8 0"/></svg><div class="name">Friend</div></div>
+    </div>
+    <p class="t-small" style="margin-top:var(--s-4)">Tab bar active states are the only icons allowed to switch to filled. Avoid emoji in the UI itself except 🤘 (in copy) and country flags on country badges. Stage symbols (skulls, runes) belong to the festival's own visual identity — we don't recreate them.</p>
+  </section>
+
+  <!-- ============================================================
+       7. MOTION
+       ============================================================ -->
+  <section class="section" id="motion">
+    <div class="section-head">
+      <div class="num">07</div>
+      <div>
+        <h2>Motion</h2>
+        <p class="desc">Motion is functional, not decorative. Three rules: feedback the tap, signal a state change, never block content. Default duration <b>160 ms</b> for state, <b>240 ms</b> for entrance, <b>320 ms</b> for celebration (pick toggle). Reduce to 0 ms when <code>prefers-reduced-motion</code>.</p>
+      </div>
+    </div>
+
+    <div class="motion-card">
+      <div>
+        <h4>Pick toggle</h4>
+        <div class="specs">
+          <b>320 ms</b> · cubic-bezier(0.34, 1.56, 0.64, 1)<br />
+          scale 0.9 → 1.15 → 1.0<br />
+          color: muted → accent-hover<br />
+          <i style="color:var(--text-faint)">// the only celebratory animation in the system</i>
+        </div>
+      </div>
+      <div class="motion-demo">
+        <svg class="motion-pick" viewBox="0 0 24 24" width="48" height="48" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+    </div>
+
+    <div class="motion-card">
+      <div>
+        <h4>Alert appear / dismiss</h4>
+        <div class="specs">
+          <b>240 ms</b> ease-out, slide-down 12 px + fade<br />
+          auto-dismiss after <b>6 s</b><br />
+          dismiss reverses with slide-up 8 px<br />
+          stack from top, max <b>3</b> visible
+        </div>
+      </div>
+      <div class="motion-demo" style="overflow:hidden">
+        <div class="motion-alert" style="width:100%">
+          <div class="alert warn" style="margin:0">
+            <div class="stripe"></div>
+            <div class="icon warn">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2 L22 20 L2 20 Z"/><path d="M12 9 V14"/></svg>
+            </div>
+            <div class="text"><b>Conflito</b><span style="font-size:13px">Blind G. e Powerwolf — escolhe um. 🤘</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="motion-card">
+      <div>
+        <h4>Offline pulse</h4>
+        <div class="specs">
+          <b>2 s</b> ease, opacity 0.4 → 1 → 0.4<br />
+          applied to dot in offline banner + pending chip<br />
+          <i style="color:var(--text-faint)">// only ambient animation allowed in chrome</i>
+        </div>
+      </div>
+      <div class="motion-demo">
+        <span class="pending-chip">↻ pending sync</span>
+      </div>
+    </div>
+
+    <div class="motion-card">
+      <div>
+        <h4>Crew card &middot; LOST glow</h4>
+        <div class="specs">
+          static — <b>no animation</b> on the LOST card<br />
+          purple gradient + 0 0 16px purple shadow<br />
+          card itself is the signal; movement would dilute it
+        </div>
+      </div>
+      <div class="motion-demo">
+        <div class="crew-card lost" style="width:100%">
+          <div class="who">
+            <div class="avatar" style="background:#581c87">RC</div>
+            <div><div class="name">Rafael</div><div class="status">no pick this slot</div></div>
+          </div>
+          <div class="lost-msg" style="font-size:18px">LOST 🤘</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="motion-card">
+      <div>
+        <h4>Page transition</h4>
+        <div class="specs">
+          tab switch is <b>instant</b> — no slide, no fade<br />
+          PWAs feel native when tab content swaps in zero frames<br />
+          rely on cached IndexedDB content to load synchronously<br />
+          <i style="color:var(--text-faint)">// loading spinners are forbidden by offline-first rule</i>
+        </div>
+      </div>
+      <div class="motion-demo">
+        <div class="t-label" style="text-align:center">no transition · zero ms</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer style="padding:var(--s-12) 0 0;border-top:4px solid var(--accent);margin-top:var(--s-12);font-family:var(--font-mono);font-size:11px;color:var(--text-muted);display:grid;grid-template-columns:1fr auto;gap:var(--s-6)">
+    <div>
+      <div style="font-family:var(--font-display);font-size:18px;color:var(--text);text-transform:uppercase;font-weight:700;letter-spacing:0.02em">Viralatas Metaleiros 🤘</div>
+      <div style="margin-top:6px">Design system v1.0 · for Wacken Open Air 2026 · ~20 crew · offline-first PWA</div>
+      <div style="margin-top:6px">Token source · <code style="color:var(--text)">src/index.css</code> &middot; Stage colors · <code style="color:var(--text)">src/lib/stageColors.ts</code></div>
+    </div>
+    <div style="text-align:right">
+      <div>D-81 · Wed Jul 29</div>
+      <div>last updated · today</div>
+    </div>
+  </footer>
+
+</div>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

@@ -4,6 +4,7 @@ import {
   ANNOUNCEMENTS_CHANGED_EVENT,
   loadAnnouncementsFromCache,
   loadCrewUsers,
+  loadOfflineAnnouncementsQueue,
   removeAnnouncementFromCache,
   saveAnnouncement,
 } from '../lib/db';
@@ -21,19 +22,23 @@ import { loadUsefulLinks } from '../lib/usefulLinks';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
+import Icon from '../components/icons/Icon';
 import styles from './AnnouncementsPage.module.css';
 
 function relativeTime(
   isoString: string,
   t: (key: string, values?: Record<string, string | number>) => string,
 ): string {
-  const diff = Date.now() - new Date(isoString).getTime();
+  const date = new Date(isoString);
+  const diff = Date.now() - date.getTime();
   const minutes = Math.floor(diff / 60_000);
   if (minutes < 1) return t('justNow');
   if (minutes < 60) return t('minutesAgo', { n: minutes });
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return t('hoursAgo', { n: hours });
-  return t('daysAgo', { n: Math.floor(hours / 24) });
+  const d = String(date.getDate()).padStart(2, '0');
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  return `${d}/${m}`;
 }
 
 export default function AnnouncementsPage() {
@@ -51,15 +56,18 @@ export default function AnnouncementsPage() {
   const [posting, setPosting] = useState(false);
   const [blocking, setBlocking] = useState<string | null>(null);
   const [blockedUserIds, setBlockedUserIds] = useState<Set<string>>(new Set());
+  const [pendingAnnouncementIds, setPendingAnnouncementIds] = useState<Set<string>>(new Set());
   const [usefulLinks, setUsefulLinks] = useState<UsefulLink[]>([]);
 
   const refreshFromCache = useCallback(async () => {
-    const [cached, users] = await Promise.all([
+    const [cached, users, pendingQueue] = await Promise.all([
       loadAnnouncementsFromCache(),
       loadCrewUsers(),
+      loadOfflineAnnouncementsQueue(),
     ]);
     setAnnouncements(cached);
     setCrewUsers(users);
+    setPendingAnnouncementIds(new Set(pendingQueue.map((a) => a.id)));
 
     // Load user roles
     const { data: allUsers } = await supabase
@@ -196,7 +204,7 @@ export default function AnnouncementsPage() {
         {usefulLinks.length > 0 && (
           <section className={styles.usefulLinksRow} aria-labelledby="useful-links-title">
             <h2 className={styles.usefulLinksTitle} id="useful-links-title">
-              🔗 {t('usefulLinksTitle')}
+              {t('usefulLinksTitle')}
             </h2>
             <div className={styles.usefulLinksList}>
               {usefulLinks.map((link) => (
@@ -207,8 +215,8 @@ export default function AnnouncementsPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {link.icon && <span aria-hidden>{link.icon}</span>}
                   <span>{link.title}</span>
+                  <Icon name="arrow" size={12} strokeWidth={2.2} className={styles.usefulLinkIcon} />
                 </a>
               ))}
             </div>
@@ -241,52 +249,81 @@ export default function AnnouncementsPage() {
             {announcements.map((a) => {
               const author = crewUsers.find((u) => u.id === a.author_id);
               const authorName = author?.display_name ?? t('anonymous');
+              const authorRole = userRoles[a.author_id] ?? 'normal';
+              const roleChipClass = {
+                normal: styles.roleNormal,
+                manager: styles.roleManager,
+                godlike: styles.roleGodlike,
+              }[authorRole as 'normal' | 'manager' | 'godlike'] ?? styles.roleNormal;
+              const showBlock = canModerate && authorRole !== 'godlike';
+              const showDelete = canModerate;
+              const alreadyBlocked = blockedUserIds.has(a.author_id);
+              const isBlocking = blocking === a.author_id;
               return (
                 <li key={a.id} className={styles.card}>
-                  <div className={styles.cardHeader}>
-                    <div className={styles.authorRow}>
-                      {author?.avatar_url ? (
-                        <img
-                          className={styles.avatar}
-                          src={author.avatar_url}
-                          alt=""
-                          loading="lazy"
-                        />
-                      ) : (
-                        <span className={styles.avatarInitial} aria-hidden>
-                          {authorName.charAt(0).toUpperCase()}
-                        </span>
-                      )}
-                      <div>
-                        <span className={styles.authorName}>{authorName}</span>
-                        <span className={styles.timestamp}>{relativeTime(a.created_at, t)}</span>
-                      </div>
-                    </div>
+                  {/* col 1: avatar */}
+                  {author?.avatar_url ? (
+                    <img
+                      className={styles.avatar}
+                      src={author.avatar_url}
+                      alt=""
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span className={styles.avatarInitial} aria-hidden>
+                      {authorName.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+
+                  {/* col 2: head row */}
+                  <div className={styles.head}>
+                    <span className={styles.name}>{authorName}</span>
+                    <span className={`${styles.roleChip} ${roleChipClass}`}>
+                      {t(`role_${authorRole}`)}
+                    </span>
+                    <span className={styles.ts}>{relativeTime(a.created_at, t)}</span>
+                  </div>
+
+                  {/* col 2: body */}
+                  <p className={styles.body}>
+                    {a.content}
+                    {pendingAnnouncementIds.has(a.id) && (
+                      <span className="pending-chip" style={{ marginLeft: '8px' }}>
+                        {t('pendingSync')}
+                      </span>
+                    )}
+                  </p>
+
+                  {/* col 2: actions */}
+                  {(showBlock || showDelete) && (
                     <div className={styles.cardActions}>
-                      {canModerate && userRoles[a.author_id] !== 'godlike' && (
+                      {showBlock && (
                         <button
-                          className={`${styles.blockBtn} ${blocking === a.author_id ? styles.blocking : ''} ${blockedUserIds.has(a.author_id) ? styles.blocked : ''}`}
+                          className={`${styles.actionBtn} ${!alreadyBlocked && !isBlocking ? styles.actionBtnDanger : ''}`}
                           onClick={() => handleBlock(a.author_id)}
-                          disabled={blocking === a.author_id || blockedUserIds.has(a.author_id)}
+                          disabled={isBlocking || alreadyBlocked}
                           aria-label={t('block')}
                           type="button"
                         >
-                          {blocking === a.author_id ? `${t('blockingUser')}` : blockedUserIds.has(a.author_id) ? `✓ ${t('block')}` : `🚫 ${t('block')}`}
+                          {isBlocking
+                            ? t('blockingUser')
+                            : alreadyBlocked
+                              ? t('blockedDone')
+                              : t('blockAction')}
                         </button>
                       )}
-                      {canModerate && (
+                      {showDelete && (
                         <button
-                          className={styles.deleteBtn}
+                          className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
                           onClick={() => handleDelete(a.id)}
                           aria-label={t('delete')}
                           type="button"
                         >
-                          {t('delete')}
+                          ⚐ {t('delete')}
                         </button>
                       )}
                     </div>
-                  </div>
-                  <p className={styles.content}>{a.content}</p>
+                  )}
                 </li>
               );
             })}

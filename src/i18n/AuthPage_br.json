@@ -9,6 +9,7 @@
   "loginLoading": "Entrando...",
   "loginAction": "Entrar",
   "registerLoading": "Criando conta...",
+  "checkingRegistration": "Verificando registro...",
   "registerAction": "Criar conta",
   "needAccount": "Ainda não tem conta?",
   "createAccount": "Criar conta",
