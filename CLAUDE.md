@@ -261,6 +261,8 @@ Phase 8 will use this structure to inventory unassociated images in `public/badg
 - ✅ **Phase 9** — Differentiate Schedule / My Picks / Popular + extracted shared bones (`BandCard`, `BandFilters`, `BandDetailModal`, `useBandConflicts`); Schedule got search + genre filter, My Picks became a day-grouped timeline with conflict chips, Popular gained avatar clusters and the detail modal
 - ✅ **Phase 9.B** — Godlike time travel: `now()` helper + `useNow` hook backed by a localStorage override, with quick-jump chips for D-1 / D1–D4 / D+1 in the Profile admin panel
 - ✅ **Phase 10** — Badge expansion: characteristic-badge conditions engine (10a — `bands_picked_genre/stage/hour_min`, `band_picked_named`); seen-tracking via `user_missed_bands` table + IDB v8 + offline queue (10b); extended `BandDetailModal` with crew breakdown, conflict warning, and "Não vi essa banda" missed toggle; 5 new `bands_seen_*` badge conditions; 177 tests
+- ✅ **Design System Phase F** — `/now` visual polish: 4px stage-color strips, Oswald group titles, tinted gradient backgrounds (orange / teal / purple) per location type, `useNow()`-driven page header; no structural changes
+- ✅ **Design System Phase G** — `/profile` restyle: 56px avatar profile head with role chip / country flag / years pill; all-badges patches-grid (4/6/8 cols, locked=grayscale); `year?` field on `BadgeConfig`; edit-profile collapsible with PT/EN language seg; gold godlike + blue manager collapsible headers; sign-out pill at bottom
 
 See **PHASES.md** for the current active phase.
 

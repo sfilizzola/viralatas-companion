@@ -41,9 +41,9 @@ These rules apply to every phase below. Read them before opening a single file.
 | B  | Typography utilities | `t-display-*`, `t-body`, `t-label`, `t-time` classes | low | ✅ completed |
 | C  | Band card restyle | `BandCard` + 3 variants (schedule / timeline / ranked) | med | ✅ completed |
 | D  | Filter chrome | `BandFilters` (pills + day tabs + bottom drawer) | med | ✅ completed |
-| **E**  | **Band detail modal + alert banner** | `BandDetailModal` + new alert component | med | **⛔ blocked by [Phase 10b](PHASES.md)** |
-| F  | `/now` visual polish (no structural change) | restyle existing location/group cards in design language | med | — |
-| **G**  | **`/profile` + patches grid** | profile head, badge grid, role chips, lang seg, collapsibles | med | **⚠️ partial — 10a shipped; year chip deferred ([FUTURE_IDEAS.md](FUTURE_IDEAS.md))** |
+| E  | Band detail modal + alert banner | `BandDetailModal` + new alert component | med | ✅ unblocked — Phase 10b shipped; execute after G |
+| F  | `/now` visual polish (no structural change) | restyle existing location/group cards in design language | med | ✅ completed |
+| G  | `/profile` + patches grid | profile head, badge grid, role chips, lang seg, collapsibles | med | ✅ completed |
 | H  | Announcements restyle | `AnnouncementsPage` mural cards | low | — |
 | I  | Auth pages + bottom nav + offline chrome | login/register, `BottomNav`, offline banner / pending chip / sync toast | low/med | — |
 | J  | Icon pass | replace ad-hoc icons with the geometric-line set | low | — |
@@ -150,89 +150,15 @@ Rebuilt `BandFilters` with a 4-column day tab bar (D1–D4: Oswald date number +
 
 ---
 
-## Phase F — `/now` visual polish (no structural change)
+## Phase F — `/now` visual polish (no structural change) [completed]
 
-> **Premise check (2026-05-09):** The app already renders `/now` as grouped location cards: current-band cards, a Camping card, an optional Metal Place card, and a Lost card, with crew rendered as chips/pills inside each group. The stale wording that called this a "crew grid" meant the older implementation and should not drive the migration.
->
-> Phase F is therefore a visual-only restyle of the **existing** `crewGroups.map(... groupCard ...)` structure toward the design system's `.loc` / `.loc-stack` rules. S1 remains deferred, but its scope is now the data-model cleanup and explicit "Onde estou" state, not introducing cards that already exist.
-
-**Goal:** Apply the design system's visual language to the existing location/group-card layout on [`RightNowPage`](src/pages/RightNowPage.tsx). **Do not** change the `user_presence` data shape or convert the current booleans into the S1 enum.
-
-**Files to read first:**
-- [`src/pages/RightNowPage.tsx`](src/pages/RightNowPage.tsx) (626 lines — read all of it)
-- [`src/pages/RightNowPage.module.css`](src/pages/RightNowPage.module.css)
-- [`src/hooks/useNow.ts`](src/hooks/useNow.ts)
-
-**Changes:**
-1. Page header treatment: "Right Now" Oswald + day/time spec on the right.
-2. Location/group cards: restyle current `groupCard` cards using the design system's location-card rules — top stage/status strip, mono kicker, Oswald uppercase title, mono subtitle, count tile, crew chips inside.
-3. LOST state styling: purple tinted gradient background, purple border, no animation (per the design system motion rule).
-4. Camping state styling: teal tinted gradient + teal border.
-5. Metal Place group card: orange-tinted gradient + orange border.
-6. Page header day/time/festival-day spec.
-7. **Do not** add the "Onde estou" segmented control.
-8. Preserve the current separate Metal Place check-in card unless explicitly moved visually into the header/control area during this phase; no behavior changes.
-
-**Acceptance:**
-- All current behaviors preserved: crew presence, camping/metal-place state, LOST detection, godlike time travel still works.
-- Visual diff: location/group cards look like the design system's `.loc` / `.loc-stack` spec.
-- No new data shape, no new RPCs.
-- Realtime updates still flow.
-- Tests green.
-
-**Ask before executing this phase:**
-- After reading the 626-line `RightNowPage.tsx`, list the sections currently displayed. The design system mockup of `/now` is already close to the current grouped-card shape, but the schema/control model is not. Confirm with the user, section by section, what stays / what gets restyled / what gets postponed to S1/S2.
-- Confirm we do NOT render the "Onde estou" segmented control yet (that's S2, depends on schema change).
-- Page header: design system shows "Right Now" Oswald + "Day 3 · Fri Jul 31 · 22:14" mono spec on the right. Confirm the day/time spec uses `useNow()` (existing godlike time-travel hook) so the time-travel feature still appears live in the header.
+Restyled `RightNowPage` location cards to the design system's `.loc` / `.loc-stack` language: 4px `.locStrip` status stripe at the top of each card, Oswald uppercase group title + mono kicker + count tile, and crew chips inside. Applied tinted gradient backgrounds per card type — orange for Metal Place, teal for Camping, deep purple for LOST. Page header gained the Oswald "Right Now" title and a day/time mono spec driven by `useNow()` so godlike time-travel stays live. No structural changes to presence booleans, realtime subscriptions, or data flow.
 
 ---
 
-## Phase G — `/profile` + patches grid
+## Phase G — `/profile` + patches grid [completed]
 
-> **⚠️ Soft dependency on feature work — read before starting.**
->
-> - **Year chip on historical patches** (the `'25`-style mono chip in the bottom-right of unlocked patches) and the **"Wacken YYYY" chip in the patch detail modal** depend on `users.historical_badges` (Phase 10c, moved to [FUTURE_IDEAS.md](FUTURE_IDEAS.md)). Stub them: skip rendering when `historical_badges` is absent. Add a TODO comment pointing to FUTURE_IDEAS.md. Do **not** invent a placeholder — wait for the schema.
-> - **Variety in the grid** — the patches grid will look thin until [Phase 10a](PHASES.md) ships characteristic-badge conditions (`bands_picked_genre_min` etc.). Not a hard block; the grid renders fine with current badges, just sparser.
->
-> **Action:** Ideally ship **Phase 10a** before Phase G so the grid has more content to display. If Phase 10a has not yet shipped when you reach Phase G, surface the question to the user: ship Phase G against the current sparse badge set, or pause and do 10a first?
-
-**Goal:** Restyle [`ProfilePage`](src/pages/ProfilePage.tsx) (1445 lines — the heaviest file in the app) using the design system's profile layout. Replace [`BadgesDisplay`](src/components/BadgesDisplay.tsx) with the patches-grid (Variant A) treatment. Preserve the godlike admin and manager tools — just collapse them behind the new `pf-collapse` rows.
-
-**Files to read first:**
-- [`src/pages/ProfilePage.tsx`](src/pages/ProfilePage.tsx) — all 1445 lines, in chunks
-- [`src/pages/ProfilePage.module.css`](src/pages/ProfilePage.module.css)
-- [`src/components/BadgesDisplay.tsx`](src/components/BadgesDisplay.tsx)
-- [`src/components/BadgesDisplay.module.css`](src/components/BadgesDisplay.module.css)
-- [`src/lib/badges.ts`](src/lib/badges.ts)
-- [`src/i18n/Badges_br.json`](src/i18n/Badges_br.json) and `Badges_en.json`
-
-**Changes:**
-1. **Profile head:** centered 56px avatar, Oswald display name, mono email, row of role chips (Crew/Manager/Godlike) + country flag + Wacken-years pill.
-2. **Patches section (Variant A grid):**
-   - 4-column grid on phone, ~6-column on desktop.
-   - Each patch: 64px circle, locked = grayscale + 32% opacity, unlocked = stage-color or accent fill.
-   - Year chip (bottom-right, `'25`-style mono) on historical badges.
-   - Tap → patch detail modal: 132px circle, Oswald name, body description, Wacken year chip (only for historical).
-   - Source data still comes from `BADGES` array in `src/lib/badges.ts` — schema unchanged.
-3. **Preferences section:** language seg (only `PT` and `EN` for now — ES/DE deferred to S4), notification toggle.
-4. **Manager tools** behind `pf-collapse` row — blue label, expand chevron. Contents = whatever's there now (read it; don't change behavior).
-5. **Godlike admin** behind `pf-collapse` row — gold label. Contents include: time-travel chips (Phase 9.B, must be preserved), live-band-test config (Phase 7), Metal-Place config (Phase 6), useful-links section (Phase 7), badge-test panel (Phase 7).
-6. **Sign out** at the bottom.
-
-**Acceptance:**
-- All ~half-dozen godlike admin features still work: time travel chips D-1 / D1–D4 / D+1, live-band test override, Metal Place config, useful links, badge test.
-- Manager tools (block user etc.) still work.
-- Badge unlock conditions evaluate identically — no regression in which badges are unlocked.
-- Patch detail modal opens for both locked and unlocked patches (just disabled-styled when locked).
-- Language switch persists to `users.preferred_language` and updates UI immediately.
-- Tests green (especially profile and badge tests).
-
-**Ask before executing this phase:**
-- ProfilePage is 1445 lines with many sub-features. Splitting into sub-components (`ProfileHead`, `PatchesGrid`, `PreferencesSection`, `ManagerTools`, `GodlikeAdmin`) would make this phase tractable — but it crosses the "don't refactor logic" guardrail if the split moves hooks. Recommended: split *visually only* (extract JSX subtrees into local components in the same file, with no hook movement), or do a fully separate prep PR ahead of this phase that just splits files without changing markup. Confirm which approach the user prefers.
-- Year chip: which badges count as "historical"? (Likely: any badge with a `wacken_years_*` condition.) Confirm.
-- Patch detail modal close gesture: tap scrim + ✕ button + Esc — confirm all three.
-- Patches grid columns at different viewport sizes — design system shows 4-col on phone, but desktop sizing isn't specced. Recommended: 4 on phone, 6 on tablet, 8 on desktop. Confirm.
-- Confirm we render only PT and EN in the language seg, not ES/DE (those are S4).
+Restyled `ProfilePage` with the design system's profile layout using local JSX subtrees (no hook movement). Profile head: centered 56px avatar, Oswald uppercase display name, mono email, role chip (gold for godlike, blue for manager, neutral for crew), country flag emoji, and sorted Wacken-years pill. Replaced `BadgesDisplay` with a full patches-grid (Variant A): 4 / 6 / 8 columns across breakpoints, all BADGES shown (locked = grayscale + 32% opacity), 64px circles, scrim-close detail modal with 132px Oswald title and body description; `year?: number` added to `BadgeConfig` for future year chips. Edit-profile form wrapped in a `pfCollapse` collapsible row; language select replaced with a PT / EN segment control. Manager tools behind a blue-labeled collapsible; Godlike admin behind a gold-labeled collapsible — all existing behaviors (time travel, live-band test, Metal Place config, user management) preserved. Sign-out moved from the top header to a mono pill button at the bottom. 177 tests green.
 
 ---
 
@@ -279,7 +205,7 @@ Rebuilt `BandFilters` with a 4-column day tab bar (D1–D4: Oswald date number +
 
 **Changes:**
 1. **Login + register pages:** match the design system's masthead style (4px accent top border, big Oswald headline, mono "specs"-style hint text). Form fields keep current behavior; restyle to use `--bg-elevated` for inputs, hard radii.
-2. **Bottom nav:** 5 cells (`Now / Sched / Picks / Popular / Me`). Active = `--accent-hover` color + filled icon variant. Inactive = `--text-muted` + line-icon variant. Icons from the design system's icon sheet (Phase J will harden the icon set; here we just adopt it).
+2. **Bottom nav:** 5 cells (`Now / Schedule / Picks / Popular / Me`). Active = `--accent-hover` color + filled icon variant. Inactive = `--text-muted` + line-icon variant. Icons from the design system's icon sheet (Phase J will harden the icon set; here we just adopt it).
 3. **Offline banner:** mono caps text, pulsing 6px dot, sits at the top of `/now`, `/schedule`, `/my-picks` when offline.
 4. **Pending chip:** mono caps, `--signal-warn` tint, pulsing dot. Inline on cards/announcements that have unsynced state.
 5. **Sync toast:** appears for ~3s when sync completes.

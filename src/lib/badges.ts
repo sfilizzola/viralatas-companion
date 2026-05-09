@@ -31,6 +31,7 @@ export type BadgeConfig = {
   labelKey: string;
   descriptionKey: string;
   condition: BadgeCondition;
+  year?: number; // Historical Wacken year chip (e.g. 2025 → "'25"). Omit for non-historical badges.
 };
 
 export type BadgeContext = {

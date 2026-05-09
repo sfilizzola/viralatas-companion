@@ -30,6 +30,19 @@ import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
 import styles from './ProfilePage.module.css';
 
+function roleLabel(role: string): string {
+  if (role === 'godlike') return 'Godlike';
+  if (role === 'manager') return 'Manager';
+  return 'Crew';
+}
+
+function countryFlag(code: string | null | undefined): string {
+  const flags: Record<string, string> = {
+    br: '🇧🇷', de: '🇩🇪', us: '🇺🇸', be: '🇧🇪', co: '🇨🇴', es: '🇪🇸',
+  };
+  return code ? (flags[code] ?? '') : '';
+}
+
 export default function ProfilePage() {
   const { language, setLanguage, t } = useI18n('ProfilePage');
   const navigate = useNavigate();
@@ -44,11 +57,6 @@ export default function ProfilePage() {
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <span className={styles.appName}>Viralatas 🤘</span>
-        <button className={styles.logoutBtn} onClick={handleLogout}>{t('logout')}</button>
-      </header>
-
       {user && (
         <ProfileForm
           key={`${user.id}:${language}`}
@@ -62,7 +70,13 @@ export default function ProfilePage() {
         />
       )}
 
-      <div style={{ textAlign: 'center', padding: '2rem 1rem 1rem', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+      <div className={styles.pfSignOutWrap}>
+        <button className={styles.pfSignOutBtn} onClick={handleLogout} type="button">
+          {t('logout')}
+        </button>
+      </div>
+
+      <div className={styles.pfVersion}>
         Caramelo Tech v{VERSION}
       </div>
 
@@ -107,6 +121,18 @@ function ProfileForm({
   const [newCountry, setNewCountry] = useState<string>(
     (user.user_metadata?.['country'] as string | undefined) ?? ''
   );
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [prefsOpen, setPrefsOpen] = useState(false);
+
+  // Read the profile head values from saved metadata (not from the draft state)
+  const savedCountry = (user.user_metadata?.['country'] as string | undefined) ?? null;
+  const savedWackenYears: number[] = Array.isArray(user.user_metadata?.['wacken_years'])
+    ? (user.user_metadata['wacken_years'] as number[])
+    : [];
+
+  useEffect(() => {
+    fetchCurrentUserRole(userId).then(setUserRole);
+  }, [userId]);
 
   async function handleSave(e: FormEvent) {
     e.preventDefault();
@@ -176,96 +202,145 @@ function ProfileForm({
     );
   }
 
+  const flag = countryFlag(savedCountry);
+
   return (
     <main className={styles.main}>
-      <div className={styles.avatar}>
-        {newAvatarUrl ? (
-          <img className={styles.avatarImg} src={newAvatarUrl} alt="" />
-        ) : (
-          <span aria-hidden>{initial}</span>
-        )}
+      {/* ── Profile head ── */}
+      <div className={styles.pfHead}>
+        <div className={styles.pfAvatarWrap}>
+          {newAvatarUrl ? (
+            <img className={styles.pfAvatarImg} src={newAvatarUrl} alt="" />
+          ) : (
+            <span className={styles.pfAvatarInitial} aria-hidden>{initial}</span>
+          )}
+        </div>
+        <h1 className={styles.pfName}>{displayName}</h1>
+        <p className={styles.pfEmail}>{user.email}</p>
+        <div className={styles.pfMeta}>
+          {userRole && (
+            <span className={`${styles.pfRoleChip} ${styles[`pfRole_${userRole}`]}`}>
+              {roleLabel(userRole)}
+            </span>
+          )}
+          {flag && <span className={styles.pfCountryFlag}>{flag}</span>}
+          {savedWackenYears.length > 0 && (
+            <span className={styles.pfYearsPill}>
+              {[...savedWackenYears].sort((a, b) => a - b).join(' · ')}
+            </span>
+          )}
+        </div>
       </div>
-      <h2 className={styles.name}>{displayName}</h2>
-      <p className={styles.email}>{user.email}</p>
 
-      <BadgesDisplay user={user} />
+      {/* ── Patches grid ── */}
+      <section className={styles.pfSection}>
+        <div className={styles.pfSectionKicker}>{t('patches')}</div>
+        <BadgesDisplay user={user} />
+      </section>
 
-      <form onSubmit={handleSave} className={styles.form}>
-        <label className={styles.label}>
-          {t('crewName')}
-          <input
-            className={styles.input}
-            type="text"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            maxLength={30}
-          />
-        </label>
-        <label className={styles.label}>
-          {t('language')}
-          <select
-            className={styles.input}
-            value={newLanguage}
-            onChange={(e) => setNewLanguage(e.target.value as Language)}
-          >
-            <option value="br">{t('portuguese')}</option>
-            <option value="en">{t('english')}</option>
-          </select>
-        </label>
-        <label className={styles.label}>
-          {t('photo')}
-          <span className={styles.photoHelp}>{t('photoHelp')}</span>
-          <span className={styles.fileButton}>
-            {uploadingPhoto ? t('uploadingPhoto') : t('choosePhoto')}
-            <input
-              className={styles.fileInput}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              disabled={uploadingPhoto}
-              onChange={handlePhotoChange}
-            />
-          </span>
-        </label>
-        {photoError && <p className={styles.error}>{t('photoError')}</p>}
-
-        <fieldset className={styles.fieldset}>
-          <legend className={styles.legend}>{t('wackenYears')}</legend>
-          {[2022, 2023, 2024, 2025, 2026].map((year) => (
-            <label key={year} className={styles.checkboxLabel}>
-              <input
-                type="checkbox"
-                checked={newWackenYears.includes(year)}
-                onChange={(e) => handleYearToggle(year, e.target.checked)}
-              />
-              {year}
-            </label>
-          ))}
-        </fieldset>
-
-        <label className={styles.label}>
-          {t('country')}
-          <select
-            className={styles.input}
-            value={newCountry}
-            onChange={(e) => setNewCountry(e.target.value)}
-          >
-            <option value="">{t('countryPlaceholder')}</option>
-            <option value="de">{t('countryDe')}</option>
-            <option value="es">{t('countryEs')}</option>
-            <option value="br">{t('countryBr')}</option>
-            <option value="us">{t('countryUs')}</option>
-            <option value="co">{t('countryCo')}</option>
-            <option value="be">{t('countryBe')}</option>
-            <option value="other">{t('countryOther')}</option>
-          </select>
-        </label>
-
-        <button className={styles.button} type="submit" disabled={saving}>
-          {saved ? `${t('saveDone')} ✓` : saving ? t('saveLoading') : t('saveProfile')}
-        </button>
-      </form>
-
+      {/* ── Schedule conflicts ── */}
       <ConflictSection userId={userId} t={t} />
+
+      {/* ── Edit profile (collapsible) ── */}
+      <div className={styles.pfCollapse}>
+        <button
+          className={styles.pfCollapseRow}
+          type="button"
+          onClick={() => setPrefsOpen(!prefsOpen)}
+          aria-expanded={prefsOpen}
+        >
+          <span className={styles.pfCollapseLabel}>{t('editProfile')}</span>
+          <span className={`${styles.pfCollapseChevron} ${prefsOpen ? styles.open : ''}`}>▼</span>
+        </button>
+        <div className={`${styles.pfCollapseContent} ${prefsOpen ? styles.open : ''}`}>
+          <form onSubmit={handleSave} className={styles.form}>
+            <label className={styles.label}>
+              {t('crewName')}
+              <input
+                className={styles.input}
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                maxLength={30}
+              />
+            </label>
+
+            <div className={styles.label}>
+              {t('language')}
+              <div className={styles.langSeg}>
+                <button
+                  type="button"
+                  className={`${styles.langSegBtn} ${newLanguage === 'br' ? styles.langSegActive : ''}`}
+                  onClick={() => setNewLanguage('br')}
+                >
+                  PT
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.langSegBtn} ${newLanguage === 'en' ? styles.langSegActive : ''}`}
+                  onClick={() => setNewLanguage('en')}
+                >
+                  EN
+                </button>
+              </div>
+            </div>
+
+            <label className={styles.label}>
+              {t('photo')}
+              <span className={styles.photoHelp}>{t('photoHelp')}</span>
+              <span className={styles.fileButton}>
+                {uploadingPhoto ? t('uploadingPhoto') : t('choosePhoto')}
+                <input
+                  className={styles.fileInput}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  disabled={uploadingPhoto}
+                  onChange={handlePhotoChange}
+                />
+              </span>
+            </label>
+            {photoError && <p className={styles.error}>{t('photoError')}</p>}
+
+            <fieldset className={styles.fieldset}>
+              <legend className={styles.legend}>{t('wackenYears')}</legend>
+              {[2022, 2023, 2024, 2025, 2026].map((year) => (
+                <label key={year} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={newWackenYears.includes(year)}
+                    onChange={(e) => handleYearToggle(year, e.target.checked)}
+                  />
+                  {year}
+                </label>
+              ))}
+            </fieldset>
+
+            <label className={styles.label}>
+              {t('country')}
+              <select
+                className={styles.input}
+                value={newCountry}
+                onChange={(e) => setNewCountry(e.target.value)}
+              >
+                <option value="">{t('countryPlaceholder')}</option>
+                <option value="de">{t('countryDe')}</option>
+                <option value="es">{t('countryEs')}</option>
+                <option value="br">{t('countryBr')}</option>
+                <option value="us">{t('countryUs')}</option>
+                <option value="co">{t('countryCo')}</option>
+                <option value="be">{t('countryBe')}</option>
+                <option value="other">{t('countryOther')}</option>
+              </select>
+            </label>
+
+            <button className={styles.button} type="submit" disabled={saving}>
+              {saved ? `${t('saveDone')} ✓` : saving ? t('saveLoading') : t('saveProfile')}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {/* ── Manager + Godlike admin ── */}
       <GodlikeSection userId={userId} t={t} />
       <ManagerSection userId={userId} t={t} />
     </main>
@@ -772,18 +847,17 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
 
   return (
     <div className={styles.godlikeSection}>
-      <div className={styles.divider} />
       <div className={styles.collapsibleCard}>
         <button
-          className={styles.conflictsHeader}
+          className={styles.pfCollapseRow}
           onClick={() => setIsOpen(!isOpen)}
           type="button"
           aria-expanded={isOpen}
         >
           <h3 className={styles.godlikeTitle}>🤘 GODLIKE POWERS</h3>
-          <div className={`${styles.chevron} ${isOpen ? styles.open : ''}`}>▼</div>
+          <span className={`${styles.pfCollapseChevron} ${isOpen ? styles.open : ''}`}>▼</span>
         </button>
-        <div className={`${styles.conflictsContent} ${isOpen ? styles.open : ''}`}>
+        <div className={`${styles.pfCollapseContent} ${isOpen ? styles.open : ''}`}>
           <div className={styles.conflictsInner}>
             <div className={styles.godlikeSectionContent}>
         <button
@@ -1377,18 +1451,17 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
 
   return (
     <div className={styles.managerSection}>
-      <div className={styles.divider} />
       <div className={styles.collapsibleCard}>
         <button
-          className={styles.conflictsHeader}
+          className={styles.pfCollapseRow}
           onClick={() => setIsOpen(!isOpen)}
           type="button"
           aria-expanded={isOpen}
         >
           <h3 className={styles.managerTitle}>🔧 MANAGER POWERS</h3>
-          <div className={`${styles.chevron} ${isOpen ? styles.open : ''}`}>▼</div>
+          <span className={`${styles.pfCollapseChevron} ${isOpen ? styles.open : ''}`}>▼</span>
         </button>
-        <div className={`${styles.conflictsContent} ${isOpen ? styles.open : ''}`}>
+        <div className={`${styles.pfCollapseContent} ${isOpen ? styles.open : ''}`}>
           <div className={styles.conflictsInner}>
             <div className={styles.managerSectionContent}>
         <div className={styles.blockedUsersSection}>

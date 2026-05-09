@@ -90,5 +90,7 @@
   "timeTravelChip_post": "Dia após o festival (02/08)",
   "registeredUsers": "Usuários cadastrados",
   "registeredUsersLoading": "Carregando usuários...",
-  "registeredUsersEmpty": "Nenhum usuário encontrado"
+  "registeredUsersEmpty": "Nenhum usuário encontrado",
+  "patches": "PATCHES",
+  "editProfile": "EDITAR PERFIL"
 }

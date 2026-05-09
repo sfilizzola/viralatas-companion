@@ -1,7 +1,239 @@
+/* ============================================================
+   PROFILE PAGE — Phase G design system layout
+   ============================================================ */
+
 .container {
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
+}
+
+/* ── Profile head ── */
+.pfHead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-8) var(--s-4) var(--s-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.pfAvatarWrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.pfAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.pfAvatarInitial {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.pfName {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  margin: var(--s-1) 0 0;
+}
+
+.pfEmail {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.pfMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: var(--s-1);
+}
+
+.pfRoleChip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  background: var(--bg-elevated);
+}
+
+.pfRole_godlike {
+  color: #d97706;
+  border-color: rgba(217, 119, 6, 0.45);
+  background: rgba(217, 119, 6, 0.08);
+}
+
+.pfRole_manager {
+  color: #3b82f6;
+  border-color: rgba(59, 130, 246, 0.45);
+  background: rgba(59, 130, 246, 0.08);
+}
+
+.pfRole_normal {
+  color: var(--text-muted);
+}
+
+.pfCountryFlag {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.pfYearsPill {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  letter-spacing: 0.05em;
+}
+
+/* ── Patches section ── */
+.pfSection {
+  width: 100%;
+  max-width: 400px;
+  align-self: center;
+  padding: var(--s-4) var(--s-4) var(--s-2);
+}
+
+.pfSectionKicker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin-bottom: var(--s-2);
+}
+
+/* ── Collapsible rows (edit profile, godlike, manager) ── */
+.pfCollapse {
+  width: 100%;
+  max-width: 400px;
+  align-self: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-2);
+  overflow: hidden;
+  margin: var(--s-3) var(--s-4);
+}
+
+.pfCollapseRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--s-3) var(--s-4);
+  background: var(--bg-elevated);
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.pfCollapseRow:hover {
+  background: var(--border);
+}
+
+.pfCollapseLabel {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.pfCollapseChevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.pfCollapseChevron.open {
+  transform: rotate(180deg);
+}
+
+.pfCollapseContent {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.pfCollapseContent.open {
+  max-height: 10000px;
+  transition: max-height 0.3s ease-in;
+}
+
+/* ── Sign out + version ── */
+.pfSignOutWrap {
+  display: flex;
+  justify-content: center;
+  padding: var(--s-4) var(--s-4) var(--s-2);
+}
+
+.pfSignOutBtn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  color: var(--text-muted);
+  padding: var(--s-2) var(--s-6);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.pfSignOutBtn:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.pfVersion {
+  text-align: center;
+  padding: var(--s-2) var(--s-4);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  opacity: 0.6;
 }
 
 .header {
@@ -36,9 +268,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 3rem 1.5rem;
-  gap: 0.5rem;
+  align-items: stretch;
+  gap: 0;
 }
 
 .avatar {
@@ -74,10 +305,11 @@
 
 .form {
   width: 100%;
-  max-width: 400px;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  padding: var(--s-4);
+  border-top: 1px solid var(--border);
 }
 
 .label {
@@ -153,14 +385,47 @@
   cursor: not-allowed;
 }
 
+/* ── Language segment control ── */
+.langSeg {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--r-2);
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.langSegBtn {
+  flex: 1;
+  padding: var(--s-2) 0;
+  background: var(--bg-elevated);
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.langSegBtn + .langSegBtn {
+  border-left: 1px solid var(--border);
+}
+
+.langSegActive {
+  background: var(--accent);
+  color: #fff;
+}
+
 /* Conflicts section */
 .conflictsSection {
   width: 100%;
   max-width: 400px;
-  margin-top: 2rem;
+  align-self: center;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   overflow: hidden;
+  margin: var(--s-3) var(--s-4);
 }
 
 .conflictsHeader {
@@ -429,19 +694,14 @@
 .godlikeSection {
   width: 100%;
   max-width: 400px;
-  margin-top: 2rem;
-}
-
-.divider {
-  height: 1px;
-  background: var(--border);
-  margin-bottom: 1.5rem;
+  align-self: center;
+  margin: var(--s-3) var(--s-4);
 }
 
 .collapsibleCard {
   width: 100%;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   overflow: hidden;
 }
 
@@ -453,11 +713,12 @@
 }
 
 .godlikeTitle {
-  font-size: 0.875rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: #d97706;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
   margin: 0;
 }
 
@@ -932,7 +1193,8 @@
 .managerSection {
   width: 100%;
   max-width: 400px;
-  margin-top: 2rem;
+  align-self: center;
+  margin: var(--s-3) var(--s-4);
 }
 
 .managerSectionContent {
@@ -943,11 +1205,12 @@
 }
 
 .managerTitle {
-  font-size: 0.875rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
   font-weight: 700;
-  color: var(--text-muted);
+  color: #3b82f6;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
   margin: 0;
 }
 
