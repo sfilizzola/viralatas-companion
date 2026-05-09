@@ -13,13 +13,24 @@ export default function RegisterPage() {
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [checkingRegistration, setCheckingRegistration] = useState(true);
+  const [registrationEnabled, setRegistrationEnabled] = useState(false);
 
   useEffect(() => {
+    let active = true;
     getRegistrationEnabled().then((enabled) => {
+      if (!active) return;
       if (!enabled) {
-        navigate('/login');
+        navigate('/login', { replace: true });
+        return;
       }
+      setRegistrationEnabled(true);
+      setCheckingRegistration(false);
     });
+
+    return () => {
+      active = false;
+    };
   }, [navigate]);
 
   async function handleSubmit(e: FormEvent) {
@@ -28,6 +39,12 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
+      const enabled = await getRegistrationEnabled();
+      if (!enabled) {
+        navigate('/login', { replace: true });
+        return;
+      }
+
       const { data, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
@@ -98,6 +115,19 @@ export default function RegisterPage() {
       setLoading(false);
     }
   }
+
+  if (checkingRegistration) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <h1 className={styles.title}>{t('appTitle')}</h1>
+          <p className={styles.subtitle}>{t('checkingRegistration')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!registrationEnabled) return null;
 
   return (
     <div className={styles.container}>

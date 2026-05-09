@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [registrationEnabled, setRegistrationEnabled] = useState(true);
+  const [registrationEnabled, setRegistrationEnabled] = useState(false);
 
   useEffect(() => {
     getRegistrationEnabled().then(setRegistrationEnabled);
