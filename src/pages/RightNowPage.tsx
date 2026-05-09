@@ -42,6 +42,7 @@ import { stageColor } from '../lib/stageColors';
 import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BadgesDisplay from '../components/BadgesDisplay';
+import PresenceToggle, { type PresenceLocation } from '../components/PresenceToggle';
 import styles from './RightNowPage.module.css';
 
 function truncateDisplayName(name: string): string {
@@ -172,8 +173,6 @@ export default function RightNowPage() {
     bandName: string;
   } | null>(null);
   const [undoTimerId, setUndoTimerId] = useState<ReturnType<typeof setTimeout> | null>(null);
-  const [metalPlaceCheckingIn, setMetalPlaceCheckingIn] = useState(false);
-  const [metalPlaceCheckedIn, setMetalPlaceCheckedIn] = useState(false);
   const [metalPlaceConfig, setMetalPlaceConfig] = useState<MetalPlaceConfig | null>(null);
   const [liveBandTestConfig, setLiveBandTestConfig] = useState<LiveBandTestConfig | null>(null);
 
@@ -349,6 +348,12 @@ export default function RightNowPage() {
 
   const isCamping = myPresence?.is_camping ?? false;
   const isAtMetalPlace = myPresence?.is_at_metal_place ?? false;
+  const presenceValue: PresenceLocation =
+    isAtMetalPlace && isMetalPlaceWindowActive
+      ? 'metal_place'
+      : isCamping && myRawPlan.status !== 'current'
+        ? 'camping'
+        : 'auto';
 
   const myPlan = useMemo(
     () => applyPresenceToLivePlan(myRawPlan, isCamping),
@@ -411,13 +416,25 @@ export default function RightNowPage() {
     setUndoState(null);
   }
 
-  function handleCampingToggle(checked: boolean) {
+  async function handlePresenceChange(nextValue: PresenceLocation) {
     if (!userId) return;
-    if (checked && myRawPlan.status === 'current') {
-      setCampingStatus(userId, false).catch(() => {});
+
+    if (nextValue === 'camping') {
+      if (myRawPlan.status === 'current') {
+        await setCampingStatus(userId, false);
+        return;
+      }
+      await setCampingStatus(userId, true);
       return;
     }
-    setCampingStatus(userId, checked).catch(() => {});
+
+    if (nextValue === 'metal_place') {
+      await setMetalPlaceStatus(userId, true);
+      return;
+    }
+
+    if (isAtMetalPlace) await setMetalPlaceStatus(userId, false);
+    if (isCamping) await setCampingStatus(userId, false);
   }
 
   return (
@@ -430,15 +447,6 @@ export default function RightNowPage() {
             {nowLabel(now, language)} {t('wackenTime')}
           </span>
         </div>
-        <label className={styles.campingSwitch}>
-          <span>{t('camping')}</span>
-          <input
-            type="checkbox"
-            checked={isCamping && myRawPlan.status !== 'current'}
-            onChange={(event) => handleCampingToggle(event.target.checked)}
-          />
-          <span className={styles.switchTrack} aria-hidden />
-        </label>
       </header>
 
       {liveTestBand && (
@@ -448,6 +456,19 @@ export default function RightNowPage() {
       )}
 
       <main className={styles.main}>
+        {userId && (
+          <PresenceToggle
+            className={styles.presence}
+            value={presenceValue}
+            metalPlaceAvailable={isMetalPlaceWindowActive}
+            labels={{
+              title: t('presenceTitle'),
+              camping: t('presenceCamping'),
+              metalPlace: t('presenceMetalPlace'),
+            }}
+            onChange={handlePresenceChange}
+          />
+        )}
         {loading ? (
           <p className={styles.empty}>{t('loading')}</p>
         ) : (
@@ -498,74 +519,6 @@ export default function RightNowPage() {
                 </>
               )}
             </section>
-
-            {userId && isMetalPlaceWindowActive && (
-              <div className={styles.metalPlaceCard}>
-                <div className={styles.metalPlaceContainer}>
-                  <div className={styles.metalPlaceLeft}>
-                    <div className={styles.metalPlaceIcon} aria-hidden>🍺</div>
-                    <div className={styles.metalPlaceInfo}>
-                      <div className={styles.metalPlaceTitle}>{t('metalPlaceGroupTitle')}</div>
-                      <div className={styles.metalPlaceSubtitle}>
-                        {metalPlaceSubtitle(metalPlaceConfig, t)}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className={styles.metalPlaceRight}>
-                    {isAtMetalPlace ? (
-                      <button
-                        className={styles.checkoutButton}
-                        onClick={async () => {
-                          setMetalPlaceCheckingIn(true);
-                          try {
-                            await setMetalPlaceStatus(userId, false);
-                            setMetalPlaceCheckedIn(true);
-                            setTimeout(() => setMetalPlaceCheckedIn(false), 3000);
-                          } finally {
-                            setMetalPlaceCheckingIn(false);
-                          }
-                        }}
-                        disabled={metalPlaceCheckingIn}
-                      >
-                        {metalPlaceCheckingIn ? '⏳' : metalPlaceCheckedIn ? '✅' : '👋'}
-                        <span className={styles.buttonText}>
-                          {metalPlaceCheckingIn
-                            ? t('metalPlaceCheckingOut')
-                            : metalPlaceCheckedIn
-                              ? t('metalPlaceCheckedOut')
-                              : t('metalPlaceCheckOut')}
-                        </span>
-                      </button>
-                    ) : (
-                      <button
-                        className={styles.checkinButton}
-                        onClick={async () => {
-                          setMetalPlaceCheckingIn(true);
-                          try {
-                            await setMetalPlaceStatus(userId, true);
-                            setMetalPlaceCheckedIn(true);
-                            setTimeout(() => setMetalPlaceCheckedIn(false), 3000);
-                          } finally {
-                            setMetalPlaceCheckingIn(false);
-                          }
-                        }}
-                        disabled={metalPlaceCheckingIn || metalPlaceCheckedIn}
-                      >
-                        {metalPlaceCheckingIn ? '⏳' : metalPlaceCheckedIn ? '✅' : '🍺'}
-                        <span className={styles.buttonText}>
-                          {metalPlaceCheckingIn
-                            ? t('metalPlaceCheckingIn')
-                            : metalPlaceCheckedIn
-                              ? t('metalPlaceCheckInActive')
-                              : t('metalPlaceCheckIn')}
-                        </span>
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
 
             {user && <BadgesDisplay user={user} />}
 

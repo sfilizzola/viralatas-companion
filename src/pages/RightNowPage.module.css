@@ -28,64 +28,14 @@
   font-size: 0.78rem;
 }
 
-.campingSwitch {
-  display: inline-grid;
-  grid-template-columns: auto 44px;
-  gap: 0.55rem;
-  align-items: center;
-  color: var(--text);
-  font-size: 0.78rem;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.campingSwitch input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.switchTrack {
-  position: relative;
-  width: 44px;
-  height: 24px;
-  border-radius: 999px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  transition: background 0.16s ease, border-color 0.16s ease;
-}
-
-.switchTrack::after {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--text-muted);
-  transition: transform 0.16s ease, background 0.16s ease;
-}
-
-.campingSwitch input:checked + .switchTrack {
-  background: var(--accent);
-  border-color: var(--accent);
-}
-
-.campingSwitch input:checked + .switchTrack::after {
-  transform: translateX(20px);
-  background: #fff;
-}
-
-.campingSwitch input:focus-visible + .switchTrack {
-  outline: 2px solid var(--accent-hover);
-  outline-offset: 2px;
-}
-
 .main {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
+}
+
+.presence {
+  margin-bottom: var(--s-3);
 }
 
 .liveTestBanner {
@@ -488,117 +438,6 @@
   background: rgba(234, 179, 8, 0.1);
 }
 
-.metalPlaceCard {
-  margin: 1rem 0;
-  padding: 1rem;
-  border: 1px solid rgba(217, 119, 6, 0.4);
-  border-radius: var(--radius);
-  background:
-    linear-gradient(135deg, rgba(217, 119, 6, 0.12) 0%, rgba(253, 224, 71, 0.06) 100%);
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15);
-}
-
-.metalPlaceContainer {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 1rem;
-  align-items: center;
-}
-
-.metalPlaceLeft {
-  display: flex;
-  gap: 1rem;
-  align-items: center;
-  min-width: 0;
-}
-
-.metalPlaceIcon {
-  font-size: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 56px;
-  height: 56px;
-  background: rgba(217, 119, 6, 0.2);
-  border-radius: 50%;
-  border: 2px solid rgba(217, 119, 6, 0.4);
-  flex-shrink: 0;
-}
-
-.metalPlaceInfo {
-  min-width: 0;
-}
-
-.metalPlaceTitle {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: rgba(253, 224, 71, 1);
-  margin-bottom: 0.15rem;
-}
-
-.metalPlaceSubtitle {
-  font-size: 0.8rem;
-  color: rgba(253, 224, 71, 0.7);
-  font-weight: 600;
-}
-
-.metalPlaceRight {
-  flex-shrink: 0;
-}
-
-.checkinButton,
-.checkoutButton {
-  padding: 0.65rem 0.85rem;
-  border: 1px solid rgba(217, 119, 6, 0.5);
-  border-radius: 6px;
-  background: linear-gradient(135deg, rgba(217, 119, 6, 0.2) 0%, rgba(217, 119, 6, 0.12) 100%);
-  color: rgba(253, 224, 71, 0.95);
-  font-size: 0.8rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  white-space: nowrap;
-}
-
-.buttonText {
-  font-weight: 600;
-}
-
-.checkinButton:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(217, 119, 6, 0.35) 0%, rgba(217, 119, 6, 0.25) 100%);
-  border-color: rgba(217, 119, 6, 0.8);
-  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.25);
-}
-
-.checkinButton:active:not(:disabled) {
-  transform: scale(0.96);
-}
-
-.checkoutButton {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(168, 85, 247, 0.08) 100%);
-  border-color: rgba(168, 85, 247, 0.4);
-  color: rgba(196, 148, 255, 0.95);
-}
-
-.checkoutButton:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.25) 0%, rgba(168, 85, 247, 0.15) 100%);
-  border-color: rgba(168, 85, 247, 0.7);
-  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.2);
-}
-
-.checkoutButton:active:not(:disabled) {
-  transform: scale(0.96);
-}
-
-.checkinButton:disabled,
-.checkoutButton:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
-}
-
 .undoToast {
   position: fixed;
   bottom: 64px;
@@ -660,11 +499,6 @@
   .header {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .campingSwitch {
-    width: 100%;
-    justify-content: space-between;
   }
 
   .hero {
