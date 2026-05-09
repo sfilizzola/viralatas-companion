@@ -5,14 +5,61 @@
 }
 
 :root {
+  /* ---------- neutrals (dark first) ---------- */
   --bg: #0a0a0a;
   --bg-surface: #141414;
   --bg-elevated: #1e1e1e;
+  --bg-sunken: #050505;
   --border: #2a2a2a;
+  --border-strong: #3a3a3a;
   --text: #e8e8e8;
   --text-muted: #888;
+  --text-faint: #555;
+
+  /* ---------- brand accent (W.E.T. red, also semantic 'live/now') ---------- */
   --accent: #c0392b;
   --accent-hover: #e74c3c;
+
+  /* ---------- semantic states ---------- */
+  --signal-live: #c0392b;
+  --signal-warn: #f39c12;
+  --signal-ok: #16a085;
+  --signal-lost: #a855f7;
+
+  /* ---------- stages (canonical, never reinterpret) ---------- */
+  --stage-faster: #2980b9;
+  --stage-harder: #e67e22;
+  --stage-louder: #8e44ad;
+  --stage-wet: #c0392b;
+  --stage-headbangers: #16a085;
+  --stage-wasteland: #2c3e50;
+  --stage-wackinger: #95a5a6;
+  --stage-jungle: #f39c12;
+
+  /* ---------- type ---------- */
+  --font-display: 'Oswald', 'Helvetica Neue Condensed', 'Arial Narrow', sans-serif;
+  --font-sans: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* ---------- spacing scale (4px base) ---------- */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+
+  /* ---------- radii ---------- */
+  --r-0: 0;
+  --r-1: 4px;
+  --r-2: 8px;
+  --r-3: 12px;
+  --r-pill: 999px;
+
+  /* ---------- legacy aliases (kept for components not yet migrated) ---------- */
   --radius: 8px;
   --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
