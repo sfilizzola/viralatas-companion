@@ -118,7 +118,7 @@ export default function MyPicksPage() {
                   isPicked={pickedIds.has(band.id)}
                   count={pickCounts[band.id] ?? 0}
                   onToggle={() => handleToggle(band.id)}
-                  dense
+                  variant="timeline"
                   conflict={
                     hasConflict
                       ? {
