@@ -453,10 +453,11 @@ export default function RightNowPage() {
       <header className={styles.header}>
         <div>
           <span className={styles.title}>{t('title')}</span>
-          <span className={styles.timestamp}>
-            {nowLabel(now, language)} {t('wackenTime')}
-          </span>
         </div>
+        <span className={styles.timestamp}>
+          <span>{nowLabel(now, language)}</span>
+          <span>{t('wackenTime')}</span>
+        </span>
       </header>
 
       {liveTestBand && (
@@ -493,24 +494,22 @@ export default function RightNowPage() {
                     const author = crewUsers.find((crewUser) => crewUser.id === latestAnnouncement.author_id);
                     const authorName = author?.display_name?.trim() || t('anonymous');
                     return (
-                      <>
-                        <span className={styles.latestAvatar}>
-                          {author?.avatar_url ? (
-                            <img src={author.avatar_url} alt="" loading="lazy" />
-                          ) : (
-                            <span aria-hidden>{authorName.charAt(0).toUpperCase()}</span>
-                          )}
-                        </span>
-                        <div className={styles.latestSignalContent}>
-                          <div className={styles.latestSignalHead}>
-                            <span className={styles.latestSignalName}>{authorName}</span>
-                            <span className={styles.latestSignalTime}>
-                              {relativeAnnouncementTime(latestAnnouncement.created_at, t)}
-                            </span>
-                          </div>
-                          <p className={styles.latestSignalText}>{latestAnnouncement.content}</p>
+                      <div className={styles.latestSignalContent}>
+                        <p className={styles.latestSignalText}>{latestAnnouncement.content}</p>
+                        <div className={styles.latestSignalMeta}>
+                          <span className={styles.latestAvatar}>
+                            {author?.avatar_url ? (
+                              <img src={author.avatar_url} alt="" loading="lazy" />
+                            ) : (
+                              <span aria-hidden>{authorName.charAt(0).toUpperCase()}</span>
+                            )}
+                          </span>
+                          <span className={styles.latestSignalName}>{authorName}</span>
+                          <span className={styles.latestSignalTime}>
+                            {relativeAnnouncementTime(latestAnnouncement.created_at, t)}
+                          </span>
                         </div>
-                      </>
+                      </div>
                     );
                   })()}
                 </div>

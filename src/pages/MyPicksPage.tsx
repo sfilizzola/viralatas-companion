@@ -151,15 +151,19 @@ export default function MyPicksPage() {
       <OfflineBanner />
       <header className={styles.header}>
         <span className={styles.title}>{t('title')}</span>
-        {!loading && myBands.length > 0 && (
-          <div className={styles.summary}>
-            {t('summary', {
+        <div className={styles.summary}>
+          <span className={styles.summaryLine}>
+            {t('headerBandsDays', {
               bands: myBands.length,
               days: grouped.length,
+            })}
+          </span>
+          <span className={styles.summaryLine}>
+            {t('headerConflicts', {
               conflicts: totalConflicts,
             })}
-          </div>
-        )}
+          </span>
+        </div>
       </header>
 
       <main className={styles.list}>
@@ -168,10 +172,12 @@ export default function MyPicksPage() {
           <p className={styles.empty}>{t('empty')}</p>
         )}
         {grouped.map(([day, dayBands]) => (
-          <section key={day}>
+          <section className={styles.daySection} key={day}>
             <h2 className={styles.dayHeader}>
               <span>{dayLabel(day)}</span>
-              <span className={styles.dayHeaderCount}>{dayBands.length}</span>
+              <small className={styles.dayHeaderCount}>
+                {t('dayPickCount', { count: dayBands.length })}
+              </small>
             </h2>
             {dayBands.map((band) => {
               const hasConflict = conflicts.has(band.id);

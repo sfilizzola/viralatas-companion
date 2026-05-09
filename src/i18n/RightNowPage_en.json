@@ -1,5 +1,5 @@
 {
-  "title": "Now",
+  "title": "Right Now",
   "wackenTime": "Wacken time",
   "camping": "I'm at camping",
   "presenceTitle": "Where am I",
@@ -35,7 +35,7 @@
   "lostCamping": "LOST at camping",
   "noPickQueued": "No pick queued",
   "after": "After: {band} - {time}",
-  "latestNews": "Last mural signal",
+  "latestNews": "Last vira-lata bark",
   "anonymous": "Vira-lata",
   "justNow": "now",
   "minutesAgo": "{n} min",
@@ -58,5 +58,5 @@
   "metalPlaceCheckedOut": "Welcome back!",
   "metalPlaceCheckingOut": "Checking out...",
   "liveTestBanner": "🧪 Live test: {band}",
-  "crewCountLabel": "crew"
+  "crewCountLabel": "vira-latas"
 }

@@ -1,5 +1,7 @@
 {
-  "title": "Schedule 🤘",
+  "title": "Schedule",
+  "headerBands": "{count} bands",
+  "headerStages": "{count} stages",
   "thursday": "Thu",
   "friday": "Fri",
   "saturday": "Sat",

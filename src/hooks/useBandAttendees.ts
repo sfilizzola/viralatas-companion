@@ -13,7 +13,7 @@ export type BandAttendee = CrewUser & {
 };
 
 function fallbackName(userId: string) {
-  return `Crew ${userId.slice(0, 4).toUpperCase()}`;
+  return `Vira-lata ${userId.slice(0, 4).toUpperCase()}`;
 }
 
 function mapAttendees(picks: UserPick[], users: CrewUser[]) {

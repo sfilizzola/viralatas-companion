@@ -2,5 +2,8 @@
   "title": "Minhas escolhas",
   "loading": "Carregando escolhas...",
   "empty": "Você ainda não escolheu nenhuma banda. Vá para a programação 🤘",
-  "summary": "{bands} bandas em {days} dias · {conflicts} conflito(s)"
+  "summary": "{bands} bandas em {days} dias · {conflicts} conflito(s)",
+  "headerBandsDays": "{bands} escolhas / {days} dias",
+  "headerConflicts": "{conflicts} conflitos",
+  "dayPickCount": "{count} escolhas"
 }

@@ -89,6 +89,10 @@ export default function SchedulePage() {
       <OfflineBanner />
       <header className={styles.header}>
         <span className={styles.title}>{t('title')}</span>
+        <div className={styles.summary}>
+          <span className={styles.summaryLine}>{t('headerBands', { count: bands.length })}</span>
+          <span className={styles.summaryLine}>{t('headerStages', { count: stages.length })}</span>
+        </div>
       </header>
 
       <BandFilters
@@ -100,7 +104,7 @@ export default function SchedulePage() {
         filteredCount={filtered.length}
       />
 
-      <main className={styles.list}>
+      <main className={`${styles.list} ${styles.scheduleList}`}>
         {loading && <p className={styles.empty}>{t('loadingSchedule')}</p>}
         {!loading && filtered.length === 0 && (
           <p className={styles.empty}>{t('emptySchedule')}</p>

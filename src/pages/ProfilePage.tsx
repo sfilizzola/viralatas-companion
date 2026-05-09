@@ -34,7 +34,7 @@ import styles from './ProfilePage.module.css';
 function roleLabel(role: string): string {
   if (role === 'godlike') return 'Godlike';
   if (role === 'manager') return 'Manager';
-  return 'Crew';
+  return 'Vira-latas';
 }
 
 function countryFlag(code: string | null | undefined): string {

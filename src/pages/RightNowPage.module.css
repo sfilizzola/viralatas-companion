@@ -6,33 +6,34 @@
 }
 
 .header {
-  padding: var(--s-4);
+  padding: var(--s-4) var(--s-4) var(--s-3);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
-  align-items: center;
+  gap: var(--s-3);
+  align-items: flex-end;
 }
 
 .title {
   display: block;
   margin: 0;
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 24px;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0;
   line-height: 1;
   text-transform: uppercase;
 }
 
 .timestamp {
-  display: block;
-  margin-top: var(--s-1);
+  display: grid;
+  gap: 2px;
   color: var(--text-muted);
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  letter-spacing: 0.08em;
+  font-size: 10px;
+  line-height: 1.25;
+  text-align: right;
   text-transform: uppercase;
 }
 
@@ -66,15 +67,12 @@
 }
 
 .latestSignalBody {
-  display: grid;
-  grid-template-columns: 40px 1fr;
-  gap: var(--s-3);
-  align-items: start;
+  display: block;
 }
 
 .latestAvatar {
-  width: 40px;
-  height: 40px;
+  width: 22px;
+  height: 22px;
   overflow: hidden;
   border: 2px solid var(--bg);
   border-radius: 50%;
@@ -84,7 +82,7 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
-  font-size: 1rem;
+  font-size: 0.62rem;
   font-weight: 700;
 }
 
@@ -99,36 +97,45 @@
   min-width: 0;
 }
 
-.latestSignalHead {
+.latestSignalMeta {
   display: flex;
-  align-items: baseline;
-  gap: var(--s-2);
+  align-items: center;
+  gap: 6px;
+  margin-top: var(--s-2);
   min-width: 0;
+  color: var(--text-muted);
 }
 
 .latestSignalName {
   overflow: hidden;
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-size: 0.75rem;
+  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .latestSignalTime {
   flex-shrink: 0;
-  margin-left: auto;
   color: var(--text-muted);
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
+}
+
+.latestSignalTime::before {
+  content: "/";
+  margin-right: 6px;
+  color: var(--border-strong);
 }
 
 .latestSignalText {
   display: -webkit-box;
-  margin: var(--s-1) 0 0;
+  margin: 0;
   overflow: hidden;
   color: var(--text);
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.35;
   white-space: pre-wrap;
   word-break: break-word;
   -webkit-box-orient: vertical;

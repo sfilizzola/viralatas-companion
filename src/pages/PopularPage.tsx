@@ -62,6 +62,14 @@ export default function PopularPage() {
     [bands, pickCounts],
   );
 
+  const totalViraLatas = useMemo(() => {
+    const userIds = new Set<string>();
+    for (const attendees of Object.values(attendeesByBand)) {
+      for (const attendee of attendees) userIds.add(attendee.id);
+    }
+    return userIds.size;
+  }, [attendeesByBand]);
+
   const activeBand = useMemo(
     () => (activeBandId ? bands.find((b) => b.id === activeBandId) ?? null : null),
     [activeBandId, bands],
@@ -113,9 +121,13 @@ export default function PopularPage() {
     <div className={styles.page}>
       <header className={styles.header}>
         <span className={styles.title}>{t('title')}</span>
+        <div className={styles.summary}>
+          <span className={styles.summaryLine}>{t('headerViraLatas', { count: totalViraLatas })}</span>
+          <span className={styles.summaryLine}>{t('headerSorted')}</span>
+        </div>
       </header>
 
-      <main className={styles.list}>
+      <main className={`${styles.list} ${styles.scheduleList}`}>
         {loading && <p className={styles.empty}>{t('loading')}</p>}
         {!loading && popularBands.length === 0 && (
           <p className={styles.empty}>{t('empty')}</p>
