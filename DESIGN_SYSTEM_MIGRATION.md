@@ -34,13 +34,13 @@ These rules apply to every phase below. Read them before opening a single file.
 
 ## Phase map (visual layer)
 
-| Phase | Title | Scope | Risk | Feature dep |
-|------|-------|-------|------|-------------|
-| A1 | Token foundation | `index.css` token set + stage color helper | low | — |
-| A2 | Self-hosted fonts | WOFF2 + `@font-face` + service-worker cache | low/med | — |
-| B  | Typography utilities | `t-display-*`, `t-body`, `t-label`, `t-time` classes | low | — |
-| C  | Band card restyle | `BandCard` + 3 variants (schedule / timeline / ranked) | med | — |
-| D  | Filter chrome | `BandFilters` (pills + day tabs + bottom drawer) | med | — |
+| Phase | Title | Scope | Risk | Status / Feature dep |
+|------|-------|-------|------|----------------------|
+| A1 | Token foundation | `index.css` token set + stage color helper | low | ✅ completed |
+| A2 | Self-hosted fonts | WOFF2 + `@font-face` + service-worker cache | low/med | ✅ completed |
+| B  | Typography utilities | `t-display-*`, `t-body`, `t-label`, `t-time` classes | low | ✅ completed |
+| C  | Band card restyle | `BandCard` + 3 variants (schedule / timeline / ranked) | med | ✅ completed |
+| D  | Filter chrome | `BandFilters` (pills + day tabs + bottom drawer) | med | ✅ completed |
 | **E**  | **Band detail modal + alert banner** | `BandDetailModal` + new alert component | med | **⛔ blocked by [Phase 10b](PHASES.md)** |
 | F  | `/now` visual polish (no structural change) | restyle existing crew grid in design language | med | — |
 | **G**  | **`/profile` + patches grid** | profile head, badge grid, role chips, lang seg, collapsibles | med | **⚠️ partial — see [Phase 10a / 10c](PHASES.md)** |
@@ -66,162 +66,33 @@ Each structural phase will get its own plan in this file when the user approves 
 
 ---
 
-## Phase A1 — Token foundation
+## Phase A1 — Token foundation [completed]
 
-**Goal:** Replace [`src/index.css`](src/index.css) (currently 44 lines, 8 tokens) with the full token set from the design system. Centralize stage colors. Zero visible UI change yet — every component still uses the variables they already use.
-
-**Files to read first:**
-- [`src/index.css`](src/index.css)
-- [`src/pages/SchedulePage.tsx`](src/pages/SchedulePage.tsx) — currently holds stage color map
-- [`src/components/BandCard.module.css`](src/components/BandCard.module.css)
-- All other `*.module.css` files (grep for `var(--`)
-
-**Changes:**
-1. Expand `:root` in `src/index.css` to include every token from the design system: surfaces (`--bg-surface`, `--bg-elevated`, `--bg-sunken`), borders (`--border-strong`), text shades (`--text-faint`), semantic states (`--signal-live`, `--signal-warn`, `--signal-ok`, `--signal-lost`), stage palette (`--stage-faster` … `--stage-jungle`), font families (3 stacks, but font-face declarations come in A2), spacing scale `--s-1` through `--s-12`, radii `--r-0` through `--r-pill`.
-2. Create `src/lib/stageColors.ts` exporting a typed `STAGE_COLOR_TOKENS` map: `Record<StageName, '--stage-faster' | …>`. Move the inline map currently in `SchedulePage.tsx` here. Provide a helper `stageColorVar(stage: string): string` that returns `var(--stage-…)` or `var(--accent)` fallback.
-3. Update every component that references stage colors to read from `stageColors.ts` (no behavior change, but kills the duplication).
-
-**Acceptance:**
-- `git diff src/index.css` shows only additions; existing tokens kept at the same hex.
-- `grep -r "#2980b9\|#e67e22\|#8e44ad\|#c0392b\|#16a085\|#2c3e50\|#95a5a6\|#f39c12" src/` returns only `stageColors.ts` (and any seed files that legitimately store data, which we leave alone).
-- App renders identically to before. Open every page, no visual regressions.
-- `npm test` green.
-
-**Ask before executing this phase:**
-- None expected — this is a pure refactor. If during execution any component turns out to depend on a hex literal in a way that resists tokenization, surface it and ask before forking the approach.
+Expanded `src/index.css` from 8 tokens to the full design-system token set (surfaces, borders, text shades, signal/stage palettes, font/spacing/radii scales). Centralized stage colors in `src/lib/stageColors.ts` with a `stageColor()` helper; removed inline hex maps from page components.
 
 ---
 
-## Phase A2 — Self-hosted fonts
+## Phase A2 — Self-hosted fonts [completed]
 
-**Goal:** Make Oswald + IBM Plex Sans + JetBrains Mono available via local WOFF2 files, declared with `@font-face` in `src/index.css`, and pre-cached by the service worker. Still no UI change — components keep their current font stack until Phase B.
-
-**Files to read first:**
-- [`src/workers/sw.ts`](src/workers/sw.ts) — to understand the current cache strategy and add font files to it
-- `vite.config.ts` (if any) — make sure WOFF2 is treated as an asset
-- `public/` — where the fonts will live
-
-**Changes:**
-1. Download the three font families' weights actually used by the design system:
-   - Oswald: 400, 600, 700 (Latin subset only — we don't need extended Cyrillic/Vietnamese)
-   - IBM Plex Sans: 400, 500, 600, 700
-   - JetBrains Mono: 400, 500, 700
-   Place under `public/fonts/`.
-2. Add `@font-face` declarations at the top of `src/index.css` with `font-display: swap`.
-3. Add the same files to the service worker's pre-cache list so they're available offline after first load.
-4. Add `<link rel="preload" as="font" type="font/woff2" crossorigin>` for the most-used weights (Oswald 700, Plex 400, JetBrains 500) to `index.html`.
-5. Define `--font-display`, `--font-sans`, `--font-mono` variables (already added in A1, just no `@font-face` backing them yet) — now they actually resolve.
-
-**Acceptance:**
-- DevTools → Network → first load shows fonts loaded from `/fonts/*.woff2`, NOT `fonts.googleapis.com` or `fonts.gstatic.com`.
-- DevTools → Application → Service Worker → caches contains the WOFF2 files.
-- Offline test: hard reload → go offline → reload page → fonts still render (no fallback to system fonts).
-- Bundle size delta documented in the PR description; aim < 250KB for the three families combined (subsetted).
-- `npm test` green.
-
-**Ask before executing this phase:**
-- Confirm we want to subset to Latin only. (Recommended: yes — saves ~60% size, our crew is BR/EN/ES/DE-Latin only, no Cyrillic / Greek / extended scripts in copy.)
-- Confirm font weights inventory matches what the design system actually uses (Oswald 400/600/700, Plex 400/500/600/700, JetBrains 400/500/700) — if any visual phase later wants a weight not in this list, we add it then, not preemptively.
-- Confirm we're OK including `LICENSE.txt` for each family in `public/fonts/` (SIL OFL requirement).
+Added self-hosted Oswald + IBM Plex Sans + JetBrains Mono WOFF2 files (Latin subset) under `public/fonts/`, wired `@font-face` declarations in `src/index.css`, pre-cached the fonts in the service worker, and preloaded the most-used weights from `index.html`. Fonts now render offline.
 
 ---
 
-## Phase B — Typography utilities
+## Phase B — Typography utilities [completed]
 
-**Goal:** Make every type style from the design system available as a CSS class so components can opt in incrementally. No component changes yet, but the next phases will use these.
-
-**Files to read first:**
-- [`src/index.css`](src/index.css)
-- design system section "02 — Type" (lines 1668–1714 of `Design System.html`)
-
-**Changes:**
-1. Append nine utility classes to `src/index.css`: `.t-display-xl`, `.t-display-l`, `.t-display-m`, `.t-band`, `.t-h`, `.t-body`, `.t-small`, `.t-label`, `.t-time`. Match the size, weight, line-height, letter-spacing, and `font-variant-numeric: tabular-nums` from the design system exactly.
-2. Set `body { font-family: var(--font-sans); }` so the default text now uses IBM Plex Sans. **This is the first visible change in the migration.**
-3. Verify nothing in the existing modules sets a conflicting `font-family` that would override.
-
-**Acceptance:**
-- Body text across the whole app renders in IBM Plex Sans.
-- A throwaway page or Storybook-style demo proves all 9 utility classes render correctly (or do this manually in the browser DevTools).
-- `npm test` green.
-
-**Ask before executing this phase:**
-- Confirm we flip the global `body { font-family }` to IBM Plex Sans (recommended) vs gating it per-component. Global is faster and matches the design system; the only risk is a screen that happens to look worse with the new metric — flag any such screen during execution and ask whether to push the change anyway or fix the layout.
-- Confirm utility-class naming (`.t-display-xl` … `.t-time`) matches the future component-system naming you have in mind. If you'd rather these be `.text-display-xl` or BEM-style, decide now — they'll be touched by every later phase.
+Added the nine typography utility classes (`.t-display-xl`, `.t-display-l`, `.t-display-m`, `.t-band`, `.t-h`, `.t-body`, `.t-small`, `.t-label`, `.t-time`) to `src/index.css` and flipped the global `body` font-family to IBM Plex Sans. First visible change in the migration.
 
 ---
 
-## Phase C — Band card restyle (3 variants)
+## Phase C — Band card restyle (3 variants) [completed]
 
-**Goal:** Replace [`BandCard`](src/components/BandCard.tsx) and its CSS with the design system's three variants:
-- `schedule` (stripe + thumb + body + pick) — used on `/schedule`
-- `timeline` (stripe + when block + body + pick) — used on `/my-picks`
-- `ranked` (stripe + rank number + body, no pick) — used on `/popular`
-
-**Files to read first:**
-- [`src/components/BandCard.tsx`](src/components/BandCard.tsx)
-- [`src/components/BandCard.module.css`](src/components/BandCard.module.css)
-- [`src/pages/SchedulePage.tsx`](src/pages/SchedulePage.tsx) — caller
-- [`src/pages/MyPicksPage.tsx`](src/pages/MyPicksPage.tsx) — caller
-- [`src/pages/PopularPage.tsx`](src/pages/PopularPage.tsx) — caller
-- [`src/hooks/useBandConflicts.ts`](src/hooks/useBandConflicts.ts) — feeds the conflict chip
-- design system component anatomy (lines 336–436 of `Design System.html`)
-
-**Changes:**
-1. Add a `variant?: 'schedule' | 'timeline' | 'ranked'` prop with default `'schedule'`.
-2. Restructure markup: `[stage-stripe-4px] [thumb-or-when-or-rank] [body] [pick?]`.
-3. Body internals: `t-band` name (uppercase, no-wrap, ellipsis), meta row with stage chip (mono 10px on stage-color background), tabular time, "going" count with red `<b>` per design.
-4. Pick toggle: 64px hit area, star SVG. Animate scale 0.9 → 1.15 → 1.0 over 320ms `cubic-bezier(0.34, 1.56, 0.64, 1)` on toggle. Honor `prefers-reduced-motion`.
-5. Conflict outline (`outline: 2px solid var(--signal-warn); outline-offset: -2px;`) for `timeline` variant when conflict detected. Schedule variant intentionally does NOT show the conflict chip — design system rule.
-6. Avatar cluster lives inside `ranked` variant body — feeds in from `usePickCounts`/avatar-cluster helper.
-7. Use module CSS only; no inline styles for tokens. Stage colors come via `stageColorVar()`.
-
-**Acceptance:**
-- All three callers render correctly with their variant.
-- Pick → unpick animation runs once, settles on red star.
-- Offline pick queueing still works (pending chip behavior unchanged for now — Phase I will style it).
-- Conflict detection still surfaces only on `/my-picks`.
-- Tap-on-card-body opens band detail modal (current behavior); tap-on-pick toggles pick (no modal). Hit-area distinction preserved.
-- Realtime count update visible within 3s when picking on another window.
-- Tests in `src/__tests__/` covering BandCard still pass.
-
-**Ask before executing this phase:**
-- When `image_url` is set on a band, do we show the image in the 56px thumb, or always force the stage-color monogram for visual consistency? (Recommended: show image if present, fall back to monogram.)
-- "Going" count behavior at low values: hide the meta entry when 0? Show "1 going" or "1"? (Recommended: hide at 0; show "N going" everywhere else.)
-- Star icon: confirm the SVG path from the design system is the canonical pick icon — we'll reuse it in BottomNav, modal, and pick toggle. Worth declaring it once as a shared asset now, even though "do not refactor logic" applies — this is a presentational asset, not logic.
+Rebuilt `BandCard` with three variants (`schedule` | `timeline` | `ranked`), a 4px stage stripe, the star pick toggle (with bouncy animation honoring `prefers-reduced-motion`), and the conflict outline on the timeline variant. Schedule, My Picks, and Popular all consume their respective variants.
 
 ---
 
-## Phase D — Filter chrome (pills + day tabs + bottom drawer)
+## Phase D — Filter chrome (pills + day tabs + bottom drawer) [completed]
 
-**Goal:** Restyle [`BandFilters`](src/components/BandFilters.tsx) using stage pills (outline → fill rule), day tab bar (Day 1–4 with date cards), and a bottom-sheet filter drawer for `/schedule`.
-
-**Files to read first:**
-- [`src/components/BandFilters.tsx`](src/components/BandFilters.tsx)
-- [`src/components/BandFilters.module.css`](src/components/BandFilters.module.css)
-- [`src/components/bandFilterValue.ts`](src/components/bandFilterValue.ts)
-- [`src/pages/SchedulePage.tsx`](src/pages/SchedulePage.tsx)
-- [`src/pages/MyPicksPage.tsx`](src/pages/MyPicksPage.tsx)
-- design system component anatomy (lines 441–488 + 1483–1532 of `Design System.html`)
-
-**Changes:**
-1. Stage pill component: outlined when off (`color: stage-color`, transparent bg, `border: 1px solid currentColor`), filled when on (bg = stage color, white text). Multi-select; empty selection = all stages.
-2. Genre pill follows same outline → fill rule but with neutral border (`var(--border-strong)`), filled state uses `--bg-elevated`.
-3. Day tab bar: 4-column grid, each cell shows `D{n}`, big Oswald date number, day-of-week. Active state: `--bg-elevated` background + 2px accent inset underline.
-4. Bottom drawer for `/schedule` filters: triggered by a "Filters" button with a count badge. Slides up over scrim, has grab handle, sectioned by Day / Stage / Genre, has primary "Apply · N bands" button. Use `<dialog>` element or a portal — must trap focus and close on Esc.
-5. Search input above filter button on `/schedule`. Already wired in Phase 9; just restyle.
-
-**Acceptance:**
-- Schedule page filters work as before (stage selection, day, genre, search).
-- Drawer opens/closes smoothly, doesn't break body scroll, dismisses on backdrop tap and Esc.
-- Day tab bar replaces whatever day picker is currently in use; same selection logic.
-- `/my-picks` day grouping still works (it doesn't need the drawer, just the day tabs treatment).
-- Mobile: drawer covers ~50–70% of viewport, content scrollable.
-- `npm test` green.
-
-**Ask before executing this phase:**
-- Current `BandFilters` may have an "all stages" affordance distinct from "empty selection" — confirm the design system rule "empty = all" matches user expectation, or whether we keep an explicit "All" pill.
-- Bottom drawer: should it remember last applied filters across sessions, or reset on close? (Recommended: persist in `localStorage` under a single key.)
-- Day tabs are also useful on `/my-picks` — confirm we add them there too in this phase, or keep `/my-picks` on the existing day-grouped timeline UI from Phase 9 for now.
+Rebuilt `BandFilters` with a 4-column day tab bar (D1–D4: Oswald date number + DOW), a bottom-sheet drawer (grab handle, multi-select stage pills with stage colors, neutral genre pills, upcoming toggle, "Apply · N bands" CTA), and a sticky bar combining a search input with a filter trigger that shows an active-filter count badge. `value.stage` became `string[]` (empty = all). Schedule filters persist to `localStorage` under `vlt:filters:schedule` (query excluded). `/my-picks` intentionally untouched.
 
 ---
 
