@@ -44,7 +44,7 @@ These rules apply to every phase below. Read them before opening a single file.
 | E  | Band detail modal + alert banner | `BandDetailModal` + new alert component | med | ✅ unblocked — Phase 10b shipped; execute after G |
 | F  | `/now` visual polish (no structural change) | restyle existing location/group cards in design language | med | ✅ completed |
 | G  | `/profile` + patches grid | profile head, badge grid, role chips, lang seg, collapsibles | med | ✅ completed |
-| H  | Announcements restyle | `AnnouncementsPage` mural cards | low | — |
+| H  | Announcements restyle | `AnnouncementsPage` mural cards | low | ✅ completed |
 | I  | Auth pages + bottom nav + offline chrome | login/register, `BottomNav`, offline banner / pending chip / sync toast | low/med | — |
 | J  | Icon pass | replace ad-hoc icons with the geometric-line set | low | — |
 
@@ -162,33 +162,9 @@ Restyled `ProfilePage` with the design system's profile layout using local JSX s
 
 ---
 
-## Phase H — Announcements restyle
+## Phase H — Announcements restyle [completed]
 
-**Goal:** Restyle [`AnnouncementsPage`](src/pages/AnnouncementsPage.tsx) to use the design system's `announce` card layout. No behavior change.
-
-**Files to read first:**
-- [`src/pages/AnnouncementsPage.tsx`](src/pages/AnnouncementsPage.tsx)
-- [`src/pages/AnnouncementsPage.module.css`](src/pages/AnnouncementsPage.module.css)
-- [`src/lib/announcements.ts`](src/lib/announcements.ts)
-
-**Changes:**
-1. New card layout: 40px author avatar | head row (name + role-chip + relative timestamp) + body + actions row.
-2. Role chips: `normal` (neutral), `manager` (blue tint), `godlike` (gold tint). Inline next to display name.
-3. Actions: "Delete" (own posts), "Block user" (manager/godlike), no reply / no reactions per design.
-4. Composer (post box) at top — restyle to match the surface treatment (`--bg-surface`, hard radius).
-5. Realtime new-post insertion still works.
-6. Soft-delete still works (godlike can see deleted; manager can't).
-
-**Acceptance:**
-- Posting an announcement renders it instantly (optimistic update).
-- Blocking a user hides their posts everywhere.
-- Soft-delete behaves correctly per role.
-- Offline post queues, syncs on reconnect (existing behavior).
-- Tests green.
-
-**Ask before executing this phase:**
-- Composer position: design system mockups don't explicitly show the composer. Confirm whether the composer stays at the top of the feed (current behavior) or moves to a floating "+" FAB.
-- Relative timestamp format: design shows "2 min", "14 min", "1 h" — confirm the cutoffs (`< 1m` = "now", `< 60m` = "X min", `< 24h` = "X h", `> 24h` = "DD/MM"?).
+Restyled `AnnouncementsPage` to the design system's `announce` card layout. Each card is now a CSS grid (`40px 1fr`): author avatar (40px, Oswald initials, 2px `--bg` border) in column 1; head row (bold name + role chip + auto-right mono timestamp), body, and actions row stacked in column 2. Role chips: neutral for `normal` ("Crew"), blue tint for `manager`, gold tint for `godlike` — matching the design system spec. Action buttons (Delete, Block) are now mono uppercase text links styled with `.actionBtn` / `.actionBtnDanger` (no filled backgrounds). Already-blocked state renders muted and disabled. Composer stays at top of feed. Timestamp format updated to design system style: `< 1m` → "agora" / "now", `< 60m` → "N min", `< 24h` → "Nh", `≥ 24h` → "DD/MM". Page title uses Oswald uppercase. Useful links section and all existing behaviors (realtime, offline queue, soft-delete, blocking) unchanged. 177 tests green.
 
 ---
 

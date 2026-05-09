@@ -7,11 +7,14 @@
 }
 
 .header {
-  padding: 16px 16px 0;
+  padding: var(--s-4) var(--s-4) 0;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: var(--s-4);
 }
 
 .title {
-  font-size: 1.4rem;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -22,11 +25,13 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 16px;
+  gap: var(--s-4);
+  padding: var(--s-4);
 }
 
-/* Useful links */
+/* ============================================================
+   USEFUL LINKS
+   ============================================================ */
 
 .usefulLinksRow {
   display: flex;
@@ -34,21 +39,23 @@
   gap: 10px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px;
+  border-radius: var(--r-2);
+  padding: var(--s-3);
 }
 
 .usefulLinksTitle {
   margin: 0;
-  color: var(--text);
-  font-size: 0.95rem;
+  font-family: var(--font-display);
+  color: var(--text-muted);
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .usefulLinksList {
   display: flex;
-  gap: 8px;
+  gap: var(--s-2);
   overflow-x: auto;
   padding-bottom: 2px;
   scrollbar-width: thin;
@@ -59,26 +66,23 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 38px;
-  max-width: 100%;
+  min-height: 36px;
   flex: 0 0 auto;
-  padding: 8px 12px;
+  padding: 6px var(--s-3);
   border: 1px solid rgba(229, 85, 85, 0.45);
   border-radius: 999px;
   background: rgba(229, 85, 85, 0.1);
   color: var(--text);
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  line-height: 1.2;
   text-decoration: none;
-  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  transition: border-color 0.15s, background 0.15s;
   white-space: nowrap;
 }
 
 .usefulLinkPill:hover {
   background: rgba(229, 85, 85, 0.18);
   border-color: rgba(229, 85, 85, 0.85);
-  color: #fff;
 }
 
 @media (max-width: 520px) {
@@ -95,16 +99,18 @@
   }
 }
 
-/* Post box */
+/* ============================================================
+   POST BOX
+   ============================================================ */
 
 .postBox {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--s-2);
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 12px;
+  border-radius: var(--r-2);
+  padding: var(--s-4);
 }
 
 .textarea {
@@ -113,11 +119,11 @@
   background: transparent;
   border: none;
   color: var(--text);
-  font-size: 1rem;
+  font-family: inherit;
+  font-size: 0.875rem;
   line-height: 1.5;
   resize: none;
   outline: none;
-  font-family: inherit;
 }
 
 .textarea::placeholder {
@@ -126,13 +132,16 @@
 
 .postBtn {
   align-self: flex-end;
-  padding: 8px 20px;
+  padding: 6px 16px;
   background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  border-radius: var(--r-1);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   cursor: pointer;
   transition: background 0.15s;
 }
@@ -146,159 +155,187 @@
   background: var(--accent-hover);
 }
 
-/* Blocked message */
+/* ============================================================
+   BLOCKED MESSAGE
+   ============================================================ */
 
 .blockedMsg {
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.9rem;
-  padding: 12px;
+  font-size: 0.875rem;
+  padding: var(--s-3);
   background: var(--bg-surface);
-  border-radius: 8px;
+  border-radius: var(--r-2);
   border: 1px solid var(--border);
 }
 
-/* Empty / loading */
+/* ============================================================
+   EMPTY / LOADING
+   ============================================================ */
 
 .empty {
   text-align: center;
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   padding: 32px 0;
 }
 
-/* Feed */
+/* ============================================================
+   FEED + ANNOUNCEMENT CARD
+   ============================================================ */
 
 .feed {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
+/* Grid layout: 40px avatar col | 1fr content col */
 .card {
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  border-radius: var(--r-2);
+  padding: var(--s-4);
+  margin-bottom: var(--s-3);
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: var(--s-3);
 }
 
-.cardHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 8px;
+.card:last-child {
+  margin-bottom: 0;
 }
 
-.authorRow {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
+/* ---- Avatar (column 1, row 1) ---- */
 
 .avatar {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  flex-shrink: 0;
+  border: 2px solid var(--bg);
+  grid-column: 1;
+  grid-row: 1;
 }
 
 .avatarInitial {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
   font-weight: 700;
-  flex-shrink: 0;
+  border: 2px solid var(--bg);
+  grid-column: 1;
+  grid-row: 1;
 }
 
-.authorName {
-  display: block;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
+/* ---- Head row (column 2) ---- */
 
-.timestamp {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.cardActions {
+.head {
+  grid-column: 2;
   display: flex;
-  gap: 6px;
-  align-items: center;
+  align-items: baseline;
+  gap: var(--s-2);
+  min-width: 0;
 }
 
-.blockBtn {
+.name {
+  font-weight: 700;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roleChip {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
   flex-shrink: 0;
-  padding: 4px 10px;
-  background: #dc2626;
-  border: 1px solid #dc2626;
-  border-radius: 4px;
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
 }
 
-.blockBtn:hover:not(:disabled) {
-  background: #b91c1c;
-  border-color: #b91c1c;
-}
-
-.blockBtn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.blockBtn.blocking {
-  opacity: 0.7;
-}
-
-.blockBtn.blocked {
-  background: #9ca3af;
-  border-color: #9ca3af;
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.deleteBtn {
-  flex-shrink: 0;
-  padding: 4px 10px;
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 4px;
+.roleNormal {
+  background: var(--bg-elevated);
   color: var(--text-muted);
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
 }
 
-.deleteBtn:hover {
-  color: #e55;
-  border-color: #e55;
+.roleManager {
+  background: rgba(41, 128, 185, 0.15);
+  color: #58a8e6;
+  border: 1px solid rgba(41, 128, 185, 0.4);
 }
 
-.content {
-  font-size: 1.05rem;
-  line-height: 1.6;
+.roleGodlike {
+  background: rgba(243, 156, 18, 0.15);
+  color: var(--signal-warn);
+  border: 1px solid rgba(243, 156, 18, 0.4);
+}
+
+.ts {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+/* ---- Body (column 2) ---- */
+
+.body {
+  grid-column: 2;
+  font-size: 0.875rem;
+  line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
   margin: 0;
 }
+
+/* ---- Actions row (column 2) ---- */
+
+.cardActions {
+  grid-column: 2;
+  display: flex;
+  gap: var(--s-3);
+}
+
+.actionBtn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  transition: color 0.15s;
+}
+
+.actionBtn:hover:not(:disabled) {
+  color: var(--text);
+}
+
+.actionBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.actionBtnDanger:hover:not(:disabled) {
+  color: var(--signal-warn);
+}
+
+/* ============================================================
+   NAV SPACER
+   ============================================================ */
 
 .navSpacer {
   height: 56px;

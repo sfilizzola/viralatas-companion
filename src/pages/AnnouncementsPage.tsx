@@ -27,13 +27,16 @@ function relativeTime(
   isoString: string,
   t: (key: string, values?: Record<string, string | number>) => string,
 ): string {
-  const diff = Date.now() - new Date(isoString).getTime();
+  const date = new Date(isoString);
+  const diff = Date.now() - date.getTime();
   const minutes = Math.floor(diff / 60_000);
   if (minutes < 1) return t('justNow');
   if (minutes < 60) return t('minutesAgo', { n: minutes });
   const hours = Math.floor(minutes / 60);
   if (hours < 24) return t('hoursAgo', { n: hours });
-  return t('daysAgo', { n: Math.floor(hours / 24) });
+  const d = String(date.getDate()).padStart(2, '0');
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  return `${d}/${m}`;
 }
 
 export default function AnnouncementsPage() {
@@ -241,52 +244,74 @@ export default function AnnouncementsPage() {
             {announcements.map((a) => {
               const author = crewUsers.find((u) => u.id === a.author_id);
               const authorName = author?.display_name ?? t('anonymous');
+              const authorRole = userRoles[a.author_id] ?? 'normal';
+              const roleChipClass = {
+                normal: styles.roleNormal,
+                manager: styles.roleManager,
+                godlike: styles.roleGodlike,
+              }[authorRole as 'normal' | 'manager' | 'godlike'] ?? styles.roleNormal;
+              const showBlock = canModerate && authorRole !== 'godlike';
+              const showDelete = canModerate;
+              const alreadyBlocked = blockedUserIds.has(a.author_id);
+              const isBlocking = blocking === a.author_id;
               return (
                 <li key={a.id} className={styles.card}>
-                  <div className={styles.cardHeader}>
-                    <div className={styles.authorRow}>
-                      {author?.avatar_url ? (
-                        <img
-                          className={styles.avatar}
-                          src={author.avatar_url}
-                          alt=""
-                          loading="lazy"
-                        />
-                      ) : (
-                        <span className={styles.avatarInitial} aria-hidden>
-                          {authorName.charAt(0).toUpperCase()}
-                        </span>
-                      )}
-                      <div>
-                        <span className={styles.authorName}>{authorName}</span>
-                        <span className={styles.timestamp}>{relativeTime(a.created_at, t)}</span>
-                      </div>
-                    </div>
+                  {/* col 1: avatar */}
+                  {author?.avatar_url ? (
+                    <img
+                      className={styles.avatar}
+                      src={author.avatar_url}
+                      alt=""
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span className={styles.avatarInitial} aria-hidden>
+                      {authorName.charAt(0).toUpperCase()}
+                    </span>
+                  )}
+
+                  {/* col 2: head row */}
+                  <div className={styles.head}>
+                    <span className={styles.name}>{authorName}</span>
+                    <span className={`${styles.roleChip} ${roleChipClass}`}>
+                      {t(`role_${authorRole}`)}
+                    </span>
+                    <span className={styles.ts}>{relativeTime(a.created_at, t)}</span>
+                  </div>
+
+                  {/* col 2: body */}
+                  <p className={styles.body}>{a.content}</p>
+
+                  {/* col 2: actions */}
+                  {(showBlock || showDelete) && (
                     <div className={styles.cardActions}>
-                      {canModerate && userRoles[a.author_id] !== 'godlike' && (
+                      {showBlock && (
                         <button
-                          className={`${styles.blockBtn} ${blocking === a.author_id ? styles.blocking : ''} ${blockedUserIds.has(a.author_id) ? styles.blocked : ''}`}
+                          className={`${styles.actionBtn} ${!alreadyBlocked && !isBlocking ? styles.actionBtnDanger : ''}`}
                           onClick={() => handleBlock(a.author_id)}
-                          disabled={blocking === a.author_id || blockedUserIds.has(a.author_id)}
+                          disabled={isBlocking || alreadyBlocked}
                           aria-label={t('block')}
                           type="button"
                         >
-                          {blocking === a.author_id ? `${t('blockingUser')}` : blockedUserIds.has(a.author_id) ? `✓ ${t('block')}` : `🚫 ${t('block')}`}
+                          {isBlocking
+                            ? t('blockingUser')
+                            : alreadyBlocked
+                              ? `✓ ${t('block')}`
+                              : `⊘ ${t('block')}`}
                         </button>
                       )}
-                      {canModerate && (
+                      {showDelete && (
                         <button
-                          className={styles.deleteBtn}
+                          className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
                           onClick={() => handleDelete(a.id)}
                           aria-label={t('delete')}
                           type="button"
                         >
-                          {t('delete')}
+                          ⚐ {t('delete')}
                         </button>
                       )}
                     </div>
-                  </div>
-                  <p className={styles.content}>{a.content}</p>
+                  )}
                 </li>
               );
             })}

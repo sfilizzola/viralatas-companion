@@ -263,6 +263,7 @@ Phase 8 will use this structure to inventory unassociated images in `public/badg
 - ✅ **Phase 10** — Badge expansion: characteristic-badge conditions engine (10a — `bands_picked_genre/stage/hour_min`, `band_picked_named`); seen-tracking via `user_missed_bands` table + IDB v8 + offline queue (10b); extended `BandDetailModal` with crew breakdown, conflict warning, and "Não vi essa banda" missed toggle; 5 new `bands_seen_*` badge conditions; 177 tests
 - ✅ **Design System Phase F** — `/now` visual polish: 4px stage-color strips, Oswald group titles, tinted gradient backgrounds (orange / teal / purple) per location type, `useNow()`-driven page header; no structural changes
 - ✅ **Design System Phase G** — `/profile` restyle: 56px avatar profile head with role chip / country flag / years pill; all-badges patches-grid (4/6/8 cols, locked=grayscale); `year?` field on `BadgeConfig`; edit-profile collapsible with PT/EN language seg; gold godlike + blue manager collapsible headers; sign-out pill at bottom
+- ✅ **Design System Phase H** — Announcements restyle: `announce` grid card (40px avatar | head/body/actions in col 2), role chips (Crew/Manager/Godlike), mono action buttons, updated timestamp format (N min / Nh / DD/MM)
 
 See **PHASES.md** for the current active phase.
 
