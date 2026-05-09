@@ -264,6 +264,8 @@ Phase 8 will use this structure to inventory unassociated images in `public/badg
 - ✅ **Design System Phase F** — `/now` visual polish: 4px stage-color strips, Oswald group titles, tinted gradient backgrounds (orange / teal / purple) per location type, `useNow()`-driven page header; no structural changes
 - ✅ **Design System Phase G** — `/profile` restyle: 56px avatar profile head with role chip / country flag / years pill; all-badges patches-grid (4/6/8 cols, locked=grayscale); `year?` field on `BadgeConfig`; edit-profile collapsible with PT/EN language seg; gold godlike + blue manager collapsible headers; sign-out pill at bottom
 - ✅ **Design System Phase H** — Announcements restyle: `announce` grid card (40px avatar | head/body/actions in col 2), role chips (Crew/Manager/Godlike), mono action buttons, updated timestamp format (N min / Nh / DD/MM)
+- ✅ **Design System Phase I** — Auth pages + bottom nav + offline chrome: 4px accent top border + Oswald title + mono labels on login/register; BottomNav mono 9px caps + filled-icon active states (6 tabs kept); `OfflineBanner` on /now, /schedule, /my-picks; `PendingChip` on offline-queued picks and announcements; `SyncToast` fires on reconnect flush (≥1 item)
+- ✅ **Design System Phase J** — Icon pass: shared `<Icon name="..."/>` component (`src/components/icons/Icon.tsx`) with all 17 design-system icons (square caps, miter joins, filled variants); `StarIcon` delegates to Icon; `BandFilters` filter icon and `BandDetailModal` close icon updated; ProfilePage chevrons (▼ → Icon), 🔧/👤 stripped, ✓/✗ removed from buttons
 
 See **PHASES.md** for the current active phase.
 

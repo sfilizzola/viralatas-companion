@@ -19,6 +19,10 @@ import announcementsBr from '../i18n/AnnouncementsPage_br.json';
 import announcementsEn from '../i18n/AnnouncementsPage_en.json';
 import badgesBr from '../i18n/Badges_br.json';
 import badgesEn from '../i18n/Badges_en.json';
+import offlineBannerBr from '../i18n/OfflineBanner_br.json';
+import offlineBannerEn from '../i18n/OfflineBanner_en.json';
+import syncToastBr from '../i18n/SyncToast_br.json';
+import syncToastEn from '../i18n/SyncToast_en.json';
 
 export type Language = 'br' | 'en';
 
@@ -32,7 +36,9 @@ type TranslationFile =
   | 'RightNowPage'
   | 'ProfilePage'
   | 'AnnouncementsPage'
-  | 'Badges';
+  | 'Badges'
+  | 'OfflineBanner'
+  | 'SyncToast';
 
 type Translations = Record<Language, Record<TranslationFile, Record<string, string>>>;
 
@@ -50,6 +56,8 @@ const translations: Translations = {
     ProfilePage: profileBr,
     AnnouncementsPage: announcementsBr,
     Badges: badgesBr,
+    OfflineBanner: offlineBannerBr,
+    SyncToast: syncToastBr,
   },
   en: {
     App: appEn,
@@ -62,6 +70,8 @@ const translations: Translations = {
     ProfilePage: profileEn,
     AnnouncementsPage: announcementsEn,
     Badges: badgesEn,
+    OfflineBanner: offlineBannerEn,
+    SyncToast: syncToastEn,
   },
 };
 

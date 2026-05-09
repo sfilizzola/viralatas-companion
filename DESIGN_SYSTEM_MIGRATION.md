@@ -45,8 +45,8 @@ These rules apply to every phase below. Read them before opening a single file.
 | F  | `/now` visual polish (no structural change) | restyle existing location/group cards in design language | med | ✅ completed |
 | G  | `/profile` + patches grid | profile head, badge grid, role chips, lang seg, collapsibles | med | ✅ completed |
 | H  | Announcements restyle | `AnnouncementsPage` mural cards | low | ✅ completed |
-| I  | Auth pages + bottom nav + offline chrome | login/register, `BottomNav`, offline banner / pending chip / sync toast | low/med | — |
-| J  | Icon pass | replace ad-hoc icons with the geometric-line set | low | — |
+| I  | Auth pages + bottom nav + offline chrome | login/register, `BottomNav`, offline banner / pending chip / sync toast | low/med | ✅ completed |
+| J  | Icon pass | replace ad-hoc icons with the geometric-line set | low | ✅ completed |
 
 **Total: 10 visual phases.** Ship them in order — later phases assume tokens and typography from A/B exist.
 
@@ -165,6 +165,18 @@ Restyled `ProfilePage` with the design system's profile layout using local JSX s
 ## Phase H — Announcements restyle [completed]
 
 Restyled `AnnouncementsPage` to the design system's `announce` card layout. Each card is now a CSS grid (`40px 1fr`): author avatar (40px, Oswald initials, 2px `--bg` border) in column 1; head row (bold name + role chip + auto-right mono timestamp), body, and actions row stacked in column 2. Role chips: neutral for `normal` ("Crew"), blue tint for `manager`, gold tint for `godlike` — matching the design system spec. Action buttons (Delete, Block) are now mono uppercase text links styled with `.actionBtn` / `.actionBtnDanger` (no filled backgrounds). Already-blocked state renders muted and disabled. Composer stays at top of feed. Timestamp format updated to design system style: `< 1m` → "agora" / "now", `< 60m` → "N min", `< 24h` → "Nh", `≥ 24h` → "DD/MM". Page title uses Oswald uppercase. Useful links section and all existing behaviors (realtime, offline queue, soft-delete, blocking) unchanged. 177 tests green.
+
+---
+
+## Phase I — Auth pages + bottom nav + offline chrome [completed]
+
+Restyled `LoginPage` and `RegisterPage` via `AuthPage.module.css`: 4px `--accent` top border, Oswald uppercase title, mono 11px uppercase subtitle and labels, zero-radius card and inputs to match design system hard geometry. `BottomNav` switched to `grid` (6 equal columns), mono 9px uppercase tab labels, active state = `--accent-hover` + filled icon variant via the `<Icon>` component; all 6 tabs kept (`/now /schedule /my-picks /popular /announcements /profile`). Added `OfflineBanner` component (mono caps + 6px pulsing dot) wired to `/now`, `/schedule`, and `/my-picks`. Added `.pending-chip` global CSS class and `useOfflinePendingBandIds` hook; `BandCard` gained a `pending` prop that shows the chip; `AnnouncementsPage` reads the offline queue and shows the chip on unsynced posts. `SyncToast` appears for 3s at the bottom of the screen after ≥1 queued item flushes (`flushOfflineQueue`, `flushPresenceQueue`, `flushPendingAnnouncements` now return flush counts; App.tsx emits `viralatas:sync-complete` when any are > 0). 177 tests green.
+
+---
+
+## Phase J — Icon pass [completed]
+
+Created `src/components/icons/Icon.tsx` — a single shared component for all 17 design-system icons (`pick`, `live`, `schedule`, `popular`, `profile`, `search`, `filter`, `conflict`, `sync`, `offline`, `dismiss`, `chevron`, `arrow`, `time`, `tent`, `friend`, `mural`). All SVGs use `strokeLinecap="square"` + `strokeLinejoin="miter"` per spec; `filled` prop switches fill for tab-bar and pick-star states. Updated: `StarIcon` now delegates to `Icon`; `BandFilters` local `FunnelIcon` replaced with `<Icon name="filter" />`; `BandDetailModal` local `CloseIcon` replaced with `<Icon name="dismiss" />`; `BottomNav` uses `Icon` with `filled={isActive}`. `ProfilePage`: all `▼` chevrons replaced with `<Icon name="chevron" size={14} />`; `🔧` removed from "MANAGER POWERS" heading and role badge; `👤` removed from role badge (kept `🤘` on godlike — allowed per spec); `✓` / `✗` removed from button labels (text alone is sufficient); `⏳` in registration toggle replaced with an i18n string. 177 tests green.
 
 ---
 

@@ -40,6 +40,7 @@ import { useNow } from '../hooks/useNow';
 import { useI18n } from '../lib/i18n';
 import { stageColor } from '../lib/stageColors';
 import BottomNav from '../components/BottomNav';
+import OfflineBanner from '../components/OfflineBanner';
 import BadgesDisplay from '../components/BadgesDisplay';
 import styles from './RightNowPage.module.css';
 
@@ -421,6 +422,7 @@ export default function RightNowPage() {
 
   return (
     <div className={styles.page}>
+      <OfflineBanner />
       <header className={styles.header}>
         <div>
           <span className={styles.title}>{t('title')}</span>

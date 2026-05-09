@@ -49,6 +49,7 @@
   "registrationToggle": "Registro",
   "registrationEnabled": "Aberto",
   "registrationDisabled": "Fechado",
+  "registrationLoading": "Atualizando...",
   "registrationToggleError": "Erro ao atualizar. Tente de novo.",
   "metalPlaceTitle": "🍺 Metal Place",
   "metalPlaceFestivalDay": "Dia do festival (1-4)",

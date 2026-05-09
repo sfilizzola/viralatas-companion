@@ -8,7 +8,9 @@ import { useMyPicks } from '../hooks/useMyPicks';
 import { usePickCounts } from '../hooks/usePickCounts';
 import { useBandConflicts } from '../hooks/useBandConflicts';
 import { useI18n } from '../lib/i18n';
+import { useOfflinePendingBandIds } from '../hooks/useOfflinePendingBandIds';
 import BottomNav from '../components/BottomNav';
+import OfflineBanner from '../components/OfflineBanner';
 import BandCard from '../components/BandCard';
 import styles from './SchedulePage.module.css';
 
@@ -23,6 +25,7 @@ export default function MyPicksPage() {
   const [highlightedConflict, setHighlightedConflict] = useState<string | null>(null);
   const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
   const pickCounts = usePickCounts();
+  const pendingBandIds = useOfflinePendingBandIds();
 
   useEffect(() => {
     loadBands().then((data) => {
@@ -85,6 +88,7 @@ export default function MyPicksPage() {
 
   return (
     <div className={styles.page}>
+      <OfflineBanner />
       <header className={styles.header}>
         <span className={styles.title}>{t('title')}</span>
         {!loading && myBands.length > 0 && (
@@ -119,6 +123,7 @@ export default function MyPicksPage() {
                   count={pickCounts[band.id] ?? 0}
                   onToggle={() => handleToggle(band.id)}
                   variant="timeline"
+                  pending={pendingBandIds.has(band.id)}
                   conflict={
                     hasConflict
                       ? {

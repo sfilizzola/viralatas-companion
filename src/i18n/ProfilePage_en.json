@@ -49,6 +49,7 @@
   "registrationToggle": "Registration",
   "registrationEnabled": "Open",
   "registrationDisabled": "Closed",
+  "registrationLoading": "Updating...",
   "registrationToggleError": "Update failed. Try again.",
   "metalPlaceTitle": "🍺 Metal Place",
   "metalPlaceFestivalDay": "Festival Day (1-4)",

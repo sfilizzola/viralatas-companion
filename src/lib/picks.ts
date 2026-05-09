@@ -83,11 +83,11 @@ export async function syncCrewPicks(): Promise<void> {
   await replaceUserPicks(data as UserPick[]);
 }
 
-export async function flushOfflineQueue(): Promise<void> {
+export async function flushOfflineQueue(): Promise<number> {
   const queue = (await loadOfflineQueue()).sort((a, b) =>
     a.created_at.localeCompare(b.created_at),
   );
-  if (queue.length === 0) return;
+  if (queue.length === 0) return 0;
 
   type Op = (typeof queue)[0];
   const groups = new Map<string, { all: Op[]; last: Op }>();
@@ -102,6 +102,7 @@ export async function flushOfflineQueue(): Promise<void> {
     }
   }
 
+  let flushed = 0;
   for (const { all, last } of groups.values()) {
     const { error } =
       last.action === 'add'
@@ -118,6 +119,8 @@ export async function flushOfflineQueue(): Promise<void> {
 
     if (!error) {
       await Promise.all(all.map((op) => removeFromOfflineQueue(op.id)));
+      flushed += all.length;
     }
   }
+  return flushed;
 }

@@ -28,6 +28,7 @@ import {
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
+import Icon from '../components/icons/Icon';
 import styles from './ProfilePage.module.css';
 
 function roleLabel(role: string): string {
@@ -250,7 +251,7 @@ function ProfileForm({
           aria-expanded={prefsOpen}
         >
           <span className={styles.pfCollapseLabel}>{t('editProfile')}</span>
-          <span className={`${styles.pfCollapseChevron} ${prefsOpen ? styles.open : ''}`}>▼</span>
+          <span className={`${styles.pfCollapseChevron} ${prefsOpen ? styles.open : ''}`}><Icon name="chevron" size={14} /></span>
         </button>
         <div className={`${styles.pfCollapseContent} ${prefsOpen ? styles.open : ''}`}>
           <form onSubmit={handleSave} className={styles.form}>
@@ -334,7 +335,7 @@ function ProfileForm({
             </label>
 
             <button className={styles.button} type="submit" disabled={saving}>
-              {saved ? `${t('saveDone')} ✓` : saving ? t('saveLoading') : t('saveProfile')}
+              {saved ? t('saveDone') : saving ? t('saveLoading') : t('saveProfile')}
             </button>
           </form>
         </div>
@@ -468,7 +469,7 @@ function ConflictSection({ userId, t }: ConflictSectionProps) {
             <span>{t('conflicts')}</span>
             <div className={styles.conflictBadge}>{conflicts.length}</div>
           </div>
-          <div className={`${styles.chevron} ${isOpen ? styles.open : ''}`}>▼</div>
+          <div className={`${styles.chevron} ${isOpen ? styles.open : ''}`}><Icon name="chevron" size={14} /></div>
         </button>
 
         <div className={`${styles.conflictsContent} ${isOpen ? styles.open : ''}`}>
@@ -855,7 +856,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
           aria-expanded={isOpen}
         >
           <h3 className={styles.godlikeTitle}>🤘 GODLIKE POWERS</h3>
-          <span className={`${styles.pfCollapseChevron} ${isOpen ? styles.open : ''}`}>▼</span>
+          <span className={`${styles.pfCollapseChevron} ${isOpen ? styles.open : ''}`}><Icon name="chevron" size={14} /></span>
         </button>
         <div className={`${styles.pfCollapseContent} ${isOpen ? styles.open : ''}`}>
           <div className={styles.conflictsInner}>
@@ -880,13 +881,11 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
               disabled={registrationLoading}
               type="button"
             >
-              {registrationLoading ? (
-                '⏳'
-              ) : registrationEnabled ? (
-                `${t('registrationEnabled')} ✓`
-              ) : (
-                `${t('registrationDisabled')} ✗`
-              )}
+              {registrationLoading
+                ? t('registrationLoading')
+                : registrationEnabled
+                  ? t('registrationEnabled')
+                  : t('registrationDisabled')}
             </button>
           </label>
           {registrationError && <p className={styles.registrationError}>{registrationError}</p>}
@@ -1167,7 +1166,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                       className={styles.roleBadge}
                       style={{ color: getRoleBadgeColor(user.role) }}
                     >
-                      {user.role === 'godlike' ? '🤘' : user.role === 'manager' ? '🔧' : '👤'}
+                      {user.role === 'godlike' ? '🤘 ' : ''}
                       {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                     </div>
 
@@ -1458,8 +1457,8 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
           type="button"
           aria-expanded={isOpen}
         >
-          <h3 className={styles.managerTitle}>🔧 MANAGER POWERS</h3>
-          <span className={`${styles.pfCollapseChevron} ${isOpen ? styles.open : ''}`}>▼</span>
+          <h3 className={styles.managerTitle}>MANAGER POWERS</h3>
+          <span className={`${styles.pfCollapseChevron} ${isOpen ? styles.open : ''}`}><Icon name="chevron" size={14} /></span>
         </button>
         <div className={`${styles.pfCollapseContent} ${isOpen ? styles.open : ''}`}>
           <div className={styles.conflictsInner}>

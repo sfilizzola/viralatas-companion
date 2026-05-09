@@ -9,6 +9,7 @@ import PopularPage from './pages/PopularPage';
 import RightNowPage from './pages/RightNowPage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
 import PrivateRoute from './components/PrivateRoute';
+import SyncToast, { SYNC_COMPLETE_EVENT } from './components/SyncToast';
 import { useAuth } from './hooks/useAuth';
 import { syncBands } from './lib/sync';
 import { flushOfflineQueue, syncCrewPicks } from './lib/picks';
@@ -16,6 +17,10 @@ import { syncCrewUsers } from './lib/users';
 import { flushPresenceQueue, syncCrewPresence } from './lib/presence';
 import { flushPendingAnnouncements, syncAnnouncements } from './lib/announcements';
 import { checkAndApplyCacheVersion } from './lib/cache';
+
+function emitSyncComplete() {
+  window.dispatchEvent(new Event(SYNC_COMPLETE_EVENT));
+}
 
 function CacheVersionCheck() {
   const { session } = useAuth();
@@ -51,8 +56,11 @@ function PickSync() {
     if (!userId) return;
 
     async function syncNow() {
-      await flushOfflineQueue();
-      await flushPresenceQueue();
+      const [picksFlushed, presenceFlushed] = await Promise.all([
+        flushOfflineQueue(),
+        flushPresenceQueue(),
+      ]);
+      if (picksFlushed + presenceFlushed > 0) emitSyncComplete();
       await Promise.all([syncCrewPicks(), syncCrewUsers(), syncCrewPresence()]);
     }
 
@@ -77,7 +85,8 @@ function AnnouncementSync() {
     if (!userId) return;
 
     async function syncNow() {
-      await flushPendingAnnouncements();
+      const flushed = await flushPendingAnnouncements();
+      if (flushed > 0) emitSyncComplete();
       await syncAnnouncements();
     }
 
@@ -101,6 +110,7 @@ export default function App() {
       <BandSync />
       <PickSync />
       <AnnouncementSync />
+      <SyncToast />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

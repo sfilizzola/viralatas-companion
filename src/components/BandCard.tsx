@@ -19,6 +19,7 @@ type BandCardProps = {
   rank?: number;
   conflict?: { active: boolean; onClick: () => void };
   attendeeCluster?: { attendees: BandAttendee[]; max?: number };
+  pending?: boolean;
   children?: ReactNode;
 };
 
@@ -32,6 +33,7 @@ export default function BandCard({
   rank,
   conflict,
   attendeeCluster,
+  pending,
   children,
 }: BandCardProps) {
   const { t } = useI18n('SchedulePage');
@@ -152,6 +154,7 @@ export default function BandCard({
           {band.genre && variant === 'schedule' && (
             <span className={styles.genre}>{band.genre}</span>
           )}
+          {pending && <span className="pending-chip">{t('pendingSync')}</span>}
         </div>
         {attendeeCluster && variant === 'ranked' && (
           <AttendeeCluster {...attendeeCluster} count={count} />

@@ -18,5 +18,8 @@
   "blocked": "You've said enough for today, buddy... 🤘",
   "role_normal": "Crew",
   "role_manager": "Manager",
-  "role_godlike": "Godlike"
+  "role_godlike": "Godlike",
+  "pendingSync": "Pending sync",
+  "blockedDone": "Blocked",
+  "blockAction": "Block"
 }

@@ -8,7 +8,9 @@ import { useMyPicks } from '../hooks/useMyPicks';
 import { useNow } from '../hooks/useNow';
 import { usePickCounts } from '../hooks/usePickCounts';
 import { useI18n } from '../lib/i18n';
+import { useOfflinePendingBandIds } from '../hooks/useOfflinePendingBandIds';
 import BottomNav from '../components/BottomNav';
+import OfflineBanner from '../components/OfflineBanner';
 import BandCard from '../components/BandCard';
 import BandFilters from '../components/BandFilters';
 import { EMPTY_FILTERS, type BandFilterValue } from '../components/bandFilterValue';
@@ -26,6 +28,7 @@ export default function SchedulePage() {
   const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
   const pickCounts = usePickCounts();
   const currentTime = useNow();
+  const pendingBandIds = useOfflinePendingBandIds();
 
   useEffect(() => {
     loadBands().then((data) => {
@@ -83,6 +86,7 @@ export default function SchedulePage() {
 
   return (
     <div className={styles.page}>
+      <OfflineBanner />
       <header className={styles.header}>
         <span className={styles.title}>{t('title')}</span>
       </header>
@@ -109,6 +113,7 @@ export default function SchedulePage() {
             count={pickCounts[band.id] ?? 0}
             onToggle={() => handleToggle(band.id)}
             onClick={() => handleToggle(band.id)}
+            pending={pendingBandIds.has(band.id)}
           />
         ))}
       </main>

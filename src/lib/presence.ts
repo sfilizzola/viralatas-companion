@@ -49,11 +49,11 @@ export async function syncCrewPresence(): Promise<void> {
   await replaceUserPresence(data as UserPresence[]);
 }
 
-export async function flushPresenceQueue(): Promise<void> {
+export async function flushPresenceQueue(): Promise<number> {
   const queue = (await loadOfflinePresenceQueue()).sort((a, b) =>
     a.updated_at.localeCompare(b.updated_at),
   );
-  if (queue.length === 0) return;
+  if (queue.length === 0) return 0;
 
   const latestByUser = new Map<string, { allIds: string[]; presence: UserPresence }>();
   for (const item of queue) {
@@ -73,12 +73,15 @@ export async function flushPresenceQueue(): Promise<void> {
     }
   }
 
+  let flushed = 0;
   for (const { allIds, presence } of latestByUser.values()) {
     const { error } = await supabase.from('user_presence').upsert(presence);
     if (!error) {
       await Promise.all(allIds.map((id) => removeFromOfflinePresenceQueue(id)));
+      flushed += allIds.length;
     }
   }
+  return flushed;
 }
 
 // --- Metal Place ---

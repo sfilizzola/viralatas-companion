@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { useI18n } from '../lib/i18n';
 import { stageColor } from '../lib/stageColors';
+import Icon from './icons/Icon';
 import type { BandFilterValue } from './bandFilterValue';
 import styles from './BandFilters.module.css';
 
@@ -250,19 +251,5 @@ export default function BandFilters({
 }
 
 function FunnelIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width={16}
-      height={16}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-    </svg>
-  );
+  return <Icon name="filter" size={16} />;
 }

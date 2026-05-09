@@ -4,6 +4,7 @@ import {
   ANNOUNCEMENTS_CHANGED_EVENT,
   loadAnnouncementsFromCache,
   loadCrewUsers,
+  loadOfflineAnnouncementsQueue,
   removeAnnouncementFromCache,
   saveAnnouncement,
 } from '../lib/db';
@@ -54,15 +55,18 @@ export default function AnnouncementsPage() {
   const [posting, setPosting] = useState(false);
   const [blocking, setBlocking] = useState<string | null>(null);
   const [blockedUserIds, setBlockedUserIds] = useState<Set<string>>(new Set());
+  const [pendingAnnouncementIds, setPendingAnnouncementIds] = useState<Set<string>>(new Set());
   const [usefulLinks, setUsefulLinks] = useState<UsefulLink[]>([]);
 
   const refreshFromCache = useCallback(async () => {
-    const [cached, users] = await Promise.all([
+    const [cached, users, pendingQueue] = await Promise.all([
       loadAnnouncementsFromCache(),
       loadCrewUsers(),
+      loadOfflineAnnouncementsQueue(),
     ]);
     setAnnouncements(cached);
     setCrewUsers(users);
+    setPendingAnnouncementIds(new Set(pendingQueue.map((a) => a.id)));
 
     // Load user roles
     const { data: allUsers } = await supabase
@@ -280,7 +284,14 @@ export default function AnnouncementsPage() {
                   </div>
 
                   {/* col 2: body */}
-                  <p className={styles.body}>{a.content}</p>
+                  <p className={styles.body}>
+                    {a.content}
+                    {pendingAnnouncementIds.has(a.id) && (
+                      <span className="pending-chip" style={{ marginLeft: '8px' }}>
+                        {t('pendingSync')}
+                      </span>
+                    )}
+                  </p>
 
                   {/* col 2: actions */}
                   {(showBlock || showDelete) && (
@@ -296,8 +307,8 @@ export default function AnnouncementsPage() {
                           {isBlocking
                             ? t('blockingUser')
                             : alreadyBlocked
-                              ? `✓ ${t('block')}`
-                              : `⊘ ${t('block')}`}
+                              ? t('blockedDone')
+                              : t('blockAction')}
                         </button>
                       )}
                       {showDelete && (

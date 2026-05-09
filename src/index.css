@@ -243,3 +243,36 @@ input {
   font-variant-numeric: tabular-nums;
   color: var(--text);
 }
+
+/* ============================================================
+   OFFLINE / SYNC STATES — shared chips / toasts
+   ============================================================ */
+
+.pending-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(243, 156, 18, 0.12);
+  color: var(--signal-warn);
+  border: 1px solid rgba(243, 156, 18, 0.3);
+  border-radius: var(--r-pill);
+  padding: 2px 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.pending-chip::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--signal-warn);
+  animation: pending-pulse 1.4s infinite;
+}
+
+@keyframes pending-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1; }
+}

@@ -34,5 +34,6 @@
   "missedToggle": "I didn't see this band",
   "missedMarked": "Marked as not seen",
   "missedUndo": "Undo",
-  "conflictWarning": "⚠ Conflicts with {name}"
+  "conflictWarning": "⚠ Conflicts with {name}",
+  "pendingSync": "Pending sync"
 }

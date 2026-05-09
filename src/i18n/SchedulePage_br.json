@@ -34,5 +34,6 @@
   "missedToggle": "Não vi essa banda",
   "missedMarked": "Marcada como não vista",
   "missedUndo": "Desfazer",
-  "conflictWarning": "⚠ Conflita com {name}"
+  "conflictWarning": "⚠ Conflita com {name}",
+  "pendingSync": "Sync pendente"
 }
