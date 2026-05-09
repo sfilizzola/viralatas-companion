@@ -234,12 +234,12 @@ type BadgeConfig = {
 };
 ```
 
-**Supported conditions only:**
-- `wacken_years_exactly`
-- `wacken_years_includes`
+**Supported conditions:**
+- `wacken_years_exactly`, `wacken_years_includes`
 - `country_is`
-- `bands_picked_min`
-- `band_attendance_min`
+- `bands_picked_min`, `band_attendance_min`
+- `bands_picked_genre_min`, `bands_picked_stage_min`, `bands_picked_before_hour_min`, `band_picked_named` (Phase 10a)
+- `bands_seen_min`, `bands_seen_genre_min`, `bands_seen_stage_min`, `bands_seen_before_hour_min`, `band_seen_named` (Phase 10b — requires `user_missed_bands`)
 
 To add a badge without changing behavior elsewhere: add the PNG to `public/badges/`, append one `BADGES` entry in `src/lib/badges.ts`, and add matching label + description keys to both `src/i18n/Badges_br.json` and `src/i18n/Badges_en.json`.
 
@@ -260,8 +260,9 @@ Phase 8 will use this structure to inventory unassociated images in `public/badg
 - ✅ **Phase 8** — Badge asset intake: added Belgian (`belga`) and Colombian (`cafetero`) country badges
 - ✅ **Phase 9** — Differentiate Schedule / My Picks / Popular + extracted shared bones (`BandCard`, `BandFilters`, `BandDetailModal`, `useBandConflicts`); Schedule got search + genre filter, My Picks became a day-grouped timeline with conflict chips, Popular gained avatar clusters and the detail modal
 - ✅ **Phase 9.B** — Godlike time travel: `now()` helper + `useNow` hook backed by a localStorage override, with quick-jump chips for D-1 / D1–D4 / D+1 in the Profile admin panel
+- ✅ **Phase 10** — Badge expansion: characteristic-badge conditions engine (10a — `bands_picked_genre/stage/hour_min`, `band_picked_named`); seen-tracking via `user_missed_bands` table + IDB v8 + offline queue (10b); extended `BandDetailModal` with crew breakdown, conflict warning, and "Não vi essa banda" missed toggle; 5 new `bands_seen_*` badge conditions; 177 tests
 
-See **PHASES.md** for detailed acceptance criteria and current status.
+See **PHASES.md** for the current active phase.
 
 ---
 

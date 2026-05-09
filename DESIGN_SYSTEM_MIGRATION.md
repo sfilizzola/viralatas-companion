@@ -43,14 +43,14 @@ These rules apply to every phase below. Read them before opening a single file.
 | D  | Filter chrome | `BandFilters` (pills + day tabs + bottom drawer) | med | ✅ completed |
 | **E**  | **Band detail modal + alert banner** | `BandDetailModal` + new alert component | med | **⛔ blocked by [Phase 10b](PHASES.md)** |
 | F  | `/now` visual polish (no structural change) | restyle existing location/group cards in design language | med | — |
-| **G**  | **`/profile` + patches grid** | profile head, badge grid, role chips, lang seg, collapsibles | med | **⚠️ partial — see [Phase 10a / 10c](PHASES.md)** |
+| **G**  | **`/profile` + patches grid** | profile head, badge grid, role chips, lang seg, collapsibles | med | **⚠️ partial — 10a shipped; year chip deferred ([FUTURE_IDEAS.md](FUTURE_IDEAS.md))** |
 | H  | Announcements restyle | `AnnouncementsPage` mural cards | low | — |
 | I  | Auth pages + bottom nav + offline chrome | login/register, `BottomNav`, offline banner / pending chip / sync toast | low/med | — |
 | J  | Icon pass | replace ad-hoc icons with the geometric-line set | low | — |
 
 **Total: 10 visual phases.** Ship them in order — later phases assume tokens and typography from A/B exist.
 
-**Pause points:** After Phase D, stop the design migration and run [PHASES.md → Phase 10a + 10b](PHASES.md) (characteristic badges + seen-tracking). Then resume with Phase E. Phase G has a softer dependency on 10a (badge variety) and 10c (year chip — deferable). See the callouts on Phase E and Phase G below for details.
+**Pause points:** After Phase D, stop the design migration and run [PHASES.md → Phase 10a + 10b](PHASES.md) (characteristic badges + seen-tracking). Then resume with Phase E. Phase G has a softer dependency on 10a (badge variety); the year chip is deferred to [FUTURE_IDEAS.md](FUTURE_IDEAS.md). See the callouts on Phase E and Phase G below for details.
 
 ## Phase map (structural — deferred, do NOT start without re-approval)
 
@@ -189,16 +189,12 @@ Rebuilt `BandFilters` with a 4-column day tab bar (D1–D4: Oswald date number +
 
 ## Phase G — `/profile` + patches grid
 
-> **⛔ Partially blocked by feature work — read before starting.**
+> **⚠️ Soft dependency on feature work — read before starting.**
 >
-> The design system patches grid relies on data that doesn't fully exist yet:
-> - **Year chip on historical patches** (the `'25`-style mono chip in the bottom-right of unlocked patches) — depends on [PHASES.md → Phase 10c](PHASES.md) (`users.historical_badges` jsonb column + godlike freeze function). 10c is itself deferred until ~late July 2026.
-> - **Patch detail modal "Wacken YYYY" chip** — same dependency on 10c.
-> - **Variety in the grid** — the patches grid will look thin until [Phase 10a](PHASES.md) ships characteristic-badge conditions (`bands_picked_genre_min` etc.). This is not a hard block; the grid renders fine with current badges, just sparser.
+> - **Year chip on historical patches** (the `'25`-style mono chip in the bottom-right of unlocked patches) and the **"Wacken YYYY" chip in the patch detail modal** depend on `users.historical_badges` (Phase 10c, moved to [FUTURE_IDEAS.md](FUTURE_IDEAS.md)). Stub them: skip rendering when `historical_badges` is absent. Add a TODO comment pointing to FUTURE_IDEAS.md. Do **not** invent a placeholder — wait for the schema.
+> - **Variety in the grid** — the patches grid will look thin until [Phase 10a](PHASES.md) ships characteristic-badge conditions (`bands_picked_genre_min` etc.). Not a hard block; the grid renders fine with current badges, just sparser.
 >
-> **Action:** Ideally ship **Phase 10a** before Phase G so the grid has more content to display. Phase 10c is OK to defer — when starting Phase G, **stub the year chip** behind a check for `historical_badges` presence and skip rendering it for now. Add a TODO pointing to 10c. Do **not** invent a placeholder year column or dual-source the year — wait for the schema.
->
-> If Phase 10a has not yet shipped when you reach Phase G, surface the question to the user: ship Phase G against the current sparse badge set, or pause and do 10a first?
+> **Action:** Ideally ship **Phase 10a** before Phase G so the grid has more content to display. If Phase 10a has not yet shipped when you reach Phase G, surface the question to the user: ship Phase G against the current sparse badge set, or pause and do 10a first?
 
 **Goal:** Restyle [`ProfilePage`](src/pages/ProfilePage.tsx) (1445 lines — the heaviest file in the app) using the design system's profile layout. Replace [`BadgesDisplay`](src/components/BadgesDisplay.tsx) with the patches-grid (Variant A) treatment. Preserve the godlike admin and manager tools — just collapse them behind the new `pf-collapse` rows.
 
