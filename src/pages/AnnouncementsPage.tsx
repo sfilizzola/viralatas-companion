@@ -22,6 +22,7 @@ import { loadUsefulLinks } from '../lib/usefulLinks';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
+import Icon from '../components/icons/Icon';
 import styles from './AnnouncementsPage.module.css';
 
 function relativeTime(
@@ -203,7 +204,7 @@ export default function AnnouncementsPage() {
         {usefulLinks.length > 0 && (
           <section className={styles.usefulLinksRow} aria-labelledby="useful-links-title">
             <h2 className={styles.usefulLinksTitle} id="useful-links-title">
-              🔗 {t('usefulLinksTitle')}
+              {t('usefulLinksTitle')}
             </h2>
             <div className={styles.usefulLinksList}>
               {usefulLinks.map((link) => (
@@ -214,8 +215,8 @@ export default function AnnouncementsPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {link.icon && <span aria-hidden>{link.icon}</span>}
                   <span>{link.title}</span>
+                  <Icon name="arrow" size={12} strokeWidth={2.2} className={styles.usefulLinkIcon} />
                 </a>
               ))}
             </div>

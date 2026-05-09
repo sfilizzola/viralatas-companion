@@ -835,17 +835,6 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
     return email.charAt(0).toUpperCase();
   };
 
-  const getRoleBadgeColor = (role: string): string => {
-    switch (role) {
-      case 'godlike':
-        return '#d97706';
-      case 'manager':
-        return '#3b82f6';
-      default:
-        return 'var(--text-muted)';
-    }
-  };
-
   return (
     <div className={styles.godlikeSection}>
       <div className={styles.collapsibleCard}>
@@ -1141,12 +1130,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
               {allUsers.map((user) => (
                 <div key={user.id} className={styles.userRow}>
                   <div className={styles.userInfo}>
-                    <div
-                      className={styles.userAvatar}
-                      style={{
-                        backgroundColor: 'var(--accent)',
-                      }}
-                    >
+                    <div className={styles.userAvatar}>
                       {user.avatar_url ? (
                         <img src={user.avatar_url} alt="" className={styles.userAvatarImg} />
                       ) : (
@@ -1162,17 +1146,15 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                   </div>
 
                   <div className={styles.userActionArea}>
-                    <div
-                      className={styles.roleBadge}
-                      style={{ color: getRoleBadgeColor(user.role) }}
-                    >
-                      {user.role === 'godlike' ? '🤘 ' : ''}
-                      {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                    <div className={`${styles.roleBadge} ${styles[`roleBadge_${user.role}`]}`}>
+                      {roleLabel(user.role)}
                     </div>
 
                     {user.role !== 'godlike' && (
                       <button
-                        className={`${styles.userActionButton} ${user.loading ? styles.loading : ''}`}
+                        className={`${styles.userActionButton} ${
+                          user.role === 'manager' ? styles.secondaryAction : ''
+                        } ${user.loading ? styles.loading : ''}`}
                         onClick={() => handlePromoteOrDemote(user.id, user.role)}
                         disabled={user.loading}
                         type="button"
@@ -1189,7 +1171,9 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
 
                     {blockedPosters.some((bp) => bp.user_id === user.id) && (
                       <button
-                        className={`${styles.userActionButton} ${user.loading ? styles.loading : ''}`}
+                        className={`${styles.userActionButton} ${styles.secondaryAction} ${
+                          user.loading ? styles.loading : ''
+                        }`}
                         onClick={() => handleUnblock(user.id)}
                         disabled={user.loading}
                         type="button"
