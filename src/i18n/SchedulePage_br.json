@@ -29,5 +29,10 @@
   "attendeeOverflow": "+{count}",
   "closeModal": "Fechar",
   "crewGoing": "{count} vira-latas indo",
-  "noCrewYet": "Nenhum vira-lata ainda"
+  "noCrewYet": "Nenhum vira-lata ainda",
+  "crewSaw": "{count} viram",
+  "missedToggle": "Não vi essa banda",
+  "missedMarked": "Marcada como não vista",
+  "missedUndo": "Desfazer",
+  "conflictWarning": "⚠ Conflita com {name}"
 }

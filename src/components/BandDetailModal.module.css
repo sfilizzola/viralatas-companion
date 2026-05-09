@@ -227,3 +227,62 @@
 .pickButtonActive:hover {
   background: var(--bg-surface);
 }
+
+.seenStat {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.conflictWarning {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #e67e22;
+  background: rgba(230, 126, 34, 0.1);
+  border: 1px solid rgba(230, 126, 34, 0.3);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+}
+
+.missedRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.missedToggleBtn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.45rem 0.75rem;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.missedToggleBtn:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.missedLabel {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.missedUndoBtn {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+}

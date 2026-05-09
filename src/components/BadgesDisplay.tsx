@@ -6,7 +6,9 @@ import {
   type BadgeBand,
   type BadgeContext,
 } from '../lib/badges';
-import { loadUserPicks, loadAllUserPicks, loadBands, PICKS_CHANGED_EVENT } from '../lib/db';
+import { loadUserPicks, loadAllUserPicks, loadBands, PICKS_CHANGED_EVENT, MISSED_CHANGED_EVENT } from '../lib/db';
+import { loadAllMissed } from '../lib/missed';
+import { now } from '../lib/time';
 import { useI18n } from '../lib/i18n';
 import styles from './BadgesDisplay.module.css';
 
@@ -16,6 +18,8 @@ const EMPTY_CTX: BadgeContext = {
   bandsPicked: 0,
   maxAttendanceInPicks: 0,
   pickedBands: [],
+  seenBands: [],
+  missedBandIds: new Set(),
 };
 
 type BadgesDisplayProps = {
@@ -31,10 +35,11 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
     let active = true;
 
     async function refresh() {
-      const [userPicks, allPicks, bands] = await Promise.all([
+      const [userPicks, allPicks, bands, allMissed] = await Promise.all([
         loadUserPicks(user.id),
         loadAllUserPicks(),
         loadBands(),
+        loadAllMissed(),
       ]);
       if (!active) return;
       const userPickBandIds = userPicks.map((p) => p.band_id);
@@ -43,14 +48,19 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
         allPickCounts.set(p.band_id, (allPickCounts.get(p.band_id) ?? 0) + 1),
       );
       const bandsById = new Map<string, BadgeBand>(bands.map((b) => [b.id, b]));
-      setCtx(buildBadgeContext(user, userPickBandIds, allPickCounts, bandsById));
+      const userMissedIds = new Set(
+        allMissed.filter((m) => m.user_id === user.id).map((m) => m.band_id),
+      );
+      setCtx(buildBadgeContext(user, userPickBandIds, allPickCounts, bandsById, userMissedIds, now()));
     }
 
     refresh();
     window.addEventListener(PICKS_CHANGED_EVENT, refresh);
+    window.addEventListener(MISSED_CHANGED_EVENT, refresh);
     return () => {
       active = false;
       window.removeEventListener(PICKS_CHANGED_EVENT, refresh);
+      window.removeEventListener(MISSED_CHANGED_EVENT, refresh);
     };
   }, [user]);
 

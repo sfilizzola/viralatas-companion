@@ -29,5 +29,10 @@
   "attendeeOverflow": "+{count}",
   "closeModal": "Close",
   "crewGoing": "{count} vira-latas going",
-  "noCrewYet": "No vira-latas yet"
+  "noCrewYet": "No vira-latas yet",
+  "crewSaw": "{count} saw it",
+  "missedToggle": "I didn't see this band",
+  "missedMarked": "Marked as not seen",
+  "missedUndo": "Undo",
+  "conflictWarning": "⚠ Conflicts with {name}"
 }

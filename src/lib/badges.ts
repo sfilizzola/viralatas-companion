@@ -17,7 +17,13 @@ export type BadgeCondition =
   | { type: 'bands_picked_stage_min'; stage: string; count: number }
   // `hour` is festival-local (CEST, +02:00); raw CEST hour < threshold
   | { type: 'bands_picked_before_hour_min'; hour: number; count: number }
-  | { type: 'band_picked_named'; name: string };
+  | { type: 'band_picked_named'; name: string }
+  // Seen-based conditions (Phase 10b): picks credited after end_time, minus missed opt-outs
+  | { type: 'bands_seen_min'; count: number }
+  | { type: 'bands_seen_genre_min'; genre: string; count: number }
+  | { type: 'bands_seen_stage_min'; stage: string; count: number }
+  | { type: 'bands_seen_before_hour_min'; hour: number; count: number }
+  | { type: 'band_seen_named'; name: string };
 
 export type BadgeConfig = {
   slug: string;
@@ -33,6 +39,8 @@ export type BadgeContext = {
   bandsPicked: number;
   maxAttendanceInPicks: number;
   pickedBands: BadgeBand[];
+  seenBands: BadgeBand[];
+  missedBandIds: Set<string>;
 };
 
 // Festival-local (CEST = UTC+2) hour for `bands_picked_before_hour_min`.
@@ -49,6 +57,8 @@ export function buildBadgeContext(
   userPickBandIds: string[],
   allPickCounts: Map<string, number>,
   bandsById: Map<string, BadgeBand>,
+  missedBandIds: Set<string> = new Set(),
+  now: Date = new Date(),
 ): BadgeContext {
   const meta = user.user_metadata;
   const maxAttendance = userPickBandIds.reduce(
@@ -58,12 +68,17 @@ export function buildBadgeContext(
   const pickedBands = userPickBandIds
     .map((id) => bandsById.get(id))
     .filter((b): b is BadgeBand => b !== undefined);
+  const seenBands = pickedBands.filter(
+    (b) => new Date(b.end_time) < now && !missedBandIds.has(b.id),
+  );
   return {
     wacken_years: Array.isArray(meta?.['wacken_years']) ? (meta['wacken_years'] as number[]) : [],
     country: (meta?.['country'] as string | undefined) ?? null,
     bandsPicked: userPickBandIds.length,
     maxAttendanceInPicks: maxAttendance,
     pickedBands,
+    seenBands,
+    missedBandIds,
   };
 }
 
@@ -94,6 +109,19 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
       );
     case 'band_picked_named':
       return ctx.pickedBands.some((b) => b.name === condition.name);
+    case 'bands_seen_min':
+      return ctx.seenBands.length >= condition.count;
+    case 'bands_seen_genre_min':
+      return ctx.seenBands.filter((b) => b.genre === condition.genre).length >= condition.count;
+    case 'bands_seen_stage_min':
+      return ctx.seenBands.filter((b) => b.stage === condition.stage).length >= condition.count;
+    case 'bands_seen_before_hour_min':
+      return (
+        ctx.seenBands.filter((b) => festivalLocalHour(b.start_time) < condition.hour).length >=
+        condition.count
+      );
+    case 'band_seen_named':
+      return ctx.seenBands.some((b) => b.name === condition.name);
   }
 }
 

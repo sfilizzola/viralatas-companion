@@ -13,6 +13,11 @@ type Props = {
   onTogglePick: () => void;
   onClose: () => void;
   children?: ReactNode;
+  isBandEnded?: boolean;
+  missedUserIds?: Set<string>;
+  isMissed?: boolean;
+  onToggleMissed?: () => void;
+  conflictBands?: Band[];
 };
 
 export default function BandDetailModal({
@@ -22,11 +27,20 @@ export default function BandDetailModal({
   onTogglePick,
   onClose,
   children,
+  isBandEnded = false,
+  missedUserIds,
+  isMissed = false,
+  onToggleMissed,
+  conflictBands,
 }: Props) {
   const { t } = useI18n('SchedulePage');
   const backdropRef = useRef<HTMLDivElement>(null);
   const color = stageColor(band.stage);
   const initial = band.name.charAt(0).toUpperCase();
+
+  const seenCount = isBandEnded && missedUserIds
+    ? attendees.filter((a) => !missedUserIds.has(a.id)).length
+    : null;
 
   useEffect(() => {
     function handleEsc(e: KeyboardEvent) {
@@ -82,6 +96,11 @@ export default function BandDetailModal({
           <div className={styles.attendeesSection}>
             <h3 className={styles.attendeesTitle}>
               {t('crewGoing', { count: attendees.length })}
+              {seenCount !== null && (
+                <span className={styles.seenStat}>
+                  {' · '}{t('crewSaw', { count: seenCount })}
+                </span>
+              )}
             </h3>
             {attendees.length > 0 ? (
               <ul className={styles.attendeeList}>
@@ -108,6 +127,14 @@ export default function BandDetailModal({
             )}
           </div>
 
+          {conflictBands && conflictBands.length > 0 && isPicked && (
+            <div className={styles.conflictWarning}>
+              {conflictBands.map((cb) => (
+                <span key={cb.id}>{t('conflictWarning', { name: `${cb.name} (${cb.stage})` })}</span>
+              ))}
+            </div>
+          )}
+
           {children}
 
           <button
@@ -117,6 +144,31 @@ export default function BandDetailModal({
           >
             {isPicked ? t('removePick') : t('addPick')}
           </button>
+
+          {isPicked && isBandEnded && onToggleMissed && (
+            <div className={styles.missedRow}>
+              {isMissed ? (
+                <>
+                  <span className={styles.missedLabel}>{t('missedMarked')}</span>
+                  <button
+                    className={styles.missedUndoBtn}
+                    onClick={onToggleMissed}
+                    type="button"
+                  >
+                    {t('missedUndo')}
+                  </button>
+                </>
+              ) : (
+                <button
+                  className={styles.missedToggleBtn}
+                  onClick={onToggleMissed}
+                  type="button"
+                >
+                  {t('missedToggle')}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

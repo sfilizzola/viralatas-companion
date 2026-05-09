@@ -33,6 +33,12 @@ export type UserPick = {
   created_at: string;
 };
 
+export type UserMissedBand = {
+  user_id: string;
+  band_id: string;
+  marked_at: string;
+};
+
 export type UserPresence = {
   user_id: string;
   is_camping: boolean;

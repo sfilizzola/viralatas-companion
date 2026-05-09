@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Band } from '../types';
-import { loadBands } from '../lib/db';
+import type { Band, UserMissedBand } from '../types';
+import { loadBands, MISSED_CHANGED_EVENT } from '../lib/db';
 import { togglePick } from '../lib/picks';
+import { loadAllMissed, markMissed, unmarkMissed, syncMissedBands, subscribeToMissedRealtime } from '../lib/missed';
+import { useBandConflicts } from '../hooks/useBandConflicts';
 import { useAuth } from '../hooks/useAuth';
 import { useBandAttendees } from '../hooks/useBandAttendees';
 import { useMyPicks } from '../hooks/useMyPicks';
 import { usePickCounts } from '../hooks/usePickCounts';
+import { useNow } from '../hooks/useNow';
 import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
 import BandCard from '../components/BandCard';
@@ -20,9 +23,11 @@ export default function PopularPage() {
   const [bands, setBands] = useState<Band[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeBandId, setActiveBandId] = useState<string | null>(null);
+  const [allMissed, setAllMissed] = useState<UserMissedBand[]>([]);
   const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
   const attendeesByBand = useBandAttendees();
   const pickCounts = usePickCounts();
+  const currentNow = useNow(60_000);
 
   useEffect(() => {
     loadBands().then((data) => {
@@ -30,6 +35,22 @@ export default function PopularPage() {
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => {
+    async function refreshMissed() {
+      setAllMissed(await loadAllMissed());
+    }
+
+    refreshMissed();
+    if (userId) syncMissedBands(userId).catch(() => {});
+
+    const unsubscribeRealtime = subscribeToMissedRealtime();
+    window.addEventListener(MISSED_CHANGED_EVENT, refreshMissed);
+    return () => {
+      window.removeEventListener(MISSED_CHANGED_EVENT, refreshMissed);
+      unsubscribeRealtime();
+    };
+  }, [userId]);
 
   const popularBands = useMemo(
     () =>
@@ -46,6 +67,30 @@ export default function PopularPage() {
     [activeBandId, bands],
   );
 
+  const pickedBands = useMemo(
+    () => bands.filter((b) => pickedIds.has(b.id)),
+    [bands, pickedIds],
+  );
+
+  const bandConflicts = useBandConflicts(pickedBands);
+
+  const missedUserIds = useMemo<Set<string>>(() => {
+    if (!activeBand) return new Set();
+    return new Set(
+      allMissed.filter((m) => m.band_id === activeBand.id).map((m) => m.user_id),
+    );
+  }, [allMissed, activeBand]);
+
+  const isMissed = useMemo(
+    () => !!(userId && activeBand && allMissed.some((m) => m.user_id === userId && m.band_id === activeBand.id)),
+    [allMissed, userId, activeBand],
+  );
+
+  const isBandEnded = useMemo(
+    () => !!activeBand && new Date(activeBand.end_time) < currentNow,
+    [activeBand, currentNow],
+  );
+
   const handleToggle = useCallback(
     async (bandId: string) => {
       if (!userId) return;
@@ -54,6 +99,15 @@ export default function PopularPage() {
     },
     [userId, pickedIds, refreshPicks],
   );
+
+  const handleToggleMissed = useCallback(async () => {
+    if (!userId || !activeBand) return;
+    if (isMissed) {
+      await unmarkMissed(userId, activeBand.id);
+    } else {
+      await markMissed(userId, activeBand.id);
+    }
+  }, [userId, activeBand, isMissed]);
 
   return (
     <div className={styles.page}>
@@ -93,6 +147,11 @@ export default function PopularPage() {
           isPicked={pickedIds.has(activeBand.id)}
           onTogglePick={() => handleToggle(activeBand.id)}
           onClose={() => setActiveBandId(null)}
+          isBandEnded={isBandEnded}
+          missedUserIds={missedUserIds}
+          isMissed={isMissed}
+          onToggleMissed={handleToggleMissed}
+          conflictBands={bandConflicts.get(activeBand.id) ?? []}
         />
       )}
 
