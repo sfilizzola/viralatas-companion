@@ -284,6 +284,31 @@ See **PHASES.md** for the current active phase.
 
 ---
 
+## When completing a phase
+
+1. **Commit once per phase.** Bundle all changes from the phase into a single commit.
+2. **Minimize token use.** Use the Bash tool directly (no narration) and stage specific files: `git add <file1> <file2>...` rather than `git add .`
+3. **Push to the active branch.** Check `git status` to confirm branch, then push with `-u` if needed: `git push -u origin <branch>`.
+4. **Lean commit messages.** State the phase number and key deliverables in 1–2 sentences, ending with the Co-Authored-By footer.
+
+Example: `"Phase 11.A: Fix /now header datetime stacking on mobile\n\nCo-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>"`
+
+---
+
+## Automatic versioning (main branch only)
+
+**Current version:** `0`
+
+**Rule:** When a commit is pushed to the `main` branch:
+1. Increment the version number by 1
+2. Tag the commit with the version string `v1.0.[version]` (e.g., `v1.0.1`, `v1.0.2`)
+3. Update this `Current version:` line in CLAUDE.md with the new number
+4. The prefix `v1.0` is hardcoded and never changes; only the patch number increments
+
+**Applies to:** Main branch commits only. Dev branch commits do not trigger versioning.
+
+---
+
 ## Subagent locations
 
 Specialized agents for isolated tasks live in `.claude/agents/`. Each agent reads this file plus its own system prompt. When delegating, prefer subagents for:

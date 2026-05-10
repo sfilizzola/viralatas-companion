@@ -215,12 +215,12 @@ export const BADGES: BadgeConfig[] = [
     condition: { type: 'wacken_years_count_min', count: 5 },
   },
   {
-    slug: 'anniversary-2022',
+    slug: 'anniversary-2016',
     imagePath: '/badges/badge_og.png',
-    labelKey: 'badgeAnniversary2022',
-    descriptionKey: 'badgeAnniversary2022Description',
-    condition: { type: 'wacken_attended_in_year', year: 2022 },
-    year: 2022,
+    labelKey: 'badgeAnniversary2016',
+    descriptionKey: 'badgeAnniversary2016Description',
+    condition: { type: 'wacken_attended_in_year', year: 2016 },
+    year: 2026,
   },
 ];
 
