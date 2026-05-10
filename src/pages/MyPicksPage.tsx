@@ -16,6 +16,7 @@ import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BandCard from '../components/BandCard';
 import BandDetailModal from '../components/BandDetailModal';
+import Icon from '../components/icons/Icon';
 import styles from './SchedulePage.module.css';
 
 export default function MyPicksPage() {
@@ -29,6 +30,7 @@ export default function MyPicksPage() {
   const [highlightedConflict, setHighlightedConflict] = useState<string | null>(null);
   const [activeBandId, setActiveBandId] = useState<string | null>(null);
   const [allMissed, setAllMissed] = useState<UserMissedBand[]>([]);
+  const [collapsedDays, setCollapsedDays] = useState<Set<string>>(new Set());
   const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
   const attendeesByBand = useBandAttendees();
   const pickCounts = usePickCounts();
@@ -140,6 +142,14 @@ export default function MyPicksPage() {
     }
   }, [userId, activeBand, isMissed]);
 
+  function toggleDayCollapse(day: string) {
+    setCollapsedDays((prev) => {
+      const next = new Set(prev);
+      next.has(day) ? next.delete(day) : next.add(day);
+      return next;
+    });
+  }
+
   function handleConflictClick(bandId: string) {
     const partners = conflicts.get(bandId);
     if (!partners || partners.length === 0) return;
@@ -171,39 +181,61 @@ export default function MyPicksPage() {
         {!loading && myBands.length === 0 && (
           <p className={styles.empty}>{t('empty')}</p>
         )}
-        {grouped.map(([day, dayBands]) => (
-          <section className={styles.daySection} key={day}>
-            <h2 className={styles.dayHeader}>
-              <span>{dayLabel(day)}</span>
-              <small className={styles.dayHeaderCount}>
-                {t('dayPickCount', { count: dayBands.length })}
-              </small>
-            </h2>
-            {dayBands.map((band) => {
-              const hasConflict = conflicts.has(band.id);
-              return (
-                <BandCard
-                  key={band.id}
-                  band={band}
-                  isPicked={pickedIds.has(band.id)}
-                  count={pickCounts[band.id] ?? 0}
-                  onToggle={() => handleToggle(band.id)}
-                  onClick={() => setActiveBandId(band.id)}
-                  variant="timeline"
-                  pending={pendingBandIds.has(band.id)}
-                  conflict={
-                    hasConflict
-                      ? {
-                          active: highlightedConflict === band.id,
-                          onClick: () => handleConflictClick(band.id),
-                        }
-                      : undefined
+        {grouped.map(([day, dayBands]) => {
+          const isExpanded = !collapsedDays.has(day);
+          return (
+            <section className={styles.daySection} key={day}>
+              <h2
+                className={styles.dayHeader}
+                role="button"
+                tabIndex={0}
+                aria-expanded={isExpanded}
+                onClick={() => toggleDayCollapse(day)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleDayCollapse(day);
                   }
-                />
-              );
-            })}
-          </section>
-        ))}
+                }}
+              >
+                <span>{dayLabel(day)}</span>
+                <span className={styles.dayHeaderRight}>
+                  <small className={styles.dayHeaderCount}>
+                    {t('dayPickCount', { count: dayBands.length })}
+                  </small>
+                  <span className={`${styles.dayCollapseChevron} ${isExpanded ? styles.dayCollapseChevronOpen : ''}`}>
+                    <Icon name="chevron" size={12} />
+                  </span>
+                </span>
+              </h2>
+              <div className={`${styles.dayBands} ${isExpanded ? styles.dayBandsOpen : ''}`}>
+                {dayBands.map((band) => {
+                  const hasConflict = conflicts.has(band.id);
+                  return (
+                    <BandCard
+                      key={band.id}
+                      band={band}
+                      isPicked={pickedIds.has(band.id)}
+                      count={pickCounts[band.id] ?? 0}
+                      onToggle={() => handleToggle(band.id)}
+                      onClick={() => setActiveBandId(band.id)}
+                      variant="timeline"
+                      pending={pendingBandIds.has(band.id)}
+                      conflict={
+                        hasConflict
+                          ? {
+                              active: highlightedConflict === band.id,
+                              onClick: () => handleConflictClick(band.id),
+                            }
+                          : undefined
+                      }
+                    />
+                  );
+                })}
+              </div>
+            </section>
+          );
+        })}
       </main>
 
       {activeBand && (
