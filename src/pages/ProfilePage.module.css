@@ -1294,6 +1294,13 @@
   position: relative;
 }
 
+.assignBadgeImgWrap {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
 .assignBadgeImg {
   width: 32px;
   height: 32px;
@@ -1301,8 +1308,21 @@
 }
 
 .revokeX {
-  font-size: 10px;
-  color: var(--accent);
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  border-radius: 50%;
+  line-height: 1;
+  pointer-events: none;
 }
 
 .spinner {

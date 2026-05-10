@@ -103,7 +103,5 @@
   "assignBadgeBtn": "Atribuir patch",
   "assignedBadgeCount": "{count} patch(es)",
   "assignBadgeModalTitle": "Atribuir patch para {name}",
-  "assignBadgeAssignSection": "Atribuir",
-  "assignBadgeRevokeSection": "Revogar",
   "assignBadgeError": "Erro ao atribuir patch. Tente de novo."
 }

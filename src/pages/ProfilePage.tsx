@@ -1365,51 +1365,27 @@ function AssignBadgeModal({ targetUser, onAssign, onClose, t }: AssignBadgeModal
 
         {error && <p className={styles.userRowError}>{error}</p>}
 
-        <div className={styles.assignBadgeSection}>
-          <p className={styles.assignBadgeSectionLabel}>{t('assignBadgeAssignSection')}</p>
-          <div className={styles.assignBadgeGrid}>
-            {ASSIGNABLE_BADGES.map((badge) => {
-              const alreadyHas = targetUser.special_badges.includes(badge.slug);
-              return (
-                <button
-                  key={badge.slug}
-                  className={`${styles.assignBadgeOption} ${alreadyHas ? styles.assignBadgeOptionOwned : ''}`}
-                  onClick={() => !alreadyHas && doAction(badge.slug, 'assign')}
-                  disabled={busy || alreadyHas}
-                  type="button"
-                  title={tBadges(badge.descriptionKey)}
-                >
+        <div className={styles.assignBadgeGrid}>
+          {ASSIGNABLE_BADGES.map((badge) => {
+            const assigned = targetUser.special_badges.includes(badge.slug);
+            return (
+              <button
+                key={badge.slug}
+                className={`${styles.assignBadgeOption} ${assigned ? styles.assignBadgeOptionOwned : ''}`}
+                onClick={() => doAction(badge.slug, assigned ? 'revoke' : 'assign')}
+                disabled={busy}
+                type="button"
+                title={tBadges(badge.descriptionKey)}
+              >
+                <div className={styles.assignBadgeImgWrap}>
                   <img src={badge.imagePath} alt="" className={styles.assignBadgeImg} />
-                  <span>{tBadges(badge.labelKey)}</span>
-                </button>
-              );
-            })}
-          </div>
+                  {assigned && <span className={styles.revokeX}>✕</span>}
+                </div>
+                <span>{tBadges(badge.labelKey)}</span>
+              </button>
+            );
+          })}
         </div>
-
-        {targetUser.special_badges.length > 0 && (
-          <div className={styles.assignBadgeSection}>
-            <p className={styles.assignBadgeSectionLabel}>{t('assignBadgeRevokeSection')}</p>
-            <div className={styles.assignBadgeGrid}>
-              {targetUser.special_badges.map((slug) => {
-                const cfg = BADGES.find((b) => b.slug === slug);
-                return (
-                  <button
-                    key={slug}
-                    className={`${styles.assignBadgeOption} ${styles.assignBadgeOptionRevoke}`}
-                    onClick={() => doAction(slug, 'revoke')}
-                    disabled={busy}
-                    type="button"
-                  >
-                    {cfg && <img src={cfg.imagePath} alt="" className={styles.assignBadgeImg} />}
-                    <span>{cfg ? tBadges(cfg.labelKey) : slug}</span>
-                    <span className={styles.revokeX}>✕</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        )}
 
         <button
           className={`${styles.conflictButton} ${styles.conflictCloseButton}`}
