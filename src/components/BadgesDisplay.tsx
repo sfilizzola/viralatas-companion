@@ -54,7 +54,7 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
         loadAllUserPicks(),
         loadBands(),
         loadAllMissed(),
-        supabase.from('users').select('special_badges, location_visits, achieved_badge_slugs').eq('id', user.id).single(),
+        supabase.from('users').select('special_badges').eq('id', user.id).single(),
         loadAllUserPresence(),
       ]);
       if (!active) return;
