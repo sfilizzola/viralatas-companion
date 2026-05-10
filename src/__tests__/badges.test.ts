@@ -202,3 +202,57 @@ describe('evaluateBadge — band_picked_named', () => {
     expect(evaluateBadge(badge({ type: 'band_picked_named', name: 'Bathory' }), ctx)).toBe(false);
   });
 });
+
+describe('evaluateBadge — wacken_years_count_min', () => {
+  it('returns true when user has attended at least N Wackens', () => {
+    const ctx = buildBadgeContext(
+      authUser({ wacken_years: [2022, 2023, 2024, 2025, 2026] }),
+      [],
+      new Map(),
+      new Map(),
+    );
+    expect(evaluateBadge(badge({ type: 'wacken_years_count_min', count: 5 }), ctx)).toBe(true);
+  });
+
+  it('returns false when user has fewer Wackens than threshold', () => {
+    const ctx = buildBadgeContext(
+      authUser({ wacken_years: [2022, 2023, 2026] }),
+      [],
+      new Map(),
+      new Map(),
+    );
+    expect(evaluateBadge(badge({ type: 'wacken_years_count_min', count: 5 }), ctx)).toBe(false);
+  });
+
+  it('returns false when user has no Wackens and count is 1', () => {
+    const ctx = buildBadgeContext(authUser({ wacken_years: [] }), [], new Map(), new Map());
+    expect(evaluateBadge(badge({ type: 'wacken_years_count_min', count: 1 }), ctx)).toBe(false);
+  });
+
+  it('returns true when count is 0 (edge case)', () => {
+    const ctx = buildBadgeContext(authUser({ wacken_years: [] }), [], new Map(), new Map());
+    expect(evaluateBadge(badge({ type: 'wacken_years_count_min', count: 0 }), ctx)).toBe(true);
+  });
+});
+
+describe('evaluateBadge — wacken_attended_in_year', () => {
+  it('returns true when user attended in specified year', () => {
+    const ctx = buildBadgeContext(
+      authUser({ wacken_years: [2022, 2023, 2026] }),
+      [],
+      new Map(),
+      new Map(),
+    );
+    expect(evaluateBadge(badge({ type: 'wacken_attended_in_year', year: 2022 }), ctx)).toBe(true);
+  });
+
+  it('returns false when user did not attend in specified year', () => {
+    const ctx = buildBadgeContext(authUser({ wacken_years: [2026] }), [], new Map(), new Map());
+    expect(evaluateBadge(badge({ type: 'wacken_attended_in_year', year: 2022 }), ctx)).toBe(false);
+  });
+
+  it('returns false when user has no Wacken years', () => {
+    const ctx = buildBadgeContext(authUser({ wacken_years: [] }), [], new Map(), new Map());
+    expect(evaluateBadge(badge({ type: 'wacken_attended_in_year', year: 2026 }), ctx)).toBe(false);
+  });
+});

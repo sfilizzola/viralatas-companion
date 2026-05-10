@@ -8,6 +8,10 @@ export type BadgeCondition =
   | { type: 'wacken_years_exactly'; years: number[] }
   // Permissive: user must have AT LEAST these years (other years don't disqualify)
   | { type: 'wacken_years_includes'; years: number[] }
+  // Milestone: user has attended at least N Wackens total
+  | { type: 'wacken_years_count_min'; count: number }
+  // Anniversary: user attended in a specific year
+  | { type: 'wacken_attended_in_year'; year: number }
   | { type: 'country_is'; country: string }
   | { type: 'bands_picked_min'; count: number }
   // True when at least one of the user's picks has N+ crew attending
@@ -93,6 +97,10 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
       );
     case 'wacken_years_includes':
       return condition.years.every((y) => ctx.wacken_years.includes(y));
+    case 'wacken_years_count_min':
+      return ctx.wacken_years.length >= condition.count;
+    case 'wacken_attended_in_year':
+      return ctx.wacken_years.includes(condition.year);
     case 'country_is':
       return ctx.country === condition.country;
     case 'bands_picked_min':
@@ -198,6 +206,21 @@ export const BADGES: BadgeConfig[] = [
     descriptionKey: 'badgeMudSurvivorDescription',
     // Veteran who survived both 2023 and 2025 (may have attended other years too)
     condition: { type: 'wacken_years_includes', years: [2023, 2025] },
+  },
+  {
+    slug: '5-wackens',
+    imagePath: '/badges/badge_og.png',
+    labelKey: 'badge5Wackens',
+    descriptionKey: 'badge5WackensDescription',
+    condition: { type: 'wacken_years_count_min', count: 5 },
+  },
+  {
+    slug: 'anniversary-2022',
+    imagePath: '/badges/badge_og.png',
+    labelKey: 'badgeAnniversary2022',
+    descriptionKey: 'badgeAnniversary2022Description',
+    condition: { type: 'wacken_attended_in_year', year: 2022 },
+    year: 2022,
   },
 ];
 
