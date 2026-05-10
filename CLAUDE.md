@@ -305,7 +305,7 @@ Example: `"Phase 11.A: Fix /now header datetime stacking on mobile\n\nCo-Authore
 3. Update this `Current version:` line in CLAUDE.md with the new number
 4. The prefix `v1.0` is hardcoded and never changes; only the patch number increments
 
-**Applies to:** Main branch commits only. Dev branch commits do not trigger versioning.
+**Important:** Only the `main` branch receives tags. Dev branch commits are never tagged. This versioning scheme tracks patch releases only; major/minor version increments follow different rules outside this scope.
 
 ---
 
