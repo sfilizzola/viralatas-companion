@@ -89,9 +89,9 @@ describe('computeBandOverlaps', () => {
     expect(result.get('b')?.[0].severity).toBe('soft');
   });
 
-  it('classifies exactly 10-minute overlap as soft', () => {
+  it('classifies exactly 15-minute overlap as soft', () => {
     const a = band('a', 'Faster', '2026-07-29T20:00:00Z', '2026-07-29T21:00:00Z');
-    const b = band('b', 'Harder', '2026-07-29T20:50:00Z', '2026-07-29T21:50:00Z');
+    const b = band('b', 'Harder', '2026-07-29T20:45:00Z', '2026-07-29T21:45:00Z');
 
     const result = computeBandOverlaps([a, b]);
 
@@ -99,9 +99,9 @@ describe('computeBandOverlaps', () => {
     expect(result.get('b')?.[0].severity).toBe('soft');
   });
 
-  it('classifies 10-minute 1-second overlap as hard', () => {
+  it('classifies 15-minute 1-second overlap as hard', () => {
     const a = band('a', 'Faster', '2026-07-29T20:00:00Z', '2026-07-29T21:00:00Z');
-    const b = band('b', 'Harder', '2026-07-29T20:49:59Z', '2026-07-29T21:49:59Z');
+    const b = band('b', 'Harder', '2026-07-29T20:44:59Z', '2026-07-29T21:44:59Z');
 
     const result = computeBandOverlaps([a, b]);
 
@@ -109,9 +109,9 @@ describe('computeBandOverlaps', () => {
     expect(result.get('b')?.[0].severity).toBe('hard');
   });
 
-  it('classifies 15-minute overlap as hard', () => {
+  it('classifies 30-minute overlap as hard', () => {
     const a = band('a', 'Faster', '2026-07-29T20:00:00Z', '2026-07-29T21:00:00Z');
-    const b = band('b', 'Harder', '2026-07-29T20:45:00Z', '2026-07-29T21:45:00Z');
+    const b = band('b', 'Harder', '2026-07-29T20:30:00Z', '2026-07-29T21:30:00Z');
 
     const result = computeBandOverlaps([a, b]);
 

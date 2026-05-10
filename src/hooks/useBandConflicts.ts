@@ -8,7 +8,7 @@ export type OverlapEntry = {
   severity: OverlapSeverity;
 };
 
-const HARD_CONFLICT_THRESHOLD_MS = 600_000; // 10 minutes
+const HARD_CONFLICT_THRESHOLD_MS = 900_000; // 15 minutes
 
 export function computeBandOverlaps(bands: Band[]): Map<string, OverlapEntry[]> {
   const conflicts = new Map<string, OverlapEntry[]>();
