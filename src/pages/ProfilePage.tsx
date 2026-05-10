@@ -37,6 +37,53 @@ function roleLabel(role: string): string {
   return 'Vira-latas';
 }
 
+const DECADE_GROUPS: { label: string; years: number[] }[] = [
+  { label: '2000s', years: [2005, 2006, 2007, 2008, 2009] },
+  { label: '2010s', years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019] },
+  { label: '2020s', years: [2022, 2023, 2024, 2025, 2026] },
+];
+
+type WackenYearPickerProps = {
+  selectedYears: number[];
+  onToggle: (year: number, checked: boolean) => void;
+  t: (key: string, values?: Record<string, string | number>) => string;
+};
+
+function WackenYearPicker({ selectedYears, onToggle, t }: WackenYearPickerProps) {
+  return (
+    <div className={styles.label}>
+      {t('wackenYears')}
+      <div className={styles.yearGrid}>
+        {DECADE_GROUPS.map(({ label, years }) => (
+          <div key={label} className={styles.yearDecade}>
+            <span className={styles.yearDecadeLabel}>{label}</span>
+            <div className={styles.yearPillRow}>
+              {years.map((year) => {
+                const selected = selectedYears.includes(year);
+                return (
+                  <button
+                    key={year}
+                    type="button"
+                    role="checkbox"
+                    aria-checked={selected}
+                    className={`${styles.yearPill} ${selected ? styles.yearPillSelected : ''}`}
+                    onClick={() => onToggle(year, !selected)}
+                  >
+                    {year}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className={styles.yearCounter}>
+        ● {selectedYears.length} Wacken{selectedYears.length !== 1 ? 's' : ''}
+      </p>
+    </div>
+  );
+}
+
 function countryFlag(code: string | null | undefined): string {
   const flags: Record<string, string> = {
     br: '🇧🇷', de: '🇩🇪', us: '🇺🇸', be: '🇧🇪', co: '🇨🇴', es: '🇪🇸',
@@ -302,19 +349,11 @@ function ProfileForm({
             </label>
             {photoError && <p className={styles.error}>{t('photoError')}</p>}
 
-            <fieldset className={styles.fieldset}>
-              <legend className={styles.legend}>{t('wackenYears')}</legend>
-              {[2022, 2023, 2024, 2025, 2026].map((year) => (
-                <label key={year} className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={newWackenYears.includes(year)}
-                    onChange={(e) => handleYearToggle(year, e.target.checked)}
-                  />
-                  {year}
-                </label>
-              ))}
-            </fieldset>
+            <WackenYearPicker
+              selectedYears={newWackenYears}
+              onToggle={handleYearToggle}
+              t={t}
+            />
 
             <label className={styles.label}>
               {t('country')}

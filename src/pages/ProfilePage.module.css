@@ -1319,34 +1319,88 @@
   white-space: nowrap;
 }
 
-/* Wacken years and country fieldset */
-.fieldset {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 0.75rem;
+/* Wacken year picker */
+.yearGrid {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 4px;
 }
 
-.legend {
-  font-size: 0.875rem;
+.yearDecade {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.yearDecade:last-child {
+  border-bottom: none;
+}
+
+.yearDecadeLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+}
+
+.yearPillRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.yearPill {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
   color: var(--text-muted);
-  padding: 0 0.25rem;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
+.yearPill:hover:not(.yearPillSelected) {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.yearPillSelected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.yearCounter {
+  margin: var(--s-1) 0 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* Checkbox label (used in admin sections) */
 .checkboxLabel {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   color: var(--text);
   cursor: pointer;
 }
 
-.checkboxLabel input[type='checkbox'] {
-  accent-color: var(--accent);
-  width: 16px;
-  height: 16px;
+.checkboxLabel input {
   cursor: pointer;
 }
