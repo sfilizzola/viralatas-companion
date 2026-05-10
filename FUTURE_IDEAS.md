@@ -112,6 +112,55 @@ Regras:
 
 ---
 
+## Phase 10c — Year freeze for historical badges
+
+**Goal:** Snapshot each user's earned badges at the end of a festival year so 2026 wins are still visible in 2027 alongside fresh badge content.
+
+**When:** Defer until ~late July 2026 (post-festival). Needs to land before the crew goes home so the snapshot is taken while festival state is still live.
+
+**Schema:**
+```sql
+alter table public.users
+  add column historical_badges jsonb not null default '[]'::jsonb;
+```
+
+Each entry: `{ slug: string; year: number; earnedAt: string }`.
+
+**`BadgeConfig` extension** (stub `yearBound` already allowed in 10a/10b badge configs — no code change needed when this ships):
+```ts
+type BadgeConfig = {
+  slug: string;
+  imagePath: string;
+  labelKey: string;
+  descriptionKey: string;
+  condition: BadgeCondition;
+  yearBound?: number;  // present on 10a/10b badges that depend on a specific festival year
+};
+```
+
+Existing badges (`puppy`, `pais-tropical`, `belga`, etc.) leave `yearBound` undefined → they remain evergreen.
+
+**Freeze mechanism:** Godlike-only Edge Function `supabase/functions/freeze-year-badges/index.ts`. Request body: `{ year: 2026 }`.
+
+1. Verify caller is godlike.
+2. For every user: load picks + missed records + metadata, build a server-side `BadgeContext`, evaluate all badges with `yearBound === year`, collect earned slugs.
+3. Upsert into `users.historical_badges`: append new `{ slug, year, earnedAt: now }` entries; de-dupe by `(slug, year)`.
+4. Idempotent on re-run.
+
+**UI:**
+- New section in `/profile` (godlike only) — single "Freeze badges for year YYYY" button with confirmation modal.
+- `BadgesDisplay` / patches grid: year chip (`'26`-style mono, bottom-right corner) on any historically-frozen patch. Chip is already stubbed (skipped when `historical_badges` is absent) from Phase G of the design migration.
+
+**Files:** `supabase/migrations/<date>_phase10c_historical_badges.sql`, `supabase/functions/freeze-year-badges/index.ts`, `src/lib/badges.ts`, `src/lib/supabase.ts`, `src/components/BadgesDisplay.tsx`, `src/pages/ProfilePage.tsx`, `src/i18n/Badges_*.json`.
+
+**Acceptance criteria:**
+- [ ] `historical_badges` migration applies cleanly on a live Supabase project.
+- [ ] Godlike "Freeze year" action snapshots correctly and is idempotent.
+- [ ] Frozen badges stay visible after their underlying live condition changes (e.g. user unpicks a band) with a "Wacken YYYY" chip.
+- [ ] Non-godlike users cannot call the freeze Edge Function (403 returned).
+
+---
+
 ## Alert cooldown reference
 
 | Alert | Cooldown |

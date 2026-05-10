@@ -6,11 +6,13 @@ Base context for every agent and Claude session in this project. This is the sin
 
 ## What this app is
 
-A festival companion PWA for **Viralatas Metaleiros** — a Brazilian metal crew attending Wacken Open Air 2026.
+A festival companion PWA for **Viralatas Metaleiros** — Brazilian metal vira-latas attending Wacken Open Air 2026.
 
-**Core loop:** Each crew member logs in, picks bands they want to watch, sees live attendance counts and who's going where, and receives proactive AI alerts powered by Claude. The app works fully offline after first load — Wacken has terrible signal.
+**Core loop:** Each vira-lata logs in, picks bands they want to watch, sees live attendance counts and who's going where, and receives proactive AI alerts powered by Claude. The app works fully offline after first load — Wacken has terrible signal.
 
-**Who:** ~20 person metal crew mostly from Brazil but people from All Over the World. Team lead: `sfilizzola@gmail.com` (godlike role, hard-coded).
+**Who:** ~20 metal vira-latas mostly from Brazil but people from All Over the World. Team lead: `sfilizzola@gmail.com` (godlike role, hard-coded).
+
+**Product terminology:** In all user-facing copy and localization files, use **vira-latas** instead of **crew** for the group/membership label. Internal code identifiers and existing schema names may keep `crew` when changing them would create unnecessary churn.
 
 ---
 
@@ -58,10 +60,10 @@ A festival companion PWA for **Viralatas Metaleiros** — a Brazilian metal crew
 
 - `/login` — Sign in with email/password
 - `/register` — Create account
-- `/now` — Live view: current or next band for user and crew (landing page after auth)
+- `/now` — Live view: current or next band for user and vira-latas (landing page after auth)
 - `/schedule` — Full band schedule with filters (stage, day, time)
 - `/my-picks` — Current user's picked bands
-- `/popular` — Crew popularity: bands sorted by total picks
+- `/popular` — Vira-latas popularity: bands sorted by total picks
 - `/announcements` — Mural-style announcements board (Phase 5)
 - `/profile` — Profile, preferences, godlike/manager UI, logout
 
@@ -208,12 +210,12 @@ The trigger also:
 
 | Decision | Choice | Reason |
 |---|---|---|
-| App type | PWA only | No iOS App Store needed; crew is ~7 people |
+| App type | PWA only | No iOS App Store needed; vira-latas group is ~7 people |
 | Offline store | IndexedDB via `idb` library | Structured, async, survives browser close |
 | Backend | Supabase | Auth + DB + Realtime in one free-tier service |
 | LLM delivery | Proactive only | At a festival, no one is typing into chat |
-| Claude context | Full crew picks every call | Crew is tiny, payload is negligible |
-| Alert language | Brazilian Portuguese | It's the Viralatas crew, not a global product |
+| Claude context | Full vira-latas picks every call | Vira-latas group is tiny, payload is negligible |
+| Alert language | Brazilian Portuguese | It's the Viralatas group, not a global product |
 | Role hierarchy | normal / manager / godlike | 3-tier allows moderation without giving everyone power |
 
 ---
@@ -234,12 +236,12 @@ type BadgeConfig = {
 };
 ```
 
-**Supported conditions only:**
-- `wacken_years_exactly`
-- `wacken_years_includes`
+**Supported conditions:**
+- `wacken_years_exactly`, `wacken_years_includes`
 - `country_is`
-- `bands_picked_min`
-- `band_attendance_min`
+- `bands_picked_min`, `band_attendance_min`
+- `bands_picked_genre_min`, `bands_picked_stage_min`, `bands_picked_before_hour_min`, `band_picked_named` (Phase 10a)
+- `bands_seen_min`, `bands_seen_genre_min`, `bands_seen_stage_min`, `bands_seen_before_hour_min`, `band_seen_named` (Phase 10b — requires `user_missed_bands`)
 
 To add a badge without changing behavior elsewhere: add the PNG to `public/badges/`, append one `BADGES` entry in `src/lib/badges.ts`, and add matching label + description keys to both `src/i18n/Badges_br.json` and `src/i18n/Badges_en.json`.
 
@@ -252,16 +254,22 @@ Phase 8 will use this structure to inventory unassociated images in `public/badg
 **Completed:**
 - ✅ **Phase 1** — Foundation: Auth, schema, offline shell
 - ✅ **Phase 2** — Schedule: Band data, filters, offline browsing
-- ✅ **Phase 3** — Picks: Pick bands, live crew counts via Realtime
-- ✅ **Phase 4B** — Live preview: Camping state, crew grid, LOST detection
+- ✅ **Phase 3** — Picks: Pick bands, live vira-latas counts via Realtime
+- ✅ **Phase 4B** — Live preview: Camping state, vira-latas grid, LOST detection
 - ✅ **Phase 5** — Announcements & user roles: Mural board, manager blocking, godlike powers
-- ✅ **Phase 6** — Metal Place: Festival-day check-in, crew grid card, test mode
+- ✅ **Phase 6** — Metal Place: Festival-day check-in, vira-latas grid card, test mode
 - ✅ **Phase 7** — Profile polish: badge modal, live band test, collapsible admin sections, useful links
 - ✅ **Phase 8** — Badge asset intake: added Belgian (`belga`) and Colombian (`cafetero`) country badges
 - ✅ **Phase 9** — Differentiate Schedule / My Picks / Popular + extracted shared bones (`BandCard`, `BandFilters`, `BandDetailModal`, `useBandConflicts`); Schedule got search + genre filter, My Picks became a day-grouped timeline with conflict chips, Popular gained avatar clusters and the detail modal
 - ✅ **Phase 9.B** — Godlike time travel: `now()` helper + `useNow` hook backed by a localStorage override, with quick-jump chips for D-1 / D1–D4 / D+1 in the Profile admin panel
+- ✅ **Phase 10** — Badge expansion: characteristic-badge conditions engine (10a — `bands_picked_genre/stage/hour_min`, `band_picked_named`); seen-tracking via `user_missed_bands` table + IDB v8 + offline queue (10b); extended `BandDetailModal` with vira-latas breakdown, conflict warning, and "Não vi essa banda" missed toggle; 5 new `bands_seen_*` badge conditions; 177 tests
+- ✅ **Design System Phase F** — `/now` visual polish: 4px stage-color strips, Oswald group titles, tinted gradient backgrounds (orange / teal / purple) per location type, `useNow()`-driven page header; no structural changes
+- ✅ **Design System Phase G** — `/profile` restyle: 56px avatar profile head with role chip / country flag / years pill; all-badges patches-grid (4/6/8 cols, locked=grayscale); `year?` field on `BadgeConfig`; edit-profile collapsible with PT/EN language seg; gold godlike + blue manager collapsible headers; sign-out pill at bottom
+- ✅ **Design System Phase H** — Announcements restyle: `announce` grid card (40px avatar | head/body/actions in col 2), role chips (Vira-latas/Manager/Godlike), mono action buttons, updated timestamp format (N min / Nh / DD/MM)
+- ✅ **Design System Phase I** — Auth pages + bottom nav + offline chrome: 4px accent top border + Oswald title + mono labels on login/register; BottomNav mono 9px caps + filled-icon active states (6 tabs kept); `OfflineBanner` on /now, /schedule, /my-picks; `PendingChip` on offline-queued picks and announcements; `SyncToast` fires on reconnect flush (≥1 item)
+- ✅ **Design System Phase J** — Icon pass: shared `<Icon name="..."/>` component (`src/components/icons/Icon.tsx`) with all 17 design-system icons (square caps, miter joins, filled variants); `StarIcon` delegates to Icon; `BandFilters` filter icon and `BandDetailModal` close icon updated; ProfilePage chevrons (▼ → Icon), 🔧/👤 stripped, ✓/✗ removed from buttons
 
-See **PHASES.md** for detailed acceptance criteria and current status.
+See **PHASES.md** for the current active phase.
 
 ---
 
@@ -294,7 +302,7 @@ Specialized agents for isolated tasks live in `.claude/agents/`. Each agent read
 
 - **Seed scripts:** `supabase/seed/` and `npm run seed:*`
   - `npm run seed:bands` — Refresh band lineup (cascades to picks)
-  - `npm run seed:test-users` — Create disposable test crew
+  - `npm run seed:test-users` — Create disposable test vira-latas
   - `npm run seed:live-now` — Time-shift bands for live preview testing
 
 - **Manual testing:**

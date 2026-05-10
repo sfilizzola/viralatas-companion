@@ -2,5 +2,8 @@
   "title": "My picks",
   "loading": "Loading picks...",
   "empty": "You haven't picked any bands yet. Head to the schedule. 🤘",
-  "summary": "{bands} bands across {days} days · {conflicts} conflicts"
+  "summary": "{bands} bands across {days} days · {conflicts} conflicts",
+  "headerBandsDays": "{bands} picks / {days} days",
+  "headerConflicts": "{conflicts} conflicts",
+  "dayPickCount": "{count} picks"
 }

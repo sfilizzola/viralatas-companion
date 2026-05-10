@@ -1,4 +1,7 @@
 import type { User as AuthUser } from '@supabase/supabase-js';
+import type { Band } from '../types';
+
+export type BadgeBand = Pick<Band, 'id' | 'name' | 'stage' | 'start_time' | 'end_time' | 'genre'>;
 
 export type BadgeCondition =
   // Exclusive: user must have ONLY these years (checking 2022+2026 loses a "2026-only" badge)
@@ -8,7 +11,19 @@ export type BadgeCondition =
   | { type: 'country_is'; country: string }
   | { type: 'bands_picked_min'; count: number }
   // True when at least one of the user's picks has N+ crew attending
-  | { type: 'band_attendance_min'; count: number };
+  | { type: 'band_attendance_min'; count: number }
+  // Picks-based characteristic conditions (Phase 10a)
+  | { type: 'bands_picked_genre_min'; genre: string; count: number }
+  | { type: 'bands_picked_stage_min'; stage: string; count: number }
+  // `hour` is festival-local (CEST, +02:00); raw CEST hour < threshold
+  | { type: 'bands_picked_before_hour_min'; hour: number; count: number }
+  | { type: 'band_picked_named'; name: string }
+  // Seen-based conditions (Phase 10b): picks credited after end_time, minus missed opt-outs
+  | { type: 'bands_seen_min'; count: number }
+  | { type: 'bands_seen_genre_min'; genre: string; count: number }
+  | { type: 'bands_seen_stage_min'; stage: string; count: number }
+  | { type: 'bands_seen_before_hour_min'; hour: number; count: number }
+  | { type: 'band_seen_named'; name: string };
 
 export type BadgeConfig = {
   slug: string;
@@ -16,6 +31,7 @@ export type BadgeConfig = {
   labelKey: string;
   descriptionKey: string;
   condition: BadgeCondition;
+  year?: number; // Historical Wacken year chip (e.g. 2025 → "'25"). Omit for non-historical badges.
 };
 
 export type BadgeContext = {
@@ -23,23 +39,47 @@ export type BadgeContext = {
   country: string | null;
   bandsPicked: number;
   maxAttendanceInPicks: number;
+  pickedBands: BadgeBand[];
+  seenBands: BadgeBand[];
+  missedBandIds: Set<string>;
 };
+
+// Festival-local (CEST = UTC+2) hour for `bands_picked_before_hour_min`.
+// Wacken runs late-July / early-August so Berlin is always on CEST; the simple
+// offset matches `bandTime.ts` and avoids dragging in `Intl.DateTimeFormat`.
+function festivalLocalHour(startIso: string): number {
+  const d = new Date(startIso);
+  const cest = new Date(d.getTime() + 2 * 60 * 60 * 1000);
+  return cest.getUTCHours();
+}
 
 export function buildBadgeContext(
   user: AuthUser,
   userPickBandIds: string[],
   allPickCounts: Map<string, number>,
+  bandsById: Map<string, BadgeBand>,
+  missedBandIds: Set<string> = new Set(),
+  now: Date = new Date(),
 ): BadgeContext {
   const meta = user.user_metadata;
   const maxAttendance = userPickBandIds.reduce(
     (max, bandId) => Math.max(max, allPickCounts.get(bandId) ?? 0),
     0,
   );
+  const pickedBands = userPickBandIds
+    .map((id) => bandsById.get(id))
+    .filter((b): b is BadgeBand => b !== undefined);
+  const seenBands = pickedBands.filter(
+    (b) => new Date(b.end_time) < now && !missedBandIds.has(b.id),
+  );
   return {
     wacken_years: Array.isArray(meta?.['wacken_years']) ? (meta['wacken_years'] as number[]) : [],
     country: (meta?.['country'] as string | undefined) ?? null,
     bandsPicked: userPickBandIds.length,
     maxAttendanceInPicks: maxAttendance,
+    pickedBands,
+    seenBands,
+    missedBandIds,
   };
 }
 
@@ -59,6 +99,30 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
       return ctx.bandsPicked >= condition.count;
     case 'band_attendance_min':
       return ctx.maxAttendanceInPicks >= condition.count;
+    case 'bands_picked_genre_min':
+      return ctx.pickedBands.filter((b) => b.genre === condition.genre).length >= condition.count;
+    case 'bands_picked_stage_min':
+      return ctx.pickedBands.filter((b) => b.stage === condition.stage).length >= condition.count;
+    case 'bands_picked_before_hour_min':
+      return (
+        ctx.pickedBands.filter((b) => festivalLocalHour(b.start_time) < condition.hour).length >=
+        condition.count
+      );
+    case 'band_picked_named':
+      return ctx.pickedBands.some((b) => b.name === condition.name);
+    case 'bands_seen_min':
+      return ctx.seenBands.length >= condition.count;
+    case 'bands_seen_genre_min':
+      return ctx.seenBands.filter((b) => b.genre === condition.genre).length >= condition.count;
+    case 'bands_seen_stage_min':
+      return ctx.seenBands.filter((b) => b.stage === condition.stage).length >= condition.count;
+    case 'bands_seen_before_hour_min':
+      return (
+        ctx.seenBands.filter((b) => festivalLocalHour(b.start_time) < condition.hour).length >=
+        condition.count
+      );
+    case 'band_seen_named':
+      return ctx.seenBands.some((b) => b.name === condition.name);
   }
 }
 

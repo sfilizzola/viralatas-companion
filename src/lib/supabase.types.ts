@@ -243,6 +243,24 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_missed_bands: {
+        Row: {
+          user_id: string;
+          band_id: string;
+          marked_at: string;
+        };
+        Insert: {
+          user_id: string;
+          band_id: string;
+          marked_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          band_id?: string;
+          marked_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {

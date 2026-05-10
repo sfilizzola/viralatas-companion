@@ -72,10 +72,11 @@ export async function deleteAnnouncement(id: string): Promise<void> {
   }
 }
 
-export async function flushPendingAnnouncements(): Promise<void> {
+export async function flushPendingAnnouncements(): Promise<number> {
   const queue = await loadOfflineAnnouncementsQueue();
-  if (queue.length === 0) return;
+  if (queue.length === 0) return 0;
 
+  let flushed = 0;
   for (const item of queue) {
     const { data, error } = await supabase
       .from('announcements')
@@ -88,8 +89,10 @@ export async function flushPendingAnnouncements(): Promise<void> {
       // Swap the local-UUID draft for the server record
       await removeAnnouncementFromCache(item.id);
       if (data) await saveAnnouncement(data as Announcement);
+      flushed++;
     }
   }
+  return flushed;
 }
 
 export async function fetchCurrentUserRole(userId: string): Promise<UserRole> {

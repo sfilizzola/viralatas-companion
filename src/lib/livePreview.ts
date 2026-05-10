@@ -135,7 +135,7 @@ export function mapCrewLivePlans(
         ...user,
         isCamping,
         isAtMetalPlace,
-        label: user.display_name?.trim() || `Crew ${user.id.slice(0, 4).toUpperCase()}`,
+        label: user.display_name?.trim() || `Vira-lata ${user.id.slice(0, 4).toUpperCase()}`,
         plan: applyPresenceToLivePlan(plan, isCamping),
       };
     })

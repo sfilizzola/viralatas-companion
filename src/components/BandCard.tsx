@@ -1,10 +1,13 @@
-import { type KeyboardEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import type { Band } from '../types';
 import type { BandAttendee } from '../hooks/useBandAttendees';
-import { stageColor } from '../lib/stageColors';
+import { stageColorVar } from '../lib/stageColors';
 import { formatTime } from '../lib/bandTime';
 import { useI18n } from '../lib/i18n';
+import StarIcon from './icons/StarIcon';
 import styles from './BandCard.module.css';
+
+export type BandCardVariant = 'schedule' | 'timeline' | 'ranked';
 
 type BandCardProps = {
   band: Band;
@@ -12,10 +15,11 @@ type BandCardProps = {
   count: number;
   onToggle: () => void;
   onClick?: () => void;
-  dense?: boolean;
-  hidePickButton?: boolean;
+  variant?: BandCardVariant;
+  rank?: number;
   conflict?: { active: boolean; onClick: () => void };
   attendeeCluster?: { attendees: BandAttendee[]; max?: number };
+  pending?: boolean;
   children?: ReactNode;
 };
 
@@ -25,16 +29,30 @@ export default function BandCard({
   count,
   onToggle,
   onClick,
-  dense = false,
-  hidePickButton = false,
+  variant = 'schedule',
+  rank,
   conflict,
   attendeeCluster,
+  pending,
   children,
 }: BandCardProps) {
   const { t } = useI18n('SchedulePage');
-  const color = stageColor(band.stage);
+  const color = stageColorVar(band.stage);
   const initial = band.name.charAt(0).toUpperCase();
   const interactive = Boolean(onClick);
+  const showPick = variant !== 'ranked';
+
+  // Pop animation only fires on user toggle, not on initial render or
+  // realtime updates from other clients.
+  const [popping, setPopping] = useState(false);
+  const userToggledRef = useRef(false);
+  useEffect(() => {
+    if (!userToggledRef.current) return;
+    userToggledRef.current = false;
+    setPopping(true);
+    const id = window.setTimeout(() => setPopping(false), 320);
+    return () => window.clearTimeout(id);
+  }, [isPicked]);
 
   function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (!onClick) return;
@@ -44,19 +62,19 @@ export default function BandCard({
     }
   }
 
+  const variantClass =
+    variant === 'timeline'
+      ? styles.variantTimeline
+      : variant === 'ranked'
+        ? styles.variantRanked
+        : styles.variantSchedule;
+
   const cardClasses = [
     styles.card,
+    variantClass,
     interactive ? '' : styles.cardStatic,
     conflict?.active ? styles.cardConflict : '',
   ]
-    .filter(Boolean)
-    .join(' ');
-
-  const imageClasses = [styles.cardImage, dense ? styles.cardImageDense : '']
-    .filter(Boolean)
-    .join(' ');
-
-  const metaClasses = [styles.meta, dense ? styles.metaDense : '']
     .filter(Boolean)
     .join(' ');
 
@@ -69,50 +87,90 @@ export default function BandCard({
       onKeyDown={handleKeyDown}
       aria-pressed={interactive ? isPicked : undefined}
     >
-      <div className={imageClasses}>
-        {band.image_url ? (
-          <img src={band.image_url} alt={band.name} className={styles.img} loading="lazy" />
-        ) : (
-          <div className={styles.imgPlaceholder} style={{ background: color }}>
-            {initial}
-          </div>
-        )}
-      </div>
+      <div className={styles.stripe} style={{ background: color }} aria-hidden />
 
-      <div className={styles.cardBody}>
+      {variant === 'schedule' && (
+        <div className={styles.thumb} style={{ background: color }} aria-hidden>
+          {band.image_url ? (
+            <img
+              src={band.image_url}
+              alt=""
+              className={styles.thumbImg}
+              loading="lazy"
+            />
+          ) : (
+            initial
+          )}
+        </div>
+      )}
+
+      {variant === 'timeline' && (
+        <div className={styles.when} aria-hidden>
+          <div className={styles.whenStart}>{formatTime(band.start_time)}</div>
+          <div className={styles.whenEnd}>{formatTime(band.end_time)}</div>
+        </div>
+      )}
+
+      {variant === 'ranked' && (
+        <div
+          className={`${styles.rank} ${rank !== undefined && rank <= 3 ? styles.rankTop : ''}`}
+          aria-hidden
+        >
+          {rank !== undefined ? String(rank).padStart(2, '0') : ''}
+        </div>
+      )}
+
+      <div className={`${styles.body} ${variant === 'ranked' ? styles.bodyRanked : ''}`}>
         <h2 className={styles.bandName}>{band.name}</h2>
-        {band.genre && <p className={styles.genre}>{band.genre}</p>}
-        <div className={metaClasses}>
+        <div className={styles.meta}>
           <span className={styles.stageBadge} style={{ background: color }}>
             {band.stage}
           </span>
-          <span className={styles.time}>
-            {formatTime(band.start_time)} – {formatTime(band.end_time)}
-          </span>
-          <span className={styles.goingCount}>{t('goingCount', { count })}</span>
-          {conflict && (
+          {variant !== 'timeline' && (
+            <span className={styles.time}>
+              {formatTime(band.start_time)} – {formatTime(band.end_time)}
+            </span>
+          )}
+          {count > 0 && (
+            <span className={styles.going}>
+              <b>{count}</b> {t('goingLabel')}
+            </span>
+          )}
+          {variant === 'timeline' && conflict && (
             <button
               type="button"
-              className={`${styles.conflictChip} ${conflict.active ? styles.conflictChipActive : ''}`}
+              className={`${styles.conflictChip} ${
+                conflict.active ? styles.conflictChipActive : ''
+              }`}
               onClick={(event) => {
                 event.stopPropagation();
                 conflict.onClick();
               }}
               aria-pressed={conflict.active}
             >
-              {t('conflictChip')}
+              ⚠ {t('conflictChip')}
             </button>
           )}
+          {band.genre && variant === 'schedule' && (
+            <span className={styles.genre}>{band.genre}</span>
+          )}
+          {pending && <span className="pending-chip">{t('pendingSync')}</span>}
         </div>
-        {attendeeCluster && <AttendeeCluster {...attendeeCluster} />}
+        {attendeeCluster && variant === 'ranked' && (
+          <AttendeeCluster {...attendeeCluster} count={count} />
+        )}
         {children}
       </div>
 
-      {!hidePickButton && (
+      {showPick && (
         <button
-          className={`${styles.pickBtn} ${isPicked ? styles.pickBtnActive : ''}`}
+          type="button"
+          className={`${styles.pick} ${isPicked ? styles.pickActive : ''} ${
+            popping ? styles.pickAnimating : ''
+          }`}
           onClick={(event) => {
             event.stopPropagation();
+            userToggledRef.current = true;
             onToggle();
           }}
           aria-label={isPicked ? t('removePick') : t('addPick')}
@@ -125,7 +183,15 @@ export default function BandCard({
   );
 }
 
-function AttendeeCluster({ attendees, max = 4 }: { attendees: BandAttendee[]; max?: number }) {
+function AttendeeCluster({
+  attendees,
+  max = 5,
+  count,
+}: {
+  attendees: BandAttendee[];
+  max?: number;
+  count: number;
+}) {
   const { t } = useI18n('SchedulePage');
   if (attendees.length === 0) return null;
   const visible = attendees.slice(0, max);
@@ -149,27 +215,16 @@ function AttendeeCluster({ attendees, max = 4 }: { attendees: BandAttendee[]; ma
             </span>
           ),
         )}
+        {overflow > 0 && (
+          <span className={styles.attendeeOverflow}>
+            {t('attendeeOverflow', { count: overflow })}
+          </span>
+        )}
       </div>
-      {overflow > 0 && (
-        <span className={styles.attendeeOverflow}>{t('attendeeOverflow', { count: overflow })}</span>
-      )}
+      <span className={styles.attendeeCount}>
+        <b>{count}</b>
+        {t('goingLabel')}
+      </span>
     </div>
-  );
-}
-
-function StarIcon({ filled }: { filled: boolean }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width={22}
-      height={22}
-      fill={filled ? 'currentColor' : 'none'}
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
   );
 }

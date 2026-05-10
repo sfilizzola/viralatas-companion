@@ -46,7 +46,7 @@ describe('BandCard', () => {
         count={3}
         onToggle={onToggle}
         onClick={onClick}
-        hidePickButton
+        variant="ranked"
       />,
     );
 
@@ -82,7 +82,7 @@ describe('BandCard', () => {
         isPicked={false}
         count={3}
         onToggle={vi.fn()}
-        hidePickButton
+        variant="ranked"
       />,
     );
 
@@ -100,7 +100,7 @@ describe('BandCard', () => {
         count={3}
         onToggle={onToggle}
         onClick={onClick}
-        hidePickButton
+        variant="ranked"
       />,
     );
 

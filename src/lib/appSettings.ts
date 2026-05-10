@@ -22,13 +22,24 @@ export async function getRegistrationEnabled(): Promise<boolean> {
 
 export async function setRegistrationEnabled(enabled: boolean): Promise<boolean> {
   try {
+    const { data: settings, error: fetchError } = await supabase
+      .from('app_settings')
+      .select('id')
+      .limit(1)
+      .single();
+
+    if (fetchError || !settings) {
+      console.error('Failed to fetch app settings row:', fetchError);
+      throw fetchError ?? new Error('App settings row not found');
+    }
+
     const { error } = await supabase
       .from('app_settings')
       .update({
         registration_enabled: enabled,
         updated_at: new Date().toISOString(),
       })
-      .limit(1);
+      .eq('id', settings.id);
 
     if (error) {
       console.error('Failed to update registration status:', error);

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { useI18n } from '../lib/i18n';
 import { stageColor } from '../lib/stageColors';
+import Icon from './icons/Icon';
 import type { BandFilterValue } from './bandFilterValue';
 import styles from './BandFilters.module.css';
 
@@ -12,17 +13,26 @@ type Props = {
   days: DayOption[];
   stages: string[];
   genres: string[];
+  filteredCount: number;
 };
 
-export default function BandFilters({ value, onChange, days, stages, genres }: Props) {
+export default function BandFilters({
+  value,
+  onChange,
+  days,
+  stages,
+  genres,
+  filteredCount,
+}: Props) {
   const { t } = useI18n('SchedulePage');
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [showAdvanced, setShowAdvanced] = useState(false);
   const backdropRef = useRef<HTMLDivElement>(null);
   const touchStartY = useRef<number>(0);
 
-  const hasActive =
-    value.day || value.stage || value.genre || value.upcoming || value.query.trim().length > 0;
+  const activeDrawerCount =
+    value.stage.length + (value.genre ? 1 : 0) + (value.upcoming ? 1 : 0);
+  const hasAnyActive =
+    activeDrawerCount > 0 || value.day !== null || value.query.trim().length > 0;
 
   useEffect(() => {
     if (!sheetOpen) return;
@@ -43,11 +53,22 @@ export default function BandFilters({ value, onChange, days, stages, genres }: P
   }
 
   function toggleStage(stage: string) {
-    update('stage', value.stage === stage ? null : stage);
+    const has = value.stage.includes(stage);
+    update('stage', has ? value.stage.filter((s) => s !== stage) : [...value.stage, stage]);
   }
 
-  function toggleGenre(genre: string) {
-    update('genre', value.genre === genre ? null : genre);
+  function clearAll() {
+    onChange({
+      query: '',
+      day: null,
+      stage: [],
+      genre: null,
+      upcoming: false,
+    });
+  }
+
+  function clearDrawer() {
+    onChange({ ...value, stage: [], genre: null, upcoming: false });
   }
 
   function handleBackdropClick(e: React.MouseEvent) {
@@ -63,60 +84,58 @@ export default function BandFilters({ value, onChange, days, stages, genres }: P
     if (endY > touchStartY.current + 50) setSheetOpen(false);
   }
 
-  function getActiveTags() {
-    const tags: string[] = [];
-    if (value.day) {
-      const label = days.find((d) => d.date === value.day)?.label;
-      if (label) tags.push(label);
-    }
-    if (value.stage) tags.push(value.stage);
-    if (value.genre) tags.push(value.genre);
-    if (value.upcoming) tags.push(t('upcomingBands'));
-    if (value.query.trim()) tags.push(`"${value.query.trim()}"`);
-    return tags;
-  }
-
   return (
     <>
       <div className={styles.stickyBar}>
-        <button className={styles.filtersButton} onClick={() => setSheetOpen(true)}>
-          <FunnelIcon />
-          <span>{t('filtros')}</span>
-        </button>
-
-        <input
-          className={styles.searchInput}
-          type="search"
-          placeholder={t('searchPlaceholder')}
-          value={value.query}
-          onChange={(e) => update('query', e.target.value)}
-          aria-label={t('searchPlaceholder')}
-        />
-
-        {hasActive && (
+        <div className={styles.controls}>
           <button
-            className={styles.clearLink}
-            onClick={() =>
-              onChange({
-                query: '',
-                day: null,
-                stage: null,
-                genre: null,
-                upcoming: false,
-              })
-            }
+            className={styles.filterTrigger}
+            onClick={() => setSheetOpen(true)}
+            aria-label={t('filtros')}
           >
-            {t('limpar')}
+            <FunnelIcon />
+            <span>{t('filtros')}</span>
+            {activeDrawerCount > 0 && (
+              <span className={styles.triggerCount}>{activeDrawerCount}</span>
+            )}
           </button>
-        )}
 
-        {hasActive && (
-          <div className={styles.activeTags}>
-            {getActiveTags().map((tag, i) => (
-              <span key={i} className={styles.tag}>
-                {tag}
-              </span>
-            ))}
+          <input
+            className={styles.searchInput}
+            type="search"
+            placeholder={t('searchPlaceholder')}
+            value={value.query}
+            onChange={(e) => update('query', e.target.value)}
+            aria-label={t('searchPlaceholder')}
+          />
+
+          {hasAnyActive && (
+            <button className={styles.clearLink} onClick={clearAll}>
+              {t('limpar')}
+            </button>
+          )}
+        </div>
+
+        {days.length > 0 && (
+          <div className={styles.dayTabs} role="tablist" aria-label={t('dia')}>
+            {days.map(({ label, date }, idx) => {
+              const d = new Date(date);
+              const dayNum = String(d.getUTCDate()).padStart(2, '0');
+              const isActive = value.day === date;
+              return (
+                <button
+                  key={date}
+                  role="tab"
+                  aria-selected={isActive}
+                  className={`${styles.dayTab} ${isActive ? styles.dayTabActive : ''}`}
+                  onClick={() => toggleDay(date)}
+                >
+                  <span className={styles.dayTabLabel}>D{idx + 1}</span>
+                  <span className={styles.dayTabDate}>{dayNum}</span>
+                  <span className={styles.dayTabDow}>{label}</span>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>
@@ -129,93 +148,92 @@ export default function BandFilters({ value, onChange, days, stages, genres }: P
           role="presentation"
         >
           <div
-            className={styles.bottomSheet}
+            className={styles.drawer}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             role="dialog"
             aria-modal="true"
           >
-            <div className={styles.sheetHandle} />
+            <div className={styles.grab} />
 
-            <div className={styles.sheetContent}>
-              <h2 className={styles.sectionTitle}>{t('dia')}</h2>
-              <div className={styles.chipRow}>
-                <button
-                  className={`${styles.pill} ${!value.day ? styles.pillActive : ''}`}
-                  onClick={() => update('day', null)}
-                >
-                  {t('todos')}
-                </button>
-                {days.map(({ label, date }) => (
+            <div className={styles.drawerContent}>
+              <div className={styles.sectionHead}>
+                <h4 className={styles.sectionTitle}>{t('palco')}</h4>
+                {value.stage.length > 0 && (
                   <button
-                    key={date}
-                    className={`${styles.pill} ${value.day === date ? styles.pillActive : ''}`}
-                    onClick={() => toggleDay(date)}
+                    className={styles.sectionClear}
+                    onClick={() => update('stage', [])}
                   >
-                    {label}
+                    {t('limpar')}
                   </button>
-                ))}
+                )}
+              </div>
+              <div className={styles.pillRow}>
+                {stages.map((stage) => {
+                  const on = value.stage.includes(stage);
+                  const color = stageColor(stage);
+                  return (
+                    <button
+                      key={stage}
+                      className={`${styles.stagePill} ${on ? styles.stagePillOn : ''}`}
+                      style={{ color: on ? '#fff' : color, background: on ? color : 'transparent' }}
+                      onClick={() => toggleStage(stage)}
+                      aria-pressed={on}
+                    >
+                      {stage}
+                    </button>
+                  );
+                })}
               </div>
 
-              <h2 className={styles.sectionTitle}>{t('palco')}</h2>
-              <div className={styles.stageRow}>
-                {stages.map((stage) => (
-                  <button
-                    key={stage}
-                    className={`${styles.pill} ${value.stage === stage ? styles.pillActive : ''}`}
-                    style={
-                      value.stage === stage
-                        ? { background: stageColor(stage), borderColor: 'transparent' }
-                        : {}
-                    }
-                    onClick={() => toggleStage(stage)}
+              {genres.length > 0 && (
+                <>
+                  <div className={styles.sectionHead}>
+                    <h4 className={styles.sectionTitle}>{t('genero')}</h4>
+                    {value.genre && (
+                      <button
+                        className={styles.sectionClear}
+                        onClick={() => update('genre', null)}
+                      >
+                        {t('limpar')}
+                      </button>
+                    )}
+                  </div>
+                  <select
+                    className={styles.genreSelect}
+                    value={value.genre ?? ''}
+                    onChange={(e) => update('genre', e.target.value || null)}
+                    aria-label={t('genero')}
                   >
-                    {stage}
-                  </button>
-                ))}
-              </div>
-
-              <div className={styles.advancedToggle}>
-                <button
-                  className={`${styles.advancedButton} ${showAdvanced ? styles.advancedActive : ''}`}
-                  onClick={() => setShowAdvanced(!showAdvanced)}
-                >
-                  {t('avancado')}
-                </button>
-              </div>
-
-              {showAdvanced && (
-                <div className={styles.advancedContent}>
-                  {genres.length > 0 && (
-                    <>
-                      <h2 className={styles.sectionTitle}>{t('genero')}</h2>
-                      <div className={styles.genreScroll}>
-                        {genres.map((genre) => (
-                          <button
-                            key={genre}
-                            className={`${styles.pill} ${value.genre === genre ? styles.pillActive : ''}`}
-                            onClick={() => toggleGenre(genre)}
-                          >
-                            {genre}
-                          </button>
-                        ))}
-                      </div>
-                    </>
-                  )}
-
-                  <h2 className={styles.sectionTitle}>{t('upcomingBands')}</h2>
-                  <button
-                    className={`${styles.pill} ${value.upcoming ? styles.pillActive : ''}`}
-                    onClick={() => update('upcoming', !value.upcoming)}
-                  >
-                    {t('upcomingBands')}
-                  </button>
-                </div>
+                    <option value="">{t('todosGeneros')}</option>
+                    {genres.map((genre) => (
+                      <option key={genre} value={genre}>{genre}</option>
+                    ))}
+                  </select>
+                </>
               )}
 
-              <button className={styles.applyBtn} onClick={() => setSheetOpen(false)}>
-                {t('verBandas')}
+              <div className={styles.sectionHead}>
+                <h4 className={styles.sectionTitle}>{t('upcomingBands')}</h4>
+              </div>
+              <button
+                className={`${styles.genrePill} ${value.upcoming ? styles.genrePillOn : ''}`}
+                onClick={() => update('upcoming', !value.upcoming)}
+                aria-pressed={value.upcoming}
+              >
+                {t('upcomingBands')}
               </button>
+
+              <div className={styles.drawerActions}>
+                {activeDrawerCount > 0 && (
+                  <button className={styles.resetBtn} onClick={clearDrawer}>
+                    {t('limpar')}
+                  </button>
+                )}
+                <button className={styles.applyBtn} onClick={() => setSheetOpen(false)}>
+                  {t('verBandasCount', { count: filteredCount })}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -225,19 +243,5 @@ export default function BandFilters({ value, onChange, days, stages, genres }: P
 }
 
 function FunnelIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      width={18}
-      height={18}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-    </svg>
-  );
+  return <Icon name="filter" size={16} />;
 }

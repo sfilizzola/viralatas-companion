@@ -49,6 +49,7 @@
   "registrationToggle": "Registro",
   "registrationEnabled": "Aberto",
   "registrationDisabled": "Fechado",
+  "registrationLoading": "Atualizando...",
   "registrationToggleError": "Erro ao atualizar. Tente de novo.",
   "metalPlaceTitle": "🍺 Metal Place",
   "metalPlaceFestivalDay": "Dia do festival (1-4)",
@@ -90,5 +91,7 @@
   "timeTravelChip_post": "Dia após o festival (02/08)",
   "registeredUsers": "Usuários cadastrados",
   "registeredUsersLoading": "Carregando usuários...",
-  "registeredUsersEmpty": "Nenhum usuário encontrado"
+  "registeredUsersEmpty": "Nenhum usuário encontrado",
+  "patches": "PATCHES",
+  "editProfile": "EDITAR PERFIL"
 }

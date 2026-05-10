@@ -8,13 +8,18 @@
   "loading": "Carregando mural...",
   "delete": "Apagar",
   "deleteConfirm": "Apagar este recado?",
-  "justNow": "agora mesmo",
-  "minutesAgo": "há {n} min",
-  "hoursAgo": "há {n}h",
-  "daysAgo": "há {n}d",
+  "justNow": "agora",
+  "minutesAgo": "{n} min",
+  "hoursAgo": "{n}h",
   "anonymous": "Vira-lata",
   "block": "Bloquear",
   "blockingUser": "Bloqueando...",
   "userBlocked": "Usuário bloqueado",
-  "blocked": "Você já falou demais por hoje, meu amigo... 🤘"
+  "blocked": "Você já falou demais por hoje, meu amigo... 🤘",
+  "role_normal": "Vira-latas",
+  "role_manager": "Manager",
+  "role_godlike": "Godlike",
+  "pendingSync": "Sync pendente",
+  "blockedDone": "Bloqueado",
+  "blockAction": "Bloquear"
 }
