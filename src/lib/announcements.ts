@@ -118,14 +118,14 @@ export async function fetchBlockedPosters(): Promise<BlockedPoster[]> {
   return (data as BlockedPoster[]) ?? [];
 }
 
-export async function fetchBlockedPostersWithUserDetails(): Promise<Array<BlockedPoster & { user_email: string; user_display_name: string | null; user_avatar_url: string | null }>> {
+export async function fetchBlockedPostersWithUserDetails(): Promise<Array<BlockedPoster & { user_email: string; user_display_name: string | null; user_avatar_url: string | null; user_special_badges: string[] }>> {
   const blocked = await fetchBlockedPosters();
   if (blocked.length === 0) return [];
 
   const { data: users } = await supabase
     .from('users')
-    .select('id, email, display_name, avatar_url')
-    .in('id', blocked.map(b => b.user_id));
+    .select('id, email, display_name, avatar_url, special_badges')
+    .in('id', blocked.map(b => b.user_id)) as { data: Array<{ id: string; email: string; display_name: string | null; avatar_url: string | null; special_badges: string[] }> | null };
 
   const userMap = new Map((users || []).map(u => [u.id, u]));
 
@@ -134,6 +134,7 @@ export async function fetchBlockedPostersWithUserDetails(): Promise<Array<Blocke
     user_email: userMap.get(b.user_id)?.email || 'unknown',
     user_display_name: userMap.get(b.user_id)?.display_name || null,
     user_avatar_url: userMap.get(b.user_id)?.avatar_url || null,
+    user_special_badges: userMap.get(b.user_id)?.special_badges ?? [],
   }));
 }
 
@@ -160,6 +161,6 @@ export async function fetchAllUsers(): Promise<
   const { data } = await supabase
     .from('users')
     .select('id, email, display_name, avatar_url, role, special_badges')
-    .order('display_name');
+    .order('display_name') as { data: Array<{ id: string; email: string; display_name: string | null; avatar_url: string | null; role: string; special_badges: string[] }> | null };
   return (data ?? []).map((u) => ({ ...u, special_badges: u.special_badges ?? [] }));
 }
