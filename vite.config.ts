@@ -2,25 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// Get build version: timestamp in hex for compact, monotonically increasing identifier.
-// Hex format is smaller than decimal and can be converted back:
-//   1746993000 (decimal) = 6797c5a8 (hex)
-// To decode: parseInt('6797c5a8', 16) = 1746993000 (seconds since unix epoch)
-const getPatch = (): string => {
-  // Use current timestamp in seconds, convert to hex for compact representation
-  const timestampSeconds = Math.floor(Date.now() / 1000);
-  const hexPatch = timestampSeconds.toString(16);
-  console.log(`[vite-config] Build timestamp: ${timestampSeconds} (hex: ${hexPatch})`);
-  return hexPatch;
-};
-
-const commitCount = getPatch();
-console.log(`[vite-config] Final PATCH version: ${commitCount}`);
-
 export default defineConfig({
-  define: {
-    'import.meta.env.VITE_COMMIT_COUNT': JSON.stringify(commitCount),
-  },
   plugins: [
     react(),
     VitePWA({
