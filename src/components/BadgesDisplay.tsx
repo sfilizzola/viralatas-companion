@@ -28,7 +28,7 @@ const EMPTY_CTX: BadgeContext = {
   locationVisits: {},
   currentLocation: null,
   crewLocationCounts: {},
-  crewEarnedBadgeSlugs: new Set(),
+  achievedBadgeSlugs: new Set(),
 };
 
 type BadgesDisplayProps = {
@@ -54,7 +54,7 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
         loadAllUserPicks(),
         loadBands(),
         loadAllMissed(),
-        supabase.from('users').select('special_badges, location_visits, crew_earned_badge_slugs').eq('id', user.id).single(),
+        supabase.from('users').select('special_badges, location_visits, achieved_badge_slugs').eq('id', user.id).single(),
         loadAllUserPresence(),
       ]);
       if (!active) return;
@@ -87,8 +87,8 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       };
 
       const locationVisits = (user.user_metadata?.location_visits as Record<string, number>) ?? {};
-      const crewEarnedBadgeSlugs = new Set<string>(
-        (user.user_metadata?.crew_earned_badge_slugs as string[]) ?? []
+      const achievedBadgeSlugs = new Set<string>(
+        (user.user_metadata?.achieved_badge_slugs as string[]) ?? []
       );
 
       const newCtx = buildBadgeContext(
@@ -102,27 +102,22 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
         locationVisits,
         currentLocation,
         crewLocationCounts,
-        crewEarnedBadgeSlugs,
+        achievedBadgeSlugs,
       );
 
-      // Write-back for newly earned crew location badges
+      // Write-back for any newly earned persist:true badge
       const earnedBadges = BADGES.filter((b) => evaluateBadge(b, newCtx));
-      const newlyCrowdEarned = earnedBadges
-        .filter(
-          (b) =>
-            b.condition.type === 'crew_at_location_min' &&
-            !crewEarnedBadgeSlugs.has(b.slug),
-        )
+      const newlyAchieved = earnedBadges
+        .filter((b) => b.persist && !achievedBadgeSlugs.has(b.slug))
         .map((b) => b.slug);
 
-      if (newlyCrowdEarned.length > 0) {
-        const updatedSlugs = [
-          ...(user.user_metadata?.crew_earned_badge_slugs ?? []),
-          ...newlyCrowdEarned,
-        ];
+      if (newlyAchieved.length > 0) {
         supabase.auth.updateUser({
           data: {
-            crew_earned_badge_slugs: updatedSlugs,
+            achieved_badge_slugs: [
+              ...(user.user_metadata?.achieved_badge_slugs ?? []),
+              ...newlyAchieved,
+            ],
           },
         }).catch(() => {
           // Silently ignore — badge earning is best-effort

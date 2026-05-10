@@ -47,6 +47,11 @@ export type BadgeConfig = {
   descriptionKey: string;
   condition: BadgeCondition;
   year?: number; // Historical Wacken year chip (e.g. 2025 → "'25"). Omit for non-historical badges.
+  // When true, the slug is stored permanently in user_metadata.achieved_badge_slugs the first time
+  // this badge is earned. Future loads show the badge even if the underlying condition no longer holds
+  // (e.g. user removes picks, changes location, crew count drops).
+  // Leave unset/false for conditional badges that reflect current state (country, active picks, etc.)
+  persist?: boolean;
 };
 
 export type BadgeContext = {
@@ -62,7 +67,7 @@ export type BadgeContext = {
   locationVisits: Record<string, number>;
   currentLocation: string | null;
   crewLocationCounts: Record<string, number>;
-  crewEarnedBadgeSlugs: Set<string>;
+  achievedBadgeSlugs: Set<string>; // persist:true badges already recorded in user_metadata
 };
 
 // Festival-local (CEST = UTC+2) hour for `bands_picked_before_hour_min`.
@@ -85,7 +90,7 @@ export function buildBadgeContext(
   locationVisits: Record<string, number> = {},
   currentLocation: string | null = null,
   crewLocationCounts: Record<string, number> = {},
-  crewEarnedBadgeSlugs: Set<string> = new Set(),
+  achievedBadgeSlugs: Set<string> = new Set(),
 ): BadgeContext {
   const meta = user.user_metadata;
   const maxAttendance = userPickBandIds.reduce(
@@ -111,11 +116,14 @@ export function buildBadgeContext(
     locationVisits,
     currentLocation,
     crewLocationCounts,
-    crewEarnedBadgeSlugs,
+    achievedBadgeSlugs,
   };
 }
 
 export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
+  // Persist badges: once recorded in the user's profile, always shown regardless of current state.
+  if (badge.persist && ctx.achievedBadgeSlugs.has(badge.slug)) return true;
+
   const { condition } = badge;
   switch (condition.type) {
     case 'wacken_years_exactly':
@@ -169,7 +177,6 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
     case 'location_visit_count_min':
       return (ctx.locationVisits[condition.location] ?? 0) >= condition.count;
     case 'crew_at_location_min':
-      if (ctx.crewEarnedBadgeSlugs.has(badge.slug)) return true;
       return (
         ctx.currentLocation === condition.location &&
         (ctx.crewLocationCounts[condition.location] ?? 0) >= condition.count
@@ -284,6 +291,7 @@ export const BADGES: BadgeConfig[] = [
     descriptionKey: 'badgeEarlyBirdDescription',
     // Early bird: arrived Sunday or Monday (before Wacken Day 1 on Wednesday)
     condition: { type: 'wacken_arrived_before', day: 'tue-jul28' },
+    persist: true,
   },
   // Joke badges — assigned manually by godlike via the assign-badge Edge Function
   {
@@ -301,6 +309,7 @@ export const BADGES: BadgeConfig[] = [
     descriptionKey: 'badgeMetalPlace2026Description',
     condition: { type: 'location_visit_count_min', location: 'metal_place', count: 1 },
     year: 2026,
+    persist: true,
   },
   // Crew at location badges
   {
@@ -310,6 +319,7 @@ export const BADGES: BadgeConfig[] = [
     descriptionKey: 'badgeCampingMobDescription',
     condition: { type: 'crew_at_location_min', location: 'camping', count: 10 },
     year: 2026,
+    persist: true,
   },
   {
     slug: 'lost-together',
@@ -318,37 +328,150 @@ export const BADGES: BadgeConfig[] = [
     descriptionKey: 'badgeLostTogetherDescription',
     condition: { type: 'crew_at_location_min', location: 'lost', count: 5 },
     year: 2026,
+    persist: true,
   },
 ];
 
 // ─── CONDITION EXAMPLES ───────────────────────────────────────────────────────
+// Reference for all available condition types. Copy any example into BADGES[] above.
+// Add `persist: true` when the badge should be recorded permanently once earned —
+// the user's profile retains it even if the underlying data later changes.
+// Omit `persist` (or set false) for badges that reflect live/current state.
+//
+// ── WACKEN HISTORY ────────────────────────────────────────────────────────────
+//
+// wacken_years_exactly
+//   User attended ONLY the listed years (no other editions allowed).
+//   Example: first-timer badge, cannot have any prior year
+//   { slug: 'first-timer', condition: { type: 'wacken_years_exactly', years: [2026] } }
+//
+// wacken_years_includes
+//   User attended ALL listed years (may have attended others too).
+//   Example: survived both notorious mud years
+//   { slug: 'mud-survivor', condition: { type: 'wacken_years_includes', years: [2023, 2025] } }
+//
+// wacken_years_count_min
+//   User has attended at least N editions total.
+//   Example: veteran after 5+ Wackens
+//   { slug: 'veteran', condition: { type: 'wacken_years_count_min', count: 5 } }
+//
+// wacken_attended_in_year
+//   User attended a specific edition — useful for anniversary badges.
+//   Example: 10-year anniversary for those who were at Wacken 2016
+//   { slug: 'decade-club', condition: { type: 'wacken_attended_in_year', year: 2016 } }
+//
+// ── PROFILE ATTRIBUTES ────────────────────────────────────────────────────────
+//
+// country_is
+//   User's registered country matches the given ISO code.
+//   Example: Brazilian flag badge
+//   { slug: 'pais-tropical', condition: { type: 'country_is', country: 'br' } }
+//
+// ── ARRIVAL ───────────────────────────────────────────────────────────────────
+//
+// wacken_arrived_before
+//   User's arrival day sorts before the given day in the camping-open order:
+//   sun-jul26 → mon-jul27 → tue-jul28 → wed-jul29 → thu-plus
+//   Example: arrived Sunday or Monday (before Tuesday)
+//   { slug: 'early-bird', condition: { type: 'wacken_arrived_before', day: 'tue-jul28' } }
+//
+// ── BAND PICKS ────────────────────────────────────────────────────────────────
+//
+// bands_picked_min
+//   User has picked at least N bands in total.
+//   Example: picked 10 bands
+//   { slug: 'collector', condition: { type: 'bands_picked_min', count: 10 } }
+//
+// band_attendance_min
+//   At least one of the user's picks has N+ crew also attending it.
+//   Example: share a pick with 10+ crew members
+//   { slug: 'pack-member', condition: { type: 'band_attendance_min', count: 10 } }
+//
+// bands_picked_genre_min
+//   User picked N+ bands in a specific genre. Genre must match exactly.
+//   Example: dedicated thrash fan with 5+ thrash picks
+//   { slug: 'thrasher', condition: { type: 'bands_picked_genre_min', genre: 'Thrash Metal', count: 5 } }
+//
+// bands_picked_stage_min
+//   User picked N+ bands on a specific stage. Stage name must match exactly.
+//   Example: loyal Faster stage follower
+//   { slug: 'faster-fanatic', condition: { type: 'bands_picked_stage_min', stage: 'Faster', count: 8 } }
+//
+// bands_picked_before_hour_min
+//   User picked N+ bands whose CEST start time is before the given hour (0–23).
+//   Example: morning warrior — 3+ bands starting before 14:00 CEST
+//   { slug: 'morning-warrior', condition: { type: 'bands_picked_before_hour_min', hour: 14, count: 3 } }
+//
+// bands_picked_after_hour_min
+//   User picked N+ bands whose CEST start time is at or after the given hour.
+//   Example: night owl — 3+ bands starting at or after 22:00 CEST
+//   { slug: 'night-owl', condition: { type: 'bands_picked_after_hour_min', hour: 22, count: 3 } }
+//
+// band_picked_named
+//   User picked a band with this exact name (case-sensitive).
+//   Example: picked the headliner
+//   { slug: 'headliner-fan', condition: { type: 'band_picked_named', name: 'Rammstein' } }
+//
+// ── BANDS SEEN (POST-END_TIME, MINUS OPT-OUTS) ───────────────────────────────
+//
+// bands_seen_min
+//   User is credited with having seen at least N bands (pick ended, not opted out via "didn't see").
+//   Example: saw 5 or more bands
+//   { slug: 'spectator', condition: { type: 'bands_seen_min', count: 5 } }
+//
+// bands_seen_genre_min
+//   Seen N+ bands in a specific genre.
+//   Example: confirmed death metal fan
+//   { slug: 'death-head', condition: { type: 'bands_seen_genre_min', genre: 'Death Metal', count: 3 } }
+//
+// bands_seen_stage_min
+//   Seen N+ bands on a specific stage.
+//   Example: Headbangers devotee
+//   { slug: 'headbangers-regular', condition: { type: 'bands_seen_stage_min', stage: 'Headbangers', count: 4 } }
+//
+// bands_seen_before_hour_min
+//   Seen N+ bands whose CEST start time is before the given hour.
+//   Example: 2+ early-afternoon bands seen
+//   { slug: 'early-doors', condition: { type: 'bands_seen_before_hour_min', hour: 14, count: 2 } }
+//
+// bands_seen_after_hour_min
+//   Seen N+ bands whose CEST start time is at or after the given hour.
+//   Example: survived until after midnight (2+ bands)
+//   { slug: 'midnight-survivor', condition: { type: 'bands_seen_after_hour_min', hour: 23, count: 2 } }
+//
+// band_seen_named
+//   User is credited with seeing a specific band (exact name match).
+//   Example: saw the legendary headliner
+//   { slug: 'rammstein-witness', condition: { type: 'band_seen_named', name: 'Rammstein' } }
+//
+// ── LOCATION PRESENCE ─────────────────────────────────────────────────────────
 //
 // location_visit_count_min
-//   Badge earned when user has toggled into a location at least N times.
+//   Badge earned when user has checked into a location at least N times.
 //   The counter persists in user_metadata.location_visits — permanent.
-//   Example: give badge for first Metal Place visit
-//   { slug: 'first-metal-place', condition: { type: 'location_visit_count_min', location: 'metal_place', count: 1 } }
-//   Example: badge for checking into camping 3 separate times
+//   Locations: 'camping' | 'metal_place' | 'lost'
+//   Example: visited Metal Place at least once
+//   { slug: 'metal-place-2026', condition: { type: 'location_visit_count_min', location: 'metal_place', count: 1 } }
+//   Example: camped at least 3 separate times during the festival
 //   { slug: 'tent-rat', condition: { type: 'location_visit_count_min', location: 'camping', count: 3 } }
 //
 // crew_at_location_min
-//   Badge earned when user is at a location AND N+ crew members are there too.
-//   Once earned it stays forever (slug stored in user_metadata.crew_earned_badge_slugs).
-//   Example: 10+ crew in camping at the same moment
+//   Earned when user is at a location AND N+ crew members are there at the same time.
+//   Permanent once earned (slug stored in user_metadata.crew_earned_badge_slugs).
+//   Locations: 'camping' | 'lost'
+//   Example: 10+ crew in camping simultaneously
 //   { slug: 'camping-mob', condition: { type: 'crew_at_location_min', location: 'camping', count: 10 } }
-//   Example: 5+ lost souls simultaneously
+//   Example: 5+ lost souls at once
 //   { slug: 'lost-together', condition: { type: 'crew_at_location_min', location: 'lost', count: 5 } }
 //
-// bands_picked_after_hour_min / bands_seen_after_hour_min
-//   Mirror of the `before` variants — counts bands whose CEST start_time >= hour.
-//   Example: picked at least 3 bands starting at or after 22:00 CEST
-//   { slug: 'night-owl', condition: { type: 'bands_picked_after_hour_min', hour: 22, count: 3 } }
-//   Example: actually saw 2 bands starting after midnight (hour: 0 wraps to next day)
-//   { slug: 'midnight-survivor', condition: { type: 'bands_seen_after_hour_min', hour: 0, count: 2 } }
+// ── ASSIGNED (GODLIKE ONLY) ───────────────────────────────────────────────────
 //
-// bands_picked_before_hour_min / bands_seen_before_hour_min  (existing)
-//   Example: picked 5 bands starting before 14:00 CEST
-//   { slug: 'early-riser', condition: { type: 'bands_picked_before_hour_min', hour: 14, count: 5 } }
+// assigned
+//   Badge has no automatic condition — godlike assigns it manually via the assign-badge Edge Function.
+//   The badge slug must appear in the user's users.special_badges array.
+//   Example: honorary inside-joke badge
+//   { slug: 'cao-caramelo', condition: { type: 'assigned' } }
+//
 // ─────────────────────────────────────────────────────────────────────────────
 
 export function getEarnedBadges(ctx: BadgeContext): BadgeConfig[] {

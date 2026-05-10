@@ -421,7 +421,7 @@ describe('evaluateBadge — crew_at_location_min', () => {
     expect(evaluateBadge(cfg, ctx)).toBe(false);
   });
 
-  it('returns true when badge slug is in crewEarnedBadgeSlugs regardless of count', () => {
+  it('returns true via persist flag when slug is in achievedBadgeSlugs regardless of count', () => {
     const ctx = buildBadgeContext(
       authUser(),
       [],
@@ -435,7 +435,7 @@ describe('evaluateBadge — crew_at_location_min', () => {
       { camping: 1, lost: 1 }, // crew count very low
       new Set(['camping-mob']), // but badge was already earned
     );
-    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 10 }), slug: 'camping-mob' };
+    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 10 }), slug: 'camping-mob', persist: true };
     expect(evaluateBadge(cfg, ctx)).toBe(true);
   });
 
@@ -454,6 +454,51 @@ describe('evaluateBadge — crew_at_location_min', () => {
       new Set(),
     );
     const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 10 }), slug: 'camping-mob' };
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+});
+
+describe('persist flag — generic achievement recording', () => {
+  it('returns true for any condition type when persist:true and slug is in achievedBadgeSlugs', () => {
+    // Condition would be false (no picks), but badge was previously earned and recorded
+    const ctx = buildBadgeContext(
+      authUser({ country: 'de' }), // country is de, not br
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      null,
+      {},
+      new Set(['pais-tropical']), // recorded from when user had country: br
+    );
+    const cfg = { ...badge({ type: 'country_is', country: 'br' }), slug: 'pais-tropical', persist: true };
+    expect(evaluateBadge(cfg, ctx)).toBe(true);
+  });
+
+  it('returns false when persist:true but slug not yet in achievedBadgeSlugs and condition not met', () => {
+    const ctx = buildBadgeContext(authUser({ country: 'de' }), [], new Map(), new Map());
+    const cfg = { ...badge({ type: 'country_is', country: 'br' }), slug: 'pais-tropical', persist: true };
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+
+  it('without persist flag, slug in achievedBadgeSlugs has no effect', () => {
+    const ctx = buildBadgeContext(
+      authUser({ country: 'de' }),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      null,
+      {},
+      new Set(['pais-tropical']),
+    );
+    const cfg = badge({ type: 'country_is', country: 'br' }); // no persist
     expect(evaluateBadge(cfg, ctx)).toBe(false);
   });
 });
