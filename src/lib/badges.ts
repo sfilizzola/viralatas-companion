@@ -29,7 +29,9 @@ export type BadgeCondition =
   | { type: 'bands_seen_before_hour_min'; hour: number; count: number }
   | { type: 'band_seen_named'; name: string }
   // Arrival day: earned when arrival day sorts before condition.day
-  | { type: 'wacken_arrived_before'; day: string };
+  | { type: 'wacken_arrived_before'; day: string }
+  // Assigned: godlike manually assigns this badge slug via the assign-badge Edge Function
+  | { type: 'assigned' };
 
 export type BadgeConfig = {
   slug: string;
@@ -44,6 +46,7 @@ export type BadgeContext = {
   wacken_years: number[];
   country: string | null;
   wacken_arrival_day: string | null;
+  assignedBadges: string[];
   bandsPicked: number;
   maxAttendanceInPicks: number;
   pickedBands: BadgeBand[];
@@ -67,6 +70,7 @@ export function buildBadgeContext(
   bandsById: Map<string, BadgeBand>,
   missedBandIds: Set<string> = new Set(),
   now: Date = new Date(),
+  assignedBadges: string[] = [],
 ): BadgeContext {
   const meta = user.user_metadata;
   const maxAttendance = userPickBandIds.reduce(
@@ -83,6 +87,7 @@ export function buildBadgeContext(
     wacken_years: Array.isArray(meta?.['wacken_years']) ? (meta['wacken_years'] as number[]) : [],
     country: (meta?.['country'] as string | undefined) ?? null,
     wacken_arrival_day: (meta?.['wacken_arrival_day'] as string | undefined) ?? null,
+    assignedBadges,
     bandsPicked: userPickBandIds.length,
     maxAttendanceInPicks: maxAttendance,
     pickedBands,
@@ -142,6 +147,8 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
       const conditionIndex = arrivalDayOrder.indexOf(condition.day);
       return userIndex >= 0 && userIndex < conditionIndex;
     }
+    case 'assigned':
+      return ctx.assignedBadges.includes(badge.slug);
   }
 }
 
@@ -240,6 +247,14 @@ export const BADGES: BadgeConfig[] = [
     descriptionKey: 'badgeEarlyBirdDescription',
     // Early bird: arrived Sunday or Monday (before Wacken Day 1 on Wednesday)
     condition: { type: 'wacken_arrived_before', day: 'tue-jul28' },
+  },
+  // Joke badges — assigned manually by godlike via the assign-badge Edge Function
+  {
+    slug: 'cao-caramelo',
+    imagePath: '/badges/badge_cao-caramelo.png',
+    labelKey: 'badgeCaoCaramelo',
+    descriptionKey: 'badgeCaoCarameloDescription',
+    condition: { type: 'assigned' },
   },
 ];
 

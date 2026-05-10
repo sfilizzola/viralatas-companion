@@ -1216,6 +1216,95 @@
   opacity: 0.7;
 }
 
+.assignedBadgeChip {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: rgba(142, 68, 173, 0.15);
+  border: 1px solid rgba(142, 68, 173, 0.4);
+  color: #bb8fce;
+  white-space: nowrap;
+}
+
+.assignBadgeSection {
+  margin-top: 12px;
+}
+
+.assignBadgeSectionLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.assignBadgeGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.assignBadgeOption {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px;
+  border-radius: var(--r-1);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  min-width: 64px;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.assignBadgeOption:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--bg-surface);
+}
+
+.assignBadgeOption:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.assignBadgeOptionOwned {
+  border-color: rgba(142, 68, 173, 0.5);
+  background: rgba(142, 68, 173, 0.08);
+  color: #bb8fce;
+}
+
+.assignBadgeOptionRevoke {
+  border-color: rgba(192, 57, 43, 0.4);
+  background: rgba(192, 57, 43, 0.08);
+  color: var(--accent-hover);
+  position: relative;
+}
+
+.assignBadgeImg {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.revokeX {
+  font-size: 10px;
+  color: var(--accent);
+}
+
 .spinner {
   display: inline-block;
   animation: spin 0.6s linear infinite;

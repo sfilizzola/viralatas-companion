@@ -11,6 +11,7 @@ import {
 import { loadUserPicks, loadAllUserPicks, loadBands, PICKS_CHANGED_EVENT, MISSED_CHANGED_EVENT } from '../lib/db';
 import { loadAllMissed } from '../lib/missed';
 import { now } from '../lib/time';
+import { supabase } from '../lib/supabase';
 import { useI18n } from '../lib/i18n';
 import styles from './BadgesDisplay.module.css';
 
@@ -18,6 +19,7 @@ const EMPTY_CTX: BadgeContext = {
   wacken_years: [],
   country: null,
   wacken_arrival_day: null,
+  assignedBadges: [],
   bandsPicked: 0,
   maxAttendanceInPicks: 0,
   pickedBands: [],
@@ -43,11 +45,12 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
     let active = true;
 
     async function refresh() {
-      const [userPicks, allPicks, bands, allMissed] = await Promise.all([
+      const [userPicks, allPicks, bands, allMissed, userRow] = await Promise.all([
         loadUserPicks(user.id),
         loadAllUserPicks(),
         loadBands(),
         loadAllMissed(),
+        supabase.from('users').select('special_badges').eq('id', user.id).single(),
       ]);
       if (!active) return;
       const userPickBandIds = userPicks.map((p) => p.band_id);
@@ -59,7 +62,8 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       const userMissedIds = new Set(
         allMissed.filter((m) => m.user_id === user.id).map((m) => m.band_id),
       );
-      setCtx(buildBadgeContext(user, userPickBandIds, allPickCounts, bandsById, userMissedIds, now()));
+      const assignedBadges: string[] = (userRow.data as { special_badges?: string[] } | null)?.special_badges ?? [];
+      setCtx(buildBadgeContext(user, userPickBandIds, allPickCounts, bandsById, userMissedIds, now(), assignedBadges));
     }
 
     refresh();

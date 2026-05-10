@@ -25,6 +25,7 @@ import {
   setTimeOverride,
   TIME_OVERRIDE_CHANGED_EVENT,
 } from '../lib/time';
+import { BADGES } from '../lib/badges';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
@@ -653,6 +654,7 @@ type UserWithLoading = {
   display_name: string | null;
   avatar_url: string | null;
   role: string;
+  special_badges: string[];
   loading?: boolean;
   error?: string;
 };
@@ -684,6 +686,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   const [liveBandTestEnabled, setLiveBandTestEnabled] = useState(false);
   const [liveBandTestActiveBandId, setLiveBandTestActiveBandId] = useState<string | null>(null);
   const [bandsByPopularity, setBandsByPopularity] = useState<Array<Band & { pickCount: number }>>([]);
+  const [assignModalUser, setAssignModalUser] = useState<UserWithLoading | null>(null);
 
   useEffect(() => {
     async function loadRole() {
@@ -701,7 +704,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
           fetchAllUsers(),
           fetchBlockedPostersWithUserDetails(),
         ]);
-        setAllUsers(users as UserWithLoading[]);
+        setAllUsers(users.map((u) => ({ ...u, special_badges: u.special_badges ?? [] })) as UserWithLoading[]);
         setBlockedPosters(blocked.map(b => ({ user_id: b.user_id })));
       } catch (error) {
         console.error('Failed to load users:', error);
@@ -909,6 +912,25 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
       }
     },
     [t],
+  );
+
+  const handleBadgeAssign = useCallback(
+    async (targetUserId: string, badgeSlug: string, action: 'assign' | 'revoke') => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke('assign-badge', {
+        body: { targetUserId, badgeSlug, action },
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      if (res.error) throw res.error;
+      const updated: string[] = (res.data as { special_badges: string[] }).special_badges;
+      setAllUsers((prev) =>
+        prev.map((u) => (u.id === targetUserId ? { ...u, special_badges: updated } : u)),
+      );
+      if (assignModalUser?.id === targetUserId) {
+        setAssignModalUser((prev) => prev ? { ...prev, special_badges: updated } : prev);
+      }
+    },
+    [assignModalUser],
   );
 
   if (loading || userRole !== 'godlike') {
@@ -1235,6 +1257,20 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                       {roleLabel(user.role)}
                     </div>
 
+                    {user.special_badges.length > 0 && (
+                      <span className={styles.assignedBadgeChip}>
+                        {t('assignedBadgeCount', { count: user.special_badges.length })}
+                      </span>
+                    )}
+
+                    <button
+                      className={`${styles.userActionButton} ${styles.secondaryAction}`}
+                      onClick={() => setAssignModalUser(user)}
+                      type="button"
+                    >
+                      {t('assignBadgeBtn')}
+                    </button>
+
                     {user.role !== 'godlike' && (
                       <button
                         className={`${styles.userActionButton} ${
@@ -1281,6 +1317,107 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
             </div>
           </div>
         </div>
+      </div>
+
+      {assignModalUser && (
+        <AssignBadgeModal
+          targetUser={assignModalUser}
+          onAssign={handleBadgeAssign}
+          onClose={() => setAssignModalUser(null)}
+          t={t}
+        />
+      )}
+    </div>
+  );
+}
+
+type AssignBadgeModalProps = {
+  targetUser: UserWithLoading;
+  onAssign: (targetUserId: string, badgeSlug: string, action: 'assign' | 'revoke') => Promise<void>;
+  onClose: () => void;
+  t: (key: string, values?: Record<string, string | number>) => string;
+};
+
+const ASSIGNABLE_BADGES = BADGES.filter((b) => b.condition.type === 'assigned');
+
+function AssignBadgeModal({ targetUser, onAssign, onClose, t }: AssignBadgeModalProps) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { t: tBadges } = useI18n('Badges');
+  const name = targetUser.display_name || targetUser.email;
+
+  async function doAction(slug: string, action: 'assign' | 'revoke') {
+    setBusy(true);
+    setError(null);
+    try {
+      await onAssign(targetUser.id, slug, action);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('assignBadgeError'));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className={styles.conflictModal} onClick={onClose} role="dialog" aria-modal="true">
+      <div className={styles.conflictModalContent} onClick={(e) => e.stopPropagation()}>
+        <h3 className={styles.conflictModalTitle}>{t('assignBadgeModalTitle', { name })}</h3>
+
+        {error && <p className={styles.userRowError}>{error}</p>}
+
+        <div className={styles.assignBadgeSection}>
+          <p className={styles.assignBadgeSectionLabel}>{t('assignBadgeAssignSection')}</p>
+          <div className={styles.assignBadgeGrid}>
+            {ASSIGNABLE_BADGES.map((badge) => {
+              const alreadyHas = targetUser.special_badges.includes(badge.slug);
+              return (
+                <button
+                  key={badge.slug}
+                  className={`${styles.assignBadgeOption} ${alreadyHas ? styles.assignBadgeOptionOwned : ''}`}
+                  onClick={() => !alreadyHas && doAction(badge.slug, 'assign')}
+                  disabled={busy || alreadyHas}
+                  type="button"
+                  title={tBadges(badge.descriptionKey)}
+                >
+                  <img src={badge.imagePath} alt="" className={styles.assignBadgeImg} />
+                  <span>{tBadges(badge.labelKey)}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {targetUser.special_badges.length > 0 && (
+          <div className={styles.assignBadgeSection}>
+            <p className={styles.assignBadgeSectionLabel}>{t('assignBadgeRevokeSection')}</p>
+            <div className={styles.assignBadgeGrid}>
+              {targetUser.special_badges.map((slug) => {
+                const cfg = BADGES.find((b) => b.slug === slug);
+                return (
+                  <button
+                    key={slug}
+                    className={`${styles.assignBadgeOption} ${styles.assignBadgeOptionRevoke}`}
+                    onClick={() => doAction(slug, 'revoke')}
+                    disabled={busy}
+                    type="button"
+                  >
+                    {cfg && <img src={cfg.imagePath} alt="" className={styles.assignBadgeImg} />}
+                    <span>{cfg ? tBadges(cfg.labelKey) : slug}</span>
+                    <span className={styles.revokeX}>✕</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        <button
+          className={`${styles.conflictButton} ${styles.conflictCloseButton}`}
+          onClick={onClose}
+          type="button"
+        >
+          {t('close')}
+        </button>
       </div>
     </div>
   );

@@ -256,3 +256,56 @@ describe('evaluateBadge — wacken_attended_in_year', () => {
     expect(evaluateBadge(badge({ type: 'wacken_attended_in_year', year: 2026 }), ctx)).toBe(false);
   });
 });
+
+describe('evaluateBadge — assigned (Phase 11.E)', () => {
+  it('returns true when badge slug is in assignedBadges', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      ['cao-caramelo', 'some-other'],
+    );
+    const b = badge({ type: 'assigned' });
+    const cfg = { ...b, slug: 'cao-caramelo' };
+    expect(evaluateBadge(cfg, ctx)).toBe(true);
+  });
+
+  it('returns false when badge slug is not in assignedBadges', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      ['some-other'],
+    );
+    const b = badge({ type: 'assigned' });
+    const cfg = { ...b, slug: 'cao-caramelo' };
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+
+  it('returns false when assignedBadges is empty', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+    );
+    const cfg = { ...badge({ type: 'assigned' }), slug: 'cao-caramelo' };
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+
+  it('defaults to empty assignedBadges when not provided', () => {
+    const ctx = buildBadgeContext(authUser(), [], new Map(), new Map());
+    expect(ctx.assignedBadges).toEqual([]);
+    const cfg = { ...badge({ type: 'assigned' }), slug: 'any-slug' };
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+});

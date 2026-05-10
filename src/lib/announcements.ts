@@ -155,11 +155,11 @@ export async function setUserRole(
 }
 
 export async function fetchAllUsers(): Promise<
-  { id: string; email: string; display_name: string | null; avatar_url: string | null; role: string }[]
+  { id: string; email: string; display_name: string | null; avatar_url: string | null; role: string; special_badges: string[] }[]
 > {
   const { data } = await supabase
     .from('users')
-    .select('id, email, display_name, avatar_url, role')
+    .select('id, email, display_name, avatar_url, role, special_badges')
     .order('display_name');
-  return data ?? [];
+  return (data ?? []).map((u) => ({ ...u, special_badges: u.special_badges ?? [] }));
 }

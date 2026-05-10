@@ -99,5 +99,11 @@
   "arrivalDayMonJul27": "Monday, Jul 27",
   "arrivalDayTueJul28": "Tuesday, Jul 28",
   "arrivalDayWedJul29": "Wednesday, Jul 29 (Day 1)",
-  "arrivalDayThuPlus": "Thursday or later"
+  "arrivalDayThuPlus": "Thursday or later",
+  "assignBadgeBtn": "Assign patch",
+  "assignedBadgeCount": "{count} patch(es)",
+  "assignBadgeModalTitle": "Assign patch to {name}",
+  "assignBadgeAssignSection": "Assign",
+  "assignBadgeRevokeSection": "Revoke",
+  "assignBadgeError": "Failed to assign patch. Try again."
 }
