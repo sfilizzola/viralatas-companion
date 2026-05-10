@@ -30,6 +30,13 @@ export type BadgeCondition =
   | { type: 'band_seen_named'; name: string }
   // Arrival day: earned when arrival day sorts before condition.day
   | { type: 'wacken_arrived_before'; day: string }
+  // Location visit count: earned when user has toggled into a location N+ times
+  | { type: 'location_visit_count_min'; location: 'camping' | 'metal_place' | 'lost'; count: number }
+  // Crew at location: earned when user is at a location AND N+ crew are there; permanent once earned
+  | { type: 'crew_at_location_min'; location: 'camping' | 'lost'; count: number }
+  // Time-based: count bands whose CEST start_time >= hour (symmetric to `before` variants)
+  | { type: 'bands_picked_after_hour_min'; hour: number; count: number }
+  | { type: 'bands_seen_after_hour_min'; hour: number; count: number }
   // Assigned: godlike manually assigns this badge slug via the assign-badge Edge Function
   | { type: 'assigned' };
 
@@ -52,6 +59,10 @@ export type BadgeContext = {
   pickedBands: BadgeBand[];
   seenBands: BadgeBand[];
   missedBandIds: Set<string>;
+  locationVisits: Record<string, number>;
+  currentLocation: string | null;
+  crewLocationCounts: Record<string, number>;
+  crewEarnedBadgeSlugs: Set<string>;
 };
 
 // Festival-local (CEST = UTC+2) hour for `bands_picked_before_hour_min`.
@@ -71,6 +82,10 @@ export function buildBadgeContext(
   missedBandIds: Set<string> = new Set(),
   now: Date = new Date(),
   assignedBadges: string[] = [],
+  locationVisits: Record<string, number> = {},
+  currentLocation: string | null = null,
+  crewLocationCounts: Record<string, number> = {},
+  crewEarnedBadgeSlugs: Set<string> = new Set(),
 ): BadgeContext {
   const meta = user.user_metadata;
   const maxAttendance = userPickBandIds.reduce(
@@ -93,6 +108,10 @@ export function buildBadgeContext(
     pickedBands,
     seenBands,
     missedBandIds,
+    locationVisits,
+    currentLocation,
+    crewLocationCounts,
+    crewEarnedBadgeSlugs,
   };
 }
 
@@ -147,6 +166,24 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
       const conditionIndex = arrivalDayOrder.indexOf(condition.day);
       return userIndex >= 0 && userIndex < conditionIndex;
     }
+    case 'location_visit_count_min':
+      return (ctx.locationVisits[condition.location] ?? 0) >= condition.count;
+    case 'crew_at_location_min':
+      if (ctx.crewEarnedBadgeSlugs.has(badge.slug)) return true;
+      return (
+        ctx.currentLocation === condition.location &&
+        (ctx.crewLocationCounts[condition.location] ?? 0) >= condition.count
+      );
+    case 'bands_picked_after_hour_min':
+      return (
+        ctx.pickedBands.filter((b) => festivalLocalHour(b.start_time) >= condition.hour).length >=
+        condition.count
+      );
+    case 'bands_seen_after_hour_min':
+      return (
+        ctx.seenBands.filter((b) => festivalLocalHour(b.start_time) >= condition.hour).length >=
+        condition.count
+      );
     case 'assigned':
       return ctx.assignedBadges.includes(badge.slug);
   }
@@ -256,7 +293,63 @@ export const BADGES: BadgeConfig[] = [
     descriptionKey: 'badgeCaoCarameloDescription',
     condition: { type: 'assigned' },
   },
+  // Location visit count badges
+  {
+    slug: 'metal-place-2026',
+    imagePath: '/badges/badge_metal_place_2026.png',
+    labelKey: 'badgeMetalPlace2026',
+    descriptionKey: 'badgeMetalPlace2026Description',
+    condition: { type: 'location_visit_count_min', location: 'metal_place', count: 1 },
+    year: 2026,
+  },
+  // Crew at location badges
+  {
+    slug: 'camping-mob',
+    imagePath: '/badges/badge_camping_mob.png',
+    labelKey: 'badgeCampingMob',
+    descriptionKey: 'badgeCampingMobDescription',
+    condition: { type: 'crew_at_location_min', location: 'camping', count: 10 },
+    year: 2026,
+  },
+  {
+    slug: 'lost-together',
+    imagePath: '/badges/badge_lost_together.png',
+    labelKey: 'badgeLostTogether',
+    descriptionKey: 'badgeLostTogetherDescription',
+    condition: { type: 'crew_at_location_min', location: 'lost', count: 5 },
+    year: 2026,
+  },
 ];
+
+// ─── CONDITION EXAMPLES ───────────────────────────────────────────────────────
+//
+// location_visit_count_min
+//   Badge earned when user has toggled into a location at least N times.
+//   The counter persists in user_metadata.location_visits — permanent.
+//   Example: give badge for first Metal Place visit
+//   { slug: 'first-metal-place', condition: { type: 'location_visit_count_min', location: 'metal_place', count: 1 } }
+//   Example: badge for checking into camping 3 separate times
+//   { slug: 'tent-rat', condition: { type: 'location_visit_count_min', location: 'camping', count: 3 } }
+//
+// crew_at_location_min
+//   Badge earned when user is at a location AND N+ crew members are there too.
+//   Once earned it stays forever (slug stored in user_metadata.crew_earned_badge_slugs).
+//   Example: 10+ crew in camping at the same moment
+//   { slug: 'camping-mob', condition: { type: 'crew_at_location_min', location: 'camping', count: 10 } }
+//   Example: 5+ lost souls simultaneously
+//   { slug: 'lost-together', condition: { type: 'crew_at_location_min', location: 'lost', count: 5 } }
+//
+// bands_picked_after_hour_min / bands_seen_after_hour_min
+//   Mirror of the `before` variants — counts bands whose CEST start_time >= hour.
+//   Example: picked at least 3 bands starting at or after 22:00 CEST
+//   { slug: 'night-owl', condition: { type: 'bands_picked_after_hour_min', hour: 22, count: 3 } }
+//   Example: actually saw 2 bands starting after midnight (hour: 0 wraps to next day)
+//   { slug: 'midnight-survivor', condition: { type: 'bands_seen_after_hour_min', hour: 0, count: 2 } }
+//
+// bands_picked_before_hour_min / bands_seen_before_hour_min  (existing)
+//   Example: picked 5 bands starting before 14:00 CEST
+//   { slug: 'early-riser', condition: { type: 'bands_picked_before_hour_min', hour: 14, count: 5 } }
+// ─────────────────────────────────────────────────────────────────────────────
 
 export function getEarnedBadges(ctx: BadgeContext): BadgeConfig[] {
   return BADGES.filter((badge) => evaluateBadge(badge, ctx));
