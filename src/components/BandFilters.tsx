@@ -57,10 +57,6 @@ export default function BandFilters({
     update('stage', has ? value.stage.filter((s) => s !== stage) : [...value.stage, stage]);
   }
 
-  function toggleGenre(genre: string) {
-    update('genre', value.genre === genre ? null : genre);
-  }
-
   function clearAll() {
     onChange({
       query: '',
