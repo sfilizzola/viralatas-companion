@@ -43,9 +43,14 @@
   grid-template-columns: 4px 56px 1fr;
 }
 
-/* ----- conflict outline (timeline variant only) ----- */
-.cardConflict {
+/* ----- conflict & overlap outlines (timeline variant only) ----- */
+.cardSoftOverlap {
   outline: 2px solid var(--signal-warn);
+  outline-offset: -2px;
+}
+
+.cardHardConflict {
+  outline: 2px solid var(--signal-live);
   outline-offset: -2px;
 }
 
@@ -205,8 +210,63 @@
 }
 
 /* ============================================================
-   CONFLICT CHIP — timeline variant only
+   OVERLAP & CONFLICT CHIP — timeline variant only
    ============================================================ */
+.overlapChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(243, 156, 18, 0.12);
+  color: #f9c66b;
+  border: 1px solid rgba(243, 156, 18, 0.4);
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.overlapChip:hover {
+  background: rgba(243, 156, 18, 0.2);
+}
+
+.overlapChipActive {
+  background: var(--signal-warn);
+  color: #1a0d00;
+  border-color: var(--signal-warn);
+}
+
+.conflictChipHard {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(192, 57, 43, 0.12);
+  color: #e74c3c;
+  border: 1px solid rgba(192, 57, 43, 0.4);
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+
+.conflictChipHard:hover {
+  background: rgba(192, 57, 43, 0.2);
+}
+
+.conflictChipHardActive {
+  background: var(--signal-live);
+  color: #fff;
+  border-color: var(--signal-live);
+}
+
+/* Keep old conflictChip for backwards compat */
 .conflictChip {
   display: inline-flex;
   align-items: center;

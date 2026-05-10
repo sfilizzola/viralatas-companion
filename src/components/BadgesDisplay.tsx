@@ -8,20 +8,27 @@ import {
   type BadgeConfig,
   type BadgeContext,
 } from '../lib/badges';
-import { loadUserPicks, loadAllUserPicks, loadBands, PICKS_CHANGED_EVENT, MISSED_CHANGED_EVENT } from '../lib/db';
+import { loadUserPicks, loadAllUserPicks, loadBands, loadAllUserPresence, PICKS_CHANGED_EVENT, MISSED_CHANGED_EVENT } from '../lib/db';
 import { loadAllMissed } from '../lib/missed';
 import { now } from '../lib/time';
+import { supabase } from '../lib/supabase';
 import { useI18n } from '../lib/i18n';
 import styles from './BadgesDisplay.module.css';
 
 const EMPTY_CTX: BadgeContext = {
   wacken_years: [],
   country: null,
+  wacken_arrival_day: null,
+  assignedBadges: [],
   bandsPicked: 0,
   maxAttendanceInPicks: 0,
   pickedBands: [],
   seenBands: [],
   missedBandIds: new Set(),
+  locationVisits: {},
+  currentLocation: null,
+  crewLocationCounts: {},
+  achievedBadgeSlugs: new Set(),
 };
 
 type BadgesDisplayProps = {
@@ -42,13 +49,16 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
     let active = true;
 
     async function refresh() {
-      const [userPicks, allPicks, bands, allMissed] = await Promise.all([
+      const [userPicks, allPicks, bands, allMissed, userRow, presence] = await Promise.all([
         loadUserPicks(user.id),
         loadAllUserPicks(),
         loadBands(),
         loadAllMissed(),
+        supabase.from('users').select('special_badges').eq('id', user.id).single(),
+        loadAllUserPresence(),
       ]);
       if (!active) return;
+
       const userPickBandIds = userPicks.map((p) => p.band_id);
       const allPickCounts = new Map<string, number>();
       allPicks.forEach((p) =>
@@ -58,7 +68,63 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       const userMissedIds = new Set(
         allMissed.filter((m) => m.user_id === user.id).map((m) => m.band_id),
       );
-      setCtx(buildBadgeContext(user, userPickBandIds, allPickCounts, bandsById, userMissedIds, now()));
+      const assignedBadges: string[] = (userRow.data as { special_badges?: string[] } | null)?.special_badges ?? [];
+
+      // Location context from presence and user_metadata
+      const myPresence = presence.find((p) => p.user_id === user.id);
+      const isAtCamping = myPresence?.is_camping ?? false;
+      const isAtMetalPlace = myPresence?.is_at_metal_place ?? false;
+      const currentLocation: string | null = isAtMetalPlace
+        ? 'metal_place'
+        : isAtCamping
+          ? 'camping'
+          : 'lost';
+
+      const crewLocationCounts: Record<string, number> = {
+        camping: presence.filter((p) => p.is_camping).length,
+        metal_place: presence.filter((p) => p.is_at_metal_place).length,
+        lost: presence.filter((p) => !p.is_camping && !p.is_at_metal_place).length,
+      };
+
+      const locationVisits = (user.user_metadata?.location_visits as Record<string, number>) ?? {};
+      const achievedBadgeSlugs = new Set<string>(
+        (user.user_metadata?.achieved_badge_slugs as string[]) ?? []
+      );
+
+      const newCtx = buildBadgeContext(
+        user,
+        userPickBandIds,
+        allPickCounts,
+        bandsById,
+        userMissedIds,
+        now(),
+        assignedBadges,
+        locationVisits,
+        currentLocation,
+        crewLocationCounts,
+        achievedBadgeSlugs,
+      );
+
+      // Write-back for any newly earned persist:true badge
+      const earnedBadges = BADGES.filter((b) => evaluateBadge(b, newCtx));
+      const newlyAchieved = earnedBadges
+        .filter((b) => b.persist && !achievedBadgeSlugs.has(b.slug))
+        .map((b) => b.slug);
+
+      if (newlyAchieved.length > 0) {
+        supabase.auth.updateUser({
+          data: {
+            achieved_badge_slugs: [
+              ...(user.user_metadata?.achieved_badge_slugs ?? []),
+              ...newlyAchieved,
+            ],
+          },
+        }).catch(() => {
+          // Silently ignore — badge earning is best-effort
+        });
+      }
+
+      setCtx(newCtx);
     }
 
     refresh();

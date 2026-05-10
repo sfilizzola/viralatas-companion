@@ -230,6 +230,22 @@
   grid-template-columns: 20px 1fr;
   gap: var(--s-3);
   padding: var(--s-3);
+  color: #e74c3c;
+  background: rgba(192, 57, 43, 0.1);
+  border: 1px solid rgba(192, 57, 43, 0.3);
+  border-radius: var(--r-1);
+  font-size: 13px;
+}
+
+.conflictWarning svg {
+  color: var(--signal-live);
+}
+
+.overlapWarning {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: var(--s-3);
+  padding: var(--s-3);
   color: #f9c66b;
   background: rgba(243, 156, 18, 0.1);
   border: 1px solid rgba(243, 156, 18, 0.3);
@@ -237,7 +253,7 @@
   font-size: 13px;
 }
 
-.conflictWarning svg {
+.overlapWarning svg {
   color: var(--signal-warn);
 }
 

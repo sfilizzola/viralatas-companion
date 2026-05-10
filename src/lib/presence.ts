@@ -16,20 +16,46 @@ function presenceOpId(userId: string) {
   return `${userId}:presence:${unique}`;
 }
 
+// Increment location visit counter in user_metadata. Called when entering a location.
+// This is fire-and-forget; failures don't interrupt presence sync.
+async function incrementLocationVisit(location: 'camping' | 'metal_place'): Promise<void> {
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) return;
+
+  const currentVisits = (data.user.user_metadata?.location_visits as Record<string, number>) ?? {};
+  const newCount = (currentVisits[location] ?? 0) + 1;
+
+  supabase.auth.updateUser({
+    data: {
+      location_visits: { ...currentVisits, [location]: newCount },
+    },
+  }).catch(() => {
+    // Silently ignore errors — location badge earning is a nice-to-have
+  });
+}
+
 async function queuePresence(presence: UserPresence) {
   await enqueueOfflinePresence({ ...presence, id: presenceOpId(presence.user_id) });
 }
 
 export async function setCampingStatus(userId: string, isCamping: boolean): Promise<void> {
   // Mutual exclusion with Metal Place: enabling camping clears Metal Place attendance.
+  const existing = await loadUserPresence(userId);
+  const wasNotCamping = !existing?.is_camping;
+  const isEnteringCamping = isCamping && wasNotCamping;
+
   const presence: UserPresence = {
     user_id: userId,
     is_camping: isCamping,
-    is_at_metal_place: isCamping ? false : (await loadUserPresence(userId))?.is_at_metal_place ?? false,
+    is_at_metal_place: isCamping ? false : existing?.is_at_metal_place ?? false,
     updated_at: new Date().toISOString(),
   };
 
   await saveUserPresence(presence);
+
+  if (isEnteringCamping) {
+    await incrementLocationVisit('camping');
+  }
 
   if (!navigator.onLine) {
     await queuePresence(presence);
@@ -105,6 +131,9 @@ export async function setMetalPlaceStatus(userId: string, isAtMetalPlace: boolea
   // Mutual exclusion with camping: checking in to Metal Place clears camping; checking out
   // preserves the prior camping state.
   const existing = await loadUserPresence(userId);
+  const wasNotAtMetalPlace = !existing?.is_at_metal_place;
+  const isEnteringMetalPlace = isAtMetalPlace && wasNotAtMetalPlace;
+
   const presence: UserPresence = {
     user_id: userId,
     is_camping: isAtMetalPlace ? false : existing?.is_camping ?? false,
@@ -113,6 +142,10 @@ export async function setMetalPlaceStatus(userId: string, isAtMetalPlace: boolea
   };
 
   await saveUserPresence(presence);
+
+  if (isEnteringMetalPlace) {
+    await incrementLocationVisit('metal_place');
+  }
 
   if (!navigator.onLine) {
     await queuePresence(presence);

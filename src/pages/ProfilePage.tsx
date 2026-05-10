@@ -25,6 +25,7 @@ import {
   setTimeOverride,
   TIME_OVERRIDE_CHANGED_EVENT,
 } from '../lib/time';
+import { BADGES } from '../lib/badges';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
@@ -35,6 +36,89 @@ function roleLabel(role: string): string {
   if (role === 'godlike') return 'Godlike';
   if (role === 'manager') return 'Manager';
   return 'Vira-latas';
+}
+
+const DECADE_GROUPS: { label: string; years: number[] }[] = [
+  { label: '2000s', years: [2005, 2006, 2007, 2008, 2009] },
+  { label: '2010s', years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019] },
+  { label: '2020s', years: [2022, 2023, 2024, 2025, 2026] },
+];
+
+type WackenYearPickerProps = {
+  selectedYears: number[];
+  onToggle: (year: number, checked: boolean) => void;
+  t: (key: string, values?: Record<string, string | number>) => string;
+};
+
+type ArrivalDayPickerProps = {
+  selectedDay: string;
+  onSelect: (day: string) => void;
+  t: (key: string, values?: Record<string, string | number>) => string;
+};
+
+const ARRIVAL_DAY_OPTIONS = [
+  { value: 'sun-jul26', labelKey: 'arrivalDaySunJul26' },
+  { value: 'mon-jul27', labelKey: 'arrivalDayMonJul27' },
+  { value: 'tue-jul28', labelKey: 'arrivalDayTueJul28' },
+  { value: 'wed-jul29', labelKey: 'arrivalDayWedJul29' },
+  { value: 'thu-plus', labelKey: 'arrivalDayThuPlus' },
+];
+
+function ArrivalDayPicker({ selectedDay, onSelect, t }: ArrivalDayPickerProps) {
+  return (
+    <div className={styles.label}>
+      {t('wackenArrivalDay')}
+      <div className={styles.arrivalDayPillRow}>
+        {ARRIVAL_DAY_OPTIONS.map(({ value, labelKey }) => (
+          <button
+            key={value}
+            type="button"
+            role="radio"
+            aria-checked={selectedDay === value}
+            className={`${styles.arrivalDayPill} ${selectedDay === value ? styles.arrivalDayPillSelected : ''}`}
+            onClick={() => onSelect(value)}
+          >
+            {t(labelKey)}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function WackenYearPicker({ selectedYears, onToggle, t }: WackenYearPickerProps) {
+  return (
+    <div className={styles.label}>
+      {t('wackenYears')}
+      <div className={styles.yearGrid}>
+        {DECADE_GROUPS.map(({ label, years }) => (
+          <div key={label} className={styles.yearDecade}>
+            <span className={styles.yearDecadeLabel}>{label}</span>
+            <div className={styles.yearPillRow}>
+              {years.map((year) => {
+                const selected = selectedYears.includes(year);
+                return (
+                  <button
+                    key={year}
+                    type="button"
+                    role="checkbox"
+                    aria-checked={selected}
+                    className={`${styles.yearPill} ${selected ? styles.yearPillSelected : ''}`}
+                    onClick={() => onToggle(year, !selected)}
+                  >
+                    {year}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+      <p className={styles.yearCounter}>
+        ● {selectedYears.length} Wacken{selectedYears.length !== 1 ? 's' : ''}
+      </p>
+    </div>
+  );
 }
 
 function countryFlag(code: string | null | undefined): string {
@@ -122,6 +206,9 @@ function ProfileForm({
   const [newCountry, setNewCountry] = useState<string>(
     (user.user_metadata?.['country'] as string | undefined) ?? ''
   );
+  const [newArrivalDay, setNewArrivalDay] = useState<string>(
+    (user.user_metadata?.['wacken_arrival_day'] as string | undefined) ?? ''
+  );
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [prefsOpen, setPrefsOpen] = useState(false);
 
@@ -147,6 +234,7 @@ function ProfileForm({
         avatar_url: newAvatarUrl,
         wacken_years: newWackenYears,
         country: newCountry || null,
+        wacken_arrival_day: newArrivalDay || null,
       },
     });
     await supabase
@@ -302,19 +390,11 @@ function ProfileForm({
             </label>
             {photoError && <p className={styles.error}>{t('photoError')}</p>}
 
-            <fieldset className={styles.fieldset}>
-              <legend className={styles.legend}>{t('wackenYears')}</legend>
-              {[2022, 2023, 2024, 2025, 2026].map((year) => (
-                <label key={year} className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={newWackenYears.includes(year)}
-                    onChange={(e) => handleYearToggle(year, e.target.checked)}
-                  />
-                  {year}
-                </label>
-              ))}
-            </fieldset>
+            <WackenYearPicker
+              selectedYears={newWackenYears}
+              onToggle={handleYearToggle}
+              t={t}
+            />
 
             <label className={styles.label}>
               {t('country')}
@@ -333,6 +413,12 @@ function ProfileForm({
                 <option value="other">{t('countryOther')}</option>
               </select>
             </label>
+
+            <ArrivalDayPicker
+              selectedDay={newArrivalDay}
+              onSelect={setNewArrivalDay}
+              t={t}
+            />
 
             <button className={styles.button} type="submit" disabled={saving}>
               {saved ? t('saveDone') : saving ? t('saveLoading') : t('saveProfile')}
@@ -568,6 +654,7 @@ type UserWithLoading = {
   display_name: string | null;
   avatar_url: string | null;
   role: string;
+  special_badges: string[];
   loading?: boolean;
   error?: string;
 };
@@ -599,6 +686,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
   const [liveBandTestEnabled, setLiveBandTestEnabled] = useState(false);
   const [liveBandTestActiveBandId, setLiveBandTestActiveBandId] = useState<string | null>(null);
   const [bandsByPopularity, setBandsByPopularity] = useState<Array<Band & { pickCount: number }>>([]);
+  const [assignModalUser, setAssignModalUser] = useState<UserWithLoading | null>(null);
 
   useEffect(() => {
     async function loadRole() {
@@ -616,7 +704,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
           fetchAllUsers(),
           fetchBlockedPostersWithUserDetails(),
         ]);
-        setAllUsers(users as UserWithLoading[]);
+        setAllUsers(users.map((u) => ({ ...u, special_badges: u.special_badges ?? [] })) as UserWithLoading[]);
         setBlockedPosters(blocked.map(b => ({ user_id: b.user_id })));
       } catch (error) {
         console.error('Failed to load users:', error);
@@ -824,6 +912,25 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
       }
     },
     [t],
+  );
+
+  const handleBadgeAssign = useCallback(
+    async (targetUserId: string, badgeSlug: string, action: 'assign' | 'revoke') => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke('assign-badge', {
+        body: { targetUserId, badgeSlug, action },
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+      if (res.error) throw res.error;
+      const updated: string[] = (res.data as { special_badges: string[] }).special_badges;
+      setAllUsers((prev) =>
+        prev.map((u) => (u.id === targetUserId ? { ...u, special_badges: updated } : u)),
+      );
+      if (assignModalUser?.id === targetUserId) {
+        setAssignModalUser((prev) => prev ? { ...prev, special_badges: updated } : prev);
+      }
+    },
+    [assignModalUser],
   );
 
   if (loading || userRole !== 'godlike') {
@@ -1150,6 +1257,20 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                       {roleLabel(user.role)}
                     </div>
 
+                    {user.special_badges.length > 0 && (
+                      <span className={styles.assignedBadgeChip}>
+                        {t('assignedBadgeCount', { count: user.special_badges.length })}
+                      </span>
+                    )}
+
+                    <button
+                      className={`${styles.userActionButton} ${styles.secondaryAction}`}
+                      onClick={() => setAssignModalUser(user)}
+                      type="button"
+                    >
+                      {t('assignBadgeBtn')}
+                    </button>
+
                     {user.role !== 'godlike' && (
                       <button
                         className={`${styles.userActionButton} ${
@@ -1196,6 +1317,83 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
             </div>
           </div>
         </div>
+      </div>
+
+      {assignModalUser && (
+        <AssignBadgeModal
+          targetUser={assignModalUser}
+          onAssign={handleBadgeAssign}
+          onClose={() => setAssignModalUser(null)}
+          t={t}
+        />
+      )}
+    </div>
+  );
+}
+
+type AssignBadgeModalProps = {
+  targetUser: UserWithLoading;
+  onAssign: (targetUserId: string, badgeSlug: string, action: 'assign' | 'revoke') => Promise<void>;
+  onClose: () => void;
+  t: (key: string, values?: Record<string, string | number>) => string;
+};
+
+const ASSIGNABLE_BADGES = BADGES.filter((b) => b.condition.type === 'assigned');
+
+function AssignBadgeModal({ targetUser, onAssign, onClose, t }: AssignBadgeModalProps) {
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { t: tBadges } = useI18n('Badges');
+  const name = targetUser.display_name || targetUser.email;
+
+  async function doAction(slug: string, action: 'assign' | 'revoke') {
+    setBusy(true);
+    setError(null);
+    try {
+      await onAssign(targetUser.id, slug, action);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t('assignBadgeError'));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className={styles.conflictModal} onClick={onClose} role="dialog" aria-modal="true">
+      <div className={styles.conflictModalContent} onClick={(e) => e.stopPropagation()}>
+        <h3 className={styles.conflictModalTitle}>{t('assignBadgeModalTitle', { name })}</h3>
+
+        {error && <p className={styles.userRowError}>{error}</p>}
+
+        <div className={styles.assignBadgeGrid}>
+          {ASSIGNABLE_BADGES.map((badge) => {
+            const assigned = targetUser.special_badges.includes(badge.slug);
+            return (
+              <button
+                key={badge.slug}
+                className={`${styles.assignBadgeOption} ${assigned ? styles.assignBadgeOptionOwned : ''}`}
+                onClick={() => doAction(badge.slug, assigned ? 'revoke' : 'assign')}
+                disabled={busy}
+                type="button"
+                title={tBadges(badge.descriptionKey)}
+              >
+                <div className={styles.assignBadgeImgWrap}>
+                  <img src={badge.imagePath} alt="" className={styles.assignBadgeImg} />
+                  {assigned && <span className={styles.revokeX}>✕</span>}
+                </div>
+                <span>{tBadges(badge.labelKey)}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          className={`${styles.conflictButton} ${styles.conflictCloseButton}`}
+          onClick={onClose}
+          type="button"
+        >
+          {t('close')}
+        </button>
       </div>
     </div>
   );

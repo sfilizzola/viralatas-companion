@@ -202,3 +202,303 @@ describe('evaluateBadge — band_picked_named', () => {
     expect(evaluateBadge(badge({ type: 'band_picked_named', name: 'Bathory' }), ctx)).toBe(false);
   });
 });
+
+describe('evaluateBadge — wacken_years_count_min', () => {
+  it('returns true when user has attended at least N Wackens', () => {
+    const ctx = buildBadgeContext(
+      authUser({ wacken_years: [2022, 2023, 2024, 2025, 2026] }),
+      [],
+      new Map(),
+      new Map(),
+    );
+    expect(evaluateBadge(badge({ type: 'wacken_years_count_min', count: 5 }), ctx)).toBe(true);
+  });
+
+  it('returns false when user has fewer Wackens than threshold', () => {
+    const ctx = buildBadgeContext(
+      authUser({ wacken_years: [2022, 2023, 2026] }),
+      [],
+      new Map(),
+      new Map(),
+    );
+    expect(evaluateBadge(badge({ type: 'wacken_years_count_min', count: 5 }), ctx)).toBe(false);
+  });
+
+  it('returns false when user has no Wackens and count is 1', () => {
+    const ctx = buildBadgeContext(authUser({ wacken_years: [] }), [], new Map(), new Map());
+    expect(evaluateBadge(badge({ type: 'wacken_years_count_min', count: 1 }), ctx)).toBe(false);
+  });
+
+  it('returns true when count is 0 (edge case)', () => {
+    const ctx = buildBadgeContext(authUser({ wacken_years: [] }), [], new Map(), new Map());
+    expect(evaluateBadge(badge({ type: 'wacken_years_count_min', count: 0 }), ctx)).toBe(true);
+  });
+});
+
+describe('evaluateBadge — wacken_attended_in_year', () => {
+  it('returns true when user attended in specified year', () => {
+    const ctx = buildBadgeContext(
+      authUser({ wacken_years: [2022, 2023, 2026] }),
+      [],
+      new Map(),
+      new Map(),
+    );
+    expect(evaluateBadge(badge({ type: 'wacken_attended_in_year', year: 2022 }), ctx)).toBe(true);
+  });
+
+  it('returns false when user did not attend in specified year', () => {
+    const ctx = buildBadgeContext(authUser({ wacken_years: [2026] }), [], new Map(), new Map());
+    expect(evaluateBadge(badge({ type: 'wacken_attended_in_year', year: 2022 }), ctx)).toBe(false);
+  });
+
+  it('returns false when user has no Wacken years', () => {
+    const ctx = buildBadgeContext(authUser({ wacken_years: [] }), [], new Map(), new Map());
+    expect(evaluateBadge(badge({ type: 'wacken_attended_in_year', year: 2026 }), ctx)).toBe(false);
+  });
+});
+
+describe('evaluateBadge — assigned (Phase 11.E)', () => {
+  it('returns true when badge slug is in assignedBadges', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      ['cao-caramelo', 'some-other'],
+    );
+    const b = badge({ type: 'assigned' });
+    const cfg = { ...b, slug: 'cao-caramelo' };
+    expect(evaluateBadge(cfg, ctx)).toBe(true);
+  });
+
+  it('returns false when badge slug is not in assignedBadges', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      ['some-other'],
+    );
+    const b = badge({ type: 'assigned' });
+    const cfg = { ...b, slug: 'cao-caramelo' };
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+
+  it('returns false when assignedBadges is empty', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+    );
+    const cfg = { ...badge({ type: 'assigned' }), slug: 'cao-caramelo' };
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+
+  it('defaults to empty assignedBadges when not provided', () => {
+    const ctx = buildBadgeContext(authUser(), [], new Map(), new Map());
+    expect(ctx.assignedBadges).toEqual([]);
+    const cfg = { ...badge({ type: 'assigned' }), slug: 'any-slug' };
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+});
+
+describe('evaluateBadge — bands_picked_after_hour_min', () => {
+  const bandsById = new Map<string, BadgeBand>([
+    ['b1', band({ id: 'b1', start_time: '2026-07-29T20:00:00.000Z' })], // 22:00 CEST
+    ['b2', band({ id: 'b2', start_time: '2026-07-29T21:00:00.000Z' })], // 23:00 CEST
+    ['b3', band({ id: 'b3', start_time: '2026-07-29T18:00:00.000Z' })], // 20:00 CEST
+  ]);
+
+  it('counts bands with start_time >= hour threshold', () => {
+    const ctx = buildBadgeContext(authUser(), ['b1', 'b2', 'b3'], new Map(), bandsById);
+    expect(
+      evaluateBadge(badge({ type: 'bands_picked_after_hour_min', hour: 22, count: 2 }), ctx),
+    ).toBe(true);
+    expect(
+      evaluateBadge(badge({ type: 'bands_picked_after_hour_min', hour: 22, count: 3 }), ctx),
+    ).toBe(false);
+    expect(
+      evaluateBadge(badge({ type: 'bands_picked_after_hour_min', hour: 20, count: 2 }), ctx),
+    ).toBe(true);
+  });
+});
+
+describe('evaluateBadge — bands_seen_after_hour_min', () => {
+  const now = new Date('2026-07-29T23:30:00.000Z');
+  const bandsById = new Map<string, BadgeBand>([
+    ['b1', band({ id: 'b1', start_time: '2026-07-29T20:00:00.000Z', end_time: '2026-07-29T21:00:00.000Z' })], // 22:00–23:00 CEST, seen
+    ['b2', band({ id: 'b2', start_time: '2026-07-29T22:00:00.000Z', end_time: '2026-07-30T00:00:00.000Z' })], // 00:00–02:00 CEST, not yet seen
+    ['b3', band({ id: 'b3', start_time: '2026-07-29T18:00:00.000Z', end_time: '2026-07-29T19:00:00.000Z' })], // 20:00–21:00 CEST, seen
+  ]);
+
+  it('counts seen bands with start_time >= hour threshold', () => {
+    const ctx = buildBadgeContext(authUser(), ['b1', 'b2', 'b3'], new Map(), bandsById, new Set(), now);
+    expect(
+      evaluateBadge(badge({ type: 'bands_seen_after_hour_min', hour: 22, count: 1 }), ctx),
+    ).toBe(true);
+    expect(
+      evaluateBadge(badge({ type: 'bands_seen_after_hour_min', hour: 22, count: 2 }), ctx),
+    ).toBe(false);
+    expect(
+      evaluateBadge(badge({ type: 'bands_seen_after_hour_min', hour: 20, count: 1 }), ctx),
+    ).toBe(true);
+  });
+});
+
+describe('evaluateBadge — location_visit_count_min', () => {
+  it('returns true when locationVisits[location] >= count', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      { metal_place: 1, camping: 3 },
+    );
+    expect(
+      evaluateBadge(badge({ type: 'location_visit_count_min', location: 'metal_place', count: 1 }), ctx),
+    ).toBe(true);
+    expect(
+      evaluateBadge(badge({ type: 'location_visit_count_min', location: 'metal_place', count: 2 }), ctx),
+    ).toBe(false);
+    expect(
+      evaluateBadge(badge({ type: 'location_visit_count_min', location: 'camping', count: 3 }), ctx),
+    ).toBe(true);
+  });
+
+  it('returns false when location not in visits object', () => {
+    const ctx = buildBadgeContext(authUser(), [], new Map(), new Map(), new Set(), new Date(), [], {});
+    expect(
+      evaluateBadge(badge({ type: 'location_visit_count_min', location: 'metal_place', count: 1 }), ctx),
+    ).toBe(false);
+  });
+});
+
+describe('evaluateBadge — crew_at_location_min', () => {
+  it('returns true when user is at location AND crew count >= threshold', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      'camping', // currentLocation
+      { camping: 10, lost: 2 },
+      new Set(),
+    );
+    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 10 }), slug: 'camping-mob' };
+    expect(evaluateBadge(cfg, ctx)).toBe(true);
+  });
+
+  it('returns false when user at location but crew count < threshold', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      'camping',
+      { camping: 5, lost: 2 },
+      new Set(),
+    );
+    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 10 }), slug: 'camping-mob' };
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+
+  it('returns true via persist flag when slug is in achievedBadgeSlugs regardless of count', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      'lost', // not at camping anymore
+      { camping: 1, lost: 1 }, // crew count very low
+      new Set(['camping-mob']), // but badge was already earned
+    );
+    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 10 }), slug: 'camping-mob', persist: true };
+    expect(evaluateBadge(cfg, ctx)).toBe(true);
+  });
+
+  it('returns false when user not at location and badge never earned', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      'lost',
+      { camping: 15, lost: 2 },
+      new Set(),
+    );
+    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 10 }), slug: 'camping-mob' };
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+});
+
+describe('persist flag — generic achievement recording', () => {
+  it('returns true for any condition type when persist:true and slug is in achievedBadgeSlugs', () => {
+    // Condition would be false (no picks), but badge was previously earned and recorded
+    const ctx = buildBadgeContext(
+      authUser({ country: 'de' }), // country is de, not br
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      null,
+      {},
+      new Set(['pais-tropical']), // recorded from when user had country: br
+    );
+    const cfg = { ...badge({ type: 'country_is', country: 'br' }), slug: 'pais-tropical', persist: true };
+    expect(evaluateBadge(cfg, ctx)).toBe(true);
+  });
+
+  it('returns false when persist:true but slug not yet in achievedBadgeSlugs and condition not met', () => {
+    const ctx = buildBadgeContext(authUser({ country: 'de' }), [], new Map(), new Map());
+    const cfg = { ...badge({ type: 'country_is', country: 'br' }), slug: 'pais-tropical', persist: true };
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+
+  it('without persist flag, slug in achievedBadgeSlugs has no effect', () => {
+    const ctx = buildBadgeContext(
+      authUser({ country: 'de' }),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      null,
+      {},
+      new Set(['pais-tropical']),
+    );
+    const cfg = badge({ type: 'country_is', country: 'br' }); // no persist
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+});

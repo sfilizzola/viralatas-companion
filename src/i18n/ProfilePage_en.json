@@ -93,5 +93,15 @@
   "registeredUsersLoading": "Loading users...",
   "registeredUsersEmpty": "No users found",
   "patches": "PATCHES",
-  "editProfile": "EDIT PROFILE"
+  "editProfile": "EDIT PROFILE",
+  "wackenArrivalDay": "When do you arrive?",
+  "arrivalDaySunJul26": "Sunday, Jul 26 (camping opens)",
+  "arrivalDayMonJul27": "Monday, Jul 27",
+  "arrivalDayTueJul28": "Tuesday, Jul 28",
+  "arrivalDayWedJul29": "Wednesday, Jul 29 (Day 1)",
+  "arrivalDayThuPlus": "Thursday or later",
+  "assignBadgeBtn": "Assign patch",
+  "assignedBadgeCount": "{count} patch(es)",
+  "assignBadgeModalTitle": "Assign patch to {name}",
+  "assignBadgeError": "Failed to assign patch. Try again."
 }

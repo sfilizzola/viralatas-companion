@@ -451,9 +451,7 @@ export default function RightNowPage() {
     <div className={styles.page}>
       <OfflineBanner />
       <header className={styles.header}>
-        <div>
-          <span className={styles.title}>{t('title')}</span>
-        </div>
+        <span className={styles.title}>{t('title')}</span>
         <span className={styles.timestamp}>
           <span>{nowLabel(now, language)}</span>
           <span>{t('wackenTime')}</span>

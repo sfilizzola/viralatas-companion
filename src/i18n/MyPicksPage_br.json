@@ -5,5 +5,7 @@
   "summary": "{bands} bandas em {days} dias · {conflicts} conflito(s)",
   "headerBandsDays": "{bands} escolhas / {days} dias",
   "headerConflicts": "{conflicts} conflitos",
+  "headerOverlaps": "{overlaps} sobreposição(ões)",
+  "conflictWarningBanner": "Você tem {count} conflito(s). Resolva fácil no seu perfil →",
   "dayPickCount": "{count} escolhas"
 }
