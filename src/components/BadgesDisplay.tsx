@@ -17,6 +17,7 @@ import styles from './BadgesDisplay.module.css';
 const EMPTY_CTX: BadgeContext = {
   wacken_years: [],
   country: null,
+  wacken_arrival_day: null,
   bandsPicked: 0,
   maxAttendanceInPicks: 0,
   pickedBands: [],

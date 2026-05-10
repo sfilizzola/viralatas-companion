@@ -27,7 +27,9 @@ export type BadgeCondition =
   | { type: 'bands_seen_genre_min'; genre: string; count: number }
   | { type: 'bands_seen_stage_min'; stage: string; count: number }
   | { type: 'bands_seen_before_hour_min'; hour: number; count: number }
-  | { type: 'band_seen_named'; name: string };
+  | { type: 'band_seen_named'; name: string }
+  // Arrival day: earned when arrival day sorts before condition.day
+  | { type: 'wacken_arrived_before'; day: string };
 
 export type BadgeConfig = {
   slug: string;
@@ -41,6 +43,7 @@ export type BadgeConfig = {
 export type BadgeContext = {
   wacken_years: number[];
   country: string | null;
+  wacken_arrival_day: string | null;
   bandsPicked: number;
   maxAttendanceInPicks: number;
   pickedBands: BadgeBand[];
@@ -79,6 +82,7 @@ export function buildBadgeContext(
   return {
     wacken_years: Array.isArray(meta?.['wacken_years']) ? (meta['wacken_years'] as number[]) : [],
     country: (meta?.['country'] as string | undefined) ?? null,
+    wacken_arrival_day: (meta?.['wacken_arrival_day'] as string | undefined) ?? null,
     bandsPicked: userPickBandIds.length,
     maxAttendanceInPicks: maxAttendance,
     pickedBands,
@@ -131,6 +135,13 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
       );
     case 'band_seen_named':
       return ctx.seenBands.some((b) => b.name === condition.name);
+    case 'wacken_arrived_before': {
+      if (!ctx.wacken_arrival_day) return false;
+      const arrivalDayOrder = ['sun-jul26', 'mon-jul27', 'tue-jul28', 'wed-jul29', 'thu-plus'];
+      const userIndex = arrivalDayOrder.indexOf(ctx.wacken_arrival_day);
+      const conditionIndex = arrivalDayOrder.indexOf(condition.day);
+      return userIndex >= 0 && userIndex < conditionIndex;
+    }
   }
 }
 
@@ -221,6 +232,14 @@ export const BADGES: BadgeConfig[] = [
     descriptionKey: 'badgeAnniversary2016Description',
     condition: { type: 'wacken_attended_in_year', year: 2016 },
     year: 2026,
+  },
+  {
+    slug: 'early-bird',
+    imagePath: '/badges/badge_early-bird.png',
+    labelKey: 'badgeEarlyBird',
+    descriptionKey: 'badgeEarlyBirdDescription',
+    // Early bird: arrived Sunday or Monday (before Wacken Day 1 on Wednesday)
+    condition: { type: 'wacken_arrived_before', day: 'tue-jul28' },
   },
 ];
 

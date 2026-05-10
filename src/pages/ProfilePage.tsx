@@ -49,6 +49,42 @@ type WackenYearPickerProps = {
   t: (key: string, values?: Record<string, string | number>) => string;
 };
 
+type ArrivalDayPickerProps = {
+  selectedDay: string;
+  onSelect: (day: string) => void;
+  t: (key: string, values?: Record<string, string | number>) => string;
+};
+
+const ARRIVAL_DAY_OPTIONS = [
+  { value: 'sun-jul26', labelKey: 'arrivalDaySunJul26' },
+  { value: 'mon-jul27', labelKey: 'arrivalDayMonJul27' },
+  { value: 'tue-jul28', labelKey: 'arrivalDayTueJul28' },
+  { value: 'wed-jul29', labelKey: 'arrivalDayWedJul29' },
+  { value: 'thu-plus', labelKey: 'arrivalDayThuPlus' },
+];
+
+function ArrivalDayPicker({ selectedDay, onSelect, t }: ArrivalDayPickerProps) {
+  return (
+    <div className={styles.label}>
+      {t('wackenArrivalDay')}
+      <div className={styles.arrivalDayPillRow}>
+        {ARRIVAL_DAY_OPTIONS.map(({ value, labelKey }) => (
+          <button
+            key={value}
+            type="button"
+            role="radio"
+            aria-checked={selectedDay === value}
+            className={`${styles.arrivalDayPill} ${selectedDay === value ? styles.arrivalDayPillSelected : ''}`}
+            onClick={() => onSelect(value)}
+          >
+            {t(labelKey)}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function WackenYearPicker({ selectedYears, onToggle, t }: WackenYearPickerProps) {
   return (
     <div className={styles.label}>
@@ -169,6 +205,9 @@ function ProfileForm({
   const [newCountry, setNewCountry] = useState<string>(
     (user.user_metadata?.['country'] as string | undefined) ?? ''
   );
+  const [newArrivalDay, setNewArrivalDay] = useState<string>(
+    (user.user_metadata?.['wacken_arrival_day'] as string | undefined) ?? ''
+  );
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [prefsOpen, setPrefsOpen] = useState(false);
 
@@ -194,6 +233,7 @@ function ProfileForm({
         avatar_url: newAvatarUrl,
         wacken_years: newWackenYears,
         country: newCountry || null,
+        wacken_arrival_day: newArrivalDay || null,
       },
     });
     await supabase
@@ -372,6 +412,12 @@ function ProfileForm({
                 <option value="other">{t('countryOther')}</option>
               </select>
             </label>
+
+            <ArrivalDayPicker
+              selectedDay={newArrivalDay}
+              onSelect={setNewArrivalDay}
+              t={t}
+            />
 
             <button className={styles.button} type="submit" disabled={saving}>
               {saved ? t('saveDone') : saving ? t('saveLoading') : t('saveProfile')}

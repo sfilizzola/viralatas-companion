@@ -1404,3 +1404,36 @@
 .checkboxLabel input {
   cursor: pointer;
 }
+
+/* Arrival day picker */
+.arrivalDayPillRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.arrivalDayPill {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.arrivalDayPill:hover:not(.arrivalDayPillSelected) {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.arrivalDayPillSelected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
