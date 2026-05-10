@@ -17,7 +17,7 @@ type BandCardProps = {
   onClick?: () => void;
   variant?: BandCardVariant;
   rank?: number;
-  conflict?: { active: boolean; onClick: () => void };
+  conflict?: { severity: 'hard' | 'soft'; active: boolean; onClick: () => void };
   attendeeCluster?: { attendees: BandAttendee[]; max?: number };
   pending?: boolean;
   children?: ReactNode;
@@ -73,7 +73,7 @@ export default function BandCard({
     styles.card,
     variantClass,
     interactive ? '' : styles.cardStatic,
-    conflict?.active ? styles.cardConflict : '',
+    conflict?.active ? (conflict.severity === 'hard' ? styles.cardHardConflict : styles.cardSoftOverlap) : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -139,8 +139,12 @@ export default function BandCard({
           {variant === 'timeline' && conflict && (
             <button
               type="button"
-              className={`${styles.conflictChip} ${
-                conflict.active ? styles.conflictChipActive : ''
+              className={`${
+                conflict.severity === 'hard' ? styles.conflictChipHard : styles.overlapChip
+              } ${
+                conflict.severity === 'hard'
+                  ? conflict.active ? styles.conflictChipHardActive : ''
+                  : conflict.active ? styles.overlapChipActive : ''
               }`}
               onClick={(event) => {
                 event.stopPropagation();
@@ -148,7 +152,7 @@ export default function BandCard({
               }}
               aria-pressed={conflict.active}
             >
-              ⚠ {t('conflictChip')}
+              ⚠ {t(conflict.severity === 'hard' ? 'conflictChip' : 'overlapChip')}
             </button>
           )}
           {band.genre && variant === 'schedule' && (

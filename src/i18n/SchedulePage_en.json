@@ -28,6 +28,7 @@
   "avancado": "Advanced",
   "searchPlaceholder": "Search band...",
   "conflictChip": "Conflict",
+  "overlapChip": "Overlap",
   "attendeeOverflow": "+{count}",
   "closeModal": "Close",
   "crewGoing": "{count} vira-latas going",
@@ -43,6 +44,7 @@
   "missedShort": "didn't see",
   "missedAvailableAfter": "Available after {time}",
   "conflictWarning": "Conflicts with {name}",
+  "overlapWarning": "Overlaps with {name}",
   "pendingSync": "Pending sync",
   "todosGeneros": "All genres"
 }

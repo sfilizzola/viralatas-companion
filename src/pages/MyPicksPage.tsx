@@ -105,11 +105,28 @@ export default function MyPicksPage() {
     return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
   }, [myBands]);
 
-  const totalConflicts = useMemo(() => {
+  const hardConflictBands = useMemo(() => {
     const ids = new Set<string>();
-    for (const id of conflicts.keys()) ids.add(id);
-    return ids.size;
+    for (const [bandId, entries] of conflicts) {
+      if (entries.some((e) => e.severity === 'hard')) {
+        ids.add(bandId);
+      }
+    }
+    return ids;
   }, [conflicts]);
+
+  const softOverlapBands = useMemo(() => {
+    const ids = new Set<string>();
+    for (const [bandId, entries] of conflicts) {
+      if (!hardConflictBands.has(bandId) && entries.some((e) => e.severity === 'soft')) {
+        ids.add(bandId);
+      }
+    }
+    return ids;
+  }, [conflicts, hardConflictBands]);
+
+  const totalConflicts = hardConflictBands.size;
+  const totalOverlaps = softOverlapBands.size;
 
   const dayLabel = useCallback(
     (dateStr: string): string => {
@@ -151,9 +168,10 @@ export default function MyPicksPage() {
   }
 
   function handleConflictClick(bandId: string) {
-    const partners = conflicts.get(bandId);
-    if (!partners || partners.length === 0) return;
-    setHighlightedConflict((current) => (current === partners[0].id ? null : partners[0].id));
+    const entries = conflicts.get(bandId);
+    if (!entries || entries.length === 0) return;
+    const firstPartner = entries[0].band;
+    setHighlightedConflict((current) => (current === firstPartner.id ? null : firstPartner.id));
   }
 
   return (
@@ -173,8 +191,22 @@ export default function MyPicksPage() {
               conflicts: totalConflicts,
             })}
           </span>
+          {totalOverlaps > 0 && (
+            <span className={styles.summaryLine}>
+              {t('headerOverlaps', {
+                overlaps: totalOverlaps,
+              })}
+            </span>
+          )}
         </div>
       </header>
+
+      {totalConflicts >= 3 && (
+        <a href="/profile" className={styles.conflictBanner}>
+          <Icon name="conflict" size={14} />
+          {t('conflictWarningBanner', { count: totalConflicts })}
+        </a>
+      )}
 
       <main className={styles.list}>
         {loading && <p className={styles.empty}>{t('loading')}</p>}
@@ -210,7 +242,10 @@ export default function MyPicksPage() {
               </h2>
               <div className={`${styles.dayBands} ${isExpanded ? styles.dayBandsOpen : ''}`}>
                 {dayBands.map((band) => {
-                  const hasConflict = conflicts.has(band.id);
+                  const entries = conflicts.get(band.id);
+                  const hasSoftOverlap = entries?.some((e) => e.severity === 'soft');
+                  const hasHardConflict = entries?.some((e) => e.severity === 'hard');
+                  const severity = hasHardConflict ? 'hard' : hasSoftOverlap ? 'soft' : undefined;
                   return (
                     <BandCard
                       key={band.id}
@@ -222,8 +257,9 @@ export default function MyPicksPage() {
                       variant="timeline"
                       pending={pendingBandIds.has(band.id)}
                       conflict={
-                        hasConflict
+                        severity
                           ? {
+                              severity,
                               active: highlightedConflict === band.id,
                               onClick: () => handleConflictClick(band.id),
                             }
@@ -249,7 +285,18 @@ export default function MyPicksPage() {
           missedUserIds={missedUserIds}
           isMissed={isMissed}
           onToggleMissed={handleToggleMissed}
-          conflictBands={conflicts.get(activeBand.id) ?? []}
+          conflictBands={
+            conflicts
+              .get(activeBand.id)
+              ?.filter((e) => e.severity === 'hard')
+              .map((e) => e.band) ?? []
+          }
+          overlapBands={
+            conflicts
+              .get(activeBand.id)
+              ?.filter((e) => e.severity === 'soft')
+              .map((e) => e.band) ?? []
+          }
         />
       )}
 

@@ -165,7 +165,18 @@ export default function PopularPage() {
           missedUserIds={missedUserIds}
           isMissed={isMissed}
           onToggleMissed={handleToggleMissed}
-          conflictBands={bandConflicts.get(activeBand.id) ?? []}
+          conflictBands={
+            bandConflicts
+              .get(activeBand.id)
+              ?.filter((e) => e.severity === 'hard')
+              .map((e) => e.band) ?? []
+          }
+          overlapBands={
+            bandConflicts
+              .get(activeBand.id)
+              ?.filter((e) => e.severity === 'soft')
+              .map((e) => e.band) ?? []
+          }
         />
       )}
 

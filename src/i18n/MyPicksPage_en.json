@@ -5,5 +5,7 @@
   "summary": "{bands} bands across {days} days · {conflicts} conflicts",
   "headerBandsDays": "{bands} picks / {days} days",
   "headerConflicts": "{conflicts} conflicts",
+  "headerOverlaps": "{overlaps} overlap(s)",
+  "conflictWarningBanner": "You have {count} conflict(s). Easy to fix in your profile →",
   "dayPickCount": "{count} picks"
 }

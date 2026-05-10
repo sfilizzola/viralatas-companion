@@ -28,6 +28,7 @@
   "avancado": "Avançado",
   "searchPlaceholder": "Buscar banda...",
   "conflictChip": "Conflito",
+  "overlapChip": "Sobreposição",
   "attendeeOverflow": "+{count}",
   "closeModal": "Fechar",
   "crewGoing": "{count} vira-latas indo",
@@ -43,6 +44,7 @@
   "missedShort": "não viu",
   "missedAvailableAfter": "Disponível depois das {time}",
   "conflictWarning": "Conflita com {name}",
+  "overlapWarning": "Sobrepõe com {name}",
   "pendingSync": "Sync pendente",
   "todosGeneros": "Todos os gêneros"
 }

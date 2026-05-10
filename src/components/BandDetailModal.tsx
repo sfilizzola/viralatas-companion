@@ -19,6 +19,7 @@ type Props = {
   isMissed?: boolean;
   onToggleMissed?: () => void;
   conflictBands?: Band[];
+  overlapBands?: Band[];
 };
 
 export default function BandDetailModal({
@@ -33,6 +34,7 @@ export default function BandDetailModal({
   isMissed = false,
   onToggleMissed,
   conflictBands,
+  overlapBands,
 }: Props) {
   const { t } = useI18n('SchedulePage');
   const backdropRef = useRef<HTMLDivElement>(null);
@@ -110,6 +112,17 @@ export default function BandDetailModal({
               {conflictBands.map((cb) => (
                 <span key={cb.id}>
                   {t('conflictWarning', { name: `${cb.name} (${cb.stage})` })}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {overlapBands && overlapBands.length > 0 && isPicked && (
+            <div className={styles.overlapWarning}>
+              <Icon name="conflict" size={18} strokeWidth={2.2} />
+              {overlapBands.map((ob) => (
+                <span key={ob.id}>
+                  {t('overlapWarning', { name: `${ob.name} (${ob.stage})` })}
                 </span>
               ))}
             </div>
