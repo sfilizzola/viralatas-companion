@@ -64,7 +64,7 @@
 
 .dayHeader {
   background: var(--bg);
-  margin: var(--s-3) 0 6px;
+  margin: var(--s-3) 0 var(--s-3);
   padding-top: 6px;
   border-top: 2px solid var(--accent);
   color: var(--text);

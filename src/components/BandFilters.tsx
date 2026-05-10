@@ -203,21 +203,17 @@ export default function BandFilters({
                       </button>
                     )}
                   </div>
-                  <div className={styles.pillRowScroll}>
-                    {genres.map((genre) => {
-                      const on = value.genre === genre;
-                      return (
-                        <button
-                          key={genre}
-                          className={`${styles.genrePill} ${on ? styles.genrePillOn : ''}`}
-                          onClick={() => toggleGenre(genre)}
-                          aria-pressed={on}
-                        >
-                          {genre}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <select
+                    className={styles.genreSelect}
+                    value={value.genre ?? ''}
+                    onChange={(e) => update('genre', e.target.value || null)}
+                    aria-label={t('genero')}
+                  >
+                    <option value="">{t('todosGeneros')}</option>
+                    {genres.map((genre) => (
+                      <option key={genre} value={genre}>{genre}</option>
+                    ))}
+                  </select>
                 </>
               )}
 

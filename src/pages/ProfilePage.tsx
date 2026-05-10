@@ -227,7 +227,7 @@ function ProfileForm({
           {flag && <span className={styles.pfCountryFlag}>{flag}</span>}
           {savedWackenYears.length > 0 && (
             <span className={styles.pfYearsPill}>
-              {[...savedWackenYears].sort((a, b) => a - b).join(' · ')}
+              {savedWackenYears.length === 1 ? '1 Wacken' : `${savedWackenYears.length} Wackens`}
             </span>
           )}
         </div>

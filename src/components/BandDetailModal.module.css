@@ -357,6 +357,7 @@
   .backdrop {
     align-items: flex-end;
     padding: var(--s-3);
+    padding-bottom: calc(var(--s-3) + env(safe-area-inset-bottom, 0px));
   }
 
   .modal {

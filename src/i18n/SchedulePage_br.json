@@ -43,5 +43,6 @@
   "missedShort": "não viu",
   "missedAvailableAfter": "Disponível depois das {time}",
   "conflictWarning": "Conflita com {name}",
-  "pendingSync": "Sync pendente"
+  "pendingSync": "Sync pendente",
+  "todosGeneros": "Todos os gêneros"
 }

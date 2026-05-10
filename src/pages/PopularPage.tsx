@@ -54,11 +54,13 @@ export default function PopularPage() {
 
   const popularBands = useMemo(
     () =>
-      [...bands].sort((a, b) => {
-        const countDelta = (pickCounts[b.id] ?? 0) - (pickCounts[a.id] ?? 0);
-        if (countDelta !== 0) return countDelta;
-        return a.start_time.localeCompare(b.start_time);
-      }),
+      [...bands]
+        .filter((b) => (pickCounts[b.id] ?? 0) > 0)
+        .sort((a, b) => {
+          const countDelta = (pickCounts[b.id] ?? 0) - (pickCounts[a.id] ?? 0);
+          if (countDelta !== 0) return countDelta;
+          return a.start_time.localeCompare(b.start_time);
+        }),
     [bands, pickCounts],
   );
 

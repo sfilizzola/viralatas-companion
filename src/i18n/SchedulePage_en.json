@@ -43,5 +43,6 @@
   "missedShort": "didn't see",
   "missedAvailableAfter": "Available after {time}",
   "conflictWarning": "Conflicts with {name}",
-  "pendingSync": "Pending sync"
+  "pendingSync": "Pending sync",
+  "todosGeneros": "All genres"
 }
