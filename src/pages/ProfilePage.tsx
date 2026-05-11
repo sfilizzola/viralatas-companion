@@ -885,7 +885,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
       );
 
       try {
-        await unblockUser(targetUserId);
+        await announcementsRepository.unblockUser(targetUserId);
         setBlockedPosters((prev) => prev.filter((bp) => bp.user_id !== targetUserId));
       } catch (error) {
         console.error('Unblock failed:', error);
@@ -1592,7 +1592,7 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
       );
 
       try {
-        await unblockUser(blockedUserId);
+        await announcementsRepository.unblockUser(blockedUserId);
         setBlockedUsers((prev) => prev.filter((u) => u.id !== blockedUserId));
       } catch (error) {
         console.error('Unblock failed:', error);

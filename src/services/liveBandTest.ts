@@ -1,6 +1,6 @@
 import type { LiveBandTestConfig } from '../types';
-import { saveLiveBandTestConfig } from './db';
-import { supabase } from './supabase';
+import { saveLiveBandTestConfig } from '../lib/db';
+import { supabase } from '../lib/supabase';
 
 export async function syncLiveBandTestConfig(): Promise<void> {
   const { data, error } = await supabase.from('live_band_test_config').select('*').single();
