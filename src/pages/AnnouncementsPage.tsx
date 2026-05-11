@@ -15,7 +15,9 @@ import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
 import Icon from '../components/icons/Icon';
+import ArrivalMap from '../components/ArrivalMap';
 import { Avatar, Chip } from '../ui';
+import { useNow } from '../hooks/useNow';
 import styles from './AnnouncementsPage.module.css';
 
 function relativeTime(
@@ -38,6 +40,7 @@ export default function AnnouncementsPage() {
   const { t } = useI18n('AnnouncementsPage');
   const { session } = useAuth();
   const userId = session?.user?.id ?? null;
+  const currentTime = useNow();
 
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [crewUsers, setCrewUsers] = useState<CrewUser[]>([]);
@@ -194,6 +197,10 @@ export default function AnnouncementsPage() {
       </header>
 
       <main className={styles.main}>
+        {userId && crewUsers.length > 0 && (
+          <ArrivalMap crewUsers={crewUsers} currentUserId={userId} currentTime={currentTime} />
+        )}
+
         {usefulLinks.length > 0 && (
           <section className={styles.usefulLinksRow} aria-labelledby="useful-links-title">
             <h2 className={styles.usefulLinksTitle} id="useful-links-title">
