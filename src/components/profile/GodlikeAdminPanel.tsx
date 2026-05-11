@@ -5,7 +5,7 @@ import { announcementsRepository, bandsRepository, presenceRepository } from '..
 import { loadBands, loadAllUserPicks, loadLiveBandTestConfig, loadMetalPlaceConfig } from '../../lib/db';
 import { getRegistrationEnabled, setRegistrationEnabled } from '../../lib/appSettings';
 import { saveLiveBandTestConfigRemote } from '../../services/liveBandTest';
-import { Avatar, Button, Collapsible, Select } from '../../ui';
+import { Avatar, Collapsible, Select } from '../../ui';
 import TimeTravelSection from './TimeTravelSection';
 import AssignBadgeModal from './AssignBadgeModal';
 import type { UserWithLoading } from './types';
@@ -266,20 +266,25 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
       <Collapsible trigger={trigger}>
         <div className={styles.conflictsInner}>
           <div className={styles.godlikeSectionContent}>
-            <Button
-              variant="destructive"
-              fullWidth
-              onClick={handleResetAllData}
-              disabled={resetting}
-            >
-              {resetting ? `${t('resetting')} ⏳` : t('resetAllData')}
-            </Button>
+            <div className={styles.resetSection}>
+              <h4 className={styles.resetSectionTitle}>{t('resetAllData')}</h4>
+              <p className={styles.resetSectionDescription}>{t('resetAllDataDescription')}</p>
+              {resetMessage && <p className={styles.resetMessage}>{resetMessage}</p>}
+              <button
+                className={styles.resetDestructiveButton}
+                onClick={handleResetAllData}
+                disabled={resetting}
+                type="button"
+              >
+                {resetting ? `${t('resetting')} ⏳` : t('resetConfirm')}
+              </button>
+            </div>
 
-            {resetMessage && <p className={styles.resetMessage}>{resetMessage}</p>}
-
-            <div className={styles.registrationControlContainer}>
-              <label className={styles.registrationControlLabel}>
-                {t('registrationToggle')}
+            <div className={styles.registrationSection}>
+              <h4 className={styles.registrationSectionTitle}>{t('registrationToggle')}</h4>
+              <p className={styles.registrationSectionDescription}>{t('registrationToggleDescription')}</p>
+              {registrationError && <p className={styles.registrationError}>{registrationError}</p>}
+              <div className={styles.registrationControlRow}>
                 <button
                   className={`${styles.registrationToggleButton} ${registrationEnabled ? styles.enabled : styles.disabled}`}
                   onClick={handleToggleRegistration}
@@ -292,8 +297,10 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                       ? t('registrationEnabled')
                       : t('registrationDisabled')}
                 </button>
-              </label>
-              {registrationError && <p className={styles.registrationError}>{registrationError}</p>}
+                <span className={styles.registrationStatus}>
+                  {registrationEnabled ? '🟢' : '🔴'}
+                </span>
+              </div>
             </div>
 
             {!metalPlaceLoading && (

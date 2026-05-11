@@ -840,6 +840,97 @@
   text-align: center;
 }
 
+.resetSection {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius);
+  background: rgba(239, 68, 68, 0.06);
+}
+
+.resetSectionTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(239, 68, 68, 0.95);
+}
+
+.resetSectionDescription {
+  margin: 0 0 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.resetMessage {
+  margin: 0 0 1rem;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  text-align: center;
+  border-radius: var(--radius);
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.resetDestructiveButton {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  border-radius: var(--radius);
+  color: rgba(239, 68, 68, 0.95);
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+}
+
+.resetDestructiveButton:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: rgba(239, 68, 68, 0.7);
+}
+
+.resetDestructiveButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.registrationSection {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--radius);
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.registrationSectionTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(59, 130, 246, 0.95);
+}
+
+.registrationSectionDescription {
+  margin: 0 0 1rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.registrationControlRow {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.registrationStatus {
+  flex-shrink: 0;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
 .metalPlaceSection {
   width: 100%;
   padding: 1rem;
