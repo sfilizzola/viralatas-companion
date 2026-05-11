@@ -1,7 +1,6 @@
 import { useState, useMemo } from 'react';
 import type { CrewUser } from '../types';
 import { useI18n } from '../lib/i18n';
-import AnnounchementsTranslations from '../i18n/Announcements_br.json';
 import styles from './ArrivalMap.module.css';
 
 type ArrivalMapProps = {
@@ -175,7 +174,7 @@ export default function ArrivalMap({
   currentUserId,
   currentTime,
 }: ArrivalMapProps) {
-  const { t } = useI18n(AnnounchementsTranslations);
+  const { t } = useI18n('AnnouncementsPage');
   const [expandedDay, setExpandedDay] = useState<ArrivalDay | null>(null);
   const [isManuallyExpanded, setIsManuallyExpanded] = useState(false);
 
