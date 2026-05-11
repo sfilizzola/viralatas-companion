@@ -46,6 +46,9 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[Supabase Schema](supabase-schema.md)** — Database tables, RLS policies, migrations, realtime setup
 - **[Data Repositories](architecture.md#repositories)** — Data access patterns, sync methods
 
+### Features & Mechanics
+- **[Badge System](badges.md)** — 22+ condition types, current badges, how to add new badges, localization, testing
+
 ### Flows & Behaviors
 - **[Flow: Picking a Band](flows/pick-band.md)** — Optimistic write, realtime update, offline fallback
 - **[Flow: Offline Sync](flows/offline-pick-sync.md)** — Queue mechanics, deduplication, reconnect behavior

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "ai-wiki/decisions/pwa-not-native.md",
+                "file": "ai-wiki/badges.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "pwa-not-native"
+              "title": "badges"
             }
           }
         ]
@@ -94,7 +94,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "ai-wiki/decisions/pwa-not-native.md",
+                "file": "ai-wiki/routes.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -104,7 +104,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for pwa-not-native"
+              "title": "Backlinks for routes"
             }
           },
           {
@@ -113,12 +113,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "ai-wiki/decisions/pwa-not-native.md",
+                "file": "ai-wiki/routes.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from pwa-not-native"
+              "title": "Outgoing links from routes"
             }
           },
           {
@@ -156,13 +156,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "ai-wiki/decisions/pwa-not-native.md",
+                "file": "ai-wiki/routes.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of pwa-not-native"
+              "title": "Outline of routes"
             }
           }
         ]
@@ -185,9 +185,12 @@
   },
   "active": "b3148644435c111f",
   "lastOpenFiles": [
-    "ai-wiki/decisions/indexeddb-primary-store.md",
+    "ai-wiki/index.md",
+    "ai-wiki/badges.md",
+    "ai-wiki/routes.md",
     "ai-wiki/flows/pick-band.md",
     "ai-wiki/decisions/pwa-not-native.md",
+    "ai-wiki/decisions/indexeddb-primary-store.md",
     "ai-wiki/testing.md",
     "ai-wiki/decisions",
     "ai-wiki/flows",
@@ -195,9 +198,7 @@
     "ai-wiki/changelog.md",
     "ai-wiki/sync-engine.md",
     "ai-wiki/glossary.md",
-    "ai-wiki/routes.md",
     "ai-wiki/offline-first.md",
-    "ai-wiki/index.md",
     "ai-wiki/domain-model.md",
     "ai-wiki/architecture.md"
   ]

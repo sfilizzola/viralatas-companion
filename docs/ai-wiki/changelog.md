@@ -4,17 +4,24 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
-## 2026-05-11
+## 2026-05-11 (Phase 13.B)
 
-### Added
-- **index.md** — Navigation hub, system diagram, architecture principles, reading order
-- **architecture.md** — 4-layer design, data flows (online/offline/realtime), repositories, offline behavior, sync mechanisms
-- **domain-model.md** — Entities (User, Band, UserPick, UserPresence, Announcement, etc.), relationships, business rules by role
-- **offline-first.md** — Golden rule (IDB primary), queue design, deduplication mechanics, example lifetimes, guarantees per data type, Service Worker caching
-- **sync-engine.md** — Sync orchestration (4 components), queue flush flow, realtime subscription flow, app init flow, key sync functions, error handling, monitoring
-- **routes.md** — All 6 routes, page components, navigation flows (login → /now, browse → pick, post announcement), error handling per route
-- **testing.md** — Unit/integration/offline testing, manual test scenarios (offline pick/announcement/dedup), testing offline behavior, badge/time logic tests
-- **glossary.md** — 100+ terms: architecture, database, React, auth, data, sync, UI, time, badge, role, testing
+### Added (User Flows)
+- **flows/live-now.md** — Live band display: time model (festival-local CEST), current/next band selection algorithm, conflict severity (hard >15min / soft ≤15min), crew grouping (by band → camping → metal place → lost), presence states (camping, metal place time window, auto-checkout), godlike test mode (splice virtual band at now), realtime presence updates (~3s), edge cases (band ends at now, multiple picks both current, timezone wrapping, stale offline state), performance memoization, known limitations (hard-coded CEST, no auto-seen tracking), future improvements
+
+---
+
+## 2026-05-11 (Phase 13.A)
+
+### Added (User Flows)
+- **flows/announcements.md** — Complete post lifecycle: happy path (online), offline queueing & flushing, realtime propagation to other users, soft-delete with RLS enforcement, moderation (manager/godlike), edge cases (post-delete race, blocked posters, flaky network, retry idempotency), known issues (blocked poster RLS missing, no dedup on retry), future improvements
+
+---
+
+## 2026-05-11 (Continued)
+
+### Added (Features & Systems)
+- **badges.md** — Badge system: 22+ condition types (Wacken history, profile, arrival, band picks/seen, location, assigned), current 30 badges, step-by-step guide to add new badges, localization (4 languages), testing patterns, edge cases, persist vs. conditional badge semantics
 
 ### Architectural Discoveries
 - IndexedDB has 13 object stores (data + queues + config)
@@ -35,18 +42,28 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-11 (Initial Session)
+
+### Added (Core Architecture)
+- **index.md** — Navigation hub, system diagram, architecture principles, reading order
+- **architecture.md** — 4-layer design, data flows (online/offline/realtime), repositories, offline behavior, sync mechanisms
+- **domain-model.md** — Entities (User, Band, UserPick, UserPresence, Announcement, etc.), relationships, business rules by role
+- **offline-first.md** — Golden rule (IDB primary), queue design, deduplication mechanics, example lifetimes, guarantees per data type, Service Worker caching
+- **sync-engine.md** — Sync orchestration (4 components), queue flush flow, realtime subscription flow, app init flow, key sync functions, error handling, monitoring
+- **routes.md** — All 6 routes, page components, navigation flows (login → /now, browse → pick, post announcement), error handling per route
+- **testing.md** — Unit/integration/offline testing, manual test scenarios (offline pick/announcement/dedup), testing offline behavior, badge/time logic tests
+- **glossary.md** — 100+ terms: architecture, database, React, auth, data, sync, UI, time, badge, role, testing
+
+---
+
 ## Future
 
-### TBD
-- **decisions/indexeddb-primary-store.md** — Why IDB is primary (offline, persistence, structured), tradeoffs
-- **decisions/supabase-as-sync-target.md** — Why Supabase (auth + DB + realtime), alternatives considered
-- **decisions/pwa-not-native.md** — Why PWA only (no React Native), constraints
-- **flows/pick-band.md** — Full lifecycle (online, offline, queue, realtime, dedup)
+### TBD (Flows & Decisions)
 - **flows/offline-pick-sync.md** — Queue mechanics, reconnect behavior, error recovery
 - **flows/live-now.md** — Time-based band display, conflicts, crew attendance
 - **flows/announcements.md** — Post, realtime, soft-delete, moderation
 - **flows/authentication.md** — Login, signup, session persistence, test users
-- **supabase-schema.md** — All tables, columns, RLS policies, realtime setup, migrations
+- **decisions/supabase-as-sync-target.md** — Why Supabase (auth + DB + realtime), alternatives considered
 
 ---
 
