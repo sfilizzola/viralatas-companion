@@ -16,6 +16,7 @@ export type Database = {
           wacken_years: number[];
           country: string | null;
           special_badges: string[];
+          wacken_arrival_day: string | null;
         };
         Insert: {
           id?: string;
@@ -29,6 +30,7 @@ export type Database = {
           wacken_years?: number[];
           country?: string | null;
           special_badges?: string[];
+          wacken_arrival_day?: string | null;
         };
         Update: {
           id?: string;
@@ -42,6 +44,7 @@ export type Database = {
           wacken_years?: number[];
           country?: string | null;
           special_badges?: string[];
+          wacken_arrival_day?: string | null;
         };
         Relationships: [];
       };

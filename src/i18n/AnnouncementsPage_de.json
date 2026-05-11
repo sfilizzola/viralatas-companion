@@ -21,5 +21,20 @@
   "role_godlike": "Godlike",
   "pendingSync": "Sync ausstehend",
   "blockedDone": "Blockiert",
-  "blockAction": "Blockieren"
+  "blockAction": "Blockieren",
+  "arrivalDaySunJul26": "SO 26. JUL",
+  "arrivalDayMonJul27": "MO 27. JUL",
+  "arrivalDayTueJul28": "DI 28. JUL",
+  "arrivalDayWedJul29": "MI 29. JUL",
+  "arrivalDayThuPlus": "DO+",
+  "arrivalMapTitle": "VIRA-LATAS ANKÜNFTE",
+  "arrivalMapNotSet": "Nicht angegeben",
+  "arrivalMapToday": "HEUTE",
+  "arrivalMapCountOne": "1 Person",
+  "arrivalMapCountOther": "{n} Personen",
+  "arrivalMapMinimized": "angekommen",
+  "arrivalMapExpandLabel": "alle sehen",
+  "arrivalMapCollapseLabel": "einklappen",
+  "arrivalMapEmpty": "Noch niemand hat seinen Ankunftstag angegeben",
+  "arrivalMapToArrive": "noch zu kommen"
 }

@@ -368,15 +368,6 @@ export const BADGES: BadgeConfig[] = [
   },
   // Crew at location badges
   {
-    slug: 'camping-mob',
-    imagePath: '/badges/badge_camping_mob.png',
-    labelKey: 'badgeCampingMob',
-    descriptionKey: 'badgeCampingMobDescription',
-    condition: { type: 'crew_at_location_min', location: 'camping', count: 10 },
-    year: 2026,
-    persist: true,
-  },
-  {
     slug: 'bbq-crew',
     imagePath: '/badges/badge_bbq.png',
     labelKey: 'badgeBbqCrew',

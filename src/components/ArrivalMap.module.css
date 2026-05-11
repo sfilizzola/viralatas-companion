@@ -1,0 +1,272 @@
+/* ============================================================
+   ARRIVAL MAP — Phase 12 crew coordination component
+   ============================================================ */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+  padding: var(--s-4);
+  background: var(--bg);
+}
+
+/* ── Header (States 2 & 3) ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  margin: 0;
+  flex: 1;
+}
+
+/* ── Day rows container ── */
+.dayRows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+/* ── Individual day row ── */
+.dayRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 4px;
+  padding: var(--s-3);
+}
+
+/* ── Row header (label + count + toggle) ── */
+.rowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+}
+
+.dayLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.d1Badge,
+.todayBadge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: var(--signal-warn);
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.rowStats {
+  display: flex;
+  align-items: center;
+  gap: var(--s-1);
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.expandButton {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+
+.expandButton:hover {
+  color: var(--text);
+}
+
+/* ── Collapsed state: avatar cluster ── */
+.collapsedContent {
+  display: flex;
+  align-items: center;
+}
+
+.cluster {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  border: 2px solid var(--bg);
+  margin-left: -6px;
+}
+
+.avatar:first-child {
+  margin-left: 0;
+}
+
+.more {
+  margin-left: 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ── Expanded state: name chips ── */
+.expandedContent {
+  padding-top: var(--s-2);
+  border-top: 1px solid var(--border);
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-1);
+}
+
+.locChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px 3px 3px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.locChipMe {
+  background: rgba(192, 57, 43, 0.14);
+  border-color: rgba(192, 57, 43, 0.45);
+  color: #fff;
+}
+
+.chipAvatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.locChipMe .chipAvatar {
+  background: var(--accent);
+}
+
+.chipName {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 100px;
+}
+
+/* ── State 1: Collapsed (one-liner) ── */
+.collapsedView {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--signal-ok);
+  border-radius: 4px;
+  padding: var(--s-3);
+}
+
+.chevron {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 8px;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.chevron:hover {
+  color: var(--text);
+}
+
+.summaryLabel {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.summaryText {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  flex: 1;
+  text-align: right;
+}
+
+/* ── Empty state ── */
+.emptyState {
+  padding: var(--s-4);
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-muted);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  border-left: 4px solid var(--border);
+}

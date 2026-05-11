@@ -161,6 +161,7 @@ export default function EditProfileForm({
         avatar_url: newAvatarUrl,
         wacken_years: newWackenYears,
         country: newCountry || null,
+        wacken_arrival_day: newArrivalDay || null,
       })
       .eq('id', user.id);
     setSaving(false);

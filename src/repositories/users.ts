@@ -5,7 +5,7 @@ import type { CrewUser } from '../types';
 async function syncCrew(): Promise<void> {
   const { data, error } = await supabase
     .from('users')
-    .select('id, display_name, avatar_url')
+    .select('id, display_name, avatar_url, wacken_arrival_day')
     .order('display_name', { ascending: true, nullsFirst: false });
 
   if (error || !data) return;

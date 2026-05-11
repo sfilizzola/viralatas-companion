@@ -21,5 +21,20 @@
   "role_godlike": "Godlike",
   "pendingSync": "Sync pendente",
   "blockedDone": "Bloqueado",
-  "blockAction": "Bloquear"
+  "blockAction": "Bloquear",
+  "arrivalDaySunJul26": "DOM JUL 26",
+  "arrivalDayMonJul27": "SEG JUL 27",
+  "arrivalDayTueJul28": "TER JUL 28",
+  "arrivalDayWedJul29": "QUA JUL 29",
+  "arrivalDayThuPlus": "QUI+",
+  "arrivalMapTitle": "CHEGADAS DOS VIRA-LATAS",
+  "arrivalMapNotSet": "Não definido",
+  "arrivalMapToday": "HOJE",
+  "arrivalMapCountOne": "1 vira-lata",
+  "arrivalMapCountOther": "{n} vira-latas",
+  "arrivalMapMinimized": "chegaram",
+  "arrivalMapExpandLabel": "ver todos",
+  "arrivalMapCollapseLabel": "recolher",
+  "arrivalMapEmpty": "Nenhum vira-lata definiu chegada ainda",
+  "arrivalMapToArrive": "a chegar"
 }
