@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { CrewUser } from '../types';
 import { useI18n } from '../lib/i18n';
 import styles from './ArrivalMap.module.css';
@@ -178,10 +178,30 @@ export default function ArrivalMap({
   const { t } = useI18n('AnnouncementsPage');
   const isFestivalActive = currentTime >= FESTIVAL_DAY_1_START;
 
-  // Start in 'days' view before festival, 'collapsed' after
-  const defaultView: ViewState = isFestivalActive ? 'collapsed' : 'days';
-  const [view, setView] = useState<ViewState>(defaultView);
+  // Load saved view state from localStorage, or use default
+  const getSavedViewState = (): ViewState => {
+    const saved = localStorage.getItem('arrivals_map_view_state');
+    if (saved === 'collapsed' || saved === 'days' || saved === 'details') {
+      return saved;
+    }
+    // Default: collapsed if festival is active, days view before
+    return isFestivalActive ? 'collapsed' : 'days';
+  };
+
+  const [view, setView] = useState<ViewState>(getSavedViewState);
   const [expandedDay, setExpandedDay] = useState<ArrivalDay | 'not-set' | null>(null);
+
+  // Persist view state to localStorage
+  useEffect(() => {
+    localStorage.setItem('arrivals_map_view_state', view);
+  }, [view]);
+
+  // Force collapse if festival has started
+  useEffect(() => {
+    if (isFestivalActive && view !== 'collapsed') {
+      setView('collapsed');
+    }
+  }, [isFestivalActive, view]);
 
   const groupedByArrivalDay = useMemo(() => {
     const grouped: Record<ArrivalDay | 'not-set', CrewUser[]> = {

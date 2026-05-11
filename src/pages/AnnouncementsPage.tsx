@@ -189,6 +189,9 @@ export default function AnnouncementsPage() {
   }
 
   const canModerate = role === 'manager' || role === 'godlike';
+  const isFestivalActive = currentTime >= new Date('2026-07-29T00:00:00+01:00');
+  const showArrivalMapTop = userId && crewUsers.length > 0 && !isFestivalActive;
+  const showArrivalMapBottom = userId && crewUsers.length > 0 && isFestivalActive;
 
   return (
     <div className={styles.page}>
@@ -219,7 +222,7 @@ export default function AnnouncementsPage() {
           </section>
         )}
 
-        {userId && crewUsers.length > 0 && (
+        {showArrivalMapTop && (
           <ArrivalMap crewUsers={crewUsers} currentUserId={userId} currentTime={currentTime} />
         )}
 
@@ -321,6 +324,12 @@ export default function AnnouncementsPage() {
               );
             })}
           </ul>
+        )}
+
+        {showArrivalMapBottom && (
+          <div className={styles.arrivalMapBottom}>
+            <ArrivalMap crewUsers={crewUsers} currentUserId={userId} currentTime={currentTime} />
+          </div>
         )}
       </main>
 
