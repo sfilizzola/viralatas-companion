@@ -17,6 +17,7 @@ dist-ssr/
 .vscode/
 .idea/
 .obsidian/
+.obsidian/graph.json
 *.sw?
 
 # OS
