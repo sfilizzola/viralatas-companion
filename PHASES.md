@@ -4,14 +4,27 @@ Current phase and upcoming work for Viralatas Metaleiros. Refer to CLAUDE.md for
 
 ---
 
-## Status: Phase 12 — Crew Arrival Map (active)
+## Status: Phase 13 — Wiki Documentation: User Flows (planned)
 
-Building a social coordination feature to show when vira-latas are arriving at Wacken.
+Documenting complete user flows through the app features. See Phase 13 section below.
 
-For upcoming work after Phase 12 see:
+For upcoming work after Phase 13 see:
 - **[FUTURE_IDEAS.md](FUTURE_IDEAS.md)** — nice-to-have features if time allows
 - **[NEW_ARCH_PLAN.md](NEW_ARCH_PLAN.md)** — staged architectural refactoring plan (services layer, repositories, page decomposition, UI primitives)
 - **[COMPONENT_LIBRARY_PLAN.md](COMPONENT_LIBRARY_PLAN.md)** — Stage 4 of the arch plan: `src/ui/` primitives spec
+
+---
+
+## Phase 12 — Crew Arrival Map ✅
+
+All sub-phases completed.
+
+| Sub-phase | Deliverable |
+|---|---|
+| **12.A** | Schema & data layer: migrated `wacken_arrival_day` to `public.users` column; `EditProfileForm` writes to both places; `syncCrew()` expanded |
+| **12.B** | Built `<ArrivalMap />` component: bar-row-per-day layout with avatar clusters + name chips; 4px accent strips (teal/red/amber); time-aware auto-minimize |
+| **12.C** | Integrated `<ArrivalMap>` on `/announcements` above announcements list |
+| **12.D** | Localized arrival map strings for all 4 languages (br/en/es/de) with localized day labels |
 
 ---
 
@@ -33,57 +46,104 @@ All sub-phases completed.
 
 ---
 
-## Phase 12 — Crew Arrival Map 🚀
+## Phase 13 — Wiki Documentation: User Flows 📖
 
-**Goal:** Show when each vira-lata is arriving at Wacken on the `/announcements` page. Build a reusable `<ArrivalMap />` component that displays crew members grouped by arrival day with expandable details.
+**Goal:** Document the complete user flows and journeys through the app. Each flow traces a feature from trigger through happy path, offline behavior, sync behavior, realtime updates, and edge cases. These docs prevent future regressions and onboard engineers faster.
 
-**Context:** Phase 11.D added `wacken_arrival_day` tracking in Supabase Auth metadata only. Phase 12 mirrors this to `public.users` and builds a visual component for the whole crew to coordinate arrivals.
+**Why after Phase 12:** Phase 12.C (ArrivalMap integration) will surface new data flow questions; documenting live flows immediately after clarifies reasoning.
+
+**Approach:** Write one flow per sub-phase. Each flow reads existing code + wiki (architecture.md, sync-engine.md, offline-first.md) and produces a standalone document with ASCII diagrams, timeline, and worked examples.
 
 ### Sub-phases
 
-| Sub-phase | Deliverable |
-|---|---|
-| **12.A** | Schema & data layer: migrate `wacken_arrival_day` to `public.users` column; update `EditProfileForm` to write both places; expand `syncCrew()` select; update types |
-| **12.B** | Build `<ArrivalMap />` component: bar-row-per-day layout with avatar clusters (collapsed) + name chips (expanded); 4px accent strips (teal/red/amber per day state); time-aware auto-minimize after Day 1 (Jul 29) |
-| **12.C** | Integration: embed `<ArrivalMap>` on `/announcements` above the announcements list; pass `crewUsers`, `currentUserId`, `currentTime` (from `useNow()`), `language` |
-| **12.D** | Localization: add arrival map strings for all 4 languages (br/en/es/de) with localized day labels (DOM/SUN/DOM/SO, etc.); handle missing-data "Não definido" row |
+| Sub-phase | Deliverable | Effort | Dependencies |
+|---|---|---|---|
+| **13.A** | **Flow: Announcements** — Post message, realtime sync, soft-delete, moderation, offline queue, reconnect | 3h | Read announcements.ts, repositories, RLS policies |
+| **13.B** | **Flow: Live Now** — Time-based band display, current/next band logic, crew attendance rendering, conflict detection | 3h | Read BandTime.ts, useNow hook, conflict logic |
+| **13.C** | **Flow: Offline Pick Sync** — Queue mechanics, deduplication worked example (5 toggles → 1 call), error recovery, reconnect toast | 2h | Read sync-engine.md, flushOfflineQueue logic |
+| **13.D** | **Flow: Authentication** — Login/signup, session persistence to IndexedDB, test user creation, RLS enforcement | 2.5h | Read supabase.ts, auth trigger, test seed scripts |
+
+**Total effort**: ~10.5 hours (reading + writing + testing)
 
 ### Acceptance Criteria
 
-- ✅ Migration applies cleanly; `wacken_arrival_day` readable on `public.users`
-- ✅ `EditProfileForm` writes to both auth metadata AND DB column on save
-- ✅ `syncCrew()` fetches `wacken_arrival_day`; crew users in IDB include the field
-- ✅ `<ArrivalMap>` renders on `/announcements` above announcements list
-- ✅ Arrival days group correctly: SUN/MON/TUE/WED/THU+ order, then "Não definido"
-- ✅ Rows show avatar cluster (max 5 + count label) when collapsed
-- ✅ Tap row to expand → shows name chips (`.loc-chip` pattern) with current user highlighted (`.me` style)
-- ✅ "TODAY" chip appears on the current day row
-- ✅ "D1" badge pill on WED JUL 29 row
-- ✅ 4px left accent strip: teal (past), red (future), amber (today)
-- ✅ Time-aware: after Jul 29 00:00 UTC+1, minimizes to single summary row; user can tap [▼] to expand
-- ✅ Empty state handles 0 arrivals: "Nenhum vira-lata definiu chegada ainda"
-- ✅ All 4 languages: br/en/es/de strings present in corresponding i18n files
-- ✅ No regressions: `npm test` passes
-- ✅ Component works in offline mode (no data fetching; relies on cached `crewUsers`)
+- ✅ **announcements.md** — Post lifecycle with 4 paths: (1) online immediate, (2) online realtime from others, (3) offline queue, (4) reconnect flush; soft-delete timing; moderation RLS
+- ✅ **live-now.md** — BandTime logic (festival-local hour), current/next band selection algorithm, `useNow()` time-shift override, conflict severity (soft/hard), crew counts, visual priority ordering
+- ✅ **offline-pick-sync.md** — Queue store structure (13 object stores), deduplication by (user_id, band_id), keepLast semantics, worked example (timestamps T=0:10 through T=0:30), error recovery, reconnect with SyncToast
+- ✅ **authentication.md** — Signup trigger → users table creation, custom Supabase adapter (IndexedDB storage), session persistence, test user metadata (is_test_user), godlike role assignment, RLS per-table enforcement
 
-### Design System Notes
+### Diagram Requirements
 
-- **Pattern:** timeline-day header + collapsible row structure (reuses `/my-picks` patterns)
-- **Avatar clusters:** `.cluster` with `.av.s32` (overlapping, max 5)
-- **Name chips:** `.loc-chip` (22px avatar + first name)
-- **Styling:** `--bg-surface`, `--border`, `--signal-ok` (teal), `--accent` (red), `--signal-warn` (amber)
-- **Typography:** Oswald for day labels, JetBrains Mono for counts
-- **Motion:** only state changes (expand/collapse), no animation
+Each flow doc should include:
+- **Trigger** — What user action starts the flow
+- **Happy Path (Online)** — ASCII timeline with 5-7 key moments
+- **Offline Behavior** — Queue storage, state representation
+- **Sync Behavior (Reconnect)** — Dedup logic (if applicable), Supabase call, result handling
+- **Realtime Updates** — Other users' effects (if applicable)
+- **Edge Cases** — 2-3 failure scenarios per flow
 
-### Critical Files
+---
 
-| File | Change |
-|---|---|
-| `supabase/migrations/<ts>_phase12_arrival_day.sql` | New — add column |
-| `src/types/index.ts` | Add `wacken_arrival_day` to `User` and `CrewUser` |
-| `src/lib/supabase.types.ts` | Add `wacken_arrival_day` to Row type |
-| `src/repositories/users.ts` | Expand syncCrew select |
-| `src/components/profile/EditProfileForm.tsx` | Write to DB column on save |
-| `src/components/ArrivalMap.tsx` | New component |
-| `src/pages/AnnouncementsPage.tsx` | Integrate ArrivalMap |
-| `src/i18n/*_br.json`, `*_en.json`, `*_es.json`, `*_de.json` | Arrival map strings (all 4 languages) |
+## Phase 14 — Wiki Documentation: Architectural Decisions 📋
+
+**Goal:** Document the "why" behind key technical choices. ADRs (Architectural Decision Records) explain tradeoffs, alternatives considered, and consequences of each major decision.
+
+**Why separate from Phase 13:** Flows are horizontal (features); ADRs are vertical (architectural decisions). Grouping them helps future engineers understand both mechanics (flows) and reasoning (decisions).
+
+**Approach:** Write one ADR per sub-phase. Each ADR follows the template: Status → Date → Context → Decision → Rationale → Consequences → Tradeoffs Accepted → Related Decisions.
+
+### Sub-phases
+
+| Sub-phase | Deliverable | Effort | Dependencies |
+|---|---|---|---|
+| **14.A** | **ADR: Supabase as Sync Target** — Why Supabase (Auth + DB + Realtime in one), alternatives (Firebase, custom Node, CouchDB), cost/complexity tradeoffs | 2h | Read supabase setup, cost calculator |
+| **14.B** | **ADR: Custom Hooks + Event Emitters (no Redux)** — Why window events instead of Zustand/Redux, performance impact, testability, complexity reduction | 1.5h | Read App.tsx, hooks/, event emitter pattern |
+| **14.C** | **ADR: Service Worker Caching Strategy** — Why NetworkFirst for API, CacheFirst for images, cache invalidation via version bump, offline resilience | 1.5h | Read vite.config.ts Workbox, sw.ts |
+
+**Total effort**: ~5 hours
+
+### Acceptance Criteria
+
+- ✅ **supabase-as-sync-target.md** — Context (need auth + DB + realtime), decision (Supabase), rationale (cost, integration, free tier), consequences (+ learning curve, - vendor lock-in), tradeoffs (eventual consistency accepted for offline-first)
+- ✅ **custom-hooks-events-no-redux.md** — Decision (window events + custom hooks), rationale (simplicity, bundle size, no boilerplate), consequences (+ readable, - no time-travel debugging), when NOT to use (multi-page state sync)
+- ✅ **workbox-caching-strategy.md** — Decision (NetworkFirst API + CacheFirst assets), rationale (offline-first, stale-while-revalidate), consequences (+ resilience, - cache busting complexity), how cache invalidation works (version bump)
+
+---
+
+## Phase 15 — Wiki Documentation: Glossary Expansion & Index 🔍
+
+**Goal:** Expand the glossary to cover terms introduced in flows (Phase 13) and decisions (Phase 14), and create a comprehensive index linking all docs.
+
+**Why last:** After flows and decisions are written, the new terminology is clear. Glossary expansion ensures every term used across all docs has a definition.
+
+### Sub-phases
+
+| Sub-phase | Deliverable | Effort |
+|---|---|---|
+| **15.A** | **Glossary Expansion** — Add 30–40 new terms from Phase 13–14 (e.g., "deduplication," "soft-delete," "time-shift," "NetworkFirst," "offline queue," "godlike," etc.) | 1.5h |
+| **15.B** | **Wiki Index Update** — Update index.md to link all new flows/decisions, organize by section, add "reading paths" (e.g., "first-time engineer," "badge developer," "offline expert") | 1h |
+
+**Total effort**: ~2.5 hours
+
+### Acceptance Criteria
+
+- ✅ Glossary now covers 140+ terms (was 100+)
+- ✅ Every technical term in Phase 13–14 docs has a glossary entry
+- ✅ index.md lists all 18 wiki documents (11 core + 1 badges + 4 flows + 2 decisions)
+- ✅ "Reading paths" provide navigation by role/expertise
+
+---
+
+## Summary: Wiki Documentation Roadmap
+
+| Phase | Docs | Hours | Status |
+|---|---|---|---|
+| **Initial** | 11 core + 1 badges | ✅ 25h | **Complete** |
+| **13** | 4 user flows | ~10.5h | Planned |
+| **14** | 3 ADRs | ~5h | Planned |
+| **15** | Glossary + index | ~2.5h | Planned |
+| **Total** | **19 docs** | **~43h** | |
+
+**Execution order**: 13 → 14 → 15 (linear dependency: flows before ADRs, index after both)
+
+**Expected outcome**: Complete, copy-paste-ready wiki covering features, flows, decisions, and terminology. New engineers can onboard in 2–3 hours instead of 2–3 days.

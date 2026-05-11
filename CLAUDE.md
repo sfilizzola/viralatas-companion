@@ -1,6 +1,6 @@
 # CLAUDE.md — Viralatas Metaleiros 🤘
 
-Base context for every agent and Claude session in this project. This is the single source of truth for project intent, constraints, and technical decisions. Keep this file as the primary reference.
+Base context for every agent and Claude session in this project. This file + the **AI Wiki** (`docs/ai-wiki/`) together form the project's institutional memory. This file sets rules and fast facts; the wiki explains the architecture.
 
 ---
 
@@ -13,6 +13,74 @@ A festival companion PWA for **Viralatas Metaleiros** — Brazilian metal vira-l
 **Who:** ~20 metal vira-latas mostly from Brazil but people from All Over the World. Team lead: `sfilizzola@gmail.com` (godlike role, hard-coded).
 
 **Product terminology:** In all user-facing copy and localization files, use **vira-latas** instead of **crew** for the group/membership label. Internal code identifiers and existing schema names may keep `crew` when changing them would create unnecessary churn.
+
+---
+
+## AI Wiki
+
+The **AI Wiki** at `docs/ai-wiki/` is the single source of truth for deep technical understanding. CLAUDE.md provides the quick facts and rules; the wiki explains the "why" and "how" behind every architectural decision.
+
+### Before any coding task
+
+1. **Read PHASES.md** — Understand which phase you're in and its acceptance criteria
+2. **Read docs/ai-wiki/index.md** — Overview of the 5 core principles + system diagram
+3. **Read relevant wiki pages** — architecture.md, offline-first.md, sync-engine.md, domain-model.md, supabase-schema.md, and flow docs for the feature you're touching
+4. **Inspect relevant source files** — Read the code mentioned in the wiki
+5. Then and only then modify code
+
+### After every meaningful change
+
+Update **both**:
+- Relevant wiki pages (architecture.md, domain-model.md, etc.)
+- `docs/ai-wiki/changelog.md` with your changes
+
+### Changelog format
+
+```markdown
+## YYYY-MM-DD
+
+### Added
+- ...
+
+### Changed
+- ...
+
+### Architectural Notes
+- ...
+```
+
+### Current wiki inventory
+
+| File | Purpose |
+|---|---|
+| `index.md` | Navigation hub; 5 core principles; system diagram; window events; open questions |
+| `architecture.md` | 4-layer design; every hook/repo/service; data flows (online/offline/realtime) |
+| `offline-first.md` | Why offline-first; 4-phase sync mechanics; worked examples; per-type guarantees |
+| `sync-engine.md` | 4 sync components; queue flush flow; realtime subscriptions; debugging |
+| `domain-model.md` | 7 entities + 3 computed views; role-based rules |
+| `supabase-schema.md` | Full SQL DDL; RLS policies; Realtime config |
+| `routes.md` | 8 routes; 5 key nav flows with ASCII diagrams |
+| `testing.md` | 128+ tests; manual offline scenarios; simulation techniques |
+| `glossary.md` | ~100 terms across architecture, DB, React, auth, sync, UI, time, badge, role, testing |
+| `decisions/indexeddb-primary-store.md` | ADR: why IndexedDB, not Supabase-primary |
+| `decisions/pwa-not-native.md` | ADR: why PWA, not React Native/Capacitor |
+| `flows/pick-band.md` | Pick-band lifecycle: online, offline, dedup, realtime, edge cases |
+
+**Planned (not yet written):**
+- `flows/offline-pick-sync.md`, `flows/live-now.md`, `flows/announcements.md`, `flows/authentication.md`
+
+### Documentation standards
+
+Every wiki page should cover:
+
+1. **Purpose** — What question does this page answer?
+2. **Relevant Source Files** — Which files implement this?
+3. **Data Flow** — How does data move through the system?
+4. **Key Hooks / Services / Repositories** — What are the main abstractions?
+5. **Offline Behavior** — What happens when the user is offline?
+6. **Synchronization Behavior** — How does Supabase sync work?
+7. **Risks / Caveats** — What could go wrong?
+8. **Open Questions** — What's still unclear?
 
 ---
 
@@ -49,6 +117,8 @@ A festival companion PWA for **Viralatas Metaleiros** — Brazilian metal vira-l
 ├── supabase/
 │   ├── migrations/       # SQL migrations (source of truth)
 │   └── functions/        # Edge Functions (one folder per function)
+├── docs/
+│   └── ai-wiki/          # Architecture wiki (14 pages)
 ├── CLAUDE.md             # ← you are here
 ├── PHASES.md             # Current and upcoming development phases
 └── README.md             # User-facing setup & features
@@ -71,39 +141,19 @@ Unknown routes redirect to `/now`.
 
 ---
 
-## Database schema (source of truth)
+## Database schema
+
+**9 tables + 1 view:**
 
 ```sql
-users           — id (uuid), email, display_name, avatar_url, created_at,
-                  role (normal|manager|godlike), preferred_language (br|en),
-                  is_test_user (bool), wacken_years (int[]), country
-
-bands           — id (uuid), name, stage (text), start_time (timestamptz), 
-                  end_time (timestamptz), image_url, genre
-
-user_picks      — user_id (fk), band_id (fk), created_at
-                  [PK: (user_id, band_id)]
-
-announcements   — id (uuid), author_id (fk), content, created_at, 
-                  deleted_at (soft-delete)
-
-blocked_posters — user_id (fk), blocked_by (fk), blocked_at
-
-user_presence   — user_id (fk), is_camping (bool), is_at_metal_place (bool),
-                  updated_at
-
-metal_place_config
-                — single-row godlike config for Metal Place festival day,
-                  time range, and test_override_day
-
-live_band_test_config
-                — single-row godlike config for pinning one band as live now
-                  during testing
-
-band_attendance — view: counts picks per band (computed, not stored)
+users, bands, user_picks, announcements, blocked_posters,
+user_presence, user_missed_bands, metal_place_config,
+live_band_test_config, band_attendance (view)
 ```
 
-**Realtime:** Enabled on `user_picks`, `announcements`, `user_presence`, `metal_place_config`, and `live_band_test_config`. Band counts computed dynamically.
+**Realtime enabled on:** `user_picks`, `announcements`, `user_presence`, `metal_place_config`, `live_band_test_config`
+
+**Full DDL, RLS policies, and all migrations** → `docs/ai-wiki/supabase-schema.md`
 
 ---
 
@@ -115,6 +165,36 @@ band_attendance — view: counts picks per band (computed, not stored)
 4. **Picks made offline are queued.** Flush on reconnect. Never silently drop an offline pick.
 5. **Announcements are cached.** New announcements sync via Realtime when online; offline posts queue and flush on reconnect.
 6. **LLM alert calls are network-dependent.** Queue triggers offline; fire when signal returns. Conflict alerts (cached-only logic) may run offline.
+
+---
+
+## Architecture philosophy & guard rails
+
+**Philosophy:**
+This project is fundamentally offline-first social coordination for temporary communities. The festival domain is one specialization. Preserve: resilience, portability, synchronization integrity, local usability, low-friction mobile interaction.
+
+**Architectural rule:**
+```
+UI → IndexedDB
+      ↕ sync
+   Supabase
+```
+
+Never invert this to: `UI → API → local cache`. IndexedDB is the source of truth for the UI; Supabase is the sync backend.
+
+**Coding constraints — do NOT:**
+- Break offline-first behavior
+- Introduce server-dependent UI reads
+- Bypass synchronization abstractions
+- Tightly couple components to Supabase
+- Duplicate sync logic across files
+
+**Prefer:**
+- Repository abstractions over direct DB calls
+- Explicit domain logic over implicit behavior
+- Deterministic state transitions
+- Resilient synchronization
+- Optimistic UI updates
 
 ---
 
@@ -210,13 +290,15 @@ The trigger also:
 
 | Decision | Choice | Reason |
 |---|---|---|
-| App type | PWA only | No iOS App Store needed; vira-latas group is ~7 people |
+| App type | PWA only | No iOS App Store needed; vira-latas group is ~20 people |
 | Offline store | IndexedDB via `idb` library | Structured, async, survives browser close |
 | Backend | Supabase | Auth + DB + Realtime in one free-tier service |
 | LLM delivery | Proactive only | At a festival, no one is typing into chat |
 | Claude context | Full vira-latas picks every call | Vira-latas group is tiny, payload is negligible |
 | Alert language | Brazilian Portuguese | It's the Viralatas group, not a global product |
 | Role hierarchy | normal / manager / godlike | 3-tier allows moderation without giving everyone power |
+
+**Full architectural decision records** → `docs/ai-wiki/decisions/`
 
 ---
 
@@ -277,20 +359,23 @@ See **PHASES.md** for the current active phase.
 ## Before starting any task
 
 1. **Read PHASES.md** — Understand which phase you're in and its acceptance criteria.
-2. **Identify affected files.** Read them before editing.
-3. **For Supabase schema changes:** Write a migration under `supabase/migrations/`. Migrations are source of truth.
-4. **For Edge Functions:** Test locally with `supabase functions serve` before deploying.
-5. **Never commit secrets.** Use `.env.local` for keys. `.env.local` is in `.gitignore`.
-6. **Keep offline-first intact.** IndexedDB first, Supabase syncs. Never reverse that.
+2. **Read docs/ai-wiki/index.md** — System overview and core principles.
+3. **Read relevant wiki pages** — architecture.md, offline-first.md, sync-engine.md, domain-model.md, flows, decisions, etc., depending on the feature.
+4. **Identify affected files.** Read them before editing.
+5. **For Supabase schema changes:** Write a migration under `supabase/migrations/`. Migrations are source of truth.
+6. **For Edge Functions:** Test locally with `supabase functions serve` before deploying.
+7. **Never commit secrets.** Use `.env.local` for keys. `.env.local` is in `.gitignore`.
+8. **Keep offline-first intact.** IndexedDB first, Supabase syncs. Never reverse that.
 
 ---
 
 ## When completing a phase
 
-1. **Commit once per phase.** Bundle all changes from the phase into a single commit.
-2. **Minimize token use.** Use the Bash tool directly (no narration) and stage specific files: `git add <file1> <file2>...` rather than `git add .`
-3. **Push to the active branch.** Check `git status` to confirm branch, then push with `-u` if needed: `git push -u origin <branch>`.
-4. **Lean commit messages.** State the phase number and key deliverables in 1–2 sentences, ending with the Co-Authored-By footer.
+1. **Update the wiki.** Modify relevant wiki pages to reflect any new architectural understanding. Update `docs/ai-wiki/changelog.md` with a dated entry listing all changes (Added, Changed, Architectural Notes).
+2. **Commit once per phase.** Bundle all changes from the phase into a single commit.
+3. **Minimize token use.** Use the Bash tool directly (no narration) and stage specific files: `git add <file1> <file2>...` rather than `git add .`
+4. **Push to the active branch.** Check `git status` to confirm branch, then push with `-u` if needed: `git push -u origin <branch>`.
+5. **Lean commit messages.** State the phase number and key deliverables in 1–2 sentences, ending with the Co-Authored-By footer.
 
 Example: `"Phase 11.A: Fix /now header datetime stacking on mobile\n\nCo-Authored-By: Claude Haiku 4.5 <noreply@anthropic.com>"`
 
@@ -341,6 +426,7 @@ Specialized agents for isolated tasks live in `.claude/agents/`. Each agent read
 ## References
 
 - **PHASES.md** — Current phases: acceptance criteria, deliverables, deadlines
+- **docs/ai-wiki/** — Architecture wiki (14 pages)
 - **README.md** — Setup instructions, scripts, environment variables
 - **supabase/migrations/** — Database schema (source of truth)
 - **src/types/index.ts** — TypeScript type definitions
