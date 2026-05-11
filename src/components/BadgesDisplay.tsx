@@ -7,10 +7,10 @@ import {
   type BadgeBand,
   type BadgeConfig,
   type BadgeContext,
-} from '../lib/badges';
+} from '../services/badges';
 import { loadUserPicks, loadAllUserPicks, loadBands, loadAllUserPresence, PICKS_CHANGED_EVENT, MISSED_CHANGED_EVENT } from '../lib/db';
 import { loadAllMissed } from '../lib/missed';
-import { now } from '../lib/time';
+import { now } from '../services/time';
 import { supabase } from '../lib/supabase';
 import { useI18n } from '../lib/i18n';
 import styles from './BadgesDisplay.module.css';

@@ -3,7 +3,7 @@ import type { Band, UserMissedBand } from '../types';
 import { loadBands, MISSED_CHANGED_EVENT } from '../lib/db';
 import { togglePick } from '../lib/picks';
 import { loadAllMissed, markMissed, unmarkMissed, syncMissedBands, subscribeToMissedRealtime } from '../lib/missed';
-import { bandDay } from '../lib/bandTime';
+import { bandDay } from '../services/bandTime';
 import { useAuth } from '../hooks/useAuth';
 import { useBandAttendees } from '../hooks/useBandAttendees';
 import { useMyPicks } from '../hooks/useMyPicks';

@@ -1,8 +1,8 @@
 import { useEffect, useRef, type ReactNode } from 'react';
 import type { Band } from '../types';
 import type { BandAttendee } from '../hooks/useBandAttendees';
-import { stageColor } from '../lib/stageColors';
-import { bandDay, formatTime } from '../lib/bandTime';
+import { stageColor } from '../services/stageColors';
+import { bandDay, formatTime } from '../services/bandTime';
 import { useI18n } from '../lib/i18n';
 import Icon from './icons/Icon';
 import styles from './BandDetailModal.module.css';

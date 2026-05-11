@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { useI18n } from '../lib/i18n';
-import { stageColor } from '../lib/stageColors';
+import { stageColor } from '../services/stageColors';
 import Icon from './icons/Icon';
 import type { BandFilterValue } from './bandFilterValue';
 import styles from './BandFilters.module.css';

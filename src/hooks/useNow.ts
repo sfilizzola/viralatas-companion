@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { TIME_OVERRIDE_CHANGED_EVENT, now } from '../lib/time';
+import { TIME_OVERRIDE_CHANGED_EVENT, now } from '../services/time';
 
 export function useNow(intervalMs?: number): Date {
   const [date, setDate] = useState(() => now());

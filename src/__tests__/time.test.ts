@@ -7,7 +7,7 @@ import {
   isTimeOverrideActive,
   now,
   setTimeOverride,
-} from '../lib/time';
+} from '../services/time';
 
 beforeAll(() => {
   // The shared test setup stubs window.indexedDB but leaves localStorage as the

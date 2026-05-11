@@ -21,9 +21,9 @@ import {
   type CrewLiveGroup,
   type CrewLivePlan,
   type LivePlan,
-} from '../lib/livePreview';
+} from '../services/livePreview';
 import { setCampingStatus, setMetalPlaceStatus, syncCrewPresence, syncMetalPlaceConfig, isTimeWithinMetalPlaceWindow, validateAndAutoCheckoutOutsideMetalPlaceWindow } from '../lib/presence';
-import { syncLiveBandTestConfig } from '../lib/liveBandTest';
+import { syncLiveBandTestConfig } from '../services/liveBandTest';
 import {
   loadLiveBandTestConfig,
   loadMetalPlaceConfig,
@@ -38,7 +38,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNow } from '../hooks/useNow';
 import { useI18n } from '../lib/i18n';
-import { stageColor } from '../lib/stageColors';
+import { stageColor } from '../services/stageColors';
 import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BadgesDisplay from '../components/BadgesDisplay';

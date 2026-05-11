@@ -1,6 +1,6 @@
 # NEW_ARCH_PLAN.md — Architectural Refactoring Plan
 
-_Status: PLAN (not started)_  
+_Status: Stage 2 is CURRENT — Stage 1 COMPLETE_  
 _Context: Written May 2026 for the Viralatas Metaleiros companion app_  
 _Deadline constraint: Wacken starts July 29, 2026 (~11 weeks away at writing time)_
 
@@ -94,8 +94,9 @@ The `lib/` folder currently contains three different kinds of things:
 
 ---
 
-## Stage 1 — `lib/` cleanup + `services/` extraction
+## Stage 1 — `lib/` cleanup + `services/` extraction ✅ COMPLETE
 
+**Status:** Done — 2026-05-11. 205 tests green, TypeScript clean.  
 **Risk:** Very low. Pure file moves + import path updates. Zero behavior changes.  
 **Duration estimate:** 2–3 days  
 **Branch:** `refactor/stage-1-services`
@@ -144,15 +145,15 @@ lib/
 
 ### Acceptance criteria
 
-- [ ] `src/services/` exists with 8 files
-- [ ] `src/lib/` contains only infrastructure
-- [ ] All 177+ tests pass
-- [ ] TypeScript compiles clean
-- [ ] `grep -r "from.*lib/badges\|from.*lib/livePreview\|from.*lib/time\b" src/` returns nothing
+- [x] `src/services/` exists with 8 files
+- [x] `src/lib/` contains only infrastructure
+- [x] All 177+ tests pass (205 passed)
+- [x] TypeScript compiles clean
+- [x] `grep -r "from.*lib/badges\|from.*lib/livePreview\|from.*lib/time\b" src/` returns nothing
 
 ---
 
-## Stage 2 — Repository layer
+## Stage 2 — Repository layer 🔄 CURRENT
 
 **Risk:** Medium. The IDB-first + offline queue pattern moves from scattered functions to structured repositories. Hooks are updated to call repositories.  
 **Duration estimate:** 5–7 days  

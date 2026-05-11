@@ -18,14 +18,14 @@ import { fetchCurrentUserRole, fetchAllUsers, fetchBlockedPostersWithUserDetails
 import { invalidateCacheForAllUsers } from '../lib/cache';
 import { getRegistrationEnabled, setRegistrationEnabled } from '../lib/appSettings';
 import { saveMetalPlaceConfigRemote, autoCheckoutAllUsersFromMetalPlace } from '../lib/presence';
-import { saveLiveBandTestConfigRemote } from '../lib/liveBandTest';
+import { saveLiveBandTestConfigRemote } from '../services/liveBandTest';
 import {
   clearTimeOverride,
   getTimeOverride,
   setTimeOverride,
   TIME_OVERRIDE_CHANGED_EVENT,
-} from '../lib/time';
-import { BADGES } from '../lib/badges';
+} from '../services/time';
+import { BADGES } from '../services/badges';
 import { VERSION } from '../version';
 import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';

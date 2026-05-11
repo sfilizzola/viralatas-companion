@@ -18,7 +18,7 @@ import {
   syncAnnouncements,
 } from '../lib/announcements';
 import { supabase } from '../lib/supabase';
-import { loadUsefulLinks } from '../lib/usefulLinks';
+import { loadUsefulLinks } from '../services/usefulLinks';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';

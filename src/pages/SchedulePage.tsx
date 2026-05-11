@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Band } from '../types';
 import { loadBands } from '../lib/db';
 import { togglePick } from '../lib/picks';
-import { bandDay } from '../lib/bandTime';
+import { bandDay } from '../services/bandTime';
 import { useAuth } from '../hooks/useAuth';
 import { useMyPicks } from '../hooks/useMyPicks';
 import { useNow } from '../hooks/useNow';

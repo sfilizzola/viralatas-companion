@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import type { Band } from '../types';
 import type { BandAttendee } from '../hooks/useBandAttendees';
-import { stageColorVar } from '../lib/stageColors';
-import { formatTime } from '../lib/bandTime';
+import { stageColorVar } from '../services/stageColors';
+import { formatTime } from '../services/bandTime';
 import { useI18n } from '../lib/i18n';
 import StarIcon from './icons/StarIcon';
 import styles from './BandCard.module.css';

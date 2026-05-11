@@ -5,7 +5,7 @@ import {
   evaluateBadge,
   type BadgeBand,
   type BadgeConfig,
-} from '../lib/badges';
+} from '../services/badges';
 
 function authUser(metadata: Record<string, unknown> = {}): AuthUser {
   return {

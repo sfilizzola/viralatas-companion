@@ -3,7 +3,7 @@ import {
   applyLiveBandTestOverride,
   findLivePlan,
   mapCrewLivePlans,
-} from '../lib/livePreview';
+} from '../services/livePreview';
 import type { Band, CrewUser, UserPick, UserPresence } from '../types';
 
 function band(id: string, start: string, end: string, overrides: Partial<Band> = {}): Band {
