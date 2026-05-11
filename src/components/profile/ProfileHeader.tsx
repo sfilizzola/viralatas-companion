@@ -1,4 +1,5 @@
 import type { UserRole } from '../../types';
+import { Avatar, Chip } from '../../ui';
 import styles from '../../pages/ProfilePage.module.css';
 
 function countryFlag(code: string | null | undefined): string {
@@ -34,29 +35,29 @@ export default function ProfileHeader({
   savedWackenYears,
 }: ProfileHeaderProps) {
   const flag = countryFlag(savedCountry);
+  const roleVariant =
+    userRole === 'godlike'
+      ? 'role-godlike'
+      : userRole === 'manager'
+        ? 'role-manager'
+        : 'role-normal';
 
   return (
     <div className={styles.pfHead}>
-      <div className={styles.pfAvatarWrap}>
-        {avatarUrl ? (
-          <img className={styles.pfAvatarImg} src={avatarUrl} alt="" />
-        ) : (
-          <span className={styles.pfAvatarInitial} aria-hidden>{initial}</span>
-        )}
-      </div>
+      <Avatar size={56} src={avatarUrl} initial={initial} />
       <h1 className={styles.pfName}>{displayName}</h1>
       <p className={styles.pfEmail}>{email}</p>
       <div className={styles.pfMeta}>
         {userRole && (
-          <span className={`${styles.pfRoleChip} ${styles[`pfRole_${userRole}`]}`}>
+          <Chip variant={roleVariant as 'role-godlike' | 'role-manager' | 'role-normal'}>
             {roleLabel(userRole)}
-          </span>
+          </Chip>
         )}
         {flag && <span className={styles.pfCountryFlag}>{flag}</span>}
         {savedWackenYears.length > 0 && (
-          <span className={styles.pfYearsPill}>
+          <Chip>
             {savedWackenYears.length === 1 ? '1 Wacken' : `${savedWackenYears.length} Wackens`}
-          </span>
+          </Chip>
         )}
       </div>
     </div>

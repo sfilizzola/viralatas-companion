@@ -1,0 +1,28 @@
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.select {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-1);
+  color: var(--text);
+  padding: 0.65rem 0.75rem;
+  font-size: 1rem;
+  font-family: inherit;
+  width: 100%;
+}
+
+.select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

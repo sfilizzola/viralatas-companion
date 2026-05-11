@@ -1,0 +1,52 @@
+.wrap {
+  border: 1px solid var(--border);
+  border-radius: var(--r-2);
+  overflow: hidden;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--s-3) var(--s-4);
+  background: var(--bg-elevated);
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+  transition: background 0.15s;
+}
+
+.trigger:hover {
+  background: var(--border);
+}
+
+.chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
+
+.contentOpen {
+  max-height: 10000px;
+  transition: max-height 0.3s ease-in;
+}

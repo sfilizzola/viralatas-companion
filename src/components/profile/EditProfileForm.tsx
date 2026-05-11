@@ -2,7 +2,7 @@ import { useState, type ChangeEvent, type FormEvent } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import { supabase } from '../../lib/supabase';
 import { type Language } from '../../lib/i18n';
-import Icon from '../icons/Icon';
+import { Button, Collapsible, Input, Select, SegmentedControl } from '../../ui';
 import styles from '../../pages/ProfilePage.module.css';
 
 const DECADE_GROUPS: { label: string; years: number[] }[] = [
@@ -17,6 +17,11 @@ const ARRIVAL_DAY_OPTIONS = [
   { value: 'tue-jul28', labelKey: 'arrivalDayTueJul28' },
   { value: 'wed-jul29', labelKey: 'arrivalDayWedJul29' },
   { value: 'thu-plus', labelKey: 'arrivalDayThuPlus' },
+];
+
+const LANG_OPTIONS = [
+  { value: 'br', label: 'PT' },
+  { value: 'en', label: 'EN' },
 ];
 
 type TFn = (key: string, values?: Record<string, string | number>) => string;
@@ -131,7 +136,6 @@ export default function EditProfileForm({
   const [newArrivalDay, setNewArrivalDay] = useState<string>(
     (user.user_metadata?.['wacken_arrival_day'] as string | undefined) ?? '',
   );
-  const [prefsOpen, setPrefsOpen] = useState(false);
 
   async function handleSave(e: FormEvent) {
     e.preventDefault();
@@ -195,103 +199,75 @@ export default function EditProfileForm({
     setNewWackenYears((prev) => (checked ? [...prev, year] : prev.filter((y) => y !== year)));
   }
 
+  const trigger = <span className={styles.pfCollapseLabel}>{t('editProfile')}</span>;
+
   return (
-    <div className={styles.pfCollapse}>
-      <button
-        className={styles.pfCollapseRow}
-        type="button"
-        onClick={() => setPrefsOpen(!prefsOpen)}
-        aria-expanded={prefsOpen}
-      >
-        <span className={styles.pfCollapseLabel}>{t('editProfile')}</span>
-        <span className={`${styles.pfCollapseChevron} ${prefsOpen ? styles.open : ''}`}>
-          <Icon name="chevron" size={14} />
-        </span>
-      </button>
-      <div className={`${styles.pfCollapseContent} ${prefsOpen ? styles.open : ''}`}>
-        <form onSubmit={handleSave} className={styles.form}>
-          <label className={styles.label}>
-            {t('crewName')}
+    <Collapsible trigger={trigger} className={styles.pfCollapse}>
+      <form onSubmit={handleSave} className={styles.form}>
+        <Input
+          label={t('crewName')}
+          type="text"
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          maxLength={30}
+        />
+
+        <div className={styles.label}>
+          {t('language')}
+          <SegmentedControl
+            options={LANG_OPTIONS}
+            value={newLanguage}
+            onChange={(v) => setNewLanguage(v as Language)}
+          />
+        </div>
+
+        <label className={styles.label}>
+          {t('photo')}
+          <span className={styles.photoHelp}>{t('photoHelp')}</span>
+          <span className={styles.fileButton}>
+            {uploadingPhoto ? t('uploadingPhoto') : t('choosePhoto')}
             <input
-              className={styles.input}
-              type="text"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              maxLength={30}
+              className={styles.fileInput}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              disabled={uploadingPhoto}
+              onChange={handlePhotoChange}
             />
-          </label>
+          </span>
+        </label>
+        {photoError && <p className={styles.error}>{t('photoError')}</p>}
 
-          <div className={styles.label}>
-            {t('language')}
-            <div className={styles.langSeg}>
-              <button
-                type="button"
-                className={`${styles.langSegBtn} ${newLanguage === 'br' ? styles.langSegActive : ''}`}
-                onClick={() => setNewLanguage('br')}
-              >
-                PT
-              </button>
-              <button
-                type="button"
-                className={`${styles.langSegBtn} ${newLanguage === 'en' ? styles.langSegActive : ''}`}
-                onClick={() => setNewLanguage('en')}
-              >
-                EN
-              </button>
-            </div>
-          </div>
+        <WackenYearPicker
+          selectedYears={newWackenYears}
+          onToggle={handleYearToggle}
+          t={t}
+        />
 
-          <label className={styles.label}>
-            {t('photo')}
-            <span className={styles.photoHelp}>{t('photoHelp')}</span>
-            <span className={styles.fileButton}>
-              {uploadingPhoto ? t('uploadingPhoto') : t('choosePhoto')}
-              <input
-                className={styles.fileInput}
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                disabled={uploadingPhoto}
-                onChange={handlePhotoChange}
-              />
-            </span>
-          </label>
-          {photoError && <p className={styles.error}>{t('photoError')}</p>}
+        <Select
+          label={t('country')}
+          value={newCountry}
+          onChange={(e) => setNewCountry(e.target.value)}
+        >
+          <option value="">{t('countryPlaceholder')}</option>
+          <option value="de">{t('countryDe')}</option>
+          <option value="es">{t('countryEs')}</option>
+          <option value="br">{t('countryBr')}</option>
+          <option value="us">{t('countryUs')}</option>
+          <option value="co">{t('countryCo')}</option>
+          <option value="be">{t('countryBe')}</option>
+          <option value="other">{t('countryOther')}</option>
+        </Select>
 
-          <WackenYearPicker
-            selectedYears={newWackenYears}
-            onToggle={handleYearToggle}
-            t={t}
-          />
+        <ArrivalDayPicker
+          selectedDay={newArrivalDay}
+          onSelect={setNewArrivalDay}
+          t={t}
+        />
 
-          <label className={styles.label}>
-            {t('country')}
-            <select
-              className={styles.input}
-              value={newCountry}
-              onChange={(e) => setNewCountry(e.target.value)}
-            >
-              <option value="">{t('countryPlaceholder')}</option>
-              <option value="de">{t('countryDe')}</option>
-              <option value="es">{t('countryEs')}</option>
-              <option value="br">{t('countryBr')}</option>
-              <option value="us">{t('countryUs')}</option>
-              <option value="co">{t('countryCo')}</option>
-              <option value="be">{t('countryBe')}</option>
-              <option value="other">{t('countryOther')}</option>
-            </select>
-          </label>
-
-          <ArrivalDayPicker
-            selectedDay={newArrivalDay}
-            onSelect={setNewArrivalDay}
-            t={t}
-          />
-
-          <button className={styles.button} type="submit" disabled={saving}>
-            {saved ? t('saveDone') : saving ? t('saveLoading') : t('saveProfile')}
-          </button>
-        </form>
-      </div>
-    </div>
+        <Button type="submit" fullWidth disabled={saving}>
+          {saved ? t('saveDone') : saving ? t('saveLoading') : t('saveProfile')}
+        </Button>
+      </form>
+    </Collapsible>
   );
 }

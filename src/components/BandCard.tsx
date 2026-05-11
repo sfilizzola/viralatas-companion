@@ -4,6 +4,7 @@ import type { BandAttendee } from '../hooks/useBandAttendees';
 import { stageColorVar } from '../services/stageColors';
 import { formatTime } from '../services/bandTime';
 import { useI18n } from '../lib/i18n';
+import { Avatar, Chip } from '../ui';
 import StarIcon from './icons/StarIcon';
 import styles from './BandCard.module.css';
 
@@ -123,9 +124,9 @@ export default function BandCard({
       <div className={`${styles.body} ${variant === 'ranked' ? styles.bodyRanked : ''}`}>
         <h2 className={styles.bandName}>{band.name}</h2>
         <div className={styles.meta}>
-          <span className={styles.stageBadge} style={{ background: color }}>
+          <Chip style={{ background: color, color: '#fff', borderColor: 'transparent' }}>
             {band.stage}
-          </span>
+          </Chip>
           {variant !== 'timeline' && (
             <span className={styles.time}>
               {formatTime(band.start_time)} – {formatTime(band.end_time)}
@@ -204,21 +205,15 @@ function AttendeeCluster({
   return (
     <div className={styles.attendeeCluster}>
       <div className={styles.attendeeAvatars}>
-        {visible.map((a) =>
-          a.avatar_url ? (
-            <img
-              key={a.id}
-              className={styles.attendeeAvatar}
-              src={a.avatar_url}
-              alt=""
-              loading="lazy"
-            />
-          ) : (
-            <span key={a.id} className={styles.attendeeAvatar} aria-hidden>
-              {a.label.charAt(0).toUpperCase()}
-            </span>
-          ),
-        )}
+        {visible.map((a) => (
+          <Avatar
+            key={a.id}
+            size={32}
+            src={a.avatar_url}
+            initial={a.label.charAt(0).toUpperCase()}
+            className={styles.attendeeAvatar}
+          />
+        ))}
         {overflow > 0 && (
           <span className={styles.attendeeOverflow}>
             {t('attendeeOverflow', { count: overflow })}

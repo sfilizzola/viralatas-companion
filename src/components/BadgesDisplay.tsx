@@ -13,6 +13,7 @@ import { missedRepository } from '../repositories';
 import { now } from '../services/time';
 import { supabase } from '../lib/supabase';
 import { useI18n } from '../lib/i18n';
+import { Modal } from '../ui';
 import styles from './BadgesDisplay.module.css';
 
 const EMPTY_CTX: BadgeContext = {
@@ -70,7 +71,6 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       );
       const assignedBadges: string[] = (userRow.data as { special_badges?: string[] } | null)?.special_badges ?? [];
 
-      // Location context from presence and user_metadata
       const myPresence = presence.find((p) => p.user_id === user.id);
       const isAtCamping = myPresence?.is_camping ?? false;
       const isAtMetalPlace = myPresence?.is_at_metal_place ?? false;
@@ -105,7 +105,6 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
         achievedBadgeSlugs,
       );
 
-      // Write-back for any newly earned persist:true badge
       const earnedBadges = BADGES.filter((b) => evaluateBadge(b, newCtx));
       const newlyAchieved = earnedBadges
         .filter((b) => b.persist && !achievedBadgeSlugs.has(b.slug))
@@ -120,7 +119,7 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
             ],
           },
         }).catch(() => {
-          // Silently ignore — badge earning is best-effort
+          // badge earning is best-effort
         });
       }
 
@@ -165,12 +164,8 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       </div>
 
       {selectedBadge && (
-        <div
-          className={styles.modal}
-          onClick={() => setSelectedSlug(null)}
-          role="presentation"
-        >
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+        <Modal onClose={() => setSelectedSlug(null)}>
+          <div className={styles.modalContent}>
             <div className={styles.modalPatch}>
               <img
                 src={selectedBadge.imagePath}
@@ -184,7 +179,7 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
             <h3 className={styles.modalName}>{t(selectedBadge.labelKey)}</h3>
             <p className={styles.modalDesc}>{t(selectedBadge.descriptionKey)}</p>
           </div>
-        </div>
+        </Modal>
       )}
     </>
   );

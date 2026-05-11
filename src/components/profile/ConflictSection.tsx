@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Band, UserPick } from '../../types';
 import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../../lib/db';
 import { picksRepository } from '../../repositories';
-import Icon from '../icons/Icon';
+import { Button, Collapsible, Modal } from '../../ui';
 import styles from '../../pages/ProfilePage.module.css';
 
 const WACKEN_START = new Date('2026-07-29T00:00:00Z');
@@ -59,7 +59,6 @@ export default function ConflictSection({ userId, t }: ConflictSectionProps) {
   const [bands, setBands] = useState<Band[]>([]);
   const [picks, setPicks] = useState<UserPick[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isOpen, setIsOpen] = useState(false);
   const [selectedConflict, setSelectedConflict] = useState<ConflictPair | null>(null);
 
   useEffect(() => {
@@ -106,101 +105,90 @@ export default function ConflictSection({ userId, t }: ConflictSectionProps) {
 
   if (loading || conflicts.length === 0) return null;
 
+  const trigger = (
+    <div className={styles.conflictsTitle}>
+      <span>{t('conflicts')}</span>
+      <div className={styles.conflictBadge}>{conflicts.length}</div>
+    </div>
+  );
+
   return (
     <>
-      <div className={styles.conflictsSection}>
-        <button
-          className={styles.conflictsHeader}
-          onClick={() => setIsOpen(!isOpen)}
-          type="button"
-        >
-          <div className={styles.conflictsTitle}>
-            <span>{t('conflicts')}</span>
-            <div className={styles.conflictBadge}>{conflicts.length}</div>
-          </div>
-          <div className={`${styles.chevron} ${isOpen ? styles.open : ''}`}>
-            <Icon name="chevron" size={14} />
-          </div>
-        </button>
-
-        <div className={`${styles.conflictsContent} ${isOpen ? styles.open : ''}`}>
-          <div className={styles.conflictsInner}>
-            {conflictsByDay.map(({ day, pairs }) => (
-              <div key={day} className={styles.dayGroup}>
-                <div className={styles.dayGroupTitle}>{t('day', { day })}</div>
-                {pairs.map((conflict, idx) => (
-                  <button
-                    key={idx}
-                    className={styles.conflictCard}
-                    onClick={() => setSelectedConflict(conflict)}
-                    type="button"
-                  >
-                    <div className={styles.conflictCardBands}>
-                      <span className={styles.bandName}>{conflict.bandA.name}</span>
-                      <span className={styles.conflictIndicator}>⚠️</span>
-                      <span className={styles.bandName}>{conflict.bandB.name}</span>
-                    </div>
-                    <div className={styles.conflictCardTimes}>
-                      <span className={styles.bandTime}>
-                        {formatTime(conflict.bandA.start_time)} - {formatTime(conflict.bandA.end_time)}
-                      </span>
-                      <span className={styles.bandTime}>
-                        {formatTime(conflict.bandB.start_time)} - {formatTime(conflict.bandB.end_time)}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {selectedConflict && (
-        <div
-          className={styles.conflictModal}
-          onClick={() => setSelectedConflict(null)}
-          role="dialog"
-          aria-modal="true"
-        >
-          <div className={styles.conflictModalContent} onClick={(e) => e.stopPropagation()}>
-            <h3 className={styles.conflictModalTitle}>{t('conflictModalTitle')}</h3>
-
-            {[selectedConflict.bandA, selectedConflict.bandB].map((band) => (
-              <div key={band.id}>
-                <div className={styles.conflictBandOption}>
-                  <div className={styles.conflictBandName}>{band.name}</div>
-                  <div className={styles.conflictBandInfo}>
-                    <div>{band.stage}</div>
-                    <div>{formatTime(band.start_time)} - {formatTime(band.end_time)}</div>
-                  </div>
-                </div>
+      <Collapsible trigger={trigger} className={styles.conflictsSection}>
+        <div className={styles.conflictsInner}>
+          {conflictsByDay.map(({ day, pairs }) => (
+            <div key={day} className={styles.dayGroup}>
+              <div className={styles.dayGroupTitle}>{t('day', { day })}</div>
+              {pairs.map((conflict, idx) => (
                 <button
-                  className={styles.conflictButton}
-                  onClick={() =>
-                    handleKeepBand(
-                      band,
-                      band.id === selectedConflict.bandA.id
-                        ? selectedConflict.bandB
-                        : selectedConflict.bandA,
-                    )
-                  }
+                  key={idx}
+                  className={styles.conflictCard}
+                  onClick={() => setSelectedConflict(conflict)}
                   type="button"
                 >
-                  {t('keepBand', { band: band.name })}
+                  <div className={styles.conflictCardBands}>
+                    <span className={styles.bandName}>{conflict.bandA.name}</span>
+                    <span className={styles.conflictIndicator}>⚠️</span>
+                    <span className={styles.bandName}>{conflict.bandB.name}</span>
+                  </div>
+                  <div className={styles.conflictCardTimes}>
+                    <span className={styles.bandTime}>
+                      {formatTime(conflict.bandA.start_time)} -{' '}
+                      {formatTime(conflict.bandA.end_time)}
+                    </span>
+                    <span className={styles.bandTime}>
+                      {formatTime(conflict.bandB.start_time)} -{' '}
+                      {formatTime(conflict.bandB.end_time)}
+                    </span>
+                  </div>
                 </button>
-              </div>
-            ))}
-
-            <button
-              className={`${styles.conflictButton} ${styles.conflictCloseButton}`}
-              onClick={() => setSelectedConflict(null)}
-              type="button"
-            >
-              {t('close') ?? 'Close'}
-            </button>
-          </div>
+              ))}
+            </div>
+          ))}
         </div>
+      </Collapsible>
+
+      {selectedConflict && (
+        <Modal onClose={() => setSelectedConflict(null)} position="bottom">
+          <h3 className={styles.conflictModalTitle}>{t('conflictModalTitle')}</h3>
+
+          {[selectedConflict.bandA, selectedConflict.bandB].map((band) => (
+            <div key={band.id}>
+              <div className={styles.conflictBandOption}>
+                <div className={styles.conflictBandName}>{band.name}</div>
+                <div className={styles.conflictBandInfo}>
+                  <div>{band.stage}</div>
+                  <div>
+                    {formatTime(band.start_time)} - {formatTime(band.end_time)}
+                  </div>
+                </div>
+              </div>
+              <Button
+                fullWidth
+                onClick={() =>
+                  handleKeepBand(
+                    band,
+                    band.id === selectedConflict.bandA.id
+                      ? selectedConflict.bandB
+                      : selectedConflict.bandA,
+                  )
+                }
+                className={styles.conflictButton}
+              >
+                {t('keepBand', { band: band.name })}
+              </Button>
+            </div>
+          ))}
+
+          <Button
+            fullWidth
+            variant="ghost"
+            onClick={() => setSelectedConflict(null)}
+            className={styles.conflictCloseButton}
+          >
+            {t('close') ?? 'Close'}
+          </Button>
+        </Modal>
       )}
     </>
   );
