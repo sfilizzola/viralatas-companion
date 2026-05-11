@@ -22,7 +22,7 @@ function getArrivalDayLabel(day: ArrivalDay): string {
     'tue-jul28': 'arrivalDayTueJul28',
     'wed-jul29': 'arrivalDayWedJul29',
     'thu-plus': 'arrivalDayThuPlus',
-    null: 'arrivalMap.notSet',
+    null: 'arrivalMapNotSet',
   };
   return keyMap[day] || '';
 }
@@ -125,8 +125,7 @@ function ArrivalDayRow({
   const past = isPastDay(day, currentTime);
   const stripColor = today ? 'var(--signal-warn)' : past ? 'var(--signal-ok)' : 'var(--accent)';
 
-  const countKey = users.length === 1 ? 'arrivalMap.count_one' : 'arrivalMap.count_other';
-  const countLabel = users.length === 1 ? t(countKey) : `${users.length} ${t('arrivalMap.count_other').split('{{n}} ')[1]}`;
+  const countLabel = users.length === 1 ? t('arrivalMapCountOne') : t('arrivalMapCountOther', { n: users.length });
 
   return (
     <div className={styles.dayRow} style={{ borderLeftColor: stripColor }}>
@@ -134,7 +133,7 @@ function ArrivalDayRow({
         <div className={styles.dayLabel}>
           {label}
           {day === 'wed-jul29' && <span className={styles.d1Badge}>D1</span>}
-          {today && <span className={styles.todayBadge}>{t('arrivalMap.today')}</span>}
+          {today && <span className={styles.todayBadge}>{t('arrivalMapToday')}</span>}
         </div>
         <div className={styles.rowStats}>
           <span className={styles.count}>{countLabel}</span>
@@ -143,7 +142,7 @@ function ArrivalDayRow({
             className={styles.expandButton}
             onClick={onToggleExpand}
             aria-expanded={isExpanded}
-            aria-label={isExpanded ? t('arrivalMap.collapseLabel') : t('arrivalMap.expandLabel')}
+            aria-label={isExpanded ? t('arrivalMapCollapseLabel') : t('arrivalMapExpandLabel')}
           >
             {isExpanded ? '▲' : '▼'}
           </button>
@@ -212,7 +211,7 @@ export default function ArrivalMap({
   if (sortedDays.length === 0) {
     return (
       <div className={styles.container}>
-        <div className={styles.emptyState}>{t('arrivalMap.empty')}</div>
+        <div className={styles.emptyState}>{t('arrivalMapEmpty')}</div>
       </div>
     );
   }
@@ -220,7 +219,7 @@ export default function ArrivalMap({
   const totalCount = sortedDays.reduce((sum, day) => sum + (groupedByArrivalDay[day]?.length || 0), 0);
 
   if (shouldMinimize) {
-    const minLabel = `${t('arrivalMap.title')}  ${totalCount} ${t('arrivalMap.minimized')}`;
+    const minLabel = `${t('arrivalMapTitle')}  ${totalCount} ${t('arrivalMapMinimized')}`;
 
     return (
       <div className={styles.container}>
@@ -242,7 +241,7 @@ export default function ArrivalMap({
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <h2 className={styles.title}>{t('arrivalMap.title')}</h2>
+        <h2 className={styles.title}>{t('arrivalMapTitle')}</h2>
       </div>
       <div className={styles.dayRows}>
         {sortedDays.map((day) => (

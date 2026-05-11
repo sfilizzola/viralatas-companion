@@ -27,15 +27,13 @@
   "arrivalDayTueJul28": "DI 28. JUL",
   "arrivalDayWedJul29": "MI 29. JUL",
   "arrivalDayThuPlus": "DO+",
-  "arrivalMap": {
-    "title": "ANKÜNFTE",
-    "notSet": "Nicht angegeben",
-    "today": "HEUTE",
-    "count_one": "1 Person",
-    "count_other": "{{n}} Personen",
-    "minimized": "angekommen",
-    "expandLabel": "alle sehen",
-    "collapseLabel": "einklappen",
-    "empty": "Noch niemand hat seinen Ankunftstag angegeben"
-  }
+  "arrivalMapTitle": "ANKÜNFTE",
+  "arrivalMapNotSet": "Nicht angegeben",
+  "arrivalMapToday": "HEUTE",
+  "arrivalMapCountOne": "1 Person",
+  "arrivalMapCountOther": "{n} Personen",
+  "arrivalMapMinimized": "angekommen",
+  "arrivalMapExpandLabel": "alle sehen",
+  "arrivalMapCollapseLabel": "einklappen",
+  "arrivalMapEmpty": "Noch niemand hat seinen Ankunftstag angegeben"
 }

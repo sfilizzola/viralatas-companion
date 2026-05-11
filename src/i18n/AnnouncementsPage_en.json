@@ -27,15 +27,13 @@
   "arrivalDayTueJul28": "TUE JUL 28",
   "arrivalDayWedJul29": "WED JUL 29",
   "arrivalDayThuPlus": "THU+",
-  "arrivalMap": {
-    "title": "ARRIVALS",
-    "notSet": "Not set",
-    "today": "TODAY",
-    "count_one": "1 member",
-    "count_other": "{{n}} members",
-    "minimized": "arrived",
-    "expandLabel": "see all",
-    "collapseLabel": "collapse",
-    "empty": "No one has set an arrival day yet"
-  }
+  "arrivalMapTitle": "ARRIVALS",
+  "arrivalMapNotSet": "Not set",
+  "arrivalMapToday": "TODAY",
+  "arrivalMapCountOne": "1 member",
+  "arrivalMapCountOther": "{n} members",
+  "arrivalMapMinimized": "arrived",
+  "arrivalMapExpandLabel": "see all",
+  "arrivalMapCollapseLabel": "collapse",
+  "arrivalMapEmpty": "No one has set an arrival day yet"
 }
