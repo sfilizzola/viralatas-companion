@@ -23,6 +23,12 @@
 
 /* --- Sizes --- */
 
+.size24 {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+
 .size32 {
   width: 32px;
   height: 32px;

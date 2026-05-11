@@ -15,6 +15,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
 import Icon from '../components/icons/Icon';
+import { Avatar, Chip } from '../ui';
 import styles from './AnnouncementsPage.module.css';
 
 function relativeTime(
@@ -242,11 +243,12 @@ export default function AnnouncementsPage() {
               const author = crewUsers.find((u) => u.id === a.author_id);
               const authorName = author?.display_name ?? t('anonymous');
               const authorRole = userRoles[a.author_id] ?? 'normal';
-              const roleChipClass = {
-                normal: styles.roleNormal,
-                manager: styles.roleManager,
-                godlike: styles.roleGodlike,
-              }[authorRole as 'normal' | 'manager' | 'godlike'] ?? styles.roleNormal;
+              const roleVariant =
+                authorRole === 'godlike'
+                  ? 'role-godlike'
+                  : authorRole === 'manager'
+                    ? 'role-manager'
+                    : ('role-normal' as const);
               const showBlock = canModerate && authorRole !== 'godlike';
               const showDelete = canModerate;
               const alreadyBlocked = blockedUserIds.has(a.author_id);
@@ -254,25 +256,17 @@ export default function AnnouncementsPage() {
               return (
                 <li key={a.id} className={styles.card}>
                   {/* col 1: avatar */}
-                  {author?.avatar_url ? (
-                    <img
-                      className={styles.avatar}
-                      src={author.avatar_url}
-                      alt=""
-                      loading="lazy"
-                    />
-                  ) : (
-                    <span className={styles.avatarInitial} aria-hidden>
-                      {authorName.charAt(0).toUpperCase()}
-                    </span>
-                  )}
+                  <Avatar
+                    size={40}
+                    src={author?.avatar_url ?? null}
+                    initial={authorName.charAt(0).toUpperCase()}
+                    className={styles.avatar}
+                  />
 
                   {/* col 2: head row */}
                   <div className={styles.head}>
                     <span className={styles.name}>{authorName}</span>
-                    <span className={`${styles.roleChip} ${roleChipClass}`}>
-                      {t(`role_${authorRole}`)}
-                    </span>
+                    <Chip variant={roleVariant}>{t(`role_${authorRole}`)}</Chip>
                     <span className={styles.ts}>{relativeTime(a.created_at, t)}</span>
                   </div>
 

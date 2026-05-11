@@ -1,10 +1,11 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import type { Band } from '../types';
 import type { BandAttendee } from '../hooks/useBandAttendees';
 import { stageColor } from '../services/stageColors';
 import { bandDay, formatTime } from '../services/bandTime';
 import { useI18n } from '../lib/i18n';
 import Icon from './icons/Icon';
+import { Avatar, Modal } from '../ui';
 import styles from './BandDetailModal.module.css';
 
 type Props = {
@@ -37,7 +38,6 @@ export default function BandDetailModal({
   overlapBands,
 }: Props) {
   const { t } = useI18n('SchedulePage');
-  const backdropRef = useRef<HTMLDivElement>(null);
   const color = stageColor(band.stage);
   const pickedCount = attendees.length;
   const sawAttendees = attendees.filter((a) => !missedUserIds?.has(a.id));
@@ -45,26 +45,8 @@ export default function BandDetailModal({
   const dateLabel = formatBandDate(band);
   const timeLabel = `${formatTime(band.start_time)} - ${formatTime(band.end_time)}`;
 
-  useEffect(() => {
-    function handleEsc(e: KeyboardEvent) {
-      if (e.key === 'Escape') onClose();
-    }
-    document.addEventListener('keydown', handleEsc);
-    return () => document.removeEventListener('keydown', handleEsc);
-  }, [onClose]);
-
-  function handleBackdropClick(e: React.MouseEvent) {
-    if (e.target === backdropRef.current) onClose();
-  }
-
   return (
-    <div
-      className={styles.backdrop}
-      ref={backdropRef}
-      onClick={handleBackdropClick}
-      role="presentation"
-    >
-      <div className={styles.modal} role="dialog" aria-modal="true" aria-label={band.name}>
+    <Modal onClose={onClose} contentClassName={styles.modal}>
         <div className={styles.hero} style={{ background: color }} />
 
         <div className={styles.head}>
@@ -161,8 +143,7 @@ export default function BandDetailModal({
             {isPicked ? t('removePick') : t('addPick')}
           </button>
         </div>
-      </div>
-    </div>
+    </Modal>
   );
 }
 
@@ -192,7 +173,7 @@ function CrewList({ title, count, attendees, missedUserIds, missedLabel }: CrewL
                 className={`${styles.whoRow} ${missedUserIds ? (missed ? styles.noShow : styles.saw) : ''}`}
                 key={attendee.id}
               >
-                <Avatar attendee={attendee} />
+                <Avatar size={24} src={attendee.avatar_url ?? null} initial={initials(attendee.label)} />
                 <span className={styles.attendeeName}>
                   {attendee.label}
                   {missed && missedLabel ? ` · ${missedLabel}` : ''}
@@ -205,18 +186,6 @@ function CrewList({ title, count, attendees, missedUserIds, missedLabel }: CrewL
         <p className={styles.attendeeEmpty}>{t('noCrewYet')}</p>
       )}
     </section>
-  );
-}
-
-function Avatar({ attendee }: { attendee: BandAttendee }) {
-  if (attendee.avatar_url) {
-    return <img className={styles.attendeeAvatar} src={attendee.avatar_url} alt="" loading="lazy" />;
-  }
-
-  return (
-    <span className={styles.attendeeAvatar} aria-hidden>
-      {initials(attendee.label)}
-    </span>
   );
 }
 

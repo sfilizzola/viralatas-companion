@@ -5,9 +5,10 @@ type ModalProps = {
   onClose: () => void;
   children: ReactNode;
   position?: 'center' | 'bottom';
+  contentClassName?: string;
 };
 
-export default function Modal({ onClose, children, position = 'center' }: ModalProps) {
+export default function Modal({ onClose, children, position = 'center', contentClassName }: ModalProps) {
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.key === 'Escape') onClose();
@@ -25,7 +26,7 @@ export default function Modal({ onClose, children, position = 'center' }: ModalP
 
   const contentClass = [
     styles.content,
-    position === 'bottom' ? styles.contentBottom : styles.contentCenter,
+    contentClassName ?? (position === 'bottom' ? styles.contentBottom : styles.contentCenter),
   ]
     .filter(Boolean)
     .join(' ');

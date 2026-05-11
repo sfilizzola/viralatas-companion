@@ -1,6 +1,6 @@
 import styles from './Avatar.module.css';
 
-type AvatarSize = 32 | 40 | 56;
+type AvatarSize = 24 | 32 | 40 | 56;
 
 type AvatarProps = {
   src?: string | null;
@@ -18,7 +18,7 @@ export default function Avatar({
   className,
 }: AvatarProps) {
   const sizeClass =
-    size === 56 ? styles.size56 : size === 32 ? styles.size32 : styles.size40;
+    size === 56 ? styles.size56 : size === 40 ? styles.size40 : size === 32 ? styles.size32 : styles.size24;
   const wrapClass = [styles.wrap, sizeClass, className].filter(Boolean).join(' ');
   const inlineStyle = color ? { backgroundColor: color } : undefined;
 
