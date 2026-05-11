@@ -9,48 +9,34 @@ type ArrivalMapProps = {
   currentTime: Date;
 };
 
-type ArrivalDay = 'sun-jul26' | 'mon-jul27' | 'tue-jul28' | 'wed-jul29' | 'thu-plus' | null;
+type ArrivalDay = 'sun-jul26' | 'mon-jul27' | 'tue-jul28' | 'wed-jul29' | 'thu-plus';
 type ViewState = 'collapsed' | 'days' | 'details';
 
 const ARRIVAL_DAY_ORDER: ArrivalDay[] = ['sun-jul26', 'mon-jul27', 'tue-jul28', 'wed-jul29', 'thu-plus'];
 const FESTIVAL_DAY_1_START = new Date('2026-07-29T00:00:00+01:00');
 
-function getArrivalDayLabel(day: ArrivalDay): string {
-  const keyMap: Record<ArrivalDay, string> = {
-    'sun-jul26': 'arrivalDaySunJul26',
-    'mon-jul27': 'arrivalDayMonJul27',
-    'tue-jul28': 'arrivalDayTueJul28',
-    'wed-jul29': 'arrivalDayWedJul29',
-    'thu-plus': 'arrivalDayThuPlus',
-    null: 'arrivalMapNotSet',
-  };
-  return keyMap[day] || '';
-}
-
-function isToday(day: ArrivalDay, currentTime: Date): boolean {
+function isToday(day: ArrivalDay | null, currentTime: Date): boolean {
   if (day !== 'wed-jul29') return false;
   return currentTime >= new Date('2026-07-29T00:00:00+01:00') && currentTime < new Date('2026-07-30T00:00:00+01:00');
 }
 
-function isPastDay(day: ArrivalDay, currentTime: Date): boolean {
+function isPastDay(day: ArrivalDay | null, currentTime: Date): boolean {
+  if (!day) return false;
   const dayMap: Record<ArrivalDay, Date> = {
     'sun-jul26': new Date('2026-07-26T00:00:00+01:00'),
     'mon-jul27': new Date('2026-07-27T00:00:00+01:00'),
     'tue-jul28': new Date('2026-07-28T00:00:00+01:00'),
     'wed-jul29': new Date('2026-07-29T00:00:00+01:00'),
     'thu-plus': new Date('2026-07-30T00:00:00+01:00'),
-    null: new Date('2026-07-26T00:00:00+01:00'),
   };
   return currentTime > dayMap[day];
 }
 
 function AvatarCluster({
   users,
-  currentUserId,
   maxShow = 3,
 }: {
   users: CrewUser[];
-  currentUserId: string;
   maxShow?: number;
 }) {
   const shown = users.slice(0, maxShow);
@@ -117,7 +103,7 @@ function ArrivalDayRow({
   onToggleExpand,
   t,
 }: {
-  day: ArrivalDay;
+  day: ArrivalDay | null;
   users: CrewUser[];
   currentUserId: string;
   currentTime: Date;
@@ -126,15 +112,15 @@ function ArrivalDayRow({
   t: (key: string, values?: Record<string, string | number>) => string;
 }) {
   const labelKey = (() => {
-    const keyMap: Record<ArrivalDay, string> = {
+    const keyMap: Record<ArrivalDay | 'not-set', string> = {
       'sun-jul26': 'arrivalDaySunJul26',
       'mon-jul27': 'arrivalDayMonJul27',
       'tue-jul28': 'arrivalDayTueJul28',
       'wed-jul29': 'arrivalDayWedJul29',
       'thu-plus': 'arrivalDayThuPlus',
-      null: 'arrivalMapNotSet',
+      'not-set': 'arrivalMapNotSet',
     };
-    return keyMap[day];
+    return keyMap[day || 'not-set'];
   })();
   const label = t(labelKey);
   const today = isToday(day, currentTime);
@@ -177,7 +163,7 @@ function ArrivalDayRow({
 
       {!isExpanded && (
         <div className={styles.collapsedContent}>
-          <AvatarCluster users={users} currentUserId={currentUserId} />
+          <AvatarCluster users={users} />
         </div>
       )}
     </div>
@@ -198,13 +184,13 @@ export default function ArrivalMap({
   const [expandedDay, setExpandedDay] = useState<ArrivalDay | 'not-set' | null>(null);
 
   const groupedByArrivalDay = useMemo(() => {
-    const grouped: Record<ArrivalDay, CrewUser[]> = {
+    const grouped: Record<ArrivalDay | 'not-set', CrewUser[]> = {
       'sun-jul26': [],
       'mon-jul27': [],
       'tue-jul28': [],
       'wed-jul29': [],
       'thu-plus': [],
-      null: [],
+      'not-set': [],
     };
 
     crewUsers.forEach((user) => {
@@ -212,7 +198,7 @@ export default function ArrivalMap({
       if (day && grouped[day]) {
         grouped[day].push(user);
       } else if (!day) {
-        grouped[null].push(user);
+        grouped['not-set'].push(user);
       }
     });
 
@@ -220,20 +206,21 @@ export default function ArrivalMap({
   }, [crewUsers]);
 
   const sortedDays = useMemo(() => {
-    return [...ARRIVAL_DAY_ORDER, null].filter(
+    const days: (ArrivalDay | 'not-set')[] = [...ARRIVAL_DAY_ORDER, 'not-set'];
+    return days.filter(
       (day) => groupedByArrivalDay[day] && groupedByArrivalDay[day].length > 0,
     );
   }, [groupedByArrivalDay]);
 
   const totalArrived = useMemo(() => {
     return sortedDays
-      .filter((day) => day && isPastDay(day, currentTime))
+      .filter((day) => day !== 'not-set' && isPastDay(day as ArrivalDay, currentTime))
       .reduce((sum, day) => sum + (groupedByArrivalDay[day]?.length || 0), 0);
   }, [sortedDays, groupedByArrivalDay, currentTime]);
 
   const totalToArrive = useMemo(() => {
     return sortedDays
-      .filter((day) => !day || !isPastDay(day, currentTime))
+      .filter((day) => day === 'not-set' || !isPastDay(day as ArrivalDay, currentTime))
       .reduce((sum, day) => sum + (groupedByArrivalDay[day]?.length || 0), 0);
   }, [sortedDays, groupedByArrivalDay, currentTime]);
 
@@ -309,21 +296,18 @@ export default function ArrivalMap({
           <h2 className={styles.title}>{t('arrivalMapTitle')}</h2>
         </div>
         <div className={styles.dayRows}>
-          {sortedDays.map((day) => {
-            const dayKey = day === null ? 'not-set' : day;
-            return (
-              <ArrivalDayRow
-                key={dayKey}
-                day={day}
-                users={groupedByArrivalDay[day] || []}
-                currentUserId={currentUserId}
-                currentTime={currentTime}
-                isExpanded={expandedDay === dayKey}
-                onToggleExpand={() => setExpandedDay(expandedDay === dayKey ? null : dayKey)}
-                t={t}
-              />
-            );
-          })}
+          {sortedDays.map((day) => (
+            <ArrivalDayRow
+              key={day}
+              day={day === 'not-set' ? null : day}
+              users={groupedByArrivalDay[day] || []}
+              currentUserId={currentUserId}
+              currentTime={currentTime}
+              isExpanded={expandedDay === day}
+              onToggleExpand={() => setExpandedDay(expandedDay === day ? null : day)}
+              t={t}
+            />
+          ))}
         </div>
       </div>
     );
@@ -346,8 +330,8 @@ export default function ArrivalMap({
       <div className={styles.dayRows}>
         {sortedDays.map((day) => (
           <ArrivalDayRow
-            key={day || 'not-set'}
-            day={day}
+            key={day}
+            day={day === 'not-set' ? null : day}
             users={groupedByArrivalDay[day] || []}
             currentUserId={currentUserId}
             currentTime={currentTime}
