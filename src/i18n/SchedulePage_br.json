@@ -44,7 +44,7 @@
   "missedShort": "não viu",
   "missedAvailableAfter": "Disponível depois das {time}",
   "conflictWarning": "Conflita com {name}",
-  "overlapWarning": "Sobrepõe com {name}",
+  "overlapWarning": "Sobrepõe a {name}",
   "pendingSync": "Sync pendente",
   "todosGeneros": "Todos os gêneros"
 }

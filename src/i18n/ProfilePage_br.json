@@ -102,6 +102,6 @@
   "arrivalDayThuPlus": "Quinta ou depois",
   "assignBadgeBtn": "Atribuir patch",
   "assignedBadgeCount": "{count} patch(es)",
-  "assignBadgeModalTitle": "Atribuir patch para {name}",
+  "assignBadgeModalTitle": "Atribuir patch a {name}",
   "assignBadgeError": "Erro ao atribuir patch. Tente de novo."
 }
