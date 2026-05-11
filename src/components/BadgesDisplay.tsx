@@ -164,21 +164,19 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       </div>
 
       {selectedBadge && (
-        <Modal onClose={() => setSelectedSlug(null)}>
-          <div className={styles.modalContent}>
-            <div className={styles.modalPatch}>
-              <img
-                src={selectedBadge.imagePath}
-                alt={t(selectedBadge.labelKey)}
-                className={styles.modalImg}
-              />
-              {selectedBadge.year && (
-                <span className={styles.modalYearChip}>{yearSuffix(selectedBadge.year)}</span>
-              )}
-            </div>
-            <h3 className={styles.modalName}>{t(selectedBadge.labelKey)}</h3>
-            <p className={styles.modalDesc}>{t(selectedBadge.descriptionKey)}</p>
+        <Modal onClose={() => setSelectedSlug(null)} contentClassName={styles.modalContent}>
+          <div className={styles.modalPatch}>
+            <img
+              src={selectedBadge.imagePath}
+              alt={t(selectedBadge.labelKey)}
+              className={styles.modalImg}
+            />
+            {selectedBadge.year && (
+              <span className={styles.modalYearChip}>{yearSuffix(selectedBadge.year)}</span>
+            )}
           </div>
+          <h3 className={styles.modalName}>{t(selectedBadge.labelKey)}</h3>
+          <p className={styles.modalDesc}>{t(selectedBadge.descriptionKey)}</p>
         </Modal>
       )}
     </>

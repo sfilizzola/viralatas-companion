@@ -86,30 +86,11 @@
    PATCH DETAIL MODAL
    ============================================================ */
 
-.modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.78);
-  z-index: 999;
-  animation: fadeIn 0.2s ease-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .modal { animation: none; }
-}
-
 .modalContent {
   background: var(--bg-surface);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-strong);
   border-radius: var(--r-3);
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
   padding: 2rem 1.5rem 1.5rem;
   max-width: 300px;
   width: calc(100% - 3rem);
@@ -117,10 +98,10 @@
   flex-direction: column;
   align-items: center;
   gap: var(--s-3);
-  animation: slideUp 0.2s ease-out;
+  animation: patchSlideUp 0.2s ease-out;
 }
 
-@keyframes slideUp {
+@keyframes patchSlideUp {
   from { opacity: 0; transform: translateY(16px); }
   to { opacity: 1; transform: translateY(0); }
 }
@@ -131,8 +112,8 @@
 
 .modalPatch {
   position: relative;
-  width: 132px;
-  height: 132px;
+  width: 145px;
+  height: 145px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -142,8 +123,8 @@
 }
 
 .modalImg {
-  width: 124px;
-  height: 124px;
+  width: 136px;
+  height: 136px;
   border-radius: 50%;
   object-fit: contain;
   display: block;

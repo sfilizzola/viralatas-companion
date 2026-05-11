@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { UserRole } from '../../types';
 import { announcementsRepository } from '../../repositories';
-import { Avatar, Button, Collapsible } from '../../ui';
+import { Avatar, Collapsible } from '../../ui';
 import type { UserWithLoading } from './types';
 import styles from '../../pages/ProfilePage.module.css';
 

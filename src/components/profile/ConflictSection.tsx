@@ -3,6 +3,7 @@ import type { Band, UserPick } from '../../types';
 import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../../lib/db';
 import { picksRepository } from '../../repositories';
 import { Button, Collapsible, Modal } from '../../ui';
+import Icon from '../icons/Icon';
 import styles from '../../pages/ProfilePage.module.css';
 
 const WACKEN_START = new Date('2026-07-29T00:00:00Z');
@@ -107,6 +108,7 @@ export default function ConflictSection({ userId, t }: ConflictSectionProps) {
 
   const trigger = (
     <div className={styles.conflictsTitle}>
+      <Icon name="conflict" size={14} className={styles.conflictsIcon} />
       <span>{t('conflicts')}</span>
       <div className={styles.conflictBadge}>{conflicts.length}</div>
     </div>
@@ -128,7 +130,7 @@ export default function ConflictSection({ userId, t }: ConflictSectionProps) {
                 >
                   <div className={styles.conflictCardBands}>
                     <span className={styles.bandName}>{conflict.bandA.name}</span>
-                    <span className={styles.conflictIndicator}>⚠️</span>
+                    <Icon name="conflict" size={14} className={styles.conflictIndicator} />
                     <span className={styles.bandName}>{conflict.bandB.name}</span>
                   </div>
                   <div className={styles.conflictCardTimes}>

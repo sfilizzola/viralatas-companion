@@ -451,21 +451,30 @@
 .conflictsTitle {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--s-2);
+  font-family: var(--font-display);
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.conflictsIcon {
+  color: var(--signal-warn);
+  flex-shrink: 0;
 }
 
 .conflictBadge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent);
+  background: var(--signal-warn);
   color: #fff;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  font-size: 0.75rem;
+  width: 20px;
+  height: 20px;
+  font-family: var(--font-mono);
+  font-size: 10px;
   font-weight: 700;
 }
 
@@ -507,14 +516,15 @@
 }
 
 .dayGroupTitle {
+  font-family: var(--font-mono);
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 10px;
   color: var(--text-muted);
   margin-bottom: 0.75rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid var(--border);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.10em;
 }
 
 .conflictCard {
@@ -524,8 +534,8 @@
   padding: 0.75rem;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--accent);
-  border-radius: var(--radius);
+  border-left: 3px solid var(--signal-warn);
+  border-radius: var(--r-1);
   cursor: pointer;
   transition: background 0.15s;
   margin-bottom: 0.75rem;
@@ -549,8 +559,10 @@
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 600;
-  font-size: 0.9rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
 }
 
 .bandName {
@@ -559,14 +571,16 @@
 }
 
 .conflictIndicator {
-  font-size: 1.2rem;
+  color: var(--signal-warn);
   flex-shrink: 0;
 }
 
 .conflictCardTimes {
   display: flex;
   justify-content: space-between;
-  font-size: 0.8rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
   color: var(--text-muted);
   gap: 0.5rem;
 }
@@ -618,8 +632,11 @@
 }
 
 .conflictModalTitle {
+  font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
   margin-bottom: 1.5rem;
   text-align: center;
 }
@@ -630,9 +647,9 @@
   gap: 0.5rem;
   padding: 1rem;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--r-1);
   margin-bottom: 0.75rem;
-  background: var(--bg);
+  background: var(--bg-elevated);
   color: var(--text);
 }
 
@@ -641,13 +658,17 @@
 }
 
 .conflictBandName {
-  font-weight: 600;
-  font-size: 1rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: uppercase;
   color: var(--text);
 }
 
 .conflictBandInfo {
-  font-size: 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
   color: var(--text-muted);
   display: flex;
   flex-direction: column;
@@ -664,7 +685,7 @@
   background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: var(--radius);
+  border-radius: var(--r-1);
   padding: 0.75rem 1rem;
   font-size: 0.95rem;
   font-weight: 600;
