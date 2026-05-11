@@ -197,10 +197,6 @@ export default function AnnouncementsPage() {
       </header>
 
       <main className={styles.main}>
-        {userId && crewUsers.length > 0 && (
-          <ArrivalMap crewUsers={crewUsers} currentUserId={userId} currentTime={currentTime} />
-        )}
-
         {usefulLinks.length > 0 && (
           <section className={styles.usefulLinksRow} aria-labelledby="useful-links-title">
             <h2 className={styles.usefulLinksTitle} id="useful-links-title">
@@ -221,6 +217,10 @@ export default function AnnouncementsPage() {
               ))}
             </div>
           </section>
+        )}
+
+        {userId && crewUsers.length > 0 && (
+          <ArrivalMap crewUsers={crewUsers} currentUserId={userId} currentTime={currentTime} />
         )}
 
         {isBlocked ? (
