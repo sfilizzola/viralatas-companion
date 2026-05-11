@@ -396,10 +396,10 @@ describe('evaluateBadge — crew_at_location_min', () => {
       [],
       {},
       'camping', // currentLocation
-      { camping: 10, lost: 2 },
+      { camping: 15, lost: 2 },
       new Set(),
     );
-    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 10 }), slug: 'camping-mob' };
+    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 15 }), slug: 'bbq-crew' };
     expect(evaluateBadge(cfg, ctx)).toBe(true);
   });
 
@@ -417,7 +417,7 @@ describe('evaluateBadge — crew_at_location_min', () => {
       { camping: 5, lost: 2 },
       new Set(),
     );
-    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 10 }), slug: 'camping-mob' };
+    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 15 }), slug: 'bbq-crew' };
     expect(evaluateBadge(cfg, ctx)).toBe(false);
   });
 
@@ -433,9 +433,9 @@ describe('evaluateBadge — crew_at_location_min', () => {
       {},
       'lost', // not at camping anymore
       { camping: 1, lost: 1 }, // crew count very low
-      new Set(['camping-mob']), // but badge was already earned
+      new Set(['bbq-crew']), // but badge was already earned
     );
-    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 10 }), slug: 'camping-mob', persist: true };
+    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 15 }), slug: 'bbq-crew', persist: true };
     expect(evaluateBadge(cfg, ctx)).toBe(true);
   });
 
@@ -453,7 +453,7 @@ describe('evaluateBadge — crew_at_location_min', () => {
       { camping: 15, lost: 2 },
       new Set(),
     );
-    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 10 }), slug: 'camping-mob' };
+    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 15 }), slug: 'bbq-crew' };
     expect(evaluateBadge(cfg, ctx)).toBe(false);
   });
 });
