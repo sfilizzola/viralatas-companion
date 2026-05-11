@@ -47,7 +47,7 @@ function isPastDay(day: ArrivalDay, currentTime: Date): boolean {
 function AvatarCluster({
   users,
   currentUserId,
-  maxShow = 5,
+  maxShow = 3,
 }: {
   users: CrewUser[];
   currentUserId: string;
@@ -176,9 +176,10 @@ export default function ArrivalMap({
   const { t } = useI18n('AnnouncementsPage');
   const [expandedDay, setExpandedDay] = useState<ArrivalDay | null>(null);
   const [isManuallyExpanded, setIsManuallyExpanded] = useState(false);
+  const [forceMinimized, setForceMinimized] = useState(false);
 
   const isFestivalActive = currentTime >= FESTIVAL_DAY_1_START;
-  const shouldMinimize = isFestivalActive && !isManuallyExpanded;
+  const shouldMinimize = (isFestivalActive || forceMinimized) && !isManuallyExpanded;
 
   const groupedByArrivalDay = useMemo(() => {
     const grouped: Record<ArrivalDay, CrewUser[]> = {
@@ -242,6 +243,16 @@ export default function ArrivalMap({
     <div className={styles.container}>
       <div className={styles.header}>
         <h2 className={styles.title}>{t('arrivalMapTitle')}</h2>
+        {!isFestivalActive && (
+          <button
+            type="button"
+            className={styles.previewButton}
+            onClick={() => setForceMinimized(!forceMinimized)}
+            title="Preview post-Wacken state"
+          >
+            {forceMinimized ? '→' : '⏩'}
+          </button>
+        )}
       </div>
       <div className={styles.dayRows}>
         {sortedDays.map((day) => (

@@ -14,6 +14,7 @@
 .header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: var(--s-2);
 }
 
@@ -25,6 +26,21 @@
   letter-spacing: 0.08em;
   color: var(--text);
   margin: 0;
+}
+
+.previewButton {
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  padding: 4px 8px;
+  transition: color 0.2s;
+}
+
+.previewButton:hover {
+  color: var(--text);
 }
 
 /* ── Day rows container ── */
@@ -125,16 +141,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   background: var(--accent);
   color: #fff;
   font-family: var(--font-display);
-  font-size: 12px;
+  font-size: 9px;
   font-weight: 700;
   border: 2px solid var(--bg);
-  margin-left: -8px;
+  margin-left: -6px;
 }
 
 .avatar:first-child {
@@ -204,6 +220,7 @@
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
+  max-width: 100px;
 }
 
 /* ── Minimized post-festival state ── */
