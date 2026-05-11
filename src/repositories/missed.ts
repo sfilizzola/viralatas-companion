@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase } from '../lib/supabase';
 import {
   saveMissedBand,
   removeMissedBand,
@@ -7,14 +7,14 @@ import {
   enqueueOfflineMissed,
   loadOfflineMissedQueue,
   removeFromOfflineMissedQueue,
-} from './db';
+} from '../lib/db';
 import type { UserMissedBand } from '../types';
 
-export async function loadAllMissed(): Promise<UserMissedBand[]> {
+async function loadAll(): Promise<UserMissedBand[]> {
   return loadAllMissedBands();
 }
 
-export async function markMissed(userId: string, bandId: string): Promise<void> {
+async function mark(userId: string, bandId: string): Promise<void> {
   const markedAt = new Date().toISOString();
   const record: UserMissedBand = { user_id: userId, band_id: bandId, marked_at: markedAt };
   await saveMissedBand(record);
@@ -30,7 +30,7 @@ export async function markMissed(userId: string, bandId: string): Promise<void> 
   }
 }
 
-export async function unmarkMissed(userId: string, bandId: string): Promise<void> {
+async function unmark(userId: string, bandId: string): Promise<void> {
   await removeMissedBand(userId, bandId);
 
   if (!navigator.onLine) {
@@ -48,23 +48,10 @@ export async function unmarkMissed(userId: string, bandId: string): Promise<void
   }
 }
 
-export async function syncMissedBands(userId: string): Promise<void> {
-  await flushOfflineMissedQueue();
-
-  const { data, error } = await supabase
-    .from('user_missed_bands')
-    .select('*')
-    .eq('user_id', userId);
-  if (error || !data) return;
-
-  await replaceUserMissedBands(data as UserMissedBand[], userId);
-}
-
-export async function flushOfflineMissedQueue(): Promise<void> {
+async function flushOfflineQueue(): Promise<void> {
   const queue = await loadOfflineMissedQueue();
   if (queue.length === 0) return;
 
-  // Last write per (user_id, band_id) pair wins
   const groups = new Map<string, (typeof queue)[0]>();
   for (const op of queue) {
     groups.set(op.id, op);
@@ -88,7 +75,19 @@ export async function flushOfflineMissedQueue(): Promise<void> {
   }
 }
 
-export function subscribeToMissedRealtime(): () => void {
+async function sync(userId: string): Promise<void> {
+  await flushOfflineQueue();
+
+  const { data, error } = await supabase
+    .from('user_missed_bands')
+    .select('*')
+    .eq('user_id', userId);
+  if (error || !data) return;
+
+  await replaceUserMissedBands(data as UserMissedBand[], userId);
+}
+
+function subscribeToRealtime(): () => void {
   const channel = supabase
     .channel('missed_bands')
     .on(
@@ -114,3 +113,12 @@ export function subscribeToMissedRealtime(): () => void {
     supabase.removeChannel(channel);
   };
 }
+
+export const missedRepository = {
+  loadAll,
+  mark,
+  unmark,
+  sync,
+  flushOfflineQueue,
+  subscribeToRealtime,
+};

@@ -22,7 +22,7 @@ import {
   type CrewLivePlan,
   type LivePlan,
 } from '../services/livePreview';
-import { setCampingStatus, setMetalPlaceStatus, syncCrewPresence, syncMetalPlaceConfig, isTimeWithinMetalPlaceWindow, validateAndAutoCheckoutOutsideMetalPlaceWindow } from '../lib/presence';
+import { picksRepository, presenceRepository } from '../repositories';
 import { syncLiveBandTestConfig } from '../services/liveBandTest';
 import {
   loadLiveBandTestConfig,
@@ -33,7 +33,6 @@ import {
   saveMetalPlaceConfig,
 } from '../lib/db';
 import type { LiveBandTestConfig, MetalPlaceConfig } from '../types';
-import { togglePick } from '../lib/picks';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useNow } from '../hooks/useNow';
@@ -226,7 +225,7 @@ export default function RightNowPage() {
   }, [refreshFromCache, undoTimerId]);
 
   useEffect(() => {
-    syncCrewPresence().catch(() => {});
+    presenceRepository.syncCrewFromRemote().catch(() => {});
 
     const channel = supabase
       .channel('user_presence_live')
@@ -252,7 +251,7 @@ export default function RightNowPage() {
     }
 
     loadMetalPlaceConfigFromDB();
-    syncMetalPlaceConfig().catch(() => {});
+    presenceRepository.syncMetalPlaceConfig().catch(() => {});
 
     function handleConfigChange() {
       loadMetalPlaceConfigFromDB();
@@ -281,7 +280,7 @@ export default function RightNowPage() {
   }, []);
 
   const isMetalPlaceWindowActive = useMemo(
-    () => isTimeWithinMetalPlaceWindow(metalPlaceConfig, now),
+    () => presenceRepository.isTimeWithinMetalPlaceWindow(metalPlaceConfig, now),
     [metalPlaceConfig, now],
   );
 
@@ -338,7 +337,7 @@ export default function RightNowPage() {
     // crossing end_time during the 30s `now` tick), so the local user gets
     // checked out when the test event ends or the real schedule expires.
     if (!metalPlaceConfig || !userId) return;
-    validateAndAutoCheckoutOutsideMetalPlaceWindow(metalPlaceConfig, userId).catch(() => {});
+    presenceRepository.validateAndAutoCheckout(metalPlaceConfig, userId).catch(() => {});
   }, [metalPlaceConfig, userId, isMetalPlaceWindowActive]);
 
   const myRawPlan = useMemo(() => {
@@ -372,7 +371,7 @@ export default function RightNowPage() {
 
   useEffect(() => {
     if (!userId || !isCamping || myRawPlan.status !== 'current') return;
-    setCampingStatus(userId, false).catch(() => {});
+    presenceRepository.setCampingStatus(userId, false).catch(() => {});
   }, [userId, isCamping, myRawPlan.status]);
 
   const crewPlans = useMemo(() => {
@@ -397,7 +396,7 @@ export default function RightNowPage() {
     if (undoTimerId) clearTimeout(undoTimerId);
 
     // Remove the pick from IndexedDB
-    await togglePick(userId, bandId, true);
+    await picksRepository.toggle(userId, bandId, true);
 
     // Show undo toast for 5 seconds
     setUndoState({
@@ -420,7 +419,7 @@ export default function RightNowPage() {
     setUndoTimerId(null);
 
     // Restore the pick to IndexedDB
-    await togglePick(userId, undoState.bandId, false);
+    await picksRepository.toggle(userId, undoState.bandId, false);
 
     // Close toast
     setUndoState(null);
@@ -431,20 +430,20 @@ export default function RightNowPage() {
 
     if (nextValue === 'camping') {
       if (myRawPlan.status === 'current') {
-        await setCampingStatus(userId, false);
+        await presenceRepository.setCampingStatus(userId, false);
         return;
       }
-      await setCampingStatus(userId, true);
+      await presenceRepository.setCampingStatus(userId, true);
       return;
     }
 
     if (nextValue === 'metal_place') {
-      await setMetalPlaceStatus(userId, true);
+      await presenceRepository.setMetalPlaceStatus(userId, true);
       return;
     }
 
-    if (isAtMetalPlace) await setMetalPlaceStatus(userId, false);
-    if (isCamping) await setCampingStatus(userId, false);
+    if (isAtMetalPlace) await presenceRepository.setMetalPlaceStatus(userId, false);
+    if (isCamping) await presenceRepository.setCampingStatus(userId, false);
   }
 
   return (

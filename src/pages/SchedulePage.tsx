@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Band } from '../types';
 import { loadBands } from '../lib/db';
-import { togglePick } from '../lib/picks';
+import { picksRepository } from '../repositories';
 import { bandDay } from '../services/bandTime';
 import { useAuth } from '../hooks/useAuth';
 import { useMyPicks } from '../hooks/useMyPicks';
@@ -78,7 +78,7 @@ export default function SchedulePage() {
   const handleToggle = useCallback(
     async (bandId: string) => {
       if (!userId) return;
-      await togglePick(userId, bandId, pickedIds.has(bandId));
+      await picksRepository.toggle(userId, bandId, pickedIds.has(bandId));
       await refreshPicks();
     },
     [userId, pickedIds, refreshPicks],

@@ -1,6 +1,6 @@
 # NEW_ARCH_PLAN.md — Architectural Refactoring Plan
 
-_Status: Stage 2 is CURRENT — Stage 1 COMPLETE_  
+_Status: Stage 3 is CURRENT — Stages 1 & 2 COMPLETE_  
 _Context: Written May 2026 for the Viralatas Metaleiros companion app_  
 _Deadline constraint: Wacken starts July 29, 2026 (~11 weeks away at writing time)_
 
@@ -153,8 +153,9 @@ lib/
 
 ---
 
-## Stage 2 — Repository layer 🔄 CURRENT
+## Stage 2 — Repository layer ✅ COMPLETE
 
+**Status:** Done — 2026-05-11. 205 tests green, TypeScript clean.  
 **Risk:** Medium. The IDB-first + offline queue pattern moves from scattered functions to structured repositories. Hooks are updated to call repositories.  
 **Duration estimate:** 5–7 days  
 **Branch:** `refactor/stage-2-repositories`
@@ -235,10 +236,10 @@ import { picksRepository } from '../repositories'
 
 ### Acceptance criteria
 
-- [ ] `src/repositories/` has 6 files + `index.ts` + `types.ts`
-- [ ] No hook or page imports from `lib/picks`, `lib/presence`, `lib/missed`, `lib/announcements`, `lib/users`, `lib/cache`
-- [ ] All 177+ tests pass (repositories are testable in isolation — consider adding unit tests for each)
-- [ ] TypeScript compiles clean
+- [x] `src/repositories/` has 6 files + `index.ts` + `types.ts`
+- [x] No hook or page imports from `lib/picks`, `lib/presence`, `lib/missed`, `lib/announcements`, `lib/users`, `lib/cache`
+- [x] All 177+ tests pass (205 passed)
+- [x] TypeScript compiles clean
 - [ ] Offline-first behavior is unchanged (manual test: go offline, toggle pick, go online, verify sync)
 
 ### Note on TanStack Query (not recommended now)
@@ -247,7 +248,7 @@ TanStack Query would complement this layer well in a future cycle: repositories 
 
 ---
 
-## Stage 3 — Fat page decomposition
+## Stage 3 — Fat page decomposition 🔄 CURRENT
 
 **Risk:** Medium-low. Each page is decomposed into sub-components + hooks. No data access changes (Stage 2 already did that). Visual output must remain identical.  
 **Duration estimate:** 5–7 days  

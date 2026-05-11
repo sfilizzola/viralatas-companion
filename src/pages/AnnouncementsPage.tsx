@@ -8,15 +8,7 @@ import {
   removeAnnouncementFromCache,
   saveAnnouncement,
 } from '../lib/db';
-import {
-  blockUser,
-  deleteAnnouncement,
-  fetchBlockedPosters,
-  fetchCurrentUserRole,
-  fetchIsBlocked,
-  postAnnouncement,
-  syncAnnouncements,
-} from '../lib/announcements';
+import { announcementsRepository } from '../repositories';
 import { supabase } from '../lib/supabase';
 import { loadUsefulLinks } from '../services/usefulLinks';
 import { useAuth } from '../hooks/useAuth';
@@ -103,17 +95,17 @@ export default function AnnouncementsPage() {
 
   useEffect(() => {
     if (!userId) return;
-    Promise.all([fetchCurrentUserRole(userId), fetchIsBlocked(userId)]).then(([r, b]) => {
+    Promise.all([announcementsRepository.fetchCurrentUserRole(userId), announcementsRepository.fetchIsBlocked(userId)]).then(([r, b]) => {
       setRole(r);
       setIsBlocked(b);
     });
   }, [userId]);
 
   useEffect(() => {
-    syncAnnouncements().catch(() => {});
+    announcementsRepository.sync().catch(() => {});
 
     // Load blocked users
-    fetchBlockedPosters().then((blocked) => {
+    announcementsRepository.fetchBlockedPosters().then((blocked) => {
       setBlockedUserIds(new Set(blocked.map(b => b.user_id)));
     });
 
@@ -164,7 +156,7 @@ export default function AnnouncementsPage() {
     e.preventDefault();
     if (!userId || !draft.trim() || posting) return;
     setPosting(true);
-    await postAnnouncement(userId, draft.trim());
+    await announcementsRepository.post(userId, draft.trim());
     setDraft('');
     setPosting(false);
   }
@@ -172,7 +164,7 @@ export default function AnnouncementsPage() {
   async function handleDelete(id: string) {
     if (!confirm(t('deleteConfirm'))) return;
     try {
-      await deleteAnnouncement(id);
+      await announcementsRepository.delete(id);
     } catch (error) {
       console.error('Delete error:', error);
       alert(`Failed to delete: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -183,8 +175,8 @@ export default function AnnouncementsPage() {
     if (!userId) return;
     setBlocking(authorId);
     try {
-      await blockUser(authorId, userId);
-      await syncAnnouncements();
+      await announcementsRepository.blockUser(authorId, userId);
+      await announcementsRepository.sync();
     } catch (error) {
       console.error('Block failed:', error);
     } finally {

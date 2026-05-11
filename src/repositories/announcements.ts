@@ -6,10 +6,10 @@ import {
   removeFromOfflineAnnouncementsQueue,
   saveAnnouncement,
   saveAnnouncements,
-} from './db';
-import { supabase } from './supabase';
+} from '../lib/db';
+import { supabase } from '../lib/supabase';
 
-export async function syncAnnouncements(): Promise<void> {
+async function sync(): Promise<void> {
   const { data, error } = await supabase
     .from('announcements')
     .select('*')
@@ -19,7 +19,7 @@ export async function syncAnnouncements(): Promise<void> {
   await saveAnnouncements(data as Announcement[]);
 }
 
-export async function postAnnouncement(userId: string, content: string): Promise<void> {
+async function post(userId: string, content: string): Promise<void> {
   const draft: Announcement = {
     id: crypto.randomUUID(),
     author_id: userId,
@@ -28,7 +28,6 @@ export async function postAnnouncement(userId: string, content: string): Promise
     deleted_at: null,
   };
 
-  // Optimistic local write so the UI responds immediately
   await saveAnnouncement(draft);
 
   if (!navigator.onLine) {
@@ -48,19 +47,16 @@ export async function postAnnouncement(userId: string, content: string): Promise
   }
 
   if (data) {
-    // Replace the local draft with the server record (correct UUID)
     await removeAnnouncementFromCache(draft.id);
     await saveAnnouncement(data as Announcement);
   }
 }
 
-export async function deleteAnnouncement(id: string): Promise<void> {
-  // Optimistically remove from cache
+async function deleteAnnouncement(id: string): Promise<void> {
   await removeAnnouncementFromCache(id);
 
   if (!navigator.onLine) return;
 
-  // Online: hard delete from Supabase
   const { error } = await supabase
     .from('announcements')
     .delete()
@@ -72,7 +68,7 @@ export async function deleteAnnouncement(id: string): Promise<void> {
   }
 }
 
-export async function flushPendingAnnouncements(): Promise<number> {
+async function flushPending(): Promise<number> {
   const queue = await loadOfflineAnnouncementsQueue();
   if (queue.length === 0) return 0;
 
@@ -86,7 +82,6 @@ export async function flushPendingAnnouncements(): Promise<number> {
 
     if (!error) {
       await removeFromOfflineAnnouncementsQueue(item.id);
-      // Swap the local-UUID draft for the server record
       await removeAnnouncementFromCache(item.id);
       if (data) await saveAnnouncement(data as Announcement);
       flushed++;
@@ -95,7 +90,7 @@ export async function flushPendingAnnouncements(): Promise<number> {
   return flushed;
 }
 
-export async function fetchCurrentUserRole(userId: string): Promise<UserRole> {
+async function fetchCurrentUserRole(userId: string): Promise<UserRole> {
   const { data } = await supabase
     .from('users')
     .select('role')
@@ -104,7 +99,7 @@ export async function fetchCurrentUserRole(userId: string): Promise<UserRole> {
   return (data?.role as UserRole | undefined) ?? 'normal';
 }
 
-export async function fetchIsBlocked(userId: string): Promise<boolean> {
+async function fetchIsBlocked(userId: string): Promise<boolean> {
   const { data } = await supabase
     .from('blocked_posters')
     .select('user_id')
@@ -113,12 +108,12 @@ export async function fetchIsBlocked(userId: string): Promise<boolean> {
   return data !== null;
 }
 
-export async function fetchBlockedPosters(): Promise<BlockedPoster[]> {
+async function fetchBlockedPosters(): Promise<BlockedPoster[]> {
   const { data } = await supabase.from('blocked_posters').select('*');
   return (data as BlockedPoster[]) ?? [];
 }
 
-export async function fetchBlockedPostersWithUserDetails(): Promise<Array<BlockedPoster & { user_email: string; user_display_name: string | null; user_avatar_url: string | null; user_special_badges: string[] }>> {
+async function fetchBlockedPostersWithUserDetails(): Promise<Array<BlockedPoster & { user_email: string; user_display_name: string | null; user_avatar_url: string | null; user_special_badges: string[] }>> {
   const blocked = await fetchBlockedPosters();
   if (blocked.length === 0) return [];
 
@@ -138,24 +133,24 @@ export async function fetchBlockedPostersWithUserDetails(): Promise<Array<Blocke
   }));
 }
 
-export async function blockUser(userId: string, blockedBy: string): Promise<void> {
+async function blockUser(userId: string, blockedBy: string): Promise<void> {
   await supabase
     .from('blocked_posters')
     .upsert({ user_id: userId, blocked_by: blockedBy });
 }
 
-export async function unblockUser(userId: string): Promise<void> {
+async function unblockUser(userId: string): Promise<void> {
   await supabase.from('blocked_posters').delete().eq('user_id', userId);
 }
 
-export async function setUserRole(
+async function setUserRole(
   targetUserId: string,
   role: 'normal' | 'manager',
 ): Promise<void> {
   await supabase.rpc('set_user_role', { target_user_id: targetUserId, new_role: role });
 }
 
-export async function fetchAllUsers(): Promise<
+async function fetchAllUsers(): Promise<
   { id: string; email: string; display_name: string | null; avatar_url: string | null; role: string; special_badges: string[] }[]
 > {
   const { data } = await supabase
@@ -164,3 +159,18 @@ export async function fetchAllUsers(): Promise<
     .order('display_name') as { data: Array<{ id: string; email: string; display_name: string | null; avatar_url: string | null; role: string; special_badges: string[] }> | null };
   return (data ?? []).map((u) => ({ ...u, special_badges: u.special_badges ?? [] }));
 }
+
+export const announcementsRepository = {
+  sync,
+  post,
+  delete: deleteAnnouncement,
+  flushPending,
+  fetchCurrentUserRole,
+  fetchIsBlocked,
+  fetchBlockedPosters,
+  fetchBlockedPostersWithUserDetails,
+  blockUser,
+  unblockUser,
+  setUserRole,
+  fetchAllUsers,
+};

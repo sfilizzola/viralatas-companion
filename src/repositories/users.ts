@@ -1,8 +1,8 @@
-import { saveCrewUsers } from './db';
-import { supabase } from './supabase';
+import { saveCrewUsers } from '../lib/db';
+import { supabase } from '../lib/supabase';
 import type { CrewUser } from '../types';
 
-export async function syncCrewUsers(): Promise<void> {
+async function syncCrew(): Promise<void> {
   const { data, error } = await supabase
     .from('users')
     .select('id, display_name, avatar_url')
@@ -12,3 +12,7 @@ export async function syncCrewUsers(): Promise<void> {
 
   await saveCrewUsers(data as CrewUser[]);
 }
+
+export const usersRepository = {
+  syncCrew,
+};

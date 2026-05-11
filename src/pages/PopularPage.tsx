@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Band, UserMissedBand } from '../types';
 import { loadBands, MISSED_CHANGED_EVENT } from '../lib/db';
-import { togglePick } from '../lib/picks';
-import { loadAllMissed, markMissed, unmarkMissed, syncMissedBands, subscribeToMissedRealtime } from '../lib/missed';
+import { picksRepository, missedRepository } from '../repositories';
 import { useBandConflicts } from '../hooks/useBandConflicts';
 import { useAuth } from '../hooks/useAuth';
 import { useBandAttendees } from '../hooks/useBandAttendees';
@@ -38,13 +37,13 @@ export default function PopularPage() {
 
   useEffect(() => {
     async function refreshMissed() {
-      setAllMissed(await loadAllMissed());
+      setAllMissed(await missedRepository.loadAll());
     }
 
     refreshMissed();
-    if (userId) syncMissedBands(userId).catch(() => {});
+    if (userId) missedRepository.sync(userId).catch(() => {});
 
-    const unsubscribeRealtime = subscribeToMissedRealtime();
+    const unsubscribeRealtime = missedRepository.subscribeToRealtime();
     window.addEventListener(MISSED_CHANGED_EVENT, refreshMissed);
     return () => {
       window.removeEventListener(MISSED_CHANGED_EVENT, refreshMissed);
@@ -104,7 +103,7 @@ export default function PopularPage() {
   const handleToggle = useCallback(
     async (bandId: string) => {
       if (!userId) return;
-      await togglePick(userId, bandId, pickedIds.has(bandId));
+      await picksRepository.toggle(userId, bandId, pickedIds.has(bandId));
       await refreshPicks();
     },
     [userId, pickedIds, refreshPicks],
@@ -113,9 +112,9 @@ export default function PopularPage() {
   const handleToggleMissed = useCallback(async () => {
     if (!userId || !activeBand) return;
     if (isMissed) {
-      await unmarkMissed(userId, activeBand.id);
+      await missedRepository.unmark(userId, activeBand.id);
     } else {
-      await markMissed(userId, activeBand.id);
+      await missedRepository.mark(userId, activeBand.id);
     }
   }, [userId, activeBand, isMissed]);
 

@@ -5,7 +5,7 @@ import {
   loadAllUserPicks,
   loadCrewUsers,
 } from '../lib/db';
-import { syncCrewUsers } from '../lib/users';
+import { usersRepository } from '../repositories';
 import type { CrewUser, UserPick } from '../types';
 
 export type BandAttendee = CrewUser & {
@@ -51,7 +51,7 @@ export function useBandAttendees(): Record<string, BandAttendee[]> {
     }
 
     refreshFromCache();
-    syncCrewUsers().catch(() => {});
+    usersRepository.syncCrew().catch(() => {});
 
     window.addEventListener(PICKS_CHANGED_EVENT, refreshFromCache);
     window.addEventListener(CREW_USERS_CHANGED_EVENT, refreshFromCache);

@@ -13,11 +13,8 @@ import {
   loadUserPicks,
   PICKS_CHANGED_EVENT,
 } from '../lib/db';
-import { togglePick } from '../lib/picks';
-import { fetchCurrentUserRole, fetchAllUsers, fetchBlockedPostersWithUserDetails, setUserRole as updateUserRole, unblockUser } from '../lib/announcements';
-import { invalidateCacheForAllUsers } from '../lib/cache';
+import { picksRepository, announcementsRepository, bandsRepository, presenceRepository } from '../repositories';
 import { getRegistrationEnabled, setRegistrationEnabled } from '../lib/appSettings';
-import { saveMetalPlaceConfigRemote, autoCheckoutAllUsersFromMetalPlace } from '../lib/presence';
 import { saveLiveBandTestConfigRemote } from '../services/liveBandTest';
 import {
   clearTimeOverride,
@@ -219,7 +216,7 @@ function ProfileForm({
     : [];
 
   useEffect(() => {
-    fetchCurrentUserRole(userId).then(setUserRole);
+    announcementsRepository.fetchCurrentUserRole(userId).then(setUserRole);
   }, [userId]);
 
   async function handleSave(e: FormEvent) {
@@ -533,7 +530,7 @@ function ConflictSection({ userId, t }: ConflictSectionProps) {
 
   const handleKeepBand = useCallback(
     async (_bandToKeep: Band, bandToRemove: Band) => {
-      await togglePick(userId, bandToRemove.id, true);
+      await picksRepository.toggle(userId, bandToRemove.id, true);
       setSelectedConflict(null);
     },
     [userId],
@@ -690,7 +687,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
 
   useEffect(() => {
     async function loadRole() {
-      const role = await fetchCurrentUserRole(userId);
+      const role = await announcementsRepository.fetchCurrentUserRole(userId);
       setUserRole(role);
       setLoading(false);
     }
@@ -701,8 +698,8 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
     async function loadUsers() {
       try {
         const [users, blocked] = await Promise.all([
-          fetchAllUsers(),
-          fetchBlockedPostersWithUserDetails(),
+          announcementsRepository.fetchAllUsers(),
+          announcementsRepository.fetchBlockedPostersWithUserDetails(),
         ]);
         setAllUsers(users.map((u) => ({ ...u, special_badges: u.special_badges ?? [] })) as UserWithLoading[]);
         setBlockedPosters(blocked.map(b => ({ user_id: b.user_id })));
@@ -804,7 +801,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
     setResetMessage(null);
 
     try {
-      await invalidateCacheForAllUsers();
+      await bandsRepository.invalidateCacheForAllUsers();
       setResetMessage(t('resetSuccess'));
       setTimeout(() => setResetMessage(null), 4000);
     } catch (error) {
@@ -850,7 +847,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
       );
 
       try {
-        await updateUserRole(targetUserId, newRole as 'normal' | 'manager');
+        await announcementsRepository.setUserRole(targetUserId, newRole as 'normal' | 'manager');
       } catch (error) {
         console.error('Failed to update user role:', error);
         setAllUsers(originalUsers);
@@ -1075,7 +1072,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
 
                     // Test mode pins the active day via test_override_day; the real
                     // festival_day, start_time, and end_time stay as configured.
-                    await saveMetalPlaceConfigRemote({
+                    await presenceRepository.saveMetalPlaceConfigRemote({
                       id: 1,
                       festival_day: festivalDay,
                       start_time: metalPlaceStartTime || null,
@@ -1084,7 +1081,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                     });
 
                     if (isTestModeNowOff) {
-                      await autoCheckoutAllUsersFromMetalPlace();
+                      await presenceRepository.autoCheckoutAllUsers();
                     }
 
                     previousTestModeRef.current = testModeEnabled;
@@ -1161,7 +1158,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                           return;
                         }
                         const festivalDay = metalPlaceDay === '' ? null : metalPlaceDay;
-                        await saveMetalPlaceConfigRemote({
+                        await presenceRepository.saveMetalPlaceConfigRemote({
                           id: 1,
                           festival_day: festivalDay,
                           start_time: metalPlaceStartTime || null,
@@ -1170,7 +1167,7 @@ function GodlikeSection({ userId, t }: GodlikeSectionProps) {
                         });
                         setTestModeEnabled(false);
                         previousTestModeRef.current = false;
-                        await autoCheckoutAllUsersFromMetalPlace();
+                        await presenceRepository.autoCheckoutAllUsers();
                       }
 
                       const config: LiveBandTestConfig = {
@@ -1554,7 +1551,7 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
 
   useEffect(() => {
     async function loadRole() {
-      const role = await fetchCurrentUserRole(userId);
+      const role = await announcementsRepository.fetchCurrentUserRole(userId);
       setUserRole(role);
     }
     loadRole();
@@ -1564,7 +1561,7 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
     async function loadBlocked() {
       if (userRole === 'manager' || userRole === 'godlike') {
         try {
-          const blocked = await fetchBlockedPostersWithUserDetails();
+          const blocked = await announcementsRepository.fetchBlockedPostersWithUserDetails();
           setBlockedUsers(blocked.map(bp => ({
             id: bp.user_id,
             email: bp.user_email,

@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase } from '../lib/supabase';
 import {
   saveUserPick,
   removeUserPick,
@@ -6,7 +6,7 @@ import {
   enqueueOfflinePick,
   loadOfflineQueue,
   removeFromOfflineQueue,
-} from './db';
+} from '../lib/db';
 import type { UserPick } from '../types';
 
 function offlinePickId(userId: string, bandId: string) {
@@ -29,7 +29,7 @@ async function queuePick(
   });
 }
 
-export async function togglePick(
+async function toggle(
   userId: string,
   bandId: string,
   currentlyPicked: boolean,
@@ -66,7 +66,7 @@ export async function togglePick(
   }
 }
 
-export async function syncUserPicks(userId: string): Promise<void> {
+async function syncForUser(userId: string): Promise<void> {
   const { data, error } = await supabase
     .from('user_picks')
     .select('*')
@@ -76,14 +76,14 @@ export async function syncUserPicks(userId: string): Promise<void> {
   await replaceUserPicks(data as UserPick[], userId);
 }
 
-export async function syncCrewPicks(): Promise<void> {
+async function syncCrewFromRemote(): Promise<void> {
   const { data, error } = await supabase.from('user_picks').select('*');
   if (error || !data) return;
 
   await replaceUserPicks(data as UserPick[]);
 }
 
-export async function flushOfflineQueue(): Promise<number> {
+async function flushOfflineQueue(): Promise<number> {
   const queue = (await loadOfflineQueue()).sort((a, b) =>
     a.created_at.localeCompare(b.created_at),
   );
@@ -124,3 +124,10 @@ export async function flushOfflineQueue(): Promise<number> {
   }
   return flushed;
 }
+
+export const picksRepository = {
+  toggle,
+  syncForUser,
+  syncCrewFromRemote,
+  flushOfflineQueue,
+};

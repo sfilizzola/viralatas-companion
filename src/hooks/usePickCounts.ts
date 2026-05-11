@@ -6,7 +6,7 @@ import {
   removeUserPick,
   saveUserPick,
 } from '../lib/db';
-import { syncCrewPicks } from '../lib/picks';
+import { picksRepository } from '../repositories';
 import type { UserPick } from '../types';
 
 function countPicks(picks: UserPick[]) {
@@ -29,7 +29,7 @@ export function usePickCounts(): Record<string, number> {
     }
 
     refreshFromCache();
-    syncCrewPicks().catch(() => {});
+    picksRepository.syncCrewFromRemote().catch(() => {});
 
     function handleLocalChange() {
       refreshFromCache();

@@ -12,11 +12,7 @@ import PrivateRoute from './components/PrivateRoute';
 import SyncToast, { SYNC_COMPLETE_EVENT } from './components/SyncToast';
 import { useAuth } from './hooks/useAuth';
 import { syncBands } from './lib/sync';
-import { flushOfflineQueue, syncCrewPicks } from './lib/picks';
-import { syncCrewUsers } from './lib/users';
-import { flushPresenceQueue, syncCrewPresence } from './lib/presence';
-import { flushPendingAnnouncements, syncAnnouncements } from './lib/announcements';
-import { checkAndApplyCacheVersion } from './lib/cache';
+import { picksRepository, usersRepository, presenceRepository, announcementsRepository, bandsRepository } from './repositories';
 
 function emitSyncComplete() {
   window.dispatchEvent(new Event(SYNC_COMPLETE_EVENT));
@@ -28,7 +24,7 @@ function CacheVersionCheck() {
 
   useEffect(() => {
     if (userId) {
-      checkAndApplyCacheVersion().catch(() => {});
+      bandsRepository.checkAndApplyCacheVersion().catch(() => {});
     }
   }, [userId]);
 
@@ -57,11 +53,11 @@ function PickSync() {
 
     async function syncNow() {
       const [picksFlushed, presenceFlushed] = await Promise.all([
-        flushOfflineQueue(),
-        flushPresenceQueue(),
+        picksRepository.flushOfflineQueue(),
+        presenceRepository.flushOfflineQueue(),
       ]);
       if (picksFlushed + presenceFlushed > 0) emitSyncComplete();
-      await Promise.all([syncCrewPicks(), syncCrewUsers(), syncCrewPresence()]);
+      await Promise.all([picksRepository.syncCrewFromRemote(), usersRepository.syncCrew(), presenceRepository.syncCrewFromRemote()]);
     }
 
     syncNow().catch(() => {});
@@ -85,9 +81,9 @@ function AnnouncementSync() {
     if (!userId) return;
 
     async function syncNow() {
-      const flushed = await flushPendingAnnouncements();
+      const flushed = await announcementsRepository.flushPending();
       if (flushed > 0) emitSyncComplete();
-      await syncAnnouncements();
+      await announcementsRepository.sync();
     }
 
     syncNow().catch(() => {});
