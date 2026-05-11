@@ -302,8 +302,8 @@ Example: `"Phase 11.A: Fix /now header datetime stacking on mobile\n\nCo-Authore
 
 **Rule:** When a commit is pushed to the `main` branch:
 1. Increment the version number by 1
-2. Tag the commit with the version string `v1.0.[version]` (e.g., `v1.0.1`, `v1.0.2`)
-3. Update this `Current version:` line in CLAUDE.md with the new number
+2. Only Tag the commit with the version string `v[major].[minor].[version]` (e.g., `v1.0.1`, `v1.0.2`) if there is a change in the minor AND major versions, do not tag versions.
+3. Update this `Current version:` line in CLAUDE.md with the new number, also update versions.ts with the new version.
 4. The prefix `v1.0` is hardcoded and never changes; only the patch number increments
 
 **Important:** Only the `main` branch receives tags. Dev branch commits are never tagged. This versioning scheme tracks patch releases only; major/minor version increments follow different rules outside this scope.
