@@ -10,11 +10,10 @@
   background: var(--bg);
 }
 
-/* ── Header ── */
+/* ── Header (States 2 & 3) ── */
 .header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--s-2);
 }
 
@@ -26,21 +25,7 @@
   letter-spacing: 0.08em;
   color: var(--text);
   margin: 0;
-}
-
-.previewButton {
-  appearance: none;
-  background: transparent;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 12px;
-  padding: 4px 8px;
-  transition: color 0.2s;
-}
-
-.previewButton:hover {
-  color: var(--text);
+  flex: 1;
 }
 
 /* ── Day rows container ── */
@@ -223,11 +208,10 @@
   max-width: 100px;
 }
 
-/* ── Minimized post-festival state ── */
-.minimizedRow {
+/* ── State 1: Collapsed (one-liner) ── */
+.collapsedView {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--s-2);
   background: var(--bg-surface);
   border: 1px solid var(--border);
@@ -236,16 +220,7 @@
   padding: var(--s-3);
 }
 
-.minimizedLabel {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text);
-}
-
-.minimizedToggle {
+.chevron {
   appearance: none;
   background: transparent;
   border: none;
@@ -254,11 +229,33 @@
   font-size: 10px;
   font-weight: 600;
   padding: 4px 8px;
+  flex-shrink: 0;
   transition: color 0.2s;
 }
 
-.minimizedToggle:hover {
+.chevron:hover {
   color: var(--text);
+}
+
+.summaryLabel {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.summaryText {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  flex: 1;
+  text-align: right;
 }
 
 /* ── Empty state ── */

@@ -35,5 +35,6 @@
   "arrivalMapMinimized": "llegaron",
   "arrivalMapExpandLabel": "ver todos",
   "arrivalMapCollapseLabel": "ocultar",
-  "arrivalMapEmpty": "Nadie ha definido su día de llegada aún"
+  "arrivalMapEmpty": "Nadie ha definido su día de llegada aún",
+  "arrivalMapToArrive": "por llegar"
 }

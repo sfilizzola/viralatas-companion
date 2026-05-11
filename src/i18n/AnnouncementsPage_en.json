@@ -35,5 +35,6 @@
   "arrivalMapMinimized": "arrived",
   "arrivalMapExpandLabel": "see all",
   "arrivalMapCollapseLabel": "collapse",
-  "arrivalMapEmpty": "No one has set an arrival day yet"
+  "arrivalMapEmpty": "No one has set an arrival day yet",
+  "arrivalMapToArrive": "to arrive"
 }

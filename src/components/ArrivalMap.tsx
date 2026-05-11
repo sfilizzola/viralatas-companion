@@ -10,9 +10,9 @@ type ArrivalMapProps = {
 };
 
 type ArrivalDay = 'sun-jul26' | 'mon-jul27' | 'tue-jul28' | 'wed-jul29' | 'thu-plus' | null;
+type ViewState = 'collapsed' | 'days' | 'details';
 
 const ARRIVAL_DAY_ORDER: ArrivalDay[] = ['sun-jul26', 'mon-jul27', 'tue-jul28', 'wed-jul29', 'thu-plus'];
-
 const FESTIVAL_DAY_1_START = new Date('2026-07-29T00:00:00+01:00');
 
 function getArrivalDayLabel(day: ArrivalDay): string {
@@ -117,9 +117,19 @@ function ArrivalDayRow({
   currentTime: Date;
   isExpanded: boolean;
   onToggleExpand: () => void;
-  t: (key: string) => string;
+  t: (key: string, values?: Record<string, string | number>) => string;
 }) {
-  const labelKey = getArrivalDayLabel(day);
+  const labelKey = (() => {
+    const keyMap: Record<ArrivalDay, string> = {
+      'sun-jul26': 'arrivalDaySunJul26',
+      'mon-jul27': 'arrivalDayMonJul27',
+      'tue-jul28': 'arrivalDayTueJul28',
+      'wed-jul29': 'arrivalDayWedJul29',
+      'thu-plus': 'arrivalDayThuPlus',
+      null: 'arrivalMapNotSet',
+    };
+    return keyMap[day];
+  })();
   const label = t(labelKey);
   const today = isToday(day, currentTime);
   const past = isPastDay(day, currentTime);
@@ -174,12 +184,12 @@ export default function ArrivalMap({
   currentTime,
 }: ArrivalMapProps) {
   const { t } = useI18n('AnnouncementsPage');
-  const [expandedDay, setExpandedDay] = useState<ArrivalDay | null>(null);
-  const [isManuallyExpanded, setIsManuallyExpanded] = useState(false);
-  const [forceMinimized, setForceMinimized] = useState(false);
-
   const isFestivalActive = currentTime >= FESTIVAL_DAY_1_START;
-  const shouldMinimize = (isFestivalActive || forceMinimized) && !isManuallyExpanded;
+
+  // Start in 'days' view before festival, 'collapsed' after
+  const defaultView: ViewState = isFestivalActive ? 'collapsed' : 'days';
+  const [view, setView] = useState<ViewState>(defaultView);
+  const [expandedDay, setExpandedDay] = useState<ArrivalDay | null>(null);
 
   const groupedByArrivalDay = useMemo(() => {
     const grouped: Record<ArrivalDay, CrewUser[]> = {
@@ -209,50 +219,120 @@ export default function ArrivalMap({
     );
   }, [groupedByArrivalDay]);
 
-  if (sortedDays.length === 0) {
+  const totalArrived = useMemo(() => {
+    return sortedDays
+      .filter((day) => day && isPastDay(day, currentTime))
+      .reduce((sum, day) => sum + (groupedByArrivalDay[day]?.length || 0), 0);
+  }, [sortedDays, groupedByArrivalDay, currentTime]);
+
+  const totalToArrive = useMemo(() => {
+    return sortedDays
+      .filter((day) => !day || !isPastDay(day, currentTime))
+      .reduce((sum, day) => sum + (groupedByArrivalDay[day]?.length || 0), 0);
+  }, [sortedDays, groupedByArrivalDay, currentTime]);
+
+  // State 1: Collapsed (one-liner summary)
+  if (view === 'collapsed') {
+    const showArrivals = totalArrived > 0;
+    const showToArrive = totalToArrive > 0;
+
+    if (!showArrivals && !showToArrive) {
+      return (
+        <div className={styles.container}>
+          <div className={styles.emptyState}>{t('arrivalMapEmpty')}</div>
+        </div>
+      );
+    }
+
+    let summary = '';
+    if (showArrivals) summary += `${totalArrived} ${t('arrivalMapMinimized')}`;
+    if (showArrivals && showToArrive) summary += ' · ';
+    if (showToArrive) summary += `${totalToArrive} ${t('arrivalMapToArrive') || t('arrivalMapMinimized')}`;
+
     return (
       <div className={styles.container}>
-        <div className={styles.emptyState}>{t('arrivalMapEmpty')}</div>
-      </div>
-    );
-  }
-
-  const totalCount = sortedDays.reduce((sum, day) => sum + (groupedByArrivalDay[day]?.length || 0), 0);
-
-  if (shouldMinimize) {
-    const minLabel = `${t('arrivalMapTitle')}  ${totalCount} ${t('arrivalMapMinimized')}`;
-
-    return (
-      <div className={styles.container}>
-        <div className={styles.minimizedRow}>
-          <span className={styles.minimizedLabel}>{minLabel}</span>
+        <div className={styles.collapsedView}>
           <button
             type="button"
-            className={styles.minimizedToggle}
-            onClick={() => setIsManuallyExpanded(true)}
-            aria-label="expand"
+            className={styles.chevron}
+            onClick={() => setView('days')}
+            aria-label="expand to days"
           >
-            ▼
+            ▶
           </button>
+          <span className={styles.summaryLabel}>{t('arrivalMapTitle')}</span>
+          <span className={styles.summaryText}>{summary}</span>
         </div>
       </div>
     );
   }
 
+  // Empty state for both expanded views
+  if (sortedDays.length === 0) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <button
+            type="button"
+            className={styles.chevron}
+            onClick={() => setView('collapsed')}
+            aria-label="collapse"
+          >
+            ▼
+          </button>
+          <h2 className={styles.title}>{t('arrivalMapTitle')}</h2>
+        </div>
+        <div className={styles.emptyState}>{t('arrivalMapEmpty')}</div>
+      </div>
+    );
+  }
+
+  // State 2: Day cluster (current behavior - rows with toggles)
+  if (view === 'days') {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <button
+            type="button"
+            className={styles.chevron}
+            onClick={() => setView('collapsed')}
+            aria-label="collapse"
+          >
+            ▼
+          </button>
+          <h2 className={styles.title}>{t('arrivalMapTitle')}</h2>
+        </div>
+        <div className={styles.dayRows}>
+          {sortedDays.map((day) => (
+            <ArrivalDayRow
+              key={day || 'not-set'}
+              day={day}
+              users={groupedByArrivalDay[day] || []}
+              currentUserId={currentUserId}
+              currentTime={currentTime}
+              isExpanded={expandedDay === day}
+              onToggleExpand={() => setExpandedDay(expandedDay === day ? null : day)}
+              t={t}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // State 3: Details (all rows expanded)
   return (
     <div className={styles.container}>
       <div className={styles.header}>
+        <button
+          type="button"
+          className={styles.chevron}
+          onClick={() => setView('collapsed')}
+          aria-label="collapse"
+        >
+          ▼
+        </button>
         <h2 className={styles.title}>{t('arrivalMapTitle')}</h2>
-        {!isFestivalActive && (
-          <button
-            type="button"
-            className={styles.previewButton}
-            onClick={() => setForceMinimized(!forceMinimized)}
-            title="Preview post-Wacken state"
-          >
-            {forceMinimized ? '→' : '⏩'}
-          </button>
-        )}
       </div>
       <div className={styles.dayRows}>
         {sortedDays.map((day) => (
@@ -262,8 +342,8 @@ export default function ArrivalMap({
             users={groupedByArrivalDay[day] || []}
             currentUserId={currentUserId}
             currentTime={currentTime}
-            isExpanded={expandedDay === day}
-            onToggleExpand={() => setExpandedDay(expandedDay === day ? null : day)}
+            isExpanded={true}
+            onToggleExpand={() => {}}
             t={t}
           />
         ))}

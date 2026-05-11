@@ -35,5 +35,6 @@
   "arrivalMapMinimized": "chegaram",
   "arrivalMapExpandLabel": "ver todos",
   "arrivalMapCollapseLabel": "recolher",
-  "arrivalMapEmpty": "Nenhum vira-lata definiu chegada ainda"
+  "arrivalMapEmpty": "Nenhum vira-lata definiu chegada ainda",
+  "arrivalMapToArrive": "a chegar"
 }

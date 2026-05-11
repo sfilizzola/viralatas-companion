@@ -35,5 +35,6 @@
   "arrivalMapMinimized": "angekommen",
   "arrivalMapExpandLabel": "alle sehen",
   "arrivalMapCollapseLabel": "einklappen",
-  "arrivalMapEmpty": "Noch niemand hat seinen Ankunftstag angegeben"
+  "arrivalMapEmpty": "Noch niemand hat seinen Ankunftstag angegeben",
+  "arrivalMapToArrive": "noch zu kommen"
 }
