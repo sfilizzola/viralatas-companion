@@ -21,5 +21,21 @@
   "role_godlike": "Godlike",
   "pendingSync": "Sync ausstehend",
   "blockedDone": "Blockiert",
-  "blockAction": "Blockieren"
+  "blockAction": "Blockieren",
+  "arrivalDaySunJul26": "SO 26. JUL",
+  "arrivalDayMonJul27": "MO 27. JUL",
+  "arrivalDayTueJul28": "DI 28. JUL",
+  "arrivalDayWedJul29": "MI 29. JUL",
+  "arrivalDayThuPlus": "DO+",
+  "arrivalMap": {
+    "title": "ANKÜNFTE",
+    "notSet": "Nicht angegeben",
+    "today": "HEUTE",
+    "count_one": "1 Person",
+    "count_other": "{{n}} Personen",
+    "minimized": "angekommen",
+    "expandLabel": "alle sehen",
+    "collapseLabel": "einklappen",
+    "empty": "Noch niemand hat seinen Ankunftstag angegeben"
+  }
 }

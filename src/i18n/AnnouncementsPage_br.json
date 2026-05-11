@@ -21,5 +21,21 @@
   "role_godlike": "Godlike",
   "pendingSync": "Sync pendente",
   "blockedDone": "Bloqueado",
-  "blockAction": "Bloquear"
+  "blockAction": "Bloquear",
+  "arrivalDaySunJul26": "DOM JUL 26",
+  "arrivalDayMonJul27": "SEG JUL 27",
+  "arrivalDayTueJul28": "TER JUL 28",
+  "arrivalDayWedJul29": "QUA JUL 29",
+  "arrivalDayThuPlus": "QUI+",
+  "arrivalMap": {
+    "title": "CHEGADAS",
+    "notSet": "Não definido",
+    "today": "HOJE",
+    "count_one": "1 vira-lata",
+    "count_other": "{{n}} vira-latas",
+    "minimized": "chegaram",
+    "expandLabel": "ver todos",
+    "collapseLabel": "recolher",
+    "empty": "Nenhum vira-lata definiu chegada ainda"
+  }
 }

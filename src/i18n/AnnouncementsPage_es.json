@@ -21,5 +21,21 @@
   "role_godlike": "Godlike",
   "pendingSync": "Sync pendiente",
   "blockedDone": "Bloqueado",
-  "blockAction": "Bloquear"
+  "blockAction": "Bloquear",
+  "arrivalDaySunJul26": "DOM JUL 26",
+  "arrivalDayMonJul27": "LUN JUL 27",
+  "arrivalDayTueJul28": "MAR JUL 28",
+  "arrivalDayWedJul29": "MIÉ JUL 29",
+  "arrivalDayThuPlus": "JUE+",
+  "arrivalMap": {
+    "title": "LLEGADAS",
+    "notSet": "Sin definir",
+    "today": "HOY",
+    "count_one": "1 persona",
+    "count_other": "{{n}} personas",
+    "minimized": "llegaron",
+    "expandLabel": "ver todos",
+    "collapseLabel": "ocultar",
+    "empty": "Nadie ha definido su día de llegada aún"
+  }
 }

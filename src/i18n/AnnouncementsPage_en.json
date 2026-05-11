@@ -21,5 +21,21 @@
   "role_godlike": "Godlike",
   "pendingSync": "Pending sync",
   "blockedDone": "Blocked",
-  "blockAction": "Block"
+  "blockAction": "Block",
+  "arrivalDaySunJul26": "SUN JUL 26",
+  "arrivalDayMonJul27": "MON JUL 27",
+  "arrivalDayTueJul28": "TUE JUL 28",
+  "arrivalDayWedJul29": "WED JUL 29",
+  "arrivalDayThuPlus": "THU+",
+  "arrivalMap": {
+    "title": "ARRIVALS",
+    "notSet": "Not set",
+    "today": "TODAY",
+    "count_one": "1 member",
+    "count_other": "{{n}} members",
+    "minimized": "arrived",
+    "expandLabel": "see all",
+    "collapseLabel": "collapse",
+    "empty": "No one has set an arrival day yet"
+  }
 }
