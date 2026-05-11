@@ -298,7 +298,7 @@ Example: `"Phase 11.A: Fix /now header datetime stacking on mobile\n\nCo-Authore
 
 ## Automatic versioning (main branch only)
 
-**Current version:** `6`
+**Current version:** `7`
 
 **Rule:** When a commit is pushed to the `main` branch:
 1. Increment the version number by 1
