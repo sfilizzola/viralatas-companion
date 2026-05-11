@@ -4,6 +4,21 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-11 (Badge Asset Wiring)
+
+### Added
+- Wired five badge assets into `BADGES`: `bbq-king-2026`, `dreamer`, `jagger-king`, `live-beast`, and `total-kaput-2026`.
+- Added badge localization keys for Brazilian Portuguese, English, Spanish, and German.
+
+### Changed
+- Updated the badge inventory to 28 active badges and documented `dreamer` as a persisted 30-pick milestone.
+- Updated the `dreamer` badge display copy to use the "I'm Tripping" / "Tô doidão" concept across locales.
+- Removed the unused `badge_camping_mob.png` test asset from the active badge asset folder.
+
+### Architectural Notes
+- `dreamer` uses the existing `persist: true` badge mechanism so it remains earned after the user later changes picks.
+- The new honor badges use the existing `assigned` condition and godlike assignment flow.
+
 ## 2026-05-11 (Phase 13.B)
 
 ### Added (User Flows)

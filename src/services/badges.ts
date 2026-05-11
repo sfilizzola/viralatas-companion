@@ -291,7 +291,16 @@ export const BADGES: BadgeConfig[] = [
     condition: { type: 'bands_seen_before_hour_min', hour: 13, count: 5 },
     year: 2026,
   },
-  // Joke badges — assigned manually by godlike via the assign-badge Edge Function
+  {
+    slug: 'dreamer',
+    imagePath: '/badges/badge_dreamer.png',
+    labelKey: 'badgeDreamer',
+    descriptionKey: 'badgeDreamerDescription',
+    condition: { type: 'bands_picked_min', count: 30 },
+    year: 2026,
+    persist: true,
+  },
+  // Festival 2026 music badges
   {
     slug: 'death-metal',
     imagePath: '/badges/badge_death-metal.png',
@@ -317,6 +326,23 @@ export const BADGES: BadgeConfig[] = [
     year: 2026,
   },
   {
+    slug: 'party-metal',
+    imagePath: '/badges/badge_party-metal.png',
+    labelKey: 'badgePartyMetal',
+    descriptionKey: 'badgePartyMetalDescription',
+    condition: { type: 'bands_seen_genre_min', genre: 'Party Metal', count: 2 },
+    year: 2026,
+  },
+  {
+    slug: 'live-beast',
+    imagePath: '/badges/badge_live-beast.png',
+    labelKey: 'badgeLiveBeast',
+    descriptionKey: 'badgeLiveBeastDescription',
+    condition: { type: 'bands_seen_min', count: 22 },
+    year: 2026,
+  },
+  // Joke badges — assigned manually by godlike via the assign-badge Edge Function
+  {
     slug: 'mosh-pit',
     imagePath: '/badges/badge_mosh-pit.png',
     labelKey: 'badgeMoshPit',
@@ -333,15 +359,6 @@ export const BADGES: BadgeConfig[] = [
     year: 2026,
   },
   {
-    slug: 'party-metal',
-    imagePath: '/badges/badge_party-metal.png',
-    labelKey: 'badgePartyMetal',
-    descriptionKey: 'badgePartyMetalDescription',
-    condition: { type: 'bands_seen_genre_min', genre: 'Party Metal', count: 2 },
-    year: 2026,
-  },
-  // Joke badges — assigned manually by godlike via the assign-badge Edge Function
-  {
     slug: 'girl-power',
     imagePath: '/badges/badge_girl-power.png',
     labelKey: 'badgeGirlPower',
@@ -355,6 +372,30 @@ export const BADGES: BadgeConfig[] = [
     labelKey: 'badgeNutella',
     descriptionKey: 'badgeNutellaDescription',
     condition: { type: 'assigned' },
+  },
+  {
+    slug: 'bbq-king-2026',
+    imagePath: '/badges/badge_bbq-king-26.png',
+    labelKey: 'badgeBbqKing2026',
+    descriptionKey: 'badgeBbqKing2026Description',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
+  {
+    slug: 'jagger-king',
+    imagePath: '/badges/badge_jagger-king.png',
+    labelKey: 'badgeJaggerKing',
+    descriptionKey: 'badgeJaggerKingDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
+  {
+    slug: 'total-kaput-2026',
+    imagePath: '/badges/badge_total-kaput-26.png',
+    labelKey: 'badgeTotalKaput2026',
+    descriptionKey: 'badgeTotalKaput2026Description',
+    condition: { type: 'assigned' },
+    year: 2026,
   },
   // Location visit count badges
   {

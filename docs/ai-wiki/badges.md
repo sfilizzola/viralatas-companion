@@ -346,49 +346,53 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `crowdsurfer` (flew over the crowd)
 - `girl-power` (inside joke or achievement)
 - `nutella` (glamour/mordomias joke)
+- `bbq-king-2026` (BBQ king honor)
+- `jagger-king` (Jagger King honor)
+- `total-kaput-2026` (festival aftermath honor)
 
 **Godlike-only**: Non-godlike users cannot assign badges
 
 ---
 
-## Current Badges Inventory (30 Total)
+## Current Badges Inventory (28 Total)
 
-### Country Pride (6)
+### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
+- `pack-member` — Shared a picked band with 10+ vira-latas
 - `pais-tropical` — Brazil
 - `deutscher` — Germany
 - `america-fuck-yeah` — USA
 - `belga` — Belgium
 - `cafetero` — Colombia
 
-### Wacken Veteran (5)
+### Wacken Veteran (4)
 - `og` — Founding member (attended 2022)
 - `mud-survivor` — Survived 2023 AND 2025
 - `5-wackens` — Attended 5+ editions
 - `10-wackens` — Attended 10+ editions
-- `anniversary-2016` — Attended in 2016
 
-### Festival 2026 (5)
+### Festival 2026 (7)
 - `early-bird` — Saw 5+ bands before 1 PM (CEST)
+- `dreamer` — "I'm Tripping" / 30+ picked bands (persist: true)
 - `death-metal` — Saw 3+ Death Metal bands
 - `power-metal` — Saw 3+ Power Metal bands
 - `party-metal` — Saw 2 Party Metal bands
 - `alestorm` — Saw Alestorm live
+- `live-beast` — Saw 22+ bands
 
-### Merit / Assigned (6)
+### Merit / Assigned (7)
 - `mosh-pit` — Hit the floor, came back (godlike-assigned)
 - `crowdsurfer` — Flew over the crowd (godlike-assigned)
 - `girl-power` — Metal queen (godlike-assigned)
 - `nutella` — Glamour / mordomias (godlike-assigned)
-- (2 slots reserved for future joke badges)
+- `bbq-king-2026` — BBQ King 2026 (godlike-assigned)
+- `jagger-king` — Jagger King (godlike-assigned)
+- `total-kaput-2026` — Total Kaput (godlike-assigned)
 
 ### Location Presence (3)
 - `metal-place-2026` — Visited Metal Place (persist: true)
 - `bbq-crew` — 15+ crew camping together (persist: true)
 - `lost-together` — 5+ crew lost together (persist: true)
-
-### Arrival Timing (1)
-- `early-bird` — Arrived before Tuesday (plus the seen-5-bands condition)
 
 ---
 
@@ -559,6 +563,7 @@ Reflect **current state** — re-evaluated on every profile load.
 - Location visits (visit once, recorded forever)
 - Crew bonding moments (crew together, recorded forever)
 - Historic achievements (saw band, attended festival year, arrived early)
+- Milestone picks that should remain earned even if the user later removes picks, such as `dreamer`
 
 **When to omit/use `false`**:
 - Active state (current location, current picks)
@@ -773,4 +778,3 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 ---
 
 **Last updated:** 2026-05-11
-
