@@ -70,8 +70,9 @@ function AvatarCluster({
             key={user.id}
             className={styles.avatar}
             title={user.display_name || 'Unknown'}
+            style={user.avatar_url ? { backgroundImage: `url(${user.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
           >
-            {initials}
+            {!user.avatar_url && initials}
           </span>
         );
       })}
@@ -96,7 +97,12 @@ function LocationChip({
 
   return (
     <span className={`${styles.locChip} ${isCurrentUser ? styles.locChipMe : ''}`}>
-      <span className={styles.chipAvatar}>{initials}</span>
+      <span
+        className={styles.chipAvatar}
+        style={user.avatar_url ? { backgroundImage: `url(${user.avatar_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+      >
+        {!user.avatar_url && initials}
+      </span>
       <span className={styles.chipName}>{user.display_name}</span>
     </span>
   );
