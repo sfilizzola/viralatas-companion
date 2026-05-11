@@ -22,6 +22,8 @@ const ARRIVAL_DAY_OPTIONS = [
 const LANG_OPTIONS = [
   { value: 'br', label: 'PT' },
   { value: 'en', label: 'EN' },
+  { value: 'es', label: 'ES' },
+  { value: 'de', label: 'DE' },
 ];
 
 type TFn = (key: string, values?: Record<string, string | number>) => string;

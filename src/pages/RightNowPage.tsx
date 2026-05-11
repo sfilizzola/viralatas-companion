@@ -1,4 +1,4 @@
-import { useI18n } from '../lib/i18n';
+import { useI18n, type Language } from '../lib/i18n';
 import { useNowData } from '../hooks/useNowData';
 import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
@@ -8,8 +8,15 @@ import LatestAnnouncementBanner from '../components/now/LatestAnnouncementBanner
 import CrewGroupsSection from '../components/now/CrewGroupsSection';
 import styles from './RightNowPage.module.css';
 
-function nowLabel(date: Date, language: 'br' | 'en') {
-  return new Intl.DateTimeFormat(language === 'br' ? 'pt-BR' : 'en-US', {
+const DATE_LOCALES: Record<Language, string> = {
+  br: 'pt-BR',
+  en: 'en-US',
+  es: 'es-ES',
+  de: 'de-DE',
+};
+
+function nowLabel(date: Date, language: Language) {
+  return new Intl.DateTimeFormat(DATE_LOCALES[language], {
     weekday: 'short',
     hour: '2-digit',
     minute: '2-digit',

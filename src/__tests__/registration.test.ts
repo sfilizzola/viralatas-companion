@@ -58,7 +58,7 @@ describe('User Registration', () => {
 
     it('should set preferred_language to br by default', () => {
       const defaultLanguage = 'br';
-      const validLanguages = ['br', 'en'];
+      const validLanguages = ['br', 'en', 'es', 'de'];
       expect(validLanguages.includes(defaultLanguage)).toBe(true);
     });
 
@@ -114,8 +114,8 @@ describe('User Registration', () => {
     });
 
     it('should have valid preferred_language values', () => {
-      const validLanguages = ['br', 'en'];
-      const testLanguages = ['br', 'en', 'invalid'];
+      const validLanguages = ['br', 'en', 'es', 'de'];
+      const testLanguages = ['br', 'en', 'es', 'de', 'invalid'];
 
       testLanguages.forEach((lang) => {
         if (validLanguages.includes(lang)) {

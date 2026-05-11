@@ -11,12 +11,21 @@ import {
 function initialLanguage(): Language {
   const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY);
   if (isLanguage(stored)) return stored;
-  return navigator.language.toLowerCase().startsWith('pt') ? 'br' : 'en';
+  const browserLanguage = navigator.language.toLowerCase();
+  if (browserLanguage.startsWith('pt')) return 'br';
+  if (browserLanguage.startsWith('es')) return 'es';
+  if (browserLanguage.startsWith('de')) return 'de';
+  return 'en';
 }
 
 function applyLanguage(language: Language) {
   localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
-  document.documentElement.lang = language === 'br' ? 'pt-BR' : 'en';
+  document.documentElement.lang = {
+    br: 'pt-BR',
+    en: 'en',
+    es: 'es',
+    de: 'de',
+  }[language];
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {

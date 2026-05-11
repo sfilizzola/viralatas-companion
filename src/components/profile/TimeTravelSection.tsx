@@ -14,8 +14,15 @@ function toDatetimeLocalValue(iso: string): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+const DATE_LOCALES: Record<Language, string> = {
+  br: 'pt-BR',
+  en: 'en-GB',
+  es: 'es-ES',
+  de: 'de-DE',
+};
+
 function formatWackenLocal(iso: string, language: Language): string {
-  return new Intl.DateTimeFormat(language === 'br' ? 'pt-BR' : 'en-GB', {
+  return new Intl.DateTimeFormat(DATE_LOCALES[language], {
     dateStyle: 'short',
     timeStyle: 'short',
     timeZone: 'Europe/Berlin',

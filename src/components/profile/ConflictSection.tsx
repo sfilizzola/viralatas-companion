@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Band, UserPick } from '../../types';
 import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../../lib/db';
 import { picksRepository } from '../../repositories';
+import { computeBandOverlaps } from '../../hooks/useBandConflicts';
 import { Button, Collapsible, Modal } from '../../ui';
 import Icon from '../icons/Icon';
 import styles from '../../pages/ProfilePage.module.css';
@@ -15,15 +16,6 @@ function getFestivalDay(isoTime: string): number {
   return dayOffset + 1;
 }
 
-function hasConflict(bandA: Band, bandB: Band): boolean {
-  const aStartMs = new Date(bandA.start_time).getTime();
-  const aEndMs = new Date(bandA.end_time).getTime();
-  const bStartMs = new Date(bandB.start_time).getTime();
-  const bEndMs = new Date(bandB.end_time).getTime();
-  const bufferMs = 30 * 60 * 1000;
-  return aStartMs < bEndMs + bufferMs && bStartMs < aEndMs + bufferMs;
-}
-
 type ConflictPair = {
   bandA: Band;
   bandB: Band;
@@ -31,19 +23,35 @@ type ConflictPair = {
 };
 
 function detectConflicts(bands: Band[]): ConflictPair[] {
+  const overlaps = computeBandOverlaps(bands);
+  const seenPairs = new Set<string>();
   const conflicts: ConflictPair[] = [];
-  for (let i = 0; i < bands.length; i++) {
-    for (let j = i + 1; j < bands.length; j++) {
-      if (hasConflict(bands[i], bands[j])) {
-        conflicts.push({
-          bandA: bands[i],
-          bandB: bands[j],
-          day: getFestivalDay(bands[i].start_time),
-        });
-      }
+
+  for (const band of bands) {
+    for (const overlap of overlaps.get(band.id) ?? []) {
+      if (overlap.severity !== 'hard') continue;
+
+      const pairKey = [band.id, overlap.band.id].sort().join(':');
+      if (seenPairs.has(pairKey)) continue;
+      seenPairs.add(pairKey);
+
+      const [bandA, bandB] = [band, overlap.band].sort((a, b) =>
+        a.start_time.localeCompare(b.start_time),
+      );
+      conflicts.push({
+        bandA,
+        bandB,
+        day: getFestivalDay(bandA.start_time),
+      });
     }
   }
-  return conflicts;
+
+  return conflicts.sort(
+    (a, b) =>
+      a.day - b.day ||
+      a.bandA.start_time.localeCompare(b.bandA.start_time) ||
+      a.bandB.start_time.localeCompare(b.bandB.start_time),
+  );
 }
 
 function formatTime(isoTime: string): string {

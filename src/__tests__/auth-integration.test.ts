@@ -119,7 +119,7 @@ describe('Auth & Users Table Integration', () => {
     });
 
     it('should load preferred_language on login', () => {
-      const validLanguages = ['br', 'en'];
+      const validLanguages = ['br', 'en', 'es', 'de'];
       const language = 'br';
 
       expect(validLanguages.includes(language)).toBe(true);

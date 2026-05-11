@@ -9,7 +9,7 @@ export type Database = {
           email: string;
           display_name: string | null;
           avatar_url: string | null;
-          preferred_language: 'br' | 'en';
+          preferred_language: 'br' | 'en' | 'es' | 'de';
           is_test_user: boolean;
           role: 'normal' | 'manager' | 'godlike';
           created_at: string;
@@ -22,7 +22,7 @@ export type Database = {
           email: string;
           display_name?: string | null;
           avatar_url?: string | null;
-          preferred_language?: 'br' | 'en';
+          preferred_language?: 'br' | 'en' | 'es' | 'de';
           is_test_user?: boolean;
           role?: 'normal' | 'manager' | 'godlike';
           created_at?: string;
@@ -35,7 +35,7 @@ export type Database = {
           email?: string;
           display_name?: string | null;
           avatar_url?: string | null;
-          preferred_language?: 'br' | 'en';
+          preferred_language?: 'br' | 'en' | 'es' | 'de';
           is_test_user?: boolean;
           role?: 'normal' | 'manager' | 'godlike';
           created_at?: string;
