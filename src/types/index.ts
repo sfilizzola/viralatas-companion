@@ -13,9 +13,10 @@ export type User = {
   created_at: string;
   wacken_years: number[];
   country: Country | null;
+  wacken_arrival_day?: string | null;
 };
 
-export type CrewUser = Pick<User, 'id' | 'display_name' | 'avatar_url'>;
+export type CrewUser = Pick<User, 'id' | 'display_name' | 'avatar_url' | 'wacken_arrival_day'>;
 
 export type Band = {
   id: string;
