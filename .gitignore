@@ -16,6 +16,7 @@ dist-ssr/
 # Editor
 .vscode/
 .idea/
+.obsidian/
 *.sw?
 
 # OS
