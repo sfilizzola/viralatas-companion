@@ -1,0 +1,18 @@
+{
+  "appTitle": "Viralatas Metaleiros 🤘",
+  "loginTitle": "Anmelden",
+  "registerTitle": "Konto erstellen",
+  "crewName": "Vira-lata-Name",
+  "crewNamePlaceholder": "z. B. Ferreiro, Gordão, Diabão...",
+  "email": "E-Mail",
+  "password": "Passwort",
+  "loginLoading": "Anmeldung läuft...",
+  "loginAction": "Anmelden",
+  "registerLoading": "Konto wird erstellt...",
+  "checkingRegistration": "Registrierung wird geprüft...",
+  "registerAction": "Konto erstellen",
+  "needAccount": "Noch kein Konto?",
+  "createAccount": "Konto erstellen",
+  "hasAccount": "Schon ein Konto?",
+  "loginLink": "Anmelden"
+}

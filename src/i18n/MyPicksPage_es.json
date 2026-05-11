@@ -1,0 +1,11 @@
+{
+  "title": "Mis Picks",
+  "loading": "Cargando Picks...",
+  "empty": "Todavía no elegiste ninguna banda. Ve a la agenda 🤘",
+  "summary": "{bands} bandas en {days} días · {conflicts} conflicto(s)",
+  "headerBandsDays": "{bands} Picks / {days} días",
+  "headerConflicts": "{conflicts} conflictos",
+  "headerOverlaps": "{overlaps} superposición(es)",
+  "conflictWarningBanner": "Tienes {count} conflicto(s). Fácil de resolver en tu perfil →",
+  "dayPickCount": "{count} Picks"
+}

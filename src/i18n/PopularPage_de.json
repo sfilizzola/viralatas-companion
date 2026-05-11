@@ -1,0 +1,7 @@
+{
+  "title": "Beliebt",
+  "headerViraLatas": "{count} vira-latas",
+  "headerSorted": "nach Picks",
+  "loading": "Beliebtheit wird geladen...",
+  "empty": "Der Zeitplan ist momentan leer."
+}

@@ -1,0 +1,7 @@
+{
+  "title": "Popular",
+  "headerViraLatas": "{count} vira-latas",
+  "headerSorted": "por Picks",
+  "loading": "Cargando popularidad...",
+  "empty": "La agenda está vacía por ahora."
+}
