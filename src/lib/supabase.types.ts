@@ -15,6 +15,7 @@ export type Database = {
           created_at: string;
           wacken_years: number[];
           country: string | null;
+          special_badges: string[];
         };
         Insert: {
           id?: string;
@@ -27,6 +28,7 @@ export type Database = {
           created_at?: string;
           wacken_years?: number[];
           country?: string | null;
+          special_badges?: string[];
         };
         Update: {
           id?: string;
@@ -39,6 +41,7 @@ export type Database = {
           created_at?: string;
           wacken_years?: number[];
           country?: string | null;
+          special_badges?: string[];
         };
         Relationships: [];
       };

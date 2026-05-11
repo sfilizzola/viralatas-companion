@@ -308,6 +308,38 @@ export const BADGES: BadgeConfig[] = [
     condition: { type: 'bands_seen_genre_min', genre: 'Power Metal', count: 3 },
     year: 2026,
   },
+  {
+    slug: 'alestorm',
+    imagePath: '/badges/badge_alestorm.png',
+    labelKey: 'badgeAlestorm',
+    descriptionKey: 'badgeAlestormDescription',
+    condition: { type: 'band_seen_named', name: 'Alestorm' },
+    year: 2026,
+  },
+  {
+    slug: 'mosh-pit',
+    imagePath: '/badges/badge_mosh-pit.png',
+    labelKey: 'badgeMoshPit',
+    descriptionKey: 'badgeMoshPitDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
+  {
+    slug: 'crowdsurfer',
+    imagePath: '/badges/badge_crowdsurfer.png',
+    labelKey: 'badgeCrowdsurfer',
+    descriptionKey: 'badgeCrowdsurferDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
+  {
+    slug: 'party-metal',
+    imagePath: '/badges/badge_party-metal.png',
+    labelKey: 'badgePartyMetal',
+    descriptionKey: 'badgePartyMetalDescription',
+    condition: { type: 'bands_seen_genre_min', genre: 'Party Metal', count: 2 },
+    year: 2026,
+  },
   // Joke badges — assigned manually by godlike via the assign-badge Edge Function
   {
     slug: 'girl-power',

@@ -1571,7 +1571,7 @@ function ManagerSection({ userId, t }: ManagerSectionProps) {
             display_name: bp.user_display_name,
             avatar_url: bp.user_avatar_url,
             role: 'blocked',
-            special_badges: bp.user_special_badges,
+            special_badges: [],
           })));
         } catch (error) {
           console.error('Failed to load blocked users:', error);
