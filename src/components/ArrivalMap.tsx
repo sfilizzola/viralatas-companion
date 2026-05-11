@@ -189,7 +189,7 @@ export default function ArrivalMap({
   // Start in 'days' view before festival, 'collapsed' after
   const defaultView: ViewState = isFestivalActive ? 'collapsed' : 'days';
   const [view, setView] = useState<ViewState>(defaultView);
-  const [expandedDay, setExpandedDay] = useState<ArrivalDay | null>(null);
+  const [expandedDay, setExpandedDay] = useState<ArrivalDay | 'not-set' | null>(null);
 
   const groupedByArrivalDay = useMemo(() => {
     const grouped: Record<ArrivalDay, CrewUser[]> = {
@@ -303,18 +303,21 @@ export default function ArrivalMap({
           <h2 className={styles.title}>{t('arrivalMapTitle')}</h2>
         </div>
         <div className={styles.dayRows}>
-          {sortedDays.map((day) => (
-            <ArrivalDayRow
-              key={day || 'not-set'}
-              day={day}
-              users={groupedByArrivalDay[day] || []}
-              currentUserId={currentUserId}
-              currentTime={currentTime}
-              isExpanded={expandedDay === day}
-              onToggleExpand={() => setExpandedDay(expandedDay === day ? null : day)}
-              t={t}
-            />
-          ))}
+          {sortedDays.map((day) => {
+            const dayKey = day === null ? 'not-set' : day;
+            return (
+              <ArrivalDayRow
+                key={dayKey}
+                day={day}
+                users={groupedByArrivalDay[day] || []}
+                currentUserId={currentUserId}
+                currentTime={currentTime}
+                isExpanded={expandedDay === dayKey}
+                onToggleExpand={() => setExpandedDay(expandedDay === dayKey ? null : dayKey)}
+                t={t}
+              />
+            );
+          })}
         </div>
       </div>
     );
