@@ -108,3 +108,81 @@
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
+
+.linkButton {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.linkButton:hover {
+  color: var(--accent-hover);
+}
+
+.forgotBox {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+
+.forgotQuestion {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0;
+}
+
+.forgotActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.forgotActions .button {
+  flex: 1;
+  margin-top: 0;
+}
+
+.buttonSecondary {
+  flex: 1;
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: border-color 0.15s, color 0.15s;
+  cursor: pointer;
+}
+
+.buttonSecondary:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.forgotSent {
+  margin-top: 1.5rem;
+  padding: 0.75rem;
+  border: 1px solid var(--signal-ok, #27ae60);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--signal-ok, #27ae60);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: center;
+}

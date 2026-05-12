@@ -8,12 +8,14 @@ Document how users register, log in, maintain session state, and how the databas
 
 ## Relevant Source Files
 
-- `src/pages/LoginPage.tsx` — Sign-in form, profile verification with retry
+- `src/pages/LoginPage.tsx` — Sign-in form, profile verification with retry, "Forgot password?" inline step
 - `src/pages/RegisterPage.tsx` — Sign-up form, registration gate, trigger-latency retry
+- `src/pages/ResetPasswordPage.tsx` — Password reset form; listens for `PASSWORD_RECOVERY` auth event
 - `src/hooks/useAuth.ts` — Session state subscription, cleanup
 - `src/lib/supabase.ts` — Supabase client with custom IndexedDB auth storage
 - `src/lib/db.ts` — `loadSession()`, `saveSession()` (IDB session store)
 - `src/components/PrivateRoute.tsx` — Route guard for authenticated pages
+- `src/i18n/AuthPage_*.json` — All auth + password-reset strings (br / en / es / de)
 - `supabase/migrations/20240101000000_initial_schema.sql` — Original `handle_new_user` trigger
 - `supabase/migrations/20260504000005_fix_handle_new_user_trigger.sql` — Bug-fixed trigger with `coalesce()`
 - `supabase/migrations/20260504000003_add_test_user_flag.sql` — `is_test_user` column
@@ -22,10 +24,11 @@ Document how users register, log in, maintain session state, and how the databas
 
 ## Triggers
 
-There are two entry points into the authentication flow:
+There are three entry points into the authentication flow:
 
 1. **Login** — returning user submits email + password at `/login`
 2. **Registration** — new user submits display name + email + password at `/register`
+3. **Password Recovery** — user clicks "Forgot password?" on `/login`, requests a reset email, then follows the link to `/reset-password`
 
 Registration is gated behind an `app_settings` flag (`registration_enabled`). When disabled, `/register` redirects to `/login`. Godlike users can toggle this in the profile admin panel.
 
@@ -160,6 +163,83 @@ Double-check: getRegistrationEnabled() (guards against race with admin disabling
 
 ---
 
+## Flow: Password Recovery
+
+The recovery flow uses Supabase's built-in email-based password reset. No schema changes are needed — Supabase manages the one-time token.
+
+```
+User clicks "Forgot password?" on /login
+         │
+         ▼
+Inline "Are you sure?" confirmation panel appears
+(email field pre-filled if user already typed it)
+         │
+         ├─ Cancel → panel dismissed, back to normal login form
+         │
+         └─ Confirm (submit email) →
+                  │
+                  ▼
+         supabase.auth.resetPasswordForEmail(email, {
+           redirectTo: `${origin}/reset-password`
+         })
+                  │
+                  ├─ Error (invalid email, rate limit) → inline error shown
+                  │
+                  └─ Success → green "Check your email" message shown
+                           │
+                           (user receives email from Supabase)
+                           │
+                           ▼
+                  User clicks link in email
+                           │
+                           ▼
+                  Browser opens: /reset-password#access_token=...&type=recovery
+                           │
+                           ▼
+                  ResetPasswordPage mounts
+                  supabase.auth.onAuthStateChange fires: PASSWORD_RECOVERY
+                  → setSessionReady(true)
+                           │
+                           ▼
+                  "Cassio, is it you again?" form shown
+                  User types new password + confirmation
+                           │
+                           ├─ Passwords don't match → inline error (localized)
+                           │
+                           └─ Match → supabase.auth.updateUser({ password })
+                                    │
+                                    ├─ Error → inline error shown
+                                    │
+                                    └─ Success → green success message
+                                             → navigate('/now') after 1.8s
+```
+
+**Timeline**:
+```
+T=0ms    — User submits email on "Are you sure?" panel
+T=200ms  — Supabase confirms reset email queued
+T=?      — User opens email, clicks link (seconds to minutes later)
+T=0ms    — /reset-password loads, PASSWORD_RECOVERY event fires
+T=50ms   — sessionReady = true, form renders
+T=?      — User types new passwords, submits
+T=300ms  — supabase.auth.updateUser() resolves
+T=300ms  — Success message shown
+T=2100ms — navigate('/now')
+```
+
+**How Supabase handles the token**: The recovery link contains a short-lived JWT in the URL hash (`#access_token=...`). When the page loads, Supabase's JS client automatically exchanges it for a session and fires `onAuthStateChange('PASSWORD_RECOVERY')`. The `ResetPasswordPage` listens for this event to unlock the form.
+
+**Session fallback**: If the user refreshes the page after the token is exchanged, `supabase.auth.getSession()` returns the active session, so `sessionReady` is set via the fallback `getSession()` call and the form remains usable.
+
+**The page header says "Cassio, is it you again?"** — a permanent in-joke referencing a friend in the vira-latas group who frequently forgets his password. The name "Cassio" is intentionally hard-coded in all 4 language translations and must never be replaced with a generic string.
+
+**Localization**: All strings live in `src/i18n/AuthPage_*.json` under keys:
+`forgotPassword`, `forgotPasswordConfirm`, `sendResetLink`, `sendingResetLink`, `resetLinkSent`, `cancelAction`, `resetPasswordTitle`, `resetPasswordSubtitle`, `newPassword`, `confirmPassword`, `passwordsDoNotMatch`, `resetPasswordAction`, `resetPasswordLoading`, `resetPasswordSuccess`, `resetPasswordNoSession`
+
+**Route**: `/reset-password` is a **public route** (no `PrivateRoute` wrapper). It must be accessible before login because the user arrives unauthenticated via the email link.
+
+---
+
 ## Database Trigger: handle_new_user()
 
 Every call to `supabase.auth.signUp()` inserts a row in `auth.users`, which fires this PostgreSQL trigger:
@@ -253,7 +333,8 @@ export function useAuth(): { session, user, loading } {
 - `SIGNED_IN` — after successful login or signup
 - `SIGNED_OUT` — after `supabase.auth.signOut()`
 - `TOKEN_REFRESHED` — Supabase auto-refreshes JWTs
-- `USER_UPDATED` — profile metadata changed
+- `USER_UPDATED` — profile metadata changed (also fires after `updateUser({ password })`)
+- `PASSWORD_RECOVERY` — user arrived via a password-reset email link; `ResetPasswordPage` listens for this to unlock the reset form
 
 **`loading: true`** on initial mount prevents route guards from redirecting to login before the IDB session is read.
 
@@ -307,6 +388,8 @@ function PrivateRoute({ children }) {
 ```
 
 All app routes (`/now`, `/schedule`, `/my-picks`, `/popular`, `/announcements`, `/profile`) are wrapped in `PrivateRoute`.
+
+**Public routes** (no `PrivateRoute`): `/login`, `/register`, `/reset-password`. The reset page must be public because the user arrives unauthenticated from an email link.
 
 ---
 
@@ -459,12 +542,12 @@ Admin disables registration while user is filling out the form. The `handleSubmi
 
 1. **No email verification**: Supabase email confirmation is disabled. Users can sign up with any email without verifying ownership.
 
-2. **No password reset UI**: The app has no "forgot password" flow. Users must contact the admin.
+2. **Godlike is hard-coded to email**: The godlike role is assigned by matching email string in the trigger. If the godlike user changes their email, the trigger won't re-assign the role.
 
-3. **Godlike is hard-coded to email**: The godlike role is assigned by matching email string in the trigger. If the godlike user changes their email, the trigger won't re-assign the role.
+3. **Test users visible to crew**: `is_test_user: true` is a DB flag but there's no UI filtering to hide test users from crew grids.
 
-4. **Test users visible to crew**: `is_test_user: true` is a DB flag but there's no UI filtering to hide test users from crew grids.
+4. **Recovery link is single-use**: The Supabase recovery token in the email link is consumed on first exchange. If the user refreshes `/reset-password` before submitting, the `PASSWORD_RECOVERY` event won't fire again, but the `getSession()` fallback keeps the form available as long as the browser tab isn't closed.
 
 ---
 
-**Last updated:** 2026-05-12
+**Last updated:** 2026-05-12 (password recovery flow added)

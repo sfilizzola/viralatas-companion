@@ -14,5 +14,20 @@
   "needAccount": "Noch kein Konto?",
   "createAccount": "Konto erstellen",
   "hasAccount": "Schon ein Konto?",
-  "loginLink": "Anmelden"
+  "loginLink": "Anmelden",
+  "forgotPassword": "Passwort vergessen?",
+  "forgotPasswordConfirm": "Bist du sicher, dass du dein Passwort zurücksetzen willst?",
+  "sendResetLink": "Reset-Link senden",
+  "sendingResetLink": "Sende...",
+  "resetLinkSent": "Prüfe deine E-Mails für den Reset-Link.",
+  "cancelAction": "Abbrechen",
+  "resetPasswordTitle": "Cassio, bist du es wieder?",
+  "resetPasswordSubtitle": "Kein Problem, lege ein neues Passwort fest.",
+  "newPassword": "Neues Passwort",
+  "confirmPassword": "Passwort bestätigen",
+  "passwordsDoNotMatch": "Passwörter stimmen nicht überein.",
+  "resetPasswordAction": "Ich bin sicher",
+  "resetPasswordLoading": "Aktualisierung...",
+  "resetPasswordSuccess": "Passwort aktualisiert! Weiterleitung...",
+  "resetPasswordNoSession": "Ungültiger oder abgelaufener Reset-Link. Bitte einen neuen anfordern."
 }
