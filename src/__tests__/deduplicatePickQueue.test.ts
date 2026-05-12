@@ -1,4 +1,15 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
+
+vi.mock('../lib/supabase', () => ({ supabase: {} }));
+vi.mock('../lib/db', () => ({
+  saveUserPick: vi.fn(),
+  removeUserPick: vi.fn(),
+  replaceUserPicks: vi.fn(),
+  enqueueOfflinePick: vi.fn(),
+  loadOfflineQueue: vi.fn(),
+  removeFromOfflineQueue: vi.fn(),
+}));
+
 import { deduplicatePickQueue } from '../repositories/picks';
 import type { OfflinePickOp } from '../lib/db';
 
