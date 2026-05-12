@@ -14,5 +14,20 @@
   "needAccount": "No account yet?",
   "createAccount": "Create account",
   "hasAccount": "Already have an account?",
-  "loginLink": "Sign in"
+  "loginLink": "Sign in",
+  "forgotPassword": "Forgot password?",
+  "forgotPasswordConfirm": "Are you sure you want to reset your password?",
+  "sendResetLink": "Send reset link",
+  "sendingResetLink": "Sending...",
+  "resetLinkSent": "Check your email for the reset link.",
+  "cancelAction": "Cancel",
+  "resetPasswordTitle": "Cassio, is it you again?",
+  "resetPasswordSubtitle": "No worries, set a new password.",
+  "newPassword": "New password",
+  "confirmPassword": "Confirm password",
+  "passwordsDoNotMatch": "Passwords do not match.",
+  "resetPasswordAction": "I'm sure",
+  "resetPasswordLoading": "Updating...",
+  "resetPasswordSuccess": "Password updated! Redirecting...",
+  "resetPasswordNoSession": "Invalid or expired reset link. Please request a new one."
 }

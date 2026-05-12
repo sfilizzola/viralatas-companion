@@ -14,5 +14,20 @@
   "needAccount": "¿Todavía no tienes cuenta?",
   "createAccount": "Crear cuenta",
   "hasAccount": "¿Ya tienes cuenta?",
-  "loginLink": "Entrar"
+  "loginLink": "Entrar",
+  "forgotPassword": "¿Olvidaste tu contraseña?",
+  "forgotPasswordConfirm": "¿Estás seguro/a de que quieres restablecer tu contraseña?",
+  "sendResetLink": "Enviar enlace de restablecimiento",
+  "sendingResetLink": "Enviando...",
+  "resetLinkSent": "Revisa tu e-mail para el enlace de restablecimiento.",
+  "cancelAction": "Cancelar",
+  "resetPasswordTitle": "Cassio, ¿eres tú otra vez?",
+  "resetPasswordSubtitle": "Sin problema, define una nueva contraseña.",
+  "newPassword": "Nueva contraseña",
+  "confirmPassword": "Confirmar contraseña",
+  "passwordsDoNotMatch": "Las contraseñas no coinciden.",
+  "resetPasswordAction": "Estoy seguro/a",
+  "resetPasswordLoading": "Actualizando...",
+  "resetPasswordSuccess": "¡Contraseña actualizada! Redirigiendo...",
+  "resetPasswordNoSession": "Enlace de restablecimiento inválido o expirado. Solicita uno nuevo."
 }

@@ -1344,97 +1344,212 @@
   white-space: nowrap;
 }
 
-.assignBadgeSection {
-  margin-top: 12px;
+/* ============================================================
+   ASSIGN BADGE MODAL (abm) — redesigned two-section layout
+   ============================================================ */
+
+.abmHeader {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
-.assignBadgeSectionLabel {
+.abmKicker {
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--text-muted);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
-.assignBadgeGrid {
+.abmTitle {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  margin: 0;
+}
+
+.abmSection {
+  margin-bottom: 20px;
+}
+
+.abmSectionLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
 }
 
-.assignBadgeOption {
+.abmCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9px;
+  background: rgba(142, 68, 173, 0.25);
+  border: 1px solid rgba(142, 68, 173, 0.5);
+  color: #bb8fce;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.abmEmpty {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 12px 0;
+  opacity: 0.6;
+}
+
+/* Assigned badges: horizontal scrollable strip */
+.abmAssignedStrip {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.abmAssignedStrip::-webkit-scrollbar {
+  display: none;
+}
+
+/* Available badges: 4-col grid */
+.abmAvailableGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+@media (min-width: 480px) {
+  .abmAvailableGrid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Shared patch button */
+.abmPatch {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 8px;
+  gap: 5px;
+  padding: 8px 6px;
   border-radius: var(--r-1);
   border: 1px solid var(--border);
   background: var(--bg-elevated);
-  color: var(--text);
+  color: var(--text-muted);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 8px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   cursor: pointer;
-  min-width: 64px;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s, background 0.15s, opacity 0.15s;
+  flex-shrink: 0;
+  width: 72px;
+  text-align: center;
 }
 
-.assignBadgeOption:hover:not(:disabled) {
+.abmPatch:hover:not(:disabled) {
   border-color: var(--accent);
   background: var(--bg-surface);
 }
 
-.assignBadgeOption:disabled {
-  opacity: 0.5;
+.abmPatch:disabled {
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
-.assignBadgeOptionOwned {
-  border-color: rgba(142, 68, 173, 0.5);
-  background: rgba(142, 68, 173, 0.08);
+/* Assigned state: glowing purple border */
+.abmPatchAssigned {
+  border-color: rgba(142, 68, 173, 0.7);
+  background: rgba(142, 68, 173, 0.1);
   color: #bb8fce;
+  box-shadow: 0 0 0 1px rgba(142, 68, 173, 0.2);
 }
 
-.assignBadgeOptionRevoke {
-  border-color: rgba(192, 57, 43, 0.4);
+.abmPatchAssigned:hover:not(:disabled) {
+  border-color: var(--accent);
   background: rgba(192, 57, 43, 0.08);
-  color: var(--accent-hover);
-  position: relative;
+  box-shadow: none;
 }
 
-.assignBadgeImgWrap {
+.abmPatchImgWrap {
   position: relative;
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
   flex-shrink: 0;
 }
 
-.assignBadgeImg {
-  width: 32px;
-  height: 32px;
+.abmPatchImg {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   object-fit: contain;
+  display: block;
 }
 
-.revokeX {
+.abmYearChip {
   position: absolute;
-  top: -5px;
-  right: -5px;
-  width: 14px;
-  height: 14px;
+  bottom: -1px;
+  right: -1px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--accent);
-  color: #fff;
-  font-size: 8px;
+  font-family: var(--font-mono);
+  font-size: 9px;
   font-weight: 700;
-  border-radius: 50%;
+  color: var(--bg);
+  background: var(--signal-warn);
+  border: 2px solid var(--bg);
   line-height: 1;
   pointer-events: none;
+}
+
+.abmRevokeOverlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--accent);
+  background: rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  transition: opacity 0.15s;
+  pointer-events: none;
+}
+
+.abmPatchAssigned:hover:not(:disabled) .abmRevokeOverlay {
+  opacity: 1;
+}
+
+.abmPatchName {
+  line-height: 1.2;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  max-width: 100%;
 }
 
 .spinner {

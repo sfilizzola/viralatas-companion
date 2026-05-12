@@ -337,4 +337,137 @@ Group of vira-latas attending together. Internally called "crew", externally "vi
 
 ---
 
-**Last updated:** 2026-05-11
+## Flow-Specific Terms (Phase 13)
+
+### Offline Pick Lifecycle
+The complete sequence of events for a pick made without network: optimistic IDB write → enqueue to offline_picks → 'online' event → flushOfflineQueue() → Supabase upsert/delete → queue entry removed.
+
+### keepLast Semantics
+Deduplication strategy used during offline queue flush. For a group of operations with the same (user_id, band_id), only the chronologically last action is synced to Supabase. All queue entries are removed from IDB after a successful sync.
+
+### Opaque Response
+HTTP response from a cross-origin request without CORS headers. Status code and body are inaccessible to the Service Worker. Workbox can cache opaque responses with `cacheableResponse: { statuses: [0, 200] }`. Used for Wacken band images.
+
+### Registration Gate
+`app_settings.registration_enabled` flag (boolean). When false, `/register` redirects to `/login`. Controlled by godlike in the admin panel. Prevents public sign-ups after initial onboarding.
+
+### Profile Verification Retry
+Post-signup or post-login loop (up to 3–4 attempts with increasing delays) that confirms the `public.users` row exists before navigating to `/now`. Covers PostgreSQL trigger latency.
+
+### Trigger Latency
+The delay between `auth.users` insertion and `handle_new_user()` trigger completing the `public.users` insert. Typically <100ms on production Supabase. Profile verification retry compensates for this.
+
+### Precache
+Workbox technique. At Service Worker install time, a manifest of app shell files (JS, CSS, HTML, fonts) is downloaded and stored in the browser cache. These files are served instantly from cache on future requests, enabling offline use. Filenames include content hashes so each deploy creates new cached entries.
+
+### NetworkFirst
+Workbox caching strategy: fetch from network first; if network fails (offline, timeout), serve from HTTP cache. Used for Supabase API calls. Prioritizes freshness; cache is a fallback.
+
+### CacheFirst
+Workbox caching strategy: serve from HTTP cache first; if not cached, fetch from network and cache the response. Used for Wacken band images and app shell. Prioritizes speed; network is a fallback.
+
+### StaleWhileRevalidate
+Workbox strategy: serve cached response immediately, then fetch from network and update cache in background. Not used in this app (NetworkFirst is used for Supabase instead to avoid serving stale auth tokens).
+
+### Cache TTL (Time-To-Live)
+Maximum age of a cached HTTP response before Workbox considers it expired and re-fetches. Supabase cache: 24 hours. Band images: 30 days.
+
+### Service Worker Lifecycle
+Installation → Waiting → Activation → Controlling. `registerType: 'autoUpdate'` triggers automatic installation and activation of new Service Worker versions. `skipWaiting` causes the new SW to activate without waiting for old tabs to close.
+
+### autoUpdate
+Vite PWA `registerType` option. When a new Service Worker is detected, it automatically installs and activates. The user may see a brief reload prompt or silent auto-refresh depending on the implementation.
+
+### clientsClaim
+Service Worker API. After activation, the new SW takes control of all open tabs immediately, without waiting for a page reload. Combined with `skipWaiting` to ensure new code is served instantly.
+
+### Content Hash (filename)
+Build-time fingerprint appended to JS/CSS/font filenames (e.g., `main-Dkj3as9.js`). Ensures new builds produce new filenames, enabling aggressive caching of old filenames (they never change) and automatic cache invalidation of new builds.
+
+### FlushPending (Announcements)
+`announcementsRepository.flushPending()` — processes pending_announcements offline queue. For each queued announcement, inserts into Supabase. On success, replaces the draft ID (crypto.randomUUID) with the server-assigned ID. Returns flush count for SyncToast.
+
+### Draft Announcement
+An announcement created locally (IDB) before server confirmation. Has a client-generated `id` (crypto.randomUUID). Replaced by the server-assigned `id` once successfully inserted into Supabase.
+
+### Server-Assigned ID
+The UUID assigned by Supabase on INSERT, replacing the client-generated draft ID. After flush, the announcement in IDB is updated to use the server ID for future operations (e.g., delete).
+
+### JWT (JSON Web Token)
+Supabase issues JWTs as auth tokens. Included in the `Authorization` header of all API requests. RLS policies evaluate `auth.uid()` from the JWT. JWTs expire (default 1 hour) and are auto-refreshed by the Supabase client.
+
+### Refresh Token
+Long-lived credential that lets the Supabase client obtain a new JWT after expiry without requiring re-login. Stored in IndexedDB via the custom auth storage adapter.
+
+### Custom Auth Storage Adapter
+The `storage` option in `createClient()` that replaces Supabase's default `localStorage` persistence. This app uses a custom async adapter that reads/writes to IndexedDB (`session` store) so the auth session survives PWA restarts and is not cleared by browser privacy settings.
+
+### handle_new_user Trigger
+PostgreSQL `AFTER INSERT ON auth.users` trigger that creates a corresponding `public.users` row. Sets role (`godlike` for `sfilizzola@gmail.com`, `normal` for all others), `preferred_language` (from metadata, default `'br'`), `is_test_user` (from metadata, default `false`), and display name.
+
+### coalesce() Fix
+The bug fix in migration `20260504000005`. The original trigger used `raw_user_meta_data->>'is_test_user' = 'true'` which evaluates to `NULL` when the field is absent, violating the NOT NULL constraint on `is_test_user`. Fixed with `coalesce(..., false)`.
+
+### security definer
+PostgreSQL trigger/function attribute. Runs the function with the privileges of the function's owner (typically `postgres`) rather than the calling user. Required for `handle_new_user()` to insert into `public.users` on behalf of a new user (who doesn't exist yet during the trigger).
+
+### SIGNED_IN / SIGNED_OUT / TOKEN_REFRESHED
+Supabase `onAuthStateChange` event types. `SIGNED_IN` fires on login/registration. `SIGNED_OUT` fires on logout. `TOKEN_REFRESHED` fires when the JWT is automatically refreshed. All update `useAuth()` state.
+
+### LivePlan
+Data type returned by `findLivePlan()`. Contains `status` (`'current'`, `'next'`, `'empty'`, `'lost'`) and `band` (current band, next band, or null). Used by `/now` page to display what each crew member is watching.
+
+### LivePlan Status
+- `current` — User is watching a band right now (start_time ≤ now < end_time)
+- `next` — User has a pick starting in the future
+- `empty` — User has no picks or all picks are in the past
+- `lost` — User has a next pick but is marked as camping (not en route)
+
+### applyLiveBandTestOverride
+Function that splices a "virtual" version of a test band into the bands array with start/end times shifted to wrap `now`. Enables godlike time testing without changing real schedule data.
+
+### CrewLiveGroup
+Grouped view of crew members for the `/now` page. Types: `band` (members watching a specific band), `camping` (members in camp), `metal_place` (members at festival), `lost` (no active status).
+
+### Metal Place Window
+Time period defined by `metal_place_config` (festival day + hours) during which the Metal Place check-in is active. Outside this window, `is_at_metal_place` is ignored and users are routed to camping/lost groups. Auto-checkout fires when the window ends.
+
+### validateAndAutoCheckout
+`presenceRepository` method that clears `is_at_metal_place` when the metal place window has ended. Called on every `metalPlaceConfig` or `now` change for the current user.
+
+### Soft Conflict
+Band overlap of ≤15 minutes (≤ `HARD_CONFLICT_THRESHOLD_MS = 900_000`). Considered doable — user can leave one show early to catch the other.
+
+### Hard Conflict
+Band overlap of >15 minutes. Considered impossible to attend both fully. Shown as a more prominent warning in `/my-picks`.
+
+### 3-Conflict Banner
+Warning banner shown on `/my-picks` when the user has 3 or more overlapping bands. Alerts the user to a heavily conflicted schedule.
+
+### Vendor Lock-In
+Dependency on a specific service or SDK that would require significant rewriting to remove. Accepted tradeoff for Supabase (PostgreSQL + Auth + Realtime in one) given the festival's short operational window.
+
+### Row-Level Security (RLS)
+See Database & Storage Terms. Each table has RLS enabled. Access rules are SQL policies enforced at query time. Examples: `auth.uid() = user_id` for writes, `to authenticated` for reads.
+
+### set_user_role RPC
+Supabase remote procedure call (`supabase.rpc('set_user_role', ...)`) used by managers/godlike to change another user's role. Implemented as a PostgreSQL function to bypass RLS (normal UPDATE on `users` is restricted to own row).
+
+### wipeAllLocalData
+Function in `src/lib/db.ts` that clears all IndexedDB stores (except `session`). Called when `CacheVersionCheck` detects a cache version mismatch. Triggers full re-sync from Supabase on next app init.
+
+### CacheVersionCheck
+`App.tsx` sync component. On login, fetches `meta.cache_version` from Supabase and compares to local version. If mismatch, calls `wipeAllLocalData()` to force a fresh sync. Prevents stale band data after lineup changes.
+
+### emitSyncComplete
+Function that dispatches a `viralatas:sync-complete` event after a successful offline queue flush. `SyncToast` listens for this event to show "✓ Synced N items".
+
+### Graceful Degradation
+Design principle: when network or a service is unavailable, the app provides reduced but functional behavior rather than failing entirely. Example: Realtime down → stale IndexedDB data still shows; offline → picks queue instead of fail.
+
+### Reading Path
+Navigation guide in the wiki index recommending which documents to read first based on reader role (new engineer, badge developer, offline expert, etc.).
+
+---
+
+**Last updated:** 2026-05-12
