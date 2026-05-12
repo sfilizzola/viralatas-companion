@@ -38,7 +38,7 @@ type BadgesDisplayProps = {
 };
 
 function yearSuffix(year: number): string {
-  return `'${String(year).slice(-2)}`;
+  return String(year).slice(-2);
 }
 
 export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
