@@ -4,6 +4,22 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-12 (Badge System Refactor)
+
+### Changed
+- `src/services/badges.ts` (deleted) — Monolithic 576-line file split into a `src/services/badges/` folder
+- `src/services/badges/types.ts` (new) — All 4 type definitions: `BadgeBand`, `BadgeCondition`, `BadgeConfig`, `BadgeContext`
+- `src/services/badges/engine.ts` (new) — Pure evaluation logic: `festivalLocalHour` helper, `buildBadgeContext`, `evaluateBadge`, `getEarnedBadges`
+- `src/services/badges/registry.ts` (new) — `BADGES[]` array with all 26 badge definitions and the condition-examples developer reference comment block
+- `src/services/badges/index.ts` (new) — Barrel re-export preserving all existing `from '…/services/badges'` import paths unchanged
+- `docs/ai-wiki/badges.md` — Updated Key Files table to reflect new folder structure
+
+### Architectural Notes
+- All four consumers (`badges.test.ts`, `missed.test.ts`, `BadgesDisplay.tsx`, `AssignBadgeModal.tsx`) required zero import changes — the barrel index maintains backward compatibility
+- Dependency order is strictly: `types.ts` ← `engine.ts` + `registry.ts` ← `index.ts` (no circular deps)
+
+---
+
 ## 2026-05-12 (Password Recovery Flow)
 
 ### Added

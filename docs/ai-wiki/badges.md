@@ -12,7 +12,10 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 
 | File | Purpose |
 |---|---|
-| `src/services/badges.ts` | BadgeConfig, BadgeCondition types; BADGES array; evaluation logic |
+| `src/services/badges/types.ts` | `BadgeBand`, `BadgeCondition`, `BadgeConfig`, `BadgeContext` type definitions |
+| `src/services/badges/engine.ts` | `buildBadgeContext`, `evaluateBadge`, `getEarnedBadges` — pure evaluation logic |
+| `src/services/badges/registry.ts` | `BADGES[]` array — all badge definitions + condition-examples reference |
+| `src/services/badges/index.ts` | Barrel re-export — preserves all existing `from '…/services/badges'` import paths |
 | `src/__tests__/badges.test.ts` | 50+ tests covering all condition types |
 | `public/badges/` | Badge PNG images (96×96 px recommended) |
 | `src/i18n/Badges_br.json` | Brazilian Portuguese labels + descriptions |
