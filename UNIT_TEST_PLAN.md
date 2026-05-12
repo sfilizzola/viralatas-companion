@@ -74,9 +74,7 @@ Stages are ordered by **change risk**: low-risk refactors come first, then tests
 
 ---
 
-### Stage 2 — Tests: Pure services (no Supabase or IDB dependency) 🔄 CURRENT
-
-> Vitest only. No mocks needed except `localStorage` (already available in jsdom).
+### Stage 2 — Tests: Pure services (no Supabase or IDB dependency) ✅ COMPLETED 2026-05-12
 
 #### `src/__tests__/bandTime.test.ts`
 Tests `bandDay()` and `formatTime()` from `services/bandTime.ts`:
@@ -125,7 +123,7 @@ Tests `lib/i18n.ts` translation lookup:
 
 ---
 
-### Stage 3 — Tests: Repository layer (mock Supabase + IDB)
+### Stage 3 — Tests: Repository layer (mock Supabase + IDB) 🔄 CURRENT
 
 > Mock pattern: `vi.mock('../lib/supabase', ...)` and `vi.mock('../lib/db', ...)`. Follows the pattern established in the existing `setup.ts`.
 

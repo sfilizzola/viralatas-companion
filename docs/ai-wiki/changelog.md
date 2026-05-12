@@ -4,6 +4,25 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-12 (UNIT_TEST_PLAN Stage 2)
+
+### Added
+- `src/__tests__/bandTime.test.ts` — 14 tests for `bandDay()` and `formatTime()` from `services/bandTime.ts`; covers CEST rollback boundary (04:00 CEST / 02:00 UTC), midnight crossover, and padding edge cases
+- `src/__tests__/bandFilter.test.ts` — 14 tests for `filterBands()` from `services/bandFilter.ts`; covers day/stage/genre/query/upcoming filters, boundary conditions, and combined interactions
+- `src/__tests__/scheduleFilterStorage.test.ts` — 12 tests for `loadStoredFilters`/`saveStoredFilters`; covers missing key, corrupted JSON, round-trip, and `query` strip-on-save behavior
+- `src/__tests__/deduplicatePickQueue.test.ts` — 8 tests for `deduplicatePickQueue()` from `repositories/picks.ts`; covers keepLast semantics, cross-band/user independence, and empty input
+- `src/__tests__/attendees.test.ts` — 8 tests for `computeAttendees()` from `services/attendees.ts`; covers grouping, hydration, missing-crew fallback label, and alphabetical sort
+- `src/__tests__/stageColors.test.ts` — 30 tests for `services/stageColors.ts`; covers all 8 stage CSS variable tokens and unknown-stage fallback
+- `src/__tests__/i18n.test.ts` — 13 tests for `lib/i18n.ts`; covers br/en/es/de lookup, missing-key fallback, placeholder interpolation, and out-of-provider error
+
+### Architectural Notes
+- UNIT_TEST_PLAN Stage 2 complete: 99 new tests, 304 total, 0 failures.
+- Key discovery: `stageColors.ts` returns CSS variable strings (`var(--stage-faster)`), not raw hex values — hex lives in `index.css`.
+- Key discovery: `t()` function lives inside the `useI18n` hook and requires React context; i18n tests use `renderHook` with a bare `I18nContext.Provider` wrapper.
+- Key discovery: `scheduleFilterStorage` never persists `query` to localStorage — stripped on save, reset to `''` on load.
+
+---
+
 ## 2026-05-12 (UNIT_TEST_PLAN Stage 1)
 
 ### Changed
