@@ -3,7 +3,7 @@
 Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for project context, constraints, and key decisions.
 
 **Completed phase history** → `docs/ai-wiki/phases-history.md`
-**Upcoming ideas** → `FUTURE_IDEAS.md`, `NEW_ARCH_PLAN.md`, `COMPONENT_LIBRARY_PLAN.md`
+**Upcoming ideas** → `FUTURE_IDEAS.md`
 
 ---
 
