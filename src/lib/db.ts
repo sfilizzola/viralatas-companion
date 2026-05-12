@@ -225,6 +225,7 @@ export async function loadBands(): Promise<Band[]> {
 export async function saveCrewUsers(users: CrewUser[]) {
   const db = await getDB();
   const tx = db.transaction('crew_users', 'readwrite');
+  await tx.store.clear();
   await Promise.all(users.map((user) => tx.store.put(user)));
   await tx.done;
   emitCrewUsersChanged();
