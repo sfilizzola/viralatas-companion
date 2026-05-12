@@ -105,5 +105,10 @@
   "assignBadgeBtn": "Patch zuweisen",
   "assignedBadgeCount": "{count} Patch(es)",
   "assignBadgeModalTitle": "Patch an {name} zuweisen",
-  "assignBadgeError": "Patch konnte nicht zugewiesen werden. Versuch es erneut."
+  "assignBadgeError": "Patch konnte nicht zugewiesen werden. Versuch es erneut.",
+  "assignBadgeKicker": "Patches zuweisen",
+  "assignedPatches": "Zugewiesene Patches",
+  "availablePatches": "Verfügbar",
+  "noPatchesAssigned": "Noch keine Patches zugewiesen",
+  "clickToRevoke": "klicken zum Entfernen"
 }

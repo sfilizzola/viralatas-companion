@@ -105,5 +105,10 @@
   "assignBadgeBtn": "Atribuir patch",
   "assignedBadgeCount": "{count} patch(es)",
   "assignBadgeModalTitle": "Atribuir patch a {name}",
-  "assignBadgeError": "Erro ao atribuir patch. Tente de novo."
+  "assignBadgeError": "Erro ao atribuir patch. Tente de novo.",
+  "assignBadgeKicker": "Atribuir patches",
+  "assignedPatches": "Patches atribuídos",
+  "availablePatches": "Disponíveis",
+  "noPatchesAssigned": "Nenhum patch atribuído ainda",
+  "clickToRevoke": "clique para remover"
 }
