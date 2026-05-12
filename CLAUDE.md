@@ -22,10 +22,18 @@ The **AI Wiki** at `docs/ai-wiki/` is the single source of truth for deep techni
 
 ### Before any coding task
 
+> **Wiki first. Codebase second.** The wiki is the fastest path to understanding intent, constraints, and prior decisions. Only open source files after you know what you're looking for.
+
 1. **Read PHASES.md** — Understand which phase you're in and its acceptance criteria
-2. **Read docs/ai-wiki/index.md** — Overview of the 5 core principles + system diagram
-3. **Read relevant wiki pages** — architecture.md, offline-first.md, sync-engine.md, domain-model.md, supabase-schema.md, and flow docs for the feature you're touching
-4. **Inspect relevant source files** — Read the code mentioned in the wiki
+2. **Read `docs/ai-wiki/index.md`** — Overview of the 5 core principles + system diagram; use it to navigate to the right pages
+3. **Read the relevant wiki pages** — Pick from the table below by feature area:
+   - Feature mechanics → `architecture.md`, `domain-model.md`
+   - Offline / sync → `offline-first.md`, `sync-engine.md`
+   - Database / RLS → `supabase-schema.md`
+   - User flows → `flows/pick-band.md`, `flows/announcements.md`, `flows/live-now.md`, `flows/offline-pick-sync.md`, `flows/authentication.md`
+   - Architectural rationale → `decisions/indexeddb-primary-store.md`, `decisions/pwa-not-native.md`, `decisions/supabase-as-sync-target.md`, `decisions/custom-hooks-events-no-redux.md`, `decisions/workbox-caching-strategy.md`
+   - Unknown terms → `glossary.md` (140+ terms)
+4. **Identify affected source files** from the wiki's "Relevant Source Files" sections — then read only those
 5. Then and only then modify code
 
 ### After every meaningful change
@@ -51,23 +59,41 @@ Update **both**:
 
 ### Current wiki inventory
 
+**Core docs (`docs/ai-wiki/`):**
+
 | File | Purpose |
 |---|---|
-| `index.md` | Navigation hub; 5 core principles; system diagram; window events; open questions |
+| `index.md` | Navigation hub; 5 core principles; system diagram; window events; open questions; reading paths by role |
 | `architecture.md` | 4-layer design; every hook/repo/service; data flows (online/offline/realtime) |
 | `offline-first.md` | Why offline-first; 4-phase sync mechanics; worked examples; per-type guarantees |
 | `sync-engine.md` | 4 sync components; queue flush flow; realtime subscriptions; debugging |
 | `domain-model.md` | 7 entities + 3 computed views; role-based rules |
 | `supabase-schema.md` | Full SQL DDL; RLS policies; Realtime config |
 | `routes.md` | 8 routes; 5 key nav flows with ASCII diagrams |
-| `testing.md` | 128+ tests; manual offline scenarios; simulation techniques |
-| `glossary.md` | ~100 terms across architecture, DB, React, auth, sync, UI, time, badge, role, testing |
+| `testing.md` | 177+ tests; manual offline scenarios; simulation techniques |
+| `glossary.md` | 140+ terms across architecture, DB, React, auth, sync, UI, time, badge, role, testing |
+| `badges.md` | Badge system design, conditions engine, asset inventory |
+| `phases-history.md` | Complete log of every completed phase (1–15+); append here when a phase closes |
+
+**User flow docs (`docs/ai-wiki/flows/`):**
+
+| File | Purpose |
+|---|---|
+| `flows/pick-band.md` | Pick-band lifecycle: online, offline, dedup, realtime, edge cases |
+| `flows/announcements.md` | Post lifecycle: online immediate, realtime from others, offline queue, reconnect flush, moderation |
+| `flows/live-now.md` | Time-based band display, current/next logic, time-shift override, conflict severity, crew counts |
+| `flows/offline-pick-sync.md` | Queue mechanics, dedup by (user_id, band_id), keepLast semantics, error recovery, SyncToast |
+| `flows/authentication.md` | Signup trigger, IndexedDB session storage, test user metadata, godlike role assignment, RLS per table |
+
+**Architectural decision records (`docs/ai-wiki/decisions/`):**
+
+| File | Purpose |
+|---|---|
 | `decisions/indexeddb-primary-store.md` | ADR: why IndexedDB, not Supabase-primary |
 | `decisions/pwa-not-native.md` | ADR: why PWA, not React Native/Capacitor |
-| `flows/pick-band.md` | Pick-band lifecycle: online, offline, dedup, realtime, edge cases |
-
-**Planned (not yet written):**
-- `flows/offline-pick-sync.md`, `flows/live-now.md`, `flows/announcements.md`, `flows/authentication.md`
+| `decisions/supabase-as-sync-target.md` | ADR: why Supabase (Auth + DB + Realtime vs. alternatives), cost/vendor tradeoffs |
+| `decisions/custom-hooks-events-no-redux.md` | ADR: why window events + custom hooks instead of Zustand/Redux |
+| `decisions/workbox-caching-strategy.md` | ADR: NetworkFirst for API, CacheFirst for assets, cache invalidation via version bump |
 
 ### Documentation standards
 
@@ -327,41 +353,28 @@ type BadgeConfig = {
 
 To add a badge without changing behavior elsewhere: add the PNG to `public/badges/`, append one `BADGES` entry in `src/lib/badges.ts`, and add matching label + description keys to both `src/i18n/Badges_br.json` and `src/i18n/Badges_en.json`.
 
-Phase 8 will use this structure to inventory unassociated images in `public/badges/` and add only the badges approved by user input.
+See `docs/ai-wiki/badges.md` for the full badge inventory, condition engine details, and asset management guidelines.
 
 ---
 
 ## Phases at a glance
 
-**Completed:**
-- ✅ **Phase 1** — Foundation: Auth, schema, offline shell
-- ✅ **Phase 2** — Schedule: Band data, filters, offline browsing
-- ✅ **Phase 3** — Picks: Pick bands, live vira-latas counts via Realtime
-- ✅ **Phase 4B** — Live preview: Camping state, vira-latas grid, LOST detection
-- ✅ **Phase 5** — Announcements & user roles: Mural board, manager blocking, godlike powers
-- ✅ **Phase 6** — Metal Place: Festival-day check-in, vira-latas grid card, test mode
-- ✅ **Phase 7** — Profile polish: badge modal, live band test, collapsible admin sections, useful links
-- ✅ **Phase 8** — Badge asset intake: added Belgian (`belga`) and Colombian (`cafetero`) country badges
-- ✅ **Phase 9** — Differentiate Schedule / My Picks / Popular + extracted shared bones (`BandCard`, `BandFilters`, `BandDetailModal`, `useBandConflicts`); Schedule got search + genre filter, My Picks became a day-grouped timeline with conflict chips, Popular gained avatar clusters and the detail modal
-- ✅ **Phase 9.B** — Godlike time travel: `now()` helper + `useNow` hook backed by a localStorage override, with quick-jump chips for D-1 / D1–D4 / D+1 in the Profile admin panel
-- ✅ **Phase 10** — Badge expansion: characteristic-badge conditions engine (10a — `bands_picked_genre/stage/hour_min`, `band_picked_named`); seen-tracking via `user_missed_bands` table + IDB v8 + offline queue (10b); extended `BandDetailModal` with vira-latas breakdown, conflict warning, and "Não vi essa banda" missed toggle; 5 new `bands_seen_*` badge conditions; 177 tests
-- ✅ **Design System Phase F** — `/now` visual polish: 4px stage-color strips, Oswald group titles, tinted gradient backgrounds (orange / teal / purple) per location type, `useNow()`-driven page header; no structural changes
-- ✅ **Design System Phase G** — `/profile` restyle: 56px avatar profile head with role chip / country flag / years pill; all-badges patches-grid (4/6/8 cols, locked=grayscale); `year?` field on `BadgeConfig`; edit-profile collapsible with PT/EN language seg; gold godlike + blue manager collapsible headers; sign-out pill at bottom
-- ✅ **Design System Phase H** — Announcements restyle: `announce` grid card (40px avatar | head/body/actions in col 2), role chips (Vira-latas/Manager/Godlike), mono action buttons, updated timestamp format (N min / Nh / DD/MM)
-- ✅ **Design System Phase I** — Auth pages + bottom nav + offline chrome: 4px accent top border + Oswald title + mono labels on login/register; BottomNav mono 9px caps + filled-icon active states (6 tabs kept); `OfflineBanner` on /now, /schedule, /my-picks; `PendingChip` on offline-queued picks and announcements; `SyncToast` fires on reconnect flush (≥1 item)
-- ✅ **Design System Phase J** — Icon pass: shared `<Icon name="..."/>` component (`src/components/icons/Icon.tsx`) with all 17 design-system icons (square caps, miter joins, filled variants); `StarIcon` delegates to Icon; `BandFilters` filter icon and `BandDetailModal` close icon updated; ProfilePage chevrons (▼ → Icon), 🔧/👤 stripped, ✓/✗ removed from buttons
-- ✅ **Phase 11** — Profile, header, badges (11.A–11.H + post): `/now` mobile header fix (11.A); year pill grid 2005–2026 (11.B); `wacken_years_count_min` + `wacken_attended_in_year` badge conditions (11.C); camping arrival day tracking + `wacken_arrived_before` badge (11.D); godlike joke badges — `special_badges` column, `assigned` condition, `assign-badge` Edge Function, assignment modal (11.E); conflict severity split soft/hard + 3-conflict banner (11.F); collapsible day sections in /my-picks + 7 new badges (11.G); location presence badges + after-hour conditions (11.H); 4 music-style badges post-phase (alestorm, mosh-pit, party-metal, crowdsurfer)
+Phases 1–15 are complete. The next active phase is **Phase 16**.
 
-See **PHASES.md** for the current active phase.
+**Full phase history** → `docs/ai-wiki/phases-history.md`
+
+**Rule:** When a phase completes, append an entry to `phases-history.md`. Do **not** add completed phase details here or in PHASES.md.
 
 ---
 
 ## Before starting any task
 
-1. **Read PHASES.md** — Understand which phase you're in and its acceptance criteria.
-2. **Read docs/ai-wiki/index.md** — System overview and core principles.
-3. **Read relevant wiki pages** — architecture.md, offline-first.md, sync-engine.md, domain-model.md, flows, decisions, etc., depending on the feature.
-4. **Identify affected files.** Read them before editing.
+> **Wiki first. Codebase second.** Do not open source files to understand the system — the wiki already explains it. Use source files only to confirm implementation details the wiki points you to.
+
+1. **Read PHASES.md** — Understand the current state of the project.
+2. **Read `docs/ai-wiki/index.md`** — System overview, core principles, and reading paths; use it to pick the right next pages.
+3. **Read relevant wiki pages** — flows/ for feature mechanics, decisions/ for rationale, architecture.md + sync-engine.md for data flow, domain-model.md for entities, supabase-schema.md for DB/RLS.
+4. **Identify affected source files** from wiki "Relevant Source Files" sections — then read only those.
 5. **For Supabase schema changes:** Write a migration under `supabase/migrations/`. Migrations are source of truth.
 6. **For Edge Functions:** Test locally with `supabase functions serve` before deploying.
 7. **Never commit secrets.** Use `.env.local` for keys. `.env.local` is in `.gitignore`.
