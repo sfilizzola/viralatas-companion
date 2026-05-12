@@ -9,7 +9,7 @@ import {
 import { picksRepository } from '../repositories';
 import type { UserPick } from '../types';
 
-function countPicks(picks: UserPick[]) {
+export function countPicks(picks: UserPick[]) {
   const map: Record<string, number> = {};
   for (const pick of picks) {
     map[pick.band_id] = (map[pick.band_id] ?? 0) + 1;

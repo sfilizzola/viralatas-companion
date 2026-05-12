@@ -6,6 +6,7 @@ import {
   enqueueOfflinePick,
   loadOfflineQueue,
   removeFromOfflineQueue,
+  type OfflinePickOp,
 } from '../lib/db';
 import type { UserPick } from '../types';
 
@@ -83,27 +84,36 @@ async function syncCrewFromRemote(): Promise<void> {
   await replaceUserPicks(data as UserPick[]);
 }
 
+export function deduplicatePickQueue(ops: OfflinePickOp[]): OfflinePickOp[] {
+  const sorted = [...ops].sort((a, b) => a.created_at.localeCompare(b.created_at));
+  const lastByKey = new Map<string, OfflinePickOp>();
+  for (const op of sorted) {
+    lastByKey.set(`${op.user_id}:${op.band_id}`, op);
+  }
+  return Array.from(lastByKey.values());
+}
+
 async function flushOfflineQueue(): Promise<number> {
-  const queue = (await loadOfflineQueue()).sort((a, b) =>
-    a.created_at.localeCompare(b.created_at),
-  );
+  const queue = await loadOfflineQueue();
   if (queue.length === 0) return 0;
 
-  type Op = (typeof queue)[0];
-  const groups = new Map<string, { all: Op[]; last: Op }>();
+  const deduped = deduplicatePickQueue(queue);
+  const keyToAll = new Map<string, OfflinePickOp[]>();
   for (const op of queue) {
     const key = `${op.user_id}:${op.band_id}`;
-    const g = groups.get(key);
-    if (g) {
-      g.all.push(op);
-      g.last = op;
+    const list = keyToAll.get(key);
+    if (list) {
+      list.push(op);
     } else {
-      groups.set(key, { all: [op], last: op });
+      keyToAll.set(key, [op]);
     }
   }
 
   let flushed = 0;
-  for (const { all, last } of groups.values()) {
+  for (const last of deduped) {
+    const key = `${last.user_id}:${last.band_id}`;
+    const all = keyToAll.get(key) ?? [last];
+
     const { error } =
       last.action === 'add'
         ? await supabase.from('user_picks').upsert({

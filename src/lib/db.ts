@@ -12,7 +12,7 @@ export const METAL_PLACE_CONFIG_CHANGED_EVENT = 'viralatas:metal-place-config-ch
 export const LIVE_BAND_TEST_CONFIG_CHANGED_EVENT = 'viralatas:live-band-test-config-changed';
 export const MISSED_CHANGED_EVENT = 'viralatas:missed-changed';
 
-type OfflinePickOp = {
+export type OfflinePickOp = {
   id: string;
   user_id: string;
   band_id: string;

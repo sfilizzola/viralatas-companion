@@ -3,6 +3,8 @@ import type { Band } from '../types';
 import { loadBands } from '../lib/db';
 import { picksRepository } from '../repositories';
 import { bandDay } from '../services/bandTime';
+import { filterBands } from '../services/bandFilter';
+import { loadStoredFilters, saveStoredFilters } from '../services/scheduleFilterStorage';
 import { useAuth } from '../hooks/useAuth';
 import { useMyPicks } from '../hooks/useMyPicks';
 import { useNow } from '../hooks/useNow';
@@ -13,7 +15,7 @@ import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BandCard from '../components/BandCard';
 import BandFilters from '../components/BandFilters';
-import { EMPTY_FILTERS, type BandFilterValue } from '../components/bandFilterValue';
+import type { BandFilterValue } from '../components/bandFilterValue';
 import styles from './SchedulePage.module.css';
 
 export default function SchedulePage() {
@@ -63,17 +65,10 @@ export default function SchedulePage() {
     [bands],
   );
 
-  const filtered = useMemo(() => {
-    const q = filters.query.trim().toLowerCase();
-    return bands.filter((b) => {
-      if (filters.day && bandDay(b) !== filters.day) return false;
-      if (filters.stage.length > 0 && !filters.stage.includes(b.stage)) return false;
-      if (filters.genre && b.genre !== filters.genre) return false;
-      if (filters.upcoming && new Date(b.end_time) <= currentTime) return false;
-      if (q && !b.name.toLowerCase().includes(q)) return false;
-      return true;
-    });
-  }, [bands, filters, currentTime]);
+  const filtered = useMemo(
+    () => filterBands(bands, filters, currentTime),
+    [bands, filters, currentTime],
+  );
 
   const handleToggle = useCallback(
     async (bandId: string) => {
@@ -126,33 +121,4 @@ export default function SchedulePage() {
       <BottomNav />
     </div>
   );
-}
-
-const FILTERS_STORAGE_KEY = 'vlt:filters:schedule';
-
-function loadStoredFilters(): BandFilterValue {
-  try {
-    const raw = localStorage.getItem(FILTERS_STORAGE_KEY);
-    if (!raw) return EMPTY_FILTERS;
-    const parsed = JSON.parse(raw) as Partial<BandFilterValue>;
-    return {
-      query: '',
-      day: typeof parsed.day === 'string' ? parsed.day : null,
-      stage: Array.isArray(parsed.stage) ? parsed.stage.filter((s) => typeof s === 'string') : [],
-      genre: typeof parsed.genre === 'string' ? parsed.genre : null,
-      upcoming: typeof parsed.upcoming === 'boolean' ? parsed.upcoming : false,
-    };
-  } catch {
-    return EMPTY_FILTERS;
-  }
-}
-
-function saveStoredFilters(filters: BandFilterValue) {
-  try {
-    const { query: _q, ...persisted } = filters;
-    void _q;
-    localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(persisted));
-  } catch {
-    /* localStorage unavailable; silently skip */
-  }
 }

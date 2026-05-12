@@ -1,41 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import type { Band } from '../types';
-
-// ─────────────────────────────────────────────────────────────────
-// Test utilities
-// ─────────────────────────────────────────────────────────────────
-
-function bandDay(band: Band): string {
-  const d = new Date(band.start_time);
-  const cest = new Date(d.getTime() + 2 * 60 * 60 * 1000);
-  const hour = cest.getUTCHours();
-  if (hour < 4) cest.setUTCDate(cest.getUTCDate() - 1);
-  return cest.toISOString().slice(0, 10);
-}
-
-function formatTime(iso: string): string {
-  const d = new Date(iso);
-  const cest = new Date(d.getTime() + 2 * 60 * 60 * 1000);
-  const h = String(cest.getUTCHours()).padStart(2, '0');
-  const m = String(cest.getUTCMinutes()).padStart(2, '0');
-  return `${h}:${m}`;
-}
-
-type Filters = {
-  day: string | null;
-  stage: string | null;
-  upcoming: boolean;
-};
-
-function applyFilters(bands: Band[], filters: Filters): Band[] {
-  const now = new Date();
-  return bands.filter((b) => {
-    if (filters.day && bandDay(b) !== filters.day) return false;
-    if (filters.stage && b.stage !== filters.stage) return false;
-    if (filters.upcoming && new Date(b.end_time) <= now) return false;
-    return true;
-  });
-}
+import { bandDay, formatTime } from '../services/bandTime';
+import { filterBands } from '../services/bandFilter';
+import type { BandFilterValue } from '../components/bandFilterValue';
 
 // ─────────────────────────────────────────────────────────────────
 // Sample data: 8 stages × 4 days
@@ -91,6 +58,10 @@ function createBand(
   };
 }
 
+function noFilters(overrides: Partial<BandFilterValue> = {}): BandFilterValue {
+  return { query: '', day: null, stage: [], genre: null, upcoming: false, ...overrides };
+}
+
 describe('Schedule: 8 Stages × 4 Days', () => {
   describe('bandDay() - Day calculation', () => {
     it('assigns daytime bands to the correct day', () => {
@@ -142,7 +113,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
         createBand(`Band ${idx}`, stage, DAYS_4[0], 14 + idx, 60),
       );
 
-      const filtered = applyFilters(bands, { day: null, stage: 'W.E.T.', upcoming: false });
+      const filtered = filterBands(bands, noFilters({ stage: ['W.E.T.'] }), new Date());
 
       expect(filtered).toHaveLength(1);
       expect(filtered[0].stage).toBe('W.E.T.');
@@ -151,17 +122,17 @@ describe('Schedule: 8 Stages × 4 Days', () => {
     it('handles filtering when stage is not present', () => {
       const bands = [createBand('Band A', 'W.E.T.', DAYS_4[0], 14, 60)];
 
-      const filtered = applyFilters(bands, { day: null, stage: 'NONEXISTENT', upcoming: false });
+      const filtered = filterBands(bands, noFilters({ stage: ['NONEXISTENT'] }), new Date());
 
       expect(filtered).toHaveLength(0);
     });
 
-    it('clears stage filter when set to null', () => {
+    it('clears stage filter when set to empty array', () => {
       const bands = STAGES_8.flatMap((stage, idx) =>
         createBand(`Band ${idx}`, stage, DAYS_4[0], 14 + idx, 60),
       );
 
-      const filtered = applyFilters(bands, { day: null, stage: null, upcoming: false });
+      const filtered = filterBands(bands, noFilters(), new Date());
 
       expect(filtered).toHaveLength(STAGES_8.length);
     });
@@ -184,7 +155,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
         createBand(`Band ${idx}`, STAGES_8[0], day, 14, 60),
       );
 
-      const filtered = applyFilters(bands, { day: DAYS_4[1], stage: null, upcoming: false });
+      const filtered = filterBands(bands, noFilters({ day: DAYS_4[1] }), new Date());
 
       expect(filtered).toHaveLength(1);
       expect(bandDay(filtered[0])).toBe(DAYS_4[1]);
@@ -199,7 +170,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
       }
 
       for (const day of DAYS_4) {
-        const filtered = applyFilters(bands, { day, stage: null, upcoming: false });
+        const filtered = filterBands(bands, noFilters({ day }), new Date());
         expect(filtered).toHaveLength(3);
         filtered.forEach((b) => expect(bandDay(b)).toBe(day));
       }
@@ -210,7 +181,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
         createBand(`Band ${idx}`, STAGES_8[0], day, 14, 60),
       );
 
-      const filtered = applyFilters(bands, { day: null, stage: null, upcoming: false });
+      const filtered = filterBands(bands, noFilters(), new Date());
 
       expect(filtered).toHaveLength(DAYS_4.length);
     });
@@ -225,7 +196,11 @@ describe('Schedule: 8 Stages × 4 Days', () => {
         }
       }
 
-      const filtered = applyFilters(bands, { day: DAYS_4[2], stage: 'Headbangers', upcoming: false });
+      const filtered = filterBands(
+        bands,
+        noFilters({ day: DAYS_4[2], stage: ['Headbangers'] }),
+        new Date(),
+      );
 
       expect(filtered).toHaveLength(1);
       expect(filtered[0].stage).toBe('Headbangers');
@@ -235,7 +210,11 @@ describe('Schedule: 8 Stages × 4 Days', () => {
     it('returns empty result when day and stage do not have overlap', () => {
       const bands = [createBand('One Band', 'W.E.T.', DAYS_4[0], 14, 60)];
 
-      const filtered = applyFilters(bands, { day: DAYS_4[3], stage: 'Headbangers', upcoming: false });
+      const filtered = filterBands(
+        bands,
+        noFilters({ day: DAYS_4[3], stage: ['Headbangers'] }),
+        new Date(),
+      );
 
       expect(filtered).toHaveLength(0);
     });
@@ -245,7 +224,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
     it('filters out bands that have already ended', () => {
       const pastBand = createBand('Past Band', 'W.E.T.', '2020-01-01', 14, 60);
 
-      const filtered = applyFilters([pastBand], { day: null, stage: null, upcoming: true });
+      const filtered = filterBands([pastBand], noFilters({ upcoming: true }), new Date());
 
       expect(filtered).toHaveLength(0);
     });
@@ -260,7 +239,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
         60,
       );
 
-      const filtered = applyFilters([futureBand], { day: null, stage: null, upcoming: true });
+      const filtered = filterBands([futureBand], noFilters({ upcoming: true }), now);
 
       expect(filtered).toHaveLength(1);
     });
@@ -268,7 +247,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
     it('does not filter past bands when upcoming is false', () => {
       const pastBand = createBand('Past Band', 'W.E.T.', '2020-01-01', 14, 60);
 
-      const filtered = applyFilters([pastBand], { day: null, stage: null, upcoming: false });
+      const filtered = filterBands([pastBand], noFilters(), new Date());
 
       expect(filtered).toHaveLength(1);
     });
@@ -321,7 +300,11 @@ describe('Schedule: 8 Stages × 4 Days', () => {
       expect(bands).toHaveLength(DAYS_4.length * STAGES_8.length * 7);
 
       // Apply a complex filter: Day 2, Headbangers
-      const filtered = applyFilters(bands, { day: DAYS_4[1], stage: 'Headbangers', upcoming: false });
+      const filtered = filterBands(
+        bands,
+        noFilters({ day: DAYS_4[1], stage: ['Headbangers'] }),
+        new Date(),
+      );
 
       expect(filtered).toHaveLength(7);
       filtered.forEach((b) => {
@@ -338,16 +321,17 @@ describe('Schedule: 8 Stages × 4 Days', () => {
         }
       }
 
-      const initial = applyFilters(bands, { day: null, stage: null, upcoming: false });
+      const now = new Date();
+      const initial = filterBands(bands, noFilters(), now);
       expect(initial).toHaveLength(32);
 
-      const byDay = applyFilters(bands, { day: DAYS_4[0], stage: null, upcoming: false });
+      const byDay = filterBands(bands, noFilters({ day: DAYS_4[0] }), now);
       expect(byDay).toHaveLength(8);
 
-      const byStage = applyFilters(bands, { day: null, stage: 'W.E.T.', upcoming: false });
+      const byStage = filterBands(bands, noFilters({ stage: ['W.E.T.'] }), now);
       expect(byStage).toHaveLength(4);
 
-      const cleared = applyFilters(bands, { day: null, stage: null, upcoming: false });
+      const cleared = filterBands(bands, noFilters(), now);
       expect(cleared).toEqual(initial);
     });
 
@@ -366,9 +350,10 @@ describe('Schedule: 8 Stages × 4 Days', () => {
       expect(days).toHaveLength(4);
 
       // Every combo should have exactly one band
+      const now = new Date();
       for (const day of days) {
         for (const stage of stages) {
-          const found = applyFilters(bands, { day, stage, upcoming: false });
+          const found = filterBands(bands, noFilters({ day, stage: [stage] }), now);
           expect(found).toHaveLength(1);
         }
       }
