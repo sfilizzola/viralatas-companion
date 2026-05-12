@@ -4,6 +4,22 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-12 (UNIT_TEST_PLAN Stage 1)
+
+### Changed
+- Extracted `filterBands(bands, filters, now)` from `SchedulePage.tsx` into `src/services/bandFilter.ts` (pure function, exported)
+- Extracted `loadStoredFilters()` / `saveStoredFilters()` from `SchedulePage.tsx` into `src/services/scheduleFilterStorage.ts`
+- Extracted `computeAttendees(picks, crewUsers)` from `useBandAttendees.ts` into `src/services/attendees.ts`; exported `BandAttendee` and `AttendeeMap` types
+- Exported `deduplicatePickQueue(ops)` as a named pure function from `src/repositories/picks.ts`; `flushOfflineQueue` calls it internally
+- Exported `countPicks` as a named pure function from `src/hooks/usePickCounts.ts`
+- Rewrote `schedule.test.ts` to import `bandDay`/`formatTime` from real source files instead of duplicating helpers
+
+### Architectural Notes
+- UNIT_TEST_PLAN Stage 1 complete: all five low-risk pure function extractions done. No behavior changes. 205 tests pass.
+- New testable surface: `bandFilter.ts`, `scheduleFilterStorage.ts`, `attendees.ts`, `deduplicatePickQueue`, `countPicks` are all now importable by unit tests without mounting hooks or pages.
+
+---
+
 ## 2026-05-12 (Badge System Refactor)
 
 ### Changed

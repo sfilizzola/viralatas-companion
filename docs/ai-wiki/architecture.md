@@ -390,7 +390,7 @@ INSERT into user_picks
 |------|---------|---------------|---------|
 | `useAuth()` | `{ session, user }` | Supabase auth state | All pages |
 | `useMyPicks()` | `Set<bandId>` | `PICKS_CHANGED_EVENT`, Realtime | MyPicksPage |
-| `usePickCounts()` | `Record<bandId, count>` | `PICKS_CHANGED_EVENT`, Realtime | RightNowPage, PopularPage |
+| `usePickCounts()` | `Record<bandId, count>` | `PICKS_CHANGED_EVENT`, Realtime | RightNowPage, PopularPage — `countPicks` is an exported pure fn |
 | `useBandAttendees(bandId)` | `User[]` | Realtime | BandDetailModal |
 | `useNowData()` | `{ current, next }` | `useNow()`, `PICKS_CHANGED_EVENT` | RightNowPage |
 | `useBandConflicts(bandIds)` | `Conflict[]` | None (computed) | MyPicksPage |
@@ -401,7 +401,7 @@ INSERT into user_picks
 
 | Repository | Key Methods | Side Effects |
 |------------|-------------|--------------|
-| `picksRepository` | `toggle()`, `syncCrewFromRemote()`, `flushOfflineQueue()` | Writes IndexedDB, enqueues offline, calls Supabase |
+| `picksRepository` | `toggle()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `deduplicatePickQueue(ops)` (exported pure fn) | Writes IndexedDB, enqueues offline, calls Supabase |
 | `announcementsRepository` | `post()`, `sync()`, `delete()`, `flushPending()` | Writes IndexedDB, enqueues pending |
 | `presenceRepository` | `update()`, `syncCrewFromRemote()`, `flushOfflineQueue()` | Writes IndexedDB, enqueues offline |
 | `usersRepository` | `syncCrew()` | Writes crew_users IndexedDB |
@@ -418,6 +418,9 @@ INSERT into user_picks
 | `stageColors.ts` | Map stage → CSS color | ✅ Yes |
 | `alerts.ts` | Queue alerts for Edge Function | Calls Supabase Edge Function |
 | `livePreview.ts` | Test data for live band preview | Reads/writes test config in IDB |
+| `bandFilter.ts` | `filterBands(bands, filters, now)` — pure filter predicate extracted from `SchedulePage`; testable without mounting any component | ✅ Yes |
+| `scheduleFilterStorage.ts` | `loadStoredFilters()` / `saveStoredFilters()` — localStorage persistence for schedule filter state; extracted from `SchedulePage` | ✅ Yes |
+| `attendees.ts` | `computeAttendees(picks, crewUsers)` — maps raw picks to hydrated `BandAttendee[]` per band; exports `BandAttendee` and `AttendeeMap` types | ✅ Yes |
 
 ---
 
@@ -528,4 +531,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-12
