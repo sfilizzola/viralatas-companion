@@ -4,6 +4,17 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-12 (Planning: remaining test stages moved to FUTURE_IDEAS)
+
+### Changed
+- `FUTURE_IDEAS.md` — added Ideas 3, 4, 5: unit tests for IDB layer (`lib/db.ts`), hook logic (pure memoized computations), and component/page integration; migrated from `UNIT_TEST_PLAN.md` Stages 4–6 plus the Vitest config threshold block and `fake-indexeddb` requirement.
+- `UNIT_TEST_PLAN.md` deleted — completed stages (1–3) are recorded in this changelog; remaining stages (4–6) are now tracked in `FUTURE_IDEAS.md` as Ideas 3–5.
+
+### Architectural Notes
+- No code or schema changes in this entry; purely planning/housekeeping.
+
+---
+
 ## 2026-05-12 (UNIT_TEST_PLAN Stage 3)
 
 ### Added

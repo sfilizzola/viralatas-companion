@@ -10,6 +10,9 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 |---|---|---|---|
 | 1 | LLM proactive alerts | High | Medium — API key handling, alert spam, offline edge cases |
 | 2 | Year freeze for historical badges | Medium | Low — godlike-only, idempotent, additive schema change |
+| 3 | Unit tests: IDB layer (`lib/db.ts`) | Medium | Low — requires `fake-indexeddb` dev dependency; isolated from app runtime |
+| 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — `renderHook` + mocked IDB and Supabase; no network |
+| 5 | Unit tests: Component and page integration | High | Low — replaces misleading stub tests; mounts pages with RTL + mocked hooks |
 
 ---
 
@@ -154,3 +157,143 @@ Existing badges (`puppy`, `pais-tropical`, `belga`, etc.) leave `yearBound` unde
 - [ ] Godlike "Freeze year" action snapshots correctly and is idempotent.
 - [ ] Frozen badges stay visible after their underlying live condition changes (e.g. user unpicks a band) with a "Wacken YYYY" chip.
 - [ ] Non-godlike users cannot call the freeze Edge Function (403 returned).
+
+---
+
+## Idea 3 — Unit tests: IDB layer (`lib/db.ts`)
+
+**Goal:** Achieve ~80% branch coverage on `lib/db.ts` (506 lines), the entire offline IndexedDB abstraction, using a real in-memory IDB implementation so tests exercise the actual schema and version migrations.
+
+**Prerequisite:** Install `fake-indexeddb` as a dev dependency (`npm install --save-dev fake-indexeddb`). Scope it to `db.test.ts` only — keep the existing minimal `window.indexedDB` stub in `setup.ts` for all other test files.
+
+**New dev dependency:**
+```bash
+npm install --save-dev fake-indexeddb
+```
+
+### Test file: `src/__tests__/db.test.ts`
+
+| Test group | Cases |
+|---|---|
+| Bands | `saveBand` / `loadBands` round-trip |
+| Picks | `saveUserPick` / `removeUserPick` / `replaceUserPicks` (per-user replace leaves other users' picks intact) |
+| Offline queue | `enqueueOfflinePick` / `loadOfflineQueue` / `removeFromOfflineQueue` |
+| Presence | `saveUserPresence` / `loadUserPresence` / `replaceUserPresence` |
+| Announcements | `loadLatestAnnouncement` returns entry with most recent `created_at` |
+| Window events | `PICKS_CHANGED_EVENT` fires after save/remove pick; `PRESENCE_CHANGED_EVENT` fires after presence write |
+
+### Vitest config additions
+
+Add coverage thresholds to `vitest.config.ts` once this stage ships:
+
+```ts
+coverage: {
+  provider: 'v8',
+  reporter: ['text', 'html'],
+  thresholds: {
+    lines: 90,
+    functions: 90,
+    branches: 85,
+    statements: 90,
+  },
+  exclude: [
+    'src/supabase.types.ts',
+    'src/vite-env.d.ts',
+    'src/version.ts',
+    'src/i18n/**',
+    '**/*.module.css',
+  ],
+},
+```
+
+**Files:** `src/__tests__/db.test.ts`, `vitest.config.ts`, `package.json` (new dev dep).
+
+**Acceptance criteria:**
+- [ ] `fake-indexeddb` is a dev-only dependency; production bundle unchanged.
+- [ ] All IDB round-trip tests pass without touching the real browser IDB.
+- [ ] Window events (`PICKS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, etc.) are asserted in tests.
+- [ ] Coverage thresholds gate is applied in `vitest.config.ts` and CI passes.
+
+---
+
+## Idea 4 — Unit tests: Hook logic (pure memoized computations)
+
+**Goal:** Cover the deterministic derivation logic inside key hooks using `renderHook` from RTL. Mocks target Supabase channels and IDB. Side effects (realtime subscriptions, flush loops) are not in scope — focus is on the pure computed outputs.
+
+**Prerequisite:** Stages 1–3 from the test plan must be complete (pure function extractions already done). Relies on the extracted `computeAttendees` from `services/attendees.ts` and `countPicks` from `hooks/usePickCounts.ts`.
+
+### Test files
+
+#### `src/__tests__/useNowData.logic.test.ts`
+
+| Case | Description |
+|---|---|
+| `presenceValue` — camping | `is_camping = true`, plan not currently active → `'camping'` |
+| `presenceValue` — metal_place | `is_at_metal_place = true`, within metal-place window → `'metal_place'` |
+| `presenceValue` — default | No special flags set → `'auto'` |
+| `isMetalPlaceWindowActive` | Outside time window gates the metal_place presence value |
+| `crewPlans` completeness | Always includes the current user even when absent from `crewUsers` |
+
+#### `src/__tests__/usePickCounts.test.ts`
+
+| Case | Description |
+|---|---|
+| Basic count | `countPicks()` returns correct `{ [band_id]: number }` map from a `UserPick[]` array |
+
+#### `src/__tests__/useBandAttendees.test.ts`
+
+| Case | Description |
+|---|---|
+| Grouping | `computeAttendees()` groups picks by `band_id` |
+| Hydration | Matches each entry with `CrewUser` display names |
+
+**Files:** `src/__tests__/useNowData.logic.test.ts`, `src/__tests__/usePickCounts.test.ts`, `src/__tests__/useBandAttendees.test.ts`.
+
+**Acceptance criteria:**
+- [ ] All derivation tests pass without mounting real Supabase subscriptions.
+- [ ] `useNowData.logic.test.ts` covers the three `presenceValue` branches and the `crewPlans` completeness invariant.
+- [ ] `countPicks` and `computeAttendees` are tested as pure functions (no `renderHook` overhead needed).
+
+---
+
+## Idea 5 — Unit tests: Component and page integration
+
+**Goal:** Mount real page and component trees with RTL + `I18nProvider`, mock out hooks and repositories, and assert rendered output. These tests replace the three misleading stub files (`registration.test.ts`, `login.test.ts`, `auth-integration.test.ts`) that do not import any app code.
+
+**Prerequisite:** Stages 1–4 complete. All pure function extractions in place. Misleading stub tests removed as part of this work.
+
+### Test files
+
+#### `src/__tests__/SchedulePage.test.tsx`
+
+| Case | Description |
+|---|---|
+| Initial render | Band list loaded from mocked IDB renders correctly |
+| Day filter | Selecting a day hides bands from other days |
+| Stage filter | Multi-select stage filter shows only matching bands |
+| Pick toggle | Clicking pick button calls `picksRepository.toggle` with correct arguments |
+
+#### `src/__tests__/LoginPage.test.tsx` _(replaces `login.test.ts`)_
+
+| Case | Description |
+|---|---|
+| Empty email | Shows validation error without calling Supabase |
+| Empty password | Shows validation error without calling Supabase |
+| Valid submit | Calls `supabase.auth.signInWithPassword` with correct credentials |
+| Supabase error | Error response renders error message to user |
+
+#### `src/__tests__/RegisterPage.test.tsx` _(replaces `registration.test.ts`)_
+
+| Case | Description |
+|---|---|
+| Short password | Shows validation error |
+| Missing display name | Shows validation error |
+| Valid submit | Calls `supabase.auth.signUp` with correct metadata shape (`display_name`, `preferred_language`, `is_test_user: false`) |
+
+**Files:** `src/__tests__/SchedulePage.test.tsx`, `src/__tests__/LoginPage.test.tsx`, `src/__tests__/RegisterPage.test.tsx`; delete `src/__tests__/registration.test.ts`, `src/__tests__/login.test.ts`, `src/__tests__/auth-integration.test.ts`.
+
+**Acceptance criteria:**
+- [ ] Misleading stub tests deleted; replaced by tests that actually import and exercise app code.
+- [ ] `SchedulePage` filter and toggle behavior tested end-to-end through the component tree.
+- [ ] Auth page tests assert on real form validation logic and correct Supabase call shapes.
+- [ ] All new tests pass with `npm test`.
