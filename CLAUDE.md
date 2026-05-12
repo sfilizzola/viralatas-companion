@@ -1,3 +1,8 @@
+---
+description: 
+alwaysApply: true
+---
+
 # CLAUDE.md — Viralatas Metaleiros 🤘
 
 Base context for every agent and Claude session in this project. This file + the **AI Wiki** (`docs/ai-wiki/`) together form the project's institutional memory. This file sets rules and fast facts; the wiki explains the architecture.
