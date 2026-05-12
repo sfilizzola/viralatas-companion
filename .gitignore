@@ -30,3 +30,6 @@ supabase/.temp/
 
 # Claude memory
 memory/
+
+# Test coverage output
+coverage/
