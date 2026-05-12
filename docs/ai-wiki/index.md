@@ -51,13 +51,21 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 
 ### Flows & Behaviors
 - **[Flow: Picking a Band](flows/pick-band.md)** — Optimistic write, realtime update, offline fallback
-- **[Flow: Offline Sync](flows/offline-pick-sync.md)** — Queue mechanics, deduplication, reconnect behavior
+- **[Flow: Offline Pick Sync](flows/offline-pick-sync.md)** — Queue mechanics, deduplication (keepLast), worked example (5 toggles → 1 call), error recovery
 - **[Flow: Live Now](flows/live-now.md)** — Time-based band display, crew attendance, conflict detection
-- **[Flow: Announcements](flows/announcements.md)** — Posting, realtime sync, moderation
-- **[Flow: Authentication](flows/authentication.md)** — Login, signup, session persistence, test users
+- **[Flow: Announcements](flows/announcements.md)** — Posting, realtime sync, moderation, soft-delete
+- **[Flow: Authentication](flows/authentication.md)** — Login, signup, trigger, session persistence, test users, RLS
 
-### Quality & Testing
+### Architectural Decisions (ADRs)
+- **[ADR: IndexedDB as Primary Store](decisions/indexeddb-primary-store.md)** — Why IDB, not Supabase-primary
+- **[ADR: PWA Not Native](decisions/pwa-not-native.md)** — Why web, not React Native/Capacitor
+- **[ADR: Supabase as Sync Target](decisions/supabase-as-sync-target.md)** — Why Supabase (auth + DB + realtime), alternatives (Firebase, custom Node)
+- **[ADR: Custom Hooks + Window Events](decisions/custom-hooks-events-no-redux.md)** — Why no Redux/Zustand; event-driven IDB state management
+- **[ADR: Workbox Caching Strategy](decisions/workbox-caching-strategy.md)** — NetworkFirst (Supabase), CacheFirst (images), precache (app shell)
+
+### Quality, Testing & Reference
 - **[Testing Strategy](testing.md)** — Unit tests, integration tests, offline scenarios
+- **[Glossary](glossary.md)** — 140+ terms: architecture, auth, sync, flows, caching, roles, badges
 - **[Changelog](changelog.md)** — All wiki modifications, discoveries, corrections
 
 ---
@@ -277,25 +285,74 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-## Recommended Reading Order
+## Reading Paths
 
-**New to the codebase?**
-1. [Architecture Overview](architecture.md) — Understand the 4-layer design
-2. [Domain Model](domain-model.md) — Learn entities and relationships
-3. [Offline-First Pattern](offline-first.md) — Core guarantee of the system
-4. [Flow: Picking a Band](flows/pick-band.md) — See offline-first in action
-5. [Sync Engine](sync-engine.md) — How consistency is maintained
-6. [Supabase Schema](supabase-schema.md) — Source of truth tables and policies
+### Path 1: First-Time Engineer (2–3 hours)
+Start here to understand the full system before touching any code.
 
-**Making a feature?**
-1. [Routes & Navigation](routes.md) — Where does your feature go?
-2. Relevant flow document (e.g., [Announcements](flows/announcements.md))
-3. [Testing](testing.md) — How to verify offline behavior
+1. [Architecture Overview](architecture.md) — 4-layer design, data flow, key files
+2. [Domain Model](domain-model.md) — Entities, relationships, role rules
+3. [Offline-First Pattern](offline-first.md) — The golden rule (IDB primary)
+4. [Flow: Picking a Band](flows/pick-band.md) — See offline-first in action end-to-end
+5. [Sync Engine](sync-engine.md) — Queue mechanics, startup sync, realtime
+6. [Supabase Schema](supabase-schema.md) — Tables, RLS, triggers, realtime config
 
-**Debugging sync issues?**
-1. [Sync Engine](sync-engine.md) — Understand the queue semantics
-2. [Flow: Offline Sync](flows/offline-pick-sync.md) — Step through reconnect
-3. Check `src/lib/db.ts` for event emission patterns
+---
+
+### Path 2: Badge Developer (45 min)
+Adding or modifying badges.
+
+1. [Badge System](badges.md) — All condition types, how to add, localization, testing
+2. [Domain Model](domain-model.md) — `user_missed_bands`, `special_badges`, user profile fields
+3. [Glossary](glossary.md) — Badge-specific terms (condition, slug, assigned, seen)
+
+---
+
+### Path 3: Offline Expert / Debugging Sync (1 hour)
+Investigating sync failures, queue corruption, or data inconsistency.
+
+1. [Sync Engine](sync-engine.md) — Sync orchestration, queue flush flow, error handling
+2. [Flow: Offline Pick Sync](flows/offline-pick-sync.md) — Worked example, edge cases, keepLast semantics
+3. [Offline-First Pattern](offline-first.md) — Guarantees per data type, failure modes
+4. [Glossary](glossary.md) — Queue, dedup, keepLast, flush, wipeAllLocalData
+
+---
+
+### Path 4: Auth & User Management (30 min)
+Adding auth features, debugging login issues, understanding roles.
+
+1. [Flow: Authentication](flows/authentication.md) — Full login/signup/trigger/RLS flow
+2. [Supabase Schema](supabase-schema.md) — `users` table, RLS policies, `handle_new_user`
+3. [Glossary](glossary.md) — JWT, refresh token, custom auth storage, trigger latency
+
+---
+
+### Path 5: Announcements / Moderation (30 min)
+Working on the mural board, soft-delete, or blocking.
+
+1. [Flow: Announcements](flows/announcements.md) — Full post lifecycle, offline queue, moderation
+2. [Domain Model](domain-model.md) — `announcements`, `blocked_posters`, role-based rules
+3. [Glossary](glossary.md) — Soft delete, pending queue, server-assigned ID, draft
+
+---
+
+### Path 6: Architecture Decision Context (1 hour)
+Understanding the "why" behind key technical choices.
+
+1. [ADR: IndexedDB as Primary Store](decisions/indexeddb-primary-store.md)
+2. [ADR: Supabase as Sync Target](decisions/supabase-as-sync-target.md)
+3. [ADR: Custom Hooks + Window Events](decisions/custom-hooks-events-no-redux.md)
+4. [ADR: Workbox Caching Strategy](decisions/workbox-caching-strategy.md)
+5. [ADR: PWA Not Native](decisions/pwa-not-native.md)
+
+---
+
+### Path 7: Live Now Page (45 min)
+Understanding or debugging the `/now` page, crew groups, time system.
+
+1. [Flow: Live Now](flows/live-now.md) — Band time model, crew grouping, Metal Place, conflicts
+2. [Architecture Overview](architecture.md) — `useNowData`, `livePreview.ts`, `bandTime.ts`
+3. [Glossary](glossary.md) — LivePlan, CrewLiveGroup, Metal Place Window, CEST
 
 ---
 
@@ -362,4 +419,4 @@ Window events emitted from `src/lib/db.ts`:
 
 ---
 
-**Last edited**: 2026-05-11 by Claude Code
+**Last edited**: 2026-05-12 by Claude Code
