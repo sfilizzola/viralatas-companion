@@ -29,17 +29,6 @@ beforeEach(() => {
   });
 });
 
-/** Build a chainable Supabase query builder stub. */
-function makeQueryBuilder(overrides: Record<string, unknown> = {}) {
-  const single = vi.fn();
-  const select = vi.fn().mockReturnValue({ single });
-  const insert = vi.fn().mockReturnValue({ select });
-  const order = vi.fn();
-  const builder = { insert, select, single, order, ...overrides };
-  // select chain: .select('*').order(...)
-  (builder.select as ReturnType<typeof vi.fn>).mockReturnValue({ single, order });
-  return builder;
-}
 
 const SERVER_ANNOUNCEMENT: Announcement = {
   id: 'server-id-1',
