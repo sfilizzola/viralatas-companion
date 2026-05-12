@@ -123,9 +123,7 @@ Tests `lib/i18n.ts` translation lookup:
 
 ---
 
-### Stage 3 — Tests: Repository layer (mock Supabase + IDB) 🔄 CURRENT
-
-> Mock pattern: `vi.mock('../lib/supabase', ...)` and `vi.mock('../lib/db', ...)`. Follows the pattern established in the existing `setup.ts`.
+### Stage 3 — Tests: Repository layer (mock Supabase + IDB) ✅ COMPLETED 2026-05-12
 
 #### `src/__tests__/picksRepository.test.ts`
 - `toggle()` online, adding: IDB `saveUserPick` called → Supabase `upsert` called
@@ -157,7 +155,7 @@ Tests `lib/i18n.ts` translation lookup:
 
 ---
 
-### Stage 4 — Tests: IDB layer (`lib/db.ts`)
+### Stage 4 — Tests: IDB layer (`lib/db.ts`) 🔄 CURRENT
 
 > Install [`fake-indexeddb`](https://github.com/dumbmatter/fakeIndexedDB) as a dev dependency. Replace the current minimal `window.indexedDB` stub in `setup.ts` for db-layer tests (keep the stub for all other tests by scoping per test file).
 

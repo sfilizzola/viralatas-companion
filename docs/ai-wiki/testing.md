@@ -8,7 +8,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 
 ## Relevant Source Files
 
-- `src/__tests__/` — All test files (304 tests)
+- `src/__tests__/` — All test files (355 tests)
 - `vitest.config.ts` — Test runner configuration
 - `package.json` — Test scripts
 - `supabase/seed/` — Seed scripts for test data
@@ -42,8 +42,13 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `attendees.test.ts` | `computeAttendees()` mapping picks → hydrated `BandAttendee[]` per band (`attendees.ts`) |
 | `stageColors.test.ts` | Stage-name → CSS color mapping, fallback for unknown stages (`stageColors.ts`) |
 | `i18n.test.ts` | Translation key completeness across `br`/`en` locale files |
+| `picksRepository.test.ts` | `toggle()` online/offline/error, `flushOfflineQueue()` dedup/routing, `syncCrewFromRemote()` (26 tests) |
+| `presenceRepository.test.ts` | `setCampingStatus()` online/offline, `isTimeWithinMetalPlaceWindow()` boundary, `validateAndAutoCheckout()` (11 tests) |
+| `announcementsRepository.test.ts` | Online post, offline queue, `flushPendingAnnouncements()` (7 tests) |
+| `bandsRepository.test.ts` | `checkAndApplyCacheVersion()` match/mismatch/no-data (3 tests) |
+| `missedRepository.test.ts` | Mark/unmark missed band online and offline (4 tests) |
 
-**Coverage**: 304 tests across all files
+**Coverage**: 355 tests across all files
 
 **Run**:
 ```bash

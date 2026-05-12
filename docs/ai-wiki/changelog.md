@@ -4,6 +4,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-12 (UNIT_TEST_PLAN Stage 3)
+
+### Added
+- `src/__tests__/picksRepository.test.ts` — 26 tests for `toggle()` (online/offline/error), `flushOfflineQueue()` (empty queue, dedup, upsert/delete routing), and `syncCrewFromRemote()`
+- `src/__tests__/presenceRepository.test.ts` — 11 tests for `setCampingStatus()` (online/offline), `isTimeWithinMetalPlaceWindow()` (time-range boundary), and `validateAndAutoCheckout()`
+- `src/__tests__/announcementsRepository.test.ts` — 7 tests for online post, offline queue, and `flushPendingAnnouncements()`
+- `src/__tests__/bandsRepository.test.ts` — 3 tests for `checkAndApplyCacheVersion()` (match/mismatch/no-data)
+- `src/__tests__/missedRepository.test.ts` — 4 tests for mark/unmark online and offline
+
+### Architectural Notes
+- UNIT_TEST_PLAN Stage 3 complete: 51 new tests, 355 total, 0 failures.
+- Mock pattern: `vi.hoisted()` required when vi.mock factory references named mock instances (Vitest hoisting constraint).
+- Supabase fluent chains (`.delete().eq().eq()`, `.insert().select().single()`) required explicit nested vi.fn() chains.
+- `navigator.onLine` overridden via `Object.defineProperty` with `configurable: true` for per-test reset.
+
+---
+
 ## 2026-05-12 (UNIT_TEST_PLAN Stage 2)
 
 ### Added
