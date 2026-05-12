@@ -8,7 +8,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 
 ## Relevant Source Files
 
-- `src/__tests__/` — All test files (128+ tests)
+- `src/__tests__/` — All test files (304 tests)
 - `vitest.config.ts` — Test runner configuration
 - `package.json` — Test scripts
 - `supabase/seed/` — Seed scripts for test data
@@ -35,8 +35,15 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `badges.test.ts` | Badge condition evaluation |
 | `missed.test.ts` | Marking bands as seen/missed |
 | `BandCard.test.tsx` | Component rendering, user interactions |
+| `bandTime.test.ts` | Band overlap/conflict logic, current/next band calc (`bandTime.ts`) |
+| `bandFilter.test.ts` | Schedule filter predicate: stage, genre, day, time, search (`bandFilter.ts`) |
+| `scheduleFilterStorage.test.ts` | localStorage persistence for schedule filter state (`scheduleFilterStorage.ts`) |
+| `deduplicatePickQueue.test.ts` | Queue deduplication (keepLast semantics) as pure function (`picks.ts`) |
+| `attendees.test.ts` | `computeAttendees()` mapping picks → hydrated `BandAttendee[]` per band (`attendees.ts`) |
+| `stageColors.test.ts` | Stage-name → CSS color mapping, fallback for unknown stages (`stageColors.ts`) |
+| `i18n.test.ts` | Translation key completeness across `br`/`en` locale files |
 
-**Coverage**: ~128 tests across all files
+**Coverage**: 304 tests across all files
 
 **Run**:
 ```bash
@@ -429,4 +436,4 @@ it('should show band as live when now equals start_time', () => {
 
 ---
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-12
