@@ -15,6 +15,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 | 5 | Unit tests: Component and page integration | High | Low — replaces misleading stub tests; mounts pages with RTL + mocked hooks | pending |
 | 6 | Multi-stage / multi-genre badge conditions | Low | Low — additive condition types, registry-only, no schema change | **implemented (2026-05-13)** |
 | 7 | Closing-ceremony slot (non-band timetable entry) | Low | Low — single nullable column on `bands`, registry untouched, narrow scope | pending |
+| 8 | Test/preview mode for persistent badges (no metadata writes) | Low | Low — dev-only switch in `BadgesDisplay`, no schema change, opt-in | pending |
 
 ---
 
@@ -550,3 +551,109 @@ Add a single entry to `supabase/seed/bands.ts` with `category: 'ceremony'`, plac
 - Opening ceremony, daily Wacken anthem, fireworks slot, marching-band parade → add new `category` values when needed (`'opening'`, `'anthem'`, `'fireworks'`). The check constraint becomes the migration site.
 - Ceremony-specific badge (`event_attended_named` condition) → introduce only if the team later wants to gamify it.
 - Auto-pick-on-login behavior → can be layered on top by inserting a `user_picks` row at session bootstrap for any unpicked `'ceremony'` rows, without touching anything in this idea's scope.
+
+---
+
+## Idea 8 — Test/preview mode for persistent badges (no metadata writes)
+
+**Goal:** Let a developer (or godlike user) verify a `persist: true` badge end-to-end in the running app — its icon, year chip, label, description, grid placement, modal — **without** the act of viewing it permanently writing the slug into `user.user_metadata.achieved_badge_slugs[]`. Today the only ways to QA a persistent badge in the live app are: (a) actually earn it and accept the metadata pollution, (b) flip `persist: true → false` in the registry temporarily, or (c) burn a `seed:test-users` account. All three are friction; none is reversible without a manual cleanup step.
+
+### Why now is a good time
+
+The auto-record block in `BadgesDisplay.tsx` is a single 12-line `if (newlyAchieved.length > 0)` branch. Gating it behind a flag is mechanical, has no schema implications, and removes the only "you can't safely look at it" constraint in the badge system. It also makes the godlike admin "Assign Badge" UI safer to demo.
+
+### Current shape (the side effect we want to bypass)
+
+```113:124:src/components/BadgesDisplay.tsx
+      if (newlyAchieved.length > 0) {
+        supabase.auth.updateUser({
+          data: {
+            achieved_badge_slugs: [
+              ...(user.user_metadata?.achieved_badge_slugs ?? []),
+              ...newlyAchieved,
+            ],
+          },
+        }).catch(() => {
+          // badge earning is best-effort
+        });
+      }
+```
+
+### Proposed mechanism — three layered options (pick one or stack)
+
+| Option | Where it lives | Persistence touched? | Cleanup needed? |
+|---|---|---|---|
+| **8a — `?badgePreview=1` URL flag** | Read once in `BadgesDisplay`, short-circuits the `updateUser` block | No | No (close the tab) |
+| **8b — Godlike-only "Preview mode" toggle on `/profile`** | Stored in `sessionStorage` (not localStorage — dies with tab) | No | No |
+| **8c — Per-evaluation override via dev console** | `window.__viralatas_badgePreview = true` for ad-hoc QA | No | No |
+
+Recommendation: **ship 8a alone first.** It's three lines, requires zero UI, and covers the 95% case ("I want to see what this badge looks like in my profile right now without committing"). 8b is worth adding later if godlike users start using it for screenshots / demos. 8c is escape-hatch only.
+
+### Engine-level hook
+
+`evaluateBadge` already returns `true` for any `persist: true` badge whose slug is in `ctx.achievedBadgeSlugs`, so preview mode does **not** need to change evaluation logic at all — it only needs to suppress the write. The badge will still appear in the UI as long as the live condition is true; it just won't be recorded for next session.
+
+### Implementation sketch (Option 8a)
+
+```ts
+// src/components/BadgesDisplay.tsx (inside refresh())
+const isPreviewMode =
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('badgePreview') === '1';
+
+// ...build newlyAchieved as today...
+
+if (newlyAchieved.length > 0 && !isPreviewMode) {
+  supabase.auth.updateUser({
+    data: {
+      achieved_badge_slugs: [
+        ...(user.user_metadata?.achieved_badge_slugs ?? []),
+        ...newlyAchieved,
+      ],
+    },
+  }).catch(() => {
+    // badge earning is best-effort
+  });
+}
+```
+
+A small `<aside>` banner ("🔬 Badge preview mode — nothing will be recorded") at the top of the badges section while the flag is on prevents foot-guns where someone forgets they're in preview and assumes their state is sticky.
+
+### Same gate applies to `crew_at_location_min`
+
+The location-bonding badges write into `crew_earned_badge_slugs[]` from a separate code path; if we ship 8a, the same `isPreviewMode` check should suppress that write too. Otherwise "preview mode" only works for half the persistent badges, which is worse than not having it.
+
+### Files
+
+- `src/components/BadgesDisplay.tsx` — read URL/sessionStorage flag, gate the `supabase.auth.updateUser` call, render the small "preview mode" banner.
+- `src/components/BadgesDisplay.module.css` — banner styling.
+- Wherever the `crew_earned_badge_slugs` write lives (likely a hook adjacent to `useNowData` or a presence-driven effect) — same gate applied.
+- `src/i18n/{br,en,es,de}.json` — short banner string (e.g. `badgePreviewMode`).
+- `docs/ai-wiki/badges.md` — add a "Testing persistent badges safely" subsection under **Testing Badges** pointing to this flag.
+
+### Acceptance criteria
+
+- [ ] Visiting `/profile?badgePreview=1` shows all earned badges (including `persist: true` ones) but writes nothing to `user_metadata.achieved_badge_slugs` or `crew_earned_badge_slugs`.
+- [ ] Closing/reopening the tab without the flag returns to normal behavior — no leftover preview state.
+- [ ] A visible banner indicates preview mode is active, so it can't silently mislead a user.
+- [ ] Non-persistent badges (`persist: false`/omitted) behave identically with or without the flag.
+- [ ] Both auto-record paths are gated (`achieved_badge_slugs` and `crew_earned_badge_slugs`).
+- [ ] No production bundle change beyond the new gate; flag is purely opt-in.
+
+### Alternatives considered
+
+| Approach | Verdict |
+|---|---|
+| **A. URL flag (`?badgePreview=1`)** — recommended | ✅ Zero UI, opt-in per page load, dies with the tab. |
+| B. Env-gated dev-only build | ❌ Useless for QA against production data. |
+| C. Always evaluate but never persist (i.e. drop `persist` writes entirely) | ❌ Breaks the "badge is recorded once earned" semantic for real users — that's the whole point of `persist: true`. |
+| D. Mock `supabase.auth.updateUser` in a separate test harness | ❌ Heavy, only useful for a single-time check, doesn't help godlikes demo on their phone. |
+| E. Add a per-badge `previewable: true` flag in registry | ❌ Pushes the concern into every config row instead of keeping it as a viewer-side toggle. |
+
+Option A is the cheapest gate that fully removes the "side effect of looking at it" without changing real persistence semantics for anyone else.
+
+### Deferred (out of scope, parked here for future reference)
+
+- A godlike-only "reset my achieved_badge_slugs" admin button → useful for cleaning up if someone *did* earn a test badge. Separate concern; would live in `/profile` admin panel.
+- An audit log of when each persistent badge was first recorded → only worth it if disputes ever come up.
+- Extending preview mode to `assigned`-condition badges (so godlikes can preview an assignment before committing it) → currently low value because assignment is already an explicit, reversible action.
