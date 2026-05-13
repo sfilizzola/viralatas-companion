@@ -118,7 +118,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 |------|-------|------|-------------|-----------|
 | TBD | TBD | WAS1 | TBD | PLACEHOLDER |
 | TBD | TBD | WAS2 | TBD | PLACEHOLDER |
-| Wacken Firefighters | TBD | WAS3 | TBD | PLACEHOLDER |
+| TBD | TBD | WAS3 | TBD | PLACEHOLDER |
 | Unzucht | Industrial / Gothic | WAS4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/2/csm_unzucht_26_5662cb7925.jpg |
 | Sir Henry Hot Memorial | TBD | WAS5 | TBD | PLACEHOLDER |
 | Mambo Kurt | TBD | WAS6 | TBD | PLACEHOLDER |
@@ -128,7 +128,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 |------|-------|------|-------------|-----------|
-| TBD | TBD | WAK1 | TBD | PLACEHOLDER |
+| Wacken Firefighters | TBD | WAK1 | TBD | PLACEHOLDER |
 | TBD | TBD | WAK2 | TBD | PLACEHOLDER |
 | Visions of Atlantis | Symphonic Metal | WAK3 | TBD | PLACEHOLDER |
 | Thundermother | Rock | WAK4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/a/csm_Thundermother-Band-2023_d61771d790.jpg |
@@ -395,8 +395,8 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 |------|-------|------|-------------|-----------|
-| TBD | TBD | WAK22 | TBD | PLACEHOLDER |
-| Wacken Firefighters | TBD | WAK23 | TBD | PLACEHOLDER |
+| Wacken Firefighters | TBD | WAK22 | TBD | PLACEHOLDER |
+| TBD | TBD | WAK23 | TBD | PLACEHOLDER |
 | The Limit | TBD | WAK24 | TBD | PLACEHOLDER |
 | Our Promise | Metal | WAK25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/0/csm_our_promise_26_661c3c384d.jpg |
 | Lagwagon | Melodic Hardcore | WAK26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/e/csm_lagwagon26_9b4cccaa2b.jpg |
