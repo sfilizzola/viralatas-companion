@@ -4,6 +4,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-13 (Seed: bands.ts rebuilt from lineup.md)
+
+### Changed
+- **supabase/seed/bands.ts** — Full rewrite to mirror `docs/ai-wiki/lineup.md` exactly. 173 bands seeded (192 listed in lineup.md minus 19 slots whose band name is literally `TBD`). Slot start/end times pulled directly from `docs/ai-wiki/stages.md` Slot IDs. Bands with `Band Status: TBD` keep their name but use a `PLACEHOLDER` image URL (8 rows). Bands with `Genre: TBD` use a `Generic Metal` fallback genre (42 rows = 38 unique bands, plus recurring acts like `Sir Henry Hot Memorial` ×4 and `Wacken Firefighters` ×2). Each band row is annotated with its Slot ID for cross-reference.
+
+### Architectural Notes
+- The fallback genre constant `TBD_GENRE = 'Generic Metal'` lives at the top of `bands.ts` — if the policy for unresolved genres changes, edit that single constant.
+- Dropped Slot IDs (band name = TBD, 19 total): Day 1 — `HBA7`, `WAS1`, `WAS2`, `WAS3`, `WAK2`; Day 2 — `WET13`, `WET14`, `WET15`, `WET16`, `HBA13`, `HBA14`, `HBA15`, `WAS8`, `WAS9`, `WAK8`, `WAK9`; Day 4 — `HBA29`, `WAK23`, `WAS23`.
+- Name corrections from previous bands.ts to match lineup.md exactly: `Alien Rockin' Explosion` → `Alien Rockin Explosion`, `Broken by the Scream` → `Broken By The Scream`, `Tuxedoo` → `tuXedoo`, `Of Mice & Men` → `Of Mice and Men`, `Sventevith` → `Misþyrming & Nergal`, `Dieter Maschine Birr` → `Dieter "Maschine" Birr`, `Cowgirls From Hell DJ Team` → `Cowgirls From Hell`.
+- `WAS26 President` flipped to `Band Status: TBD` in lineup.md → now uses PLACEHOLDER image while keeping `Metal` genre.
+
+---
+
 ## 2026-05-13 (Lineup: Day 4 Saturday reorganization — corrected algorithm)
 
 ### Changed

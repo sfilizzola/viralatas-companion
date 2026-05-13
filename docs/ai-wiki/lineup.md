@@ -410,7 +410,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | TBD | TBD | WAS23 | TBD | PLACEHOLDER |
 | Zeltinger Band | TBD | WAS24 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/0/csm_zeltinger_26_74420c1905.jpg |
 | The Other | Horror Punk | WAS25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/8/csm_the_other_26_bb6a90d46d.jpg |
-| President | Metal | WAS26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/e/csm_president26_527cb5b2ae.jpg |
+| President | Metal | WAS26 | TBD | PLACEHOLDER |
 | Minotaurus | TBD | WAS27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/0/csm_minotaurus_26_1ab67a12ae.jpg |
 | Heavysaurus | Children's Metal | WAS28 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/0/csm_heavysaurus_26_9d1aa2a6db.jpg |
 | Fit For An Autopsy | Death Metal | WAS29 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/7/csm_fit_for_an_autopsy_26_1695f9334e.jpg |
