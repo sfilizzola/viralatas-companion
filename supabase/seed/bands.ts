@@ -91,7 +91,8 @@ export const bands: BandSeed[] = [
 
   // ═══════════════════════════════════════════════════════
   // DAY 1 — Wednesday 29 July
-  // Note: Headbangers/Wasteland/Wackinger/Jungle open ~16:00.
+  // Note: HARDER and HEADBANGERS stages are closed on Day 1.
+  //       Wasteland/Wackinger/Jungle open ~16:00.
   //       Faster opens 16:00 (user-confirmed).
   // ═══════════════════════════════════════════════════════
 
@@ -100,14 +101,6 @@ export const bands: BandSeed[] = [
   { name: 'The Hardkiss',      stage: STAGES.WET, start_time: t(D1,16,30), end_time: t(D1,17,30), genre: 'Rock',               image_url: PLACEHOLDER },
   { name: 'Rose Tattoo',       stage: STAGES.WET, start_time: t(D1,19, 0), end_time: t(D1,20, 0), genre: 'Hard Rock',          image_url: `${WOA}/fileadmin/_processed_/5/5/csm_rose_tattoo26_a5747c907d.jpg` },
   { name: 'Velvet Rush',       stage: STAGES.WET, start_time: t(D1,21,30), end_time: t(D1,22,30), genre: 'AOR',                image_url: PLACEHOLDER },
-
-  // HARDER STAGE — Day 1
-  { name: 'Lovebites',            stage: STAGES.HARDER, start_time: t(D1,12,30), end_time: t(D1,13,30), genre: 'Heavy Metal',    image_url: PLACEHOLDER },
-  { name: 'Sacred Steel',         stage: STAGES.HARDER, start_time: t(D1,14,30), end_time: t(D1,15,30), genre: 'Power Metal',    image_url: PLACEHOLDER },
-  { name: 'Phantom',              stage: STAGES.HARDER, start_time: t(D1,16,30), end_time: t(D1,17,30), genre: 'Heavy Metal',    image_url: PLACEHOLDER },
-  { name: 'Thundermother',        stage: STAGES.HARDER, start_time: t(D1,18,30), end_time: t(D1,19,30), genre: 'Rock',           image_url: `${WOA}/fileadmin/_processed_/9/a/csm_Thundermother-Band-2023_d61771d790.jpg` },
-  { name: 'The Troops of Doom',   stage: STAGES.HARDER, start_time: t(D1,20,30), end_time: t(D1,21,30), genre: 'Thrash Metal',   image_url: PLACEHOLDER },
-  { name: 'Poison the Preacher',  stage: STAGES.HARDER, start_time: t(D1,22,30), end_time: t(D1,23,30), genre: 'Metal',          image_url: PLACEHOLDER },
 
   // LOUDER STAGE — Day 1 (user-confirmed slots: 12:00 / 13:30 / 15:15 / 17:00 / 19:00 / 21:00)
   { name: 'Crypt Sermon',           stage: STAGES.LOUDER, start_time: t(D1,12, 0), end_time: t(D1,13, 0), genre: 'Doom Metal',        image_url: PLACEHOLDER },
@@ -122,11 +115,6 @@ export const bands: BandSeed[] = [
   { name: 'Hämatom',             stage: STAGES.FASTER, start_time: t(D1,17,45), end_time: t(D1,18,45),  genre: 'Industrial Metal',     image_url: `${WOA}/fileadmin/_processed_/5/e/csm_haematom_26_a104ede3d5.jpg` },
   { name: 'Kadavar',             stage: STAGES.FASTER, start_time: t(D1,19,45), end_time: t(D1,21, 0),  genre: 'Stoner Rock',          image_url: `${WOA}/fileadmin/_processed_/f/9/csm_kadavar_26b_5241b42bda.jpg` },
   { name: 'Unzucht',             stage: STAGES.FASTER, start_time: t(D1,22, 0), end_time: t(D1n, 0, 0), genre: 'Industrial / Gothic',  image_url: `${WOA}/fileadmin/_processed_/b/2/csm_unzucht_26_5662cb7925.jpg` },
-
-  // HEADBANGERS STAGE — Day 1 (opens ~16:00)
-  { name: 'TBS',              stage: STAGES.HEADBANGERS, start_time: t(D1,16, 0), end_time: t(D1,17, 0), genre: 'TBD', image_url: PLACEHOLDER },
-  { name: 'Battlecreek',      stage: STAGES.HEADBANGERS, start_time: t(D1,18,30), end_time: t(D1,19,30), genre: 'TBD', image_url: PLACEHOLDER },
-  { name: 'Diabolisches Werk',stage: STAGES.HEADBANGERS, start_time: t(D1,21, 0), end_time: t(D1,22,30), genre: 'TBD', image_url: PLACEHOLDER },
 
   // WASTELAND STAGE — Day 1 (opens ~16:00)
   { name: 'Expellow',    stage: STAGES.WASTELAND, start_time: t(D1,16, 0), end_time: t(D1,17, 0), genre: 'TBD',          image_url: PLACEHOLDER },
@@ -158,6 +146,7 @@ export const bands: BandSeed[] = [
   // HARDER STAGE — Day 2
   { name: 'Katerfahrt',    stage: STAGES.HARDER, start_time: t(D2,12, 0), end_time: t(D2,13, 0), genre: 'Rock',             image_url: PLACEHOLDER },
   { name: 'Black Tish',    stage: STAGES.HARDER, start_time: t(D2,13,30), end_time: t(D2,14,30), genre: 'TBD',              image_url: PLACEHOLDER },
+  { name: 'Thundermother', stage: STAGES.HARDER, start_time: t(D2,15,30), end_time: t(D2,16,30), genre: 'Rock',             image_url: `${WOA}/fileadmin/_processed_/9/a/csm_Thundermother-Band-2023_d61771d790.jpg` },
   { name: 'Life of Agony', stage: STAGES.HARDER, start_time: t(D2,17, 0), end_time: t(D2,18,15), genre: 'Alternative Metal', image_url: `${WOA}/fileadmin/_processed_/9/4/csm_life_of_agony26_68ef27b061.jpg` },
   { name: 'Europe',        stage: STAGES.HARDER, start_time: t(D2,18,30), end_time: t(D2,19,45), genre: 'Hard Rock',         image_url: `${WOA}/fileadmin/_processed_/5/3/csm_Europe-WOA26_9d76063492.jpg` },
   { name: 'Turbonegro',    stage: STAGES.HARDER, start_time: t(D2,20,15), end_time: t(D2,21,15), genre: 'Punk Rock',         image_url: `${WOA}/fileadmin/_processed_/1/b/csm_turbonegro26_2118d824cd.jpg` },
@@ -183,14 +172,22 @@ export const bands: BandSeed[] = [
   { name: 'Year of the Goat', stage: STAGES.FASTER, start_time: t(D2,21,30), end_time: t(D2,22,30), genre: 'Occult Rock', image_url: PLACEHOLDER },
 
   // HEADBANGERS STAGE — Day 2
-  { name: 'Anaal Nathrakh', stage: STAGES.HEADBANGERS, start_time: t(D2,15, 0), end_time: t(D2,16, 0), genre: 'Black Metal / Grindcore',  image_url: PLACEHOLDER },
-  { name: 'Craft',          stage: STAGES.HEADBANGERS, start_time: t(D2,18,30), end_time: t(D2,19,30), genre: 'Black Metal',              image_url: PLACEHOLDER },
-  { name: 'Misery Index',   stage: STAGES.HEADBANGERS, start_time: t(D2,21,30), end_time: t(D2,22,30), genre: 'Death Metal / Grindcore',  image_url: PLACEHOLDER },
+  { name: 'TBS',               stage: STAGES.HEADBANGERS, start_time: t(D2,12,30), end_time: t(D2,13,30), genre: 'TBD',                      image_url: PLACEHOLDER },
+  { name: 'Battlecreek',       stage: STAGES.HEADBANGERS, start_time: t(D2,14, 0), end_time: t(D2,15, 0), genre: 'TBD',                      image_url: PLACEHOLDER },
+  { name: 'Anaal Nathrakh',    stage: STAGES.HEADBANGERS, start_time: t(D2,15, 0), end_time: t(D2,16, 0), genre: 'Black Metal / Grindcore',  image_url: PLACEHOLDER },
+  { name: 'Diabolisches Werk', stage: STAGES.HEADBANGERS, start_time: t(D2,17, 0), end_time: t(D2,18, 0), genre: 'TBD',                      image_url: PLACEHOLDER },
+  { name: 'Craft',             stage: STAGES.HEADBANGERS, start_time: t(D2,18,30), end_time: t(D2,19,30), genre: 'Black Metal',              image_url: PLACEHOLDER },
+  { name: 'Lovebites',         stage: STAGES.HEADBANGERS, start_time: t(D2,20, 0), end_time: t(D2,21, 0), genre: 'Heavy Metal',             image_url: PLACEHOLDER },
+  { name: 'Misery Index',      stage: STAGES.HEADBANGERS, start_time: t(D2,21,30), end_time: t(D2,22,30), genre: 'Death Metal / Grindcore',  image_url: PLACEHOLDER },
 
   // WASTELAND STAGE — Day 2
-  { name: 'Blood Red Throne', stage: STAGES.WASTELAND, start_time: t(D2,13,30), end_time: t(D2,14,30), genre: 'Death Metal',  image_url: PLACEHOLDER },
-  { name: 'Firespawn',        stage: STAGES.WASTELAND, start_time: t(D2,16,30), end_time: t(D2,17,30), genre: 'Death Metal',  image_url: PLACEHOLDER },
-  { name: 'Spectral Wound',   stage: STAGES.WASTELAND, start_time: t(D2,20, 0), end_time: t(D2,21, 0), genre: 'Black Metal',  image_url: PLACEHOLDER },
+  { name: 'Blood Red Throne',  stage: STAGES.WASTELAND, start_time: t(D2,13,30), end_time: t(D2,14,30), genre: 'Death Metal',  image_url: PLACEHOLDER },
+  { name: 'Sacred Steel',      stage: STAGES.WASTELAND, start_time: t(D2,15, 0), end_time: t(D2,15,45), genre: 'Power Metal',  image_url: PLACEHOLDER },
+  { name: 'Firespawn',         stage: STAGES.WASTELAND, start_time: t(D2,16,30), end_time: t(D2,17,30), genre: 'Death Metal',  image_url: PLACEHOLDER },
+  { name: 'Phantom',           stage: STAGES.WASTELAND, start_time: t(D2,18, 0), end_time: t(D2,18,45), genre: 'Heavy Metal',  image_url: PLACEHOLDER },
+  { name: 'Spectral Wound',    stage: STAGES.WASTELAND, start_time: t(D2,20, 0), end_time: t(D2,21, 0), genre: 'Black Metal',  image_url: PLACEHOLDER },
+  { name: 'The Troops of Doom',stage: STAGES.WASTELAND, start_time: t(D2,21, 0), end_time: t(D2,21,45), genre: 'Thrash Metal', image_url: PLACEHOLDER },
+  { name: 'Poison the Preacher',stage: STAGES.WASTELAND, start_time: t(D2,22,30), end_time: t(D2,23,15), genre: 'Metal',       image_url: PLACEHOLDER },
 
   // WACKINGER STAGE — Day 2
   { name: 'Sventevith',         stage: STAGES.WACKINGER, start_time: t(D2,14,30), end_time: t(D2,15,30), genre: 'Black Metal', image_url: PLACEHOLDER },

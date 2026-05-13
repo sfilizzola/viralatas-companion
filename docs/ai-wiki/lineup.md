@@ -50,9 +50,292 @@ Times are **CEST (UTC+2)**. Slots marked `*` cross midnight into the next calend
 
 ---
 
+## Stage Schedule Template
+
+> This grid is extracted from the 2024 WOA running order as a realistic approximation. Bands are assigned to these slots in the sections below. When the official 2026 running order is published, update the band→slot assignments in the day sections without changing this grid.
+>
+> **Source mapping:** Image Wednesday → Day 1 · Image Thursday → Day 2 · Image Friday → Day 3 · Image Saturday → Day 4. Day 1 slots for FASTER and LOUDER are user-confirmed overrides; all other slots are read from the image. Slot times marked `~` are approximate (image resolution limited exact reading).
+
+---
+
+### FASTER
+
+| Day | Slot # | Start | End |
+|-----|--------|-------|-----|
+| Day 1 (Wed) | 1 | 16:00 | 17:00 |
+| Day 1 (Wed) | 2 | 17:45 | 18:45 |
+| Day 1 (Wed) | 3 | 19:45 | 21:00 |
+| Day 1 (Wed) | 4 | 22:00 | 00:00* |
+| Day 2 (Thu) | 1 | 16:00 | 17:30 |
+| Day 2 (Thu) | 2 | 18:15 | 19:15 |
+| Day 2 (Thu) | 3 | 20:15 | 21:30 |
+| Day 2 (Thu) | 4 | 22:30 | 00:00* |
+| Day 3 (Fri) | 1 | 12:15 | 13:00 |
+| Day 3 (Fri) | 2 | 13:45 | 14:45 |
+| Day 3 (Fri) | 3 | 15:30 | 16:30 |
+| Day 3 (Fri) | 4 | 17:15 | 18:30 |
+| Day 3 (Fri) | 5 | 19:30 | 21:00 |
+| Day 3 (Fri) | 6 | 22:00 | 00:00* |
+| Day 4 (Sat) | 1 | 12:15 | 13:00 |
+| Day 4 (Sat) | 2 | 13:45 | 14:45 |
+| Day 4 (Sat) | 3 | 15:30 | 16:30 |
+| Day 4 (Sat) | 4 | 17:15 | 18:30 |
+| Day 4 (Sat) | 5 | 19:30 | 21:00 |
+| Day 4 (Sat) | 6 | 22:00 | 00:00* |
+
+---
+
+### HARDER
+
+> Closed on Day 1 (Wed) — HARDER opens Thursday in the source running order.
+
+| Day | Slot # | Start | End |
+|-----|--------|-------|-----|
+| Day 2 (Thu) | 1 | 15:30 | 16:30 |
+| Day 2 (Thu) | 2 | 17:15 | 18:15 |
+| Day 2 (Thu) | 3 | 19:15 | 20:30 |
+| Day 2 (Thu) | 4 | 21:30 | 00:00* |
+| Day 3 (Fri) | 1 | 12:15 | 13:00 |
+| Day 3 (Fri) | 2 | 13:45 | 14:45 |
+| Day 3 (Fri) | 3 | 15:30 | 16:30 |
+| Day 3 (Fri) | 4 | 17:15 | 18:30 |
+| Day 3 (Fri) | 5 | 19:30 | 21:00 |
+| Day 3 (Fri) | 6 | 22:00 | 00:00* |
+| Day 4 (Sat) | 1 | 12:15 | 13:00 |
+| Day 4 (Sat) | 2 | 13:45 | 14:45 |
+| Day 4 (Sat) | 3 | 15:30 | 16:30 |
+| Day 4 (Sat) | 4 | 17:15 | 18:30 |
+| Day 4 (Sat) | 5 | 19:30 | 21:00 |
+| Day 4 (Sat) | 6 | 22:00 | 00:00* |
+
+---
+
+### LOUDER
+
+| Day | Slot # | Start | End |
+|-----|--------|-------|-----|
+| Day 1 (Wed) | 1 | 12:00 | 13:00 |
+| Day 1 (Wed) | 2 | 13:30 | 14:30 |
+| Day 1 (Wed) | 3 | 15:15 | 16:15 |
+| Day 1 (Wed) | 4 | 17:00 | 18:00 |
+| Day 1 (Wed) | 5 | 19:00 | 20:00 |
+| Day 1 (Wed) | 6 | 21:00 | 22:30 |
+| Day 2 (Thu) | 1 | ~12:00 | ~12:45 |
+| Day 2 (Thu) | 2 | ~13:30 | ~14:30 |
+| Day 2 (Thu) | 3 | ~15:00 | ~16:00 |
+| Day 2 (Thu) | 4 | ~17:00 | ~18:00 |
+| Day 2 (Thu) | 5 | ~19:30 | ~20:30 |
+| Day 2 (Thu) | 6 | ~21:30 | ~22:30 |
+| Day 2 (Thu) | 7 | ~23:00 | ~00:00* |
+| Day 3 (Fri) | 1 | ~12:00 | ~12:45 |
+| Day 3 (Fri) | 2 | ~13:30 | ~14:30 |
+| Day 3 (Fri) | 3 | ~15:00 | ~16:00 |
+| Day 3 (Fri) | 4 | ~17:00 | ~18:00 |
+| Day 3 (Fri) | 5 | ~19:30 | ~20:30 |
+| Day 3 (Fri) | 6 | ~21:30 | ~22:30 |
+| Day 3 (Fri) | 7 | ~23:00 | ~00:00* |
+| Day 4 (Sat) | 1 | ~12:00 | ~12:45 |
+| Day 4 (Sat) | 2 | ~13:30 | ~14:30 |
+| Day 4 (Sat) | 3 | ~15:00 | ~16:00 |
+| Day 4 (Sat) | 4 | ~17:00 | ~18:00 |
+| Day 4 (Sat) | 5 | ~19:30 | ~20:30 |
+| Day 4 (Sat) | 6 | ~21:30 | ~22:30 |
+| Day 4 (Sat) | 7 | ~23:00 | ~00:00* |
+
+---
+
+### WELCOME TO THE JUNGLE
+
+> Stage runs from Monday in the source image; Wednesday is its third day of operation.
+
+| Day | Slot # | Start | End |
+|-----|--------|-------|-----|
+| Day 1 (Wed) | 1 | ~11:30 | ~12:15 |
+| Day 1 (Wed) | 2 | ~13:00 | ~13:45 |
+| Day 1 (Wed) | 3 | ~14:30 | ~15:15 |
+| Day 1 (Wed) | 4 | ~16:00 | ~16:45 |
+| Day 1 (Wed) | 5 | ~17:30 | ~18:15 |
+| Day 1 (Wed) | 6 | ~19:00 | ~19:45 |
+| Day 1 (Wed) | 7 | ~20:30 | ~21:15 |
+| Day 1 (Wed) | 8 | ~22:00 | ~22:45 |
+| Day 2 (Thu) | 1 | ~11:30 | ~12:15 |
+| Day 2 (Thu) | 2 | ~13:00 | ~13:45 |
+| Day 2 (Thu) | 3 | ~14:30 | ~15:15 |
+| Day 2 (Thu) | 4 | ~16:00 | ~16:45 |
+| Day 2 (Thu) | 5 | ~17:30 | ~18:15 |
+| Day 2 (Thu) | 6 | ~19:00 | ~19:45 |
+| Day 2 (Thu) | 7 | ~20:30 | ~21:15 |
+| Day 2 (Thu) | 8 | ~22:00 | ~22:45 |
+| Day 3 (Fri) | 1 | ~11:30 | ~12:15 |
+| Day 3 (Fri) | 2 | ~13:00 | ~13:45 |
+| Day 3 (Fri) | 3 | ~14:30 | ~15:15 |
+| Day 3 (Fri) | 4 | ~16:00 | ~16:45 |
+| Day 3 (Fri) | 5 | ~17:30 | ~18:15 |
+| Day 3 (Fri) | 6 | ~19:00 | ~19:45 |
+| Day 3 (Fri) | 7 | ~20:30 | ~21:15 |
+| Day 3 (Fri) | 8 | ~22:00 | ~22:45 |
+| Day 4 (Sat) | 1 | ~11:30 | ~12:15 |
+| Day 4 (Sat) | 2 | ~13:00 | ~13:45 |
+| Day 4 (Sat) | 3 | ~14:30 | ~15:15 |
+| Day 4 (Sat) | 4 | ~16:00 | ~16:45 |
+| Day 4 (Sat) | 5 | ~17:30 | ~18:15 |
+| Day 4 (Sat) | 6 | ~19:00 | ~19:45 |
+| Day 4 (Sat) | 7 | ~20:30 | ~21:15 |
+| Day 4 (Sat) | 8 | ~22:00 | ~22:45 |
+
+---
+
+### WASTELAND
+
+| Day | Slot # | Start | End |
+|-----|--------|-------|-----|
+| Day 1 (Wed) | 1 | ~13:30 | ~14:15 |
+| Day 1 (Wed) | 2 | ~15:00 | ~15:45 |
+| Day 1 (Wed) | 3 | ~16:30 | ~17:15 |
+| Day 1 (Wed) | 4 | ~18:00 | ~18:45 |
+| Day 1 (Wed) | 5 | ~19:30 | ~20:15 |
+| Day 1 (Wed) | 6 | ~21:00 | ~21:45 |
+| Day 1 (Wed) | 7 | ~22:30 | ~23:15 |
+| Day 1 (Wed) | 8 | ~00:00 | ~00:45* |
+| Day 2 (Thu) | 1 | ~13:30 | ~14:15 |
+| Day 2 (Thu) | 2 | ~15:00 | ~15:45 |
+| Day 2 (Thu) | 3 | ~16:30 | ~17:15 |
+| Day 2 (Thu) | 4 | ~18:00 | ~18:45 |
+| Day 2 (Thu) | 5 | ~19:30 | ~20:15 |
+| Day 2 (Thu) | 6 | ~21:00 | ~21:45 |
+| Day 2 (Thu) | 7 | ~22:30 | ~23:15 |
+| Day 2 (Thu) | 8 | ~00:00 | ~00:45* |
+| Day 3 (Fri) | 1 | ~13:30 | ~14:15 |
+| Day 3 (Fri) | 2 | ~15:00 | ~15:45 |
+| Day 3 (Fri) | 3 | ~16:30 | ~17:15 |
+| Day 3 (Fri) | 4 | ~18:00 | ~18:45 |
+| Day 3 (Fri) | 5 | ~19:30 | ~20:15 |
+| Day 3 (Fri) | 6 | ~21:00 | ~21:45 |
+| Day 3 (Fri) | 7 | ~22:30 | ~23:15 |
+| Day 3 (Fri) | 8 | ~00:00 | ~00:45* |
+| Day 4 (Sat) | 1 | ~13:30 | ~14:15 |
+| Day 4 (Sat) | 2 | ~15:00 | ~15:45 |
+| Day 4 (Sat) | 3 | ~16:30 | ~17:15 |
+| Day 4 (Sat) | 4 | ~18:00 | ~18:45 |
+| Day 4 (Sat) | 5 | ~19:30 | ~20:15 |
+| Day 4 (Sat) | 6 | ~21:00 | ~21:45 |
+| Day 4 (Sat) | 7 | ~22:30 | ~23:15 |
+| Day 4 (Sat) | 8 | ~00:00 | ~00:45* |
+
+---
+
+### W.E.T. STAGE
+
+> Stage runs from Monday in the source image; Wednesday is its third day of operation.
+
+| Day | Slot # | Start | End |
+|-----|--------|-------|-----|
+| Day 1 (Wed) | 1 | ~13:00 | ~13:45 |
+| Day 1 (Wed) | 2 | ~14:30 | ~15:15 |
+| Day 1 (Wed) | 3 | ~16:00 | ~16:45 |
+| Day 1 (Wed) | 4 | ~17:30 | ~18:15 |
+| Day 1 (Wed) | 5 | ~19:00 | ~19:45 |
+| Day 1 (Wed) | 6 | ~20:30 | ~21:15 |
+| Day 1 (Wed) | 7 | ~22:00 | ~22:45 |
+| Day 2 (Thu) | 1 | ~12:00 | ~12:45 |
+| Day 2 (Thu) | 2 | ~13:30 | ~14:15 |
+| Day 2 (Thu) | 3 | ~15:00 | ~15:45 |
+| Day 2 (Thu) | 4 | ~16:30 | ~17:15 |
+| Day 2 (Thu) | 5 | ~18:00 | ~18:45 |
+| Day 2 (Thu) | 6 | ~19:30 | ~20:15 |
+| Day 2 (Thu) | 7 | ~21:00 | ~21:45 |
+| Day 2 (Thu) | 8 | ~23:00 | ~00:30* |
+| Day 3 (Fri) | 1 | ~12:00 | ~12:45 |
+| Day 3 (Fri) | 2 | ~13:30 | ~14:15 |
+| Day 3 (Fri) | 3 | ~15:00 | ~15:45 |
+| Day 3 (Fri) | 4 | ~16:30 | ~17:15 |
+| Day 3 (Fri) | 5 | ~18:00 | ~18:45 |
+| Day 3 (Fri) | 6 | ~19:30 | ~20:15 |
+| Day 3 (Fri) | 7 | ~21:00 | ~21:45 |
+| Day 3 (Fri) | 8 | ~23:00 | ~00:30* |
+| Day 4 (Sat) | 1 | ~12:00 | ~12:45 |
+| Day 4 (Sat) | 2 | ~13:30 | ~14:15 |
+| Day 4 (Sat) | 3 | ~15:00 | ~15:45 |
+| Day 4 (Sat) | 4 | ~16:30 | ~17:15 |
+| Day 4 (Sat) | 5 | ~18:00 | ~18:45 |
+| Day 4 (Sat) | 6 | ~19:30 | ~20:15 |
+| Day 4 (Sat) | 7 | ~21:00 | ~21:45 |
+| Day 4 (Sat) | 8 | ~23:00 | ~00:30* |
+
+---
+
+### HEADBANGERS STAGE
+
+> Closed on Day 1 (Wed) — HEADBANGERS opens Thursday in the source running order.
+
+| Day | Slot # | Start | End |
+|-----|--------|-------|-----|
+| Day 2 (Thu) | 1 | ~12:30 | ~13:30 |
+| Day 2 (Thu) | 2 | ~14:00 | ~15:00 |
+| Day 2 (Thu) | 3 | ~15:30 | ~16:30 |
+| Day 2 (Thu) | 4 | ~17:00 | ~18:00 |
+| Day 2 (Thu) | 5 | ~18:30 | ~19:30 |
+| Day 2 (Thu) | 6 | ~20:00 | ~21:00 |
+| Day 2 (Thu) | 7 | ~21:30 | ~23:00 |
+| Day 3 (Fri) | 1 | ~12:30 | ~13:30 |
+| Day 3 (Fri) | 2 | ~14:00 | ~15:00 |
+| Day 3 (Fri) | 3 | ~15:30 | ~16:30 |
+| Day 3 (Fri) | 4 | ~17:00 | ~18:00 |
+| Day 3 (Fri) | 5 | ~18:30 | ~19:30 |
+| Day 3 (Fri) | 6 | ~20:00 | ~21:00 |
+| Day 3 (Fri) | 7 | ~21:30 | ~23:00 |
+| Day 4 (Sat) | 1 | ~12:30 | ~13:30 |
+| Day 4 (Sat) | 2 | ~14:00 | ~15:00 |
+| Day 4 (Sat) | 3 | ~15:30 | ~16:30 |
+| Day 4 (Sat) | 4 | ~17:00 | ~18:00 |
+| Day 4 (Sat) | 5 | ~18:30 | ~19:30 |
+| Day 4 (Sat) | 6 | ~20:00 | ~21:00 |
+| Day 4 (Sat) | 7 | ~21:30 | ~23:00 |
+
+---
+
+### WACKINGER STAGE
+
+| Day | Slot # | Start | End |
+|-----|--------|-------|-----|
+| Day 1 (Wed) | 1 | ~12:00 | ~12:45 |
+| Day 1 (Wed) | 2 | ~13:30 | ~14:15 |
+| Day 1 (Wed) | 3 | ~15:00 | ~15:45 |
+| Day 1 (Wed) | 4 | ~16:30 | ~17:15 |
+| Day 1 (Wed) | 5 | ~18:00 | ~18:45 |
+| Day 1 (Wed) | 6 | ~19:30 | ~20:15 |
+| Day 1 (Wed) | 7 | ~21:00 | ~21:45 |
+| Day 1 (Wed) | 8 | ~22:30 | ~23:15 |
+| Day 2 (Thu) | 1 | ~12:00 | ~12:45 |
+| Day 2 (Thu) | 2 | ~13:30 | ~14:15 |
+| Day 2 (Thu) | 3 | ~15:00 | ~15:45 |
+| Day 2 (Thu) | 4 | ~16:30 | ~17:15 |
+| Day 2 (Thu) | 5 | ~18:00 | ~18:45 |
+| Day 2 (Thu) | 6 | ~19:30 | ~20:15 |
+| Day 2 (Thu) | 7 | ~21:00 | ~21:45 |
+| Day 2 (Thu) | 8 | ~22:30 | ~23:15 |
+| Day 3 (Fri) | 1 | ~12:00 | ~12:45 |
+| Day 3 (Fri) | 2 | ~13:30 | ~14:15 |
+| Day 3 (Fri) | 3 | ~15:00 | ~15:45 |
+| Day 3 (Fri) | 4 | ~16:30 | ~17:15 |
+| Day 3 (Fri) | 5 | ~18:00 | ~18:45 |
+| Day 3 (Fri) | 6 | ~19:30 | ~20:15 |
+| Day 3 (Fri) | 7 | ~21:00 | ~21:45 |
+| Day 3 (Fri) | 8 | ~22:30 | ~23:15 |
+| Day 4 (Sat) | 1 | ~12:00 | ~12:45 |
+| Day 4 (Sat) | 2 | ~13:30 | ~14:15 |
+| Day 4 (Sat) | 3 | ~15:00 | ~15:45 |
+| Day 4 (Sat) | 4 | ~16:30 | ~17:15 |
+| Day 4 (Sat) | 5 | ~18:00 | ~18:45 |
+| Day 4 (Sat) | 6 | ~19:30 | ~20:15 |
+| Day 4 (Sat) | 7 | ~21:00 | ~21:45 |
+| Day 4 (Sat) | 8 | ~22:30 | ~23:15 |
+
+---
+
 ## Day 1 — Wednesday, 29 July 2026
 
-> **Note:** Headbangers, Wasteland, Wackinger, and Welcome to the Jungle stages open later on Day 1 (from ~16:00). Faster stage also starts later (16:00). Louder and Harder run full-day from ~12:00.
+> **Note:** **Harder and Headbangers stages are closed on Day 1.** Wasteland, Wackinger, and Welcome to the Jungle stages open later (from ~16:00). Faster starts at 16:00. Louder runs full-day from ~12:00.
 
 ### W.E.T. Stage
 
@@ -62,17 +345,6 @@ Times are **CEST (UTC+2)**. Slots marked `*` cross midnight into the next calend
 | The Hardkiss | Rock | 16:30 | 17:30 | TBD | PLACEHOLDER |
 | Rose Tattoo | Hard Rock | 19:00 | 20:00 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/5/csm_rose_tattoo26_a5747c907d.jpg |
 | Velvet Rush | AOR | 21:30 | 22:30 | TBD | PLACEHOLDER |
-
-### Harder Stage
-
-| Name | Genre | Start | End | Status | Image URL |
-|------|-------|-------|-----|--------|-----------|
-| Lovebites | Heavy Metal | 12:30 | 13:30 | TBD | PLACEHOLDER |
-| Sacred Steel | Power Metal | 14:30 | 15:30 | TBD | PLACEHOLDER |
-| Phantom | Heavy Metal | 16:30 | 17:30 | TBD | PLACEHOLDER |
-| Thundermother | Rock | 18:30 | 19:30 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/a/csm_Thundermother-Band-2023_d61771d790.jpg |
-| The Troops of Doom | Thrash Metal | 20:30 | 21:30 | TBD | PLACEHOLDER |
-| Poison the Preacher | Metal | 22:30 | 23:30 | TBD | PLACEHOLDER |
 
 ### Louder Stage
 
@@ -93,14 +365,6 @@ Times are **CEST (UTC+2)**. Slots marked `*` cross midnight into the next calend
 | Hämatom | Industrial Metal | 17:45 | 18:45 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/e/csm_haematom_26_a104ede3d5.jpg |
 | Kadavar | Stoner Rock | 19:45 | 21:00 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/9/csm_kadavar_26b_5241b42bda.jpg |
 | Unzucht | Industrial / Gothic | 22:00 | 00:00* | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/2/csm_unzucht_26_5662cb7925.jpg |
-
-### Headbangers Stage
-
-| Name | Genre | Start | End | Status | Image URL |
-|------|-------|-------|-----|--------|-----------|
-| TBS | TBD | 16:00 | 17:00 | TBD | PLACEHOLDER |
-| Battlecreek | TBD | 18:30 | 19:30 | TBD | PLACEHOLDER |
-| Diabolisches Werk | TBD | 21:00 | 22:30 | TBD | PLACEHOLDER |
 
 ### Wasteland Stage
 
@@ -147,6 +411,7 @@ Times are **CEST (UTC+2)**. Slots marked `*` cross midnight into the next calend
 |------|-------|-------|-----|--------|-----------|
 | Katerfahrt | Rock | 12:00 | 13:00 | TBD | PLACEHOLDER |
 | Black Tish | TBD | 13:30 | 14:30 | TBD | PLACEHOLDER |
+| Thundermother | Rock | 15:30 | 16:30 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/a/csm_Thundermother-Band-2023_d61771d790.jpg |
 | Life of Agony | Alternative Metal | 17:00 | 18:15 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/4/csm_life_of_agony26_68ef27b061.jpg |
 | Europe | Hard Rock | 18:30 | 19:45 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/3/csm_Europe-WOA26_9d76063492.jpg |
 | Turbonegro | Punk Rock | 20:15 | 21:15 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/b/csm_turbonegro26_2118d824cd.jpg |
@@ -181,8 +446,12 @@ Times are **CEST (UTC+2)**. Slots marked `*` cross midnight into the next calend
 
 | Name | Genre | Start | End | Status | Image URL |
 |------|-------|-------|-----|--------|-----------|
+| TBS | TBD | 12:30 | 13:30 | TBD | PLACEHOLDER |
+| Battlecreek | TBD | 14:00 | 15:00 | TBD | PLACEHOLDER |
 | Anaal Nathrakh | Black Metal / Grindcore | 15:00 | 16:00 | TBD | PLACEHOLDER |
+| Diabolisches Werk | TBD | 17:00 | 18:00 | TBD | PLACEHOLDER |
 | Craft | Black Metal | 18:30 | 19:30 | TBD | PLACEHOLDER |
+| Lovebites | Heavy Metal | 20:00 | 21:00 | TBD | PLACEHOLDER |
 | Misery Index | Death Metal / Grindcore | 21:30 | 22:30 | TBD | PLACEHOLDER |
 
 ### Wasteland Stage
@@ -190,8 +459,12 @@ Times are **CEST (UTC+2)**. Slots marked `*` cross midnight into the next calend
 | Name | Genre | Start | End | Status | Image URL |
 |------|-------|-------|-----|--------|-----------|
 | Blood Red Throne | Death Metal | 13:30 | 14:30 | TBD | PLACEHOLDER |
+| Sacred Steel | Power Metal | 15:00 | 15:45 | TBD | PLACEHOLDER |
 | Firespawn | Death Metal | 16:30 | 17:30 | TBD | PLACEHOLDER |
+| Phantom | Heavy Metal | 18:00 | 18:45 | TBD | PLACEHOLDER |
 | Spectral Wound | Black Metal | 20:00 | 21:00 | TBD | PLACEHOLDER |
+| The Troops of Doom | Thrash Metal | 21:00 | 21:45 | TBD | PLACEHOLDER |
+| Poison the Preacher | Metal | 22:30 | 23:15 | TBD | PLACEHOLDER |
 
 ### Wackinger Stage
 
