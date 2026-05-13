@@ -18,8 +18,28 @@
  *   - Bands with `Genre: TBD` use the fallback genre `"Generic Metal"`.
  *   - Each slot's start_time/end_time comes from stages.md (slot ID → time).
  *
- * WARNING: deletes all existing bands (cascades to user_picks) before inserting.
- * Only run this against a dev/staging project, never a live festival session.
+ * ────────────────────────────────────────────────────────────────────────
+ * DESTRUCTIVE BEHAVIOR — this script REPLACES the entire `bands` table.
+ * ────────────────────────────────────────────────────────────────────────
+ *
+ * On every run, the script will:
+ *   1. Count existing bands.
+ *   2. DELETE every row in `public.bands`.
+ *      Cascades to dependents:
+ *        - `user_picks`         (ON DELETE CASCADE  — all picks erased)
+ *        - `user_missed_bands`  (ON DELETE CASCADE  — all "seen" flags erased)
+ *        - `live_band_test_config.band_id`  (ON DELETE SET NULL)
+ *   3. Verify the table is empty (aborts on mismatch).
+ *   4. INSERT all bands from the constant array below.
+ *   5. Verify row count equals the constant length (aborts on mismatch).
+ *
+ * Times (start_time/end_time) are part of each band row, so old times are
+ * replaced as part of the table replacement — there is no per-row update path.
+ *
+ * Run with --force to skip the confirmation prompt (useful in CI / scripts).
+ * Without --force the script will print a 5-second warning before deleting.
+ *
+ * NEVER run this against a live festival session — picks WILL be lost.
  */
 
 import { readFileSync } from 'node:fs';
@@ -365,11 +385,25 @@ export const bands: BandSeed[] = [
 // Run
 // ---------------------------------------------------------------------------
 
+async function countBands(
+  supabase: ReturnType<typeof createClient>,
+): Promise<number> {
+  const { count, error } = await supabase
+    .from('bands')
+    .select('*', { count: 'exact', head: true });
+  if (error) {
+    console.error('Count failed:', error.message);
+    process.exit(1);
+  }
+  return count ?? 0;
+}
+
 async function seed() {
   loadEnvFile();
 
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const force = process.argv.includes('--force');
 
   if (!supabaseUrl || !serviceRoleKey) {
     console.error('Missing VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
@@ -380,21 +414,68 @@ async function seed() {
     auth: { persistSession: false },
   });
 
-  console.log(`Seeding ${bands.length} bands into Wacken 2026 schedule…`);
+  // ── Step 1: announce destructive intent ─────────────────────────────────
+  console.log('━'.repeat(72));
+  console.log('Wacken 2026 lineup seed — DESTRUCTIVE');
+  console.log('━'.repeat(72));
+  console.log(`Target:        ${supabaseUrl}`);
+  console.log(`Bands to seed: ${bands.length} (from supabase/seed/bands.ts)`);
 
-  // Remove existing data — CASCADE takes care of user_picks FK
-  const { error: delError } = await supabase.from('bands').delete().not('id', 'is', null);
+  const existing = await countBands(supabase);
+  console.log(`Existing rows in public.bands: ${existing}`);
+  console.log('');
+  console.log('This will:');
+  console.log('  • DELETE every row in public.bands');
+  console.log('  • CASCADE-delete every row in public.user_picks');
+  console.log('  • CASCADE-delete every row in public.user_missed_bands');
+  console.log('  • NULL out live_band_test_config.band_id');
+  console.log(`  • INSERT ${bands.length} fresh rows from lineup.md`);
+  console.log('');
+
+  if (!force) {
+    console.log('Starting in 5s — press Ctrl-C to abort, or rerun with --force to skip wait.');
+    await new Promise((r) => setTimeout(r, 5000));
+  }
+
+  // ── Step 2: delete everything ───────────────────────────────────────────
+  // `.gte('start_time', '1900-01-01')` matches every row (start_time is NOT NULL).
+  console.log('Deleting all rows in public.bands…');
+  const { error: delError } = await supabase
+    .from('bands')
+    .delete()
+    .gte('start_time', '1900-01-01T00:00:00Z');
   if (delError) {
     console.error('Delete failed:', delError.message);
     process.exit(1);
   }
 
+  const afterDelete = await countBands(supabase);
+  if (afterDelete !== 0) {
+    console.error(
+      `Delete verification failed — expected 0 rows, found ${afterDelete}.`,
+    );
+    process.exit(1);
+  }
+  console.log(`  Deleted ${existing} rows · table is now empty ✓`);
+
+  // ── Step 3: insert fresh data ───────────────────────────────────────────
+  console.log(`Inserting ${bands.length} bands…`);
   const { error: insError } = await supabase.from('bands').insert(bands);
   if (insError) {
     console.error('Insert failed:', insError.message);
     process.exit(1);
   }
 
+  const afterInsert = await countBands(supabase);
+  if (afterInsert !== bands.length) {
+    console.error(
+      `Insert verification failed — expected ${bands.length} rows, found ${afterInsert}.`,
+    );
+    process.exit(1);
+  }
+  console.log(`  Inserted ${bands.length} rows · verified ✓`);
+
+  console.log('');
   console.log('Done 🤘');
 }
 

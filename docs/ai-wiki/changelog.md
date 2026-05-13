@@ -4,6 +4,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-13 (Seed: bands.ts destructive guarantees hardened)
+
+### Changed
+- **supabase/seed/bands.ts** — Rewrote the `seed()` runner to make the destructive replace-all behavior provably correct:
+  - Prints existing row count, target Supabase URL, and the full cascade impact (`user_picks`, `user_missed_bands`, `live_band_test_config.band_id`) before doing anything.
+  - 5-second abort window (Ctrl-C) before the first DELETE; skip with `--force` for CI/scripts.
+  - DELETE filter changed from `.not('id', 'is', null)` to `.gte('start_time', '1900-01-01T00:00:00Z')` — semantically equivalent (matches every row, since `start_time` is `NOT NULL`) but explicit about intent and never confuses the postgrest planner.
+  - Post-DELETE verification: aborts if the table is not empty.
+  - Post-INSERT verification: aborts if row count doesn't equal `bands.length` (173).
+  - File header docs the full destructive contract: which tables cascade, which set null, which records get lost, when not to run it.
+
+### Architectural Notes
+- All FKs that reference `bands.id` are accounted for: `user_picks` (CASCADE), `user_missed_bands` (CASCADE), `live_band_test_config.band_id` (SET NULL). No other tables reference `bands.id`, so DELETE cannot be blocked by FK violations.
+- The `bands` UNIQUE constraint is `(stage, start_time, name)` — verified that all 173 seed rows have distinct tuples on those three columns, so re-seeding never collides with itself.
+
+---
+
 ## 2026-05-13 (Seed: bands.ts rebuilt from lineup.md)
 
 ### Changed
