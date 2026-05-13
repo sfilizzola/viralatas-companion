@@ -379,9 +379,16 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `dreamer` — "I'm Tripping" / 30+ picked bands (persist: true)
 - `death-metal` — Saw 3+ Death Metal bands
 - `power-metal` — Saw 3+ Power Metal bands
-- `party-metal` — Saw 2 Party Metal bands
-- `alestorm` — Saw Alestorm live
+- `party-metal` — Saw 2 Party Metal bands. **In the 2026 lineup the `Party Metal` genre is held by exactly 2 bands: `Alestorm` (FAS16, Day 4) and `Airbourne` (HAR11, Day 4) — so this badge effectively requires seeing both. Note their slots overlap (Alestorm 19:15–20:45, Airbourne 21:00–22:30) on the paired Faster↔Harder stages, so the badge is reachable in a single Day-4 evening.**
+- `alestorm` — Saw Alestorm live (band_seen_named) — distinct from the genre-based `party-metal` above.
 - `live-beast` — Saw 22+ bands
+
+### Genres present in lineup with NO corresponding badge
+
+These genres exist on the 2026 lineup but no badge in `src/services/badges/registry.ts` references them:
+
+- `Pirate Metal` — held by 1 band only (`Mr. Hurley und die Pulveraffen`, WAK17, Day 3). Single-band genres are not a good fit for a `bands_seen_genre_min` badge (would be equivalent to `band_seen_named`). If a "pirate" badge is desired, prefer `band_seen_named` against that one band.
+- Most stage-specific or niche genres (Goregrind, Humppa, Horror Punk, etc.) — intentional, to keep the badge inventory curated.
 
 ### Merit / Assigned (7)
 - `mosh-pit` — Hit the floor, came back (godlike-assigned)
@@ -438,7 +445,7 @@ Repeat for `Badges_es.json` and `Badges_de.json`.
 
 ### Step 3: Add BadgeConfig to BADGES Array
 
-In `src/services/badges.ts`, append to the `BADGES` array:
+In `src/services/badges/registry.ts`, append to the `BADGES` array:
 
 ```typescript
 {
@@ -770,7 +777,10 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ## Related Files
 
-- **src/services/badges.ts** — Core logic, BADGES array, all condition types
+- **src/services/badges/registry.ts** — `BADGES[]` array and condition-examples reference
+- **src/services/badges/engine.ts** — `buildBadgeContext`, `evaluateBadge`, `getEarnedBadges`
+- **src/services/badges/types.ts** — Type definitions
+- **src/services/badges/index.ts** — Barrel re-export
 - **src/__tests__/badges.test.ts** — 50+ test cases
 - **src/components/BadgeModal.tsx** — Badge display component
 - **src/components/ProfilePage.tsx** — Badge grid + godlike assign UI
@@ -780,4 +790,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-13

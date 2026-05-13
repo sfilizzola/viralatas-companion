@@ -4,7 +4,14 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
-## 2026-05-13 (Lineup: Day 3 & Day 4 slot swaps + Party Metal genre)
+## 2026-05-13 (Docs: badge paths + Party Metal context)
+
+### Changed
+- **badges.md** — Refreshed the `party-metal` inventory line to reflect that the genre now belongs to exactly 2 bands (Alestorm + Airbourne), so the badge is a "see both" objective for Day 4. Added a new "Genres present in lineup with NO corresponding badge" section explicitly noting that `Pirate Metal` has no badge (only `Mr. Hurley und die Pulveraffen` carries it). Fixed stale `src/services/badges.ts` path to `src/services/badges/registry.ts`. Bumped Last updated.
+- **CLAUDE.md** — Fixed badge section to point at `src/services/badges/registry.ts` (was `src/services/badges.ts`/`src/lib/badges.ts` — both old paths). Expanded i18n note from "br + en" to "br, en, es, de" matching the actual file layout.
+
+### Architectural Notes
+- The `party-metal` badge being calibrated to exactly the existing Party-Metal band count is intentional going forward — adding a 3rd Party Metal band to the lineup would make the badge easier to earn without code changes; check this when curating future lineups.
 
 ### Changed
 - **lineup.md** — Two slot swaps and two genre updates:
@@ -16,7 +23,9 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ### Architectural Notes
 - Band image URLs follow the band when they swap slots, not the slot.
-- After this change, the only `Pirate Metal` genre row is `Mr. Hurley und die Pulveraffen` (WAK17 Day 3). The new `Party Metal` genre contains exactly 2 bands: Alestorm and Airbourne. If any badge in `src/lib/badges.ts` references either genre via `bands_picked_genre_min` / `bands_seen_genre_min`, its eligibility set has shifted accordingly.
+- Badge impact (verified against `src/services/badges/registry.ts`):
+  - `party-metal` badge (`bands_seen_genre_min: 'Party Metal', count: 2`) is now perfectly calibrated: exactly 2 bands carry this genre — `Alestorm` (FAS16 Day 4, 19:15–20:45) and `Airbourne` (HAR11 Day 4, 21:00–22:30). The badge effectively requires seeing both. Slots don't overlap, so it's reachable in one Day-4 evening.
+  - There is **no** `pirate-metal` badge. The only Pirate Metal band remaining (`Mr. Hurley und die Pulveraffen`, WAK17 Day 3) is not referenced by any badge. The `alestorm` badge uses `band_seen_named` against the band name `Alestorm`, not the genre — unaffected by the genre change.
 
 ---
 
