@@ -357,7 +357,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 
 ---
 
-## Current Badges Inventory (28 Total)
+## Current Badges Inventory (29 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -374,13 +374,14 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `5-wackens` — Attended 5+ editions
 - `10-wackens` — Attended 10+ editions
 
-### Festival 2026 (7)
+### Festival 2026 (8)
 - `early-bird` — Saw 5+ bands before 1 PM (CEST)
 - `dreamer` — "I'm Tripping" / 30+ picked bands (persist: true)
 - `death-metal` — Saw 3+ Death Metal bands
 - `power-metal` — Saw 3+ Power Metal bands
 - `party-metal` — Saw 2 Party Metal bands. **In the 2026 lineup the `Party Metal` genre is held by exactly 2 bands: `Alestorm` (FAS16, Day 4) and `Airbourne` (HAR11, Day 4) — so this badge effectively requires seeing both. Note their slots overlap (Alestorm 19:15–20:45, Airbourne 21:00–22:30) on the paired Faster↔Harder stages, so the badge is reachable in a single Day-4 evening.**
 - `alestorm` — Saw Alestorm live (band_seen_named) — distinct from the genre-based `party-metal` above.
+- `roots` — "Roots, Bloody Roots" — Saw Sepultura's farewell show (band_seen_named: `Sepultura`, HAR6 Day 3, 19:00–20:30).
 - `live-beast` — Saw 22+ bands
 
 ### Genres present in lineup with NO corresponding badge
@@ -790,4 +791,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-13
+**Last updated:** 2026-05-13 — added `roots` (Sepultura farewell witness)

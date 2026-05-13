@@ -4,6 +4,22 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-13 (Badge: roots — Sepultura farewell witness)
+
+### Added
+- **`roots` badge** — "Roots, Bloody Roots". Awarded via `band_seen_named: 'Sepultura'`, year 2026. Sepultura plays HAR6 on Day 3 (Friday, July 31, 19:00–20:30) and is on their farewell tour, so this badge commemorates witnessing the goodbye of a legendary Brazilian metal act. Image already present at `public/badges/badge_roots.png`. Internal "Dani" reference in the description is an inside joke for the vira-latas.
+
+### Changed
+- **`src/services/badges/registry.ts`** — Appended the `roots` BadgeConfig after `alestorm` (both are `band_seen_named` festival-2026 badges, grouped together).
+- **`src/i18n/Badges_br.json`, `Badges_en.json`, `Badges_es.json`, `Badges_de.json`** — Added `badgeRoots` (label, kept as "Roots, Bloody Roots" in all 4 languages per request — it's a song title) and `badgeRootsDescription` (translated description "You saw the farewell of an amazing band, right Dani?" into BR/EN/ES/DE).
+- **`docs/ai-wiki/badges.md`** — Bumped inventory count 28 → 29; expanded "Festival 2026" section 7 → 8 entries with the `roots` line referencing the Sepultura HAR6 slot.
+
+### Architectural Notes
+- The `roots` condition uses `band_seen_named` (exact case-sensitive match on `Band.name`), the same pattern as `alestorm`. The badge is automatically earned once Sepultura's `end_time` passes and the user has not opted out via the "didn't see" toggle.
+- Distinct from any future `groove-metal` genre badge (Sepultura's genre is `Groove Metal` in `supabase/seed/bands.ts`): this badge is band-specific, tied to the farewell-tour narrative rather than the genre.
+
+---
+
 ## 2026-05-13 (Docs: badge paths + Party Metal context)
 
 ### Changed

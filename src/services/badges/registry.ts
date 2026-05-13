@@ -130,6 +130,15 @@ export const BADGES: BadgeConfig[] = [
     year: 2026,
   },
   {
+    slug: 'roots',
+    imagePath: '/badges/badge_roots.png',
+    labelKey: 'badgeRoots',
+    descriptionKey: 'badgeRootsDescription',
+    // Witnessed Sepultura's farewell show at Wacken 2026 (HAR6, Day 3, 19:00–20:30)
+    condition: { type: 'band_seen_named', name: 'Sepultura' },
+    year: 2026,
+  },
+  {
     slug: 'party-metal',
     imagePath: '/badges/badge_party-metal.png',
     labelKey: 'badgePartyMetal',
