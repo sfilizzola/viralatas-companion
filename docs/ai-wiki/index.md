@@ -46,6 +46,10 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[Supabase Schema](supabase-schema.md)** — Database tables, RLS policies, migrations, realtime setup
 - **[Data Repositories](architecture.md#repositories)** — Data access patterns, sync methods
 
+### Festival Content
+- **[Stage Reference](stages.md)** — 8 stages: categories, colors, pairing rules, slot schedules (start/end times per slot per day)
+- **[Band Lineup](lineup.md)** — Band assignments by day and stage; cross-references stages.md via Slot IDs
+
 ### Features & Mechanics
 - **[Badge System](badges.md)** — 22+ condition types, current badges, how to add new badges, localization, testing
 
@@ -205,6 +209,8 @@ window.addEventListener('viralatas:picks-changed', () => {
 | **Time System** | `src/hooks/useNow.ts`, `src/services/time.ts`, `src/services/bandTime.ts` |
 | **App Shell** | `src/App.tsx` (route setup), `src/components/BottomNav.tsx`, `src/components/PrivateRoute.tsx` |
 | **PWA** | `vite.config.ts` (Workbox setup), `public/manifest.json`, Service Worker auto-generated |
+| **Stage Colors** | `src/services/stageColors.ts`, `src/index.css` (CSS custom properties) |
+| **Band Seed** | `supabase/seed/bands.ts`, `docs/ai-wiki/lineup.md`, `docs/ai-wiki/stages.md` |
 
 ---
 
@@ -212,11 +218,13 @@ window.addEventListener('viralatas:picks-changed', () => {
 
 ### Entities
 - **User**: Email, display name, role (normal/manager/godlike), Wacken years, country, arrival day
-- **Band**: Name, stage, time window, genre, image URL
+- **Band**: Name, stage (string), time window, genre, image URL — stage is an attribute, not a foreign key
 - **UserPick**: User → Band relationship (many-to-many)
 - **Announcement**: Text posts with author, creation time, soft-delete support
 - **UserPresence**: Camping status, Metal Place check-in status
 - **UserMissedBand**: Bands user marked as "didn't watch" (for badges)
+
+> **Stage is not a DB entity.** Each `Band` record stores `stage: string`. Stage metadata (colors, schedules, pairing rules) lives in `docs/ai-wiki/stages.md` and in source constants (`stageColors.ts`, `SchedulePage.tsx`). Band assignments per slot live in `docs/ai-wiki/lineup.md`.
 
 ### Relationships
 ```
@@ -419,4 +427,4 @@ Window events emitted from `src/lib/db.ts`:
 
 ---
 
-**Last edited**: 2026-05-12 by Claude Code
+**Last edited**: 2026-05-13 by Claude Code

@@ -15,7 +15,25 @@ Portuguese: Stray dog, mutt. In this context, a member of the Viralatas Metaleir
 Annual metal music festival in northern Germany, July 29 - Aug 1, 2026. ~170k attendees across 8 stages.
 
 ### Band
-A musical act performing on one stage at one time slot. 78+ bands total.
+A musical act performing on one stage at one time slot. 78+ bands total. Each `Band` record carries its own `stage: string` field — there is no separate Stage entity in the database.
+
+### Band Assignment
+The mapping of a specific band name to a slot on a specific stage and day. Tracked in `docs/ai-wiki/lineup.md`. Separate from the slot schedule (start/end times), which lives in `docs/ai-wiki/stages.md`.
+
+### Stage
+One of 8 named performance venues at Wacken 2026: Faster, Harder, Louder, W.E.T., Headbangers, Wasteland, Wackinger, Welcome to the Jungle. Stored as a plain string on each `Band` record — not a separate DB entity. Full reference in `docs/ai-wiki/stages.md`.
+
+### Stage Category
+Grouping of stages by physical location: Main Infield (Faster, Harder, Louder), Outside Infield (W.E.T., Headbangers), Specialized (Wasteland, Wackinger, Welcome to the Jungle).
+
+### Stage Pairing
+Physical adjacency between two stages that share interleaved ~15 min gaps. Paired pairs: Harder↔Faster, W.E.T.↔Headbangers. Means a band ending on stage A at HH:45 reliably signals stage B starts at HH+1:00. Used for conflict resolution.
+
+### Stage Schedule
+The grid of slot start/end times for a given stage and day. Lives in `docs/ai-wiki/stages.md`. Separate from band assignments (who plays each slot), which live in `docs/ai-wiki/lineup.md`.
+
+### Slot ID
+Unique identifier for a time slot, combining stage abbreviation + sequential number (e.g. `FAS1`, `HAR7`). Global across all days. Used to cross-reference slot times (in `stages.md`) with band assignments (in `lineup.md`).
 
 ### Pick
 User's decision to watch a band. Not a commitment, just an interest marker.
@@ -226,7 +244,7 @@ Visual indicator on band card showing it overlaps with another pick.
 Large warning banner on /my-picks if user has 3+ conflicts.
 
 ### Stage Color
-CSS color mapped to stage. Example: Faster (blue), Harder (orange). Visual identifier.
+CSS custom property mapped to each stage. Example: Faster (`var(--stage-faster)` / `#2980b9` blue), Harder (`var(--stage-harder)` / `#e67e22` orange). Defined in `src/index.css`; resolved to token strings by `stageColors.ts`. Full color table in `docs/ai-wiki/stages.md`.
 
 ---
 
@@ -470,4 +488,4 @@ Navigation guide in the wiki index recommending which documents to read first ba
 
 ---
 
-**Last updated:** 2026-05-12
+**Last updated:** 2026-05-13

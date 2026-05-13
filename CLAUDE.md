@@ -79,6 +79,8 @@ Update **both**:
 | `glossary.md` | 140+ terms across architecture, DB, React, auth, sync, UI, time, badge, role, testing |
 | `badges.md` | Badge system design, conditions engine, asset inventory |
 | `phases-history.md` | Complete log of every completed phase (1–15+); append here when a phase closes |
+| `stages.md` | 8 Wacken 2026 stages: categories, colors, pairing rules, slot schedules (start/end times per slot) |
+| `lineup.md` | Band assignments by day and stage; cross-references stages.md via Slot IDs |
 
 **User flow docs (`docs/ai-wiki/flows/`):**
 

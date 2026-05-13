@@ -4,6 +4,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-13 (Wiki: Stages/Lineup Split)
+
+### Added
+- **stages.md** (new) — Authoritative reference for the 8 Wacken 2026 stages: stage table (name, abbreviation, category, UI color, hex), stage pairing rule (Harder↔Faster, W.E.T.↔Headbangers physical adjacency), reference keys (stage abbreviations, day codes D1–D4, overnight codes D1n–D4n, slot confirmation status), slot ID scheme (range per stage), all stage schedule grids (start/end times per slot per day for all 8 stages), how stages link to bands (Band type mapping, bands.ts field table), maintenance guides for confirming slot times and adding new slots.
+
+### Changed
+- **lineup.md** — Removed stage schedules, reference keys, stage pairing rule, and slot ID scheme (all moved to stages.md). Now focused exclusively on band assignments. Added cross-references to stages.md via Slot IDs throughout. Maintenance guide updated to link out to stages.md for slot and schedule operations.
+- **glossary.md** — Added 7 new terms: `Band Assignment`, `Stage`, `Stage Category`, `Stage Pairing`, `Stage Schedule`, `Slot ID`. Updated existing `Band` entry to clarify stage is a string attribute (not a foreign key). Updated `Stage Color` entry with CSS variable detail and reference to stages.md.
+- **index.md** — Added "Festival Content" section to Quick Navigation with links to both stages.md and lineup.md. Updated Domain Overview to clarify stage is not a DB entity. Added Stage Colors and Band Seed rows to Key Files table. Updated last edited date.
+
+### Architectural Notes
+- Stage is **not a DB entity**: `Band.stage` is a plain string. All stage metadata (colors, schedules, pairing) lives in source constants and wiki docs, not in the database.
+- The Slot ID scheme (e.g. `FAS1`, `HAR7`) is the link between `stages.md` (times) and `lineup.md` (bands). When updating either file, keep Slot IDs consistent across both.
+- `stageColors.ts` returns CSS variable tokens (`var(--stage-faster)`), not raw hex values; hex lives in `index.css`.
+
+---
+
 ## 2026-05-12 (Planning: remaining test stages moved to FUTURE_IDEAS)
 
 ### Changed
@@ -198,4 +215,4 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
-**Last updated:** 2026-05-12
+**Last updated:** 2026-05-13
