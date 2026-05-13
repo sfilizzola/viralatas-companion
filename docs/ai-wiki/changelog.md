@@ -4,6 +4,31 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-13 (Idea 6: multi-stage / multi-genre badge conditions)
+
+### Added
+- **4 new plural-form `BadgeCondition` variants** in `src/services/badges/types.ts`:
+  - `bands_picked_stages_min` — `{ stages: string[]; count: number }`
+  - `bands_picked_genres_min` — `{ genres: string[]; count: number }`
+  - `bands_seen_stages_min` — `{ stages: string[]; count: number }`
+  - `bands_seen_genres_min` — `{ genres: string[]; count: number }`
+  All four use set-membership (OR-combined within the array). A pick/seen-band counts toward the threshold if its `stage` (or `genre`) is included in the configured array; total matches must reach `count`. Single-element arrays behave identically to the existing singular conditions; empty arrays are never earned for `count > 0`; bands with `genre = null` are skipped in the `*_genres_min` variants.
+- **4 new `evaluateBadge` case branches** in `src/services/badges/engine.ts` — each is a one-line `Set` membership filter for O(1) lookup. No changes to `BadgeContext`, `buildBadgeContext`, or any repository: the data the new branches need (`ctx.pickedBands`, `ctx.seenBands`) is already in scope.
+- **18 new test cases** across 4 test groups in `src/__tests__/badges.test.ts` (`evaluateBadge — bands_{picked,seen}_{stages,genres}_min (Idea 6)`). Total badge tests grew from 36 → 54, all passing.
+- **CONDITION EXAMPLES** block in `src/services/badges/registry.ts` extended with prose-style entries for all 4 new types (Infield Rat / Extreme Devotee / etc. examples) matching the existing comment style.
+
+### Changed
+- **`docs/ai-wiki/badges.md`** — Bumped condition-type count 22 → 26. Added full documentation sections for the 4 new types under "BAND PICKS" and "BANDS SEEN" (with semantics, single-element equivalence, empty-array behavior, null-genre handling). Added 4 new rows to the cheat-sheet table. Bumped Last updated.
+
+### Architectural Notes
+- This is an additive change — every existing badge in `BADGES[]` (e.g. `death-metal`, `power-metal`, `party-metal`, all stage-min badges) keeps working unchanged. No registry migration, no DB migration, no asset changes.
+- TS exhaustiveness on the `BadgeCondition` discriminated union is preserved: `tsc --noEmit` passes after the edit. The `switch` in `evaluateBadge` covers every union variant.
+- Semantic decision recorded in `FUTURE_IDEAS.md`: **OR-within-the-array, not AND-across-stages**. "Saw 5 bands across Faster ∪ Harder" means any combination summing to 5; we do **not** also require ≥1 from each stage. A future `*_across_all_stages_min` variant would be a separate condition if ever needed.
+- The plural-form pattern (Option A from the design table) is preferred over widening existing fields (`stage: string | string[]`) because it preserves discriminated-union narrowing in the engine and keeps the call site readable (singular = 1, plural = many). The pattern extends naturally to future multi-day or multi-country set-membership badges.
+- **Idea 6** is now marked `implemented` in `FUTURE_IDEAS.md` and can be removed from that file in a follow-up cleanup pass.
+
+---
+
 ## 2026-05-13 (Badge: roots — Sepultura farewell witness)
 
 ### Added

@@ -62,7 +62,7 @@ type BadgeConfig = {
 - Example keys: `badgeMudSurvivor`, `badgeMudSurvivorDescription`
 
 **condition** (Required)
-- One of 22+ BadgeCondition types (see below)
+- One of 26+ BadgeCondition types (see below)
 - Evaluated against BadgeContext on every profile load
 - Example: `{ type: 'country_is', country: 'br' }`
 
@@ -80,7 +80,7 @@ type BadgeConfig = {
 
 ---
 
-## BadgeCondition Types (22 Total)
+## BadgeCondition Types (26 Total)
 
 ### WACKEN HISTORY — Attendance Records
 
@@ -194,6 +194,32 @@ User picked **N+** bands on a specific stage (exact match).
 **Use case**: Stage loyalty badges
 **Stage values**: `'Faster'`, `'Harder'`, `'Louder'`, `'W.E.T.'`, `'Headbangers'`, `'Wasteland'`, `'Wackinger'`, `'Welcome to the Jungle'`
 
+#### `bands_picked_stages_min`
+User picked **N+** bands whose `stage` is any of the listed stages — **set membership, OR-combined**.
+
+```typescript
+{ type: 'bands_picked_stages_min', stages: ['Faster', 'Harder'], count: 6 }
+```
+**Use case**: "Corridor" / multi-stage loyalty badges — e.g. *Infield Rat* for hanging around the Faster ↔ Harder pair.
+**Semantics**: A pick counts toward the threshold if its `stage` is in the array; the total across the listed stages must reach `count`. Does **not** require ≥1 from each stage (pure OR).
+**Single-element** behaves identically to the singular `bands_picked_stage_min`.
+**Empty array** is never earned for `count > 0`.
+
+#### `bands_picked_genres_min`
+User picked **N+** bands whose `genre` is any of the listed genres — **set membership, OR-combined**.
+
+```typescript
+{
+  type: 'bands_picked_genres_min',
+  genres: ['Death Metal', 'Black Metal', 'Grindcore', 'Brutal Death Metal'],
+  count: 5,
+}
+```
+**Use case**: Genre-family badges — e.g. *Extreme Picker* across heavy sub-genres.
+**Semantics**: Same OR-within-the-array rule as `bands_picked_stages_min`.
+**Bands with `genre: null`** are never counted (no string to match).
+**Single-element** behaves identically to the singular `bands_picked_genre_min`.
+
 #### `bands_picked_before_hour_min`
 User picked **N+** bands whose **CEST start time** is **before** the given hour (0–23).
 
@@ -256,6 +282,30 @@ User **seen N+** bands on a specific stage.
 { type: 'bands_seen_stage_min', stage: 'Headbangers', count: 4 }
 ```
 **Use case**: Stage devotee badges
+
+#### `bands_seen_stages_min`
+User **seen N+** bands whose `stage` is any of the listed stages — **set membership, OR-combined**.
+
+```typescript
+{ type: 'bands_seen_stages_min', stages: ['Faster', 'Harder'], count: 6 }
+```
+**Use case**: "Corridor" devotee badges — e.g. *Infield Rat* once Day 4 is over and the user has racked up 6+ seen bands across the Faster ↔ Harder pair.
+**Semantics**: Same OR-within-the-array rule as `bands_picked_stages_min`, but counted against `seenBands` (band end_time has passed AND user did not opt out via "didn't see").
+**Single-element** behaves identically to the singular `bands_seen_stage_min`.
+
+#### `bands_seen_genres_min`
+User **seen N+** bands whose `genre` is any of the listed genres — **set membership, OR-combined**.
+
+```typescript
+{
+  type: 'bands_seen_genres_min',
+  genres: ['Death Metal', 'Black Metal', 'Grindcore', 'Brutal Death Metal'],
+  count: 5,
+}
+```
+**Use case**: Genre-family devotee badges — e.g. *Extreme Devotee*.
+**Bands with `genre: null`** are never counted.
+**Missed opt-outs** (`user_missed_bands`) are correctly excluded — the count operates over `seenBands` which already removes those.
 
 #### `bands_seen_before_hour_min`
 User **seen N+** bands whose **CEST start time** is **before** the given hour.
@@ -623,7 +673,7 @@ Run the test suite:
 npm test -- badges.test.ts
 ```
 
-**Coverage**: 50+ tests covering all 22+ condition types, context building, evaluation logic, edge cases.
+**Coverage**: 50+ tests covering all 26+ condition types, context building, evaluation logic, edge cases.
 
 **Test structure**:
 ```typescript
@@ -761,12 +811,16 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 | `band_attendance_min` | `count: number` | `10` → share pick with 10+ crew |
 | `bands_picked_genre_min` | `genre, count` | `'Death Metal', 3` → 3+ Death Metal |
 | `bands_picked_stage_min` | `stage, count` | `'Faster', 8` → 8+ Faster stage |
+| `bands_picked_stages_min` | `stages, count` | `['Faster', 'Harder'], 6` → 6+ across Faster ∪ Harder |
+| `bands_picked_genres_min` | `genres, count` | `['Death Metal', 'Black Metal'], 5` → 5+ across listed genres |
 | `bands_picked_before_hour_min` | `hour, count` | `14, 3` → 3+ before 2 PM CEST |
 | `bands_picked_after_hour_min` | `hour, count` | `22, 3` → 3+ at/after 10 PM CEST |
 | `band_picked_named` | `name: string` | `'Rammstein'` → picked Rammstein |
 | `bands_seen_min` | `count: number` | `5` → saw 5+ |
 | `bands_seen_genre_min` | `genre, count` | `'Death Metal', 3` → saw 3+ Death Metal |
 | `bands_seen_stage_min` | `stage, count` | `'Headbangers', 4` → saw 4+ Headbangers |
+| `bands_seen_stages_min` | `stages, count` | `['Faster', 'Harder'], 6` → saw 6+ across the listed stages |
+| `bands_seen_genres_min` | `genres, count` | `['Death Metal', 'Black Metal'], 5` → saw 5+ across the listed genres |
 | `bands_seen_before_hour_min` | `hour, count` | `13, 5` → saw 5+ before 1 PM |
 | `bands_seen_after_hour_min` | `hour, count` | `23, 2` → saw 2+ after 11 PM |
 | `band_seen_named` | `name: string` | `'Alestorm'` → saw Alestorm |
@@ -791,4 +845,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-13 — added `roots` (Sepultura farewell witness)
+**Last updated:** 2026-05-13 — added 4 plural-form badge conditions (`bands_picked_stages_min`, `bands_picked_genres_min`, `bands_seen_stages_min`, `bands_seen_genres_min`) — Idea 6 implemented

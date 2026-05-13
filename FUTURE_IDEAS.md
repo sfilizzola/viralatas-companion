@@ -6,15 +6,15 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 
 ## Ideas at a glance
 
-| # | Title | Complexity | Risk |
-|---|---|---|---|
-| 1 | LLM proactive alerts | High | Medium — API key handling, alert spam, offline edge cases |
-| 2 | Year freeze for historical badges | Medium | Low — godlike-only, idempotent, additive schema change |
-| 3 | Unit tests: IDB layer (`lib/db.ts`) | Medium | Low — requires `fake-indexeddb` dev dependency; isolated from app runtime |
-| 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — `renderHook` + mocked IDB and Supabase; no network |
-| 5 | Unit tests: Component and page integration | High | Low — replaces misleading stub tests; mounts pages with RTL + mocked hooks |
-| 6 | Multi-stage / multi-genre badge conditions | Low | Low — additive condition types, registry-only, no schema change |
-| 7 | Closing-ceremony slot (non-band timetable entry) | Low | Low — single nullable column on `bands`, registry untouched, narrow scope |
+| # | Title | Complexity | Risk | Status |
+|---|---|---|---|---|
+| 1 | LLM proactive alerts | High | Medium — API key handling, alert spam, offline edge cases | pending |
+| 2 | Year freeze for historical badges | Medium | Low — godlike-only, idempotent, additive schema change | pending |
+| 3 | Unit tests: IDB layer (`lib/db.ts`) | Medium | Low — requires `fake-indexeddb` dev dependency; isolated from app runtime | pending |
+| 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — `renderHook` + mocked IDB and Supabase; no network | pending |
+| 5 | Unit tests: Component and page integration | High | Low — replaces misleading stub tests; mounts pages with RTL + mocked hooks | pending |
+| 6 | Multi-stage / multi-genre badge conditions | Low | Low — additive condition types, registry-only, no schema change | **implemented (2026-05-13)** |
+| 7 | Closing-ceremony slot (non-band timetable entry) | Low | Low — single nullable column on `bands`, registry untouched, narrow scope | pending |
 
 ---
 
@@ -304,6 +304,8 @@ coverage: {
 
 ## Idea 6 — Multi-stage / multi-genre badge conditions
 
+> **Status: implemented (2026-05-13).** Shipped with 4 plural-form `BadgeCondition` variants (`bands_picked_stages_min`, `bands_picked_genres_min`, `bands_seen_stages_min`, `bands_seen_genres_min`), matching engine branches, registry CONDITION EXAMPLES, and 18 new test cases in `src/__tests__/badges.test.ts`. Safe to remove this section in a follow-up cleanup pass. See `docs/ai-wiki/changelog.md` (2026-05-13 entry) and the updated `docs/ai-wiki/badges.md`.
+
 **Goal:** Let a single badge reward presence across **a set of stages or genres**, not just one. Concrete motivation: at Wacken, `Faster` and `Harder` are physically adjacent in the Main Infield — a vira-lata who hangs around that corridor and racks up N seen bands across both deserves a badge ("Infield Rat", "Riff Boulevard", etc.). The same shape extends naturally to genre families (e.g. "Extreme Metal" = `Death Metal` ∪ `Black Metal` ∪ `Grindcore`).
 
 ### Why now is a good time
@@ -410,12 +412,12 @@ Option A is the cheapest, least-risky generalisation that still scales to any fu
 
 ### Acceptance criteria
 
-- [ ] All four new condition types compile and narrow correctly in `evaluateBadge`'s `switch` (TS exhaustiveness preserved).
-- [ ] Single-element-array behavior is identical to the existing singular condition for the same stage/genre.
-- [ ] Multi-element-array behavior sums matches across listed stages/genres.
-- [ ] Bands with `genre = null` are excluded from `*_genres_min` counts.
-- [ ] All existing badges in `BADGES[]` keep working unchanged — no registry migration required.
-- [ ] `src/services/badges/registry.ts` CONDITION EXAMPLES section documents the four new types with the same prose style as the existing entries.
+- [x] All four new condition types compile and narrow correctly in `evaluateBadge`'s `switch` (TS exhaustiveness preserved). _Verified via `tsc --noEmit`._
+- [x] Single-element-array behavior is identical to the existing singular condition for the same stage/genre. _Covered by 4 test cases (one per new variant)._
+- [x] Multi-element-array behavior sums matches across listed stages/genres. _Covered by 4 test cases._
+- [x] Bands with `genre = null` are excluded from `*_genres_min` counts. _Covered by dedicated test cases for both picked and seen genres variants._
+- [x] All existing badges in `BADGES[]` keep working unchanged — no registry migration required. _Full `badges.test.ts` suite (54 tests) passes._
+- [x] `src/services/badges/registry.ts` CONDITION EXAMPLES section documents the four new types with the same prose style as the existing entries.
 
 ---
 

@@ -306,6 +306,22 @@ export const BADGES: BadgeConfig[] = [
 //   Example: loyal Faster stage follower
 //   { slug: 'faster-fanatic', condition: { type: 'bands_picked_stage_min', stage: 'Faster', count: 8 } }
 //
+// bands_picked_stages_min
+//   User picked N+ bands whose stage is any of the listed stages (set membership, OR-combined).
+//   A pick is counted if its `stage` is in the array; total picks across the listed stages
+//   must reach `count`. Does NOT require ≥1 from each stage.
+//   Example: Main Infield corridor lover — 6+ picks across Faster ∪ Harder
+//   { slug: 'infield-rat', condition: { type: 'bands_picked_stages_min', stages: ['Faster', 'Harder'], count: 6 } }
+//
+// bands_picked_genres_min
+//   User picked N+ bands whose genre is any of the listed genres (set membership, OR-combined).
+//   Bands with `genre = null` are never counted (no matching string). Genre names must match exactly.
+//   Example: extreme-metal devotee — 5+ picks across heavy sub-genres
+//   { slug: 'extreme-picker',
+//     condition: { type: 'bands_picked_genres_min',
+//                  genres: ['Death Metal', 'Black Metal', 'Grindcore', 'Brutal Death Metal'],
+//                  count: 5 } }
+//
 // bands_picked_before_hour_min
 //   User picked N+ bands whose CEST start time is before the given hour (0–23).
 //   Example: morning warrior — 3+ bands starting before 14:00 CEST
@@ -337,6 +353,21 @@ export const BADGES: BadgeConfig[] = [
 //   Seen N+ bands on a specific stage.
 //   Example: Headbangers devotee
 //   { slug: 'headbangers-regular', condition: { type: 'bands_seen_stage_min', stage: 'Headbangers', count: 4 } }
+//
+// bands_seen_stages_min
+//   Seen N+ bands whose stage is any of the listed stages (set membership, OR-combined).
+//   Same semantics as `bands_picked_stages_min` but counted against `seenBands`.
+//   Example: hung around the Main Infield corridor — saw 6+ bands across Faster ∪ Harder
+//   { slug: 'infield-rat', condition: { type: 'bands_seen_stages_min', stages: ['Faster', 'Harder'], count: 6 } }
+//
+// bands_seen_genres_min
+//   Seen N+ bands whose genre is any of the listed genres (set membership, OR-combined).
+//   Bands with `genre = null` are never counted.
+//   Example: confirmed extreme-metal devotee — saw 5+ across heavy sub-genres
+//   { slug: 'extreme-devotee',
+//     condition: { type: 'bands_seen_genres_min',
+//                  genres: ['Death Metal', 'Black Metal', 'Grindcore', 'Brutal Death Metal'],
+//                  count: 5 } }
 //
 // bands_seen_before_hour_min
 //   Seen N+ bands whose CEST start time is before the given hour.
