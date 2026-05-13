@@ -13,6 +13,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 | 3 | Unit tests: IDB layer (`lib/db.ts`) | Medium | Low — requires `fake-indexeddb` dev dependency; isolated from app runtime |
 | 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — `renderHook` + mocked IDB and Supabase; no network |
 | 5 | Unit tests: Component and page integration | High | Low — replaces misleading stub tests; mounts pages with RTL + mocked hooks |
+| 6 | Multi-stage / multi-genre badge conditions | Low | Low — additive condition types, registry-only, no schema change |
 
 ---
 
@@ -297,3 +298,120 @@ coverage: {
 - [ ] `SchedulePage` filter and toggle behavior tested end-to-end through the component tree.
 - [ ] Auth page tests assert on real form validation logic and correct Supabase call shapes.
 - [ ] All new tests pass with `npm test`.
+
+---
+
+## Idea 6 — Multi-stage / multi-genre badge conditions
+
+**Goal:** Let a single badge reward presence across **a set of stages or genres**, not just one. Concrete motivation: at Wacken, `Faster` and `Harder` are physically adjacent in the Main Infield — a vira-lata who hangs around that corridor and racks up N seen bands across both deserves a badge ("Infield Rat", "Riff Boulevard", etc.). The same shape extends naturally to genre families (e.g. "Extreme Metal" = `Death Metal` ∪ `Black Metal` ∪ `Grindcore`).
+
+### Why now is a good time
+
+The current conditions are 1-stage and 1-genre only, which makes the registry repetitive and forces an artificial choice when designing "vibe" badges. We already have stable seen/picked plumbing (`ctx.seenBands`, `ctx.pickedBands`) and a `BadgeCondition` discriminated union that is trivially extensible.
+
+### Current shape
+
+```ts
+// src/services/badges/types.ts
+| { type: 'bands_picked_stage_min'; stage: string; count: number }
+| { type: 'bands_picked_genre_min'; genre: string; count: number }
+| { type: 'bands_seen_stage_min';   stage: string; count: number }
+| { type: 'bands_seen_genre_min';   genre: string; count: number }
+```
+
+### Proposed shape (additive — no breaking change)
+
+Add four new plural-form condition types that accept arrays. Keep the existing singular forms intact so the 8 badges already in `BADGES[]` (`death-metal`, `power-metal`, `party-metal`, etc.) require no migration.
+
+```ts
+// src/services/badges/types.ts
+| { type: 'bands_picked_stages_min'; stages: string[]; count: number }
+| { type: 'bands_picked_genres_min'; genres: string[]; count: number }
+| { type: 'bands_seen_stages_min';   stages: string[]; count: number }
+| { type: 'bands_seen_genres_min';   genres: string[]; count: number }
+```
+
+**Semantics:** A band counts toward the threshold if its `stage` (or `genre`) is included in the configured array — i.e. set-membership, OR-combined within the array. The badge is earned when total matching bands `>= count`.
+
+> **Note:** This is OR-within-the-array, not AND-across-stages. "Saw 5 bands across Faster ∪ Harder" means *any combination summing to 5*. We do **not** also require ≥1 from each stage; if a use case for that ever appears, it would be a separate `*_across_all_stages_min` condition.
+
+### Engine implementation
+
+In `src/services/badges/engine.ts`, four new `case` branches reuse the existing `pickedBands` / `seenBands` arrays. Implementation is one-liners using `Set` membership for O(1) lookup:
+
+```ts
+case 'bands_seen_stages_min': {
+  const set = new Set(condition.stages);
+  return ctx.seenBands.filter((b) => set.has(b.stage)).length >= condition.count;
+}
+case 'bands_seen_genres_min': {
+  const set = new Set(condition.genres);
+  return ctx.seenBands.filter((b) => b.genre != null && set.has(b.genre)).length >= condition.count;
+}
+case 'bands_picked_stages_min': {
+  const set = new Set(condition.stages);
+  return ctx.pickedBands.filter((b) => set.has(b.stage)).length >= condition.count;
+}
+case 'bands_picked_genres_min': {
+  const set = new Set(condition.genres);
+  return ctx.pickedBands.filter((b) => b.genre != null && set.has(b.genre)).length >= condition.count;
+}
+```
+
+No changes needed to `BadgeContext`, `buildBadgeContext`, or any repository — the data the new branches need is already in `ctx`.
+
+### Registry: example badges this unlocks
+
+```ts
+// Saw 6+ bands while hanging out on the Faster ↔ Harder corridor
+{
+  slug: 'infield-rat',
+  imagePath: '/badges/badge_infield-rat.png',
+  labelKey: 'badgeInfieldRat',
+  descriptionKey: 'badgeInfieldRatDescription',
+  condition: { type: 'bands_seen_stages_min', stages: ['Faster', 'Harder'], count: 6 },
+  year: 2026,
+},
+// Wacken 2026 extreme-metal devotee — saw 5+ across all heavy sub-genres
+{
+  slug: 'extreme-devotee',
+  imagePath: '/badges/badge_extreme-devotee.png',
+  labelKey: 'badgeExtremeDevotee',
+  descriptionKey: 'badgeExtremeDevoteeDescription',
+  condition: {
+    type: 'bands_seen_genres_min',
+    genres: ['Death Metal', 'Black Metal', 'Grindcore', 'Brutal Death Metal'],
+    count: 5,
+  },
+  year: 2026,
+},
+```
+
+### Alternative shapes considered
+
+| Approach | Verdict |
+|---|---|
+| **A. Plural-form additive types (`*_stages_min`)** — recommended | ✅ Zero migration. Backward compatible. Clear at the call site (singular = 1, plural = many). Symmetric with existing seen/picked split. |
+| B. Widen field to `stage: string \| string[]` on existing types | ❌ Breaks discriminated-union narrowing in `engine.ts`. Mixes singular/plural reading at the call site. Forces `Array.isArray()` guard everywhere. |
+| C. Replace `stage: string` with `stages: string[]` and migrate registry | ❌ Touches every existing music/stage badge. Higher diff, no behavioral upside over A. |
+| D. Generic combinator wrapper (`{ type: 'any_of'; conditions: [...] }`) | ❌ Overkill — pulls badge logic toward a tiny DSL we don't need. Reconsider only if we ever want AND/NOT across heterogeneous conditions. |
+
+Option A is the cheapest, least-risky generalisation that still scales to any future "set membership" feature (e.g. multi-day, multi-country) by mirroring the same plural-form pattern.
+
+### Files
+
+- `src/services/badges/types.ts` — extend the `BadgeCondition` union with 4 new variants.
+- `src/services/badges/engine.ts` — 4 new `case` branches in `evaluateBadge`.
+- `src/services/badges/registry.ts` — extend the CONDITION EXAMPLES block at the bottom with 4 new entries; optionally add the example "Infield Rat" / "Extreme Devotee" badges.
+- `src/__tests__/badges.test.ts` — 4 new test groups (single-element-array equivalence, multi-element OR, empty array = never earned, missing genre on bands is skipped).
+- `public/badges/badge_*.png` — only if shipping the example badges above.
+- `src/i18n/Badges_{br,en,es,de}.json` — only if shipping the example badges above.
+
+### Acceptance criteria
+
+- [ ] All four new condition types compile and narrow correctly in `evaluateBadge`'s `switch` (TS exhaustiveness preserved).
+- [ ] Single-element-array behavior is identical to the existing singular condition for the same stage/genre.
+- [ ] Multi-element-array behavior sums matches across listed stages/genres.
+- [ ] Bands with `genre = null` are excluded from `*_genres_min` counts.
+- [ ] All existing badges in `BADGES[]` keep working unchanged — no registry migration required.
+- [ ] `src/services/badges/registry.ts` CONDITION EXAMPLES section documents the four new types with the same prose style as the existing entries.
