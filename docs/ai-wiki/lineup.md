@@ -248,7 +248,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 |------|-------|------|-------------|-----------|
 | Animals as Leaders | Progressive Metal | HAR4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/b/csm_animals_as_leaders26_0a9b3dfbf5.jpg |
 | Danko Jones | Hard Rock | HAR5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/e/csm_danko_jones_26_3405a63446.jpg |
-| Emperor | Black Metal | HAR6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/2/csm_Emperor-WOA26_d4f869c941.jpg |
+| Sepultura | Groove Metal | HAR6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/1/csm_Sepultura-WOA26_f6b8328d6d.jpg |
 | In Flames | Melodic Death Metal | HAR7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/6/csm_In-Flames-WOA26_9e6947d658.jpg |
 
 ### Faster Stage
@@ -271,7 +271,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | Bear McCreary | Orchestral / Film Music | LOU16 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/e/csm_bear_mccreary_26b_802dfd47bf.jpg |
 | Any Given Day | Metalcore | LOU17 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/f/csm_Any_given_Day-WOA26_45b0bb14e2.jpg |
 | Alcest | Post-Black Metal | LOU18 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/2/csm_alcest_26_ca67b9d832.jpg |
-| Sepultura | Groove Metal | LOU19 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/1/csm_Sepultura-WOA26_f6b8328d6d.jpg |
+| Emperor | Black Metal | LOU19 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/2/csm_Emperor-WOA26_d4f869c941.jpg |
 | Running Wild | Speed Metal | LOU20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/f/csm_Running_Wild-WOA26_5c9b78de18.jpg |
 
 ### W.E.T. Stage
@@ -342,7 +342,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | Corrosion of Conformity | Sludge Metal | FAS13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/b/csm_corrosion_of_conformity_26_8ba7dabe09.jpg |
 | Asrock | Metal | FAS14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/a/csm_asrock_26_85c4a23518.jpg |
 | Ad Infinitum | Symphonic Metal | FAS15 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/a/csm_ad_infinitum_26_cb9028b792.jpg |
-| Triptykon | Black / Doom Metal | FAS16 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/c/csm_Triptykon-WOA26_0599ad9698.jpg |
+| Alestorm | Party Metal | FAS16 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/d/csm_alestorm_26_9ddf45fa2e.jpg |
 | Lamb of God | Groove Metal | FAS17 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/4/csm_lamb_of_god_26b_d0cd004159.jpg |
 | Sabaton | Power Metal | FAS18 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/4/csm_sabaton_26_143decf5a4.jpg |
 
@@ -353,7 +353,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | Blood Command | Punk Metal | HAR8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/8/csm_Blood_Command-WOA26_f82b942e22.jpg |
 | Allt | Black Metal | HAR9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/f/csm_Allt-WOA26_20072966da.jpg |
 | Thy Art Is Murder | Deathcore | HAR10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/0/csm_thy_art_is_murder_26_9e88fcd95e.jpg |
-| Airbourne | Hard Rock | HAR11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/e/csm_Airborn-WOA26_24e9c1f588.jpg |
+| Airbourne | Party Metal | HAR11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/e/csm_Airborn-WOA26_24e9c1f588.jpg |
 | Powerwolf | Power Metal | HAR12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/f/csm_Powerwolf-WOA26_acf32b8b68.jpg |
 
 ### Louder Stage
@@ -365,7 +365,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | Castle Rat | Heavy Metal | LOU23 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/3/csm_castle_Rat_26_29b54db683.jpg |
 | Angelus Apatrida | Thrash Metal | LOU24 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/0/csm_angelus_apatrida_26_0bf97316dd.jpg |
 | Nevermore | Progressive Metal | LOU25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/6/csm_nevermore_26b_55b9630985.jpg |
-| Alestorm | Pirate Metal | LOU26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/d/csm_alestorm_26_9ddf45fa2e.jpg |
+| Triptykon | Black / Doom Metal | LOU26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/c/csm_Triptykon-WOA26_0599ad9698.jpg |
 | Arch Enemy | Melodic Death Metal | LOU27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/c/csm_arch_enemy_26c_e1e9c04c76.jpg |
 
 ### W.E.T. Stage

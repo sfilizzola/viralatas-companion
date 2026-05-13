@@ -252,7 +252,7 @@ export const bands: BandSeed[] = [
   // HARDER STAGE — Day 3
   { name: 'Animals as Leaders', stage: STAGES.HARDER, start_time: t(D3,13,45), end_time: t(D3,14,45),  genre: 'Progressive Metal',   image_url: `${WOA}/fileadmin/_processed_/2/b/csm_animals_as_leaders26_0a9b3dfbf5.jpg` }, // HAR4
   { name: 'Danko Jones',        stage: STAGES.HARDER, start_time: t(D3,16,15), end_time: t(D3,17,15),  genre: 'Hard Rock',           image_url: `${WOA}/fileadmin/_processed_/d/e/csm_danko_jones_26_3405a63446.jpg` },       // HAR5
-  { name: 'Emperor',            stage: STAGES.HARDER, start_time: t(D3,19, 0), end_time: t(D3,20,30),  genre: 'Black Metal',         image_url: `${WOA}/fileadmin/_processed_/d/2/csm_Emperor-WOA26_d4f869c941.jpg` },        // HAR6
+  { name: 'Sepultura',          stage: STAGES.HARDER, start_time: t(D3,19, 0), end_time: t(D3,20,30),  genre: 'Groove Metal',        image_url: `${WOA}/fileadmin/_processed_/6/1/csm_Sepultura-WOA26_f6b8328d6d.jpg` },      // HAR6
   { name: 'In Flames',          stage: STAGES.HARDER, start_time: t(D3,23,30), end_time: t(D3n, 0, 0), genre: 'Melodic Death Metal', image_url: `${WOA}/fileadmin/_processed_/8/6/csm_In-Flames-WOA26_9e6947d658.jpg` },      // HAR7
 
   // FASTER STAGE — Day 3
@@ -269,7 +269,7 @@ export const bands: BandSeed[] = [
   { name: 'Bear McCreary',    stage: STAGES.LOUDER, start_time: t(D3,17,15), end_time: t(D3,18,15),  genre: 'Orchestral / Film Music',       image_url: `${WOA}/fileadmin/_processed_/a/e/csm_bear_mccreary_26b_802dfd47bf.jpg` },      // LOU16
   { name: 'Any Given Day',    stage: STAGES.LOUDER, start_time: t(D3,19, 0), end_time: t(D3,20, 0),  genre: 'Metalcore',                    image_url: `${WOA}/fileadmin/_processed_/d/f/csm_Any_given_Day-WOA26_45b0bb14e2.jpg` },     // LOU17
   { name: 'Alcest',           stage: STAGES.LOUDER, start_time: t(D3,20,45), end_time: t(D3,21,45),  genre: 'Post-Black Metal',             image_url: `${WOA}/fileadmin/_processed_/d/2/csm_alcest_26_ca67b9d832.jpg` },              // LOU18
-  { name: 'Sepultura',        stage: STAGES.LOUDER, start_time: t(D3,22,45), end_time: t(D3n, 0, 0), genre: 'Groove Metal',                 image_url: `${WOA}/fileadmin/_processed_/6/1/csm_Sepultura-WOA26_f6b8328d6d.jpg` },        // LOU19
+  { name: 'Emperor',          stage: STAGES.LOUDER, start_time: t(D3,22,45), end_time: t(D3n, 0, 0), genre: 'Black Metal',                  image_url: `${WOA}/fileadmin/_processed_/d/2/csm_Emperor-WOA26_d4f869c941.jpg` },          // LOU19
   { name: 'Running Wild',     stage: STAGES.LOUDER, start_time: t(D3n, 0,45), end_time: t(D3n, 2, 0), genre: 'Speed Metal',                  image_url: `${WOA}/fileadmin/_processed_/b/f/csm_Running_Wild-WOA26_5c9b78de18.jpg` },     // LOU20
 
   // W.E.T. STAGE — Day 3
@@ -320,7 +320,7 @@ export const bands: BandSeed[] = [
   { name: 'Corrosion of Conformity', stage: STAGES.FASTER, start_time: t(D4,11,30), end_time: t(D4,12,30),  genre: 'Sludge Metal',     image_url: `${WOA}/fileadmin/_processed_/0/b/csm_corrosion_of_conformity_26_8ba7dabe09.jpg` }, // FAS13
   { name: 'Asrock',                  stage: STAGES.FASTER, start_time: t(D4,14, 0), end_time: t(D4,15, 0),  genre: 'Metal',            image_url: `${WOA}/fileadmin/_processed_/c/a/csm_asrock_26_85c4a23518.jpg` },                  // FAS14
   { name: 'Ad Infinitum',            stage: STAGES.FASTER, start_time: t(D4,16,30), end_time: t(D4,17,30),  genre: 'Symphonic Metal',  image_url: `${WOA}/fileadmin/_processed_/f/a/csm_ad_infinitum_26_cb9028b792.jpg` },            // FAS15
-  { name: 'Triptykon',               stage: STAGES.FASTER, start_time: t(D4,19,15), end_time: t(D4,20,45),  genre: 'Black / Doom Metal',image_url: `${WOA}/fileadmin/_processed_/3/c/csm_Triptykon-WOA26_0599ad9698.jpg` },             // FAS16
+  { name: 'Alestorm',                stage: STAGES.FASTER, start_time: t(D4,19,15), end_time: t(D4,20,45),  genre: 'Party Metal',       image_url: `${WOA}/fileadmin/_processed_/6/d/csm_alestorm_26_9ddf45fa2e.jpg` },                   // FAS16
   { name: 'Lamb of God',             stage: STAGES.FASTER, start_time: t(D4,22,30), end_time: t(D4,23, 0),  genre: 'Groove Metal',     image_url: `${WOA}/fileadmin/_processed_/7/4/csm_lamb_of_god_26b_d0cd004159.jpg` },              // FAS17
   { name: 'Sabaton',                 stage: STAGES.FASTER, start_time: t(D4,23, 0), end_time: t(D4n, 0,30), genre: 'Power Metal',      image_url: `${WOA}/fileadmin/_processed_/a/4/csm_sabaton_26_143decf5a4.jpg` },                   // FAS18
 
@@ -328,7 +328,7 @@ export const bands: BandSeed[] = [
   { name: 'Blood Command',     stage: STAGES.HARDER, start_time: t(D4,12,45), end_time: t(D4,13,45),  genre: 'Punk Metal', image_url: `${WOA}/fileadmin/_processed_/e/8/csm_Blood_Command-WOA26_f82b942e22.jpg` }, // HAR8
   { name: 'Allt',              stage: STAGES.HARDER, start_time: t(D4,15,15), end_time: t(D4,16,15),  genre: 'Black Metal', image_url: `${WOA}/fileadmin/_processed_/a/f/csm_Allt-WOA26_20072966da.jpg` },         // HAR9
   { name: 'Thy Art Is Murder', stage: STAGES.HARDER, start_time: t(D4,17,45), end_time: t(D4,19, 0),  genre: 'Deathcore',  image_url: `${WOA}/fileadmin/_processed_/8/0/csm_thy_art_is_murder_26_9e88fcd95e.jpg` }, // HAR10
-  { name: 'Airbourne',         stage: STAGES.HARDER, start_time: t(D4,21, 0), end_time: t(D4,22,30),  genre: 'Hard Rock',   image_url: `${WOA}/fileadmin/_processed_/d/e/csm_Airborn-WOA26_24e9c1f588.jpg` },       // HAR11
+  { name: 'Airbourne',         stage: STAGES.HARDER, start_time: t(D4,21, 0), end_time: t(D4,22,30),  genre: 'Party Metal', image_url: `${WOA}/fileadmin/_processed_/d/e/csm_Airborn-WOA26_24e9c1f588.jpg` },       // HAR11
   { name: 'Powerwolf',         stage: STAGES.HARDER, start_time: t(D4n, 0,45), end_time: t(D4n, 2, 0), genre: 'Power Metal', image_url: `${WOA}/fileadmin/_processed_/9/f/csm_Powerwolf-WOA26_acf32b8b68.jpg` },     // HAR12
 
   // LOUDER STAGE — Day 4
@@ -337,7 +337,7 @@ export const bands: BandSeed[] = [
   { name: 'Castle Rat',             stage: STAGES.LOUDER, start_time: t(D4,15,30), end_time: t(D4,16,30),  genre: 'Heavy Metal',        image_url: `${WOA}/fileadmin/_processed_/f/3/csm_castle_Rat_26_29b54db683.jpg` },             // LOU23
   { name: 'Angelus Apatrida',       stage: STAGES.LOUDER, start_time: t(D4,17,15), end_time: t(D4,18,15),  genre: 'Thrash Metal',       image_url: `${WOA}/fileadmin/_processed_/d/0/csm_angelus_apatrida_26_0bf97316dd.jpg` },       // LOU24
   { name: 'Nevermore',              stage: STAGES.LOUDER, start_time: t(D4,19, 0), end_time: t(D4,20, 0),  genre: 'Progressive Metal',  image_url: `${WOA}/fileadmin/_processed_/6/6/csm_nevermore_26b_55b9630985.jpg` },              // LOU25
-  { name: 'Alestorm',               stage: STAGES.LOUDER, start_time: t(D4,20,45), end_time: t(D4,22, 0),  genre: 'Pirate Metal',       image_url: `${WOA}/fileadmin/_processed_/6/d/csm_alestorm_26_9ddf45fa2e.jpg` },                // LOU26
+  { name: 'Triptykon',              stage: STAGES.LOUDER, start_time: t(D4,20,45), end_time: t(D4,22, 0),  genre: 'Black / Doom Metal', image_url: `${WOA}/fileadmin/_processed_/3/c/csm_Triptykon-WOA26_0599ad9698.jpg` },             // LOU26
   { name: 'Arch Enemy',             stage: STAGES.LOUDER, start_time: t(D4,23, 0), end_time: t(D4n, 0,30), genre: 'Melodic Death Metal',image_url: `${WOA}/fileadmin/_processed_/c/c/csm_arch_enemy_26c_e1e9c04c76.jpg` },              // LOU27
 
   // W.E.T. STAGE — Day 4

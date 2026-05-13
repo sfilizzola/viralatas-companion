@@ -4,6 +4,22 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-13 (Lineup: Day 3 & Day 4 slot swaps + Party Metal genre)
+
+### Changed
+- **lineup.md** — Two slot swaps and two genre updates:
+  - **Day 3:** Emperor (Black Metal) ↔ Sepultura (Groove Metal). Sepultura now headlines HAR6 (Harder 19:00–20:30); Emperor moves to LOU19 (Louder 22:45–00:00*).
+  - **Day 4:** Triptykon (Black / Doom Metal) ↔ Alestorm. Alestorm now plays FAS16 (Faster 19:15–20:45); Triptykon moves to LOU26 (Louder 20:45–22:00).
+  - **Alestorm:** genre changed from `Pirate Metal` to `Party Metal`.
+  - **Airbourne:** genre changed from `Hard Rock` to `Party Metal`.
+- **supabase/seed/bands.ts** — Mirrored all four changes from lineup.md. 173-row total unchanged. Verified no UNIQUE(stage, start_time, name) collisions.
+
+### Architectural Notes
+- Band image URLs follow the band when they swap slots, not the slot.
+- After this change, the only `Pirate Metal` genre row is `Mr. Hurley und die Pulveraffen` (WAK17 Day 3). The new `Party Metal` genre contains exactly 2 bands: Alestorm and Airbourne. If any badge in `src/lib/badges.ts` references either genre via `bands_picked_genre_min` / `bands_seen_genre_min`, its eligibility set has shifted accordingly.
+
+---
+
 ## 2026-05-13 (Seed: bands.ts destructive guarantees hardened)
 
 ### Changed
