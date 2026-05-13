@@ -17,16 +17,16 @@ Document the 8 Wacken 2026 stages: their identities, physical layout, categories
 
 ## The 8 Stages
 
-| Stage | Abbrev | Category | UI Color | Hex |
-|-------|--------|----------|----------|-----|
-| Faster | `FAS` | Main Infield | `var(--stage-faster)` | `#2980b9` (Blue) |
-| Harder | `HAR` | Main Infield | `var(--stage-harder)` | `#e67e22` (Orange) |
-| Louder | `LOU` | Main Infield | `var(--stage-louder)` | `#8e44ad` (Purple) |
-| W.E.T. | `WET` | Outside Infield | `var(--stage-wet)` | `#c0392b` (Red) |
-| Headbangers | `HBA` | Outside Infield | `var(--stage-headbangers)` | `#16a085` (Teal) |
-| Wasteland | `WAS` | Specialized | `var(--stage-wasteland)` | `#2c3e50` (Dark Blue) |
-| Wackinger | `WAK` | Specialized | `var(--stage-wackinger)` | `#95a5a6` (Gray) |
-| Welcome to the Jungle | `JUN` | Specialized | `var(--stage-jungle)` | `#f39c12` (Gold) |
+|Rank| Stage | Abbrev | Category | UI Color | Hex |
+|---|-------|--------|----------|----------|-----|
+|1| Faster | `FAS` | Main Infield | `var(--stage-faster)` | `#2980b9` (Blue) |
+|2| Harder | `HAR` | Main Infield | `var(--stage-harder)` | `#e67e22` (Orange) |
+|3| Louder | `LOU` | Main Infield | `var(--stage-louder)` | `#8e44ad` (Purple) |
+|4| W.E.T. | `WET` | Outside Infield | `var(--stage-wet)` | `#c0392b` (Red) |
+|5| Headbangers | `HBA` | Outside Infield | `var(--stage-headbangers)` | `#16a085` (Teal) |
+|7| Wasteland | `WAS` | Specialized | `var(--stage-wasteland)` | `#2c3e50` (Dark Blue) |
+|6| Wackinger | `WAK` | Specialized | `var(--stage-wackinger)` | `#95a5a6` (Gray) |
+|8| Welcome to the Jungle | `JUN` | Specialized | `var(--stage-jungle)` | `#f39c12` (Gold) |
 
 Stage colors are defined in `src/index.css` as CSS custom properties. `stageColors.ts` returns the CSS variable token (e.g., `var(--stage-faster)`), not the raw hex. Unknown stages fall back to `var(--accent)`.
 
@@ -91,18 +91,18 @@ In `bands.ts`, the `end_time` (and `start_time` for 00:xx slots) uses the **next
 Each slot has a unique ID combining stage abbreviation + sequential number, **global across all days**.
 
 - Numbering starts at 1 per stage and increments through Day 1 → Day 4 in chronological order
-- Example: `FAS1` = first Faster slot (Day 1, 16:00), `FAS34` = last Faster slot (Day 4, 22:30)
+- Example: `FAS1` = first Faster slot (Day 1, 16:00), `FAS18` = last Faster slot (Day 4, 23:00)
 - Use the Slot ID to cross-reference between this Stage Schedules grid and the Band Assignments tables in [lineup.md](lineup.md)
 
 | Stage | Slot range |
 |-------|-----------|
-| HAR | HAR1 – HAR21 |
-| FAS | FAS1 – FAS34 |
-| LOU | LOU1 – LOU30 |
-| WET | WET1 – WET31 |
-| HBA | HBA1 – HBA27 |
-| WAS | WAS1 – WAS20 |
-| WAK | WAK1 – WAK16 |
+| HAR | HAR1 – HAR12 |
+| FAS | FAS1 – FAS18 |
+| LOU | LOU1 – LOU27 |
+| WET | WET1 – WET35 |
+| HBA | HBA1 – HBA35 |
+| WAS | WAS1 – WAS29 |
+| WAK | WAK1 – WAK28 |
 | JUN | JUN1 – JUN8 |
 
 ---
@@ -153,37 +153,29 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| HAR1 | 12:00 | 13:00 | NO |
-| HAR2 | 13:30 | 14:30 | NO |
-| HAR3 | 15:30 | 16:30 | NO |
-| HAR4 | 17:00 | 18:15 | NO |
-| HAR5 | 18:30 | 19:45 | NO |
-| HAR6 | 20:15 | 21:15 | NO |
-| HAR7 | 22:00 | 23:30 | NO |
+| HAR1 | 15:00 | 16:00 | NO |
+| HAR2 | 17:30 | 18:30 | NO |
+| HAR3 | 20:30 | 22:30 | NO |
+
 
 #### Day 3 (Friday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| HAR8 | 12:00 | 12:45 | NO |
-| HAR9 | 13:00 | 13:45 | NO |
-| HAR10 | 14:00 | 14:45 | NO |
-| HAR11 | 15:00 | 16:00 | NO |
-| HAR12 | 16:15 | 17:30 | NO |
-| HAR13 | 17:45 | 19:00 | NO |
-| HAR14 | 19:15 | 20:15 | NO |
-| HAR15 | 21:30 | 22:45 | NO |
+| HAR4 | 13:45 | 14:45 | NO |
+| HAR5 | 16:15 | 17:15 | NO |
+| HAR6 | 19:00 | 20:30 | NO |
+| HAR7 | 23:30 | 00:00* | NO |
 
 #### Day 4 (Saturday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| HAR16 | 12:00 | 13:00 | NO |
-| HAR17 | 13:30 | 14:30 | NO |
-| HAR18 | 15:30 | 16:30 | NO |
-| HAR19 | 17:30 | 18:30 | NO |
-| HAR20 | 19:00 | 20:00 | NO |
-| HAR21 | 21:00 | 22:30 | NO |
+| HAR8 | 12:45 | 13:45 | NO |
+| HAR9 | 15:15 | 16:15 | NO |
+| HAR10 | 17:45 | 19:00 | NO |
+| HAR11 | 21:00 | 22:30 | NO |
+| HAR12 | 00:45* | 02:00* | NO |
 
 ---
 
@@ -204,46 +196,32 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| FAS5 | 12:00 | 12:45 | NO |
-| FAS6 | 13:00 | 13:45 | NO |
-| FAS7 | 14:00 | 14:45 | NO |
-| FAS8 | 15:30 | 16:30 | NO |
-| FAS9 | 17:00 | 17:45 | NO |
-| FAS10 | 18:30 | 19:15 | NO |
-| FAS11 | 20:00 | 20:45 | NO |
-| FAS12 | 21:30 | 22:15 | NO |
+| FAS5 | 16:15 | 17:15 | NO |
+| FAS6 | 18:45 | 20:15 | NO |
+| FAS7 | 22:45 | 00:00* | NO |
+
 
 #### Day 3 (Friday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| FAS13 | 12:00 | 12:45 | NO |
-| FAS14 | 13:00 | 13:45 | NO |
-| FAS15 | 14:30 | 15:15 | NO |
-| FAS16 | 15:45 | 16:45 | NO |
-| FAS17 | 17:00 | 17:45 | NO |
-| FAS18 | 18:00 | 18:45 | NO |
-| FAS19 | 20:00 | 21:00 | NO |
-| FAS20 | 21:30 | 22:15 | NO |
+| FAS8 | 12:30 | 13:30 | NO |
+| FAS9 | 15:00 | 16:00 | NO |
+| FAS10 | 17:30 | 18:45 | NO |
+| FAS11 | 20:45 | 22:15 | NO |
+| FAS12 | 00:15* | 01:30* | NO |
+
 
 #### Day 4 (Saturday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| FAS21 | 12:00 | 12:45 | NO |
-| FAS22 | 13:00 | 13:45 | NO |
-| FAS23 | 14:00 | 14:45 | NO |
-| FAS24 | 14:45 | 15:30 | NO |
-| FAS25 | 15:30 | 16:15 | NO |
-| FAS26 | 16:15 | 17:00 | NO |
-| FAS27 | 17:00 | 17:45 | NO |
-| FAS28 | 17:45 | 18:30 | NO |
-| FAS29 | 18:30 | 19:15 | NO |
-| FAS30 | 19:15 | 20:00 | NO |
-| FAS31 | 20:00 | 20:45 | NO |
-| FAS32 | 20:45 | 21:30 | NO |
-| FAS33 | 21:30 | 22:30 | NO |
-| FAS34 | 22:30 | 23:30 | NO |
+| FAS13 | 11:30 | 12:30 | NO |
+| FAS14 | 14:00 | 15:00 | NO |
+| FAS15 | 16:30 | 17:30 | NO |
+| FAS16 | 19:15 | 20:45 | NO |
+| FAS17 | 22:30 | 23:00 | NO |
+| FAS18 | 23:00 | 00:30* | NO |
 
 ---
 
@@ -256,48 +234,45 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 | LOU1 | 12:00 | 13:00 | NO |
 | LOU2 | 13:30 | 14:30 | NO |
 | LOU3 | 15:15 | 16:15 | NO |
-| LOU4 | 17:00 | 18:45 | NO |
-| LOU5 | 18:45 | 20:30 | NO |
+| LOU4 | 17:00 | 18:00 | NO |
+| LOU5 | 18:45 | 20:00 | NO |
 | LOU6 | 21:00 | 22:30 | NO |
 
 #### Day 2 (Thursday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| LOU7 | 12:00 | 12:45 | NO |
-| LOU8 | 13:30 | 14:30 | NO |
-| LOU9 | 15:00 | 16:00 | NO |
-| LOU10 | 17:00 | 18:00 | NO |
-| LOU11 | 19:30 | 20:30 | NO |
-| LOU12 | 21:30 | 22:30 | NO |
-| LOU13 | 23:00 | 00:00* | NO |
+| LOU7 | 12:00 | 13:00 | NO |
+| LOU8 | 13:45 | 14:45 | NO |
+| LOU9 | 15:30 | 16:30 | NO |
+| LOU10 | 17:30 | 18:45 | NO |
+| LOU11 | 19:45 | 21:00 | NO |
+| LOU12 | 22:00 | 23:30 | NO |
 
 #### Day 3 (Friday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| LOU14 | 12:00 | 12:45 | NO |
-| LOU15 | 13:30 | 14:15 | NO |
-| LOU16 | 15:00 | 16:00 | NO |
-| LOU17 | 17:00 | 18:00 | NO |
-| LOU18 | 19:30 | 20:30 | NO |
-| LOU19 | 21:30 | 22:30 | NO |
+| LOU13 | 12:00 | 13:00 | NO |
+| LOU14 | 13:45 | 14:45 | NO |
+| LOU15 | 15:30 | 16:30 | NO |
+| LOU16 | 17:15 | 18:15 | NO |
+| LOU17 | 19:00 | 20:00 | NO |
+| LOU18 | 20:45 | 21:45 | NO |
+| LOU19 | 22:45 | 00:00* | NO |
+| LOU20 | 00:45* | 02:00* | NO |
 
 #### Day 4 (Saturday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| LOU20 | 12:00 | 12:45 | NO |
-| LOU21 | 13:00 | 13:45 | NO |
-| LOU22 | 14:00 | 14:45 | NO |
-| LOU23 | 15:00 | 16:00 | NO |
-| LOU24 | 16:15 | 17:00 | NO |
-| LOU25 | 17:15 | 18:15 | NO |
-| LOU26 | 18:30 | 19:30 | NO |
-| LOU27 | 19:45 | 20:45 | NO |
-| LOU28 | 21:00 | 22:30 | NO |
-| LOU29 | 22:45 | 23:30 | NO |
-| LOU30 | 23:45 | 00:30* | NO |
+| LOU21 | 12:00 | 13:00 | NO |
+| LOU22 | 13:45 | 14:45 | NO |
+| LOU23 | 15:30 | 16:30 | NO |
+| LOU24 | 17:15 | 18:15 | NO |
+| LOU25 | 19:00 | 20:00 | NO |
+| LOU26 | 20:45 | 22:00 | NO |
+| LOU27 | 23:00 | 00:30* | NO |
 
 ---
 
@@ -326,35 +301,39 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| WET13 | 12:00 | 13:00 | NO |
-| WET14 | 14:00 | 15:00 | NO |
-| WET15 | 15:30 | 17:00 | NO |
-| WET16 | 17:15 | 18:15 | NO |
-| WET17 | 20:00 | 21:00 | NO |
-| WET18 | 23:30 | 01:00* | NO |
+| WET13 | 11:00 | 11:20 | NO |
+| WET14 | 11:50 | 12:10 | NO |
+| WET15 | 12:40 | 13:00 | NO |
+| WET16 | 13:30 | 13:50 | NO |
+| WET17 | 14:20 | 14:40 | NO |
+| WET18 | 15:10 | 15:30 | NO |
+| WET19 | 16:15 | 17:00 | NO |
+| WET20 | 18:15 | 19:00 | NO |
+| WET21 | 20:30 | 21:30 | NO |
+| WET22 | 23:00 | 00:00* | NO |
 
 #### Day 3 (Friday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| WET19 | 12:00 | 13:00 | NO |
-| WET20 | 13:30 | 14:30 | NO |
-| WET21 | 15:00 | 16:00 | NO |
-| WET22 | 16:30 | 17:45 | NO |
-| WET23 | 18:00 | 19:15 | NO |
-| WET24 | 19:30 | 21:00 | NO |
-| WET25 | 21:15 | 22:30 | NO |
-| WET26 | 00:00* | 01:30* | NO |
+| WET23 | 11:00 | 11:45 | NO |
+| WET24 | 13:00 | 13:45 | NO |
+| WET25 | 15:00 | 15:45 | NO |
+| WET26 | 17:00 | 17:45 | NO |
+| WET27 | 19:00 | 19:45 | NO |
+| WET28 | 21:15 | 22:15 | NO |
+| WET29 | 23:45 | 00:45* | NO |
 
 #### Day 4 (Saturday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| WET27 | 12:00 | 13:00 | NO |
-| WET28 | 14:30 | 15:30 | NO |
-| WET29 | 17:30 | 18:30 | NO |
-| WET30 | 20:30 | 22:00 | NO |
-| WET31 | 23:00 | 00:30* | NO |
+| WET30 | 13:00 | 13:45 | NO |
+| WET31 | 15:00 | 15:45 | NO |
+| WET32 | 17:00 | 17:45 | NO |
+| WET33 | 19:00 | 19:45 | NO |
+| WET34 | 21:15 | 22:15 | NO |
+| WET35 | 23:45 | 00:45* | NO |
 
 ---
 
@@ -368,14 +347,14 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 |---------|-------|-----|-----------|
 | HBA1 | 11:25 | 11:45 | NO |
 | HBA2 | 12:15 | 12:35 | NO |
-| HBA3 | 13:00 | 13:25 | NO |
+| HBA3 | 13:05 | 13:25 | NO |
 | HBA4 | 13:55 | 14:15 | NO |
 | HBA5 | 14:45 | 15:45 | NO |
 | HBA6 | 16:15 | 16:35 | NO |
 | HBA7 | 17:05 | 17:25 | NO |
 | HBA8 | 17:55 | 18:15 | NO |
-| HBA9 | 18:15 | 19:05 | NO |
-| HBA10 | 19:55 | 20:10 | NO |
+| HBA9 | 18:45 | 19:05 | NO |
+| HBA10 | 19:35 | 20:10 | NO |
 | HBA11 | 21:30 | 22:30 | NO |
 | HBA12 | 00:00* | 01:00* | NO |
 
@@ -383,31 +362,39 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| HBA13 | 12:30 | 13:30 | NO |
-| HBA14 | 14:00 | 15:00 | NO |
-| HBA15 | 15:00 | 16:00 | NO |
-| HBA16 | 17:00 | 18:00 | NO |
-| HBA17 | 18:30 | 19:30 | NO |
-| HBA18 | 20:00 | 21:00 | NO |
-| HBA19 | 21:30 | 22:30 | NO |
+| HBA13 | 11:25 | 11:45 | NO |
+| HBA14 | 12:15 | 12:35 | NO |
+| HBA15 | 13:05 | 13:25 | NO |
+| HBA16 | 13:55 | 14:15 | NO |
+| HBA17 | 14:45 | 15:05 | NO |
+| HBA18 | 15:35 | 15:55 | NO |
+| HBA19 | 17:15 | 18:00 | NO |
+| HBA20 | 19:15 | 20:15 | NO |
+| HBA21 | 21:45 | 22:45 | NO |
 
 #### Day 3 (Friday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| HBA20 | 13:00 | 13:45 | NO |
-| HBA21 | 14:30 | 15:30 | NO |
-| HBA22 | 16:30 | 17:30 | NO |
-| HBA23 | 18:30 | 19:30 | NO |
-| HBA24 | 21:00 | 22:15 | NO |
+| HBA22 | 12:00 | 12:45 | NO |
+| HBA23 | 14:00 | 14:45 | NO |
+| HBA24 | 16:00 | 16:45 | NO |
+| HBA25 | 18:00 | 18:45 | NO |
+| HBA26 | 20:00 | 21:00 | NO |
+| HBA27 | 22:30 | 23:30 | NO |
+| HBA28 | 01:00* | 02:00* | NO |
 
 #### Day 4 (Saturday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| HBA25 | 13:00 | 14:00 | NO |
-| HBA26 | 15:30 | 16:30 | NO |
-| HBA27 | 19:00 | 20:00 | NO |
+| HBA29 | 12:00 | 12:45 | NO |
+| HBA30 | 14:00 | 14:45 | NO |
+| HBA31 | 16:00 | 16:45 | NO |
+| HBA32 | 18:00 | 18:45 | NO |
+| HBA33 | 20:00 | 21:00 | NO |
+| HBA34 | 22:30 | 23:30 | NO |
+| HBA35 | 01:00* | 02:00* | NO |
 
 ---
 
@@ -429,29 +416,38 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| WAS8 | 13:30 | 14:30 | NO |
-| WAS9 | 15:00 | 15:45 | NO |
-| WAS10 | 16:30 | 17:30 | NO |
-| WAS11 | 18:00 | 18:45 | NO |
-| WAS12 | 20:00 | 21:00 | NO |
-| WAS13 | 21:00 | 21:45 | NO |
-| WAS14 | 22:30 | 23:15 | NO |
+| WAS8 | 14:00 | 14:45 | NO |
+| WAS9 | 15:30 | 16:15 | NO |
+| WAS10 | 17:00 | 17:45 | NO |
+| WAS11 | 18:30 | 19:15 | NO |
+| WAS12 | 20:00 | 20:45 | NO |
+| WAS13 | 21:30 | 22:15 | NO |
+| WAS14 | 23:00 | 00:00* | NO |
 
 #### Day 3 (Friday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| WAS15 | 13:30 | 14:30 | NO |
-| WAS16 | 16:00 | 17:00 | NO |
-| WAS17 | 18:30 | 19:30 | NO |
-| WAS18 | 21:30 | 22:30 | NO |
+| WAS15 | 14:00 | 14:45 | NO |
+| WAS16 | 15:30 | 16:15 | NO |
+| WAS17 | 17:00 | 17:45 | NO |
+| WAS18 | 18:30 | 19:15 | NO |
+| WAS19 | 20:00 | 20:45 | NO |
+| WAS20 | 21:30 | 22:15 | NO |
+| WAS21 | 23:00 | 00:00* | NO |
+| WAS22 | 00:30* | 01:00* | NO |
 
 #### Day 4 (Saturday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| WAS19 | 14:30 | 15:30 | NO |
-| WAS20 | 18:00 | 19:00 | NO |
+| WAS23 | 14:00 | 14:45 | NO |
+| WAS24 | 15:30 | 16:15 | NO |
+| WAS25 | 17:00 | 17:45 | NO |
+| WAS26 | 18:30 | 19:15 | NO |
+| WAS27 | 20:00 | 20:45 | NO |
+| WAS28 | 21:30 | 22:15 | NO |
+| WAS29 | 23:00 | 00:00* | NO |
 
 ---
 
@@ -463,8 +459,8 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 |---------|-------|-----|-----------|
 | WAK1 | 12:00 | 12:45 | NO |
 | WAK2 | 13:30 | 14:15 | NO |
-| WAK3 | 15:00 | 15:45 | NO |
-| WAK4 | 15:45 | 16:30 | NO |
+| WAK3 | 15:00 | 16:00 | NO |
+| WAK4 | 16:45 | 17:45 | NO |
 | WAK5 | 18:30 | 19:30 | NO |
 | WAK6 | 20:15 | 21:15 | NO |
 | WAK7 | 22:15 | 23:15 | NO |
@@ -473,25 +469,37 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| WAK8 | 14:30 | 15:30 | NO |
-| WAK9 | 17:30 | 18:30 | NO |
+| WAK8 | 12:00 | 12:45 | NO |
+| WAK9 | 13:30 | 14:15 | NO |
+| WAK10 | 15:00 | 16:00 | NO |
+| WAK11 | 16:45 | 17:45 | NO |
+| WAK12 | 18:30 | 19:30 | NO |
+| WAK13 | 20:15 | 21:15 | NO |
+| WAK14 | 22:15 | 23:15 | NO |
 
 #### Day 3 (Friday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| WAK10 | 13:00 | 14:00 | NO |
-| WAK11 | 15:00 | 16:00 | NO |
-| WAK12 | 17:30 | 18:30 | NO |
-| WAK13 | 20:00 | 21:00 | NO |
-| WAK14 | 22:00 | 23:00 | NO |
+| WAK15 | 12:00 | 12:45 | NO |
+| WAK16 | 13:30 | 14:15 | NO |
+| WAK17 | 15:00 | 16:00 | NO |
+| WAK18 | 16:45 | 17:45 | NO |
+| WAK19 | 18:30 | 19:30 | NO |
+| WAK20 | 20:15 | 21:15 | NO |
+| WAK21 | 22:15 | 23:15 | NO |
 
 #### Day 4 (Saturday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| WAK15 | 15:00 | 16:00 | NO |
-| WAK16 | 17:30 | 18:30 | NO |
+| WAK22 | 12:00 | 12:45 | NO |
+| WAK23 | 13:30 | 14:15 | NO |
+| WAK24 | 15:00 | 16:00 | NO |
+| WAK25 | 16:45 | 17:45 | NO |
+| WAK26 | 18:30 | 19:30 | NO |
+| WAK27 | 20:15 | 21:15 | NO |
+| WAK28 | 22:15 | 23:15 | NO |
 
 ---
 
@@ -508,22 +516,23 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| JUN3 | 21:00 | 22:00 | NO |
+| JUN3 | 19:30 | 20:30 | NO |
+| JUN4 | 21:00 | 21:30 | NO |
+
 
 #### Day 3 (Friday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| JUN4 | 14:00 | 15:00 | NO |
-| JUN5 | 17:00 | 18:00 | NO |
-| JUN6 | 21:30 | 22:30 | NO |
+| JUN5 | 21:00 | 21:30 | NO |
 
 #### Day 4 (Saturday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| JUN7 | 16:00 | 17:00 | NO |
-| JUN8 | 20:00 | 21:00 | NO |
+| JUN6 | 18:00 | 19:00 | NO |
+| JUN7 | 19:30 | 20:30 | NO |
+| JUN8 | 21:00 | 21:30 | NO |
 
 ---
 

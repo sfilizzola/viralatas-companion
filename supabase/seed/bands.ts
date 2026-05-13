@@ -99,16 +99,16 @@ export const bands: BandSeed[] = [
   // W.E.T. STAGE — Day 1
   { name: 'Ricky Warwick',     stage: STAGES.WET, start_time: t(D1,14, 0), end_time: t(D1,15, 0), genre: 'Hard Rock',          image_url: PLACEHOLDER },
   { name: 'The Hardkiss',      stage: STAGES.WET, start_time: t(D1,16,30), end_time: t(D1,17,30), genre: 'Rock',               image_url: PLACEHOLDER },
-  { name: 'Rose Tattoo',       stage: STAGES.WET, start_time: t(D1,19, 0), end_time: t(D1,20, 0), genre: 'Hard Rock',          image_url: `${WOA}/fileadmin/_processed_/5/5/csm_rose_tattoo26_a5747c907d.jpg` },
-  { name: 'Velvet Rush',       stage: STAGES.WET, start_time: t(D1,21,30), end_time: t(D1,22,30), genre: 'AOR',                image_url: PLACEHOLDER },
+  { name: 'Velvet Rush',       stage: STAGES.WET, start_time: t(D1,19, 0), end_time: t(D1,20, 0), genre: 'AOR',                image_url: PLACEHOLDER },
+  { name: 'Rose Tattoo',       stage: STAGES.WET, start_time: t(D1,21,30), end_time: t(D1,22,30), genre: 'Hard Rock',          image_url: `${WOA}/fileadmin/_processed_/5/5/csm_rose_tattoo26_a5747c907d.jpg` },
 
   // LOUDER STAGE — Day 1 (user-confirmed slots: 12:00 / 13:30 / 15:15 / 17:00 / 19:00 / 21:00)
   { name: 'Crypt Sermon',           stage: STAGES.LOUDER, start_time: t(D1,12, 0), end_time: t(D1,13, 0), genre: 'Doom Metal',        image_url: PLACEHOLDER },
   { name: 'Broken by the Scream',   stage: STAGES.LOUDER, start_time: t(D1,13,30), end_time: t(D1,14,30), genre: 'Visual Kei Metal',   image_url: PLACEHOLDER },
   { name: 'Dirty Shirt',            stage: STAGES.LOUDER, start_time: t(D1,15,15), end_time: t(D1,16,15), genre: 'Crossover Metal',    image_url: PLACEHOLDER },
   { name: 'Alien Rockin\' Explosion',stage: STAGES.LOUDER, start_time: t(D1,17, 0), end_time: t(D1,18, 0), genre: 'Rock',              image_url: PLACEHOLDER },
-  { name: 'Vanir',                  stage: STAGES.LOUDER, start_time: t(D1,19, 0), end_time: t(D1,20, 0), genre: 'Viking Metal',       image_url: `${WOA}/fileadmin/_processed_/0/f/csm_vanir_26_4989af5ab2.jpg` },
-  { name: 'The Gathering',          stage: STAGES.LOUDER, start_time: t(D1,21, 0), end_time: t(D1,22,30), genre: 'Gothic Metal',       image_url: PLACEHOLDER },
+  { name: 'The Gathering',          stage: STAGES.LOUDER, start_time: t(D1,19, 0), end_time: t(D1,20, 0), genre: 'Gothic Metal',       image_url: PLACEHOLDER },
+  { name: 'Vanir',                  stage: STAGES.LOUDER, start_time: t(D1,21, 0), end_time: t(D1,22,30), genre: 'Viking Metal',       image_url: `${WOA}/fileadmin/_processed_/0/f/csm_vanir_26_4989af5ab2.jpg` },
 
   // FASTER STAGE — Day 1 (user-confirmed slots: 16:00 / 17:45 / 19:45 / 22:00)
   { name: 'Visions of Atlantis', stage: STAGES.FASTER, start_time: t(D1,16, 0), end_time: t(D1,17, 0),  genre: 'Symphonic Metal',      image_url: PLACEHOLDER },
@@ -137,10 +137,10 @@ export const bands: BandSeed[] = [
 
   // W.E.T. STAGE — Day 2
   { name: 'Kupfergold',        stage: STAGES.WET, start_time: t(D2,12, 0), end_time: t(D2,13, 0),  genre: 'TBD',               image_url: PLACEHOLDER },
-  { name: 'Uli Jon Roth',      stage: STAGES.WET, start_time: t(D2,14, 0), end_time: t(D2,15, 0),  genre: 'Rock',              image_url: `${WOA}/fileadmin/_processed_/3/b/csm_uli_jon_roth26_db0812a7ce.jpg` },
-  { name: 'Skyline',           stage: STAGES.WET, start_time: t(D2,15,30), end_time: t(D2,16,30),  genre: 'TBD',               image_url: PLACEHOLDER },
-  { name: 'Yngwie Malmsteen',  stage: STAGES.WET, start_time: t(D2,17, 0), end_time: t(D2,18, 0),  genre: 'Neoclassical Metal',image_url: `${WOA}/fileadmin/_processed_/9/0/csm_yngwie_malmsteen_26_451945c4f5.jpg` },
-  { name: 'Sir Henry Hot Memorial', stage: STAGES.WET, start_time: t(D2,20, 0), end_time: t(D2,21,30), genre: 'TBD',           image_url: PLACEHOLDER },
+  { name: 'Skyline',           stage: STAGES.WET, start_time: t(D2,14, 0), end_time: t(D2,15, 0),  genre: 'TBD',               image_url: PLACEHOLDER },
+  { name: 'Sir Henry Hot Memorial', stage: STAGES.WET, start_time: t(D2,15,30), end_time: t(D2,17, 0), genre: 'TBD',           image_url: PLACEHOLDER },
+  { name: 'Uli Jon Roth',      stage: STAGES.WET, start_time: t(D2,17,15), end_time: t(D2,18,15), genre: 'Rock',              image_url: `${WOA}/fileadmin/_processed_/3/b/csm_uli_jon_roth26_db0812a7ce.jpg` },
+  { name: 'Yngwie Malmsteen',  stage: STAGES.WET, start_time: t(D2,20, 0), end_time: t(D2,21, 0),  genre: 'Neoclassical Metal',image_url: `${WOA}/fileadmin/_processed_/9/0/csm_yngwie_malmsteen_26_451945c4f5.jpg` },
   { name: 'Def Leppard',       stage: STAGES.WET, start_time: t(D2,23,30), end_time: t(D2n, 1, 0), genre: 'Hard Rock',         image_url: `${WOA}/fileadmin/_processed_/3/4/csm_Def_Leppard-WOA26_27e5f4ed42.jpg` },
 
   // HARDER STAGE — Day 2
@@ -155,21 +155,21 @@ export const bands: BandSeed[] = [
   // LOUDER STAGE — Day 2
   { name: 'Saviourself',       stage: STAGES.LOUDER, start_time: t(D2,12, 0), end_time: t(D2,12,45), genre: 'TBD',                    image_url: PLACEHOLDER },
   { name: 'Alien Ant Farm',    stage: STAGES.LOUDER, start_time: t(D2,13,30), end_time: t(D2,14,30), genre: 'Alternative Rock',        image_url: PLACEHOLDER },
-  { name: 'Therapy?',          stage: STAGES.LOUDER, start_time: t(D2,15, 0), end_time: t(D2,16, 0), genre: 'Alternative Rock',        image_url: `${WOA}/fileadmin/_processed_/8/5/csm_therapy26_acbd2ac94b.jpg` },
+  { name: 'Sagenbringer',      stage: STAGES.LOUDER, start_time: t(D2,15, 0), end_time: t(D2,16, 0), genre: 'Folk Metal',              image_url: PLACEHOLDER },
   { name: 'Wytch Hazel',       stage: STAGES.LOUDER, start_time: t(D2,17, 0), end_time: t(D2,18, 0), genre: 'Traditional Heavy Metal', image_url: PLACEHOLDER },
   { name: 'Evil Jared & Krogi',stage: STAGES.LOUDER, start_time: t(D2,19,30), end_time: t(D2,20,30), genre: 'TBD',                    image_url: PLACEHOLDER },
-  { name: 'Sagenbringer',      stage: STAGES.LOUDER, start_time: t(D2,21,30), end_time: t(D2,22,30), genre: 'Folk Metal',              image_url: PLACEHOLDER },
+  { name: 'Therapy?',          stage: STAGES.LOUDER, start_time: t(D2,21,30), end_time: t(D2,22,30), genre: 'Alternative Rock',        image_url: `${WOA}/fileadmin/_processed_/8/5/csm_therapy26_acbd2ac94b.jpg` },
   { name: 'H-Blockx',          stage: STAGES.LOUDER, start_time: t(D2,23, 0), end_time: t(D2n, 0, 0), genre: 'Rap Metal',             image_url: `${WOA}/fileadmin/_processed_/c/7/csm_H_Blockx-WOA26_c10c9dda61.jpg` },
 
   // FASTER STAGE — Day 2
-  { name: 'Storm Seeker',  stage: STAGES.FASTER, start_time: t(D2,12, 0), end_time: t(D2,12,45), genre: 'Folk Metal',  image_url: `${WOA}/fileadmin/_processed_/c/9/csm_stormseeker26_ffac69751b.jpg` },
-  { name: 'Vogelfrey',     stage: STAGES.FASTER, start_time: t(D2,13, 0), end_time: t(D2,13,45), genre: 'Folk Metal',  image_url: `${WOA}/fileadmin/_processed_/a/3/csm_vogelfrey_26_b_0c6f4b5859.jpg` },
-  { name: 'Brunhilde',     stage: STAGES.FASTER, start_time: t(D2,14, 0), end_time: t(D2,14,45), genre: 'Folk Metal',  image_url: `${WOA}/fileadmin/_processed_/b/4/csm_brunhilde_26_489882e4fb.jpg` },
-  { name: '9mm Headshot',  stage: STAGES.FASTER, start_time: t(D2,15,30), end_time: t(D2,16,30), genre: 'TBD',         image_url: PLACEHOLDER },
+  { name: 'Wüstenberg',    stage: STAGES.FASTER, start_time: t(D2,12, 0), end_time: t(D2,12,45), genre: 'TBD',         image_url: PLACEHOLDER },
+  { name: '9mm Headshot',  stage: STAGES.FASTER, start_time: t(D2,13, 0), end_time: t(D2,13,45), genre: 'TBD',         image_url: PLACEHOLDER },
+  { name: 'Manntra',       stage: STAGES.FASTER, start_time: t(D2,14, 0), end_time: t(D2,14,45), genre: 'Folk Metal',  image_url: PLACEHOLDER },
+  { name: 'Year of the Goat', stage: STAGES.FASTER, start_time: t(D2,15,30), end_time: t(D2,16,30), genre: 'Occult Rock', image_url: PLACEHOLDER },
   { name: 'P.O.D.',        stage: STAGES.FASTER, start_time: t(D2,17, 0), end_time: t(D2,17,45), genre: 'Nu Metal',    image_url: `${WOA}/fileadmin/_processed_/f/0/csm_POD_26_52d8ce1512.jpg` },
-  { name: 'Manntra',       stage: STAGES.FASTER, start_time: t(D2,18,30), end_time: t(D2,19,30), genre: 'Folk Metal',  image_url: PLACEHOLDER },
-  { name: 'Wüstenberg',    stage: STAGES.FASTER, start_time: t(D2,20, 0), end_time: t(D2,20,45), genre: 'TBD',         image_url: PLACEHOLDER },
-  { name: 'Year of the Goat', stage: STAGES.FASTER, start_time: t(D2,21,30), end_time: t(D2,22,30), genre: 'Occult Rock', image_url: PLACEHOLDER },
+  { name: 'Storm Seeker',  stage: STAGES.FASTER, start_time: t(D2,18,30), end_time: t(D2,19,15), genre: 'Folk Metal',  image_url: `${WOA}/fileadmin/_processed_/c/9/csm_stormseeker26_ffac69751b.jpg` },
+  { name: 'Vogelfrey',     stage: STAGES.FASTER, start_time: t(D2,20, 0), end_time: t(D2,20,45), genre: 'Folk Metal',  image_url: `${WOA}/fileadmin/_processed_/a/3/csm_vogelfrey_26_b_0c6f4b5859.jpg` },
+  { name: 'Brunhilde',     stage: STAGES.FASTER, start_time: t(D2,21,30), end_time: t(D2,22,15), genre: 'Folk Metal',  image_url: `${WOA}/fileadmin/_processed_/b/4/csm_brunhilde_26_489882e4fb.jpg` },
 
   // HEADBANGERS STAGE — Day 2
   { name: 'TBS',               stage: STAGES.HEADBANGERS, start_time: t(D2,12,30), end_time: t(D2,13,30), genre: 'TBD',                      image_url: PLACEHOLDER },

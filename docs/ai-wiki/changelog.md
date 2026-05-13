@@ -4,6 +4,29 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-13 (Lineup: Day 4 Saturday reorganization — corrected algorithm)
+
+### Changed
+- **lineup.md** — Rewrote Day 4 (Saturday, 1 August 2026) band assignments using the corrected importance-rank algorithm from the official Wacken 2026 Saturday poster. Group A (Faster, Harder, Louder = 18 slots) is exhausted completely with bands #1–#18 before any Group B assignment begins. Group B (W.E.T., Headbangers, Wackinger, Wasteland, Jungle = 30 slots) receives bands #19–#45. 45 bands mapped to 48 slots; 3 slots remain TBD (HBA29, WAK22, WAS23). Slot IDs corrected to match stages.md (previous Day 4 used wrong IDs such as HAR16–HAR21, FAS21–FAS34, etc.). Summary updated to 75 CONFIRMED · 94 TBD · 169 total.
+
+### Architectural Notes
+- Day 4 Group A headliners: Sabaton → FAS18, Powerwolf → HAR12, Arch Enemy → LOU27. Group A completely absorbs the top 18 importance-ranked bands, meaning all three Louder stage closers (Arch Enemy, Alestorm, Nevermore) are in Group A, not Group B.
+- Group B last-slot headliners: Dritte Wahl → WET35, Einherjer → HBA35, Finsterforst → WAK28, Fit For An Autopsy → WAS29, Focus. → JUN8.
+- Wacken Firefighters and Sir Henry Hot Memorial appear on both Day 1/2/3 and Day 4 — these are recurring daily acts; they are intentionally kept in all days they appear.
+
+---
+
+## 2026-05-13 (Lineup: Day 3 Friday reorganization — corrected algorithm)
+
+### Changed
+- **lineup.md** — Rewrote Day 3 (Friday, 31 July 2026) band assignments using the corrected importance-rank algorithm from the official Wacken 2026 Friday poster. Group A (Faster, Harder, Louder — 17 slots) filled completely first, then Group B (W.E.T., Headbangers, Wackinger, Wasteland, Welcome to the Jungle — 30 slots). All 47 bands placed across 47 Day 3 slots with correct `stages.md` slot IDs (FAS8–FAS12, HAR4–HAR7, LOU13–LOU20, WET23–WET29, HBA22–HBA28, WAK15–WAK21, WAS15–WAS22, JUN5).
+
+### Architectural Notes
+- Group A headliner chain: Judas Priest→FAS12, In Flames→HAR7, Running Wild→LOU20; Saxon→FAS11, Emperor→HAR6, Sepultura→LOU19.
+- Group B headliner chain: Chaosbay→WET29, Crematory→HBA28, Cruachan→WAK21, Cursed Abyss→WAS22, Deafheaven→JUN5 (only slot).
+
+---
+
 ## 2026-05-13 (Wiki: Stages/Lineup Split)
 
 ### Added
