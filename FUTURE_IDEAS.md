@@ -14,6 +14,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 | 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — `renderHook` + mocked IDB and Supabase; no network |
 | 5 | Unit tests: Component and page integration | High | Low — replaces misleading stub tests; mounts pages with RTL + mocked hooks |
 | 6 | Multi-stage / multi-genre badge conditions | Low | Low — additive condition types, registry-only, no schema change |
+| 7 | Closing-ceremony slot (non-band timetable entry) | Low | Low — single nullable column on `bands`, registry untouched, narrow scope |
 
 ---
 
@@ -415,3 +416,135 @@ Option A is the cheapest, least-risky generalisation that still scales to any fu
 - [ ] Bands with `genre = null` are excluded from `*_genres_min` counts.
 - [ ] All existing badges in `BADGES[]` keep working unchanged — no registry migration required.
 - [ ] `src/services/badges/registry.ts` CONDITION EXAMPLES section documents the four new types with the same prose style as the existing entries.
+
+---
+
+## Idea 7 — Closing-ceremony slot (non-band timetable entry)
+
+**Goal:** Model the traditional Wacken closing ceremony (the owners' farewell + "Sad Song" sing-along) as a first-class timetable entry — pickable by vira-latas, visually distinct, and respectfully kept out of music-badge counts.
+
+**Scope:** Narrow. One ceremony slot per festival year. No opening ceremony, daily anthem, fireworks, or other event types in scope — those would each be a follow-up.
+
+### Behavior summary (decided)
+
+| Aspect | Decision |
+|---|---|
+| Modeling approach | Add a `category` column to `bands` (Approach 1 from research). No new table. |
+| Pickable | ✅ Yes — uses existing `user_picks`. Crew RSVP count and avatars render like any band. |
+| Counts toward music badges | ❌ No — excluded from every `bands_picked_*` and `bands_seen_*` condition via filter in `buildBadgeContext`. |
+| Conflict alerts on overlap | ❌ No — overlap with another pick at the same time produces no warning. |
+| Dedicated ceremony badge | ❌ No — ceremonial, not gamified. |
+
+### Schema change
+
+```sql
+-- supabase/migrations/<date>_idea7_band_category.sql
+alter table public.bands
+  add column category text not null default 'band'
+  check (category in ('band', 'ceremony'));
+
+-- Optional index (probably overkill at 78+1 rows, skip unless query plans need it)
+-- create index bands_category_idx on public.bands(category);
+```
+
+`'band'` is the default, so every existing row stays exactly as-is. `'ceremony'` is opt-in for the new slot.
+
+### Type updates
+
+```ts
+// src/types/index.ts
+export type Band = {
+  id: string;
+  name: string;
+  stage: string;
+  start_time: string;
+  end_time: string;
+  image_url: string | null;
+  genre: string | null;
+  category: 'band' | 'ceremony';  // NEW (defaults to 'band' from DB)
+};
+
+// src/services/badges/types.ts
+export type BadgeBand = Pick<Band,
+  'id' | 'name' | 'stage' | 'start_time' | 'end_time' | 'genre' | 'category'
+>;
+```
+
+### Badge engine: auto-exclusion via context filter
+
+The cleanest place to exclude ceremonies from every existing badge in one shot is `buildBadgeContext` — filter at the source, so all 13+ `bands_picked_*` / `bands_seen_*` conditions stay protected without touching `evaluateBadge` at all.
+
+```ts
+// src/services/badges/engine.ts
+const pickedBands = userPickBandIds
+  .map((id) => bandsById.get(id))
+  .filter((b): b is BadgeBand => b !== undefined)
+  .filter((b) => b.category === 'band');  // NEW: ceremonies never count toward music badges
+```
+
+This single line guarantees:
+- `bands_seen_min`, `bands_picked_min` → ceremony does not inflate totals.
+- `bands_seen_genre_min`, `bands_seen_stage_min`, `*_before_hour_min`, `*_after_hour_min` → ceremony is invisible (it has `genre: null` and a stage that *would* match `Faster`/`Harder`/`Louder`, so the filter is essential).
+- `band_seen_named`, `band_picked_named` → ceremony can never accidentally satisfy a named-band badge.
+- All future plural-form badges from Idea 6 inherit the same protection for free.
+
+### UI treatment
+
+| Surface | Rendering |
+|---|---|
+| `/schedule` | Card with a gold/silver border, no genre line, label "Closing Ceremony" (i18n), no "pick" toggle override — just the same heart/check pattern as any pick. |
+| `/now` | When live: full-width hero card, same special styling. When upcoming within an hour: standard "next up" card with the same border treatment. |
+| `/my-picks` | Renders identically to a picked band, with the same border treatment so it's visually grouped at the right slot. |
+| `/popular` | Either include it (with the special styling) or exclude it entirely from the popularity list. Recommendation: **include it** so vira-latas can see who's planning to be at the farewell — that's the whole point. |
+
+**i18n keys (new):**
+- `scheduleClosingCeremony` — short label shown on the card ("Cerimônia de Encerramento" / "Closing Ceremony" / "Schlusszeremonie" / "Ceremonia de Cierre").
+- No translation of the row's `name` itself — keep the canonical name in the DB (e.g. `"Wacken Farewell"` or whatever the team prefers) and surface the category label via i18n.
+
+### Seed data (one row, godlike-curated)
+
+Add a single entry to `supabase/seed/bands.ts` with `category: 'ceremony'`, placed on whichever Main Infield stage the festival actually uses for the farewell (typically Faster on Saturday late afternoon). Genre stays `null`. Real start/end times to be filled when Wacken publishes them.
+
+```ts
+// supabase/seed/bands.ts (excerpt)
+{
+  name: 'Wacken Farewell',
+  stage: 'Faster',
+  start_time: '2026-08-01T17:00:00+02:00',  // TBD from Wacken's published schedule
+  end_time:   '2026-08-01T17:30:00+02:00',  // TBD
+  image_url: '/ceremony/wacken-farewell-2026.png',
+  genre: null,
+  category: 'ceremony',
+},
+```
+
+### Files
+
+- `supabase/migrations/<date>_idea7_band_category.sql` — single `alter table` + check constraint.
+- `src/types/index.ts` — add `category` to `Band`.
+- `src/lib/supabase.ts` — extend the generated/manual `bands` row type (or regenerate `supabase.types.ts` after running the migration locally).
+- `src/services/badges/types.ts` — add `category` to `BadgeBand`.
+- `src/services/badges/engine.ts` — single filter line in `buildBadgeContext`.
+- `src/pages/SchedulePage.tsx` — branch on `band.category` for card styling.
+- `src/pages/NowPage.tsx` (or wherever `/now` lives) — same branch in the hero/now-card renderer.
+- `src/components/<BandCard>.tsx` — accept a `category` prop and toggle the special border + label.
+- `src/i18n/{br,en,es,de}.json` — `scheduleClosingCeremony` label.
+- `supabase/seed/bands.ts` — one ceremony entry per festival year.
+- `src/__tests__/badges.test.ts` — new test: picking a `category: 'ceremony'` row does not satisfy `bands_picked_min`, `bands_picked_stage_min`, `bands_seen_min`, or `band_seen_named`.
+
+### Acceptance criteria
+
+- [ ] Migration applies cleanly; all existing 78+ bands have `category = 'band'` post-migration.
+- [ ] Check constraint rejects any value outside `('band', 'ceremony')`.
+- [ ] Ceremony row renders on `/schedule` with distinct styling and "Closing Ceremony" label.
+- [ ] Picking the ceremony writes to `user_picks` and shows the crew RSVP count, just like a band.
+- [ ] Picking the ceremony does **not** increment any music-badge count (`bands_picked_min`, `bands_seen_min`, `bands_*_stage_min`, `bands_*_genre_min`, `band_*_named`) — covered by new test cases.
+- [ ] Overlapping picks (band + ceremony at the same time) produce **no** conflict alert.
+- [ ] Offline-first behavior intact: ceremony row syncs into IndexedDB exactly like a band; picks made offline queue and flush on reconnect.
+- [ ] No regression on existing badges (full `badges.test.ts` suite passes).
+
+### Deferred (out of scope, parked here for future reference)
+
+- Opening ceremony, daily Wacken anthem, fireworks slot, marching-band parade → add new `category` values when needed (`'opening'`, `'anthem'`, `'fireworks'`). The check constraint becomes the migration site.
+- Ceremony-specific badge (`event_attended_named` condition) → introduce only if the team later wants to gamify it.
+- Auto-pick-on-login behavior → can be layered on top by inserting a `user_picks` row at session bootstrap for any unpicked `'ceremony'` rows, without touching anything in this idea's scope.
