@@ -4,6 +4,68 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-14 (Tweak: lost-together threshold)
+
+### Changed
+- **`src/services/badges/registry.ts`** — `lost-together` condition bumped from `count: 5` to `count: 10` (`crew_at_location_min`, location `'lost'`). All other fields (slug, imagePath, year, persist) unchanged.
+- **`src/i18n/Badges_br.json`, `Badges_en.json`, `Badges_es.json`, `Badges_de.json`** — `badgeLostTogetherDescription` updated from "15+" to "10+" in all four languages, fixing a pre-existing inconsistency where the descriptions claimed 15+ while the registry required 5.
+- **`docs/ai-wiki/badges.md`** — Updated the three `lost-together` mentions (Location Presence inventory bullet, Festival 2026 inventory bullet, Persistent Badges example) from `5` / `5+` to `10` / `10+`. Bumped Last updated.
+
+### Architectural Notes
+- Non-breaking tightening. Because `lost-together` is `persist: true`, its slug is stored permanently in `user_metadata.crew_earned_badge_slugs` once earned — existing users who have already triggered the badge keep it regardless of the new threshold. Only future earnings require 10+ crew at the `lost` location simultaneously.
+
+---
+
+## 2026-05-13 (Badges: 6 image-driven festival 2026 additions)
+
+### Added
+- **6 new badges** wired up to images that already existed in `public/badges/` but were unreferenced by `BADGES[]`. Inventory grew 29 → 35.
+  - `wacken-firefighters` — `band_seen_named: 'Wacken Firefighters'`, year 2026. Tribute to the volunteer parade band that opens Day 1 12:00 (WAK1) and closes Day 4 12:00 (WAK22) on the Wackinger stage. Label kept identical in BR/EN/ES/DE.
+  - `gutalax` — `band_seen_named: 'Gutalax'`, year 2026. Goregrind, Wasteland Day 3 21:30 (WAS20). Inside-joke "Osmar" reference preserved across all 4 languages.
+  - `heavysaurus` — display label "Mighty Roar" (translated per locale: "Rugido Poderoso" BR/ES, "Mächtiges Brüllen" DE). `band_seen_named: 'Heavysaurus'`, year 2026. Wasteland Day 4 21:30 (WAS28).
+  - `wackinger-regular` — display label "Wackinger Viking" (kept identical in all 4 languages). `bands_seen_stage_min: { stage: 'Wackinger', count: 3 }`, year 2026. Description references Amon Amarth thematically.
+  - `wasteland-warrior` — kept identical in all 4 languages. `bands_seen_stage_min: { stage: 'Wasteland', count: 1 }`, year 2026. Low threshold ("you went there at all"). Description preserves "Mad Max" as a globally recognized character name.
+  - `bullhead-heat` — "Heat" translated per locale, "Bullhead" preserved (it's the proper name of the flaming bullhead landmark between Faster ↔ Harder). `bands_seen_stages_min: { stages: ['Faster', 'Harder'], count: 6 }`, year 2026. "More than 5" interpreted strictly as > 5 → count: 6.
+- **6 unit-test groups** in `src/__tests__/badges.test.ts` under `registry — 2026 image-driven badges`. Each group looks up the badge in `BADGES[]` by slug (so the test will fail if the registry entry is removed) and exercises the earn / not-earn paths against a hand-built `BadgeContext`. Total badge tests grew from 54 → 65 (+11).
+
+### Changed
+- **`src/services/badges/registry.ts`** — Appended 6 new `BadgeConfig` entries after the location-presence section, grouped by intent: 3 band-named (firefighters, gutalax, heavysaurus), 2 stage-loyalty (wackinger-regular, wasteland-warrior), 1 multi-stage (bullhead-heat).
+- **`src/i18n/Badges_br.json`, `Badges_en.json`, `Badges_es.json`, `Badges_de.json`** — 6 label keys × 4 languages = 24 new label strings + 24 new description strings. Naming follows the existing `badge{PascalCase(slug)}` / `badge{PascalCase(slug)}Description` convention; label values for slugs `heavysaurus` and `wackinger-regular` intentionally diverge from the slug PascalCase (display says "Mighty Roar" / "Wackinger Viking" while the keys remain `badgeHeavysaurus` / `badgeWackingerRegular` for backward compatibility with the convention).
+- **`docs/ai-wiki/badges.md`** — Inventory total 29 → 35. "Festival 2026" subsection 8 → 14 entries. Bumped Last updated.
+- **`src/__tests__/badges.test.ts`** — Imported `BADGES` from the barrel re-export and added the 6 test groups.
+
+### Architectural Notes
+- Pure additive change. No migrations, no schema changes, no DB writes, no asset additions — all 6 PNGs already shipped. Verified by listing `public/badges/` against `imagePath` values in `BADGES[]`.
+- All 6 badges use existing condition types (`band_seen_named`, `bands_seen_stage_min`, `bands_seen_stages_min`); no engine changes required. Idea 6's plural-form `bands_seen_stages_min` (added earlier the same day) is exercised in production for the first time by `bullhead-heat`.
+- Inside jokes / proper names preserved per-locale where culturally meaningful: "Osmar" (Gutalax), "Amon Amarth" (Wackinger Viking), "Mad Max" (Wasteland Warrior), "Bullhead" (Bullhead Heat). The user's intent that `Bullhead` is a **proper noun** (name of the flaming sculpture) — not a translatable common noun — is honored: only "Heat" is localized.
+
+---
+
+## 2026-05-13 (Idea 6: multi-stage / multi-genre badge conditions)
+
+### Added
+- **4 new plural-form `BadgeCondition` variants** in `src/services/badges/types.ts`:
+  - `bands_picked_stages_min` — `{ stages: string[]; count: number }`
+  - `bands_picked_genres_min` — `{ genres: string[]; count: number }`
+  - `bands_seen_stages_min` — `{ stages: string[]; count: number }`
+  - `bands_seen_genres_min` — `{ genres: string[]; count: number }`
+  All four use set-membership (OR-combined within the array). A pick/seen-band counts toward the threshold if its `stage` (or `genre`) is included in the configured array; total matches must reach `count`. Single-element arrays behave identically to the existing singular conditions; empty arrays are never earned for `count > 0`; bands with `genre = null` are skipped in the `*_genres_min` variants.
+- **4 new `evaluateBadge` case branches** in `src/services/badges/engine.ts` — each is a one-line `Set` membership filter for O(1) lookup. No changes to `BadgeContext`, `buildBadgeContext`, or any repository: the data the new branches need (`ctx.pickedBands`, `ctx.seenBands`) is already in scope.
+- **18 new test cases** across 4 test groups in `src/__tests__/badges.test.ts` (`evaluateBadge — bands_{picked,seen}_{stages,genres}_min (Idea 6)`). Total badge tests grew from 36 → 54, all passing.
+- **CONDITION EXAMPLES** block in `src/services/badges/registry.ts` extended with prose-style entries for all 4 new types (Infield Rat / Extreme Devotee / etc. examples) matching the existing comment style.
+
+### Changed
+- **`docs/ai-wiki/badges.md`** — Bumped condition-type count 22 → 26. Added full documentation sections for the 4 new types under "BAND PICKS" and "BANDS SEEN" (with semantics, single-element equivalence, empty-array behavior, null-genre handling). Added 4 new rows to the cheat-sheet table. Bumped Last updated.
+
+### Architectural Notes
+- This is an additive change — every existing badge in `BADGES[]` (e.g. `death-metal`, `power-metal`, `party-metal`, all stage-min badges) keeps working unchanged. No registry migration, no DB migration, no asset changes.
+- TS exhaustiveness on the `BadgeCondition` discriminated union is preserved: `tsc --noEmit` passes after the edit. The `switch` in `evaluateBadge` covers every union variant.
+- Semantic decision recorded in `FUTURE_IDEAS.md`: **OR-within-the-array, not AND-across-stages**. "Saw 5 bands across Faster ∪ Harder" means any combination summing to 5; we do **not** also require ≥1 from each stage. A future `*_across_all_stages_min` variant would be a separate condition if ever needed.
+- The plural-form pattern (Option A from the design table) is preferred over widening existing fields (`stage: string | string[]`) because it preserves discriminated-union narrowing in the engine and keeps the call site readable (singular = 1, plural = many). The pattern extends naturally to future multi-day or multi-country set-membership badges.
+- **Idea 6** is now marked `implemented` in `FUTURE_IDEAS.md` and can be removed from that file in a follow-up cleanup pass.
+
+---
+
 ## 2026-05-13 (Badge: roots — Sepultura farewell witness)
 
 ### Added

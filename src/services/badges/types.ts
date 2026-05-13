@@ -18,6 +18,10 @@ export type BadgeCondition =
   // Picks-based characteristic conditions (Phase 10a)
   | { type: 'bands_picked_genre_min'; genre: string; count: number }
   | { type: 'bands_picked_stage_min'; stage: string; count: number }
+  // Plural-form set-membership variants (Idea 6): a pick counts if its stage/genre
+  // is included in the configured array; matches are OR-combined within the array.
+  | { type: 'bands_picked_stages_min'; stages: string[]; count: number }
+  | { type: 'bands_picked_genres_min'; genres: string[]; count: number }
   // `hour` is festival-local (CEST, +02:00); raw CEST hour < threshold
   | { type: 'bands_picked_before_hour_min'; hour: number; count: number }
   | { type: 'band_picked_named'; name: string }
@@ -25,6 +29,9 @@ export type BadgeCondition =
   | { type: 'bands_seen_min'; count: number }
   | { type: 'bands_seen_genre_min'; genre: string; count: number }
   | { type: 'bands_seen_stage_min'; stage: string; count: number }
+  // Plural-form set-membership variants (Idea 6) for seen bands
+  | { type: 'bands_seen_stages_min'; stages: string[]; count: number }
+  | { type: 'bands_seen_genres_min'; genres: string[]; count: number }
   | { type: 'bands_seen_before_hour_min'; hour: number; count: number }
   | { type: 'band_seen_named'; name: string }
   // Arrival day: earned when arrival day sorts before condition.day

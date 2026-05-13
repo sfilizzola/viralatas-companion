@@ -79,6 +79,17 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
       return ctx.pickedBands.filter((b) => b.genre === condition.genre).length >= condition.count;
     case 'bands_picked_stage_min':
       return ctx.pickedBands.filter((b) => b.stage === condition.stage).length >= condition.count;
+    case 'bands_picked_stages_min': {
+      const set = new Set(condition.stages);
+      return ctx.pickedBands.filter((b) => set.has(b.stage)).length >= condition.count;
+    }
+    case 'bands_picked_genres_min': {
+      const set = new Set(condition.genres);
+      return (
+        ctx.pickedBands.filter((b) => b.genre != null && set.has(b.genre)).length >=
+        condition.count
+      );
+    }
     case 'bands_picked_before_hour_min':
       return (
         ctx.pickedBands.filter((b) => festivalLocalHour(b.start_time) < condition.hour).length >=
@@ -92,6 +103,16 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
       return ctx.seenBands.filter((b) => b.genre === condition.genre).length >= condition.count;
     case 'bands_seen_stage_min':
       return ctx.seenBands.filter((b) => b.stage === condition.stage).length >= condition.count;
+    case 'bands_seen_stages_min': {
+      const set = new Set(condition.stages);
+      return ctx.seenBands.filter((b) => set.has(b.stage)).length >= condition.count;
+    }
+    case 'bands_seen_genres_min': {
+      const set = new Set(condition.genres);
+      return (
+        ctx.seenBands.filter((b) => b.genre != null && set.has(b.genre)).length >= condition.count
+      );
+    }
     case 'bands_seen_before_hour_min':
       return (
         ctx.seenBands.filter((b) => festivalLocalHour(b.start_time) < condition.hour).length >=

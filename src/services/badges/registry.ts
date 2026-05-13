@@ -235,9 +235,64 @@ export const BADGES: BadgeConfig[] = [
     imagePath: '/badges/badge_lost_together.png',
     labelKey: 'badgeLostTogether',
     descriptionKey: 'badgeLostTogetherDescription',
-    condition: { type: 'crew_at_location_min', location: 'lost', count: 5 },
+    condition: { type: 'crew_at_location_min', location: 'lost', count: 10 },
     year: 2026,
     persist: true,
+  },
+  // Festival 2026 — band-named witness badges
+  {
+    slug: 'wacken-firefighters',
+    imagePath: '/badges/badge_firefighters.png',
+    labelKey: 'badgeWackenFirefighters',
+    descriptionKey: 'badgeWackenFirefightersDescription',
+    // Wacken Firefighters open (Day 1 12:00, WAK1) and close (Day 4 12:00, WAK22) the festival on the Wackinger stage.
+    condition: { type: 'band_seen_named', name: 'Wacken Firefighters' },
+    year: 2026,
+  },
+  {
+    slug: 'gutalax',
+    imagePath: '/badges/badge_gutalax.png',
+    labelKey: 'badgeGutalax',
+    descriptionKey: 'badgeGutalaxDescription',
+    // Gutalax (Goregrind) — Wasteland Day 3, 21:30 (WAS20).
+    condition: { type: 'band_seen_named', name: 'Gutalax' },
+    year: 2026,
+  },
+  {
+    slug: 'heavysaurus',
+    imagePath: '/badges/badge_heavysaurus.png',
+    labelKey: 'badgeHeavysaurus',
+    descriptionKey: 'badgeHeavysaurusDescription',
+    // Heavysaurus (Children's Metal) — Wasteland Day 4, 21:30 (WAS28).
+    condition: { type: 'band_seen_named', name: 'Heavysaurus' },
+    year: 2026,
+  },
+  // Festival 2026 — stage-loyalty badges
+  {
+    slug: 'wackinger-regular',
+    imagePath: '/badges/badge_wackinger.png',
+    labelKey: 'badgeWackingerRegular',
+    descriptionKey: 'badgeWackingerRegularDescription',
+    condition: { type: 'bands_seen_stage_min', stage: 'Wackinger', count: 3 },
+    year: 2026,
+  },
+  {
+    slug: 'wasteland-warrior',
+    imagePath: '/badges/badge_wasteland.png',
+    labelKey: 'badgeWastelandWarrior',
+    descriptionKey: 'badgeWastelandWarriorDescription',
+    condition: { type: 'bands_seen_stage_min', stage: 'Wasteland', count: 1 },
+    year: 2026,
+  },
+  // Festival 2026 — Bullhead loyalty (Faster + Harder main-infield corridor)
+  {
+    slug: 'bullhead-heat',
+    imagePath: '/badges/badge_heat.png',
+    labelKey: 'badgeBullheadHeat',
+    descriptionKey: 'badgeBullheadHeatDescription',
+    // "More than 5" → strictly > 5 → count: 6 across Faster ∪ Harder (the flaming bullhead sits between them).
+    condition: { type: 'bands_seen_stages_min', stages: ['Faster', 'Harder'], count: 6 },
+    year: 2026,
   },
 ];
 
@@ -306,6 +361,22 @@ export const BADGES: BadgeConfig[] = [
 //   Example: loyal Faster stage follower
 //   { slug: 'faster-fanatic', condition: { type: 'bands_picked_stage_min', stage: 'Faster', count: 8 } }
 //
+// bands_picked_stages_min
+//   User picked N+ bands whose stage is any of the listed stages (set membership, OR-combined).
+//   A pick is counted if its `stage` is in the array; total picks across the listed stages
+//   must reach `count`. Does NOT require ≥1 from each stage.
+//   Example: Main Infield corridor lover — 6+ picks across Faster ∪ Harder
+//   { slug: 'infield-rat', condition: { type: 'bands_picked_stages_min', stages: ['Faster', 'Harder'], count: 6 } }
+//
+// bands_picked_genres_min
+//   User picked N+ bands whose genre is any of the listed genres (set membership, OR-combined).
+//   Bands with `genre = null` are never counted (no matching string). Genre names must match exactly.
+//   Example: extreme-metal devotee — 5+ picks across heavy sub-genres
+//   { slug: 'extreme-picker',
+//     condition: { type: 'bands_picked_genres_min',
+//                  genres: ['Death Metal', 'Black Metal', 'Grindcore', 'Brutal Death Metal'],
+//                  count: 5 } }
+//
 // bands_picked_before_hour_min
 //   User picked N+ bands whose CEST start time is before the given hour (0–23).
 //   Example: morning warrior — 3+ bands starting before 14:00 CEST
@@ -337,6 +408,21 @@ export const BADGES: BadgeConfig[] = [
 //   Seen N+ bands on a specific stage.
 //   Example: Headbangers devotee
 //   { slug: 'headbangers-regular', condition: { type: 'bands_seen_stage_min', stage: 'Headbangers', count: 4 } }
+//
+// bands_seen_stages_min
+//   Seen N+ bands whose stage is any of the listed stages (set membership, OR-combined).
+//   Same semantics as `bands_picked_stages_min` but counted against `seenBands`.
+//   Example: hung around the Main Infield corridor — saw 6+ bands across Faster ∪ Harder
+//   { slug: 'infield-rat', condition: { type: 'bands_seen_stages_min', stages: ['Faster', 'Harder'], count: 6 } }
+//
+// bands_seen_genres_min
+//   Seen N+ bands whose genre is any of the listed genres (set membership, OR-combined).
+//   Bands with `genre = null` are never counted.
+//   Example: confirmed extreme-metal devotee — saw 5+ across heavy sub-genres
+//   { slug: 'extreme-devotee',
+//     condition: { type: 'bands_seen_genres_min',
+//                  genres: ['Death Metal', 'Black Metal', 'Grindcore', 'Brutal Death Metal'],
+//                  count: 5 } }
 //
 // bands_seen_before_hour_min
 //   Seen N+ bands whose CEST start time is before the given hour.
