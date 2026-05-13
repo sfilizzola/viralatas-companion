@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import {
+  BADGES,
   buildBadgeContext,
   evaluateBadge,
   type BadgeBand,
@@ -862,5 +863,168 @@ describe('persist flag — generic achievement recording', () => {
     );
     const cfg = badge({ type: 'country_is', country: 'br' }); // no persist
     expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+});
+
+describe('registry — 2026 image-driven badges', () => {
+  const findBadge = (slug: string): BadgeConfig => {
+    const found = BADGES.find((b) => b.slug === slug);
+    if (!found) throw new Error(`Badge not found in BADGES[]: ${slug}`);
+    return found;
+  };
+
+  describe('wacken-firefighters (band_seen_named: Wacken Firefighters)', () => {
+    const cfg = findBadge('wacken-firefighters');
+    const now = new Date('2026-08-01T12:00:00.000Z');
+    const ff = band({
+      id: 'wak1',
+      name: 'Wacken Firefighters',
+      stage: 'Wackinger',
+      start_time: '2026-07-29T10:00:00.000Z',
+      end_time: '2026-07-29T10:45:00.000Z',
+    });
+
+    it('earned when user picked & seen Wacken Firefighters', () => {
+      const ctx = buildBadgeContext(
+        authUser(),
+        ['wak1'],
+        new Map(),
+        new Map([['wak1', ff]]),
+        new Set(),
+        now,
+      );
+      expect(evaluateBadge(cfg, ctx)).toBe(true);
+    });
+
+    it('not earned when user did not pick the band', () => {
+      const ctx = buildBadgeContext(authUser(), [], new Map(), new Map([['wak1', ff]]), new Set(), now);
+      expect(evaluateBadge(cfg, ctx)).toBe(false);
+    });
+  });
+
+  describe('gutalax (band_seen_named: Gutalax)', () => {
+    const cfg = findBadge('gutalax');
+    const now = new Date('2026-08-01T12:00:00.000Z');
+    const gx = band({
+      id: 'was20',
+      name: 'Gutalax',
+      stage: 'Wasteland',
+      start_time: '2026-07-31T19:30:00.000Z',
+      end_time: '2026-07-31T20:15:00.000Z',
+      genre: 'Goregrind',
+    });
+
+    it('earned when user is credited with seeing Gutalax', () => {
+      const ctx = buildBadgeContext(authUser(), ['was20'], new Map(), new Map([['was20', gx]]), new Set(), now);
+      expect(evaluateBadge(cfg, ctx)).toBe(true);
+    });
+
+    it('not earned if user opted out via "didn\'t see"', () => {
+      const ctx = buildBadgeContext(
+        authUser(),
+        ['was20'],
+        new Map(),
+        new Map([['was20', gx]]),
+        new Set(['was20']),
+        now,
+      );
+      expect(evaluateBadge(cfg, ctx)).toBe(false);
+    });
+  });
+
+  describe('heavysaurus (band_seen_named: Heavysaurus)', () => {
+    const cfg = findBadge('heavysaurus');
+    const now = new Date('2026-08-02T12:00:00.000Z');
+    const hs = band({
+      id: 'was28',
+      name: 'Heavysaurus',
+      stage: 'Wasteland',
+      start_time: '2026-08-01T19:30:00.000Z',
+      end_time: '2026-08-01T20:15:00.000Z',
+      genre: "Children's Metal",
+    });
+
+    it('earned when user picked & seen Heavysaurus', () => {
+      const ctx = buildBadgeContext(authUser(), ['was28'], new Map(), new Map([['was28', hs]]), new Set(), now);
+      expect(evaluateBadge(cfg, ctx)).toBe(true);
+    });
+  });
+
+  describe('wackinger-regular (bands_seen_stage_min: Wackinger, count 3)', () => {
+    const cfg = findBadge('wackinger-regular');
+    const now = new Date('2026-08-02T23:00:00.000Z');
+    const bandsById = new Map<string, BadgeBand>([
+      ['w1', band({ id: 'w1', stage: 'Wackinger', end_time: '2026-07-29T11:00:00.000Z' })],
+      ['w2', band({ id: 'w2', stage: 'Wackinger', end_time: '2026-07-30T11:00:00.000Z' })],
+      ['w3', band({ id: 'w3', stage: 'Wackinger', end_time: '2026-07-31T11:00:00.000Z' })],
+      ['f1', band({ id: 'f1', stage: 'Faster', end_time: '2026-07-29T11:00:00.000Z' })],
+    ]);
+
+    it('earned at exactly 3 Wackinger bands seen', () => {
+      const ctx = buildBadgeContext(authUser(), ['w1', 'w2', 'w3'], new Map(), bandsById, new Set(), now);
+      expect(evaluateBadge(cfg, ctx)).toBe(true);
+    });
+
+    it('not earned at 2 Wackinger seen', () => {
+      const ctx = buildBadgeContext(authUser(), ['w1', 'w2', 'f1'], new Map(), bandsById, new Set(), now);
+      expect(evaluateBadge(cfg, ctx)).toBe(false);
+    });
+  });
+
+  describe('wasteland-warrior (bands_seen_stage_min: Wasteland, count 1)', () => {
+    const cfg = findBadge('wasteland-warrior');
+    const now = new Date('2026-08-02T23:00:00.000Z');
+    const bandsById = new Map<string, BadgeBand>([
+      ['w1', band({ id: 'w1', stage: 'Wasteland', end_time: '2026-07-29T11:00:00.000Z' })],
+      ['f1', band({ id: 'f1', stage: 'Faster', end_time: '2026-07-29T11:00:00.000Z' })],
+    ]);
+
+    it('earned with a single Wasteland band seen', () => {
+      const ctx = buildBadgeContext(authUser(), ['w1'], new Map(), bandsById, new Set(), now);
+      expect(evaluateBadge(cfg, ctx)).toBe(true);
+    });
+
+    it('not earned with 0 Wasteland bands seen', () => {
+      const ctx = buildBadgeContext(authUser(), ['f1'], new Map(), bandsById, new Set(), now);
+      expect(evaluateBadge(cfg, ctx)).toBe(false);
+    });
+  });
+
+  describe('bullhead-heat (bands_seen_stages_min: Faster ∪ Harder, count 6)', () => {
+    const cfg = findBadge('bullhead-heat');
+    const now = new Date('2026-08-02T23:00:00.000Z');
+    const bandsById = new Map<string, BadgeBand>([
+      ['f1', band({ id: 'f1', stage: 'Faster', end_time: '2026-07-29T11:00:00.000Z' })],
+      ['f2', band({ id: 'f2', stage: 'Faster', end_time: '2026-07-29T13:00:00.000Z' })],
+      ['f3', band({ id: 'f3', stage: 'Faster', end_time: '2026-07-29T15:00:00.000Z' })],
+      ['h1', band({ id: 'h1', stage: 'Harder', end_time: '2026-07-29T11:00:00.000Z' })],
+      ['h2', band({ id: 'h2', stage: 'Harder', end_time: '2026-07-29T13:00:00.000Z' })],
+      ['h3', band({ id: 'h3', stage: 'Harder', end_time: '2026-07-29T15:00:00.000Z' })],
+      ['l1', band({ id: 'l1', stage: 'Louder', end_time: '2026-07-29T15:00:00.000Z' })],
+    ]);
+
+    it('earned at exactly 6 across Faster ∪ Harder ("more than 5")', () => {
+      const ctx = buildBadgeContext(
+        authUser(),
+        ['f1', 'f2', 'f3', 'h1', 'h2', 'h3'],
+        new Map(),
+        bandsById,
+        new Set(),
+        now,
+      );
+      expect(evaluateBadge(cfg, ctx)).toBe(true);
+    });
+
+    it('not earned at 5 across Faster ∪ Harder (Louder picks do not count)', () => {
+      const ctx = buildBadgeContext(
+        authUser(),
+        ['f1', 'f2', 'f3', 'h1', 'h2', 'l1'],
+        new Map(),
+        bandsById,
+        new Set(),
+        now,
+      );
+      expect(evaluateBadge(cfg, ctx)).toBe(false);
+    });
   });
 });

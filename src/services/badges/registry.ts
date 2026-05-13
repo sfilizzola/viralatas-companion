@@ -235,9 +235,64 @@ export const BADGES: BadgeConfig[] = [
     imagePath: '/badges/badge_lost_together.png',
     labelKey: 'badgeLostTogether',
     descriptionKey: 'badgeLostTogetherDescription',
-    condition: { type: 'crew_at_location_min', location: 'lost', count: 5 },
+    condition: { type: 'crew_at_location_min', location: 'lost', count: 10 },
     year: 2026,
     persist: true,
+  },
+  // Festival 2026 — band-named witness badges
+  {
+    slug: 'wacken-firefighters',
+    imagePath: '/badges/badge_firefighters.png',
+    labelKey: 'badgeWackenFirefighters',
+    descriptionKey: 'badgeWackenFirefightersDescription',
+    // Wacken Firefighters open (Day 1 12:00, WAK1) and close (Day 4 12:00, WAK22) the festival on the Wackinger stage.
+    condition: { type: 'band_seen_named', name: 'Wacken Firefighters' },
+    year: 2026,
+  },
+  {
+    slug: 'gutalax',
+    imagePath: '/badges/badge_gutalax.png',
+    labelKey: 'badgeGutalax',
+    descriptionKey: 'badgeGutalaxDescription',
+    // Gutalax (Goregrind) — Wasteland Day 3, 21:30 (WAS20).
+    condition: { type: 'band_seen_named', name: 'Gutalax' },
+    year: 2026,
+  },
+  {
+    slug: 'heavysaurus',
+    imagePath: '/badges/badge_heavysaurus.png',
+    labelKey: 'badgeHeavysaurus',
+    descriptionKey: 'badgeHeavysaurusDescription',
+    // Heavysaurus (Children's Metal) — Wasteland Day 4, 21:30 (WAS28).
+    condition: { type: 'band_seen_named', name: 'Heavysaurus' },
+    year: 2026,
+  },
+  // Festival 2026 — stage-loyalty badges
+  {
+    slug: 'wackinger-regular',
+    imagePath: '/badges/badge_wackinger.png',
+    labelKey: 'badgeWackingerRegular',
+    descriptionKey: 'badgeWackingerRegularDescription',
+    condition: { type: 'bands_seen_stage_min', stage: 'Wackinger', count: 3 },
+    year: 2026,
+  },
+  {
+    slug: 'wasteland-warrior',
+    imagePath: '/badges/badge_wasteland.png',
+    labelKey: 'badgeWastelandWarrior',
+    descriptionKey: 'badgeWastelandWarriorDescription',
+    condition: { type: 'bands_seen_stage_min', stage: 'Wasteland', count: 1 },
+    year: 2026,
+  },
+  // Festival 2026 — Bullhead loyalty (Faster + Harder main-infield corridor)
+  {
+    slug: 'bullhead-heat',
+    imagePath: '/badges/badge_heat.png',
+    labelKey: 'badgeBullheadHeat',
+    descriptionKey: 'badgeBullheadHeatDescription',
+    // "More than 5" → strictly > 5 → count: 6 across Faster ∪ Harder (the flaming bullhead sits between them).
+    condition: { type: 'bands_seen_stages_min', stages: ['Faster', 'Harder'], count: 6 },
+    year: 2026,
   },
 ];
 

@@ -368,7 +368,7 @@ Earned when user **is at a location AND N+ crew members are there** (permanent o
 **Use case**: Crew bonding badges ("15 of us were camping together!")
 **Example badges**:
 - `bbq-crew` (15+ crew in camping simultaneously)
-- `lost-together` (5+ lost souls at once)
+- `lost-together` (10+ lost souls at once)
 
 **How it works**:
 1. System calculates real-time crew count at each location
@@ -407,7 +407,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 
 ---
 
-## Current Badges Inventory (29 Total)
+## Current Badges Inventory (35 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -424,7 +424,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `5-wackens` — Attended 5+ editions
 - `10-wackens` — Attended 10+ editions
 
-### Festival 2026 (8)
+### Festival 2026 (14)
 - `early-bird` — Saw 5+ bands before 1 PM (CEST)
 - `dreamer` — "I'm Tripping" / 30+ picked bands (persist: true)
 - `death-metal` — Saw 3+ Death Metal bands
@@ -433,6 +433,12 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `alestorm` — Saw Alestorm live (band_seen_named) — distinct from the genre-based `party-metal` above.
 - `roots` — "Roots, Bloody Roots" — Saw Sepultura's farewell show (band_seen_named: `Sepultura`, HAR6 Day 3, 19:00–20:30).
 - `live-beast` — Saw 22+ bands
+- `wacken-firefighters` — Saw the *Wacken Firefighters* (band_seen_named) — they open Day 1 12:00 (WAK1) and close Day 4 12:00 (WAK22) on the Wackinger stage. Tribute to the volunteer brass-band tradition.
+- `gutalax` — Saw *Gutalax* (band_seen_named) — Goregrind, Wasteland Day 3 21:30 (WAS20). Inside-joke description references "Osmar".
+- `heavysaurus` — Display label "Mighty Roar". Saw *Heavysaurus* (band_seen_named) — Children's Metal dinosaur band, Wasteland Day 4 21:30 (WAS28).
+- `wackinger-regular` — Display label "Wackinger Viking". Saw 3+ bands on the Wackinger stage (`bands_seen_stage_min`).
+- `wasteland-warrior` — Saw 1+ band on the Wasteland stage (`bands_seen_stage_min`). Low threshold by design — Wasteland is the "you went there at all" badge.
+- `bullhead-heat` — "Bullhead Heat" / "Calor do Bullhead" / "Calor del Bullhead" / "Bullhead-Hitze". Loyalty to the flaming bullhead between Faster ↔ Harder: saw 6+ bands across Faster ∪ Harder (`bands_seen_stages_min`, "more than 5" interpreted as strictly > 5).
 
 ### Genres present in lineup with NO corresponding badge
 
@@ -453,7 +459,7 @@ These genres exist on the 2026 lineup but no badge in `src/services/badges/regis
 ### Location Presence (3)
 - `metal-place-2026` — Visited Metal Place (persist: true)
 - `bbq-crew` — 15+ crew camping together (persist: true)
-- `lost-together` — 5+ crew lost together (persist: true)
+- `lost-together` — 10+ crew lost together (persist: true)
 
 ---
 
@@ -614,7 +620,7 @@ Reflect **current state** — re-evaluated on every profile load.
 **Examples**:
 - `metal-place-2026` — Visited Metal Place once; recorded forever
 - `bbq-crew` — 15 crew camping together once; recorded forever even if crew disperses
-- `lost-together` — 5 crew lost together once; recorded forever
+- `lost-together` — 10 crew lost together once; recorded forever
 
 **Storage**: Slug stored in `user.user_metadata.achieved_badge_slugs[]` (for standard persist) or `crew_earned_badge_slugs[]` (for location crew badges)
 
@@ -845,4 +851,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-13 — added 4 plural-form badge conditions (`bands_picked_stages_min`, `bands_picked_genres_min`, `bands_seen_stages_min`, `bands_seen_genres_min`) — Idea 6 implemented
+**Last updated:** 2026-05-14 — bumped `lost-together` threshold 5 → 10 (registry, all 4 i18n descriptions, inventory bullets).
