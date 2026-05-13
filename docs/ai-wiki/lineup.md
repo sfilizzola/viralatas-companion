@@ -8,7 +8,7 @@
 > 2. Apply changes to `supabase/seed/bands.ts`
 > 3. Run `npm run seed:bands`
 
-**Summary:** 75 bands CONFIRMED · 85 bands TBD · 160 total
+**Summary:** 75 bands CONFIRMED · 86 bands TBD · 161 total
 
 ---
 
@@ -51,6 +51,8 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 ## Day 1 — Wednesday, 29 July 2026
 
 > **Note:** Harder stage is closed on Day 1. Faster starts at 16:00 (Doors: 15:30). Louder, W.E.T., Headbangers, Wasteland, Wackinger, and Welcome to the Jungle stages open earlier (from ~11:00–14:00).
+>
+> **Band placement algorithm:** Importance rank #1 → last slot of rank-1 stage (Faster), then rank #3 stage (Louder, rank-2 Harder is closed), then stages 4–8 in rank order. Repeat from 2nd-to-last slots inward.
 
 ### Harder Stage
 
@@ -60,21 +62,21 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 |------|-------|------|-------------|-----------|
-| Visions of Atlantis | Symphonic Metal | FAS1 | TBD | PLACEHOLDER |
-| Hämatom | Industrial Metal | FAS2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/e/csm_haematom_26_a104ede3d5.jpg |
-| Kadavar | Stoner Rock | FAS3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/9/csm_kadavar_26b_5241b42bda.jpg |
-| Unzucht | Industrial / Gothic | FAS4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/2/csm_unzucht_26_5662cb7925.jpg |
+| Poison the Preacher | Metal | FAS1 | TBD | PLACEHOLDER |
+| Diabolisches Werk | TBD | FAS2 | TBD | PLACEHOLDER |
+| Lacuna Coil | Gothic Metal | FAS3 | TBD | PLACEHOLDER |
+| Gagamania | TBD | FAS4 | TBD | PLACEHOLDER |
 
 ### Louder Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
 |------|-------|------|-------------|-----------|
-| Crypt Sermon | Doom Metal | LOU1 | TBD | PLACEHOLDER |
-| Broken by the Scream | Visual Kei Metal | LOU2 | TBD | PLACEHOLDER |
-| Dirty Shirt | Crossover Metal | LOU3 | TBD | PLACEHOLDER |
-| Alien Rockin' Explosion | Rock | LOU4 | TBD | PLACEHOLDER |
-| The Gathering | Gothic Metal | LOU5 | TBD | PLACEHOLDER |
-| Vanir | Viking Metal | LOU6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/f/csm_vanir_26_4989af5ab2.jpg |
+| Wacken Firefighters | TBD | LOU1 | TBD | PLACEHOLDER |
+| Thundermother | Rock | LOU2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/a/csm_Thundermother-Band-2023_d61771d790.jpg |
+| Ricky Warwick | Hard Rock | LOU3 | TBD | PLACEHOLDER |
+| Dirty Shirt | Crossover Metal | LOU4 | TBD | PLACEHOLDER |
+| 5th Avenue | TBD | LOU5 | TBD | PLACEHOLDER |
+| Hämatom | Industrial Metal | LOU6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/e/csm_haematom_26_a104ede3d5.jpg |
 
 ### W.E.T. Stage
 
@@ -84,14 +86,14 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | TBD | TBD | WET2 | TBD | PLACEHOLDER |
 | TBD | TBD | WET3 | TBD | PLACEHOLDER |
 | TBD | TBD | WET4 | TBD | PLACEHOLDER |
-| Ricky Warwick | Hard Rock | WET5 | TBD | PLACEHOLDER |
+| TBD | TBD | WET5 | TBD | PLACEHOLDER |
 | TBD | TBD | WET6 | TBD | PLACEHOLDER |
-| The Hardkiss | Rock | WET7 | TBD | PLACEHOLDER |
-| TBD | TBD | WET8 | TBD | PLACEHOLDER |
-| TBD | TBD | WET9 | TBD | PLACEHOLDER |
-| Velvet Rush | AOR | WET10 | TBD | PLACEHOLDER |
-| TBD | TBD | WET11 | TBD | PLACEHOLDER |
-| Rose Tattoo | Hard Rock | WET12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/5/csm_rose_tattoo26_a5747c907d.jpg |
+| TBD | TBD | WET7 | TBD | PLACEHOLDER |
+| Unzucht | Industrial / Gothic | WET8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/2/csm_unzucht_26_5662cb7925.jpg |
+| Sacred Steel | Power Metal | WET9 | TBD | PLACEHOLDER |
+| Expellow | TBD | WET10 | TBD | PLACEHOLDER |
+| Alien Rockin' Explosion | Rock | WET11 | TBD | PLACEHOLDER |
+| Electric Bassboy | TBD | WET12 | TBD | PLACEHOLDER |
 
 ### Headbangers Stage
 
@@ -104,11 +106,11 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | TBD | TBD | HBA5 | TBD | PLACEHOLDER |
 | TBD | TBD | HBA6 | TBD | PLACEHOLDER |
 | TBD | TBD | HBA7 | TBD | PLACEHOLDER |
-| TBD | TBD | HBA8 | TBD | PLACEHOLDER |
-| TBD | TBD | HBA9 | TBD | PLACEHOLDER |
-| TBD | TBD | HBA10 | TBD | PLACEHOLDER |
-| TBD | TBD | HBA11 | TBD | PLACEHOLDER |
-| TBD | TBD | HBA12 | TBD | PLACEHOLDER |
+| Vanir | Viking Metal | HBA8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/f/csm_vanir_26_4989af5ab2.jpg |
+| Sir Henry Hot Memorial | TBD | HBA9 | TBD | PLACEHOLDER |
+| Kadavar | Stoner Rock | HBA10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/9/csm_kadavar_26b_5241b42bda.jpg |
+| Ballroom Hamburg DJ Team | TBD | HBA11 | TBD | PLACEHOLDER |
+| TBS | TBD | HBA12 | TBD | PLACEHOLDER |
 
 ### Wasteland Stage
 
@@ -116,11 +118,11 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 |------|-------|------|-------------|-----------|
 | TBD | TBD | WAS1 | TBD | PLACEHOLDER |
 | TBD | TBD | WAS2 | TBD | PLACEHOLDER |
-| Expellow | TBD | WAS3 | TBD | PLACEHOLDER |
-| 5th Avenue | TBD | WAS4 | TBD | PLACEHOLDER |
-| TBD | TBD | WAS5 | TBD | PLACEHOLDER |
-| Lacuna Coil | Gothic Metal | WAS6 | TBD | PLACEHOLDER |
-| TBD | TBD | WAS7 | TBD | PLACEHOLDER |
+| Visions of Atlantis | Symphonic Metal | WAS3 | TBD | PLACEHOLDER |
+| The Troops of Doom | Thrash Metal | WAS4 | TBD | PLACEHOLDER |
+| Phantom | Heavy Metal | WAS5 | TBD | PLACEHOLDER |
+| Broken by the Scream | Visual Kei Metal | WAS6 | TBD | PLACEHOLDER |
+| Rose Tattoo | Hard Rock | WAS7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/5/csm_rose_tattoo26_a5747c907d.jpg |
 
 ### Wackinger Stage
 
@@ -128,18 +130,18 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 |------|-------|------|-------------|-----------|
 | TBD | TBD | WAK1 | TBD | PLACEHOLDER |
 | TBD | TBD | WAK2 | TBD | PLACEHOLDER |
-| TBD | TBD | WAK3 | TBD | PLACEHOLDER |
-| Mambo Kurt | TBD | WAK4 | TBD | PLACEHOLDER |
-| Sir Henry Hot Memorial | TBD | WAK5 | TBD | PLACEHOLDER |
-| Gagamania | TBD | WAK6 | TBD | PLACEHOLDER |
-| TBD | TBD | WAK7 | TBD | PLACEHOLDER |
+| Velvet Rush | AOR | WAK3 | TBD | PLACEHOLDER |
+| The Hardkiss | Rock | WAK4 | TBD | PLACEHOLDER |
+| Mambo Kurt | TBD | WAK5 | TBD | PLACEHOLDER |
+| Battlecreek | TBD | WAK6 | TBD | PLACEHOLDER |
+| Lovebites | Heavy Metal | WAK7 | TBD | PLACEHOLDER |
 
 ### Welcome to the Jungle Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
 |------|-------|------|-------------|-----------|
-| Ballroom Hamburg DJ Team | TBD | JUN1 | TBD | PLACEHOLDER |
-| Wacken Firefighters | TBD | JUN2 | TBD | PLACEHOLDER |
+| Crypt Sermon | Doom Metal | JUN1 | TBD | PLACEHOLDER |
+| The Gathering | Gothic Metal | JUN2 | TBD | PLACEHOLDER |
 
 ---
 
@@ -151,7 +153,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 |------|-------|------|-------------|-----------|
 | Katerfahrt | Rock | HAR1 | TBD | PLACEHOLDER |
 | Black Tish | TBD | HAR2 | TBD | PLACEHOLDER |
-| Thundermother | Rock | HAR3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/a/csm_Thundermother-Band-2023_d61771d790.jpg |
+| TBD | TBD | HAR3 | TBD | PLACEHOLDER |
 | Life of Agony | Alternative Metal | HAR4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/4/csm_life_of_agony26_68ef27b061.jpg |
 | Europe | Hard Rock | HAR5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/3/csm_Europe-WOA26_9d76063492.jpg |
 | Turbonegro | Punk Rock | HAR6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/b/csm_turbonegro26_2118d824cd.jpg |
@@ -197,12 +199,12 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 |------|-------|------|-------------|-----------|
-| TBS | TBD | HBA13 | TBD | PLACEHOLDER |
-| Battlecreek | TBD | HBA14 | TBD | PLACEHOLDER |
+| TBD | TBD | HBA13 | TBD | PLACEHOLDER |
+| TBD | TBD | HBA14 | TBD | PLACEHOLDER |
 | Anaal Nathrakh | Black Metal / Grindcore | HBA15 | TBD | PLACEHOLDER |
-| Diabolisches Werk | TBD | HBA16 | TBD | PLACEHOLDER |
+| TBD | TBD | HBA16 | TBD | PLACEHOLDER |
 | Craft | Black Metal | HBA17 | TBD | PLACEHOLDER |
-| Lovebites | Heavy Metal | HBA18 | TBD | PLACEHOLDER |
+| TBD | TBD | HBA18 | TBD | PLACEHOLDER |
 | Misery Index | Death Metal / Grindcore | HBA19 | TBD | PLACEHOLDER |
 
 ### Wasteland Stage
@@ -210,12 +212,12 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | Name | Genre | Slot | Band Status | Image URL |
 |------|-------|------|-------------|-----------|
 | Blood Red Throne | Death Metal | WAS8 | TBD | PLACEHOLDER |
-| Sacred Steel | Power Metal | WAS9 | TBD | PLACEHOLDER |
+| TBD | TBD | WAS9 | TBD | PLACEHOLDER |
 | Firespawn | Death Metal | WAS10 | TBD | PLACEHOLDER |
-| Phantom | Heavy Metal | WAS11 | TBD | PLACEHOLDER |
+| TBD | TBD | WAS11 | TBD | PLACEHOLDER |
 | Spectral Wound | Black Metal | WAS12 | TBD | PLACEHOLDER |
-| The Troops of Doom | Thrash Metal | WAS13 | TBD | PLACEHOLDER |
-| Poison the Preacher | Metal | WAS14 | TBD | PLACEHOLDER |
+| TBD | TBD | WAS13 | TBD | PLACEHOLDER |
+| TBD | TBD | WAS14 | TBD | PLACEHOLDER |
 
 ### Wackinger Stage
 
