@@ -1741,35 +1741,88 @@
   cursor: pointer;
 }
 
-/* Arrival day picker */
-.arrivalDayPillRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 4px;
-}
-
-.arrivalDayPill {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 600;
-  padding: 4px 10px;
-  border-radius: var(--r-pill);
+/* Arrival day picker — matches schedule day tabs */
+.arrivalDayTabs {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  margin-top: 6px;
   border: 1px solid var(--border);
-  background: var(--bg-elevated);
-  color: var(--text-muted);
-  cursor: pointer;
-  line-height: 1;
-  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  border-radius: var(--r-1);
+  overflow: hidden;
+  background: var(--bg-surface);
 }
 
-.arrivalDayPill:hover:not(.arrivalDayPillSelected) {
-  border-color: var(--text-muted);
+.arrivalDayTab {
+  padding: var(--s-2) 2px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+  cursor: pointer;
+  background: transparent;
+  border-top: none;
+  border-bottom: none;
+  border-left: none;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.arrivalDayTab:last-child {
+  border-right: 0;
+}
+
+.arrivalDayTab:hover {
   color: var(--text);
 }
 
-.arrivalDayPillSelected {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+.arrivalDayTabActive {
+  background: var(--bg-elevated);
+  color: var(--text);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+.arrivalDayTabMarker {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+}
+
+.arrivalDayTab:hover .arrivalDayTabMarker,
+.arrivalDayTabActive .arrivalDayTabMarker {
+  color: var(--text-muted);
+}
+
+.arrivalDayTabHighlight .arrivalDayTabMarker {
+  color: var(--accent);
+}
+
+.arrivalDayTabHighlight.arrivalDayTabActive .arrivalDayTabMarker {
+  color: var(--accent-hover);
+}
+
+.arrivalDayTabDate {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+
+.arrivalDayTabDow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.arrivalDayTabActive .arrivalDayTabDow {
+  color: var(--text-muted);
 }
