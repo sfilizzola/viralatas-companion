@@ -36,5 +36,12 @@
   "arrivalMapExpandLabel": "ver todos",
   "arrivalMapCollapseLabel": "ocultar",
   "arrivalMapEmpty": "Nadie ha definido su día de llegada aún",
-  "arrivalMapToArrive": "por llegar"
+  "arrivalMapToArrive": "por llegar",
+  "loadMore": "Cargar más",
+  "loadingMore": "Cargando...",
+  "noMoreMessages": "No hay más mensajes",
+  "offlineCannotLoadMore": "Estás sin conexión — no hay más mensajes para cargar",
+  "pin": "Fijar",
+  "unpin": "Desfijar",
+  "pinned": "Fijado"
 }

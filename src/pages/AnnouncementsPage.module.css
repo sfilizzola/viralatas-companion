@@ -317,6 +317,29 @@
   margin: 0;
 }
 
+/* ---- Pinned card variant ---- */
+
+.cardPinned {
+  border-color: var(--accent);
+  border-left-width: 3px;
+  background: color-mix(in srgb, var(--bg-surface) 90%, var(--accent) 10%);
+}
+
+/* ---- Pinned chip in head row ---- */
+
+.pinnedChip {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
 /* ---- Actions row (column 2) ---- */
 
 .cardActions {
@@ -349,6 +372,41 @@
 
 .actionBtnDanger:hover:not(:disabled) {
   color: var(--signal-warn);
+}
+
+.actionBtnActive {
+  color: var(--accent);
+}
+
+/* ============================================================
+   LOAD MORE BUTTON
+   ============================================================ */
+
+.loadMoreBtn {
+  display: block;
+  width: 100%;
+  padding: var(--s-3) var(--s-4);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-2);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.loadMoreBtn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.loadMoreBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ============================================================
