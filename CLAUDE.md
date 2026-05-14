@@ -366,7 +366,7 @@ See `docs/ai-wiki/badges.md` for the full badge inventory, condition engine deta
 
 ## Phases at a glance
 
-Phases 1–15 are complete. The next active phase is **Phase 16**.
+Phases 1–18 are complete. The next active phase is **Phase 19**.
 
 **Full phase history** → `docs/ai-wiki/phases-history.md`
 

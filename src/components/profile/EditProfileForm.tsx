@@ -3,6 +3,7 @@ import type { User as AuthUser } from '@supabase/supabase-js';
 import { supabase } from '../../lib/supabase';
 import { type Language } from '../../lib/i18n';
 import { Button, Collapsible, Input, Select, SegmentedControl } from '../../ui';
+import PatchesBackgroundPicker from './PatchesBackgroundPicker';
 import styles from '../../pages/ProfilePage.module.css';
 
 const DECADE_GROUPS: { label: string; years: number[] }[] = [
@@ -11,12 +12,20 @@ const DECADE_GROUPS: { label: string; years: number[] }[] = [
   { label: '2020s', years: [2022, 2023, 2024, 2025, 2026] },
 ];
 
-const ARRIVAL_DAY_OPTIONS = [
-  { value: 'sun-jul26', labelKey: 'arrivalDaySunJul26' },
-  { value: 'mon-jul27', labelKey: 'arrivalDayMonJul27' },
-  { value: 'tue-jul28', labelKey: 'arrivalDayTueJul28' },
-  { value: 'wed-jul29', labelKey: 'arrivalDayWedJul29' },
-  { value: 'thu-plus', labelKey: 'arrivalDayThuPlus' },
+type ArrivalDayOption = {
+  value: string;
+  marker: string;
+  date: string;
+  dowKey: string;
+  highlight?: boolean;
+};
+
+const ARRIVAL_DAY_OPTIONS: ArrivalDayOption[] = [
+  { value: 'sun-jul26', marker: 'T\u22123', date: '26', dowKey: 'arrivalDayDowSun' },
+  { value: 'mon-jul27', marker: 'T\u22122', date: '27', dowKey: 'arrivalDayDowMon' },
+  { value: 'tue-jul28', marker: 'T\u22121', date: '28', dowKey: 'arrivalDayDowTue' },
+  { value: 'wed-jul29', marker: 'D1', date: '29', dowKey: 'arrivalDayDowWed', highlight: true },
+  { value: 'thu-plus', marker: 'D2+', date: '30+', dowKey: 'arrivalDayDowThuPlus' },
 ];
 
 const LANG_OPTIONS = [
@@ -40,19 +49,35 @@ function ArrivalDayPicker({
   return (
     <div className={styles.label}>
       {t('wackenArrivalDay')}
-      <div className={styles.arrivalDayPillRow}>
-        {ARRIVAL_DAY_OPTIONS.map(({ value, labelKey }) => (
-          <button
-            key={value}
-            type="button"
-            role="radio"
-            aria-checked={selectedDay === value}
-            className={`${styles.arrivalDayPill} ${selectedDay === value ? styles.arrivalDayPillSelected : ''}`}
-            onClick={() => onSelect(value)}
-          >
-            {t(labelKey)}
-          </button>
-        ))}
+      <div
+        className={styles.arrivalDayTabs}
+        role="radiogroup"
+        aria-label={t('wackenArrivalDay')}
+      >
+        {ARRIVAL_DAY_OPTIONS.map(({ value, marker, date, dowKey, highlight }) => {
+          const isActive = selectedDay === value;
+          const cls = [
+            styles.arrivalDayTab,
+            isActive ? styles.arrivalDayTabActive : '',
+            highlight ? styles.arrivalDayTabHighlight : '',
+          ]
+            .filter(Boolean)
+            .join(' ');
+          return (
+            <button
+              key={value}
+              type="button"
+              role="radio"
+              aria-checked={isActive}
+              className={cls}
+              onClick={() => onSelect(value)}
+            >
+              <span className={styles.arrivalDayTabMarker}>{marker}</span>
+              <span className={styles.arrivalDayTabDate}>{date}</span>
+              <span className={styles.arrivalDayTabDow}>{t(dowKey)}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -222,6 +247,11 @@ export default function EditProfileForm({
             value={newLanguage}
             onChange={(v) => setNewLanguage(v as Language)}
           />
+        </div>
+
+        <div className={styles.label}>
+          {t('patchesBackground')}
+          <PatchesBackgroundPicker t={t} />
         </div>
 
         <label className={styles.label}>

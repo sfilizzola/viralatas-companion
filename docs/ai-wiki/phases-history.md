@@ -235,3 +235,41 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `index.md` updated: lists all 19 wiki documents, organised with reading paths for first-time engineer / badge developer / offline expert
 
 ---
+
+### Phase 16 — Schedule Sort Order Filter
+**Status:** ✅ Complete
+**Deliverables:**
+- `sortOrder: 'time-asc' | 'time-desc' | 'alpha'` field added to `BandFilterValue` and `EMPTY_FILTERS` (`src/components/bandFilterValue.ts`)
+- Sort logic moved into `filterBands()` in `src/services/bandFilter.ts` as a final step; secondary sort by `name` for stable ordering on identical `start_time`
+- `scheduleFilterStorage.ts` persists and restores `sortOrder`; falls back to `'time-asc'` on invalid/missing stored value
+- 3 new icons added to `src/components/icons/Icon.tsx`: `sort-time-asc` (clock + sun), `sort-time-desc` (clock + crescent moon), `sort-alpha` (A/Z + arrow)
+- Day tabs row restructured to flex in `BandFilters.tsx`; sort button (36×36px, accent dot on non-default) + upward-anchored icon-only popover added
+- `BandFilters.module.css` — `.dayTabsRow`, `.sortWrapper`, `.sortBtn`, `.sortBtnActive`, `.sortDot`, `.sortPopover`, `.sortOption`, `.sortOptionActive` styles
+- Hardcoded `.sort()` removed from `SchedulePage.tsx` `loadBands()` callback
+- 4 i18n keys (`sortLabel`, `sortTimeAsc`, `sortTimeDesc`, `sortAlpha`) added to all 4 locale files
+- `clearAll()` preserves `sortOrder` (sort is a display preference, not a filter)
+
+---
+
+### Phase 17 — My Picks: Saw / Didn't See Sections
+**Status:** ✅ Complete
+**Deliverables:**
+- `hidePick?: boolean` prop added to `BandCard` — suppresses the star button (controlled by `variant !== 'ranked' && !hidePick`)
+- `hidePick?: boolean` prop added to `BandDetailModal` — hides the pick/unpick action button when `true`; saw/missed toggle is unaffected
+- `MyPicksPage` grouping refactored: `myBands` split into `upcomingBands` (end_time ≥ now) and `endedBands` (end_time < now); `endedBands` further split into `sawBands` / `didntSeeBands` via per-user `missedBandIds` from `allMissed`
+- `grouped` now derives from `upcomingBands`; ended bands no longer appear in day sections
+- Two new collapsible sections rendered at the bottom of the list: "Saw" (green `--signal-ok` border) and "Didn't See" (amber `--signal-warn` border); each hidden when empty
+- `.dayHeaderSaw` and `.dayHeaderDidntSee` CSS modifier classes added to `SchedulePage.module.css`
+- `sectionSaw` and `sectionDidntSee` i18n keys (with `{count}` interpolation) added to all 4 locale files (`br`, `en`, `de`, `es`)
+- `BandDetailModal` in `MyPicksPage` receives `hidePick={isBandEnded}` so the pick/unpick button disappears once a band has ended
+
+---
+
+### Phase 18 — Badge Preview Tool in Godlike Menu
+**Status:** ✅ Complete
+**Deliverables:**
+- `src/components/profile/TestBadgeSection.tsx` — new self-contained component; renders scrollable grid of all badges from `BADGES` registry; manages local `selectedBadge: BadgeConfig | null` state; opens a detail modal with badge image, optional year chip, translated title, and description; zero persistence, zero network calls
+- `src/components/profile/GodlikeAdminPanel.module.css` — new CSS module with `.testBadgeGrid`, `.testBadgeCell`, `.testBadgeCaption` (grid) and full set of `.testBadgeModal*` classes (modal detail) mirroring `BadgesDisplay.module.css` visual pattern
+- `GodlikeAdminPanel.tsx` — imports and mounts `<TestBadgeSection t={t} />` after `<TimeTravelSection />`, before the registered users list
+
+---

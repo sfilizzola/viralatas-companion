@@ -7,5 +7,7 @@
   "headerConflicts": "{conflicts} conflitos",
   "headerOverlaps": "{overlaps} sobreposição(ões)",
   "conflictWarningBanner": "Você tem {count} conflito(s). Resolva fácil no seu perfil →",
-  "dayPickCount": "{count} escolhas"
+  "dayPickCount": "{count} escolhas",
+  "sectionSaw": "Vi ({count})",
+  "sectionDidntSee": "Não vi ({count})"
 }

@@ -24,7 +24,10 @@ export type IconName =
   | 'time'
   | 'tent'
   | 'friend'
-  | 'mural';
+  | 'mural'
+  | 'sort-time-asc'
+  | 'sort-time-desc'
+  | 'sort-alpha';
 
 type PathDef = (filled: boolean) => React.ReactNode;
 
@@ -136,6 +139,33 @@ const ICONS: Record<IconName, PathDef> = {
     </>
   ),
   mural: (_filled) => <path d="M3 11l19-9-9 19-2-8-8-2z" />,
+  'sort-time-asc': (_filled) => (
+    <>
+      {/* Clock offset lower-left */}
+      <circle cx="11" cy="14" r="7" />
+      <path d="M11 11 V14 L13 15.5" />
+      {/* Sun — filled circle + 4 short rays */}
+      <circle cx="19" cy="5" r="2" fill="currentColor" stroke="none" />
+      <path d="M19 1.8 V2.8 M22.2 5 H21.2 M19 7.2 V8.2 M15.8 5 H16.8" strokeWidth="1.4" />
+    </>
+  ),
+  'sort-time-desc': (_filled) => (
+    <>
+      {/* Clock offset lower-left */}
+      <circle cx="11" cy="14" r="7" />
+      <path d="M11 11 V14 L9 15.5" />
+      {/* Crescent moon — Lucide-style path */}
+      <path d="M18 2 a3 3 0 0 0 4.5 4.5 a4.5 4.5 0 1 1 -4.5 -4.5 Z" fill="currentColor" stroke="none" />
+    </>
+  ),
+  'sort-alpha': (_filled) => (
+    <>
+      <text x="2" y="10" fontSize="9" fontWeight="700" fill="currentColor" stroke="none">A</text>
+      <text x="2" y="22" fontSize="9" fontWeight="700" fill="currentColor" stroke="none">Z</text>
+      <line x1="17" y1="4" x2="17" y2="19" />
+      <polyline points="14 16 17 20 20 16" />
+    </>
+  ),
 };
 
 export default function Icon({

@@ -4,6 +4,87 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-14 (Phase 18: Badge Preview Tool in Godlike Menu)
+
+### Added
+- `src/components/profile/TestBadgeSection.tsx` — self-contained godlike-only section; renders a scrollable grid of all badges from the registry; local `selectedBadge` state drives a detail modal; zero network calls, zero IndexedDB reads or writes
+- `src/components/profile/GodlikeAdminPanel.module.css` — new CSS module with `.testBadgeGrid`, `.testBadgeCell`, `.testBadgeCaption` (grid styles) and `.testBadgeModalContent`, `.testBadgeModalPatch`, `.testBadgeModalImg`, `.testBadgeModalYearChip`, `.testBadgeModalName`, `.testBadgeModalDesc` (modal styles mirroring `BadgesDisplay.module.css` pattern)
+
+### Changed
+- `src/components/profile/GodlikeAdminPanel.tsx` — imports and mounts `<TestBadgeSection t={t} />` after `<TimeTravelSection />`, before the registered users list
+
+### Architectural Notes
+- `TestBadgeSection` uses `useI18n('Badges')` internally to resolve badge label/description keys — the `t` prop from the godlike panel is accepted for the component signature but not used for badge-specific text
+- Data flow is entirely static: `BADGES` array (build-time) → grid → `selectedBadge` state → modal; no context evaluation, no persistence
+- `BadgesDisplay.tsx` is untouched; `BADGES` registry is untouched; `user_metadata.achieved_badge_slugs` is never read or written
+
+---
+
+## 2026-05-14 (Patches Grid Background Preference)
+
+### Added
+- `src/lib/patchesBackground.ts` — shared module with `PatchesBackground` type, `PATCHES_BG_VALUES`, storage key, `PATCHES_BG_CHANGED_EVENT`, `loadPatchesBackground()`, `savePatchesBackground()`
+- `src/components/profile/PatchesBackgroundPicker.tsx` + `.module.css` — 5-swatch fabric selector (`none`, `grid`, `steel`, `indigo`, `leather`), each swatch is a miniature of the real texture it represents; swatches sized 42×42px
+- Picker mounted inside the **Edit Profile** collapsible (right under the Language control) — it's a per-device personalization, grouped with other cosmetic preferences
+- i18n keys `patchesBackground` ("Pick your battle vest color" + translations), `bgNone`, `bgGrid`, `bgSteel`, `bgIndigo`, `bgLeather` in all 4 locale files (`br`, `en`, `es`, `de`)
+- `data-bg` attribute on `.patchesGrid` in `BadgesDisplay` driven by the preference
+- CSS variants `.patchesGrid[data-bg='none' | 'grid' | 'steel' | 'indigo' | 'leather']` in `BadgesDisplay.module.css`
+- Leather texture uses three offset radial-gradient dot grids at differing sizes (8px / 11px / 13px) to simulate pebbled grain — non-repeating organic look on a `#2b1813` cordovan base
+
+### Changed
+- `.patchesGrid` no longer has a hard-coded background; the texture is fully delegated to the `data-bg` attribute selectors
+- `BadgesDisplay` now reads `loadPatchesBackground()` on mount and listens to `PATCHES_BG_CHANGED_EVENT` for live updates
+- **`country` label rephrased** to "Where do you live?" (and translations) — users were confusing this with country of origin; the field stores their current residence (`user_metadata.country`)
+
+### Architectural Notes
+- **Storage is localStorage, not Supabase or IndexedDB.** The preference is purely cosmetic, per-device by design, and must work offline at Wacken with zero round-trip. It does not belong in `user_metadata` or the `users` table.
+- The picker dispatches a `CustomEvent` with the new value in `detail`; this matches the existing window-event pattern used for IDB changes (e.g. `PICKS_CHANGED_EVENT`), keeping component coupling minimal.
+- Default is `steel` (dark indigo denim) — visually consistent with the rest of the dark theme.
+
+---
+
+## 2026-05-14 (Phase 17: My Picks — Saw / Didn't See Sections)
+
+### Added
+- `hidePick?: boolean` prop on `BandCard` — suppresses the star button when `true`; controlled by `variant !== 'ranked' && !hidePick`
+- `hidePick?: boolean` prop on `BandDetailModal` — hides the pick/unpick action button in the `.actions` footer when `true`
+- `upcomingBands` / `endedBands` split in `MyPicksPage` (filter on `end_time < currentNow`)
+- `missedBandIds` (per current user) derived from `allMissed` to further split `endedBands` into `sawBands` and `didntSeeBands`
+- Two collapsible sections at the bottom of `/my-picks`: "Saw" (green border, `--signal-ok`) and "Didn't See" (amber border, `--signal-warn`)
+- `.dayHeaderSaw` and `.dayHeaderDidntSee` CSS modifier classes in `SchedulePage.module.css`
+- `sectionSaw` and `sectionDidntSee` i18n keys (with `{count}` interpolation) in all 4 locale files (`br`, `en`, `de`, `es`)
+
+### Changed
+- `grouped` in `MyPicksPage` now derives from `upcomingBands` instead of `myBands`; ended bands no longer appear in day sections
+- `BandDetailModal` in `MyPicksPage` receives `hidePick={isBandEnded}` so the pick/unpick button disappears for ended bands
+
+### Architectural Notes
+- All state is offline-first: `endedBands` / `sawBands` / `didntSeeBands` are derived entirely from IndexedDB (`allMissed` via `missedRepository`, bands from `loadBands()`). No new network calls.
+- Saw/missed toggle in the detail modal still moves a card between the two ended sections in real time via the `MISSED_CHANGED_EVENT` window event and `refreshMissed()`.
+
+---
+
+## 2026-05-14 (Phase 16: Schedule Sort Order Filter)
+
+### Added
+- `sortOrder: 'time-asc' | 'time-desc' | 'alpha'` field to `BandFilterValue` and `EMPTY_FILTERS`
+- Sort step at end of `filterBands()` — operates on post-filter result set; `time-asc`/`time-desc` use secondary `name` sort for stable ordering
+- `VALID_SORT_ORDERS` guard in `scheduleFilterStorage.ts`; fallback to `'time-asc'` on missing/invalid value
+- 3 new `IconName` values and SVG paths: `sort-time-asc`, `sort-time-desc`, `sort-alpha`
+- Sort button + upward-anchored popover in `BandFilters.tsx`; outside-click closes via `mousedown` listener on document
+- `.dayTabsRow` flex wrapper in `BandFilters.module.css` so day tabs and sort button share a row
+- 4 aria-label i18n keys in all 4 locale files (`sortLabel`, `sortTimeAsc`, `sortTimeDesc`, `sortAlpha`)
+
+### Changed
+- `BandFilters.tsx` — `clearAll()` preserves `sortOrder` (it is a display preference, not a filter)
+- `SchedulePage.tsx` — removed hardcoded `.sort()` from `loadBands()` callback; ordering is now fully delegated to `filterBands()`
+
+### Architectural Notes
+- Sort is 100% client-side and fully offline: operates on the in-memory band list, preference persisted to `localStorage`. No network dependency.
+- `sortOrder` is excluded from the "clear filters" reset path intentionally per spec.
+
+---
+
 ## 2026-05-14 (Tweak: lost-together threshold)
 
 ### Changed

@@ -127,6 +127,36 @@
   color: var(--border-strong);
 }
 
+.latestSignalReadMore {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.latestSignalClickable {
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
+}
+
+.latestSignalClickable:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-elevated);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.latestSignalClickable:active {
+  background: rgba(229, 85, 85, 0.06);
+}
+
 .latestSignalText {
   display: -webkit-box;
   margin: 0;

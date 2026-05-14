@@ -15,6 +15,8 @@
   "emptySchedule": "No se encontró ninguna banda.",
   "goingCount": "{count} van",
   "goingLabel": "van",
+  "sawLabel": "vieron",
+  "skipLabel": "no fueron",
   "removePick": "Quitar Pick",
   "addPick": "Añadir Pick",
   "filtros": "Filtros",
@@ -46,5 +48,9 @@
   "conflictWarning": "Conflicto con {name}",
   "overlapWarning": "Se superpone con {name}",
   "pendingSync": "Sync pendiente",
-  "todosGeneros": "Todos los géneros"
+  "todosGeneros": "Todos los géneros",
+  "sortLabel": "Ordenar",
+  "sortTimeAsc": "Más temprano primero",
+  "sortTimeDesc": "Más tarde primero",
+  "sortAlpha": "Alfabético"
 }

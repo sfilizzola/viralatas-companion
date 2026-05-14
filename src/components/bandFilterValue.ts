@@ -4,6 +4,7 @@ export type BandFilterValue = {
   stage: string[];
   genre: string | null;
   upcoming: boolean;
+  sortOrder: 'time-asc' | 'time-desc' | 'alpha';
 };
 
 export const EMPTY_FILTERS: BandFilterValue = {
@@ -12,4 +13,5 @@ export const EMPTY_FILTERS: BandFilterValue = {
   stage: [],
   genre: null,
   upcoming: false,
+  sortOrder: 'time-asc',
 };

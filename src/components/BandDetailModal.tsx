@@ -21,6 +21,7 @@ type Props = {
   onToggleMissed?: () => void;
   conflictBands?: Band[];
   overlapBands?: Band[];
+  hidePick?: boolean;
 };
 
 export default function BandDetailModal({
@@ -36,6 +37,7 @@ export default function BandDetailModal({
   onToggleMissed,
   conflictBands,
   overlapBands,
+  hidePick = false,
 }: Props) {
   const { t } = useI18n('SchedulePage');
   const color = stageColor(band.stage);
@@ -135,13 +137,15 @@ export default function BandDetailModal({
           <button className={`${styles.actionButton} ${styles.actionButtonGhost}`} onClick={onClose} type="button">
             {t('closeModal')}
           </button>
-          <button
-            className={`${styles.actionButton} ${styles.actionButtonPrimary} ${isPicked ? styles.actionButtonPicked : ''}`}
-            onClick={onTogglePick}
-            type="button"
-          >
-            {isPicked ? t('removePick') : t('addPick')}
-          </button>
+          {!hidePick && (
+            <button
+              className={`${styles.actionButton} ${styles.actionButtonPrimary} ${isPicked ? styles.actionButtonPicked : ''}`}
+              onClick={onTogglePick}
+              type="button"
+            >
+              {isPicked ? t('removePick') : t('addPick')}
+            </button>
+          )}
         </div>
     </Modal>
   );

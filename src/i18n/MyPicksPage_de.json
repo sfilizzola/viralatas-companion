@@ -7,5 +7,7 @@
   "headerConflicts": "{conflicts} Konflikte",
   "headerOverlaps": "{overlaps} Überschneidung(en)",
   "conflictWarningBanner": "Du hast {count} Konflikt(e). Einfach im Profil lösen →",
-  "dayPickCount": "{count} Picks"
+  "dayPickCount": "{count} Picks",
+  "sectionSaw": "Gesehen ({count})",
+  "sectionDidntSee": "Nicht gesehen ({count})"
 }

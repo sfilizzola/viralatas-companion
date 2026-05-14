@@ -24,6 +24,35 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 | `src/i18n/Badges_de.json` | German labels + descriptions (if available) |
 | `src/components/BadgeModal.tsx` | Display earned badges in profile |
 | `src/components/ProfilePage.tsx` | Badge grid (4/6/8 cols) + admin assign-badge UI |
+| `src/lib/patchesBackground.ts` | Per-device patches grid background preference (localStorage) |
+| `src/components/profile/PatchesBackgroundPicker.tsx` | 4-swatch fabric selector in profile |
+
+---
+
+## Patches Grid Background Preference
+
+The patches grid background is a **per-device visual preference**, not a synced user setting. Each vira-lata can pick one of four backdrops for their patches collection.
+
+| Value | Texture | When to use |
+|---|---|---|
+| `none` | Transparent — sits directly on the page | Minimal, framerless look |
+| `grid` | Sunken black with fine crosshatch | Subtle texture without color shift |
+| `steel` | Dark indigo battle-vest denim (default) | Anchors the patches in a vest aesthetic |
+| `indigo` | Brighter washed denim | Higher contrast, more vibrant |
+| `leather` | Dark cordovan with pebbled grain | Black-leather metal jacket vibe |
+
+**Why localStorage and not Supabase / IndexedDB:**
+- Pure cosmetic — no other vira-lata is affected
+- Per-device is the correct semantics for theming
+- Zero network round-trip — toggling must feel instant even at Wacken with no signal
+- Avoids polluting `user_metadata` and the `users` table with view-state
+
+**Mechanism:**
+1. `PatchesBackgroundPicker` writes `localStorage['viralatas:patches-bg']` and dispatches `viralatas:patches-bg-changed` (CustomEvent with the new value in `detail`).
+2. `BadgesDisplay` listens for the event and re-renders `.patchesGrid` with `data-bg={value}`.
+3. CSS in `BadgesDisplay.module.css` keys each variant off the `data-bg` attribute. Switching is instant; no re-mount.
+
+If `localStorage` is unavailable (private mode, SSR), `loadPatchesBackground()` falls back to `DEFAULT_PATCHES_BG = 'steel'` and `savePatchesBackground` silently no-ops while still firing the event so the in-memory state updates for the session.
 
 ---
 

@@ -15,6 +15,8 @@
   "emptySchedule": "Nenhuma banda encontrada.",
   "goingCount": "{count} indo",
   "goingLabel": "indo",
+  "sawLabel": "viram",
+  "skipLabel": "pularam",
   "removePick": "Remover escolha",
   "addPick": "Adicionar escolha",
   "filtros": "Filtros",
@@ -46,5 +48,9 @@
   "conflictWarning": "Conflita com {name}",
   "overlapWarning": "Sobrepõe a {name}",
   "pendingSync": "Sync pendente",
-  "todosGeneros": "Todos os gêneros"
+  "todosGeneros": "Todos os gêneros",
+  "sortLabel": "Ordenação",
+  "sortTimeAsc": "Mais cedo primeiro",
+  "sortTimeDesc": "Mais tarde primeiro",
+  "sortAlpha": "Alfabético"
 }

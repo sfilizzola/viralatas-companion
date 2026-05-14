@@ -17,7 +17,118 @@
   grid-template-columns: repeat(4, 1fr);
   gap: var(--s-2);
   width: 100%;
+  padding: var(--s-3);
+  border-radius: var(--r-2);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* ============================================================
+   PATCHES GRID — BACKGROUND VARIANTS
+   Toggled via data-bg attribute, driven by user preference
+   stored in localStorage. See src/lib/patchesBackground.ts.
+   ============================================================ */
+
+/* none — transparent, no frame; patches sit directly on the page */
+.patchesGrid[data-bg='none'] {
   padding: var(--s-2) 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+/* grid — subtle crosshatch on sunken black; minimalist */
+.patchesGrid[data-bg='grid'] {
+  background-color: var(--bg-sunken);
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.028) 0px, rgba(255, 255, 255, 0.028) 1px,
+      transparent 1px, transparent 5px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.028) 0px, rgba(255, 255, 255, 0.028) 1px,
+      transparent 1px, transparent 5px
+    );
+  border: 1px solid var(--border);
+}
+
+/* steel — darker indigo battle-vest denim (default) */
+.patchesGrid[data-bg='steel'] {
+  background-color: #18293f;
+  background-image:
+    radial-gradient(ellipse 130% 110% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.38) 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px, transparent 3px,
+      rgba(255, 255, 255, 0.022) 3px, rgba(255, 255, 255, 0.022) 4px
+    ),
+    repeating-linear-gradient(
+      -52deg,
+      rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 2px,
+      transparent 2px, transparent 8px
+    ),
+    repeating-linear-gradient(
+      -52deg,
+      rgba(0, 0, 24, 0.22) 0px, rgba(0, 0, 24, 0.22) 1px,
+      transparent 1px, transparent 2px,
+      rgba(0, 0, 24, 0.12) 2px, rgba(0, 0, 24, 0.12) 3px,
+      transparent 3px, transparent 5px
+    );
+  border: 1px solid #0e1e30;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+/* indigo — brighter washed denim, more saturated */
+.patchesGrid[data-bg='indigo'] {
+  background-color: #34527a;
+  background-image:
+    radial-gradient(ellipse 130% 110% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.38) 100%),
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px, transparent 3px,
+      rgba(255, 255, 255, 0.022) 3px, rgba(255, 255, 255, 0.022) 4px
+    ),
+    repeating-linear-gradient(
+      -52deg,
+      rgba(255, 255, 255, 0.035) 0px, rgba(255, 255, 255, 0.035) 2px,
+      transparent 2px, transparent 8px
+    ),
+    repeating-linear-gradient(
+      -52deg,
+      rgba(0, 0, 24, 0.22) 0px, rgba(0, 0, 24, 0.22) 1px,
+      transparent 1px, transparent 2px,
+      rgba(0, 0, 24, 0.12) 2px, rgba(0, 0, 24, 0.12) 3px,
+      transparent 3px, transparent 5px
+    );
+  border: 1px solid #1d3558;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+/* leather — dark cordovan, pebbled grain, warm sheen */
+.patchesGrid[data-bg='leather'] {
+  background-color: #2b1813;
+  background-image:
+    /* Edge vignette — fabric depth */
+    radial-gradient(ellipse 130% 110% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.5) 100%),
+    /* Top warm sheen — light catching curved leather */
+    linear-gradient(180deg, rgba(255, 200, 140, 0.04) 0%, transparent 35%),
+    /* Pebbled grain — three offset dot grids at different sizes for randomness */
+    radial-gradient(circle at 30% 35%, rgba(0, 0, 0, 0.22) 0px, transparent 2px),
+    radial-gradient(circle at 65% 75%, rgba(0, 0, 0, 0.22) 0px, transparent 2.2px),
+    radial-gradient(circle at 50% 50%, rgba(255, 180, 120, 0.04) 0px, transparent 1.5px);
+  background-size:
+    100% 100%,
+    100% 100%,
+    8px 8px,
+    11px 11px,
+    13px 13px;
+  border: 1px solid #1a0d09;
+  box-shadow: inset 0 1px 0 rgba(255, 180, 120, 0.07);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .patchesGrid { transition: none; }
 }
 
 @media (min-width: 640px) {
@@ -68,23 +179,40 @@
 
 .yearChip {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
+  bottom: -2px;
+  right: -2px;
   width: 24px;
   height: 24px;
-  border-radius: 50%;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 9px;
   font-weight: 700;
-  color: var(--bg);
-  background: var(--signal-warn);
-  border: 2px solid var(--bg);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.01em;
+  color: #fff;
+  /* Red enamel pin — high contrast, battle vest authentic, echoes --accent */
+  background: linear-gradient(145deg, #d93025 0%, #b32020 60%, #7a1010 100%);
+  filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.9));
   line-height: 1;
   pointer-events: none;
+  z-index: 1;
+}
+
+/* Enamel lacquer gloss — softer and rounder than metallic specular */
+.yearChip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.08) 45%, rgba(255, 255, 255, 0) 70%);
+}
+
+/* Red glow on badge hover */
+.patchBtn:hover .yearChip {
+  filter:
+    drop-shadow(0 2px 5px rgba(0, 0, 0, 0.9))
+    drop-shadow(0 0 7px rgba(192, 57, 43, 0.6));
 }
 
 /* ============================================================
@@ -123,7 +251,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-elevated);
+  /* Spotlight from above — badge illuminated like a display case */
+  background: radial-gradient(circle at 50% 38%, #2a2a2a 0%, #0d0d0d 100%);
+  /* Circular frame ring */
+  box-shadow: 0 0 0 1px var(--border-strong), 0 8px 32px rgba(0, 0, 0, 0.65);
   flex-shrink: 0;
 }
 
@@ -138,22 +269,30 @@
 
 .modalYearChip {
   position: absolute;
-  bottom: 2px;
-  right: 2px;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  bottom: -2px;
+  right: -2px;
+  width: 38px;
+  height: 38px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
   display: flex;
   align-items: center;
   justify-content: center;
   font-family: var(--font-mono);
   font-size: 14px;
   font-weight: 700;
-  color: var(--bg);
-  background: var(--signal-warn);
-  border: 2px solid var(--bg);
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.01em;
+  color: #fff;
+  background: linear-gradient(145deg, #d93025 0%, #b32020 60%, #7a1010 100%);
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.95));
   line-height: 1;
+}
+
+.modalYearChip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.08) 45%, rgba(255, 255, 255, 0) 70%);
+  pointer-events: none;
 }
 
 .modalName {
