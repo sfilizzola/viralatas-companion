@@ -264,3 +264,12 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `BandDetailModal` in `MyPicksPage` receives `hidePick={isBandEnded}` so the pick/unpick button disappears once a band has ended
 
 ---
+
+### Phase 18 — Badge Preview Tool in Godlike Menu
+**Status:** ✅ Complete
+**Deliverables:**
+- `src/components/profile/TestBadgeSection.tsx` — new self-contained component; renders scrollable grid of all badges from `BADGES` registry; manages local `selectedBadge: BadgeConfig | null` state; opens a detail modal with badge image, optional year chip, translated title, and description; zero persistence, zero network calls
+- `src/components/profile/GodlikeAdminPanel.module.css` — new CSS module with `.testBadgeGrid`, `.testBadgeCell`, `.testBadgeCaption` (grid) and full set of `.testBadgeModal*` classes (modal detail) mirroring `BadgesDisplay.module.css` visual pattern
+- `GodlikeAdminPanel.tsx` — imports and mounts `<TestBadgeSection t={t} />` after `<TimeTravelSection />`, before the registered users list
+
+---

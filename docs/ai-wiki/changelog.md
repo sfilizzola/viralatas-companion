@@ -4,6 +4,22 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-14 (Phase 18: Badge Preview Tool in Godlike Menu)
+
+### Added
+- `src/components/profile/TestBadgeSection.tsx` — self-contained godlike-only section; renders a scrollable grid of all badges from the registry; local `selectedBadge` state drives a detail modal; zero network calls, zero IndexedDB reads or writes
+- `src/components/profile/GodlikeAdminPanel.module.css` — new CSS module with `.testBadgeGrid`, `.testBadgeCell`, `.testBadgeCaption` (grid styles) and `.testBadgeModalContent`, `.testBadgeModalPatch`, `.testBadgeModalImg`, `.testBadgeModalYearChip`, `.testBadgeModalName`, `.testBadgeModalDesc` (modal styles mirroring `BadgesDisplay.module.css` pattern)
+
+### Changed
+- `src/components/profile/GodlikeAdminPanel.tsx` — imports and mounts `<TestBadgeSection t={t} />` after `<TimeTravelSection />`, before the registered users list
+
+### Architectural Notes
+- `TestBadgeSection` uses `useI18n('Badges')` internally to resolve badge label/description keys — the `t` prop from the godlike panel is accepted for the component signature but not used for badge-specific text
+- Data flow is entirely static: `BADGES` array (build-time) → grid → `selectedBadge` state → modal; no context evaluation, no persistence
+- `BadgesDisplay.tsx` is untouched; `BADGES` registry is untouched; `user_metadata.achieved_badge_slugs` is never read or written
+
+---
+
 ## 2026-05-14 (Patches Grid Background Preference)
 
 ### Added

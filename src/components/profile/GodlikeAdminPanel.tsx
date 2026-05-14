@@ -7,6 +7,7 @@ import { getRegistrationEnabled, setRegistrationEnabled } from '../../lib/appSet
 import { saveLiveBandTestConfigRemote } from '../../services/liveBandTest';
 import { Avatar, Collapsible, Select } from '../../ui';
 import TimeTravelSection from './TimeTravelSection';
+import TestBadgeSection from './TestBadgeSection';
 import AssignBadgeModal from './AssignBadgeModal';
 import type { UserWithLoading } from './types';
 import { roleLabel } from './ProfileHeader';
@@ -534,6 +535,8 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
             )}
 
             <TimeTravelSection />
+
+            <TestBadgeSection t={t} />
 
             <div className={styles.userManagementSection}>
               <h4 className={styles.userManagementTitle}>{t('registeredUsers')}</h4>
