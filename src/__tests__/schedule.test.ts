@@ -59,7 +59,7 @@ function createBand(
 }
 
 function noFilters(overrides: Partial<BandFilterValue> = {}): BandFilterValue {
-  return { query: '', day: null, stage: [], genre: null, upcoming: false, ...overrides };
+  return { query: '', day: null, stage: [], genre: null, upcoming: false, sortOrder: 'time-asc', ...overrides };
 }
 
 describe('Schedule: 8 Stages × 4 Days', () => {

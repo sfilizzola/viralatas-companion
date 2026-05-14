@@ -82,6 +82,7 @@ describe('saveStoredFilters + loadStoredFilters round-trip', () => {
       stage: ['Faster', 'Louder'],
       genre: 'Heavy Metal',
       upcoming: true,
+      sortOrder: 'time-asc',
     };
     saveStoredFilters(filters);
     const loaded = loadStoredFilters();
@@ -94,7 +95,7 @@ describe('saveStoredFilters + loadStoredFilters round-trip', () => {
   });
 
   it('does not persist the query field to localStorage', () => {
-    saveStoredFilters({ query: 'metallica', day: null, stage: [], genre: null, upcoming: false });
+    saveStoredFilters({ query: 'metallica', day: null, stage: [], genre: null, upcoming: false, sortOrder: 'time-asc' });
     const raw = localStorage.getItem(STORAGE_KEY);
     expect(raw).toBeTruthy();
     const parsed = JSON.parse(raw!);
@@ -102,8 +103,8 @@ describe('saveStoredFilters + loadStoredFilters round-trip', () => {
   });
 
   it('overwrites previous saved filters when called again', () => {
-    saveStoredFilters({ query: '', day: '2026-07-29', stage: ['Faster'], genre: null, upcoming: false });
-    saveStoredFilters({ query: '', day: '2026-07-30', stage: ['Harder'], genre: 'Thrash Metal', upcoming: true });
+    saveStoredFilters({ query: '', day: '2026-07-29', stage: ['Faster'], genre: null, upcoming: false, sortOrder: 'time-asc' });
+    saveStoredFilters({ query: '', day: '2026-07-30', stage: ['Harder'], genre: 'Thrash Metal', upcoming: true, sortOrder: 'time-desc' });
     const loaded = loadStoredFilters();
     expect(loaded.day).toBe('2026-07-30');
     expect(loaded.stage).toEqual(['Harder']);
