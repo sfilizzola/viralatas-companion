@@ -1,0 +1,141 @@
+/* ============================================================
+   PATCHES BACKGROUND PICKER — fabric swatch selector
+   ============================================================ */
+
+.row {
+  display: flex;
+  gap: var(--s-2);
+  padding: var(--s-2) 0;
+  flex-wrap: wrap;
+}
+
+.swatch {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--r-1);
+  border: 1px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.swatch:hover {
+  transform: translateY(-1px);
+  border-color: var(--border-strong);
+}
+
+.swatch:active {
+  transform: translateY(0);
+}
+
+.swatch.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(192, 57, 43, 0.25), 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* ---- 1. none — empty, dashed indicator of absence ---- */
+.swatchNone {
+  background:
+    linear-gradient(135deg,
+      transparent 0%, transparent 47%,
+      rgba(255, 255, 255, 0.12) 47%, rgba(255, 255, 255, 0.12) 53%,
+      transparent 53%, transparent 100%),
+    var(--bg);
+}
+
+/* ---- 2. grid — micro crosshatch on sunken black ---- */
+.swatchGrid {
+  background:
+    repeating-linear-gradient(0deg,
+      rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px, transparent 4px),
+    repeating-linear-gradient(90deg,
+      rgba(255, 255, 255, 0.05) 0px, rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px, transparent 4px),
+    var(--bg-sunken);
+}
+
+/* ---- 3. steel — darker indigo denim ---- */
+.swatchSteel {
+  background-color: #18293f;
+  background-image:
+    radial-gradient(ellipse 130% 110% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.38) 100%),
+    repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(255,255,255,0.022) 3px, rgba(255,255,255,0.022) 4px),
+    repeating-linear-gradient(-52deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 2px, transparent 2px, transparent 8px),
+    repeating-linear-gradient(-52deg, rgba(0,0,24,0.32) 0px, rgba(0,0,24,0.32) 1px, transparent 1px, transparent 2px, rgba(0,0,24,0.18) 2px, rgba(0,0,24,0.18) 3px, transparent 3px, transparent 5px);
+}
+
+/* ---- 4. indigo — brighter battle vest denim ---- */
+.swatchIndigo {
+  background-color: #34527a;
+  background-image:
+    radial-gradient(ellipse 130% 110% at 50% 50%, transparent 50%, rgba(0, 0, 0, 0.38) 100%),
+    repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(255,255,255,0.022) 3px, rgba(255,255,255,0.022) 4px),
+    repeating-linear-gradient(-52deg, rgba(255,255,255,0.04) 0px, rgba(255,255,255,0.04) 2px, transparent 2px, transparent 8px),
+    repeating-linear-gradient(-52deg, rgba(0,0,24,0.28) 0px, rgba(0,0,24,0.28) 1px, transparent 1px, transparent 2px, rgba(0,0,24,0.15) 2px, rgba(0,0,24,0.15) 3px, transparent 3px, transparent 5px);
+}
+
+/* ---- 5. leather — dark cordovan, pebbled grain, warm sheen ---- */
+.swatchLeather {
+  background-color: #2b1813;
+  background-image:
+    radial-gradient(ellipse 130% 110% at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.5) 100%),
+    linear-gradient(180deg, rgba(255, 200, 140, 0.05) 0%, transparent 35%),
+    radial-gradient(circle at 30% 35%, rgba(0, 0, 0, 0.22) 0px, transparent 2px),
+    radial-gradient(circle at 65% 75%, rgba(0, 0, 0, 0.22) 0px, transparent 2px),
+    radial-gradient(circle at 50% 50%, rgba(255, 180, 120, 0.05) 0px, transparent 1.5px);
+  background-size:
+    100% 100%,
+    100% 100%,
+    7px 7px,
+    10px 10px,
+    12px 12px;
+}
+
+.label {
+  margin-top: var(--s-1);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  display: block;
+  user-select: none;
+}
+
+.cell.selected .label {
+  color: var(--accent);
+}
+
+.cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 42px;
+}
+
+/* Tiny accent dot bottom-right of selected swatch */
+.swatch.selected::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 1.5px var(--bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swatch { transition: none; }
+}

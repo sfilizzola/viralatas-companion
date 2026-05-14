@@ -4,6 +4,29 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-14 (Patches Grid Background Preference)
+
+### Added
+- `src/lib/patchesBackground.ts` — shared module with `PatchesBackground` type, `PATCHES_BG_VALUES`, storage key, `PATCHES_BG_CHANGED_EVENT`, `loadPatchesBackground()`, `savePatchesBackground()`
+- `src/components/profile/PatchesBackgroundPicker.tsx` + `.module.css` — 5-swatch fabric selector (`none`, `grid`, `steel`, `indigo`, `leather`), each swatch is a miniature of the real texture it represents; swatches sized 42×42px
+- Picker mounted inside the **Edit Profile** collapsible (right under the Language control) — it's a per-device personalization, grouped with other cosmetic preferences
+- i18n keys `patchesBackground` ("Pick your battle vest color" + translations), `bgNone`, `bgGrid`, `bgSteel`, `bgIndigo`, `bgLeather` in all 4 locale files (`br`, `en`, `es`, `de`)
+- `data-bg` attribute on `.patchesGrid` in `BadgesDisplay` driven by the preference
+- CSS variants `.patchesGrid[data-bg='none' | 'grid' | 'steel' | 'indigo' | 'leather']` in `BadgesDisplay.module.css`
+- Leather texture uses three offset radial-gradient dot grids at differing sizes (8px / 11px / 13px) to simulate pebbled grain — non-repeating organic look on a `#2b1813` cordovan base
+
+### Changed
+- `.patchesGrid` no longer has a hard-coded background; the texture is fully delegated to the `data-bg` attribute selectors
+- `BadgesDisplay` now reads `loadPatchesBackground()` on mount and listens to `PATCHES_BG_CHANGED_EVENT` for live updates
+- **`country` label rephrased** to "Where do you live?" (and translations) — users were confusing this with country of origin; the field stores their current residence (`user_metadata.country`)
+
+### Architectural Notes
+- **Storage is localStorage, not Supabase or IndexedDB.** The preference is purely cosmetic, per-device by design, and must work offline at Wacken with zero round-trip. It does not belong in `user_metadata` or the `users` table.
+- The picker dispatches a `CustomEvent` with the new value in `detail`; this matches the existing window-event pattern used for IDB changes (e.g. `PICKS_CHANGED_EVENT`), keeping component coupling minimal.
+- Default is `steel` (dark indigo denim) — visually consistent with the rest of the dark theme.
+
+---
+
 ## 2026-05-14 (Phase 17: My Picks — Saw / Didn't See Sections)
 
 ### Added

@@ -3,6 +3,7 @@ import type { User as AuthUser } from '@supabase/supabase-js';
 import { supabase } from '../../lib/supabase';
 import { type Language } from '../../lib/i18n';
 import { Button, Collapsible, Input, Select, SegmentedControl } from '../../ui';
+import PatchesBackgroundPicker from './PatchesBackgroundPicker';
 import styles from '../../pages/ProfilePage.module.css';
 
 const DECADE_GROUPS: { label: string; years: number[] }[] = [
@@ -222,6 +223,11 @@ export default function EditProfileForm({
             value={newLanguage}
             onChange={(v) => setNewLanguage(v as Language)}
           />
+        </div>
+
+        <div className={styles.label}>
+          {t('patchesBackground')}
+          <PatchesBackgroundPicker t={t} />
         </div>
 
         <label className={styles.label}>

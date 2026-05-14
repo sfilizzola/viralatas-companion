@@ -13,6 +13,11 @@ import { missedRepository } from '../repositories';
 import { now } from '../services/time';
 import { supabase } from '../lib/supabase';
 import { useI18n } from '../lib/i18n';
+import {
+  loadPatchesBackground,
+  PATCHES_BG_CHANGED_EVENT,
+  type PatchesBackground,
+} from '../lib/patchesBackground';
 import { Modal } from '../ui';
 import styles from './BadgesDisplay.module.css';
 
@@ -45,6 +50,16 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
   const { t } = useI18n('Badges');
   const [ctx, setCtx] = useState<BadgeContext>(EMPTY_CTX);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
+  const [bg, setBg] = useState<PatchesBackground>(() => loadPatchesBackground());
+
+  useEffect(() => {
+    function onBgChange(event: Event) {
+      const next = (event as CustomEvent<PatchesBackground>).detail;
+      if (next) setBg(next);
+    }
+    window.addEventListener(PATCHES_BG_CHANGED_EVENT, onBgChange);
+    return () => window.removeEventListener(PATCHES_BG_CHANGED_EVENT, onBgChange);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -146,7 +161,7 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
   return (
     <>
       {heading && <div className={styles.patchesHeading}>{heading}</div>}
-      <div className={styles.patchesGrid}>
+      <div className={styles.patchesGrid} data-bg={bg}>
         {earned.map((badge) => (
           <button
             key={badge.slug}
