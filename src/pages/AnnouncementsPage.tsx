@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { Announcement, CrewUser, UserRole, UsefulLink } from '../types';
 import {
   ANNOUNCEMENTS_CHANGED_EVENT,
@@ -19,6 +19,19 @@ import ArrivalMap from '../components/ArrivalMap';
 import { Avatar, Chip } from '../ui';
 import { useNow } from '../hooks/useNow';
 import styles from './AnnouncementsPage.module.css';
+
+const PAGE_SIZE = 10;
+const LOAD_MORE_SIZE = 5;
+
+function applyPinSort(announcements: Announcement[]): Announcement[] {
+  if (announcements.length < 2) return announcements;
+  const pinnedIdx = announcements.findIndex((a) => a.is_pinned);
+  if (pinnedIdx === -1) return announcements;
+  const pinned = announcements[pinnedIdx];
+  const rest = announcements.filter((_, i) => i !== pinnedIdx);
+  // rest[0] is the most recent non-pinned; insert pinned at position 1
+  return [rest[0], pinned, ...rest.slice(1)];
+}
 
 function relativeTime(
   isoString: string,
@@ -54,6 +67,10 @@ export default function AnnouncementsPage() {
   const [blockedUserIds, setBlockedUserIds] = useState<Set<string>>(new Set());
   const [pendingAnnouncementIds, setPendingAnnouncementIds] = useState<Set<string>>(new Set());
   const [usefulLinks, setUsefulLinks] = useState<UsefulLink[]>([]);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [pinning, setPinning] = useState<string | null>(null);
 
   const refreshFromCache = useCallback(async () => {
     const [cached, users, pendingQueue] = await Promise.all([
@@ -78,6 +95,45 @@ export default function AnnouncementsPage() {
 
     setLoading(false);
   }, []);
+
+  const sortedAnnouncements = useMemo(() => applyPinSort(announcements), [announcements]);
+  const visibleAnnouncements = useMemo(
+    () => sortedAnnouncements.slice(0, visibleCount),
+    [sortedAnnouncements, visibleCount],
+  );
+
+  async function handleLoadMore() {
+    if (loadingMore) return;
+
+    // If we have more items in cache than currently shown, just reveal them
+    if (announcements.length > visibleCount) {
+      setVisibleCount((v) => v + LOAD_MORE_SIZE);
+      return;
+    }
+
+    // Need to fetch from network
+    if (!navigator.onLine) {
+      alert(t('offlineCannotLoadMore'));
+      return;
+    }
+
+    setLoadingMore(true);
+    const oldest = announcements[announcements.length - 1]?.created_at;
+    if (!oldest) {
+      setHasMore(false);
+      setLoadingMore(false);
+      return;
+    }
+
+    const fetched = await announcementsRepository.fetchMore(oldest, LOAD_MORE_SIZE);
+    setLoadingMore(false);
+
+    if (fetched.length < LOAD_MORE_SIZE) setHasMore(false);
+    if (fetched.length > 0) {
+      await refreshFromCache();
+      setVisibleCount((v) => v + LOAD_MORE_SIZE);
+    }
+  }
 
   useEffect(() => {
     refreshFromCache();
@@ -118,6 +174,13 @@ export default function AnnouncementsPage() {
       .on(
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'announcements' },
+        async (payload) => {
+          await saveAnnouncement(payload.new as Announcement);
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'announcements' },
         async (payload) => {
           await saveAnnouncement(payload.new as Announcement);
         },
@@ -188,6 +251,22 @@ export default function AnnouncementsPage() {
     }
   }
 
+  async function handlePin(a: Announcement) {
+    if (!navigator.onLine) return;
+    setPinning(a.id);
+    try {
+      if (a.is_pinned) {
+        await announcementsRepository.unpinAnnouncement(a.id);
+      } else {
+        await announcementsRepository.pinAnnouncement(a.id);
+      }
+      await announcementsRepository.sync();
+      await refreshFromCache();
+    } finally {
+      setPinning(null);
+    }
+  }
+
   const canModerate = role === 'manager' || role === 'godlike';
   const isFestivalActive = currentTime >= new Date('2026-07-29T00:00:00+01:00');
   const showArrivalMapTop = userId && crewUsers.length > 0 && !isFestivalActive;
@@ -248,82 +327,111 @@ export default function AnnouncementsPage() {
         ) : announcements.length === 0 ? (
           <p className={styles.empty}>{t('empty')}</p>
         ) : (
-          <ul className={styles.feed}>
-            {announcements.map((a) => {
-              const author = crewUsers.find((u) => u.id === a.author_id);
-              const authorName = author?.display_name ?? t('anonymous');
-              const authorRole = userRoles[a.author_id] ?? 'normal';
-              const roleVariant =
-                authorRole === 'godlike'
-                  ? 'role-godlike'
-                  : authorRole === 'manager'
-                    ? 'role-manager'
-                    : ('role-normal' as const);
-              const showBlock = canModerate && authorRole !== 'godlike';
-              const showDelete = canModerate;
-              const alreadyBlocked = blockedUserIds.has(a.author_id);
-              const isBlocking = blocking === a.author_id;
-              return (
-                <li key={a.id} className={styles.card}>
-                  {/* col 1: avatar */}
-                  <Avatar
-                    size={40}
-                    src={author?.avatar_url ?? null}
-                    initial={authorName.charAt(0).toUpperCase()}
-                    className={styles.avatar}
-                  />
+          <>
+            <ul className={styles.feed}>
+              {visibleAnnouncements.map((a) => {
+                const author = crewUsers.find((u) => u.id === a.author_id);
+                const authorName = author?.display_name ?? t('anonymous');
+                const authorRole = userRoles[a.author_id] ?? 'normal';
+                const roleVariant =
+                  authorRole === 'godlike'
+                    ? 'role-godlike'
+                    : authorRole === 'manager'
+                      ? 'role-manager'
+                      : ('role-normal' as const);
+                const showBlock = canModerate && authorRole !== 'godlike';
+                const showDelete = canModerate;
+                const showPin = canModerate;
+                const alreadyBlocked = blockedUserIds.has(a.author_id);
+                const isBlocking = blocking === a.author_id;
+                const isPinning = pinning === a.id;
+                return (
+                  <li key={a.id} className={`${styles.card} ${a.is_pinned ? styles.cardPinned : ''}`}>
+                    {/* col 1: avatar */}
+                    <Avatar
+                      size={40}
+                      src={author?.avatar_url ?? null}
+                      initial={authorName.charAt(0).toUpperCase()}
+                      className={styles.avatar}
+                    />
 
-                  {/* col 2: head row */}
-                  <div className={styles.head}>
-                    <span className={styles.name}>{authorName}</span>
-                    <Chip variant={roleVariant}>{t(`role_${authorRole}`)}</Chip>
-                    <span className={styles.ts}>{relativeTime(a.created_at, t)}</span>
-                  </div>
-
-                  {/* col 2: body */}
-                  <p className={styles.body}>
-                    {a.content}
-                    {pendingAnnouncementIds.has(a.id) && (
-                      <span className="pending-chip" style={{ marginLeft: '8px' }}>
-                        {t('pendingSync')}
-                      </span>
-                    )}
-                  </p>
-
-                  {/* col 2: actions */}
-                  {(showBlock || showDelete) && (
-                    <div className={styles.cardActions}>
-                      {showBlock && (
-                        <button
-                          className={`${styles.actionBtn} ${!alreadyBlocked && !isBlocking ? styles.actionBtnDanger : ''}`}
-                          onClick={() => handleBlock(a.author_id)}
-                          disabled={isBlocking || alreadyBlocked}
-                          aria-label={t('block')}
-                          type="button"
-                        >
-                          {isBlocking
-                            ? t('blockingUser')
-                            : alreadyBlocked
-                              ? t('blockedDone')
-                              : t('blockAction')}
-                        </button>
+                    {/* col 2: head row */}
+                    <div className={styles.head}>
+                      <span className={styles.name}>{authorName}</span>
+                      <Chip variant={roleVariant}>{t(`role_${authorRole}`)}</Chip>
+                      {a.is_pinned && (
+                        <span className={styles.pinnedChip}>{t('pinned')}</span>
                       )}
-                      {showDelete && (
-                        <button
-                          className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
-                          onClick={() => handleDelete(a.id)}
-                          aria-label={t('delete')}
-                          type="button"
-                        >
-                          ⚐ {t('delete')}
-                        </button>
-                      )}
+                      <span className={styles.ts}>{relativeTime(a.created_at, t)}</span>
                     </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+
+                    {/* col 2: body */}
+                    <p className={styles.body}>
+                      {a.content}
+                      {pendingAnnouncementIds.has(a.id) && (
+                        <span className="pending-chip" style={{ marginLeft: '8px' }}>
+                          {t('pendingSync')}
+                        </span>
+                      )}
+                    </p>
+
+                    {/* col 2: actions */}
+                    {(showBlock || showDelete || showPin) && (
+                      <div className={styles.cardActions}>
+                        {showPin && (
+                          <button
+                            className={`${styles.actionBtn} ${a.is_pinned ? styles.actionBtnActive : ''}`}
+                            onClick={() => handlePin(a)}
+                            disabled={isPinning || !navigator.onLine}
+                            aria-label={a.is_pinned ? t('unpin') : t('pin')}
+                            type="button"
+                          >
+                            {a.is_pinned ? `📌 ${t('unpin')}` : `📌 ${t('pin')}`}
+                          </button>
+                        )}
+                        {showBlock && (
+                          <button
+                            className={`${styles.actionBtn} ${!alreadyBlocked && !isBlocking ? styles.actionBtnDanger : ''}`}
+                            onClick={() => handleBlock(a.author_id)}
+                            disabled={isBlocking || alreadyBlocked}
+                            aria-label={t('block')}
+                            type="button"
+                          >
+                            {isBlocking
+                              ? t('blockingUser')
+                              : alreadyBlocked
+                                ? t('blockedDone')
+                                : t('blockAction')}
+                          </button>
+                        )}
+                        {showDelete && (
+                          <button
+                            className={`${styles.actionBtn} ${styles.actionBtnDanger}`}
+                            onClick={() => handleDelete(a.id)}
+                            aria-label={t('delete')}
+                            type="button"
+                          >
+                            ⚐ {t('delete')}
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+
+            {hasMore && announcements.length >= visibleCount && (
+              <button
+                className={styles.loadMoreBtn}
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                type="button"
+              >
+                {loadingMore ? t('loadingMore') : t('loadMore')}
+              </button>
+            )}
+          </>
         )}
 
         {showArrivalMapBottom && (

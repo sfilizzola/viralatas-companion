@@ -36,5 +36,12 @@
   "arrivalMapExpandLabel": "see all",
   "arrivalMapCollapseLabel": "collapse",
   "arrivalMapEmpty": "No one has set an arrival day yet",
-  "arrivalMapToArrive": "to arrive"
+  "arrivalMapToArrive": "to arrive",
+  "loadMore": "Load more",
+  "loadingMore": "Loading...",
+  "noMoreMessages": "No more messages",
+  "offlineCannotLoadMore": "You're offline — no more messages to load",
+  "pin": "Pin",
+  "unpin": "Unpin",
+  "pinned": "Pinned"
 }

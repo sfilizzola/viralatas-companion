@@ -157,8 +157,23 @@ export default function MyPicksPage() {
     return ids;
   }, [conflicts, hardConflictBands]);
 
-  const totalConflicts = hardConflictBands.size;
-  const totalOverlaps = softOverlapBands.size;
+  const totalConflicts = useMemo(() => {
+    const seen = new Set<string>();
+    for (const [bandId, entries] of conflicts)
+      for (const e of entries)
+        if (e.severity === 'hard')
+          seen.add([bandId, e.band.id].sort().join(':'));
+    return seen.size;
+  }, [conflicts]);
+
+  const totalOverlaps = useMemo(() => {
+    const seen = new Set<string>();
+    for (const [bandId, entries] of conflicts)
+      for (const e of entries)
+        if (e.severity === 'soft' && !hardConflictBands.has(bandId) && !hardConflictBands.has(e.band.id))
+          seen.add([bandId, e.band.id].sort().join(':'));
+    return seen.size;
+  }, [conflicts, hardConflictBands]);
 
   const dayLabel = useCallback(
     (dateStr: string): string => {

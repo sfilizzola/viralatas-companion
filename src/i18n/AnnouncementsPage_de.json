@@ -36,5 +36,12 @@
   "arrivalMapExpandLabel": "alle sehen",
   "arrivalMapCollapseLabel": "einklappen",
   "arrivalMapEmpty": "Noch niemand hat seinen Ankunftstag angegeben",
-  "arrivalMapToArrive": "noch zu kommen"
+  "arrivalMapToArrive": "noch zu kommen",
+  "loadMore": "Mehr laden",
+  "loadingMore": "Lädt...",
+  "noMoreMessages": "Keine weiteren Nachrichten",
+  "offlineCannotLoadMore": "Du bist offline — keine weiteren Nachrichten verfügbar",
+  "pin": "Anheften",
+  "unpin": "Lösen",
+  "pinned": "Angeheftet"
 }

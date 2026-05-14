@@ -9,14 +9,30 @@ import {
 } from '../lib/db';
 import { supabase } from '../lib/supabase';
 
+const INITIAL_SYNC_LIMIT = 10;
+
 async function sync(): Promise<void> {
   const { data, error } = await supabase
     .from('announcements')
     .select('*')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(INITIAL_SYNC_LIMIT);
 
   if (error || !data) return;
   await saveAnnouncements(data as Announcement[]);
+}
+
+async function fetchMore(before: string, limit = 5): Promise<Announcement[]> {
+  const { data, error } = await supabase
+    .from('announcements')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .lt('created_at', before)
+    .limit(limit);
+
+  if (error || !data) return [];
+  await saveAnnouncements(data as Announcement[]);
+  return data as Announcement[];
 }
 
 async function post(userId: string, content: string): Promise<void> {
@@ -26,6 +42,7 @@ async function post(userId: string, content: string): Promise<void> {
     content,
     created_at: new Date().toISOString(),
     deleted_at: null,
+    is_pinned: false,
   };
 
   await saveAnnouncement(draft);
@@ -143,6 +160,26 @@ async function unblockUser(userId: string): Promise<void> {
   await supabase.from('blocked_posters').delete().eq('user_id', userId);
 }
 
+async function pinAnnouncement(id: string): Promise<void> {
+  // Unpin all, then pin the target
+  await supabase
+    .from('announcements')
+    .update({ is_pinned: false })
+    .eq('is_pinned', true);
+
+  await supabase
+    .from('announcements')
+    .update({ is_pinned: true })
+    .eq('id', id);
+}
+
+async function unpinAnnouncement(id: string): Promise<void> {
+  await supabase
+    .from('announcements')
+    .update({ is_pinned: false })
+    .eq('id', id);
+}
+
 async function setUserRole(
   targetUserId: string,
   role: 'normal' | 'manager',
@@ -162,6 +199,7 @@ async function fetchAllUsers(): Promise<
 
 export const announcementsRepository = {
   sync,
+  fetchMore,
   post,
   delete: deleteAnnouncement,
   flushPending,
@@ -173,4 +211,6 @@ export const announcementsRepository = {
   unblockUser,
   setUserRole,
   fetchAllUsers,
+  pinAnnouncement,
+  unpinAnnouncement,
 };

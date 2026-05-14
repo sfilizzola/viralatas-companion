@@ -36,5 +36,12 @@
   "arrivalMapExpandLabel": "ver todos",
   "arrivalMapCollapseLabel": "recolher",
   "arrivalMapEmpty": "Nenhum vira-lata definiu chegada ainda",
-  "arrivalMapToArrive": "a chegar"
+  "arrivalMapToArrive": "a chegar",
+  "loadMore": "Carregar mais",
+  "loadingMore": "Carregando...",
+  "noMoreMessages": "Sem mais recados",
+  "offlineCannotLoadMore": "Você está offline — sem mais recados para carregar",
+  "pin": "Fixar",
+  "unpin": "Desfixar",
+  "pinned": "Fixado"
 }

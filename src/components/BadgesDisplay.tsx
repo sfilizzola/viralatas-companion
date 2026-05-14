@@ -170,10 +170,12 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
             type="button"
             aria-label={t(badge.labelKey)}
           >
-            <img src={badge.imagePath} alt="" className={styles.patchImg} />
-            {badge.year && (
-              <span className={styles.yearChip}>{yearSuffix(badge.year)}</span>
-            )}
+            <span className={styles.imgWrapper}>
+              <img src={badge.imagePath} alt="" className={styles.patchImg} />
+              {badge.year && (
+                <span className={styles.yearChip}>{yearSuffix(badge.year)}</span>
+              )}
+            </span>
           </button>
         ))}
       </div>

@@ -53,6 +53,7 @@ export type Announcement = {
   content: string;
   created_at: string;
   deleted_at: string | null;
+  is_pinned: boolean;
 };
 
 export type BlockedPoster = {
