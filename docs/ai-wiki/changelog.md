@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-14 (Phase 16: Schedule Sort Order Filter)
+
+### Added
+- `sortOrder: 'time-asc' | 'time-desc' | 'alpha'` field to `BandFilterValue` and `EMPTY_FILTERS`
+- Sort step at end of `filterBands()` — operates on post-filter result set; `time-asc`/`time-desc` use secondary `name` sort for stable ordering
+- `VALID_SORT_ORDERS` guard in `scheduleFilterStorage.ts`; fallback to `'time-asc'` on missing/invalid value
+- 3 new `IconName` values and SVG paths: `sort-time-asc`, `sort-time-desc`, `sort-alpha`
+- Sort button + upward-anchored popover in `BandFilters.tsx`; outside-click closes via `mousedown` listener on document
+- `.dayTabsRow` flex wrapper in `BandFilters.module.css` so day tabs and sort button share a row
+- 4 aria-label i18n keys in all 4 locale files (`sortLabel`, `sortTimeAsc`, `sortTimeDesc`, `sortAlpha`)
+
+### Changed
+- `BandFilters.tsx` — `clearAll()` preserves `sortOrder` (it is a display preference, not a filter)
+- `SchedulePage.tsx` — removed hardcoded `.sort()` from `loadBands()` callback; ordering is now fully delegated to `filterBands()`
+
+### Architectural Notes
+- Sort is 100% client-side and fully offline: operates on the in-memory band list, preference persisted to `localStorage`. No network dependency.
+- `sortOrder` is excluded from the "clear filters" reset path intentionally per spec.
+
+---
+
 ## 2026-05-14 (Tweak: lost-together threshold)
 
 ### Changed

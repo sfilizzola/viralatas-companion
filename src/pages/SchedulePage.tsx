@@ -34,7 +34,7 @@ export default function SchedulePage() {
 
   useEffect(() => {
     loadBands().then((data) => {
-      setBands(data.sort((a, b) => a.start_time.localeCompare(b.start_time)));
+      setBands(data);
       setLoading(false);
     });
   }, []);

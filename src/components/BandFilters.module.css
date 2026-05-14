@@ -90,15 +90,121 @@
 }
 
 /* ============================================================
-   DAY TAB BAR (4-column grid, D1–D4)
+   DAY TAB BAR + SORT BUTTON ROW
    ============================================================ */
+.dayTabsRow {
+  display: flex;
+  align-items: stretch;
+  gap: var(--s-2);
+}
+
 .dayTabs {
+  flex: 1;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   border: 1px solid var(--border);
   border-radius: var(--r-1);
   overflow: hidden;
   background: var(--bg-surface);
+}
+
+/* ---- Sort button ---- */
+.sortWrapper {
+  position: relative;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.sortBtn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 100%;
+  min-height: 36px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-1);
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.sortBtn:hover {
+  border-color: var(--text-muted);
+  color: var(--text);
+}
+
+.sortBtnActive {
+  color: var(--text);
+}
+
+.sortDot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* ---- Sort popover ---- */
+.sortPopover {
+  position: absolute;
+  bottom: calc(100% + var(--s-2));
+  right: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: row;
+  gap: var(--s-1);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-2);
+  padding: var(--s-2);
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.5);
+  animation: popoverIn 0.15s ease-out;
+}
+
+@keyframes popoverIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sortOption {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-1);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+
+.sortOption:hover {
+  background: var(--bg-surface);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.sortOptionActive {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
 }
 
 .dayTab {

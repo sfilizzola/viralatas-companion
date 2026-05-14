@@ -46,5 +46,9 @@
   "conflictWarning": "Conflicto con {name}",
   "overlapWarning": "Se superpone con {name}",
   "pendingSync": "Sync pendiente",
-  "todosGeneros": "Todos los géneros"
+  "todosGeneros": "Todos los géneros",
+  "sortLabel": "Ordenar",
+  "sortTimeAsc": "Más temprano primero",
+  "sortTimeDesc": "Más tarde primero",
+  "sortAlpha": "Alfabético"
 }

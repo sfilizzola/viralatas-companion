@@ -4,7 +4,7 @@ import { bandDay } from './bandTime';
 
 export function filterBands(bands: Band[], filters: BandFilterValue, now: Date): Band[] {
   const q = filters.query.trim().toLowerCase();
-  return bands.filter((b) => {
+  const result = bands.filter((b) => {
     if (filters.day && bandDay(b) !== filters.day) return false;
     if (filters.stage.length > 0 && !filters.stage.includes(b.stage)) return false;
     if (filters.genre && b.genre !== filters.genre) return false;
@@ -12,4 +12,18 @@ export function filterBands(bands: Band[], filters: BandFilterValue, now: Date):
     if (q && !b.name.toLowerCase().includes(q)) return false;
     return true;
   });
+
+  switch (filters.sortOrder) {
+    case 'time-asc':
+      result.sort((a, b) => a.start_time.localeCompare(b.start_time) || a.name.localeCompare(b.name));
+      break;
+    case 'time-desc':
+      result.sort((a, b) => b.start_time.localeCompare(a.start_time) || a.name.localeCompare(b.name));
+      break;
+    case 'alpha':
+      result.sort((a, b) => a.name.localeCompare(b.name));
+      break;
+  }
+
+  return result;
 }

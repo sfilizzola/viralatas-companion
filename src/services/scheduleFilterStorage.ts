@@ -2,17 +2,23 @@ import { EMPTY_FILTERS, type BandFilterValue } from '../components/bandFilterVal
 
 const FILTERS_STORAGE_KEY = 'vlt:filters:schedule';
 
+const VALID_SORT_ORDERS = ['time-asc', 'time-desc', 'alpha'] as const;
+
 export function loadStoredFilters(): BandFilterValue {
   try {
     const raw = localStorage.getItem(FILTERS_STORAGE_KEY);
     if (!raw) return EMPTY_FILTERS;
     const parsed = JSON.parse(raw) as Partial<BandFilterValue>;
+    const sortOrder = (VALID_SORT_ORDERS as readonly string[]).includes(parsed.sortOrder as string)
+      ? (parsed.sortOrder as BandFilterValue['sortOrder'])
+      : 'time-asc';
     return {
       query: '',
       day: typeof parsed.day === 'string' ? parsed.day : null,
       stage: Array.isArray(parsed.stage) ? parsed.stage.filter((s) => typeof s === 'string') : [],
       genre: typeof parsed.genre === 'string' ? parsed.genre : null,
       upcoming: typeof parsed.upcoming === 'boolean' ? parsed.upcoming : false,
+      sortOrder,
     };
   } catch {
     return EMPTY_FILTERS;

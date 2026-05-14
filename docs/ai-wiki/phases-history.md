@@ -235,3 +235,18 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `index.md` updated: lists all 19 wiki documents, organised with reading paths for first-time engineer / badge developer / offline expert
 
 ---
+
+### Phase 16 — Schedule Sort Order Filter
+**Status:** ✅ Complete
+**Deliverables:**
+- `sortOrder: 'time-asc' | 'time-desc' | 'alpha'` field added to `BandFilterValue` and `EMPTY_FILTERS` (`src/components/bandFilterValue.ts`)
+- Sort logic moved into `filterBands()` in `src/services/bandFilter.ts` as a final step; secondary sort by `name` for stable ordering on identical `start_time`
+- `scheduleFilterStorage.ts` persists and restores `sortOrder`; falls back to `'time-asc'` on invalid/missing stored value
+- 3 new icons added to `src/components/icons/Icon.tsx`: `sort-time-asc` (clock + sun), `sort-time-desc` (clock + crescent moon), `sort-alpha` (A/Z + arrow)
+- Day tabs row restructured to flex in `BandFilters.tsx`; sort button (36×36px, accent dot on non-default) + upward-anchored icon-only popover added
+- `BandFilters.module.css` — `.dayTabsRow`, `.sortWrapper`, `.sortBtn`, `.sortBtnActive`, `.sortDot`, `.sortPopover`, `.sortOption`, `.sortOptionActive` styles
+- Hardcoded `.sort()` removed from `SchedulePage.tsx` `loadBands()` callback
+- 4 i18n keys (`sortLabel`, `sortTimeAsc`, `sortTimeDesc`, `sortAlpha`) added to all 4 locale files
+- `clearAll()` preserves `sortOrder` (sort is a display preference, not a filter)
+
+---
