@@ -7,8 +7,6 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-## Status: Phase 17 — Closing-Ceremony Slot
-
 ## Phase 17 — Closing-Ceremony Slot
 
 **Spec:** `docs/superpowers/specs/2026-05-14-closing-ceremony-slot-design.md`
