@@ -88,8 +88,8 @@ The button icon reflects the active sort mode. Three new icons are added to `src
 
 | Mode | Icon name | Description |
 |---|---|---|
-| `time-asc` | `sort-time-asc` | Clock face with upward arrow — "earliest first" |
-| `time-desc` | `sort-time-desc` | Clock face with downward arrow — "latest first" |
+| `time-asc` | `sort-time-asc` | Clock face with a sun — "earliest first" (morning) |
+| `time-desc` | `sort-time-desc` | Clock face with a crescent moon — "latest first" (night) |
 | `alpha` | `sort-alpha` | "A" over "Z" with downward arrow — alphabetical |
 
 **Active indicator:** when `sortOrder` is not `'time-asc'` (the default), a small accent-colored dot appears on the button (same pattern as the filter trigger's count badge), signaling that a non-default sort is in effect.
