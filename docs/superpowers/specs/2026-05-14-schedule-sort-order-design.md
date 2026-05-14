@@ -105,7 +105,7 @@ Clicking the sort button opens a small upward-anchored popover positioned absolu
 ```
 
 - Each button is ~40×40px, square, with 8px rounded corners.
-- The active button has `var(--accent)` background with white icon.
+- **The currently active option is always highlighted with `var(--accent)` background and white icon — including `time-asc` on first open.** The popover always opens with one option clearly selected.
 - Inactive buttons have `bg-elevated` background with `text-muted` icon.
 - Each button carries an `aria-label` (localized) for screen readers.
 - Selecting any option sets `sortOrder` and **immediately closes** the popover. No "Apply" step.
