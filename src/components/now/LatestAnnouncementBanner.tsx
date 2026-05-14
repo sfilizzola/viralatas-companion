@@ -1,4 +1,7 @@
+import { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { Announcement, CrewUser } from '../../types';
+import Icon from '../icons/Icon';
 import styles from '../../pages/RightNowPage.module.css';
 
 type TFn = (key: string, values?: Record<string, string | number>) => string;
@@ -29,15 +32,35 @@ export default function LatestAnnouncementBanner({
 }: LatestAnnouncementBannerProps) {
   const author = crewUsers.find((u) => u.id === announcement.author_id);
   const authorName = author?.display_name?.trim() || t('anonymous');
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const [isTruncated, setIsTruncated] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const el = textRef.current;
+    if (!el) return;
+    setIsTruncated(el.scrollHeight > el.clientHeight);
+  }, [announcement.content]);
+
+  function handleNavigate() {
+    navigate('/announcements');
+  }
 
   return (
-    <section className={styles.latestSignal} aria-labelledby="latest-mural-signal">
+    <section
+      className={`${styles.latestSignal}${isTruncated ? ` ${styles.latestSignalClickable}` : ''}`}
+      aria-labelledby="latest-mural-signal"
+      onClick={isTruncated ? handleNavigate : undefined}
+      role={isTruncated ? 'button' : undefined}
+      tabIndex={isTruncated ? 0 : undefined}
+      onKeyDown={isTruncated ? (e) => { if (e.key === 'Enter' || e.key === ' ') handleNavigate(); } : undefined}
+    >
       <span className={styles.latestSignalKicker} id="latest-mural-signal">
         {t('latestNews')}
       </span>
       <div className={styles.latestSignalBody}>
         <div className={styles.latestSignalContent}>
-          <p className={styles.latestSignalText}>{announcement.content}</p>
+          <p ref={textRef} className={styles.latestSignalText}>{announcement.content}</p>
           <div className={styles.latestSignalMeta}>
             <span className={styles.latestAvatar}>
               {author?.avatar_url ? (
@@ -50,6 +73,12 @@ export default function LatestAnnouncementBanner({
             <span className={styles.latestSignalTime}>
               {relativeAnnouncementTime(announcement.created_at, t)}
             </span>
+            {isTruncated && (
+              <span className={styles.latestSignalReadMore} aria-label={t('readMore')}>
+                {t('readMore')}
+                <Icon name="arrow" size={10} strokeWidth={2.5} aria-hidden />
+              </span>
+            )}
           </div>
         </div>
       </div>
