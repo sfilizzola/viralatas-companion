@@ -100,6 +100,14 @@ export default function PopularPage() {
     [activeBand, currentNow],
   );
 
+  const missedCountsByBand = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const m of allMissed) {
+      map[m.band_id] = (map[m.band_id] ?? 0) + 1;
+    }
+    return map;
+  }, [allMissed]);
+
   const handleToggle = useCallback(
     async (bandId: string) => {
       if (!userId) return;
@@ -137,6 +145,7 @@ export default function PopularPage() {
           const attendees = attendeesByBand[band.id] ?? [];
           const count = pickCounts[band.id] ?? 0;
 
+          const ended = new Date(band.end_time) < currentNow;
           return (
             <BandCard
               key={band.id}
@@ -148,6 +157,8 @@ export default function PopularPage() {
               variant="ranked"
               rank={index + 1}
               attendeeCluster={count > 0 ? { attendees, max: 5 } : undefined}
+              isBandEnded={ended}
+              missedCount={ended ? (missedCountsByBand[band.id] ?? 0) : undefined}
             />
           );
         })}
@@ -161,6 +172,7 @@ export default function PopularPage() {
           onTogglePick={() => handleToggle(activeBand.id)}
           onClose={() => setActiveBandId(null)}
           isBandEnded={isBandEnded}
+          hidePick={isBandEnded}
           missedUserIds={missedUserIds}
           isMissed={isMissed}
           onToggleMissed={handleToggleMissed}

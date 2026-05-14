@@ -117,6 +117,14 @@
   transition: max-height 0.25s ease-in;
 }
 
+.dayHeaderSaw {
+  border-top-color: var(--signal-ok);
+}
+
+.dayHeaderDidntSee {
+  border-top-color: var(--signal-warn);
+}
+
 .conflictBanner {
   display: flex;
   align-items: center;

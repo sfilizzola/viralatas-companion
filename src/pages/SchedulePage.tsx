@@ -113,6 +113,7 @@ export default function SchedulePage() {
             onToggle={() => handleToggle(band.id)}
             onClick={() => handleToggle(band.id)}
             pending={pendingBandIds.has(band.id)}
+            isBandEnded={new Date(band.end_time) < currentTime}
           />
         ))}
       </main>

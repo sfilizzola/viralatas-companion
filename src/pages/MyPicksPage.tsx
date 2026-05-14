@@ -64,6 +64,39 @@ export default function MyPicksPage() {
     [bands, pickedIds],
   );
 
+  const upcomingBands = useMemo(
+    () => myBands.filter((band) => new Date(band.end_time) >= currentNow),
+    [myBands, currentNow],
+  );
+
+  const endedBands = useMemo(
+    () => myBands.filter((band) => new Date(band.end_time) < currentNow),
+    [myBands, currentNow],
+  );
+
+  const missedBandIds = useMemo(
+    () => new Set(allMissed.filter((m) => m.user_id === userId).map((m) => m.band_id)),
+    [allMissed, userId],
+  );
+
+  const sawBands = useMemo(
+    () => endedBands.filter((band) => !missedBandIds.has(band.id)),
+    [endedBands, missedBandIds],
+  );
+
+  const didntSeeBands = useMemo(
+    () => endedBands.filter((band) => missedBandIds.has(band.id)),
+    [endedBands, missedBandIds],
+  );
+
+  const missedCountsByBand = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const m of allMissed) {
+      map[m.band_id] = (map[m.band_id] ?? 0) + 1;
+    }
+    return map;
+  }, [allMissed]);
+
   const conflicts = useBandConflicts(myBands);
 
   const activeBand = useMemo(
@@ -95,14 +128,14 @@ export default function MyPicksPage() {
 
   const grouped = useMemo(() => {
     const map = new Map<string, Band[]>();
-    for (const band of myBands) {
+    for (const band of upcomingBands) {
       const day = bandDay(band);
       const list = map.get(day) ?? [];
       list.push(band);
       map.set(day, list);
     }
     return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
-  }, [myBands]);
+  }, [upcomingBands]);
 
   const hardConflictBands = useMemo(() => {
     const ids = new Set<string>();
@@ -264,6 +297,8 @@ export default function MyPicksPage() {
                             }
                           : undefined
                       }
+                      isBandEnded={new Date(band.end_time) < currentNow}
+                      missedCount={missedCountsByBand[band.id] ?? 0}
                     />
                   );
                 })}
@@ -271,6 +306,98 @@ export default function MyPicksPage() {
             </section>
           );
         })}
+
+        {sawBands.length > 0 && (() => {
+          const key = '__saw__';
+          const isExpanded = !collapsedDays.has(key);
+          return (
+            <section className={styles.daySection} key={key}>
+              <h2
+                className={`${styles.dayHeader} ${styles.dayHeaderSaw}`}
+                role="button"
+                tabIndex={0}
+                aria-expanded={isExpanded}
+                onClick={() => toggleDayCollapse(key)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleDayCollapse(key);
+                  }
+                }}
+              >
+                <span>{t('sectionSaw', { count: sawBands.length })}</span>
+                <span className={styles.dayHeaderRight}>
+                  <span className={`${styles.dayCollapseChevron} ${isExpanded ? styles.dayCollapseChevronOpen : ''}`}>
+                    <Icon name="chevron" size={12} />
+                  </span>
+                </span>
+              </h2>
+              <div className={`${styles.dayBands} ${isExpanded ? styles.dayBandsOpen : ''}`}>
+                {sawBands.map((band) => (
+                  <BandCard
+                    key={band.id}
+                    band={band}
+                    isPicked={pickedIds.has(band.id)}
+                    count={pickCounts[band.id] ?? 0}
+                    onToggle={() => handleToggle(band.id)}
+                    onClick={() => setActiveBandId(band.id)}
+                    variant="timeline"
+                    pending={pendingBandIds.has(band.id)}
+                    hidePick
+                    isBandEnded
+                    missedCount={missedCountsByBand[band.id] ?? 0}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })()}
+
+        {didntSeeBands.length > 0 && (() => {
+          const key = '__didntSee__';
+          const isExpanded = !collapsedDays.has(key);
+          return (
+            <section className={styles.daySection} key={key}>
+              <h2
+                className={`${styles.dayHeader} ${styles.dayHeaderDidntSee}`}
+                role="button"
+                tabIndex={0}
+                aria-expanded={isExpanded}
+                onClick={() => toggleDayCollapse(key)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleDayCollapse(key);
+                  }
+                }}
+              >
+                <span>{t('sectionDidntSee', { count: didntSeeBands.length })}</span>
+                <span className={styles.dayHeaderRight}>
+                  <span className={`${styles.dayCollapseChevron} ${isExpanded ? styles.dayCollapseChevronOpen : ''}`}>
+                    <Icon name="chevron" size={12} />
+                  </span>
+                </span>
+              </h2>
+              <div className={`${styles.dayBands} ${isExpanded ? styles.dayBandsOpen : ''}`}>
+                {didntSeeBands.map((band) => (
+                  <BandCard
+                    key={band.id}
+                    band={band}
+                    isPicked={pickedIds.has(band.id)}
+                    count={pickCounts[band.id] ?? 0}
+                    onToggle={() => handleToggle(band.id)}
+                    onClick={() => setActiveBandId(band.id)}
+                    variant="timeline"
+                    pending={pendingBandIds.has(band.id)}
+                    hidePick
+                    isBandEnded
+                    missedCount={missedCountsByBand[band.id] ?? 0}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })()}
       </main>
 
       {activeBand && (
@@ -281,6 +408,7 @@ export default function MyPicksPage() {
           onTogglePick={() => handleToggle(activeBand.id)}
           onClose={() => setActiveBandId(null)}
           isBandEnded={isBandEnded}
+          hidePick={isBandEnded}
           missedUserIds={missedUserIds}
           isMissed={isMissed}
           onToggleMissed={handleToggleMissed}

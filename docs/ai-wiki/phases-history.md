@@ -250,3 +250,17 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `clearAll()` preserves `sortOrder` (sort is a display preference, not a filter)
 
 ---
+
+### Phase 17 — My Picks: Saw / Didn't See Sections
+**Status:** ✅ Complete
+**Deliverables:**
+- `hidePick?: boolean` prop added to `BandCard` — suppresses the star button (controlled by `variant !== 'ranked' && !hidePick`)
+- `hidePick?: boolean` prop added to `BandDetailModal` — hides the pick/unpick action button when `true`; saw/missed toggle is unaffected
+- `MyPicksPage` grouping refactored: `myBands` split into `upcomingBands` (end_time ≥ now) and `endedBands` (end_time < now); `endedBands` further split into `sawBands` / `didntSeeBands` via per-user `missedBandIds` from `allMissed`
+- `grouped` now derives from `upcomingBands`; ended bands no longer appear in day sections
+- Two new collapsible sections rendered at the bottom of the list: "Saw" (green `--signal-ok` border) and "Didn't See" (amber `--signal-warn` border); each hidden when empty
+- `.dayHeaderSaw` and `.dayHeaderDidntSee` CSS modifier classes added to `SchedulePage.module.css`
+- `sectionSaw` and `sectionDidntSee` i18n keys (with `{count}` interpolation) added to all 4 locale files (`br`, `en`, `de`, `es`)
+- `BandDetailModal` in `MyPicksPage` receives `hidePick={isBandEnded}` so the pick/unpick button disappears once a band has ended
+
+---

@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-14 (Phase 17: My Picks — Saw / Didn't See Sections)
+
+### Added
+- `hidePick?: boolean` prop on `BandCard` — suppresses the star button when `true`; controlled by `variant !== 'ranked' && !hidePick`
+- `hidePick?: boolean` prop on `BandDetailModal` — hides the pick/unpick action button in the `.actions` footer when `true`
+- `upcomingBands` / `endedBands` split in `MyPicksPage` (filter on `end_time < currentNow`)
+- `missedBandIds` (per current user) derived from `allMissed` to further split `endedBands` into `sawBands` and `didntSeeBands`
+- Two collapsible sections at the bottom of `/my-picks`: "Saw" (green border, `--signal-ok`) and "Didn't See" (amber border, `--signal-warn`)
+- `.dayHeaderSaw` and `.dayHeaderDidntSee` CSS modifier classes in `SchedulePage.module.css`
+- `sectionSaw` and `sectionDidntSee` i18n keys (with `{count}` interpolation) in all 4 locale files (`br`, `en`, `de`, `es`)
+
+### Changed
+- `grouped` in `MyPicksPage` now derives from `upcomingBands` instead of `myBands`; ended bands no longer appear in day sections
+- `BandDetailModal` in `MyPicksPage` receives `hidePick={isBandEnded}` so the pick/unpick button disappears for ended bands
+
+### Architectural Notes
+- All state is offline-first: `endedBands` / `sawBands` / `didntSeeBands` are derived entirely from IndexedDB (`allMissed` via `missedRepository`, bands from `loadBands()`). No new network calls.
+- Saw/missed toggle in the detail modal still moves a card between the two ended sections in real time via the `MISSED_CHANGED_EVENT` window event and `refreshMissed()`.
+
+---
+
 ## 2026-05-14 (Phase 16: Schedule Sort Order Filter)
 
 ### Added

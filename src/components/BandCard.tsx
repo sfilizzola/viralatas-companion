@@ -21,6 +21,9 @@ type BandCardProps = {
   conflict?: { severity: 'hard' | 'soft'; active: boolean; onClick: () => void };
   attendeeCluster?: { attendees: BandAttendee[]; max?: number };
   pending?: boolean;
+  hidePick?: boolean;
+  isBandEnded?: boolean;
+  missedCount?: number;
   children?: ReactNode;
 };
 
@@ -35,13 +38,16 @@ export default function BandCard({
   conflict,
   attendeeCluster,
   pending,
+  hidePick = false,
+  isBandEnded = false,
+  missedCount,
   children,
 }: BandCardProps) {
   const { t } = useI18n('SchedulePage');
   const color = stageColorVar(band.stage);
   const initial = band.name.charAt(0).toUpperCase();
   const interactive = Boolean(onClick);
-  const showPick = variant !== 'ranked';
+  const showPick = variant !== 'ranked' && !hidePick;
 
   // Pop animation only fires on user toggle, not on initial render or
   // realtime updates from other clients.
@@ -132,9 +138,18 @@ export default function BandCard({
               {formatTime(band.start_time)} – {formatTime(band.end_time)}
             </span>
           )}
-          {count > 0 && (
+          {count > 0 && variant !== 'ranked' && (
             <span className={styles.going}>
-              <b>{count}</b> {t('goingLabel')}
+              {isBandEnded ? (
+                <>
+                  <b>{missedCount !== undefined ? count - missedCount : count}</b> {t('sawLabel')}
+                  {missedCount !== undefined && missedCount > 0 && (
+                    <> · <b>{missedCount}</b> {t('skipLabel')}</>
+                  )}
+                </>
+              ) : (
+                <><b>{count}</b> {t('goingLabel')}</>
+              )}
             </span>
           )}
           {variant === 'timeline' && conflict && (
@@ -162,7 +177,12 @@ export default function BandCard({
           {pending && <span className="pending-chip">{t('pendingSync')}</span>}
         </div>
         {attendeeCluster && variant === 'ranked' && (
-          <AttendeeCluster {...attendeeCluster} count={count} />
+          <AttendeeCluster
+            {...attendeeCluster}
+            count={count}
+            isBandEnded={isBandEnded}
+            missedCount={missedCount}
+          />
         )}
         {children}
       </div>
@@ -192,15 +212,20 @@ function AttendeeCluster({
   attendees,
   max = 5,
   count,
+  isBandEnded = false,
+  missedCount,
 }: {
   attendees: BandAttendee[];
   max?: number;
   count: number;
+  isBandEnded?: boolean;
+  missedCount?: number;
 }) {
   const { t } = useI18n('SchedulePage');
   if (attendees.length === 0) return null;
   const visible = attendees.slice(0, max);
   const overflow = attendees.length - visible.length;
+  const sawCount = missedCount !== undefined ? count - missedCount : count;
 
   return (
     <div className={styles.attendeeCluster}>
@@ -221,8 +246,16 @@ function AttendeeCluster({
         )}
       </div>
       <span className={styles.attendeeCount}>
-        <b>{count}</b>
-        {t('goingLabel')}
+        {isBandEnded ? (
+          <>
+            <b>{sawCount}</b>{t('sawLabel')}
+            {missedCount !== undefined && missedCount > 0 && (
+              <> · <b>{missedCount}</b>{t('skipLabel')}</>
+            )}
+          </>
+        ) : (
+          <><b>{count}</b>{t('goingLabel')}</>
+        )}
       </span>
     </div>
   );
