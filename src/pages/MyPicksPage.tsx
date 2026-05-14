@@ -147,16 +147,6 @@ export default function MyPicksPage() {
     return ids;
   }, [conflicts]);
 
-  const softOverlapBands = useMemo(() => {
-    const ids = new Set<string>();
-    for (const [bandId, entries] of conflicts) {
-      if (!hardConflictBands.has(bandId) && entries.some((e) => e.severity === 'soft')) {
-        ids.add(bandId);
-      }
-    }
-    return ids;
-  }, [conflicts, hardConflictBands]);
-
   const totalConflicts = useMemo(() => {
     const seen = new Set<string>();
     for (const [bandId, entries] of conflicts)

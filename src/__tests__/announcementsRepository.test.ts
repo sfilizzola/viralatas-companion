@@ -36,6 +36,7 @@ const SERVER_ANNOUNCEMENT: Announcement = {
   content: 'Hello metal!',
   created_at: '2026-07-29T14:00:00Z',
   deleted_at: null,
+  is_pinned: false,
 };
 
 describe('announcementsRepository.post', () => {
@@ -102,8 +103,8 @@ describe('announcementsRepository.post', () => {
 describe('announcementsRepository.flushPending', () => {
   it('posts pending announcements to Supabase and clears them from the queue on success', async () => {
     const pending: Announcement[] = [
-      { id: 'pending-1', author_id: 'user1', content: 'First', created_at: '2026-07-29T10:00:00Z', deleted_at: null },
-      { id: 'pending-2', author_id: 'user2', content: 'Second', created_at: '2026-07-29T11:00:00Z', deleted_at: null },
+      { id: 'pending-1', author_id: 'user1', content: 'First', created_at: '2026-07-29T10:00:00Z', deleted_at: null, is_pinned: false },
+      { id: 'pending-2', author_id: 'user2', content: 'Second', created_at: '2026-07-29T11:00:00Z', deleted_at: null, is_pinned: false },
     ];
     vi.mocked(db.loadOfflineAnnouncementsQueue).mockResolvedValue(pending);
 
@@ -113,6 +114,7 @@ describe('announcementsRepository.flushPending', () => {
       content: 'First',
       created_at: '2026-07-29T10:00:00Z',
       deleted_at: null,
+      is_pinned: false,
     };
     const mockSingle = vi.fn().mockResolvedValue({ data: serverResponse, error: null });
     const mockSelect = vi.fn().mockReturnValue({ single: mockSingle });
@@ -140,7 +142,7 @@ describe('announcementsRepository.flushPending', () => {
 
   it('does not clear from queue when Supabase insert fails', async () => {
     const pending: Announcement[] = [
-      { id: 'pending-fail', author_id: 'user1', content: 'Will fail', created_at: '2026-07-29T10:00:00Z', deleted_at: null },
+      { id: 'pending-fail', author_id: 'user1', content: 'Will fail', created_at: '2026-07-29T10:00:00Z', deleted_at: null, is_pinned: false },
     ];
     vi.mocked(db.loadOfflineAnnouncementsQueue).mockResolvedValue(pending);
 

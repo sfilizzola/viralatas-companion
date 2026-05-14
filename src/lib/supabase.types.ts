@@ -124,6 +124,7 @@ export type Database = {
           content: string;
           created_at: string;
           deleted_at: string | null;
+          is_pinned: boolean;
         };
         Insert: {
           id?: string;
@@ -131,6 +132,7 @@ export type Database = {
           content: string;
           created_at?: string;
           deleted_at?: string | null;
+          is_pinned?: boolean;
         };
         Update: {
           id?: string;
@@ -138,6 +140,7 @@ export type Database = {
           content?: string;
           created_at?: string;
           deleted_at?: string | null;
+          is_pinned?: boolean;
         };
         Relationships: [];
       };
