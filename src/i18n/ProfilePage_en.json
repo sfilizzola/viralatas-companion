@@ -27,6 +27,8 @@
   "resetError": "Reset failed. Try again.",
   "promoverManager": "Promote to manager",
   "removerManager": "Remove manager",
+  "marcarAmigo": "Mark as friend",
+  "removerAmigo": "Remove friend",
   "erroRole": "Update failed. Try again.",
   "blockedUsers": "Blocked users",
   "noBlockedUsers": "No blocked users",

@@ -42,6 +42,7 @@ type User = {
   avatar_url: string | null;            // Avatar image URL
   preferred_language: 'br' | 'en' | 'es' | 'de';
   is_test_user: boolean;                // Created for testing
+  is_friend?: boolean | null;           // Attending but not camping; excludes from camping/lost groups and location badges
   role: UserRole;                       // 'normal' | 'manager' | 'godlike'
   created_at: string;                   // ISO 8601
   wacken_years: number[];               // [2018, 2019, 2022, 2024]
@@ -59,6 +60,9 @@ type Country = 'de' | 'es' | 'br' | 'us' | 'co' | 'be' | 'other';
 - All other signups are role='normal'
 - Only godlike can assign badges, edit test configs, time travel
 - Only manager+ can block posters
+- `is_friend = true` → user does not appear in camping/lost crew groups; `PresenceToggle` is hidden; location badges (`metal-place-2026`, `bbq-crew`, `lost-together`) cannot be earned; they are excluded from `crewLocationCounts` used to gate crew-location badges for others
+- Only godlike can toggle `is_friend` (via admin panel)
+- `NULL` and `false` are both treated as non-friend
 
 **Lifecycle:**
 1. User signs up (email/password via Supabase Auth)

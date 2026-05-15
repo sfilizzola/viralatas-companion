@@ -188,12 +188,12 @@ async function setUserRole(
 }
 
 async function fetchAllUsers(): Promise<
-  { id: string; email: string; display_name: string | null; avatar_url: string | null; role: string; special_badges: string[] }[]
+  { id: string; email: string; display_name: string | null; avatar_url: string | null; role: string; special_badges: string[]; is_friend: boolean | null }[]
 > {
   const { data } = await supabase
     .from('users')
-    .select('id, email, display_name, avatar_url, role, special_badges')
-    .order('display_name') as { data: Array<{ id: string; email: string; display_name: string | null; avatar_url: string | null; role: string; special_badges: string[] }> | null };
+    .select('id, email, display_name, avatar_url, role, special_badges, is_friend')
+    .order('display_name') as { data: Array<{ id: string; email: string; display_name: string | null; avatar_url: string | null; role: string; special_badges: string[]; is_friend: boolean | null }> | null };
   return (data ?? []).map((u) => ({ ...u, special_badges: u.special_badges ?? [] }));
 }
 

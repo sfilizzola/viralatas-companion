@@ -27,6 +27,8 @@
   "resetError": "Erro ao redefinir. Tente de novo.",
   "promoverManager": "Promover a manager",
   "removerManager": "Remover manager",
+  "marcarAmigo": "Marcar como amigo",
+  "removerAmigo": "Remover amigo",
   "erroRole": "Erro ao atualizar. Tente de novo.",
   "blockedUsers": "Usuários bloqueados",
   "noBlockedUsers": "Nenhum usuário bloqueado",

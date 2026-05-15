@@ -29,6 +29,7 @@ export default function RightNowPage() {
   const {
     user,
     userId,
+    isFriend,
     crewUsers,
     latestAnnouncement,
     now,
@@ -64,7 +65,7 @@ export default function RightNowPage() {
       )}
 
       <main className={styles.main}>
-        {userId && (
+        {userId && !isFriend && (
           <PresenceToggle
             className={styles.presence}
             value={presenceValue}

@@ -67,6 +67,7 @@ CREATE TABLE public.users (
   avatar_url text,
   preferred_language text DEFAULT 'br' CHECK (preferred_language IN ('br', 'en', 'es', 'de')),
   is_test_user boolean DEFAULT false,
+  is_friend boolean DEFAULT NULL,  -- NULL/false = normal crew; true = friend (not camping, excluded from camping/lost groups and location badges)
   role text DEFAULT 'normal' CHECK (role IN ('normal', 'manager', 'godlike')),
   created_at timestamptz DEFAULT now(),
   wacken_years int[] DEFAULT ARRAY[]::int[],

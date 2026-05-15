@@ -13,6 +13,7 @@ export type CrewLivePlan = CrewUser & {
   plan: LivePlan;
   isCamping: boolean;
   isAtMetalPlace: boolean;
+  isFriend: boolean;
 };
 
 export type CrewLiveGroup =
@@ -114,14 +115,14 @@ export function mapCrewLivePlans(
   const usersById = new Map(users.map((user) => [user.id, user]));
   for (const userId of picksByUser.keys()) {
     if (!usersById.has(userId)) {
-      usersById.set(userId, { id: userId, display_name: null, avatar_url: null });
+      usersById.set(userId, { id: userId, display_name: null, avatar_url: null, is_friend: null });
     }
   }
 
   const presenceByUser = new Map(presence.map((item) => [item.user_id, item]));
   for (const item of presenceByUser.values()) {
     if (!usersById.has(item.user_id)) {
-      usersById.set(item.user_id, { id: item.user_id, display_name: null, avatar_url: null });
+      usersById.set(item.user_id, { id: item.user_id, display_name: null, avatar_url: null, is_friend: null });
     }
   }
 
@@ -130,11 +131,13 @@ export function mapCrewLivePlans(
       const presence = presenceByUser.get(user.id);
       const isCamping = presence?.is_camping ?? false;
       const isAtMetalPlace = presence?.is_at_metal_place ?? false;
+      const isFriend = user.is_friend === true;
       const plan = findLivePlan(effectiveBands, picksByUser.get(user.id) ?? new Set(), now);
       return {
         ...user,
         isCamping,
         isAtMetalPlace,
+        isFriend,
         label: user.display_name?.trim() || `Vira-lata ${user.id.slice(0, 4).toUpperCase()}`,
         plan: applyPresenceToLivePlan(plan, isCamping),
       };
@@ -177,6 +180,9 @@ export function groupCrewLivePlans(
       bandGroups.set(crew.plan.band.id, group);
       continue;
     }
+
+    // Friends are invisible when not on a current band — excluded from camping and lost.
+    if (crew.isFriend) continue;
 
     if (crew.isCamping) {
       campingMembers.push(crew);

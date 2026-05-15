@@ -8,7 +8,7 @@ import {
   type BadgeConfig,
   type BadgeContext,
 } from '../services/badges';
-import { loadUserPicks, loadAllUserPicks, loadBands, loadAllUserPresence, PICKS_CHANGED_EVENT, MISSED_CHANGED_EVENT } from '../lib/db';
+import { loadUserPicks, loadAllUserPicks, loadBands, loadAllUserPresence, loadCrewUsers, PICKS_CHANGED_EVENT, MISSED_CHANGED_EVENT } from '../lib/db';
 import { missedRepository } from '../repositories';
 import { now } from '../services/time';
 import { supabase } from '../lib/supabase';
@@ -65,13 +65,14 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
     let active = true;
 
     async function refresh() {
-      const [userPicks, allPicks, bands, allMissed, userRow, presence] = await Promise.all([
+      const [userPicks, allPicks, bands, allMissed, userRow, presence, crewUsers] = await Promise.all([
         loadUserPicks(user.id),
         loadAllUserPicks(),
         loadBands(),
         missedRepository.loadAll(),
-        supabase.from('users').select('special_badges').eq('id', user.id).single(),
+        supabase.from('users').select('special_badges, is_friend').eq('id', user.id).single(),
         loadAllUserPresence(),
+        loadCrewUsers(),
       ]);
       if (!active) return;
 
@@ -84,21 +85,32 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       const userMissedIds = new Set(
         allMissed.filter((m) => m.user_id === user.id).map((m) => m.band_id),
       );
-      const assignedBadges: string[] = (userRow.data as { special_badges?: string[] } | null)?.special_badges ?? [];
+      const rowData = userRow.data as { special_badges?: string[]; is_friend?: boolean | null } | null;
+      const assignedBadges: string[] = rowData?.special_badges ?? [];
+      const isCurrentUserFriend = rowData?.is_friend === true;
 
       const myPresence = presence.find((p) => p.user_id === user.id);
       const isAtCamping = myPresence?.is_camping ?? false;
       const isAtMetalPlace = myPresence?.is_at_metal_place ?? false;
-      const currentLocation: string | null = isAtMetalPlace
-        ? 'metal_place'
-        : isAtCamping
-          ? 'camping'
-          : 'lost';
+      let currentLocation: string | null;
+      if (isCurrentUserFriend) {
+        currentLocation = null;
+      } else if (isAtMetalPlace) {
+        currentLocation = 'metal_place';
+      } else if (isAtCamping) {
+        currentLocation = 'camping';
+      } else {
+        currentLocation = 'lost';
+      }
 
+      const friendUserIds = new Set(
+        crewUsers.filter((u) => u.is_friend === true).map((u) => u.id),
+      );
+      const nonFriendPresence = presence.filter((p) => !friendUserIds.has(p.user_id));
       const crewLocationCounts: Record<string, number> = {
-        camping: presence.filter((p) => p.is_camping).length,
-        metal_place: presence.filter((p) => p.is_at_metal_place).length,
-        lost: presence.filter((p) => !p.is_camping && !p.is_at_metal_place).length,
+        camping: nonFriendPresence.filter((p) => p.is_camping).length,
+        metal_place: nonFriendPresence.filter((p) => p.is_at_metal_place).length,
+        lost: nonFriendPresence.filter((p) => !p.is_camping && !p.is_at_metal_place).length,
       };
 
       const locationVisits = (user.user_metadata?.location_visits as Record<string, number>) ?? {};

@@ -9,6 +9,7 @@ export type User = {
   avatar_url: string | null;
   preferred_language: 'br' | 'en' | 'es' | 'de';
   is_test_user: boolean;
+  is_friend?: boolean | null;
   role: UserRole;
   created_at: string;
   wacken_years: number[];
@@ -16,7 +17,7 @@ export type User = {
   wacken_arrival_day?: string | null;
 };
 
-export type CrewUser = Pick<User, 'id' | 'display_name' | 'avatar_url' | 'wacken_arrival_day'>;
+export type CrewUser = Pick<User, 'id' | 'display_name' | 'avatar_url' | 'wacken_arrival_day' | 'is_friend'>;
 
 export type Band = {
   id: string;

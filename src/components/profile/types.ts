@@ -5,6 +5,7 @@ export type UserWithLoading = {
   avatar_url: string | null;
   role: string;
   special_badges: string[];
+  is_friend?: boolean | null;
   loading?: boolean;
   error?: string;
 };

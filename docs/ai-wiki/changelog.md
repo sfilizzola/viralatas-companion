@@ -4,6 +4,33 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-15 (Friend user flag)
+
+### Added
+- `supabase/migrations/20260515000000_add_is_friend_flag.sql` — `is_friend boolean DEFAULT NULL` column on `public.users`
+- `is_friend?: boolean | null` field on `User` and `CrewUser` types in `src/types/index.ts`
+- `isFriend: boolean` on `CrewLivePlan` (derived from `user.is_friend === true`) in `src/services/livePreview.ts`
+- `isFriend` derived value exposed from `useNowData` hook
+- `handleToggleFriend` handler in `GodlikeAdminPanel.tsx`
+- Friend toggle button in godlike user management row (next to promote/demote)
+- i18n keys `marcarAmigo` / `removerAmigo` in all 4 `ProfilePage_*.json` locale files
+
+### Changed
+- `src/services/livePreview.ts` — `groupCrewLivePlans`: friends skip camping/lost routing when not on a current band; fallback synthetic users initialised with `is_friend: null`
+- `src/repositories/users.ts` — crew sync select now includes `is_friend`
+- `src/repositories/announcements.ts` — `fetchAllUsers` select now includes `is_friend`
+- `src/pages/RightNowPage.tsx` — `PresenceToggle` hidden for friends (`!isFriend` guard)
+- `src/components/BadgesDisplay.tsx` — `currentLocation` set to `null` for friends; `crewLocationCounts` excludes friend presence rows
+- `src/components/profile/types.ts` — `UserWithLoading` gains `is_friend?: boolean | null`
+
+### Architectural Notes
+- `is_friend` is a permanent user identity flag (like `is_test_user`), not a presence state — stored on `users`, not `user_presence`
+- Friends appear in the band group when on a current pick; otherwise invisible in crew grid
+- Friends cannot earn `metal-place-2026`, `bbq-crew`, or `lost-together` badges and are excluded from the crew counts that gate those badges for others
+- Toggle is godlike-only; setting back to non-friend uses `null` (not `false`) to stay consistent with the nullable default
+
+---
+
 ## 2026-05-15 (Admin panel headers — DS §05 spec implementation)
 
 ### Changed

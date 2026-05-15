@@ -27,6 +27,8 @@
   "resetError": "Zurücksetzen fehlgeschlagen. Versuch es erneut.",
   "promoverManager": "Zum Manager befördern",
   "removerManager": "Manager entfernen",
+  "marcarAmigo": "Als Freund markieren",
+  "removerAmigo": "Als Freund entfernen",
   "erroRole": "Aktualisierung fehlgeschlagen. Versuch es erneut.",
   "blockedUsers": "Blockierte Nutzer",
   "noBlockedUsers": "Keine blockierten Nutzer",

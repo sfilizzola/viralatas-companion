@@ -27,6 +27,8 @@
   "resetError": "Error al restablecer. Inténtalo de nuevo.",
   "promoverManager": "Promover a Manager",
   "removerManager": "Quitar Manager",
+  "marcarAmigo": "Marcar como amigo",
+  "removerAmigo": "Quitar amigo",
   "erroRole": "Error al actualizar. Inténtalo de nuevo.",
   "blockedUsers": "Usuarios bloqueados",
   "noBlockedUsers": "Ningún usuario bloqueado",

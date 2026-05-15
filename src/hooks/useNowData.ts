@@ -38,6 +38,7 @@ export type NowData = {
   userId: string | null;
   user: ReturnType<typeof useAuth>['user'];
   userDisplayName: string | null;
+  isFriend: boolean;
   bands: Band[];
   picks: UserPick[];
   crewUsers: CrewUser[];
@@ -224,6 +225,11 @@ export function useNowData(): NowData {
     [presence, userId],
   );
 
+  const isFriend = useMemo(
+    () => crewUsers.find((u) => u.id === userId)?.is_friend === true,
+    [crewUsers, userId],
+  );
+
   const isCamping = myPresence?.is_camping ?? false;
   const isAtMetalPlace = myPresence?.is_at_metal_place ?? false;
   const presenceValue: PresenceLocation =
@@ -297,6 +303,7 @@ export function useNowData(): NowData {
     userId,
     user,
     userDisplayName,
+    isFriend,
     bands,
     picks,
     crewUsers,

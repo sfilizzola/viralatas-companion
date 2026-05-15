@@ -211,6 +211,42 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
     [allUsers, t],
   );
 
+  const handleToggleFriend = useCallback(
+    async (targetUserId: string, currentValue: boolean | null | undefined) => {
+      const newValue = currentValue === true ? null : true;
+      setAllUsers((prev) =>
+        prev.map((u) => (u.id === targetUserId ? { ...u, loading: true, error: undefined } : u)),
+      );
+      try {
+        const { error } = await supabase
+          .from('users')
+          .update({ is_friend: newValue })
+          .eq('id', targetUserId);
+        if (error) throw error;
+        setAllUsers((prev) =>
+          prev.map((u) => (u.id === targetUserId ? { ...u, is_friend: newValue } : u)),
+        );
+      } catch (error) {
+        console.error('Failed to toggle friend flag:', error);
+        setAllUsers((prev) =>
+          prev.map((u) =>
+            u.id === targetUserId ? { ...u, error: t('erroRole') } : u,
+          ),
+        );
+        setTimeout(() => {
+          setAllUsers((prev) =>
+            prev.map((u) => (u.id === targetUserId ? { ...u, error: undefined } : u)),
+          );
+        }, 3000);
+      } finally {
+        setAllUsers((prev) =>
+          prev.map((u) => (u.id === targetUserId ? { ...u, loading: false } : u)),
+        );
+      }
+    },
+    [t],
+  );
+
   const handleUnblock = useCallback(
     async (targetUserId: string) => {
       if (!window.confirm(t('unblockConfirm'))) return;
@@ -607,6 +643,25 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                               t('promoverManager')
                             ) : (
                               t('removerManager')
+                            )}
+                          </button>
+                        )}
+
+                        {user.role !== 'godlike' && (
+                          <button
+                            className={`${styles.userActionButton} ${
+                              user.is_friend ? styles.secondaryAction : ''
+                            } ${user.loading ? styles.loading : ''}`}
+                            onClick={() => handleToggleFriend(user.id, user.is_friend)}
+                            disabled={user.loading}
+                            type="button"
+                          >
+                            {user.loading ? (
+                              <span className={styles.spinner}>⏳</span>
+                            ) : user.is_friend ? (
+                              t('removerAmigo')
+                            ) : (
+                              t('marcarAmigo')
                             )}
                           </button>
                         )}
