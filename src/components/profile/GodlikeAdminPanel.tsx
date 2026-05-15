@@ -595,7 +595,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                     <div key={user.id} className={styles.userRow}>
                       <div className={styles.userInfo}>
                         <Avatar
-                          size={36}
+                          size={40}
                           src={user.avatar_url}
                           initial={getInitial(user.display_name, user.email)}
                         />
