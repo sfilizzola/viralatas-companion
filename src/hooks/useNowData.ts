@@ -338,7 +338,6 @@ export function useNowData(): NowData {
     handlePresenceChange,
     duckBandId,
     duckQuack,
-    duckIsOnCooldown,
     duckCooldownUntil,
   };
 }
