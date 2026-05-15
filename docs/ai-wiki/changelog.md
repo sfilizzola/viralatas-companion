@@ -4,6 +4,18 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-15 (LatestAnnouncementBanner DS alignment)
+
+### Changed
+- `src/pages/RightNowPage.module.css` — aligned `.latestSignalKicker`, `.latestSignalText`, `.latestAvatar`, `.latestSignalTime`, `.latestSignalReadMore` to DS §08.02 spec:
+  - Kicker: `color: var(--signal-ok)` (was `--text-muted`), 9px (was 10px), letter-spacing 0.12em (was 0.1em), added `::before` red pulse dot with `latestPulse` keyframe
+  - Body text: `font-family: var(--font-sans)`, 14px normal weight, `line-height: 1.5` (was display bold 1.05rem)
+  - Avatar: 24px (was 22px), consistent with `av s24` in DS
+  - Time: removed `/` separator `::before`
+  - "See more →": `color: var(--accent-hover)` (was `--accent`), 10px (was 9px)
+
+---
+
 ## 2026-05-15 (Friend user flag)
 
 ### Added

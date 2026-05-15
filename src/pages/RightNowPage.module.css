@@ -58,12 +58,25 @@
 }
 
 .latestSignalKicker {
-  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--signal-ok);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+.latestSignalKicker::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  flex-shrink: 0;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: latestPulse 1.6s infinite;
 }
 
 .latestSignalBody {
@@ -71,8 +84,8 @@
 }
 
 .latestAvatar {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   overflow: hidden;
   border: 2px solid var(--bg);
   border-radius: 50%;
@@ -82,8 +95,9 @@
   align-items: center;
   justify-content: center;
   font-family: var(--font-display);
-  font-size: 0.62rem;
+  font-size: 10px;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .latestAvatar img {
@@ -119,12 +133,7 @@
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 10px;
-}
-
-.latestSignalTime::before {
-  content: "/";
-  margin-right: 6px;
-  color: var(--border-strong);
+  margin-left: 2px;
 }
 
 .latestSignalReadMore {
@@ -133,9 +142,9 @@
   gap: 3px;
   margin-left: auto;
   flex-shrink: 0;
-  color: var(--accent);
+  color: var(--accent-hover);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -162,10 +171,10 @@
   margin: 0;
   overflow: hidden;
   color: var(--text);
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 700;
-  line-height: 1.35;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
   -webkit-box-orient: vertical;
@@ -693,6 +702,11 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+@keyframes latestPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.45; transform: scale(0.75); }
 }
 
 .navSpacer {
