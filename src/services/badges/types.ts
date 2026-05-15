@@ -1,6 +1,6 @@
 import type { Band } from '../../types';
 
-export type BadgeBand = Pick<Band, 'id' | 'name' | 'stage' | 'start_time' | 'end_time' | 'genre'>;
+export type BadgeBand = Pick<Band, 'id' | 'name' | 'stage' | 'start_time' | 'end_time' | 'genre' | 'category'>;
 
 export type BadgeCondition =
   // Exclusive: user must have ONLY these years (checking 2022+2026 loses a "2026-only" badge)

@@ -44,7 +44,6 @@ export default function BandCard({
   children,
 }: BandCardProps) {
   const { t } = useI18n('SchedulePage');
-  const color = stageColorVar(band.stage);
   const initial = band.name.charAt(0).toUpperCase();
   const interactive = Boolean(onClick);
   const showPick = variant !== 'ranked' && !hidePick;
@@ -69,6 +68,9 @@ export default function BandCard({
     }
   }
 
+  const isCeremony = band.category === 'ceremony';
+  const color = isCeremony ? 'var(--ceremony-gold)' : stageColorVar(band.stage);
+
   const variantClass =
     variant === 'timeline'
       ? styles.variantTimeline
@@ -79,6 +81,7 @@ export default function BandCard({
   const cardClasses = [
     styles.card,
     variantClass,
+    isCeremony ? styles.cardCeremony : '',
     interactive ? '' : styles.cardStatic,
     conflict?.active ? (conflict.severity === 'hard' ? styles.cardHardConflict : styles.cardSoftOverlap) : '',
   ]
@@ -130,9 +133,15 @@ export default function BandCard({
       <div className={`${styles.body} ${variant === 'ranked' ? styles.bodyRanked : ''}`}>
         <h2 className={styles.bandName}>{band.name}</h2>
         <div className={styles.meta}>
-          <Chip style={{ background: color, color: '#fff', borderColor: 'transparent' }}>
-            {band.stage}
-          </Chip>
+          {isCeremony ? (
+            <span className={styles.ceremonyLabel}>
+              ✦ {t('scheduleClosingCeremony')}
+            </span>
+          ) : (
+            <Chip style={{ background: color, color: '#fff', borderColor: 'transparent' }}>
+              {band.stage}
+            </Chip>
+          )}
           {variant !== 'timeline' && (
             <span className={styles.time}>
               {formatTime(band.start_time)} – {formatTime(band.end_time)}

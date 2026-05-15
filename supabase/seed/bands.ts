@@ -107,8 +107,9 @@ export type BandSeed = {
   stage: string;
   start_time: string;
   end_time: string;
-  genre: string;
+  genre: string | null;
   image_url: string | null;
+  category?: 'band' | 'ceremony';
 };
 
 // ---------------------------------------------------------------------------
@@ -321,7 +322,7 @@ export const bands: BandSeed[] = [
   { name: 'Asrock',                  stage: STAGES.FASTER, start_time: t(D4,14, 0), end_time: t(D4,15, 0),  genre: 'Metal',            image_url: `${WOA}/fileadmin/_processed_/c/a/csm_asrock_26_85c4a23518.jpg` },                  // FAS14
   { name: 'Ad Infinitum',            stage: STAGES.FASTER, start_time: t(D4,16,30), end_time: t(D4,17,30),  genre: 'Symphonic Metal',  image_url: `${WOA}/fileadmin/_processed_/f/a/csm_ad_infinitum_26_cb9028b792.jpg` },            // FAS15
   { name: 'Alestorm',                stage: STAGES.FASTER, start_time: t(D4,19,15), end_time: t(D4,20,45),  genre: 'Party Metal',       image_url: `${WOA}/fileadmin/_processed_/6/d/csm_alestorm_26_9ddf45fa2e.jpg` },                   // FAS16
-  { name: 'Lamb of God',             stage: STAGES.FASTER, start_time: t(D4,22,30), end_time: t(D4,23, 0),  genre: 'Groove Metal',     image_url: `${WOA}/fileadmin/_processed_/7/4/csm_lamb_of_god_26b_d0cd004159.jpg` },              // FAS17
+  // FAS17 — Farewell & Announcements closing ceremony (see ceremony entry at bottom of file)
   { name: 'Sabaton',                 stage: STAGES.FASTER, start_time: t(D4,23, 0), end_time: t(D4n, 0,30), genre: 'Power Metal',      image_url: `${WOA}/fileadmin/_processed_/a/4/csm_sabaton_26_143decf5a4.jpg` },                   // FAS18
 
   // HARDER STAGE — Day 4
@@ -349,7 +350,7 @@ export const bands: BandSeed[] = [
   { name: 'Dritte Wahl',             stage: STAGES.WET, start_time: t(D4,23,45), end_time: t(D4n, 0,45), genre: 'Punk',       image_url: `${WOA}/fileadmin/_processed_/f/8/csm_Dritte_Wahl_26_89eac3e241.jpg` },     // WET35
 
   // HEADBANGERS STAGE — Day 4
-  // HBA29 — dropped (name TBD)
+  { name: 'Lamb of God',    stage: STAGES.HEADBANGERS, start_time: t(D4,12, 0), end_time: t(D4,12,45),  genre: 'Groove Metal',         image_url: `${WOA}/fileadmin/_processed_/7/4/csm_lamb_of_god_26b_d0cd004159.jpg` },             // HBA29
   { name: 'Vended',         stage: STAGES.HEADBANGERS, start_time: t(D4,14, 0), end_time: t(D4,14,45),  genre: 'Nu Metal',             image_url: `${WOA}/fileadmin/_processed_/0/7/csm_vended_26_a96222e9bb.jpg` },                // HBA30
   { name: 'Stonem',         stage: STAGES.HEADBANGERS, start_time: t(D4,16, 0), end_time: t(D4,16,45),  genre: 'Metal',                image_url: `${WOA}/fileadmin/_processed_/4/9/csm_stonem_26_e1ff4b71dd.jpg` },                // HBA31
   { name: 'Orbit Culture',  stage: STAGES.HEADBANGERS, start_time: t(D4,18, 0), end_time: t(D4,18,45),  genre: 'Melodic Death Metal',  image_url: `${WOA}/fileadmin/_processed_/d/c/csm_Orbit_Culture-WOA26_e0ccb2b84a.jpg` },      // HBA32
@@ -379,6 +380,22 @@ export const bands: BandSeed[] = [
   { name: 'Municipal Waste', stage: STAGES.JUNGLE, start_time: t(D4,18, 0), end_time: t(D4,19, 0),  genre: 'Thrash Metal',     image_url: `${WOA}/fileadmin/_processed_/4/1/csm_municipal_waste26_b40cb13d64.jpg` }, // JUN6
   { name: 'Kim Dracula',     stage: STAGES.JUNGLE, start_time: t(D4,19,30), end_time: t(D4,20,30),  genre: 'Alternative Metal',image_url: `${WOA}/fileadmin/_processed_/3/4/csm_kim_dracula26_6085add158.jpg` },     // JUN7
   { name: 'Focus.',          stage: STAGES.JUNGLE, start_time: t(D4,21, 0), end_time: t(D4,21,30),  genre: TBD_GENRE,          image_url: `${WOA}/fileadmin/_processed_/8/9/csm_focus_26_a98ab7e760.jpg` },         // JUN8
+
+  // ═══════════════════════════════════════════════════════
+  // CLOSING CEREMONY — Saturday August 1 (Day 4)
+  // Occupies slot FAS17 (22:30–23:00) on the Faster stage.
+  // Lamb of God was moved to HBA29 to free this slot.
+  // category: 'ceremony' — excluded from /popular and all badge conditions.
+  // ═══════════════════════════════════════════════════════
+  {
+    name: 'Farewell & Announcements',
+    stage: STAGES.FASTER,
+    start_time: t(D4, 22, 30),
+    end_time: t(D4, 23,  0),
+    genre: null,
+    image_url: null,
+    category: 'ceremony',
+  },
 ];
 
 // ---------------------------------------------------------------------------

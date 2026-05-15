@@ -33,6 +33,11 @@
     --signal-ok:    #16a085;  /* synced / camping ok */
     --signal-lost:  #a855f7;  /* LOST 🤘 */
 
+    /* ---- ceremony ---- */
+    --ceremony-gold:     #d4af37;              /* Wacken Farewell closing ceremony */
+    --ceremony-gold-dim: rgba(212,175,55,0.55);
+    --ceremony-gold-bg:  rgba(212,175,55,0.07);
+
     /* ---- stages (canonical, never reinterpret) ---- */
     --stage-faster:     #2980b9;
     --stage-harder:     #e67e22;
@@ -439,6 +444,36 @@
   }
   .bcard.ranked .rank.top { color: var(--accent); }
   .bcard.ranked .body { padding-bottom: var(--s-4); }
+
+  /* ---- band card variant: ceremony ---- */
+  .bcard.ceremony {
+    border-color: var(--ceremony-gold-dim);
+    background:
+      linear-gradient(135deg, var(--ceremony-gold-bg) 0%, transparent 60%),
+      var(--bg-surface);
+  }
+  .bcard.ceremony .stripe { background: var(--ceremony-gold); }
+  .bcard.ceremony .thumb {
+    background: rgba(212,175,55,0.1);
+    color: var(--ceremony-gold);
+    border: 1px solid rgba(212,175,55,0.25);
+  }
+  .bcard.ceremony .ceremony-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ceremony-gold);
+    padding: 2px 6px;
+    border-radius: 2px;
+    border: 1px solid rgba(212,175,55,0.4);
+    background: rgba(212,175,55,0.1);
+  }
+  .bcard.ceremony .pick.on {
+    color: var(--ceremony-gold);
+    background: rgba(212,175,55,0.1);
+  }
 
   /* ============================================================
      STAGE PILL
@@ -2015,6 +2050,7 @@
       <div class="swatch"><div class="chip" style="background:#f39c12">#f39c12</div><div class="meta"><div class="name">Warn / Conflict / Queued</div><div class="tok">--signal-warn</div><div class="hex">overlap, offline pending</div></div></div>
       <div class="swatch"><div class="chip" style="background:#16a085">#16a085</div><div class="meta"><div class="name">OK / Synced</div><div class="tok">--signal-ok</div><div class="hex">camping, sync restored</div></div></div>
       <div class="swatch"><div class="chip" style="background:#a855f7">#a855f7</div><div class="meta"><div class="name">Lost 🤘</div><div class="tok">--signal-lost</div><div class="hex">no current pick</div></div></div>
+      <div class="swatch"><div class="chip" style="background:#d4af37">#d4af37</div><div class="meta"><div class="name">Ceremony Gold</div><div class="tok">--ceremony-gold</div><div class="hex">Wacken Farewell closing ceremony</div></div></div>
     </div>
 
     <div class="exception-note">
@@ -2284,6 +2320,78 @@
           <li><b>Avatar cluster</b> up to 5 visible, +N overflow</li>
           <li>Tap → opens band detail modal</li>
           <li>Day chip uses <code>D1</code>–<code>D4</code> shorthand</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- BAND CARD: ceremony -->
+    <div class="subhead">Band card &middot; ceremony variant (Phase 19)</div>
+    <div class="demo">
+      <div class="demo-stage">
+
+        <!-- schedule variant — picked -->
+        <div class="bcard ceremony">
+          <div class="stripe"></div>
+          <div class="thumb">FA</div>
+          <div class="body">
+            <div class="name">FAREWELL &amp; ANNOUNCEMENTS</div>
+            <div class="meta">
+              <span class="ceremony-label">✦ Closing Ceremony</span>
+              <span class="time">22:30 — 23:00</span>
+              <span class="going"><b>18</b> going</span>
+            </div>
+          </div>
+          <button class="pick on" aria-label="Picked">
+            <svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        </div>
+
+        <!-- schedule variant — unpicked -->
+        <div class="bcard ceremony">
+          <div class="stripe"></div>
+          <div class="thumb">FA</div>
+          <div class="body">
+            <div class="name">FAREWELL &amp; ANNOUNCEMENTS</div>
+            <div class="meta">
+              <span class="ceremony-label">✦ Closing Ceremony</span>
+              <span class="time">22:30 — 23:00</span>
+              <span class="going"><b>18</b> going</span>
+            </div>
+          </div>
+          <button class="pick" aria-label="Pick">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        </div>
+
+        <!-- timeline/my-picks variant — picked, no conflict chip -->
+        <div class="bcard timeline ceremony" style="margin-top:var(--s-4)">
+          <div class="stripe"></div>
+          <div class="when"><div class="h">22:30</div><div class="end">23:00</div></div>
+          <div class="body">
+            <div class="name">FAREWELL &amp; ANNOUNCEMENTS</div>
+            <div class="meta">
+              <span class="ceremony-label">✦ Closing Ceremony</span>
+              <span class="going"><b>18</b> crew going</span>
+              <!-- no .conflict-chip: ceremony never generates conflict -->
+            </div>
+          </div>
+          <button class="pick on">
+            <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </button>
+        </div>
+
+      </div>
+      <div class="demo-notes">
+        <h4>Ceremony variant</h4>
+        <ul>
+          <li><b>Gold border + stripe</b> <code>--ceremony-gold #d4af37</code> — distinct from conflict amber <code>#f39c12</code></li>
+          <li><b>Ceremony label</b> replaces stage chip — i18n key <code>scheduleClosingCeremony</code></li>
+          <li>Stage chip hidden — ceremony label takes its place regardless of which stage the slot is on</li>
+          <li>Pick + RSVP count work exactly like a band card</li>
+          <li><b>No conflict chip ever</b> — ceremony entries skip <code>computeBandOverlaps</code></li>
+          <li><b>Excluded from /popular</b> — filtered before ranked list renders</li>
+          <li><b>Excluded from badge engine</b> — filtered in <code>buildBadgeContext</code></li>
+          <li>Applied via CSS class <code>.cardCeremony</code> in <code>BandCard.tsx</code></li>
         </ul>
       </div>
     </div>

@@ -25,6 +25,7 @@ function band(partial: Partial<BadgeBand> & Pick<BadgeBand, 'id'>): BadgeBand {
     start_time: '2026-07-28T10:00:00.000Z',
     end_time: '2026-07-28T11:00:00.000Z',
     genre: 'Heavy Metal',
+    category: 'band',
     ...partial,
   };
 }

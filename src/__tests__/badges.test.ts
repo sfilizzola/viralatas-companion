@@ -25,6 +25,19 @@ function band(partial: Partial<BadgeBand> & Pick<BadgeBand, 'id'>): BadgeBand {
     start_time: '2026-07-29T10:00:00.000Z', // 12:00 CEST
     end_time: '2026-07-29T11:00:00.000Z',
     genre: 'Heavy Metal',
+    category: 'band',
+    ...partial,
+  };
+}
+
+function ceremonyBand(partial: Partial<BadgeBand> & Pick<BadgeBand, 'id'>): BadgeBand {
+  return {
+    name: 'Farewell & Announcements',
+    stage: 'Faster',
+    start_time: '2026-08-01T20:30:00.000Z', // 22:30 CEST
+    end_time: '2026-08-01T21:00:00.000Z',   // 23:00 CEST
+    genre: null,
+    category: 'ceremony',
     ...partial,
   };
 }
@@ -87,7 +100,12 @@ describe('evaluateBadge — existing conditions still pass', () => {
   });
 
   it('bands_picked_min', () => {
-    const ctx = buildBadgeContext(authUser(), ['b1', 'b2', 'b3'], new Map(), new Map());
+    const bandsById = new Map<string, BadgeBand>([
+      ['b1', band({ id: 'b1' })],
+      ['b2', band({ id: 'b2' })],
+      ['b3', band({ id: 'b3' })],
+    ]);
+    const ctx = buildBadgeContext(authUser(), ['b1', 'b2', 'b3'], new Map(), bandsById);
     expect(evaluateBadge(badge({ type: 'bands_picked_min', count: 3 }), ctx)).toBe(true);
     expect(evaluateBadge(badge({ type: 'bands_picked_min', count: 4 }), ctx)).toBe(false);
   });
@@ -1026,5 +1044,75 @@ describe('registry — 2026 image-driven badges', () => {
       );
       expect(evaluateBadge(cfg, ctx)).toBe(false);
     });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Phase 19 — Ceremony entry badge regression
+// Picking or seeing a ceremony entry must NEVER satisfy any music-badge condition.
+// ─────────────────────────────────────────────────────────────────────────────
+describe('ceremony entry — badge regression (Phase 19)', () => {
+  const now = new Date('2026-08-02T00:00:00.000Z'); // after ceremony end
+  const c1 = ceremonyBand({ id: 'c1' });
+  const bandsById = new Map<string, BadgeBand>([['c1', c1]]);
+
+  function ctxWithCeremony() {
+    return buildBadgeContext(authUser(), ['c1'], new Map(), bandsById, new Set(), now);
+  }
+
+  it('ceremony pick is excluded from pickedBands', () => {
+    const ctx = ctxWithCeremony();
+    expect(ctx.pickedBands).toHaveLength(0);
+  });
+
+  it('ceremony pick is excluded from seenBands', () => {
+    const ctx = ctxWithCeremony();
+    expect(ctx.seenBands).toHaveLength(0);
+  });
+
+  it('does NOT satisfy bands_picked_min: 1', () => {
+    const ctx = ctxWithCeremony();
+    expect(evaluateBadge(badge({ type: 'bands_picked_min', count: 1 }), ctx)).toBe(false);
+  });
+
+  it('does NOT satisfy bands_seen_min: 1', () => {
+    const ctx = ctxWithCeremony();
+    expect(evaluateBadge(badge({ type: 'bands_seen_min', count: 1 }), ctx)).toBe(false);
+  });
+
+  it('does NOT satisfy bands_picked_stage_min: Faster, count 1', () => {
+    const ctx = ctxWithCeremony();
+    expect(evaluateBadge(badge({ type: 'bands_picked_stage_min', stage: 'Faster', count: 1 }), ctx)).toBe(false);
+  });
+
+  it('does NOT satisfy bands_seen_stage_min: Faster, count 1', () => {
+    const ctx = ctxWithCeremony();
+    expect(evaluateBadge(badge({ type: 'bands_seen_stage_min', stage: 'Faster', count: 1 }), ctx)).toBe(false);
+  });
+
+  it('does NOT satisfy band_picked_named: Farewell & Announcements', () => {
+    const ctx = ctxWithCeremony();
+    expect(evaluateBadge(badge({ type: 'band_picked_named', name: 'Farewell & Announcements' }), ctx)).toBe(false);
+  });
+
+  it('does NOT satisfy band_seen_named: Farewell & Announcements', () => {
+    const ctx = ctxWithCeremony();
+    expect(evaluateBadge(badge({ type: 'band_seen_named', name: 'Farewell & Announcements' }), ctx)).toBe(false);
+  });
+
+  it('bandsPicked is the raw pick count (includes ceremony IDs)', () => {
+    const ctx = ctxWithCeremony();
+    expect(ctx.bandsPicked).toBe(1);
+  });
+
+  it('regular band + ceremony: only regular counts toward pickedBands; bands_picked_min uses pickedBands', () => {
+    const b1 = band({ id: 'b1' });
+    const mixed = new Map<string, BadgeBand>([['b1', b1], ['c1', c1]]);
+    const ctx = buildBadgeContext(authUser(), ['b1', 'c1'], new Map(), mixed, new Set(), now);
+    expect(ctx.pickedBands).toHaveLength(1);
+    expect(ctx.pickedBands[0]?.id).toBe('b1');
+    expect(ctx.bandsPicked).toBe(2); // raw pick ID count includes ceremony
+    expect(evaluateBadge(badge({ type: 'bands_picked_min', count: 1 }), ctx)).toBe(true);
+    expect(evaluateBadge(badge({ type: 'bands_picked_min', count: 2 }), ctx)).toBe(false); // ceremony excluded
   });
 });

@@ -20,6 +20,7 @@ const sampleBand: Band = {
   end_time: '2026-07-29T20:30:00Z',
   image_url: null,
   genre: 'Heavy Metal',
+  category: 'band',
 };
 
 describe('BandCard', () => {

@@ -273,3 +273,23 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `GodlikeAdminPanel.tsx` — imports and mounts `<TestBadgeSection t={t} />` after `<TimeTravelSection />`, before the registered users list
 
 ---
+
+## Phase 19 — Closing Ceremony Slot
+
+**Completed:** 2026-05-15
+
+**Goal:** Model the Wacken closing ceremony as a first-class pickable timetable entry — visible across `/schedule`, `/now`, and `/my-picks` with a distinctive gold border and "Closing Ceremony" label, excluded from `/popular`, excluded from all music-badge counts, and generating no conflict alerts when overlapping a band pick.
+
+**Deliverables:**
+- `supabase/migrations/20260514000000_idea7_band_category.sql` — `category text not null default 'band'` column + check constraint `('band','ceremony')` on `public.bands`
+- `BandCategory = 'band' | 'ceremony'` union and `category` field on `Band` type in `src/types/index.ts`
+- `category` field added to `BadgeBand` via `Pick<Band, ...>` in `src/services/badges/types.ts`
+- `buildBadgeContext` in `src/services/badges/engine.ts` filters ceremony from `pickedBands` / `seenBands`; `bands_picked_min` condition changed to use `pickedBands.length` (consistent with all other `bands_picked_*` conditions)
+- `computeBandOverlaps` in `src/hooks/useBandConflicts.ts` skips ceremony entries — no conflict chip ever shown
+- `.cardCeremony` + `.ceremonyLabel` CSS in `src/components/BandCard.module.css`; ceremony rendering logic in `src/components/BandCard.tsx` (gold color, `✦ Closing Ceremony` chip replacing stage chip)
+- `popularBands` filter in `src/pages/PopularPage.tsx` excludes `category === 'ceremony'`
+- `scheduleClosingCeremony` i18n key in all 4 locale files (`SchedulePage_br/en/de/es.json`)
+- `Farewell & Announcements` ceremony seed entry in `supabase/seed/bands.ts` at Faster stage, slot FAS17 (22:30–23:00 Day 4 Saturday Aug 1)
+- Phase 19 ceremony badge regression suite (12 tests) in `src/__tests__/badges.test.ts`; `band()` helper updated with `category: 'band'` default; new `ceremonyBand()` helper
+
+---

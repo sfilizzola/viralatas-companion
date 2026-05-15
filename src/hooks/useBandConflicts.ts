@@ -14,10 +14,12 @@ export function computeBandOverlaps(bands: Band[]): Map<string, OverlapEntry[]> 
   const conflicts = new Map<string, OverlapEntry[]>();
   for (let i = 0; i < bands.length; i++) {
     const a = bands[i];
+    if (a.category === 'ceremony') continue;
     const aStart = new Date(a.start_time).getTime();
     const aEnd = new Date(a.end_time).getTime();
     for (let j = i + 1; j < bands.length; j++) {
       const b = bands[j];
+      if (b.category === 'ceremony') continue;
       if (a.stage === b.stage) continue;
       const bStart = new Date(b.start_time).getTime();
       const bEnd = new Date(b.end_time).getTime();

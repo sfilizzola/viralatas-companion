@@ -11,6 +11,7 @@ function makeBand(overrides: Partial<Band> = {}): Band {
     end_time: '2026-07-29T13:00:00Z',
     image_url: null,
     genre: null,
+    category: 'band',
     ...overrides,
   };
 }

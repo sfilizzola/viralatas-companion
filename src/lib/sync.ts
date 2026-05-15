@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { saveBands } from './db';
+import type { Band } from '../types';
 
 export async function syncBands(): Promise<void> {
   const { data, error } = await supabase
@@ -8,5 +9,5 @@ export async function syncBands(): Promise<void> {
     .order('start_time');
 
   if (error) throw error;
-  if (data && data.length > 0) await saveBands(data);
+  if (data && data.length > 0) await saveBands(data as unknown as Band[]);
 }

@@ -324,6 +324,51 @@
 }
 
 /* ============================================================
+   CEREMONY VARIANT — gold border, warm tint, no stage chip
+   ============================================================ */
+.cardCeremony {
+  border-color: var(--ceremony-gold-dim);
+  background:
+    linear-gradient(135deg, var(--ceremony-gold-bg) 0%, transparent 60%),
+    var(--bg-surface);
+}
+
+.cardCeremony .stripe {
+  background: var(--ceremony-gold);
+}
+
+.cardCeremony .thumb {
+  background: rgba(212, 175, 55, 0.15);
+  color: var(--ceremony-gold);
+}
+
+.ceremonyLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ceremony-gold);
+  border: 1px solid var(--ceremony-gold-dim);
+  border-radius: var(--r-pill);
+  padding: 2px 8px;
+  background: var(--ceremony-gold-bg);
+}
+
+.cardCeremony .pickActive {
+  color: var(--ceremony-gold);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.cardCeremony .pickActive:hover {
+  background: rgba(212, 175, 55, 0.18);
+  color: var(--ceremony-gold);
+}
+
+/* ============================================================
    ATTENDEE CLUSTER — ranked variant
    ============================================================ */
 .attendeeCluster {

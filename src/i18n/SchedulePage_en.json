@@ -52,5 +52,6 @@
   "sortLabel": "Sort order",
   "sortTimeAsc": "Earliest first",
   "sortTimeDesc": "Latest first",
-  "sortAlpha": "Alphabetical"
+  "sortAlpha": "Alphabetical",
+  "scheduleClosingCeremony": "Closing Ceremony"
 }

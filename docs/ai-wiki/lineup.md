@@ -8,7 +8,7 @@
 > 2. Apply changes to `supabase/seed/bands.ts`
 > 3. Run `npm run seed:bands`
 
-**Summary:** 166 bands CONFIRMED · 26 bands TBD · 192 total
+**Summary:** 167 bands CONFIRMED · 25 bands TBD · 192 total · 1 ceremony (Farewell & Announcements, FAS17)
 
 ---
 
@@ -343,7 +343,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | Asrock | Metal | FAS14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/a/csm_asrock_26_85c4a23518.jpg |
 | Ad Infinitum | Symphonic Metal | FAS15 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/a/csm_ad_infinitum_26_cb9028b792.jpg |
 | Alestorm | Party Metal | FAS16 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/d/csm_alestorm_26_9ddf45fa2e.jpg |
-| Lamb of God | Groove Metal | FAS17 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/4/csm_lamb_of_god_26b_d0cd004159.jpg |
+| Farewell & Announcements | — | FAS17 | CEREMONY | — |
 | Sabaton | Power Metal | FAS18 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/4/csm_sabaton_26_143decf5a4.jpg |
 
 ### Harder Stage
@@ -383,7 +383,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 |------|-------|------|-------------|-----------|
-| TBD | TBD | HBA29 | TBD | PLACEHOLDER |
+| Lamb of God | Groove Metal | HBA29 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/4/csm_lamb_of_god_26b_d0cd004159.jpg |
 | Vended | Nu Metal | HBA30 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/7/csm_vended_26_a96222e9bb.jpg |
 | Stonem | Metal | HBA31 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/9/csm_stonem_26_e1ff4b71dd.jpg |
 | Orbit Culture | Melodic Death Metal | HBA32 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/c/csm_Orbit_Culture-WOA26_e0ccb2b84a.jpg |

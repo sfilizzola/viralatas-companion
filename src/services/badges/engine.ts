@@ -31,7 +31,7 @@ export function buildBadgeContext(
   );
   const pickedBands = userPickBandIds
     .map((id) => bandsById.get(id))
-    .filter((b): b is BadgeBand => b !== undefined);
+    .filter((b): b is BadgeBand => b !== undefined && b.category !== 'ceremony');
   const seenBands = pickedBands.filter(
     (b) => new Date(b.end_time) < now && !missedBandIds.has(b.id),
   );
@@ -72,7 +72,7 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
     case 'country_is':
       return ctx.country === condition.country;
     case 'bands_picked_min':
-      return ctx.bandsPicked >= condition.count;
+      return ctx.pickedBands.length >= condition.count;
     case 'band_attendance_min':
       return ctx.maxAttendanceInPicks >= condition.count;
     case 'bands_picked_genre_min':

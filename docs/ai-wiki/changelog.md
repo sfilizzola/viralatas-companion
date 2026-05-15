@@ -4,6 +4,33 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-15 (Phase 19 — Closing Ceremony Slot)
+
+### Added
+- `supabase/migrations/20260514000000_idea7_band_category.sql` — `category text not null default 'band'` column + check constraint `('band','ceremony')` on `public.bands`
+- `category: BandCategory` field on `Band` type in `src/types/index.ts`; `BandCategory = 'band' | 'ceremony'` union exported from same file
+- `category` field added to `BadgeBand` via `Pick<Band, ...>` in `src/services/badges/types.ts`
+- `buildBadgeContext` in `src/services/badges/engine.ts` now filters `category === 'ceremony'` from `pickedBands` and `seenBands`
+- `computeBandOverlaps` in `src/hooks/useBandConflicts.ts` skips ceremony entries — no conflict chip ever shown
+- `.cardCeremony`, `.ceremonyLabel` CSS classes in `src/components/BandCard.module.css` (gold border `--ceremony-gold #d4af37`, warm tint, pill chip replacing stage chip)
+- Ceremony rendering logic in `src/components/BandCard.tsx`: ceremony cards use `--ceremony-gold` for stripe/thumb/pick-active; stage chip replaced by `✦ Closing Ceremony` label
+- `popularBands` filter in `src/pages/PopularPage.tsx` excludes `category === 'ceremony'`
+- `scheduleClosingCeremony` i18n key in all 4 locale files (`br`, `en`, `de`, `es`) under `SchedulePage_*.json`
+- `Farewell & Announcements` ceremony seed entry in `supabase/seed/bands.ts` at Faster stage, slot FAS17 (22:30–23:00 Day 4)
+- Phase 19 ceremony badge regression suite in `src/__tests__/badges.test.ts`
+
+### Changed
+- `BandSeed.genre` type widened to `string | null`; `BandSeed.category` optional field added
+- `band()` test helper in `badges.test.ts` now includes `category: 'band'` default; new `ceremonyBand()` helper added
+- `public/Design System.html` — ceremony card demos updated to "Farewell & Announcements" / 22:30–23:00 / `FA` monogram; notes corrected to reflect stage chip is hidden (not absent)
+
+### Architectural Notes
+- `category` column uses a DB-level check constraint — invalid values are rejected at the Postgres layer, not just TypeScript.
+- Ceremony entries sync into IndexedDB exactly like bands (no special-casing in the sync layer); the filtering is purely presentational and in the badge engine.
+- `bandsPicked` (raw pick count) still includes ceremony picks — it feeds `band_attendance_min` checks which are pick-based, not music-based. Only the `pickedBands` / `seenBands` arrays (used by all music conditions) are filtered.
+
+---
+
 ## 2026-05-15 (LatestAnnouncementBanner DS alignment)
 
 ### Changed

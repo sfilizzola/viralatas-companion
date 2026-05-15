@@ -19,6 +19,8 @@ export type User = {
 
 export type CrewUser = Pick<User, 'id' | 'display_name' | 'avatar_url' | 'wacken_arrival_day' | 'is_friend'>;
 
+export type BandCategory = 'band' | 'ceremony';
+
 export type Band = {
   id: string;
   name: string;
@@ -27,6 +29,7 @@ export type Band = {
   end_time: string;
   image_url: string | null;
   genre: string | null;
+  category: BandCategory;
 };
 
 export type UserPick = {

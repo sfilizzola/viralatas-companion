@@ -55,6 +55,7 @@ function createBand(
     end_time: endStr,
     image_url: null,
     genre: 'Metal',
+    category: 'band',
   };
 }
 

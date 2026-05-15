@@ -15,6 +15,7 @@ function band(id: string, start: string, end: string, overrides: Partial<Band> =
     end_time: end,
     image_url: null,
     genre: null,
+    category: 'band',
     ...overrides,
   };
 }

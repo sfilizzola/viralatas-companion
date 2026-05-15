@@ -16,6 +16,7 @@ function band(
     end_time: endIso,
     image_url: null,
     genre: null,
+    category: 'band',
   };
 }
 
