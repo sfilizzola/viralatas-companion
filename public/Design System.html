@@ -1579,6 +1579,72 @@
     font-size: 13px; color: var(--text-muted); line-height: 1.5;
     margin-top: 6px;
   }
+  /* Real badge image buttons (DS preview — mirrors BadgesDisplay.tsx .patchBtn) */
+  .patch-img-btn {
+    background: none; border: none; padding: 4px; cursor: pointer;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s;
+  }
+  .patch-img-btn:hover { transform: scale(1.08); }
+  .patch-img-btn:active { transform: scale(0.95); }
+  .patch-img { width: 64px; height: 64px; border-radius: 50%; display: block; object-fit: contain; }
+
+  /* Badge detail modal — mirrors .modalContent / .modalPatch / .modalImg / .modalName / .modalDesc */
+  .ds-modal-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--r-3);
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5);
+    padding: 2rem 1.5rem 1.5rem;
+    max-width: 300px;
+    width: calc(100% - 3rem);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--s-3);
+  }
+  .ds-modal-circle {
+    position: relative;
+    width: 145px; height: 145px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: radial-gradient(circle at 50% 38%, #2a2a2a 0%, #0d0d0d 100%);
+    box-shadow: 0 0 0 1px var(--border-strong), 0 8px 32px rgba(0, 0, 0, 0.65);
+    flex-shrink: 0;
+  }
+  .ds-modal-img {
+    width: 136px; height: 136px;
+    border-radius: 50%; object-fit: contain; display: block;
+  }
+  .ds-modal-name {
+    font-family: var(--font-display); font-size: 20px; font-weight: 700;
+    text-transform: uppercase; color: var(--text);
+    margin: 0; text-align: center; letter-spacing: 0.02em;
+  }
+  .ds-modal-desc {
+    font-size: 0.875rem; line-height: 1.5;
+    color: var(--text-muted); margin: 0; text-align: center;
+  }
+  /* Year chip — mirrors .modalYearChip: 38×38 diamond, red enamel, absolute bottom-right of circle */
+  .ds-modal-year-chip {
+    position: absolute;
+    bottom: -2px; right: -2px;
+    width: 38px; height: 38px;
+    clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 14px; font-weight: 700;
+    letter-spacing: 0.01em; color: #fff; line-height: 1;
+    background: linear-gradient(145deg, #d93025 0%, #b32020 60%, #7a1010 100%);
+    filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.95));
+    pointer-events: none; z-index: 1;
+  }
+  .ds-modal-year-chip::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(150deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.08) 45%, rgba(255,255,255,0) 70%);
+  }
+
   /* In code: .modalYearChip is a 38×38px diamond (clip-path polygon), red enamel gradient,
      var(--font-mono) 14px 700, not a rect pill. Rect pill was the original DS design. */
   .patch-detail .wacken-chip {
@@ -1786,18 +1852,23 @@
   .ds-input-error-text { font-family: var(--font-mono); font-size: 11px; color: var(--signal-live); }
 
   /* ============================================================
-     BADGE UNLOCK ANIMATION
+     BADGE GLOW — new-badge "unread" state
      ============================================================ */
-  @keyframes badge-unlock {
-    0%   { transform: scale(0.85); }
-    60%  { transform: scale(1.12); }
-    100% { transform: scale(1.0); }
+  @keyframes badge-glow {
+    0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 160, 40, 0.55)); }
+    50%       { filter: drop-shadow(0 0 13px rgba(255, 160, 40, 0.9))
+                        drop-shadow(0 0 4px rgba(255, 210, 80, 0.6)); }
   }
-  .patch.unlocking {
-    animation: badge-unlock 380ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  }
+  .patch.glowing,
+  .patch-img-btn.glowing,
   .motion-badge-preview {
-    animation: badge-unlock 380ms cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s infinite alternate;
+    animation: badge-glow 2s ease-in-out infinite;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .patch.glowing, .patch-img-btn.glowing, .motion-badge-preview {
+      animation: none;
+      filter: drop-shadow(0 0 6px rgba(255, 160, 40, 0.75));
+    }
   }
 
   /* ============================================================
@@ -1986,7 +2057,7 @@
     </div>
     <div class="type-row">
       <div class="label"><b>Body</b>Plex Sans · 400 · 15/22</div>
-      <div class="sample t-body">Você marcou Blind Guardian e Powerwolf ao mesmo tempo. Qual palco vai rolar? 🤘</div>
+      <div class="sample t-body">You picked Blind Guardian and Powerwolf at the same time. Which stage are you going to? 🤘</div>
     </div>
     <div class="type-row">
       <div class="label"><b>Small</b>Plex Sans · 400 · 13/19</div>
@@ -2125,7 +2196,7 @@
             <div class="meta">
               <span class="stage" style="background:var(--stage-faster)">Faster</span>
               <span class="going"><b>11</b> crew going</span>
-              <span class="conflict-chip">⚠ Conflito</span>
+              <span class="conflict-chip">⚠ Conflict</span>
             </div>
           </div>
           <button class="pick on">
@@ -2140,7 +2211,7 @@
             <div class="meta">
               <span class="stage" style="background:var(--stage-louder)">Louder</span>
               <span class="going"><b>7</b> crew going</span>
-              <span class="conflict-chip">⚠ Conflito</span>
+              <span class="conflict-chip">⚠ Conflict</span>
             </div>
           </div>
           <button class="pick on">
@@ -2371,7 +2442,7 @@
               </div>
               <div class="who-list">
                 <div>
-                  <h5><b class="label">Vão ver</b><span class="ct">7</span></h5>
+                  <h5><b class="label">Going</b><span class="ct">7</span></h5>
                   <div class="who-rows">
                     <div class="who-row"><span class="av s24" style="background:#c0392b">SF</span><span class="nm">Salvatore</span></div>
                     <div class="who-row"><span class="av s24" style="background:#2980b9">JP</span><span class="nm">Joana</span></div>
@@ -2383,15 +2454,15 @@
                   </div>
                 </div>
                 <div>
-                  <h5><b class="label" style="color:#5fd0bb">Viram</b><span class="ct" style="color:#5fd0bb">5</span></h5>
+                  <h5><b class="label" style="color:#5fd0bb">Saw it</b><span class="ct" style="color:#5fd0bb">5</span></h5>
                   <div class="who-rows">
                     <div class="who-row saw"><span class="av s24" style="background:#c0392b">SF</span><span class="nm">Salvatore</span></div>
                     <div class="who-row saw"><span class="av s24" style="background:#2980b9">JP</span><span class="nm">Joana</span></div>
                     <div class="who-row saw"><span class="av s24" style="background:#16a085">LM</span><span class="nm">Lucas</span></div>
                     <div class="who-row saw"><span class="av s24" style="background:#e67e22">DK</span><span class="nm">Diogo</span></div>
                     <div class="who-row saw"><span class="av s24" style="background:#f39c12;color:#0a0a0a">VB</span><span class="nm">Victor</span></div>
-                    <div class="who-row no-show"><span class="av s24" style="background:#8e44ad">RC</span><span class="nm">Rafael &middot; não vi</span></div>
-                    <div class="who-row no-show"><span class="av s24" style="background:#2c3e50">FF</span><span class="nm">Felipe &middot; não vi</span></div>
+                    <div class="who-row no-show"><span class="av s24" style="background:#8e44ad">RC</span><span class="nm">Rafael &middot; didn't see</span></div>
+                    <div class="who-row no-show"><span class="av s24" style="background:#2c3e50">FF</span><span class="nm">Felipe &middot; didn't see</span></div>
                   </div>
                 </div>
               </div>
@@ -2400,7 +2471,7 @@
                 <div>You also picked <b>Blind Guardian</b> at 22:00 on Faster. One of these has to give.</div>
               </div>
               <div class="seen-toggle">
-                <div class="label">Não vi essa banda<br /><small style="color:var(--text-faint);font-family:var(--font-mono);font-size:10px">Available after 23:45</small></div>
+                <div class="label">Didn't see this band<br /><small style="color:var(--text-faint);font-family:var(--font-mono);font-size:10px">Available after 23:45</small></div>
                 <div class="toggle-track"></div>
               </div>
             </div>
@@ -2418,7 +2489,7 @@
           <li><b>Stat pair</b> picked / actually-saw — the headline number</li>
           <li><b>Who picked / who saw</b> — names + avatars are the primary display, not just counts</li>
           <li><b>Conflict warn</b> only when overlapping picks exist</li>
-          <li><b>"Não vi"</b> toggle activates after band's <code>end_time</code></li>
+          <li><b>"Didn't see"</b> toggle activates after band's <code>end_time</code></li>
         </ul>
       </div>
     </div>
@@ -2437,8 +2508,8 @@
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2 L22 20 L2 20 Z"/><path d="M12 9 L12 14"/><circle cx="12" cy="17" r="0.6" fill="currentColor"/></svg>
           </div>
           <div class="text">
-            <b>Conflito de palco</b>
-            Você marcou Blind Guardian e Powerwolf ao mesmo tempo. Qual palco vai rolar? 🤘
+            <b>Stage conflict</b>
+            You picked Blind Guardian and Powerwolf at the same time. Which stage are you going to? 🤘
             <small>2 min ago · Faster vs Louder</small>
           </div>
           <button class="dismiss">✕</button>
@@ -2449,8 +2520,8 @@
             <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg>
           </div>
           <div class="text">
-            <b>Crew dividida</b>
-            Vocês estão em 4 palcos diferentes agora. 🤘
+            <b>Crew split</b>
+            Crew is spread across 4 stages right now. 🤘
             <small>just now</small>
           </div>
           <button class="dismiss">✕</button>
@@ -2461,8 +2532,8 @@
             <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><polyline points="4 12 10 18 20 6"/></svg>
           </div>
           <div class="text">
-            <b>Sincronizado</b>
-            3 picks pendentes salvos. Tudo em dia. 🤘
+            <b>Synced</b>
+            3 pending picks saved. All caught up. 🤘
             <small>now · 3 actions flushed</small>
           </div>
           <button class="dismiss">✕</button>
@@ -2483,76 +2554,50 @@
     <div class="subhead">Badge collection &middot; circular patches, vest-style</div>
     <p class="t-small" style="margin:-6px 0 var(--s-3)">Badges live as <b>patches on a metal vest</b>, not entries in a settings list. The default state is image-only — no captions visible. Tap any patch to open the detail modal with name, description, and (if historical) the Wacken year chip.</p>
 
-    <div class="subhead" style="font-size:11px;border-bottom:0;padding-bottom:0;margin-top:var(--s-5)">Variant A &middot; even circle grid</div>
     <div class="demo">
       <div class="demo-stage">
         <div class="patch-grid">
-          <div class="patch flag-br">BR</div>
-          <div class="patch veteran">5<span style="font-size:14px;vertical-align:super">x</span></div>
-          <div class="patch sniper">42</div>
-          <div class="patch witness">25<span class="year-chip">'25</span></div>
-          <div class="patch headbang">🤘</div>
-          <div class="patch wasteland-loyal">⚒</div>
-          <div class="patch flag-co locked">CO</div>
-          <div class="patch flag-be locked">BE</div>
-          <div class="patch flag-de locked">DE</div>
+          <button class="patch-img-btn glowing" title="Novo! Click para marcar como visto"><img src="badges/badge_heat.png" alt="Heat" class="patch-img" /></button>
+          <button class="patch-img-btn" title="Badge Wackinger"><img src="badges/badge_wackinger.png" alt="Wackinger" class="patch-img" /></button>
+          <button class="patch-img-btn" title="Badge Firefighters"><img src="badges/badge_firefighters.png" alt="Firefighters" class="patch-img" /></button>
+          <button class="patch-img-btn" title="Badge Heavysaurus"><img src="badges/badge_heavysaurus.png" alt="Heavysaurus" class="patch-img" /></button>
+          <button class="patch-img-btn" title="Badge Roots"><img src="badges/badge_roots.png" alt="Roots" class="patch-img" /></button>
+          <button class="patch-img-btn" title="Badge Gutalax"><img src="badges/badge_gutalax.png" alt="Gutalax" class="patch-img" /></button>
+          <button class="patch-img-btn" title="Badge Wasteland"><img src="badges/badge_wasteland.png" alt="Wasteland" class="patch-img" /></button>
+          <button class="patch-img-btn" title="Badge Melon"><img src="badges/badge_melon.png" alt="Melon" class="patch-img" /></button>
         </div>
       </div>
       <div class="demo-notes">
-        <h4>Coins on a display</h4>
+        <h4>Circular patches on denim</h4>
         <ul>
-          <li>Strict rows, equal sizing, equal spacing</li>
-          <li>Locked = grayscale + 32% opacity</li>
-          <li>Year chip pinned bottom-right of historical patches</li>
-          <li>Reads as a <b>collection</b> &mdash; orderly, comparable</li>
+          <li>Only earned badges are shown — unearned badges are invisible</li>
+          <li>New (unacknowledged) badges pulse with a golden amber glow</li>
+          <li>Click any patch to open the detail modal — glow disappears</li>
+          <li>Glow state persists across reloads via <code>localStorage.badgeAcknowledged</code></li>
         </ul>
       </div>
     </div>
 
-    <div class="subhead" style="font-size:11px;border-bottom:0;padding-bottom:0;margin-top:var(--s-5)">Variant B &middot; organic vest layout</div>
+    <div class="subhead" style="font-size:11px;border-bottom:0;padding-bottom:0;margin-top:var(--s-5)">Detail modal &middot; on tap</div>
     <div class="demo">
-      <div class="demo-stage">
-        <div class="vest">
-          <div class="patch flag-br" style="--rot:-8deg;left:6%;top:8%;width:96px;height:96px;font-size:30px">BR</div>
-          <div class="patch veteran" style="--rot:5deg;left:30%;top:4%;width:78px;height:78px;font-size:24px">5<span style="font-size:12px;vertical-align:super">x</span></div>
-          <div class="patch sniper" style="--rot:-3deg;left:54%;top:11%;width:84px;height:84px;font-size:26px">42</div>
-          <div class="patch witness" style="--rot:7deg;left:78%;top:6%;width:74px;height:74px;font-size:22px">25<span class="year-chip">'25</span></div>
-          <div class="patch headbang" style="--rot:-12deg;left:18%;top:42%;width:90px;height:90px;font-size:34px">🤘</div>
-          <div class="patch wasteland-loyal" style="--rot:8deg;left:46%;top:46%;width:86px;height:86px;font-size:32px">⚒</div>
-          <div class="patch flag-co locked" style="--rot:-5deg;left:70%;top:48%;width:70px;height:70px;font-size:22px">CO</div>
-          <div class="patch flag-be locked" style="--rot:11deg;left:8%;top:74%;width:74px;height:74px;font-size:22px">BE</div>
-          <div class="patch flag-de locked" style="--rot:-7deg;left:36%;top:78%;width:68px;height:68px;font-size:20px">DE</div>
-          <div class="patch sniper locked" style="--rot:6deg;left:62%;top:76%;width:78px;height:78px;font-size:24px">100</div>
-        </div>
-      </div>
-      <div class="demo-notes">
-        <h4>Sewn on, lived in</h4>
-        <ul>
-          <li>Varied sizes (68–96 px), slight rotation ±12°</li>
-          <li>Patches can overlap, not a strict grid</li>
-          <li>Subtle stitching lines hint at vest seams</li>
-          <li>Reads as an <b>identity</b> &mdash; this is mine, this is who I am</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="subhead" style="font-size:11px;border-bottom:0;padding-bottom:0;margin-top:var(--s-5)">Detail modal (any variant, on tap)</div>
-    <div class="demo">
-      <div class="demo-stage" style="justify-content:center;align-items:center;display:flex;background:rgba(0,0,0,0.7)">
-        <div class="patch-detail">
-          <div class="patch witness patch-big">25</div>
-          <div class="pname">All Pit, Always</div>
-          <div class="pdesc">25 bandas vistas em um único Wacken. Você não foi pra dormir.</div>
-          <div class="wacken-chip">'25</div>
+      <div class="demo-stage" style="justify-content:center;align-items:center;display:flex;background:rgba(0,0,0,0.6)">
+        <div class="ds-modal-card">
+          <div class="ds-modal-circle">
+            <img src="badges/badge_wackinger.png" alt="Wackinger" class="ds-modal-img" />
+            <span class="ds-modal-year-chip">26</span>
+          </div>
+          <h3 class="ds-modal-name">Wackinger</h3>
+          <p class="ds-modal-desc">Você escolheu uma banda no palco Wackinger. Folk metal é metal. 🤘</p>
         </div>
       </div>
       <div class="demo-notes">
         <h4>Modal contents</h4>
         <ul>
-          <li>Larger circular patch (132 px)</li>
-          <li>Badge name, description copy</li>
-          <li>"Wacken YYYY" chip on historical/frozen badges only</li>
-          <li>Tap scrim or close gesture to dismiss</li>
+          <li>Dark circular spotlight (145 px) on radial gradient black — image inside (136 px)</li>
+          <li>Badge name in display font, uppercase</li>
+          <li>Description copy in muted text</li>
+          <li>Year diamond chip (38 px, red enamel) shown only on historical badges</li>
+          <li>Tap scrim or ✕ to dismiss</li>
         </ul>
       </div>
     </div>
@@ -2580,7 +2625,7 @@
             <span class="role-chip manager">Manager</span>
             <span class="ts">14 min</span>
           </div>
-          <div class="body">Quem tá no portão sul agora? O ônibus do shuttle saiu cedo. Mandem pin no maps.</div>
+          <div class="body">Who's at the south gate now? The shuttle bus left early. Drop a pin in maps.</div>
           <div class="actions">
             <button class="action danger">⊘ Block user</button>
           </div>
@@ -2592,7 +2637,7 @@
             <span class="role-chip normal">Crew</span>
             <span class="ts">1 h</span>
           </div>
-          <div class="body">Powerwolf na Louder agora — venham, tá lotando.</div>
+          <div class="body">Powerwolf at Louder right now — come join, it's packed.</div>
         </div>
       </div>
       <div class="demo-notes">
@@ -2709,7 +2754,7 @@
     <div class="subhead">Offline &amp; sync states</div>
     <div class="demo">
       <div class="demo-stage" style="display:grid;gap:var(--s-3)">
-        <div class="offline-banner">Sem conexão — modo offline</div>
+        <div class="offline-banner">No connection — offline mode</div>
         <div class="row">
           <span class="pending-chip">↻ queued · pick</span>
           <span class="pending-chip">↻ queued · post</span>
@@ -2772,10 +2817,10 @@
         <div class="ds-input-group">
           <div class="ds-input-label">Email &middot; <span style="color:var(--signal-live)">error</span></div>
           <input class="ds-input error" type="text" value="nao-e-email" />
-          <span class="ds-input-error-text">Email inválido</span>
+          <span class="ds-input-error-text">Invalid email</span>
         </div>
         <div class="ds-input-group">
-          <div class="ds-input-label faint">Usuário &middot; <span style="color:var(--text-faint)">disabled</span></div>
+          <div class="ds-input-label faint">Username &middot; <span style="color:var(--text-faint)">disabled</span></div>
           <input class="ds-input" type="text" value="@salvatore" disabled />
         </div>
       </div>
@@ -3044,14 +3089,14 @@
               <h2>My Picks</h2>
               <div class="when">12 picks<br />2 conflicts</div>
             </div>
-            <div class="offline-banner" style="margin-bottom:var(--s-3)">Sem conexão — modo offline</div>
+            <div class="offline-banner" style="margin-bottom:var(--s-3)">No connection — offline mode</div>
             <div class="timeline-day">Day 3 · Friday <small>5 picks</small></div>
             <div class="timeline-bcard conflict-soft">
               <div class="when"><div class="h">22:00</div><div class="e">23:30</div></div>
               <div class="body">
                 <div class="name">BLIND GUARDIAN</div>
                 <div class="meta"><span class="stage" style="background:var(--stage-faster)">Faster</span><span>11 going</span></div>
-                <span class="conflict-mini">⚠ Conflito</span>
+                <span class="conflict-mini">⚠ Conflict</span>
               </div>
               <div class="pick"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg></div>
             </div>
@@ -3060,7 +3105,7 @@
               <div class="body">
                 <div class="name">POWERWOLF</div>
                 <div class="meta"><span class="stage" style="background:var(--stage-louder)">Louder</span><span>7 going</span></div>
-                <span class="conflict-mini">⚠ Conflito</span>
+                <span class="conflict-mini">⚠ Conflict</span>
               </div>
               <div class="pick"><svg viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"/></svg></div>
             </div>
@@ -3380,18 +3425,19 @@
 
     <div class="motion-card">
       <div>
-        <h4>Badge unlock</h4>
+        <h4>Badge glow &middot; new / unread</h4>
         <div class="specs">
-          <b>380 ms</b> · cubic-bezier(0.34, 1.56, 0.64, 1)<br />
-          scale 0.85 → 1.12 → 1.0<br />
-          class <code>.patch.unlocking</code> triggers animation<br />
-          fired once per session per badge slug<br />
-          store triggered slugs in <code>sessionStorage</code><br />
-          <i style="color:var(--text-faint)">// permanent milestone → 60 ms longer than pick toggle</i>
+          <b>2 s</b> · ease-in-out · infinite<br />
+          <code>drop-shadow</code> 4 px → 13 px amber glow on the button<br />
+          class <code>.patch.glowing</code> added while badge is unacknowledged<br />
+          persists across reloads — state stored in <code>localStorage.badgeAcknowledged</code><br />
+          clicking the badge opens the modal <b>and</b> removes the glow<br />
+          <code>prefers-reduced-motion</code>: static glow ring, no pulse<br />
+          <i style="color:var(--text-faint)">// drop-shadow on button (not img) so glow follows circular shape</i>
         </div>
       </div>
       <div class="motion-demo">
-        <div class="patch veteran motion-badge-preview" style="width:64px;height:64px;font-size:20px">5<span style="font-size:10px;vertical-align:super">x</span></div>
+        <button class="patch-img-btn motion-badge-preview" style="padding:8px"><img src="badges/badge_heat.png" alt="Heat badge" class="patch-img" /></button>
       </div>
     </div>
 
@@ -3468,13 +3514,13 @@
     <div class="demo">
       <div class="demo-stage">
         <div class="now-hero">
-          <div class="kicker" style="color:var(--signal-ok)">Último latido vira-lata</div>
-          <p style="font-size:14px;margin-top:8px;color:var(--text);line-height:1.5">"Galera, o acampamento tem fila no banheiro enorme — evitem por umas 2h 🤘"</p>
+          <div class="kicker" style="color:var(--signal-ok)">Latest vira-lata howl</div>
+          <p style="font-size:14px;margin-top:8px;color:var(--text);line-height:1.5">"Crew, the campsite has a massive bathroom queue — avoid for the next 2h 🤘"</p>
           <div class="meta" style="margin-top:8px">
             <span class="av s24" style="background:var(--accent)">SF</span>
             <span style="font-size:12px;font-weight:600;margin-left:6px">Salvatore</span>
             <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-left:8px">3 min ago</span>
-            <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent-hover);margin-left:auto">Ver mais →</span>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--accent-hover);margin-left:auto">See more →</span>
           </div>
         </div>
       </div>
@@ -3482,9 +3528,9 @@
         <h4>Behavior</h4>
         <ul>
           <li>Appears on <b>/now</b> when there's at least one announcement</li>
-          <li>Kicker: <code>latestNews</code> i18n key ("Último latido vira-lata" in PT)</li>
+          <li>Kicker: <code>latestNews</code> i18n key ("Latest vira-lata howl" in EN)</li>
           <li>Text truncated to <b>4 lines</b> via <code>-webkit-line-clamp: 4</code>; if truncated, full card is tappable → <b>/announcements</b></li>
-          <li>"Ver mais →" arrow only shown when truncated</li>
+          <li>"See more →" arrow only shown when truncated</li>
           <li>Uses <code>RightNowPage.module.css</code> (shared styles)</li>
         </ul>
       </div>
@@ -3584,7 +3630,7 @@
         <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">/now — pre-festival</div>
         <div class="empty-state">
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg>
-          <p class="empty-msg">Ninguém escolheu uma banda ainda.</p>
+          <p class="empty-msg">Nobody has picked a band yet.</p>
         </div>
       </div>
 
@@ -3593,7 +3639,7 @@
         <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">/schedule — no results</div>
         <div class="empty-state">
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-          <p class="empty-msg">Nenhuma banda encontrada. Tente outro filtro.</p>
+          <p class="empty-msg">No bands found. Try a different filter.</p>
         </div>
       </div>
 
@@ -3602,7 +3648,7 @@
         <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">/my-picks — zero picks</div>
         <div class="empty-state">
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <p class="empty-msg">Nenhuma banda salva ainda. Vai lá no Sched. 🤘</p>
+          <p class="empty-msg">No bands saved yet. Head to Schedule. 🤘</p>
         </div>
       </div>
 
@@ -3611,7 +3657,7 @@
         <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">/popular — no picks</div>
         <div class="empty-state">
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 17l4-8 4 5 3-3 4 6"/></svg>
-          <p class="empty-msg">Nenhum pick ainda. Primeiro a salvar ganha.</p>
+          <p class="empty-msg">No picks yet. First to save wins.</p>
         </div>
       </div>
 
@@ -3620,7 +3666,7 @@
         <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">/announcements — empty mural</div>
         <div class="empty-state">
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-          <p class="empty-msg">Nenhum anúncio ainda. Seja o primeiro. 🤘</p>
+          <p class="empty-msg">No announcements yet. Be the first. 🤘</p>
         </div>
       </div>
 
@@ -3643,7 +3689,7 @@
         <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">variant: network</div>
         <div class="error-state network" style="border:none;border-radius:0;background:transparent">
           <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-          <p class="error-msg">Sem sinal. No modo offline. 🤘</p>
+          <p class="error-msg">No signal. Offline mode. 🤘</p>
         </div>
       </div>
 
@@ -3652,8 +3698,8 @@
         <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">variant: sync</div>
         <div class="error-state" style="border:none;border-radius:0;background:transparent">
           <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
-          <p class="error-msg">Erro ao sincronizar. Tentaremos de novo.</p>
-          <button class="btn" style="margin-top:var(--s-1);font-size:12px;padding:8px 14px">Tentar de novo</button>
+          <p class="error-msg">Sync failed. We'll retry automatically.</p>
+          <button class="btn" style="margin-top:var(--s-1);font-size:12px;padding:8px 14px">Retry</button>
         </div>
       </div>
 
@@ -3662,8 +3708,8 @@
         <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">variant: auth</div>
         <div class="error-state" style="border:none;border-radius:0;background:transparent">
           <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          <p class="error-msg">Sessão expirada. Por favor, entre novamente.</p>
-          <button class="btn" style="margin-top:var(--s-1);font-size:12px;padding:8px 14px">Entrar</button>
+          <p class="error-msg">Session expired. Please log in again.</p>
+          <button class="btn" style="margin-top:var(--s-1);font-size:12px;padding:8px 14px">Log In</button>
         </div>
       </div>
 
@@ -3685,6 +3731,17 @@
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
 
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v2.1 — May 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li>Replaced ephemeral badge-unlock (scale bounce) with persistent badge-glow (amber drop-shadow pulse, 2 s)</li>
+          <li>Glow persists across reloads via <code>localStorage.badgeAcknowledged</code>; removed on first click-to-open-modal</li>
+          <li>Removed Variant B (organic vest layout) — only the even grid (Variant A) is implemented</li>
+          <li>§09 Patches now uses real badge images (<code>/badges/badge_*.png</code>) instead of placeholder text</li>
+          <li>Added <code>.glowing</code> class spec and live preview to §07 Motion</li>
+        </ul>
+      </div>
+
+      <div style="border-left:2px solid var(--border-strong);padding-left:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v2.0 — Sprint 3 · May 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
           <li>Added §10 Empty &amp; Error States — 5 canonical empty patterns + 3 error variants</li>

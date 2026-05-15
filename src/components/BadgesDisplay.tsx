@@ -168,22 +168,24 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
     ? (earned.find((b) => b.slug === selectedSlug) ?? null)
     : null;
 
-  // Track which badges have been animated this session to fire only once per badge
-  const animatedRef = useRef<Set<string>>(
-    new Set(JSON.parse(sessionStorage.getItem('badgeAnimated') ?? '[]') as string[]),
+  const acknowledgedRef = useRef<Set<string>>(
+    new Set(JSON.parse(localStorage.getItem('badgeAcknowledged') ?? '[]') as string[]),
   );
-  const [unlockingSlug, setUnlockingSlug] = useState<string | null>(null);
+  const [glowingSlugs, setGlowingSlugs] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const alreadyAnimated = animatedRef.current;
-    const newSlug = earned.find((b) => !alreadyAnimated.has(b.slug))?.slug ?? null;
-    if (!newSlug) return;
-    alreadyAnimated.add(newSlug);
-    sessionStorage.setItem('badgeAnimated', JSON.stringify([...alreadyAnimated]));
-    setUnlockingSlug(newSlug);
-    const t = setTimeout(() => setUnlockingSlug(null), 400);
-    return () => clearTimeout(t);
-  }, [earned]);
+    const earnedNow = BADGES.filter((b) => evaluateBadge(b, ctx));
+    const ack = acknowledgedRef.current;
+    const unacked = earnedNow.filter((b) => !ack.has(b.slug)).map((b) => b.slug);
+    setGlowingSlugs(new Set(unacked));
+  }, [ctx]);
+
+  function handleBadgeClick(slug: string) {
+    acknowledgedRef.current.add(slug);
+    localStorage.setItem('badgeAcknowledged', JSON.stringify([...acknowledgedRef.current]));
+    setGlowingSlugs((prev) => { const s = new Set(prev); s.delete(slug); return s; });
+    setSelectedSlug(slug);
+  }
 
   if (earned.length === 0) return null;
 
@@ -192,15 +194,15 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       {heading && <div className={styles.patchesHeading}>{heading}</div>}
       <div className={styles.patchesGrid} data-bg={bg}>
         {earned.map((badge) => {
-          const isUnlocking = unlockingSlug === badge.slug;
-          const btnClass = isUnlocking
-            ? `${styles.patchBtn} ${styles.unlocking}`
+          const isGlowing = glowingSlugs.has(badge.slug);
+          const btnClass = isGlowing
+            ? `${styles.patchBtn} ${styles.glowing}`
             : styles.patchBtn;
           return (
           <button
             key={badge.slug}
             className={btnClass}
-            onClick={() => setSelectedSlug(badge.slug)}
+            onClick={() => handleBadgeClick(badge.slug)}
             type="button"
             aria-label={t(badge.labelKey)}
           >
