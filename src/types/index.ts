@@ -29,7 +29,7 @@ export type Band = {
   end_time: string;
   image_url: string | null;
   genre: string | null;
-  category: BandCategory;
+  category: BandCategory | null;
 };
 
 export type UserPick = {
