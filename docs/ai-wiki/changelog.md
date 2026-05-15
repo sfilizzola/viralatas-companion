@@ -513,4 +513,17 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
-**Last updated:** 2026-05-13
+**Last updated:** 2026-05-15
+
+---
+
+## 2026-05-15
+
+### Added
+- **Melon badge** — new `assigned`-type badge added to `src/services/badges/registry.ts` with slug `melon`, asset `/badges/badge_melon.png`, and i18n keys `badgeMelon` / `badgeMelonDescription`
+- **Melon badge i18n** — name ("Melon", untranslated) and description translated in all 4 language files: `Badges_br.json`, `Badges_en.json`, `Badges_es.json`, `Badges_de.json`
+
+### Changed
+- **Admin panel action buttons** — replaced generic `.secondaryAction` modifier with semantic per-action CSS classes in `ProfilePage.module.css`: `.actionPromote` (blue), `.actionFriend` (amber), `.actionBadge` (purple), `.actionUnblock` (orange); `.secondaryAction` kept as a no-op for backward compatibility
+- **GodlikeAdminPanel** — wired new semantic button classes; role chip moved inside the user info block for better layout; avatar size reduced to 36px
+- **ManagerAdminPanel** — wired `.actionUnblock` class on the unblock button

@@ -3541,6 +3541,15 @@
         <li><b>PatchesBackgroundPicker</b> — lets users choose their vest background texture on the profile page</li>
         <li><b>ConflictSection</b> — /my-picks conflict summary with links to conflicting bands</li>
       </ul>
+      <h4>Admin user-row action button semantics (<code>ProfilePage.module.css</code>)</h4>
+      <p style="margin-bottom:8px">Each action button uses a semantic modifier class on top of <code>.userActionButton</code>. The base style is neutral (muted border, no color). Modifiers communicate intent via tinted backgrounds:</p>
+      <ul>
+        <li><code>.actionPromote</code> — blue tint · promote/demote role actions</li>
+        <li><code>.actionFriend</code> — amber tint · mark/unmark user as friend</li>
+        <li><code>.actionBadge</code> — purple tint · open badge assignment modal</li>
+        <li><code>.actionUnblock</code> — orange tint · unblock a blocked user</li>
+        <li><code>.secondaryAction</code> — neutral (no-op kept for backward compat)</li>
+      </ul>
     </div>
   </section>
 
