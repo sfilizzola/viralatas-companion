@@ -431,12 +431,13 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `bbq-king-2026` (BBQ king honor)
 - `jagger-king` (Jagger King honor)
 - `total-kaput-2026` (festival aftermath honor)
+- `melon` (true vira-latas friend not camping with the group)
 
 **Godlike-only**: Non-godlike users cannot assign badges
 
 ---
 
-## Current Badges Inventory (35 Total)
+## Current Badges Inventory (36 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -476,7 +477,7 @@ These genres exist on the 2026 lineup but no badge in `src/services/badges/regis
 - `Pirate Metal` — held by 1 band only (`Mr. Hurley und die Pulveraffen`, WAK17, Day 3). Single-band genres are not a good fit for a `bands_seen_genre_min` badge (would be equivalent to `band_seen_named`). If a "pirate" badge is desired, prefer `band_seen_named` against that one band.
 - Most stage-specific or niche genres (Goregrind, Humppa, Horror Punk, etc.) — intentional, to keep the badge inventory curated.
 
-### Merit / Assigned (7)
+### Merit / Assigned (8)
 - `mosh-pit` — Hit the floor, came back (godlike-assigned)
 - `crowdsurfer` — Flew over the crowd (godlike-assigned)
 - `girl-power` — Metal queen (godlike-assigned)
@@ -484,6 +485,7 @@ These genres exist on the 2026 lineup but no badge in `src/services/badges/regis
 - `bbq-king-2026` — BBQ King 2026 (godlike-assigned)
 - `jagger-king` — Jagger King (godlike-assigned)
 - `total-kaput-2026` — Total Kaput (godlike-assigned)
+- `melon` — True vira-latas friend not camping with the group (godlike-assigned)
 
 ### Location Presence (3)
 - `metal-place-2026` — Visited Metal Place (persist: true)
