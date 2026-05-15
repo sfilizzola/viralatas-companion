@@ -69,7 +69,14 @@ export default function BandFilters({
   }
 
   function toggleDay(date: string) {
-    update('day', value.day === date ? null : date);
+    const next = value.day === date ? null : date;
+    update('day', next);
+    const idx = days.findIndex((d) => d.date === (next ?? date));
+    if (next && idx !== -1) {
+      globalThis.history.replaceState(null, '', `#day-${idx + 1}`);
+    } else {
+      globalThis.history.replaceState(null, '', globalThis.location.pathname + globalThis.location.search);
+    }
   }
 
   function toggleStage(stage: string) {
@@ -126,14 +133,26 @@ export default function BandFilters({
             )}
           </button>
 
-          <input
-            className={styles.searchInput}
-            type="search"
-            placeholder={t('searchPlaceholder')}
-            value={value.query}
-            onChange={(e) => update('query', e.target.value)}
-            aria-label={t('searchPlaceholder')}
-          />
+          <div className={styles.searchWrap}>
+            <input
+              className={styles.searchInput}
+              type="search"
+              placeholder={t('searchPlaceholder')}
+              value={value.query}
+              onChange={(e) => update('query', e.target.value)}
+              aria-label={t('searchPlaceholder')}
+            />
+            {value.query.trim().length > 0 && (
+              <button
+                className={styles.searchClear}
+                type="button"
+                aria-label={t('limpar')}
+                onClick={() => update('query', '')}
+              >
+                ×
+              </button>
+            )}
+          </div>
 
           {hasAnyActive && (
             <button className={styles.clearLink} onClick={clearAll}>

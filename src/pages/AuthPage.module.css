@@ -58,13 +58,52 @@
   border-radius: 0;
   color: var(--text);
   padding: 0.65rem 0.75rem;
+  font-family: var(--font-sans);
   font-size: 0.9375rem;
   transition: border-color 0.15s;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input:focus {
   outline: none;
   border-color: var(--accent);
+}
+
+.inputError {
+  border-color: var(--signal-live) !important;
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.inputWrap .input {
+  flex: 1;
+  padding-right: 2.5rem;
+}
+
+.pwToggle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: color 0.15s;
+  padding: 0;
+}
+
+.pwToggle:hover {
+  color: var(--text);
 }
 
 .button {

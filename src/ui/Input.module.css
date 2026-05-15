@@ -23,6 +23,44 @@
 }
 
 .input:disabled {
-  opacity: 0.6;
+  opacity: 0.45;
   cursor: not-allowed;
+}
+
+.input.error {
+  border-color: var(--signal-live);
+}
+
+.errorText {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--signal-live);
+  margin-top: 0.2rem;
+}
+
+.passwordWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.passwordWrapper .input {
+  padding-right: 2.5rem;
+}
+
+.eyeButton {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  line-height: 0;
+}
+
+.eyeButton:hover {
+  color: var(--text);
 }

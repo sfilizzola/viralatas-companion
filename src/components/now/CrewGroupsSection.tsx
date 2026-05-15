@@ -146,6 +146,11 @@ export default function CrewGroupsSection({
                 </span>
                 <h3 className={styles.groupTitle}>{groupTitle(group, t)}</h3>
                 <p className={styles.groupSubtitle}>{groupSubtitle(group, t, metalPlaceConfig)}</p>
+                {isUserHere && group.kind === 'band' && myPlan.nextBand && (
+                  <p className={styles.groupNextUp}>
+                    {t('nextUp')} → {myPlan.nextBand.name}
+                  </p>
+                )}
               </div>
               <div className={styles.groupCount}>
                 {group.members.length}

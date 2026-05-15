@@ -298,10 +298,11 @@ A reusable component for: network error, sync error, auth error. Each variant ha
 
 **File:** `src/components/BadgesDisplay.tsx`
 
-When a badge transitions from `locked → unlocked` (detected via prop change or subscription), run:
+Ther is no transition between unlock and lock, the badge appears or not appears.
+verify if it is possible whenthe user gets the badge in the first time some animation happens , please think and ask questions if necessary 
 - `transform: scale(0.85)` → `scale(1.12)` → `scale(1.0)`
 - Duration: 380 ms, `cubic-bezier(0.34, 1.56, 0.64, 1)`
-- Trigger once per session per badge (store triggered slugs in `sessionStorage`)
+- Trigger once when badge is available for the user, use minimal coding effort for that, simple solutions. ask if only complex solutions are possible. 
 
 **Effort:** S (1–2 h)
 
@@ -323,7 +324,7 @@ Add one paragraph after the lede:
 
 **File:** `public/Design System.html` — masthead eyebrow
 
-After Sprint 0–3 complete, update the DS version to `v1.1` and add a changelog section at the bottom documenting what changed.
+After Sprint 0–3 complete, update the DS version to `v2.0` and add a changelog section at the bottom documenting what changed.
 
 **Effort:** XS (< 30 min)
 
@@ -342,6 +343,7 @@ After Sprint 0–3 complete, update the DS version to `v1.1` and add a changelog
 Add a subsection after the band card variants:
 
 - **Visual treatment:** gold top strip (`var(--stage-jungle)` / `#f39c12`), 2px gold border, no left stage stripe
+- Have in mind that is an specific image for the cerominy card, a retangular image, landscape orientation.
 - **Label:** "Closing Ceremony" (i18n: `scheduleClosingCeremony`) in place of genre
 - **Excluded behaviors:** no conflict chip, not shown in `/popular`, does not count toward any `bands_picked_*` badge
 - **Included behaviors:** picks sync to IndexedDB like a band, crew attendance count shown, offline-first intact
@@ -350,7 +352,7 @@ Add a subsection after the band card variants:
 
 **Files:** `src/components/BandCard.tsx` + `BandCard.module.css`
 
-Implement `.cardCeremony` per DS spec above. The gold treatment should feel like a medal, not just a colored band card.
+Implement `.cardCeremony` per DS spec above. The gold treatment should feel like a medal, not just a colored band card, should have the importance feeling, but remeber that this is metal rock app, go into that direction of theme,colors and fell
 
 **Effort:** M (2–4 h)
 

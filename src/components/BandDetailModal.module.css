@@ -305,7 +305,7 @@
   height: 14px;
   border-radius: 50%;
   background: var(--text-muted);
-  transition: all 0.15s ease;
+  transition: left 0.15s ease, background 0.15s ease;
 }
 
 .toggleTrackOn {

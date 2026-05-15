@@ -55,21 +55,63 @@
   padding: 0 5px;
 }
 
-.searchInput {
+.searchWrap {
+  position: relative;
   flex: 1;
   min-width: 120px;
+  display: flex;
+  align-items: center;
+}
+
+.searchInput {
+  width: 100%;
   background: var(--bg-elevated);
-  border: 1px solid var(--border-strong);
+  border: 1px solid var(--border);
   border-radius: var(--r-1);
   color: var(--text);
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: 13px;
   padding: var(--s-2) var(--s-3);
   outline: none;
+  transition: border-color 0.15s;
 }
 
 .searchInput:focus {
   border-color: var(--accent);
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.searchInput:not(:placeholder-shown) {
+  padding-right: 28px;
+}
+
+.searchClear {
+  position: absolute;
+  right: var(--s-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.searchClear:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
 }
 
 .clearLink {

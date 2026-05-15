@@ -55,9 +55,9 @@ export default function ProfileHeader({
         )}
         {flag && <span className={styles.pfCountryFlag}>{flag}</span>}
         {savedWackenYears.length > 0 && (
-          <Chip>
-            {savedWackenYears.length === 1 ? '1 Wacken' : `${savedWackenYears.length} Wackens`}
-          </Chip>
+          <span className={styles.pfYearDiamond} title={savedWackenYears.join(', ')}>
+            {savedWackenYears.length}×
+          </span>
         )}
       </div>
     </div>

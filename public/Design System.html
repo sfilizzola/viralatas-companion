@@ -1655,9 +1655,176 @@
   .row { display: flex; flex-wrap: wrap; gap: var(--s-3); align-items: center; }
   .col { display: grid; gap: var(--s-3); }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-4); }
+
+  /* ============================================================
+     STICKY SECTION NAV
+     ============================================================ */
+  .sidenav {
+    position: fixed;
+    top: var(--s-12);
+    left: var(--s-5);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .sidenav a {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-faint);
+    text-decoration: none;
+    padding: 4px 8px 4px 10px;
+    border-left: 2px solid transparent;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    line-height: 1.6;
+  }
+  .sidenav a:hover { color: var(--text); border-left-color: var(--accent); }
+  @media (max-width: 1100px) { .sidenav { display: none; } }
+
+  /* ============================================================
+     INPUT COMPONENT (Design System demo)
+     ============================================================ */
+  .ds-input {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--r-1);
+    color: var(--text);
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: var(--font-sans);
+    width: 100%;
+    appearance: none;
+  }
+  .ds-input::placeholder { color: var(--text-faint); font-family: var(--font-mono); font-size: 13px; }
+  .ds-input:disabled { opacity: 0.45; cursor: not-allowed; }
+  .ds-input.focused { border-color: var(--accent); outline: none; }
+  .ds-input.error { border-color: var(--signal-live); }
+  .ds-input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .ds-input-wrap .ds-input-inner {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--r-1);
+    color: var(--text);
+    padding: 10px 40px 10px 12px;
+    font-size: 15px;
+    font-family: var(--font-sans);
+    width: 100%;
+    appearance: none;
+  }
+  .ds-input-wrap.focused .ds-input-inner { border-color: var(--accent); }
+  .ds-input-eye {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+  }
+  .ds-input-eye:hover { color: var(--text); }
+  .ds-input-group { display: flex; flex-direction: column; gap: 6px; }
+  .ds-input-label { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-muted); }
+  .ds-input-label.faint { color: var(--text-faint); }
+  .ds-input-error-text { font-family: var(--font-mono); font-size: 11px; color: var(--signal-live); }
+
+  /* ============================================================
+     BADGE UNLOCK ANIMATION
+     ============================================================ */
+  @keyframes badge-unlock {
+    0%   { transform: scale(0.85); }
+    60%  { transform: scale(1.12); }
+    100% { transform: scale(1.0); }
+  }
+  .patch.unlocking {
+    animation: badge-unlock 380ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  .motion-badge-preview {
+    animation: badge-unlock 380ms cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s infinite alternate;
+  }
+
+  /* ============================================================
+     CREW-STATE EXCEPTION NOTE
+     ============================================================ */
+  .exception-note {
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--signal-lost);
+    border-radius: var(--r-1);
+    padding: var(--s-4) var(--s-5);
+    margin-top: var(--s-4);
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    max-width: 76ch;
+  }
+  .exception-note .exception-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text);
+    margin-bottom: var(--s-2);
+    display: flex;
+    align-items: center;
+    gap: var(--s-2);
+  }
+  .exception-note .exception-title::before {
+    content: '';
+    display: inline-block;
+    width: 8px; height: 8px;
+    background: var(--signal-lost);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ============================================================
+     GESTURE SPEC BLOCK
+     ============================================================ */
+  .gesture-spec {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s-3);
+    margin-top: var(--s-3);
+  }
+  .gesture-spec-item {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--r-1);
+    padding: var(--s-3) var(--s-4);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.55;
+  }
+  .gesture-spec-item .gs-label {
+    color: var(--text);
+    font-weight: 700;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--s-1);
+  }
+  .gesture-spec-item .gs-val { color: var(--text-muted); }
 </style>
 </head>
 <body>
+<nav class="sidenav">
+  <a href="#color">01 Color</a>
+  <a href="#type">02 Type</a>
+  <a href="#space">03 Space</a>
+  <a href="#components">04 Components</a>
+  <a href="#layouts">05 Layouts</a>
+  <a href="#icons">06 Icons</a>
+  <a href="#motion">07 Motion</a>
+  <a href="#additional">08 Additional</a>
+</nav>
 <div class="page">
 
   <!-- ============================================================
@@ -1679,7 +1846,7 @@
       no glow / no gradients*<br />
       stage colors are fixed<br />
       offline-first &mdash; no spinners<br />
-      <small style="color:var(--text-faint)">* gradients reserved for crew-state cards only</small>
+      <small style="color:var(--text-faint)">* see §01 Crew-state exception</small>
     </div>
   </header>
 
@@ -1727,6 +1894,11 @@
       <div class="swatch"><div class="chip" style="background:#f39c12">#f39c12</div><div class="meta"><div class="name">Warn / Conflict / Queued</div><div class="tok">--signal-warn</div><div class="hex">overlap, offline pending</div></div></div>
       <div class="swatch"><div class="chip" style="background:#16a085">#16a085</div><div class="meta"><div class="name">OK / Synced</div><div class="tok">--signal-ok</div><div class="hex">camping, sync restored</div></div></div>
       <div class="swatch"><div class="chip" style="background:#a855f7">#a855f7</div><div class="meta"><div class="name">Lost 🤘</div><div class="tok">--signal-lost</div><div class="hex">no current pick</div></div></div>
+    </div>
+
+    <div class="exception-note">
+      <div class="exception-title">Crew-state exception</div>
+      Cards representing a vira-lata's physical location (<b style="color:var(--text)">camping, metal place, lost</b>) may use a single low-opacity gradient + ambient glow to signal emotional state. The glow must be <strong style="color:var(--text)">static — no animation</strong>. Total exception budget: <strong style="color:var(--text)">1 gradient + 1 text-shadow + 1 box-shadow, all at ≤ 50% opacity</strong>. This is the only context where gradients and glows are permitted; the masthead rule "no glow / no gradients" applies everywhere else.
     </div>
   </section>
 
@@ -2478,7 +2650,7 @@
           <li><b>s32</b> default cluster</li>
           <li><b>s40</b> announcements, crew card</li>
           <li><b>s56</b> profile</li>
-          <li>Background = user's chosen identity color (random from stage palette if not set)</li>
+          <li>Background = randomly assigned from the 8 stage colors <strong>at account creation</strong> and stored in the <code>users</code> table — consistent across sessions, not user-selectable</li>
         </ul>
       </div>
     </div>
@@ -2525,7 +2697,99 @@
           <li>Inline next to display name on announcements + profile</li>
           <li><b>Crew</b> default neutral</li>
           <li><b>Manager</b> blue tint — moderation rights</li>
-          <li><b>Godlike</b> gold tint — admin powers, hard-coded to <code><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d4a7b2bdb8bdaeaebbb8b594b3b9b5bdb8fab7bbb9">[email&#160;protected]</a></code></li>
+          <li><b>Godlike</b> gold tint — admin powers, hard-coded to <code>sfilizzola@gmail.com</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- TEXT INPUT -->
+    <div class="subhead">Text input &middot; <code>src/ui/Input.module.css</code></div>
+    <div class="demo">
+      <div class="demo-stage" style="display:flex;flex-direction:column;gap:var(--s-5)">
+        <div class="ds-input-group">
+          <div class="ds-input-label">Email &middot; <span style="color:var(--text-faint)">rest</span></div>
+          <input class="ds-input" type="text" placeholder="you@viralatas.com" />
+        </div>
+        <div class="ds-input-group">
+          <div class="ds-input-label">Senha &middot; <span style="color:var(--accent)">focus</span></div>
+          <div class="ds-input-wrap focused">
+            <input class="ds-input-inner" type="password" value="••••••••" readonly />
+            <button class="ds-input-eye" tabindex="-1">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="ds-input-group">
+          <div class="ds-input-label">Email &middot; <span style="color:var(--signal-live)">error</span></div>
+          <input class="ds-input error" type="text" value="nao-e-email" />
+          <span class="ds-input-error-text">Email inválido</span>
+        </div>
+        <div class="ds-input-group">
+          <div class="ds-input-label faint">Usuário &middot; <span style="color:var(--text-faint)">disabled</span></div>
+          <input class="ds-input" type="text" value="@salvatore" disabled />
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>States</h4>
+        <ul>
+          <li><b>Rest</b> bg: --bg-elevated · border: 1px --border · r: --r-1</li>
+          <li><b>Focus</b> border-color: --accent · no box-shadow · outline: none</li>
+          <li><b>Error</b> border-color: --signal-live · error msg below in --signal-live · --font-mono 11px</li>
+          <li><b>Disabled</b> opacity 0.45 · cursor: not-allowed</li>
+        </ul>
+        <h4 style="margin-top:var(--s-3)">Typography</h4>
+        <ul>
+          <li><b>Input text</b> --font-sans · 15px · --text</li>
+          <li><b>Placeholder</b> --font-mono · 13px · --text-faint</li>
+          <li><b>Label</b> --font-mono · 10px · uppercase · 0.1em tracking</li>
+          <li><b>Error text</b> --font-mono · 11px · --signal-live</li>
+        </ul>
+        <h4 style="margin-top:var(--s-3)">Password field</h4>
+        <ul>
+          <li>Eye icon: stroke SVG 16px, absolute right: 10px</li>
+          <li>Tap toggles <code>type="password"</code> ↔ <code>type="text"</code></li>
+          <li>Icon uses <code>stroke="currentColor"</code> — inherits muted → text on hover</li>
+        </ul>
+        <h4 style="margin-top:var(--s-3)">Used on</h4>
+        <ul>
+          <li>/login &middot; /register (email, password)</li>
+          <li>/schedule (search field)</li>
+          <li>/announcements (composer textarea shares tokens)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- FILTER DRAWER CLOSE GESTURE -->
+    <div class="subhead">Filter drawer &middot; close gesture spec</div>
+    <div class="demo">
+      <div class="demo-stage" style="position:relative;padding:0;overflow:hidden;min-height:200px">
+        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.45)"></div>
+        <div class="drawer" style="position:absolute">
+          <div class="grab"></div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;text-align:center;padding-bottom:var(--s-3)">swipe ↓ to close</div>
+          <h4>Stage</h4>
+          <div class="pill-row">
+            <button class="pill on" style="padding:5px 10px;font-size:10px">Faster</button>
+            <button class="pill" style="padding:5px 10px;font-size:10px">Louder</button>
+          </div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Close triggers</h4>
+        <ul>
+          <li><b>Swipe down</b> velocity ≥ 200 px/s <em>or</em> drag ≥ 40% drawer height</li>
+          <li><b>Tap scrim</b> (backdrop) closes immediately</li>
+          <li><b>Escape key</b> closes on desktop</li>
+        </ul>
+        <h4 style="margin-top:var(--s-3)">Spring-back</h4>
+        <ul>
+          <li>If threshold not met: 200 ms ease-out return to open position</li>
+          <li>No bounceback overshoot — ease-out only</li>
+        </ul>
+        <h4 style="margin-top:var(--s-3)">Grab handle</h4>
+        <ul>
+          <li>36×4px bar · --border-strong · centered at top</li>
+          <li>Visual affordance only — drag initiates from anywhere in the drawer header</li>
         </ul>
       </div>
     </div>
@@ -3061,6 +3325,23 @@
       </div>
       <div class="motion-demo">
         <span class="pending-chip">↻ pending sync</span>
+      </div>
+    </div>
+
+    <div class="motion-card">
+      <div>
+        <h4>Badge unlock</h4>
+        <div class="specs">
+          <b>380 ms</b> · cubic-bezier(0.34, 1.56, 0.64, 1)<br />
+          scale 0.85 → 1.12 → 1.0<br />
+          class <code>.patch.unlocking</code> triggers animation<br />
+          fired once per session per badge slug<br />
+          store triggered slugs in <code>sessionStorage</code><br />
+          <i style="color:var(--text-faint)">// permanent milestone → 60 ms longer than pick toggle</i>
+        </div>
+      </div>
+      <div class="motion-demo">
+        <div class="patch veteran motion-badge-preview" style="width:64px;height:64px;font-size:20px">5<span style="font-size:10px;vertical-align:super">x</span></div>
       </div>
     </div>
 

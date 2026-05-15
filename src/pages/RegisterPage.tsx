@@ -5,6 +5,21 @@ import { useI18n } from '../lib/i18n';
 import { getRegistrationEnabled } from '../lib/appSettings';
 import styles from './AuthPage.module.css';
 
+function EyeIcon({ open }: { open: boolean }) {
+  return open ? (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
+    </svg>
+  ) : (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+      <line x1="1" y1="1" x2="23" y2="23" />
+    </svg>
+  );
+}
+
 export default function RegisterPage() {
   const { language, t } = useI18n('AuthPage');
   const navigate = useNavigate();
@@ -15,6 +30,7 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [checkingRegistration, setCheckingRegistration] = useState(true);
   const [registrationEnabled, setRegistrationEnabled] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -163,15 +179,25 @@ export default function RegisterPage() {
 
           <label className={styles.label}>
             {t('password')}
-            <input
-              className={styles.input}
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              autoComplete="new-password"
-            />
+            <div className={styles.inputWrap}>
+              <input
+                className={`${styles.input} ${error ? styles.inputError : ''}`}
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={8}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className={styles.pwToggle}
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+              >
+                <EyeIcon open={showPassword} />
+              </button>
+            </div>
           </label>
 
           {error && <p className={styles.error}>{error}</p>}

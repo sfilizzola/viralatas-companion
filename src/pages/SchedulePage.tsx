@@ -37,6 +37,16 @@ export default function SchedulePage() {
     loadBands().then((data) => {
       setBands(data);
       setLoading(false);
+
+      // Restore day from URL hash (#day-1, #day-2, ...) on initial load
+      const hashMatch = /^#day-(\d+)$/.exec(globalThis.location.hash);
+      if (hashMatch) {
+        const dayIdx = Number.parseInt(hashMatch[1], 10) - 1;
+        const uniqueDays = [...new Set(data.map(bandDay))].sort();
+        if (uniqueDays[dayIdx]) {
+          setFilters((prev) => ({ ...prev, day: uniqueDays[dayIdx] }));
+        }
+      }
     });
   }, []);
 

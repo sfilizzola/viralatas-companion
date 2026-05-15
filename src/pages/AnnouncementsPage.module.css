@@ -283,32 +283,6 @@
   text-overflow: ellipsis;
 }
 
-.roleChip {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  padding: 1px 5px;
-  border-radius: 2px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  flex-shrink: 0;
-}
-
-.roleNormal {
-  background: var(--bg-elevated);
-  color: var(--text-muted);
-}
-
-.roleManager {
-  background: rgba(59, 130, 246, 0.08);
-  color: #3b82f6;
-  border: 1px solid rgba(59, 130, 246, 0.45);
-}
-
-.roleGodlike {
-  background: rgba(217, 119, 6, 0.08);
-  color: #d97706;
-  border: 1px solid rgba(217, 119, 6, 0.45);
-}
 
 .ts {
   font-family: var(--font-mono);
