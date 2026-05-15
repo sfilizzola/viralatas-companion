@@ -8,9 +8,11 @@ type DuckButtonProps = {
   onDuck: () => void;
   isOnCooldown: boolean;
   cooldownUntil: number | null;
+  /** When true, removes the column border-left and fixed width (for in-body placement) */
+  inBody?: boolean;
 };
 
-export default function DuckButton({ onDuck, isOnCooldown, cooldownUntil }: DuckButtonProps) {
+export default function DuckButton({ onDuck, isOnCooldown, cooldownUntil, inBody }: DuckButtonProps) {
   const { t } = useI18n('DuckButton');
   const [drainAngle, setDrainAngle] = useState(0);
   const [popping, setPopping] = useState(false);
@@ -53,7 +55,7 @@ export default function DuckButton({ onDuck, isOnCooldown, cooldownUntil }: Duck
   }
 
   return (
-    <div className={styles.wrapper}>
+    <div className={`${styles.wrapper} ${inBody ? styles.wrapperInBody : ''}`}>
       <button
         type="button"
         className={`${styles.button} ${popping ? styles.popping : ''}`}

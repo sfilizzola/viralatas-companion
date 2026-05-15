@@ -89,7 +89,6 @@ export default function BandCard({
   const cardClasses = [
     styles.card,
     variantClass,
-    showDuck && variant !== 'ranked' ? styles.withDuck : '',
     isCeremony ? styles.cardCeremony : '',
     interactive ? '' : styles.cardStatic,
     conflict?.active ? (conflict.severity === 'hard' ? styles.cardHardConflict : styles.cardSoftOverlap) : '',
@@ -194,6 +193,20 @@ export default function BandCard({
           )}
           {pending && <span className="pending-chip">{t('pendingSync')}</span>}
         </div>
+
+        {showDuck && onDuck && variant !== 'ranked' && (
+          <div className={styles.duckRow}>
+            <DuckButton
+              onDuck={onDuck}
+              isOnCooldown={
+                duckCooldownUntil !== undefined && duckCooldownUntil > Date.now()
+              }
+              cooldownUntil={duckCooldownUntil ?? null}
+              inBody
+            />
+          </div>
+        )}
+
         {attendeeCluster && variant === 'ranked' && (
           <AttendeeCluster
             {...attendeeCluster}
@@ -204,16 +217,6 @@ export default function BandCard({
         )}
         {children}
       </div>
-
-      {showDuck && onDuck && (
-        <DuckButton
-          onDuck={onDuck}
-          isOnCooldown={
-            duckCooldownUntil !== undefined && duckCooldownUntil > Date.now()
-          }
-          cooldownUntil={duckCooldownUntil ?? null}
-        />
-      )}
 
       {showPick && (
         <button
