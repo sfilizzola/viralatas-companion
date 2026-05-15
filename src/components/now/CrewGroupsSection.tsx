@@ -141,54 +141,58 @@ export default function CrewGroupsSection({
               className={styles.locStrip}
               style={group.kind === 'band' ? { background: stageColor(group.band.stage) } : undefined}
             />
-            <div className={styles.groupHeader}>
-              <div>
-                <span className={styles.groupKicker}>
-                  {group.kind === 'band' && isUserHere && (
-                    <span className={styles.liveDot} aria-hidden />
+            <div className={styles.groupBody}>
+              <div className={styles.groupMain}>
+                <div className={styles.groupLeft}>
+                  <span className={styles.groupKicker}>
+                    {isUserHere && <span className={styles.liveDot} aria-hidden />}
+                    {groupKicker(group, t, isUserHere)}
+                  </span>
+                  <h3 className={styles.groupTitle}>{groupTitle(group, t)}</h3>
+                  <p className={styles.groupSubtitle}>{groupSubtitle(group, t, metalPlaceConfig)}</p>
+                  {isUserHere && group.kind === 'band' && myPlan.nextBand && (
+                    <p className={styles.groupNextUp}>
+                      {t('nextUp')} → {myPlan.nextBand.name}
+                    </p>
                   )}
-                  {groupKicker(group, t, isUserHere)}
-                </span>
-                <h3 className={styles.groupTitle}>{groupTitle(group, t)}</h3>
-                <p className={styles.groupSubtitle}>{groupSubtitle(group, t, metalPlaceConfig)}</p>
-                {isUserHere && group.kind === 'band' && myPlan.nextBand && (
-                  <p className={styles.groupNextUp}>
-                    {t('nextUp')} → {myPlan.nextBand.name}
-                  </p>
-                )}
+                  {group.members.length > 0 ? (
+                    <ul className={styles.memberList}>
+                      {group.members.map((crew) => (
+                        <CrewMember crew={crew} isCurrentUser={crew.id === userId} key={crew.id} />
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className={styles.groupEmpty}>{emptyGroupMessage(group, t)}</p>
+                  )}
+                </div>
+                <div className={styles.groupCountCol}>
+                  <div className={styles.groupCount}>
+                    {group.members.length}
+                    <small className={styles.locCountLabel}>{t('crewCountLabel')}</small>
+                  </div>
+                  {showWeakButton && onDuck && (
+                    <DuckButton
+                      onDuck={onDuck}
+                      isOnCooldown={
+                        duckCooldownUntil !== null &&
+                        duckCooldownUntil !== undefined &&
+                        duckCooldownUntil > Date.now()
+                      }
+                      cooldownUntil={duckCooldownUntil ?? null}
+                      inBody
+                      tile
+                    />
+                  )}
+                </div>
               </div>
-              <div className={styles.groupCount}>
-                {group.members.length}
-                <small className={styles.locCountLabel}>{t('crewCountLabel')}</small>
-              </div>
+              {showWeakButton && (
+                <div className={styles.groupActions}>
+                  <button className={styles.skipButton} onClick={onSkip}>
+                    {t('souFraco')}
+                  </button>
+                </div>
+              )}
             </div>
-            {group.members.length > 0 ? (
-              <ul className={styles.memberList}>
-                {group.members.map((crew) => (
-                  <CrewMember crew={crew} isCurrentUser={crew.id === userId} key={crew.id} />
-                ))}
-              </ul>
-            ) : (
-              <p className={styles.groupEmpty}>{emptyGroupMessage(group, t)}</p>
-            )}
-            {showWeakButton && (
-              <div className={styles.groupActions}>
-                <button className={styles.skipButton} onClick={onSkip}>
-                  {t('souFraco')}
-                </button>
-                {onDuck && (
-                  <DuckButton
-                    onDuck={onDuck}
-                    isOnCooldown={
-                      duckCooldownUntil !== null &&
-                      duckCooldownUntil !== undefined &&
-                      duckCooldownUntil > Date.now()
-                    }
-                    cooldownUntil={duckCooldownUntil ?? null}
-                  />
-                )}
-              </div>
-            )}
           </article>
         );
       })}
