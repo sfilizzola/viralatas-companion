@@ -6,6 +6,7 @@ import { formatTime } from '../services/bandTime';
 import { useI18n } from '../lib/i18n';
 import { Avatar, Chip } from '../ui';
 import StarIcon from './icons/StarIcon';
+import DuckButton from './DuckButton';
 import styles from './BandCard.module.css';
 
 export type BandCardVariant = 'schedule' | 'timeline' | 'ranked';
@@ -25,6 +26,9 @@ type BandCardProps = {
   isBandEnded?: boolean;
   missedCount?: number;
   children?: ReactNode;
+  /** When provided, renders the duck button (only for live + picked non-ceremony bands) */
+  onDuck?: () => void;
+  duckCooldownUntil?: number;
 };
 
 export default function BandCard({
@@ -42,6 +46,8 @@ export default function BandCard({
   isBandEnded = false,
   missedCount,
   children,
+  onDuck,
+  duckCooldownUntil,
 }: BandCardProps) {
   const { t } = useI18n('SchedulePage');
   const initial = band.name.charAt(0).toUpperCase();
@@ -71,6 +77,7 @@ export default function BandCard({
   const isCeremony = band.category === 'ceremony';
   const color = isCeremony ? 'var(--ceremony-gold)' : stageColorVar(band.stage);
   const thumbFallback = isCeremony ? '✦' : initial;
+  const showDuck = Boolean(onDuck) && !isCeremony;
 
   const variantClass =
     variant === 'timeline'
@@ -82,6 +89,7 @@ export default function BandCard({
   const cardClasses = [
     styles.card,
     variantClass,
+    showDuck && variant !== 'ranked' ? styles.withDuck : '',
     isCeremony ? styles.cardCeremony : '',
     interactive ? '' : styles.cardStatic,
     conflict?.active ? (conflict.severity === 'hard' ? styles.cardHardConflict : styles.cardSoftOverlap) : '',
@@ -196,6 +204,16 @@ export default function BandCard({
         )}
         {children}
       </div>
+
+      {showDuck && onDuck && (
+        <DuckButton
+          onDuck={onDuck}
+          isOnCooldown={
+            duckCooldownUntil !== undefined && duckCooldownUntil > Date.now()
+          }
+          cooldownUntil={duckCooldownUntil ?? null}
+        />
+      )}
 
       {showPick && (
         <button

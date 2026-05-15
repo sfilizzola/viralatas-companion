@@ -7,6 +7,7 @@ import type {
 import { formatFestivalTime } from '../../services/livePreview';
 import { stageColor } from '../../services/stageColors';
 import Icon from '../icons/Icon';
+import DuckButton from '../DuckButton';
 import styles from '../../pages/RightNowPage.module.css';
 
 type TFn = (key: string, values?: Record<string, string | number>) => string;
@@ -94,6 +95,8 @@ type CrewGroupsSectionProps = {
   myPlan: LivePlan;
   metalPlaceConfig: MetalPlaceConfig | null;
   onSkip: () => Promise<void>;
+  onDuck?: () => void;
+  duckCooldownUntil?: number | null;
   t: TFn;
 };
 
@@ -104,6 +107,8 @@ export default function CrewGroupsSection({
   myPlan,
   metalPlaceConfig,
   onSkip,
+  onDuck,
+  duckCooldownUntil,
   t,
 }: CrewGroupsSectionProps) {
   if (crewPlans.length === 0) {
@@ -171,6 +176,17 @@ export default function CrewGroupsSection({
                 <button className={styles.skipButton} onClick={onSkip}>
                   {t('souFraco')}
                 </button>
+                {onDuck && (
+                  <DuckButton
+                    onDuck={onDuck}
+                    isOnCooldown={
+                      duckCooldownUntil !== null &&
+                      duckCooldownUntil !== undefined &&
+                      duckCooldownUntil > Date.now()
+                    }
+                    cooldownUntil={duckCooldownUntil ?? null}
+                  />
+                )}
               </div>
             )}
           </article>

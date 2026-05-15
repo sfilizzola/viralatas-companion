@@ -45,6 +45,9 @@ export default function RightNowPage() {
     handleSkip,
     handleUndo,
     handlePresenceChange,
+    duckBandId,
+    duckQuack,
+    duckCooldownUntil,
   } = useNowData();
 
   return (
@@ -100,6 +103,8 @@ export default function RightNowPage() {
               myPlan={myPlan}
               metalPlaceConfig={metalPlaceConfig}
               onSkip={handleSkip}
+              onDuck={duckBandId ? duckQuack : undefined}
+              duckCooldownUntil={duckCooldownUntil}
               t={t}
             />
           </>

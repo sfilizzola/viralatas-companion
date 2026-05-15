@@ -425,6 +425,10 @@ Window events emitted from `src/lib/db.ts`:
 - `'viralatas:live-band-test-config-changed'` — live_band_test_config updated
 - `'viralatas:missed-changed'` — user_missed_bands or offline_missed_bands updated
 
+Window events dispatched by hooks/components (not from db.ts):
+- `'viralatas:duck-quack'` (CustomEvent `{ detail: { bandId: string } }`) — emitted by `useDuckNotifications` when a Realtime INSERT arrives on `duck_quacks`; consumed by `DuckToast`
+- `'viralatas:sync-complete'` — emitted by `App.tsx` when offline picks/presence/announcements flush
+
 ---
 
-**Last edited**: 2026-05-13 by Claude Code
+**Last edited**: 2026-05-15 by Claude Sonnet 4.6

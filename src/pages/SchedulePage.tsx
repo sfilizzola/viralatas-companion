@@ -9,6 +9,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useMyPicks } from '../hooks/useMyPicks';
 import { useNow } from '../hooks/useNow';
 import { usePickCounts } from '../hooks/usePickCounts';
+import { useDuckQuack } from '../hooks/useDuckQuack';
 import { useI18n } from '../lib/i18n';
 import { useOfflinePendingBandIds } from '../hooks/useOfflinePendingBandIds';
 import BottomNav from '../components/BottomNav';
@@ -18,6 +19,45 @@ import BandFilters from '../components/BandFilters';
 import Icon from '../components/icons/Icon';
 import type { BandFilterValue } from '../components/bandFilterValue';
 import styles from './SchedulePage.module.css';
+
+/**
+ * Wraps BandCard with per-band duck quack capability.
+ * Hook is always called (with null values when duck shouldn't show)
+ * so React's rules of hooks are satisfied inside the mapped list.
+ */
+function DuckableBandCard({
+  band,
+  isPicked,
+  isLive,
+  userId,
+  ...rest
+}: {
+  band: Band;
+  isPicked: boolean;
+  isLive: boolean;
+  userId: string | null;
+  count: number;
+  onToggle: () => void;
+  onClick: () => void;
+  pending: boolean;
+  isBandEnded: boolean;
+}) {
+  const canDuck = isLive && isPicked && band.category !== 'ceremony';
+  const { quack, isOnCooldown, cooldownUntil } = useDuckQuack(
+    canDuck ? userId : null,
+    canDuck ? band.id : null,
+  );
+
+  return (
+    <BandCard
+      band={band}
+      isPicked={isPicked}
+      onDuck={canDuck ? quack : undefined}
+      duckCooldownUntil={isOnCooldown && cooldownUntil ? cooldownUntil : undefined}
+      {...rest}
+    />
+  );
+}
 
 export default function SchedulePage() {
   const { t } = useI18n('SchedulePage');
@@ -118,18 +158,25 @@ export default function SchedulePage() {
             {t('emptySchedule')}
           </div>
         )}
-        {filtered.map((band) => (
-          <BandCard
-            key={band.id}
-            band={band}
-            isPicked={pickedIds.has(band.id)}
-            count={pickCounts[band.id] ?? 0}
-            onToggle={() => handleToggle(band.id)}
-            onClick={() => handleToggle(band.id)}
-            pending={pendingBandIds.has(band.id)}
-            isBandEnded={new Date(band.end_time) < currentTime}
-          />
-        ))}
+        {filtered.map((band) => {
+          const isLive =
+            new Date(band.start_time) <= currentTime &&
+            currentTime < new Date(band.end_time);
+          return (
+            <DuckableBandCard
+              key={band.id}
+              band={band}
+              isPicked={pickedIds.has(band.id)}
+              isLive={isLive}
+              userId={userId}
+              count={pickCounts[band.id] ?? 0}
+              onToggle={() => handleToggle(band.id)}
+              onClick={() => handleToggle(band.id)}
+              pending={pendingBandIds.has(band.id)}
+              isBandEnded={new Date(band.end_time) < currentTime}
+            />
+          );
+        })}
       </main>
 
       <div className={styles.navSpacer} />

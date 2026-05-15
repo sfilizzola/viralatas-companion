@@ -367,7 +367,7 @@ See `docs/ai-wiki/badges.md` for the full badge inventory, condition engine deta
 
 ## Phases at a glance
 
-Phases 1–18 are complete. The next active phase is **Phase 19**.
+Phases 1–20 are complete. The next active phase is **Phase 21**.
 
 **Full phase history** → `docs/ai-wiki/phases-history.md`
 
@@ -404,7 +404,7 @@ Example: `"Phase 11.A: Fix /now header datetime stacking on mobile\n\nCo-Authore
 
 ## Automatic versioning (main branch only)
 
-**Current version:** `16`
+**Current version:** `17`
 
 **Rule:** When a commit is pushed to the `main` branch:
 1. Increment the version number by 1

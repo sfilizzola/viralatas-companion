@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -11,9 +11,13 @@ import RightNowPage from './pages/RightNowPage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
 import PrivateRoute from './components/PrivateRoute';
 import SyncToast, { SYNC_COMPLETE_EVENT } from './components/SyncToast';
+import DuckToast from './components/DuckToast';
 import { useAuth } from './hooks/useAuth';
+import { useDuckNotifications } from './hooks/useDuckNotifications';
 import { syncBands } from './lib/sync';
-import { picksRepository, usersRepository, presenceRepository, announcementsRepository, bandsRepository } from './repositories';
+import { subscribeToPush } from './lib/pushSubscription';
+import { PICKS_CHANGED_EVENT, loadUserPicks } from './lib/db';
+import { picksRepository, usersRepository, presenceRepository, announcementsRepository, bandsRepository, duckRepository } from './repositories';
 
 function emitSyncComplete() {
   window.dispatchEvent(new Event(SYNC_COMPLETE_EVENT));
@@ -100,6 +104,63 @@ function AnnouncementSync() {
   return null;
 }
 
+function DuckSync() {
+  const { session } = useAuth();
+  const userId = session?.user?.id;
+
+  useEffect(() => {
+    if (!userId) return;
+
+    function handleOnline() {
+      duckRepository.flushOfflineDucks().catch(() => {});
+    }
+
+    window.addEventListener('online', handleOnline);
+    return () => window.removeEventListener('online', handleOnline);
+  }, [userId]);
+
+  return null;
+}
+
+function PushSetup() {
+  const { session } = useAuth();
+  const userId = session?.user?.id;
+
+  useEffect(() => {
+    if (!userId) return;
+    subscribeToPush(userId).catch(() => {});
+  }, [userId]);
+
+  return null;
+}
+
+/**
+ * Top-level listener that subscribes to Supabase Realtime duck_quacks events
+ * and dispatches `viralatas:duck-quack` window events for DuckToast to consume.
+ */
+function DuckNotificationsListener() {
+  const { session } = useAuth();
+  const userId = session?.user?.id ?? null;
+  const [pickedBandIds, setPickedBandIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!userId) return;
+
+    async function loadPicks() {
+      const picks = await loadUserPicks(userId!);
+      setPickedBandIds(new Set(picks.map((p) => p.band_id)));
+    }
+
+    loadPicks().catch(() => {});
+    window.addEventListener(PICKS_CHANGED_EVENT, loadPicks);
+    return () => window.removeEventListener(PICKS_CHANGED_EVENT, loadPicks);
+  }, [userId]);
+
+  useDuckNotifications(userId, pickedBandIds);
+
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -107,7 +168,11 @@ export default function App() {
       <BandSync />
       <PickSync />
       <AnnouncementSync />
+      <DuckSync />
+      <PushSetup />
+      <DuckNotificationsListener />
       <SyncToast />
+      <DuckToast />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

@@ -4,6 +4,42 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-15 (Phase 20 — The Duck 🦆)
+
+### Added
+- `supabase/migrations/20260515000002_phase20_duck.sql` — `duck_quacks` table (id, user_id, band_id, quacked_at; RLS INSERT own, SELECT all; Realtime enabled) + `push_subscriptions` table (id, user_id, endpoint UNIQUE, p256dh, auth; RLS INSERT/DELETE/SELECT own)
+- `src/lib/db.ts` — `offline_duck_quacks` store (DB version 8→9); `OfflineDuckQuackOp` type; `enqueueOfflineDuckQuack`, `loadOfflineDuckQuackQueue`, `removeFromOfflineDuckQuackQueue` helpers
+- `src/lib/pushSubscription.ts` — `subscribeToPush(userId)`: requests Notification permission, registers PushSubscription via SW, upserts to `push_subscriptions`; VAPID key read from `VITE_VAPID_PUBLIC_KEY`
+- `src/workers/sw.ts` — custom Service Worker with Workbox `precacheAndRoute`, NetworkFirst for Supabase, CacheFirst for Wacken images, `push` event listener (shows system notification), `notificationclick` listener (focuses/opens `/now`)
+- `vite.config.ts` — switched from `generateSW` to `injectManifest` strategy (srcDir: `src/workers`, filename: `sw.ts`); workbox runtime caching moved into the SW file
+- `src/repositories/duck.ts` — `quackBand(userId, bandId)`: inserts to Supabase or queues offline; `flushOfflineDucks()`: flushes offline queue on reconnect
+- `src/hooks/useDuckQuack.ts` — manages 90s per-user per-band cooldown via `localStorage` key `duck_cooldown:{userId}:{bandId}`; returns `{ quack, isOnCooldown, cooldownUntil }`
+- `src/hooks/useDuckNotifications.ts` — Supabase Realtime subscription on `duck_quacks` INSERT; ignores own quacks and non-picked bands; dispatches `viralatas:duck-quack` CustomEvent
+- `src/components/DuckButton.tsx` + `DuckButton.module.css` — circular rubber-duck button; conic-gradient drain overlay (dark sweeps CW from 12 o'clock over 90s representing elapsed cooldown); pop animation on press; disabled during cooldown
+- `src/components/DuckToast.tsx` + `DuckToast.module.css` — global floating duck toast; listens to `viralatas:duck-quack`; looks up band name from IndexedDB; slide-up entrance / fade-out exit; auto-dismisses after ~3s
+- `src/i18n/DuckButton_{br,en,de,es}.json` — duck-specific i18n keys: `quackLabel`, `cooldownLabel`, `pushPromptTitle`, `pushPromptBody`, `pushDenied`
+- `supabase/functions/send-duck-push/index.ts` — Edge Function triggered by Database Webhook on `duck_quacks` INSERT; queries `user_picks` (excluding quacker), fetches `push_subscriptions`, sends Web Push via `npm:web-push` with VAPID keys from Supabase secrets
+
+### Changed
+- `src/components/BandCard.tsx` — added optional `onDuck?: () => void` and `duckCooldownUntil?: number` props; renders `<DuckButton>` when `onDuck` provided and band is not ceremony; CSS grid gains `.withDuck` class adding extra column for the duck button
+- `src/components/BandCard.module.css` — added `.variantSchedule.withDuck` and `.variantTimeline.withDuck` grid templates (extra `auto` column for duck button)
+- `src/components/now/CrewGroupsSection.tsx` — added `onDuck?: () => void` and `duckCooldownUntil?: number | null` props; renders `<DuckButton>` in `.groupActions` alongside skip button when user is at a live band group
+- `src/hooks/useNowData.ts` — calls `useDuckQuack(userId, duckBandId)` where `duckBandId` is the user's current live non-ceremony band; exposes `duckBandId`, `duckQuack`, `duckCooldownUntil` in `NowData`
+- `src/pages/RightNowPage.tsx` — passes `onDuck` and `duckCooldownUntil` to `CrewGroupsSection`
+- `src/pages/SchedulePage.tsx` — `DuckableBandCard` wrapper component uses `useDuckQuack` per band (hook always called, null when not live/picked); passes `onDuck` and `duckCooldownUntil` to `BandCard`
+- `src/App.tsx` — mounts `<DuckSync />` (flush offline ducks on reconnect), `<PushSetup />` (subscribeToPush after auth), `<DuckNotificationsListener />` (self-contained realtime listener), `<DuckToast />` (global)
+- `src/repositories/index.ts` — exports `duckRepository`
+- `src/lib/i18n.ts` — imports and registers `DuckButton` namespace for all 4 locales
+
+### Architectural Notes
+- **Service Worker strategy change**: switched from `generateSW` to `injectManifest` to enable custom push event handlers. All workbox caching configuration moved into `src/workers/sw.ts`. Functionally identical runtime caching behavior.
+- **Cooldown is client-side only**: the 90s cooldown is enforced via `localStorage` on the client. Other users' cooldowns are independent. The DB accepts multiple quacks (no server-side dedup); the client-side guard prevents accidental rapid-fire.
+- **Offline quacks flush harmlessly**: if a concert ends before reconnect, the queued duck still inserts to `duck_quacks` and triggers Web Push. This is documented as "stale but harmless" in the phase spec.
+- **Push subscription is per-device**: users with multiple devices get multiple notifications. Acceptable for ~20 users.
+- **Edge Function requires Supabase Database Webhook**: configure in Dashboard → Database → Webhooks; table `duck_quacks`, event INSERT, URL `https://<project>.supabase.co/functions/v1/send-duck-push`.
+
+---
+
 ## 2026-05-15 (Phase 19 — Closing Ceremony Slot)
 
 ### Added

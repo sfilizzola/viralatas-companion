@@ -43,6 +43,15 @@
   grid-template-columns: 4px 56px 1fr;
 }
 
+/* With duck button: extra column before the pick star */
+.variantSchedule.withDuck {
+  grid-template-columns: 4px 56px 1fr auto auto;
+}
+
+.variantTimeline.withDuck {
+  grid-template-columns: 4px 64px 1fr auto auto;
+}
+
 /* ----- conflict & overlap outlines (timeline variant only) ----- */
 .cardSoftOverlap {
   outline: 2px solid var(--signal-warn);

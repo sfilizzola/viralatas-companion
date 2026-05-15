@@ -47,6 +47,10 @@ import syncToastBr from '../i18n/SyncToast_br.json';
 import syncToastDe from '../i18n/SyncToast_de.json';
 import syncToastEn from '../i18n/SyncToast_en.json';
 import syncToastEs from '../i18n/SyncToast_es.json';
+import duckButtonBr from '../i18n/DuckButton_br.json';
+import duckButtonDe from '../i18n/DuckButton_de.json';
+import duckButtonEn from '../i18n/DuckButton_en.json';
+import duckButtonEs from '../i18n/DuckButton_es.json';
 
 export type Language = 'br' | 'en' | 'es' | 'de';
 
@@ -62,7 +66,8 @@ type TranslationFile =
   | 'AnnouncementsPage'
   | 'Badges'
   | 'OfflineBanner'
-  | 'SyncToast';
+  | 'SyncToast'
+  | 'DuckButton';
 
 type Translations = Record<Language, Record<TranslationFile, Record<string, string>>>;
 
@@ -82,6 +87,7 @@ const translations: Translations = {
     Badges: badgesBr,
     OfflineBanner: offlineBannerBr,
     SyncToast: syncToastBr,
+    DuckButton: duckButtonBr,
   },
   en: {
     App: appEn,
@@ -96,6 +102,7 @@ const translations: Translations = {
     Badges: badgesEn,
     OfflineBanner: offlineBannerEn,
     SyncToast: syncToastEn,
+    DuckButton: duckButtonEn,
   },
   es: {
     App: appEs,
@@ -110,6 +117,7 @@ const translations: Translations = {
     Badges: badgesEs,
     OfflineBanner: offlineBannerEs,
     SyncToast: syncToastEs,
+    DuckButton: duckButtonEs,
   },
   de: {
     App: appDe,
@@ -124,6 +132,7 @@ const translations: Translations = {
     Badges: badgesDe,
     OfflineBanner: offlineBannerDe,
     SyncToast: syncToastDe,
+    DuckButton: duckButtonDe,
   },
 };
 

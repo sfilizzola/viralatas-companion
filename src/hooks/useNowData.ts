@@ -28,6 +28,7 @@ import {
   type LivePlan,
 } from '../services/livePreview';
 import { picksRepository, presenceRepository } from '../repositories';
+import { useDuckQuack } from './useDuckQuack';
 import { syncLiveBandTestConfig } from '../services/liveBandTest';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
@@ -58,6 +59,9 @@ export type NowData = {
   handleSkip: () => Promise<void>;
   handleUndo: () => Promise<void>;
   handlePresenceChange: (nextValue: PresenceLocation) => Promise<void>;
+  duckBandId: string | null;
+  duckQuack: () => Promise<void>;
+  duckCooldownUntil: number | null;
 };
 
 export function useNowData(): NowData {
@@ -281,6 +285,15 @@ export function useNowData(): NowData {
     setUndoState(null);
   }, [undoState, userId, undoTimerId]);
 
+  // Duck quack for the user's current live band (if any and not a ceremony)
+  const duckBandId = useMemo(() => {
+    if (myPlan.status !== 'current' || !myPlan.band) return null;
+    if (myPlan.band.category === 'ceremony') return null;
+    return myPlan.band.id;
+  }, [myPlan]);
+
+  const { quack: duckQuack, cooldownUntil: duckCooldownUntil } = useDuckQuack(userId, duckBandId);
+
   const handlePresenceChange = useCallback(async (nextValue: PresenceLocation) => {
     if (!userId) return;
     if (nextValue === 'camping') {
@@ -323,5 +336,9 @@ export function useNowData(): NowData {
     handleSkip,
     handleUndo,
     handlePresenceChange,
+    duckBandId,
+    duckQuack,
+    duckIsOnCooldown,
+    duckCooldownUntil,
   };
 }

@@ -8,7 +8,7 @@ Document how data is synchronized between IndexedDB (primary), offline queues, a
 
 ## Relevant Source Files
 
-- `src/App.tsx` — Sync orchestration (BandSync, PickSync, AnnouncementSync, CacheVersionCheck)
+- `src/App.tsx` — Sync orchestration (BandSync, PickSync, AnnouncementSync, DuckSync, PushSetup, CacheVersionCheck)
 - `src/repositories/picks.ts` — Pick sync, queue deduplication
 - `src/repositories/announcements.ts` — Announcement sync and pending queue
 - `src/repositories/presence.ts` — Presence sync
@@ -343,6 +343,9 @@ useAuth() detects session
      │  ├─ flushPending()
      │  │  └─ (empty if first login)
      │  ├─ announcementsRepository.sync()
+     │
+     ├─ DuckSync
+     │  └─ (listens to 'online'; flushes offline_duck_quacks via duckRepository.flushOfflineDucks())
      │  │  ├─ Fetch all announcements from Supabase
      │  │  └─ Overwrite IndexedDB
      │  └─ [Subscribe to Realtime]

@@ -293,3 +293,31 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Phase 19 ceremony badge regression suite (12 tests) in `src/__tests__/badges.test.ts`; `band()` helper updated with `category: 'band'` default; new `ceremonyBand()` helper
 
 ---
+
+### Phase 20 — The Duck 🦆
+**Status:** ✅ Complete
+
+**Goal:** Add a social rubber-duck quack button to live band cards. When a user who has picked a band presses the duck during the live set, a floating duck notification is broadcast to all other pickers — in-app via Supabase Realtime (DuckToast) and as a Web Push system notification for background/closed-app users. 90-second per-user per-band cooldown shown as a conic-gradient drain animation. Offline presses are queued and flushed on reconnect.
+
+**Deliverables:**
+- `supabase/migrations/20260515000002_phase20_duck.sql` — `duck_quacks` (Realtime-enabled, RLS INSERT own / SELECT all) + `push_subscriptions` (RLS INSERT/DELETE/SELECT own) tables
+- `src/lib/db.ts` — `offline_duck_quacks` IDB store (DB version 8→9); `OfflineDuckQuackOp` type + helpers
+- `src/lib/pushSubscription.ts` — `subscribeToPush(userId)`: Notification permission + PushSubscription registration + Supabase upsert
+- `src/workers/sw.ts` — custom SW (injectManifest): Workbox precache + NetworkFirst (Supabase) + CacheFirst (Wacken images) + `push` + `notificationclick` handlers
+- `vite.config.ts` — switched from `generateSW` → `injectManifest` strategy
+- `src/repositories/duck.ts` — `quackBand` (online/offline) + `flushOfflineDucks`; exported from `src/repositories/index.ts`
+- `src/hooks/useDuckQuack.ts` — 90s localStorage cooldown; returns `{ quack, isOnCooldown, cooldownUntil }`
+- `src/hooks/useDuckNotifications.ts` — Realtime listener on `duck_quacks` INSERT; dispatches `viralatas:duck-quack` CustomEvent
+- `src/components/DuckButton.tsx` + `DuckButton.module.css` — circular duck PNG button; conic-gradient drain overlay (elapsed CW sweep); pop animation
+- `src/components/DuckToast.tsx` + `DuckToast.module.css` — global floating toast; listens to `viralatas:duck-quack`; resolves band name from IndexedDB; animated entrance/exit; 3s auto-dismiss
+- `src/i18n/DuckButton_{br,en,de,es}.json` — i18n namespace for duck UI labels; registered in `src/lib/i18n.ts`
+- `src/components/BandCard.tsx` + `BandCard.module.css` — `onDuck?`/`duckCooldownUntil?` props; `.withDuck` CSS grid variant
+- `src/components/now/CrewGroupsSection.tsx` — `onDuck?`/`duckCooldownUntil?` props; DuckButton in `.groupActions` on user's live band group
+- `src/hooks/useNowData.ts` — `useDuckQuack(userId, duckBandId)`; exposes `duckBandId`, `duckQuack`, `duckCooldownUntil`
+- `src/pages/RightNowPage.tsx` — passes duck props to `CrewGroupsSection`
+- `src/pages/SchedulePage.tsx` — `DuckableBandCard` wrapper (hook per band, null when not applicable)
+- `src/App.tsx` — mounts `DuckSync`, `PushSetup`, `DuckNotificationsListener`, `DuckToast`
+- `supabase/functions/send-duck-push/index.ts` — Edge Function for Web Push via `npm:web-push`; triggered by Supabase Database Webhook on `duck_quacks` INSERT
+- `public/Design System.html` §11 — pre-authored DuckButton states (ready/cooldown drain at 10/50/85%), DuckToast entrance/exit, live card simulation with 8 crew + "I am weak" + duck button
+
+---

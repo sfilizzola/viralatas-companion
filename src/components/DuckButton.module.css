@@ -1,0 +1,93 @@
+/* ============================================================
+   DUCK BUTTON — design system § 11
+   Circular rubber-duck button for live band quacking.
+   States: ready (full duck visible) · cooldown (conic-gradient drain overlay).
+   ============================================================ */
+
+.wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--border);
+}
+
+.button {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s, transform 0.1s;
+  overflow: hidden;
+}
+
+.button:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 215, 0, 0.5);
+  transform: scale(1.08);
+}
+
+.button:active:not(:disabled) {
+  transform: scale(0.93);
+}
+
+.button:disabled {
+  cursor: default;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.duckImg {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Drain overlay — dark area sweeps CW from 12 o'clock, representing elapsed cooldown.
+   drain-angle=0 → no overlay (just pressed). drain-angle=360 → fully covered. */
+.drainOverlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from -90deg,
+    rgba(0, 0, 0, 0.62) 0deg var(--drain-angle, 0deg),
+    transparent var(--drain-angle, 0deg) 360deg
+  );
+  pointer-events: none;
+}
+
+/* Pop animation on successful quack */
+@keyframes duckPop {
+  0%   { transform: scale(0.85); }
+  45%  { transform: scale(1.22); }
+  100% { transform: scale(1); }
+}
+
+.popping {
+  animation: duckPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .popping {
+    animation: none;
+  }
+  .button {
+    transition: none;
+  }
+}

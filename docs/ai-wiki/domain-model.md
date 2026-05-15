@@ -23,6 +23,8 @@ Viralatas Metaleiros is a small group (~20 people) attending Wacken Open Air 202
 3. **UserPick** — A vira-lata's interest in seeing a band
 4. **UserPresence** — Where is the vira-lata right now (camping vs. at Metal Place)
 5. **UserMissedBand** — A band the vira-lata actually watched (marked after the fact)
+6. **DuckQuack** — A social "quack" signal sent by a vira-lata during a live band set (Phase 20)
+7. **PushSubscription** — A device-level Web Push subscription for background notifications (Phase 20)
 6. **Announcement** — A mural post from any vira-lata
 7. **BlockedPoster** — Manager blocking moderation rules
 

@@ -2,7 +2,7 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { Announcement, Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserMissedBand, UserPick, UserPresence } from '../types';
 
 const DB_NAME = 'viralatas-db';
-const DB_VERSION = 8;
+const DB_VERSION = 9;
 
 export const PICKS_CHANGED_EVENT = 'viralatas:picks-changed';
 export const CREW_USERS_CHANGED_EVENT = 'viralatas:crew-users-changed';
@@ -30,6 +30,13 @@ type OfflineMissedOp = {
 
 type OfflinePresenceOp = UserPresence & {
   id: string;
+};
+
+export type OfflineDuckQuackOp = {
+  id: string;
+  user_id: string;
+  band_id: string;
+  quacked_at: string;
 };
 
 type ViralatasDB = {
@@ -91,6 +98,10 @@ type ViralatasDB = {
     key: string;
     value: OfflineMissedOp;
   };
+  offline_duck_quacks: {
+    key: string;
+    value: OfflineDuckQuackOp;
+  };
 };
 
 let dbPromise: Promise<IDBPDatabase<ViralatasDB>> | null = null;
@@ -146,6 +157,9 @@ function getDB() {
         }
         if (!db.objectStoreNames.contains('offline_missed_bands')) {
           db.createObjectStore('offline_missed_bands', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('offline_duck_quacks')) {
+          db.createObjectStore('offline_duck_quacks', { keyPath: 'id' });
         }
       },
     });
@@ -503,4 +517,21 @@ export async function loadCacheVersion(): Promise<string | null> {
   const db = await getDB();
   const meta = await db.get('meta', 'cache_version');
   return meta?.cache_version ?? null;
+}
+
+// --- Offline duck quacks ---
+
+export async function enqueueOfflineDuckQuack(op: OfflineDuckQuackOp) {
+  const db = await getDB();
+  await db.put('offline_duck_quacks', op);
+}
+
+export async function loadOfflineDuckQuackQueue(): Promise<OfflineDuckQuackOp[]> {
+  const db = await getDB();
+  return db.getAll('offline_duck_quacks');
+}
+
+export async function removeFromOfflineDuckQuackQueue(id: string) {
+  const db = await getDB();
+  await db.delete('offline_duck_quacks', id);
 }
