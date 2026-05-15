@@ -13,6 +13,7 @@ export const BADGES: BadgeConfig[] = [
     descriptionKey: 'badgePuppyDescription',
     // Exclusive — only 2026 checked. Adding any other year removes this badge.
     condition: { type: 'wacken_years_exactly', years: [2026] },
+    year: 2026,
   },
   {
     slug: 'pack-member',
@@ -184,6 +185,13 @@ export const BADGES: BadgeConfig[] = [
     imagePath: '/badges/badge_nutella.png',
     labelKey: 'badgeNutella',
     descriptionKey: 'badgeNutellaDescription',
+    condition: { type: 'assigned' },
+  },
+  {
+    slug: 'melon',
+    imagePath: '/badges/badge_melon.png',
+    labelKey: 'badgeMelon',
+    descriptionKey: 'badgeMelonDescription',
     condition: { type: 'assigned' },
   },
   {

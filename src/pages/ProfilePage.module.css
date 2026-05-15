@@ -1306,9 +1306,9 @@
 }
 
 .userActionButton {
-  background: rgba(192, 57, 43, 0.14);
-  color: var(--accent-hover);
-  border: 1px solid rgba(192, 57, 43, 0.45);
+  background: var(--bg-elevated);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
   border-radius: var(--r-1);
   padding: 5px 9px;
   font-family: var(--font-mono);
@@ -1323,10 +1323,12 @@
 }
 
 .userActionButton:hover:not(:disabled) {
-  background: rgba(192, 57, 43, 0.22);
-  border-color: rgba(192, 57, 43, 0.75);
+  background: var(--bg-surface);
+  border-color: var(--text-muted);
+  color: var(--text);
 }
 
+/* kept for backward compatibility — now a no-op since the base is already neutral */
 .secondaryAction {
   background: var(--bg-elevated);
   border-color: var(--border);
@@ -1337,6 +1339,55 @@
   background: var(--bg-surface);
   border-color: var(--text-muted);
   color: var(--text);
+}
+
+/* Semantic action modifiers */
+.actionPromote {
+  background: rgba(41, 128, 185, 0.10);
+  border-color: rgba(41, 128, 185, 0.40);
+  color: #58a8e6;
+}
+
+.actionPromote:hover:not(:disabled) {
+  background: rgba(41, 128, 185, 0.20);
+  border-color: rgba(41, 128, 185, 0.65);
+  color: #72b9f0;
+}
+
+.actionFriend {
+  background: rgba(217, 119, 6, 0.10);
+  border-color: rgba(217, 119, 6, 0.40);
+  color: #d97706;
+}
+
+.actionFriend:hover:not(:disabled) {
+  background: rgba(217, 119, 6, 0.20);
+  border-color: rgba(217, 119, 6, 0.65);
+  color: #f59e0b;
+}
+
+.actionBadge {
+  background: rgba(142, 68, 173, 0.10);
+  border-color: rgba(142, 68, 173, 0.40);
+  color: #bb8fce;
+}
+
+.actionBadge:hover:not(:disabled) {
+  background: rgba(142, 68, 173, 0.20);
+  border-color: rgba(142, 68, 173, 0.65);
+  color: #d2a8e6;
+}
+
+.actionUnblock {
+  background: rgba(234, 88, 12, 0.10);
+  border-color: rgba(234, 88, 12, 0.35);
+  color: #fb923c;
+}
+
+.actionUnblock:hover:not(:disabled) {
+  background: rgba(234, 88, 12, 0.18);
+  border-color: rgba(234, 88, 12, 0.55);
+  color: #fdba74;
 }
 
 .userActionButton:disabled {

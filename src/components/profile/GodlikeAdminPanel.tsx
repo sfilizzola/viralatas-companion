@@ -595,7 +595,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                     <div key={user.id} className={styles.userRow}>
                       <div className={styles.userInfo}>
                         <Avatar
-                          size={40}
+                          size={36}
                           src={user.avatar_url}
                           initial={getInitial(user.display_name, user.email)}
                         />
@@ -605,15 +605,12 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                           </div>
                           <div className={styles.userEmail}>{user.email}</div>
                         </div>
+                        <div className={`${styles.roleBadge} ${styles[`roleBadge_${user.role}`]}`}>
+                          {roleLabel(user.role)}
+                        </div>
                       </div>
 
                       <div className={styles.userActionArea}>
-                        <div
-                          className={`${styles.roleBadge} ${styles[`roleBadge_${user.role}`]}`}
-                        >
-                          {roleLabel(user.role)}
-                        </div>
-
                         {user.special_badges.length > 0 && (
                           <span className={styles.assignedBadgeChip}>
                             {t('assignedBadgeCount', { count: user.special_badges.length })}
@@ -621,7 +618,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                         )}
 
                         <button
-                          className={`${styles.userActionButton} ${styles.secondaryAction}`}
+                          className={`${styles.userActionButton} ${styles.actionBadge}`}
                           onClick={() => setAssignModalUser(user)}
                           type="button"
                         >
@@ -631,7 +628,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                         {user.role !== 'godlike' && (
                           <button
                             className={`${styles.userActionButton} ${
-                              user.role === 'manager' ? styles.secondaryAction : ''
+                              user.role === 'normal' ? styles.actionPromote : ''
                             } ${user.loading ? styles.loading : ''}`}
                             onClick={() => handlePromoteOrDemote(user.id, user.role)}
                             disabled={user.loading}
@@ -650,7 +647,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                         {user.role !== 'godlike' && (
                           <button
                             className={`${styles.userActionButton} ${
-                              user.is_friend ? styles.secondaryAction : ''
+                              user.is_friend ? '' : styles.actionFriend
                             } ${user.loading ? styles.loading : ''}`}
                             onClick={() => handleToggleFriend(user.id, user.is_friend)}
                             disabled={user.loading}
@@ -668,7 +665,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
 
                         {blockedPosters.some((bp) => bp.user_id === user.id) && (
                           <button
-                            className={`${styles.userActionButton} ${styles.secondaryAction} ${
+                            className={`${styles.userActionButton} ${styles.actionUnblock} ${
                               user.loading ? styles.loading : ''
                             }`}
                             onClick={() => handleUnblock(user.id)}

@@ -127,7 +127,7 @@ export default function ManagerAdminPanel({ userId, t }: ManagerAdminPanelProps)
                         </div>
                       ) : (
                         <button
-                          className={`${styles.userActionButton} ${user.loading ? styles.loading : ''}`}
+                          className={`${styles.userActionButton} ${styles.actionUnblock} ${user.loading ? styles.loading : ''}`}
                           onClick={() => handleUnblock(user.id)}
                           disabled={user.loading}
                           type="button"
