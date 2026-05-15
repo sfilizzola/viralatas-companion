@@ -248,7 +248,10 @@ export default function MyPicksPage() {
       <main className={styles.list}>
         {loading && <p className={styles.empty}>{t('loading')}</p>}
         {!loading && myBands.length === 0 && (
-          <p className={styles.empty}>{t('empty')}</p>
+          <div className={styles.emptyState}>
+            <Icon name="pick" size={24} aria-hidden />
+            {t('empty')}
+          </div>
         )}
         {grouped.map(([day, dayBands]) => {
           const isExpanded = !collapsedDays.has(day);

@@ -267,6 +267,18 @@
   line-height: 1.45;
 }
 
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-3);
+  padding: 2rem 1rem;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 .nextHint {
   margin-top: 0.55rem;
   color: var(--text);
@@ -299,7 +311,7 @@
 }
 
 .youAreHere {
-  border-color: var(--border);
+  border-left: 2px solid var(--accent);
 }
 
 /* 4px stage/status strip at top of each card */

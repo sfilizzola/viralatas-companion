@@ -15,6 +15,7 @@ import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BandCard from '../components/BandCard';
 import BandFilters from '../components/BandFilters';
+import Icon from '../components/icons/Icon';
 import type { BandFilterValue } from '../components/bandFilterValue';
 import styles from './SchedulePage.module.css';
 
@@ -102,7 +103,10 @@ export default function SchedulePage() {
       <main className={`${styles.list} ${styles.scheduleList}`}>
         {loading && <p className={styles.empty}>{t('loadingSchedule')}</p>}
         {!loading && filtered.length === 0 && (
-          <p className={styles.empty}>{t('emptySchedule')}</p>
+          <div className={styles.emptyState}>
+            <Icon name="search" size={24} aria-hidden />
+            {t('emptySchedule')}
+          </div>
         )}
         {filtered.map((band) => (
           <BandCard

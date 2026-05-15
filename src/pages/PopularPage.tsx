@@ -12,6 +12,7 @@ import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
 import BandCard from '../components/BandCard';
 import BandDetailModal from '../components/BandDetailModal';
+import Icon from '../components/icons/Icon';
 import styles from './SchedulePage.module.css';
 
 export default function PopularPage() {
@@ -139,7 +140,10 @@ export default function PopularPage() {
       <main className={`${styles.list} ${styles.scheduleList}`}>
         {loading && <p className={styles.empty}>{t('loading')}</p>}
         {!loading && popularBands.length === 0 && (
-          <p className={styles.empty}>{t('empty')}</p>
+          <div className={styles.emptyState}>
+            <Icon name="popular" size={24} aria-hidden />
+            {t('empty')}
+          </div>
         )}
         {popularBands.map((band, index) => {
           const attendees = attendeesByBand[band.id] ?? [];

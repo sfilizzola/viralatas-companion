@@ -325,7 +325,10 @@ export default function AnnouncementsPage() {
         {loading ? (
           <p className={styles.empty}>{t('loading')}</p>
         ) : announcements.length === 0 ? (
-          <p className={styles.empty}>{t('empty')}</p>
+          <div className={styles.emptyState}>
+            <Icon name="mural" size={24} aria-hidden />
+            {t('empty')}
+          </div>
         ) : (
           <>
             <ul className={styles.feed}>

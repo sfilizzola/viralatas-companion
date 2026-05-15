@@ -58,6 +58,18 @@
   font-size: 0.9rem;
 }
 
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-3);
+  padding: 3rem 1rem;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
 .daySection {
   padding: 0 var(--s-4);
 }

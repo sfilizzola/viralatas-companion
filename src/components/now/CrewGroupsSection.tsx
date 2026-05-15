@@ -6,6 +6,7 @@ import type {
 } from '../../services/livePreview';
 import { formatFestivalTime } from '../../services/livePreview';
 import { stageColor } from '../../services/stageColors';
+import Icon from '../icons/Icon';
 import styles from '../../pages/RightNowPage.module.css';
 
 type TFn = (key: string, values?: Record<string, string | number>) => string;
@@ -106,7 +107,12 @@ export default function CrewGroupsSection({
   t,
 }: CrewGroupsSectionProps) {
   if (crewPlans.length === 0) {
-    return <p className={styles.empty}>{t('crewEmpty')}</p>;
+    return (
+      <div className={styles.emptyState}>
+        <Icon name="friend" size={24} aria-hidden />
+        {t('crewEmpty')}
+      </div>
+    );
   }
 
   return (

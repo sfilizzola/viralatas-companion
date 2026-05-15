@@ -266,33 +266,6 @@
   border-color: var(--signal-live);
 }
 
-/* Keep old conflictChip for backwards compat */
-.conflictChip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: rgba(243, 156, 18, 0.12);
-  color: #f9c66b;
-  border: 1px solid rgba(243, 156, 18, 0.4);
-  border-radius: var(--r-pill);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  padding: 2px 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  cursor: pointer;
-}
-
-.conflictChip:hover {
-  background: rgba(243, 156, 18, 0.2);
-}
-
-.conflictChipActive {
-  background: var(--signal-warn);
-  color: #1a0d00;
-  border-color: var(--signal-warn);
-}
 
 /* ============================================================
    PICK — 64px hit area, star icon

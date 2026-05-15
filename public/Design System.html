@@ -816,10 +816,8 @@
     letter-spacing: 0.08em;
   }
   /* Canonical role chip values — from src/ui/Chip.module.css (.roleManager / .roleGodlike).
-     ⚠ AnnouncementsPage.module.css has its own diverged role chip CSS:
-       .roleManager: bg rgba(41,128,185,0.15), color #58a8e6, border rgba(41,128,185,0.4)
-       .roleGodlike: bg rgba(243,156,18,0.15), color var(--signal-warn), border rgba(243,156,18,0.4)
-     These are different from the canonical chip values below. */
+     ✅ Sprint 0 resolved: AnnouncementsPage.module.css previously had diverged values.
+     Both files now use the canonical values below. */
   .role-chip.normal   { background: var(--bg-elevated); color: var(--text-muted); }
   .role-chip.manager  { background: rgba(59,130,246,0.08); color: #3b82f6; border: 1px solid rgba(59,130,246,0.45); }
   .role-chip.godlike  { background: rgba(217,119,6,0.08); color: #d97706; border: 1px solid rgba(217,119,6,0.45); }
@@ -1098,6 +1096,9 @@
   .timeline-bcard .body .name { font-family: var(--font-display); font-size: 13px; font-weight: 700; text-transform: uppercase; line-height: 1.05; }
   .timeline-bcard .body .meta { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); margin-top: 3px; }
   .timeline-bcard .body .meta .stage { color: #fff; padding: 1px 4px; font-size: 8px; }
+  /* ✅ Sprint 0 resolved: conflict-mini was a duplicate of conflict-chip at a different size.
+     Canonical overlap chip is .overlapChip in BandCard.module.css (amber pill, pill border-radius).
+     The .conflict-chip class below is the DS spec; .conflict-mini was removed from dead code. */
   .timeline-bcard .body .conflict-mini { display: inline-block; margin-top: 3px; font-family: var(--font-mono); font-size: 9px; color: var(--signal-warn); border: 1px solid var(--signal-warn); padding: 1px 5px; border-radius: var(--r-pill); text-transform: uppercase; letter-spacing: 0.04em; }
 
   /* popular frame */
@@ -1296,9 +1297,8 @@
     background: var(--bg-surface);
     overflow: hidden;
   }
-  /* .loc.you — code uses only var(--border), no accent highlight.
-     The youAreHere class in RightNowPage.module.css: border-color: var(--border) */
-  .loc.you { border-color: var(--border); }
+  /* .loc.you — Sprint 0 fix: now uses accent left border for clear visual differentiation. */
+  .loc.you { border-left: 2px solid var(--accent); }
   .loc-strip { height: 4px; background: var(--text-muted); }
   .loc-head {
     display: grid;
