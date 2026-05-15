@@ -4,6 +4,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-15 (Admin panel headers — DS §05 spec implementation)
+
+### Changed
+- `src/components/profile/GodlikeAdminPanel.tsx` — trigger content updated to DS §05 pf-collapse godlike spec: amber crown icon (`path M5 18 L7 4 L12 12 L17 4 L19 18`) + "Godlike admin" label in `font-display`, uppercase, `#d97706`; collapsible receives `className={styles.godlikeCollapsible}` for amber left accent border
+- `src/components/profile/ManagerAdminPanel.tsx` — trigger content updated to DS §05 pf-collapse manager spec: blue shield icon (`path M12 2 L20 6 V12 …`) + "Manager tools" label in `font-display`, uppercase, `#3b82f6`; collapsible receives `className={styles.managerCollapsible}` for blue left accent border
+- `src/pages/ProfilePage.module.css` — added `.adminTriggerInner`, `.adminTriggerIcon`, `.adminTriggerLabel` base classes; `.managerTriggerIcon`, `.managerTriggerLabel` (blue tints); `.godlikeTriggerIcon`, `.godlikeTriggerLabel` (amber tints); `.managerCollapsible`, `.godlikeCollapsible` (2px role-colored left border on the Collapsible wrapper)
+
+### Architectural Notes
+- All functionality and behaviour unchanged — only the trigger JSX content is replaced; `Collapsible` state management, chevron, collapse animation, and role guard (`userRole !== 'manager'` / `userRole !== 'godlike'`) are untouched
+- Icons use `stroke="currentColor"` inheriting the `.adminTriggerIcon` color via CSS, matching the DS SVG stroke pattern
+
+---
+
 ## 2026-05-15 (Sprint 3 — Design System Systematic Gaps)
 
 ### Added

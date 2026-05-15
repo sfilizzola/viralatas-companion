@@ -83,11 +83,20 @@ export default function ManagerAdminPanel({ userId, t }: ManagerAdminPanelProps)
 
   if (loading || userRole !== 'manager') return null;
 
-  const trigger = <h3 className={styles.managerTitle}>MANAGER POWERS</h3>;
+  const trigger = (
+    <span className={styles.adminTriggerInner}>
+      <span className={`${styles.adminTriggerIcon} ${styles.managerTriggerIcon}`}>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+          <path d="M12 2 L20 6 V12 c0 5 -4 9 -8 10 -4 -1 -8 -5 -8 -10 V6 Z" />
+        </svg>
+      </span>
+      <span className={`${styles.adminTriggerLabel} ${styles.managerTriggerLabel}`}>Manager tools</span>
+    </span>
+  );
 
   return (
     <div className={styles.managerSection}>
-      <Collapsible trigger={trigger}>
+      <Collapsible trigger={trigger} className={styles.managerCollapsible}>
         <div className={styles.conflictsInner}>
           <div className={styles.managerSectionContent}>
             <div className={styles.blockedUsersSection}>

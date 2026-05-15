@@ -260,11 +260,20 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
 
   if (loading || userRole !== 'godlike') return null;
 
-  const trigger = <h3 className={styles.godlikeTitle}>🤘 GODLIKE POWERS</h3>;
+  const trigger = (
+    <span className={styles.adminTriggerInner}>
+      <span className={`${styles.adminTriggerIcon} ${styles.godlikeTriggerIcon}`}>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+          <path d="M5 18 L7 4 L12 12 L17 4 L19 18 Z" />
+        </svg>
+      </span>
+      <span className={`${styles.adminTriggerLabel} ${styles.godlikeTriggerLabel}`}>Godlike admin</span>
+    </span>
+  );
 
   return (
     <div className={styles.godlikeSection}>
-      <Collapsible trigger={trigger}>
+      <Collapsible trigger={trigger} className={styles.godlikeCollapsible}>
         <div className={styles.conflictsInner}>
           <div className={styles.godlikeSectionContent}>
             <div className={styles.resetSection}>

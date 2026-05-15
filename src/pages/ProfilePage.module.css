@@ -1618,6 +1618,62 @@
   margin: 0;
 }
 
+/* ── Admin panel trigger headers (DS §05 pf-collapse spec) ── */
+
+.adminTriggerInner {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-width: 0;
+}
+
+.adminTriggerIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--r-1);
+}
+
+.adminTriggerLabel {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  margin: 0;
+}
+
+.managerTriggerIcon {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.10);
+}
+
+.managerTriggerLabel {
+  color: #3b82f6;
+}
+
+.godlikeTriggerIcon {
+  color: #d97706;
+  background: rgba(217, 119, 6, 0.10);
+}
+
+.godlikeTriggerLabel {
+  color: #d97706;
+}
+
+/* Left accent rule on the collapsible wrapper for admin panels */
+.managerCollapsible {
+  border-left: 2px solid rgba(59, 130, 246, 0.45) !important;
+}
+
+.godlikeCollapsible {
+  border-left: 2px solid rgba(217, 119, 6, 0.45) !important;
+}
+
 .blockedUsersSection {
   width: 100%;
   border: 1px solid var(--border);
