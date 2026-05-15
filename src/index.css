@@ -104,6 +104,11 @@
   --signal-ok: #16a085;
   --signal-lost: #a855f7;
 
+  /* ---------- ceremony ---------- */
+  --ceremony-gold:     #d4af37;
+  --ceremony-gold-dim: rgba(212,175,55,0.55);
+  --ceremony-gold-bg:  rgba(212,175,55,0.07);
+
   /* ---------- stages (canonical, never reinterpret) ---------- */
   --stage-faster: #2980b9;
   --stage-harder: #e67e22;
