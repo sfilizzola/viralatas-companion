@@ -900,6 +900,55 @@
   }
 
   /* ============================================================
+     EMPTY STATE & ERROR STATE
+     ============================================================ */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-3);
+    padding: var(--s-10) var(--s-6);
+    text-align: center;
+    min-height: 180px;
+  }
+  .empty-state .empty-icon {
+    color: var(--text-faint);
+    width: 28px; height: 28px;
+    flex-shrink: 0;
+  }
+  .empty-state .empty-msg {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-width: 28ch;
+  }
+  .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-3);
+    padding: var(--s-8) var(--s-6);
+    text-align: center;
+    min-height: 180px;
+    border: 1px solid var(--border);
+    border-radius: var(--r-2);
+    background: var(--bg-surface);
+  }
+  .error-state .error-icon { color: var(--signal-warn); width: 28px; height: 28px; }
+  .error-state.network .error-icon { color: var(--text-faint); }
+  .error-state .error-msg {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    max-width: 28ch;
+  }
+  .error-state .btn { margin-top: var(--s-1); font-size: 12px; padding: 8px 14px; }
+
+  /* ============================================================
      PHONE FRAME (page mockups)
      ============================================================ */
   .frames {
@@ -1832,9 +1881,10 @@
        ============================================================ -->
   <header class="masthead">
     <div>
-      <div class="eyebrow">Design System &middot; v1.0 &middot; Wacken Open Air 2026</div>
+      <div class="eyebrow">Design System &middot; v2.0 &middot; Wacken Open Air 2026</div>
       <h1>Viralatas<br />Metaleiros<span class="horns"> 🤘</span></h1>
       <p class="lede">A festival companion PWA for ~20 metalheads. Dark-first, offline-first. Feels like a backstage wristband, not a corporate app.</p>
+      <p class="lede" style="margin-top:var(--s-3);font-size:13px;color:var(--text-faint);max-width:52ch"><strong style="color:var(--text-muted)">Visual relationship to Wacken Open Air:</strong> We reference the festival by using its 8 canonical stage colors as the only saturated palette in the app. We do not recreate, copy, or approximate Wacken's own graphic identity (logotype, mascot, stage graphics). Stage color assignments are fixed and must not be changed — they are the festival's identity, not ours to reinterpret.</p>
     </div>
     <div class="specs">
       <b>FOUNDATION</b><br />
@@ -3495,17 +3545,186 @@
   </section>
 
   <!-- ============================================================
+       10. EMPTY & ERROR STATES
+       ============================================================ -->
+  <section class="section" id="empty-states">
+    <div class="section-head">
+      <div class="num">10</div>
+      <div>
+        <h2>Empty &amp; Error States</h2>
+        <p class="desc">Offline-first apps hit empty states constantly — first launch, stale cache, quiet periods. Every list screen has a canonical empty pattern. Error states are separate: they signal a recoverable failure, not just absence of data.</p>
+      </div>
+    </div>
+
+    <div class="subhead">Visual pattern — empty states</div>
+    <div class="demo-notes" style="border-left:0;padding-left:0;margin-bottom:var(--s-6)">
+      <ul>
+        <li>Centered layout · <code>display:flex; flex-direction:column; align-items:center; padding:40px 24px</code></li>
+        <li>Single muted line of copy · <code>--font-sans · 14px · --text-muted · max-width: 28ch</code></li>
+        <li>Optional DS icon (24px stroke, <code>--text-faint</code>) above the copy — not required</li>
+        <li>No illustrations. No "no data found" placeholders. Keep the metal voice.</li>
+        <li>These are transitions, not destinations — density should be low</li>
+      </ul>
+    </div>
+
+    <div class="subhead">Canonical empty states</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--s-4);margin-bottom:var(--s-6)">
+
+      <!-- /now -->
+      <div style="border:1px solid var(--border);border-radius:var(--r-2);background:var(--bg-surface);overflow:hidden">
+        <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">/now — pre-festival</div>
+        <div class="empty-state">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M9 12h6M12 9v6"/></svg>
+          <p class="empty-msg">Ninguém escolheu uma banda ainda.</p>
+        </div>
+      </div>
+
+      <!-- /schedule search -->
+      <div style="border:1px solid var(--border);border-radius:var(--r-2);background:var(--bg-surface);overflow:hidden">
+        <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">/schedule — no results</div>
+        <div class="empty-state">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          <p class="empty-msg">Nenhuma banda encontrada. Tente outro filtro.</p>
+        </div>
+      </div>
+
+      <!-- /my-picks -->
+      <div style="border:1px solid var(--border);border-radius:var(--r-2);background:var(--bg-surface);overflow:hidden">
+        <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">/my-picks — zero picks</div>
+        <div class="empty-state">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          <p class="empty-msg">Nenhuma banda salva ainda. Vai lá no Sched. 🤘</p>
+        </div>
+      </div>
+
+      <!-- /popular -->
+      <div style="border:1px solid var(--border);border-radius:var(--r-2);background:var(--bg-surface);overflow:hidden">
+        <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">/popular — no picks</div>
+        <div class="empty-state">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 17l4-8 4 5 3-3 4 6"/></svg>
+          <p class="empty-msg">Nenhum pick ainda. Primeiro a salvar ganha.</p>
+        </div>
+      </div>
+
+      <!-- /announcements -->
+      <div style="border:1px solid var(--border);border-radius:var(--r-2);background:var(--bg-surface);overflow:hidden">
+        <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">/announcements — empty mural</div>
+        <div class="empty-state">
+          <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <p class="empty-msg">Nenhum anúncio ainda. Seja o primeiro. 🤘</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="subhead">Canonical error states · <code>src/components/ErrorState.tsx</code></div>
+    <div class="demo-notes" style="border-left:0;padding-left:0;margin-bottom:var(--s-4)">
+      <ul>
+        <li>Reusable component · props: <code>variant: 'network' | 'sync' | 'auth'</code> · <code>onRetry?: () =&gt; void</code> · <code>message?: string</code></li>
+        <li>Each variant has a retry CTA button styled to DS (<code>.btn</code> class)</li>
+        <li>Retry button only rendered when <code>onRetry</code> prop is provided</li>
+        <li>Custom <code>message</code> overrides default copy when provided</li>
+      </ul>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--s-4)">
+
+      <!-- network error -->
+      <div style="border:1px solid var(--border);border-radius:var(--r-2);background:var(--bg-surface);overflow:hidden">
+        <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">variant: network</div>
+        <div class="error-state network" style="border:none;border-radius:0;background:transparent">
+          <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+          <p class="error-msg">Sem sinal. No modo offline. 🤘</p>
+        </div>
+      </div>
+
+      <!-- sync error -->
+      <div style="border:1px solid var(--border);border-radius:var(--r-2);background:var(--bg-surface);overflow:hidden">
+        <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">variant: sync</div>
+        <div class="error-state" style="border:none;border-radius:0;background:transparent">
+          <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+          <p class="error-msg">Erro ao sincronizar. Tentaremos de novo.</p>
+          <button class="btn" style="margin-top:var(--s-1);font-size:12px;padding:8px 14px">Tentar de novo</button>
+        </div>
+      </div>
+
+      <!-- auth error -->
+      <div style="border:1px solid var(--border);border-radius:var(--r-2);background:var(--bg-surface);overflow:hidden">
+        <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">variant: auth</div>
+        <div class="error-state" style="border:none;border-radius:0;background:transparent">
+          <svg class="error-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <p class="error-msg">Sessão expirada. Por favor, entre novamente.</p>
+          <button class="btn" style="margin-top:var(--s-1);font-size:12px;padding:8px 14px">Entrar</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
+       CHANGELOG
+       ============================================================ -->
+  <section class="section" id="changelog">
+    <div class="section-head">
+      <div class="num" style="font-size:10px">LOG</div>
+      <div>
+        <h2>Changelog</h2>
+        <p class="desc">Design system revision history. Sprints 0–3 completed pre-Wacken 2026.</p>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v2.0 — Sprint 3 · May 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li>Added §10 Empty &amp; Error States — 5 canonical empty patterns + 3 error variants</li>
+          <li>Documented <code>ErrorState.tsx</code> reusable component (props: variant, onRetry, message)</li>
+          <li>Added Wacken identity relationship statement to masthead</li>
+          <li>Specified badge unlock animation: scale 0.85 → 1.12 → 1.0, 380 ms spring (§07 Motion)</li>
+          <li>Bumped version from v1.0 to v2.0</li>
+        </ul>
+      </div>
+
+      <div style="border-left:2px solid var(--border-strong);padding-left:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v1.1 — Sprints 1–2 · May 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li>Added sticky sidebar navigation (§01–09 anchors)</li>
+          <li>Documented input component: rest, focus, error, disabled states + password toggle</li>
+          <li>Added badge unlock animation spec to §07 Motion</li>
+          <li>Formalized crew-state exception (LOST card gradient + glow budget)</li>
+          <li>Clarified avatar color assignment (random at creation, stored in DB)</li>
+          <li>Documented filter drawer close gesture + velocity threshold</li>
+          <li>Screen polish: /now hierarchy, presence toggle tap targets, /schedule search, /my-picks day headers, /profile diamond year chip, band detail modal toggle animation, login/register input styling</li>
+        </ul>
+      </div>
+
+      <div style="border-left:2px solid var(--border-strong);padding-left:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v1.0 — Sprint 0 · May 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li>Initial design system document</li>
+          <li>Merged role chip implementations (AnnouncementsPage.module.css → Chip.module.css canonical)</li>
+          <li>Consolidated conflict-chip + conflict-mini into single class</li>
+          <li>"You are here" border fix: <code>border-left: 2px solid var(--accent)</code></li>
+          <li>Defined empty states for all list screens</li>
+        </ul>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============================================================
        FOOTER
        ============================================================ -->
   <footer style="padding:var(--s-12) 0 0;border-top:4px solid var(--accent);margin-top:var(--s-12);font-family:var(--font-mono);font-size:11px;color:var(--text-muted);display:grid;grid-template-columns:1fr auto;gap:var(--s-6)">
     <div>
       <div style="font-family:var(--font-display);font-size:18px;color:var(--text);text-transform:uppercase;font-weight:700;letter-spacing:0.02em">Viralatas Metaleiros 🤘</div>
-      <div style="margin-top:6px">Design system v1.0 · for Wacken Open Air 2026 · ~20 crew · offline-first PWA</div>
+      <div style="margin-top:6px">Design system v2.0 · for Wacken Open Air 2026 · ~20 crew · offline-first PWA</div>
       <div style="margin-top:6px">Token source · <code style="color:var(--text)">src/index.css</code> &middot; Stage colors · <code style="color:var(--text)">src/services/stageColors.ts</code></div>
     </div>
     <div style="text-align:right">
-      <div>D-81 · Wed Jul 29</div>
-      <div>last updated · today</div>
+      <div>D-75 · Wed Jul 29</div>
+      <div>last updated · May 2026</div>
     </div>
   </footer>
 

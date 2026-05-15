@@ -43,9 +43,10 @@ The **AI Wiki** at `docs/ai-wiki/` is the single source of truth for deep techni
 
 ### After every meaningful change
 
-Update **both**:
+Update **all three**:
 - Relevant wiki pages (architecture.md, domain-model.md, etc.)
 - `docs/ai-wiki/changelog.md` with your changes
+- `public/Design System.html` — if any UI element is added, changed, or removed, update the relevant DS section. Treat the design system as a living spec: it must stay in sync with the code.
 
 ### Changelog format
 

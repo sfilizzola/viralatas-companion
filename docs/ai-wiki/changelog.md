@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-15 (Sprint 3 — Design System Systematic Gaps)
+
+### Added
+- `src/components/ErrorState.tsx` + `ErrorState.module.css` — reusable error state component; props: `variant: 'network' | 'sync' | 'auth'`, `onRetry?: () => void`, `message?: string`; each variant shows an appropriate SVG icon and Portuguese copy; retry button only rendered when `onRetry` is provided
+- `public/Design System.html` §10 Empty & Error States — new section documenting 5 canonical empty states (`/now`, `/schedule`, `/my-picks`, `/popular`, `/announcements`) and 3 error state variants (`network`, `sync`, `auth`); visual pattern: centered layout, single muted line of copy, optional 24px stroke icon
+- `public/Design System.html` Changelog section — revision history for v1.0–v2.0 at the bottom of the document
+
+### Changed
+- `src/components/BadgesDisplay.tsx` — badge unlock animation fires once per session per slug; uses `sessionStorage` key `badgeAnimated` to track already-played slugs; applies `.unlocking` CSS class for 380 ms then clears it
+- `src/components/BadgesDisplay.module.css` — added `@keyframes badgeUnlock` (scale 0.85 → 1.12 → 1.0) and `.unlocking` class (380 ms, `cubic-bezier(0.34, 1.56, 0.64, 1)`); respects `prefers-reduced-motion`
+- `public/Design System.html` masthead — added Wacken identity relationship statement after lede; eyebrow version bumped from v1.0 to v2.0; footer updated to v2.0
+- `CLAUDE.md` — "After every meaningful change" rule expanded to include `public/Design System.html` as a required update target alongside the wiki pages
+- Deleted `docs/DESIGN_IMPROVEMENT_PLAN.md` — all 4 sprints complete; no longer needed
+
+### Architectural Notes
+- `ErrorState` is intentionally thin — no IndexedDB reads, no Supabase calls; it is a pure display component that wraps a known failure state
+- Badge unlock animation uses `sessionStorage` (not `localStorage`) so it fires again on next browser open, giving a fresh moment of discovery each festival day
+- DS §10 empty state copy is in Brazilian Portuguese as per product voice rules; component implementors should use these exact strings via i18n keys if/when these states are wired up per-page
+
+---
+
 ## 2026-05-14 (Phase 18: Badge Preview Tool in Godlike Menu)
 
 ### Added

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import {
   BADGES,
@@ -156,16 +156,38 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
     ? (earned.find((b) => b.slug === selectedSlug) ?? null)
     : null;
 
+  // Track which badges have been animated this session to fire only once per badge
+  const animatedRef = useRef<Set<string>>(
+    new Set(JSON.parse(sessionStorage.getItem('badgeAnimated') ?? '[]') as string[]),
+  );
+  const [unlockingSlug, setUnlockingSlug] = useState<string | null>(null);
+
+  useEffect(() => {
+    const alreadyAnimated = animatedRef.current;
+    const newSlug = earned.find((b) => !alreadyAnimated.has(b.slug))?.slug ?? null;
+    if (!newSlug) return;
+    alreadyAnimated.add(newSlug);
+    sessionStorage.setItem('badgeAnimated', JSON.stringify([...alreadyAnimated]));
+    setUnlockingSlug(newSlug);
+    const t = setTimeout(() => setUnlockingSlug(null), 400);
+    return () => clearTimeout(t);
+  }, [earned]);
+
   if (earned.length === 0) return null;
 
   return (
     <>
       {heading && <div className={styles.patchesHeading}>{heading}</div>}
       <div className={styles.patchesGrid} data-bg={bg}>
-        {earned.map((badge) => (
+        {earned.map((badge) => {
+          const isUnlocking = unlockingSlug === badge.slug;
+          const btnClass = isUnlocking
+            ? `${styles.patchBtn} ${styles.unlocking}`
+            : styles.patchBtn;
+          return (
           <button
             key={badge.slug}
-            className={styles.patchBtn}
+            className={btnClass}
             onClick={() => setSelectedSlug(badge.slug)}
             type="button"
             aria-label={t(badge.labelKey)}
@@ -177,7 +199,8 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
               )}
             </span>
           </button>
-        ))}
+          );
+        })}
       </div>
 
       {selectedBadge && (
