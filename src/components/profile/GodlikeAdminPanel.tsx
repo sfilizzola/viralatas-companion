@@ -267,7 +267,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
           <path d="M5 18 L7 4 L12 12 L17 4 L19 18 Z" />
         </svg>
       </span>
-      <span className={`${styles.adminTriggerLabel} ${styles.godlikeTriggerLabel}`}>Godlike admin</span>
+      <span className={`${styles.adminTriggerLabel} ${styles.godlikeTriggerLabel}`}>Godlike Powers</span>
     </span>
   );
 
