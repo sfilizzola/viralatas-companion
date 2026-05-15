@@ -338,8 +338,11 @@
 }
 
 .cardCeremony .thumb {
-  background: rgba(212, 175, 55, 0.15);
+  background: rgba(212, 175, 55, 0.1);
   color: var(--ceremony-gold);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  font-size: 28px;
+  font-family: inherit;
 }
 
 .ceremonyLabel {
@@ -350,12 +353,12 @@
   font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: var(--ceremony-gold);
-  border: 1px solid var(--ceremony-gold-dim);
-  border-radius: var(--r-pill);
-  padding: 2px 8px;
-  background: var(--ceremony-gold-bg);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 2px;
+  padding: 2px 6px;
+  background: rgba(212, 175, 55, 0.1);
 }
 
 .cardCeremony .pickActive {

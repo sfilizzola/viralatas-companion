@@ -70,6 +70,7 @@ export default function BandCard({
 
   const isCeremony = band.category === 'ceremony';
   const color = isCeremony ? 'var(--ceremony-gold)' : stageColorVar(band.stage);
+  const thumbFallback = isCeremony ? '✦' : initial;
 
   const variantClass =
     variant === 'timeline'
@@ -109,7 +110,7 @@ export default function BandCard({
               loading="lazy"
             />
           ) : (
-            initial
+            thumbFallback
           )}
         </div>
       )}

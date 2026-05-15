@@ -393,7 +393,7 @@ export const bands: BandSeed[] = [
     start_time: t(D4, 22, 30),
     end_time: t(D4, 23,  0),
     genre: null,
-    image_url: null,
+    image_url: '/ceremony-farewell.png',
     category: 'ceremony',
   },
 ];
