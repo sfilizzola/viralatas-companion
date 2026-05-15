@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import styles from './ErrorState.module.css';
 
 type ErrorVariant = 'network' | 'sync' | 'auth';

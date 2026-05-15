@@ -11,6 +11,7 @@ export type Database = {
           avatar_url: string | null;
           preferred_language: 'br' | 'en' | 'es' | 'de';
           is_test_user: boolean;
+          is_friend: boolean | null;
           role: 'normal' | 'manager' | 'godlike';
           created_at: string;
           wacken_years: number[];
@@ -25,6 +26,7 @@ export type Database = {
           avatar_url?: string | null;
           preferred_language?: 'br' | 'en' | 'es' | 'de';
           is_test_user?: boolean;
+          is_friend?: boolean | null;
           role?: 'normal' | 'manager' | 'godlike';
           created_at?: string;
           wacken_years?: number[];
@@ -39,6 +41,7 @@ export type Database = {
           avatar_url?: string | null;
           preferred_language?: 'br' | 'en' | 'es' | 'de';
           is_test_user?: boolean;
+          is_friend?: boolean | null;
           role?: 'normal' | 'manager' | 'godlike';
           created_at?: string;
           wacken_years?: number[];
