@@ -22,7 +22,7 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 | `src/i18n/Badges_en.json` | English labels + descriptions |
 | `src/i18n/Badges_es.json` | Spanish labels + descriptions (if available) |
 | `src/i18n/Badges_de.json` | German labels + descriptions (if available) |
-| `src/components/BadgeModal.tsx` | Display earned badges in profile |
+| `src/components/BadgesDisplay.tsx` | Patches grid, detail modal, and fullscreen zoom overlay |
 | `src/components/ProfilePage.tsx` | Badge grid (4/6/8 cols) + admin assign-badge UI |
 | `src/lib/patchesBackground.ts` | Per-device patches grid background preference (localStorage) |
 | `src/components/profile/PatchesBackgroundPicker.tsx` | 4-swatch fabric selector in profile |
@@ -53,6 +53,30 @@ The patches grid background is a **per-device visual preference**, not a synced 
 3. CSS in `BadgesDisplay.module.css` keys each variant off the `data-bg` attribute. Switching is instant; no re-mount.
 
 If `localStorage` is unavailable (private mode, SSR), `loadPatchesBackground()` falls back to `DEFAULT_PATCHES_BG = 'steel'` and `savePatchesBackground` silently no-ops while still firing the event so the in-memory state updates for the session.
+
+---
+
+## Badge Detail Modal & Fullscreen Zoom
+
+### Detail Modal
+
+Tapping any earned badge in the patches grid opens a detail modal via the `<Modal>` component. The modal shows:
+- The badge image (136 px) inside a 145 px circular spotlight (`radial-gradient` black)
+- The badge name (display font, uppercase)
+- The badge description (muted text)
+- Year diamond chip (38 px, red enamel) — only on historical badges with a `year` field
+- A small **magnifying glass button** (26 px, top-right of the circle) to enter fullscreen
+
+### Fullscreen Zoom
+
+Clicking the magnifying glass (`🔍`) renders a fullscreen overlay (`position: fixed; inset: 0`) with:
+- The badge image scaled to `min(80vmin, 420px)` — fills the screen on mobile while capping at 420 px on desktop
+- A blurred dark backdrop (`backdrop-filter: blur(12px)`) for a display-case feel
+- A spring entrance animation (`cubic-bezier(0.16, 1, 0.3, 1)`) for the badge image
+- A decorative ✕ mark fixed to the top-right as a visual affordance
+- Click anywhere (the whole overlay is a `<button>`) or close the parent modal to dismiss
+
+**State:** `isFullscreen` lives in `BadgesDisplay` alongside `selectedSlug`. Closing the parent modal also resets `isFullscreen` to prevent stale fullscreen state.
 
 ---
 
@@ -729,8 +753,9 @@ it('awards badge when condition met', () => {
 
 1. **Profile Page**: Navigate to `/profile` and view badge grid
 2. **Badge Modal**: Click a badge to see full label + description
-3. **Admin Assign**: (Godlike only) Use "Assign Badge" button to test `assigned` condition
-4. **Offline**: Reload offline — badges should display from cached user data
+3. **Zoom to Fullscreen**: Inside the modal, click the magnifying glass icon (top-right of the badge circle) to view the badge full-screen; click anywhere or press Escape to dismiss
+4. **Admin Assign**: (Godlike only) Use "Assign Badge" button to test `assigned` condition
+5. **Offline**: Reload offline — badges should display from cached user data
 
 ### Test Data
 
@@ -874,7 +899,7 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 - **src/services/badges/types.ts** — Type definitions
 - **src/services/badges/index.ts** — Barrel re-export
 - **src/__tests__/badges.test.ts** — 50+ test cases
-- **src/components/BadgeModal.tsx** — Badge display component
+- **src/components/BadgesDisplay.tsx** — Patches grid, detail modal, and fullscreen zoom overlay
 - **src/components/ProfilePage.tsx** — Badge grid + godlike assign UI
 - **src/i18n/Badges_*.json** — All 4 language translations
 - **public/badges/** — All badge PNG files

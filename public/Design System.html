@@ -1661,6 +1661,51 @@
     font-size: 0.875rem; line-height: 1.5;
     color: var(--text-muted); margin: 0; text-align: center;
   }
+  /* Zoom button — mirrors .zoomBtn: 26×26 glass pill, top-right of modal circle */
+  .ds-zoom-btn {
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(0,0,0,0.55);
+    color: rgba(255,255,255,0.75);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; padding: 0;
+    transition: background 0.15s, color 0.15s, transform 0.15s;
+    z-index: 2;
+  }
+  .ds-zoom-btn:hover {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border-color: rgba(255,255,255,0.4);
+    transform: scale(1.1);
+  }
+  /* Fullscreen overlay — mirrors .fullscreenOverlay */
+  .ds-fullscreen-overlay {
+    position: relative;
+    width: 100%; height: 240px;
+    background: rgba(0,0,0,0.92);
+    display: flex; align-items: center; justify-content: center;
+    border-radius: var(--r-2);
+    overflow: hidden;
+  }
+  .ds-fullscreen-img {
+    width: 160px; height: 160px;
+    border-radius: 50%; object-fit: contain; display: block;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.1), 0 0 40px rgba(255,255,255,0.06);
+    filter: drop-shadow(0 8px 24px rgba(0,0,0,0.8));
+  }
+  .ds-fullscreen-close {
+    position: absolute;
+    top: 10px; right: 10px;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    display: flex; align-items: center; justify-content: center;
+  }
   /* Year chip — mirrors .modalYearChip: 38×38 diamond, red enamel, absolute bottom-right of circle */
   .ds-modal-year-chip {
     position: absolute;
@@ -2693,6 +2738,12 @@
           <div class="ds-modal-circle">
             <img src="badges/badge_wackinger.png" alt="Wackinger" class="ds-modal-img" />
             <span class="ds-modal-year-chip">26</span>
+            <button class="ds-zoom-btn" type="button" aria-label="View badge fullscreen">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.8"/>
+                <line x1="10.5" y1="10.5" x2="14.5" y2="14.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
           </div>
           <h3 class="ds-modal-name">Wackinger</h3>
           <p class="ds-modal-desc">Você escolheu uma banda no palco Wackinger. Folk metal é metal. 🤘</p>
@@ -2705,7 +2756,34 @@
           <li>Badge name in display font, uppercase</li>
           <li>Description copy in muted text</li>
           <li>Year diamond chip (38 px, red enamel) shown only on historical badges</li>
+          <li>Magnifying glass button (26 px, top-right of circle) — opens fullscreen overlay</li>
           <li>Tap scrim or ✕ to dismiss</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="subhead" style="font-size:11px;border-bottom:0;padding-bottom:0;margin-top:var(--s-5)">Fullscreen overlay &middot; on zoom tap</div>
+    <div class="demo">
+      <div class="demo-stage" style="padding:0">
+        <div class="ds-fullscreen-overlay">
+          <img src="badges/badge_wackinger.png" alt="Wackinger" class="ds-fullscreen-img" />
+          <span class="ds-fullscreen-close" aria-hidden="true">
+            <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
+              <line x1="2" y1="2" x2="16" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <line x1="16" y1="2" x2="2" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </span>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Fullscreen overlay</h4>
+        <ul>
+          <li>Full-screen <code>position:fixed</code> button — click anywhere to close</li>
+          <li>Badge scales to <code>min(80vmin, 420px)</code> — fills screen on mobile</li>
+          <li>Blurred dark backdrop (<code>backdrop-filter: blur(12px)</code>)</li>
+          <li>Spring entrance: badge scales from 0.7 → 1 with <code>cubic-bezier(0.16,1,0.3,1)</code></li>
+          <li>Decorative ✕ fixed to top-right (pointer-events: none; accessible close via the whole-overlay button)</li>
+          <li>Closing parent modal also resets fullscreen state</li>
         </ul>
       </div>
     </div>
