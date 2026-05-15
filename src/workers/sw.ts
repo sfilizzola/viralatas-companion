@@ -57,7 +57,6 @@ self.addEventListener('push', (event) => {
       icon: '/rubber-duck.png',
       badge: '/rubber-duck.png',
       tag: 'duck-quack',
-      renotify: true,
     }),
   );
 });
