@@ -9,17 +9,25 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ### Added
 - `supabase/functions/send-test-push/index.ts` — new `send-test-push` Edge Function; authenticates caller via JWT, queries their `push_subscriptions`, sends a real VAPID Web Push directly to them; provides inline diagnostic feedback (`no_subscription`, `sent`, `failed`)
 - `docs/ai-wiki/flows/duck.md` — new flow document covering the full duck quack lifecycle: button press → cooldown → online/offline quack → Realtime in-app DuckToast → Database Webhook → `send-duck-push` → Web Push → SW push handler; also documents admin test flows (Test Quack vs Test Push)
+- `public/Design System.html` — comprehensive design system audit & reference: token inventory (colors, spacing, radii, typography, motion), component docs (Button, Input, Chip, Modal, BandCard, Avatar), audit score 72/100, implementation checklist with 7 priority issues.
+- `src/index.css` — new CSS tokens: `--role-godlike`, `--role-godlike-bg/border`, `--role-manager`, `--role-manager-bg/border`, `--btn-destructive`, `--btn-destructive-hover`, `--signal-warn-light`, `--text-on-warn`, `--text-white`; motion tokens: `--duration-fast`, `--duration-normal`, `--duration-slow`, `--easing-ease-out`, `--easing-ease-in`.
 
 ### Changed
+- `src/ui/Chip.module.css` — role variant colors (`#d97706`, `#3b82f6`) replaced with `--role-godlike` / `--role-manager` token set.
+- `src/ui/Button.module.css` — destructive variant colors (`#dc2626`, `#b91c1c`) replaced with `--btn-destructive` / `--btn-destructive-hover`; transition duration uses `--duration-fast`.
+- `src/components/BandCard.module.css` — all hardcoded hex values replaced with CSS variables; hardcoded spacing (`2px`, `4px`, `6px`) replaced with `--s-1`/`--s-2`; stripe/thumb now use `--stage-color` custom property; transition uses `--duration-fast/normal`.
+- `src/components/BandCard.tsx` — removed inline `style={{ background: color }}` from stripe and thumb; set `--stage-color` as a CSS custom property on the article root; replaced `Chip` with `styles.stageBadge` class for stage label (no more `color: '#fff'` inline).
 - `src/components/profile/GodlikeAdminPanel.tsx` — added "📲 Test Push Notification" button in Godlike Powers panel; calls `send-test-push` and shows inline success/error feedback; the existing "Test Quack" description updated to clarify it only tests the in-app DuckToast (no push)
 - `src/i18n/ProfilePage_{br,en,de,es}.json` — updated `testQuackDescription` to clarify in-app-only scope; added keys: `testPushTitle`, `testPushDescription`, `testPushButton`, `testPushSent`, `testPushNoSubscription`, `testPushFailed`, `testPushError`
 - `docs/ai-wiki/domain-model.md` — fixed duplicate entity numbering (Announcement was erroneously numbered 6, BlockedPoster 7 — now 8 and 9); added full `### DuckQuack` and `### PushSubscription` entity sections with TypeScript types, invariants, business rules, lifecycle, and relevant source files
 - `src/version.ts` + `CLAUDE.md` — bumped to version `1.0.23`
 
 ### Fixed
-- `docs/ai-wiki/ArrivalMap`: removed force-collapse useEffect that prevented user interaction after festival starts; initial state still defaults to collapsed when festival is active (ArrivalMap.tsx)
+- ArrivalMap: removed force-collapse useEffect that prevented user interaction after festival starts; initial state still defaults to collapsed when festival is active (ArrivalMap.tsx)
 
 ### Architectural Notes
+- Stage color is now propagated as a CSS custom property (`--stage-color`) on the BandCard root element, eliminating multiple inline style objects. The stripe, thumb, and stage badge all consume it via `var(--stage-color, <fallback>)`.
+- All role and destructive action colors are now globally overridable via CSS tokens, making future theming straightforward.
 - The "Test Quack" button and "Test Push Notification" button test different things and must remain separate. Test Quack fires a local window event only (for DuckToast component testing). Test Push exercises the real Web Push stack (VAPID, push_subscriptions, Service Worker) and is the correct tool for diagnosing push delivery failures on a real device.
 
 ---
