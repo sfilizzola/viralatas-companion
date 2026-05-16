@@ -103,36 +103,13 @@
   line-height: 1;
 }
 
-.pfYearsPill {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 600;
-  color: var(--text-muted);
-  padding: 3px 8px;
-  border-radius: var(--r-pill);
-  border: 1px solid var(--border);
-  background: var(--bg-elevated);
-  letter-spacing: 0.05em;
-}
-
-.pfYearDiamond {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border-strong);
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-align: center;
-  text-transform: uppercase;
-  line-height: 1.1;
-  flex-shrink: 0;
+/* ── Wackens chip ──
+   Lives next to the country flag on the profile header. Inherits the shared
+   Chip geometry (pill, mono 10 px, uppercase) and keeps the muted gray
+   palette so it reads as ambient metadata rather than a CTA. Tooltip
+   carries the comma-separated list of years attended. */
+.pfWackenChip {
+  cursor: default;
 }
 
 /* ── Patches section ── */

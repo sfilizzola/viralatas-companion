@@ -982,6 +982,71 @@
       </div>
 
       <div class="component-section">
+        <h3>ProfileHeader <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/profile/ProfileHeader.tsx</span></h3>
+        <p>Top of <code>/profile</code>. Stacks avatar → name → email → metadata row (<code>.pfMeta</code>). The metadata row shows, in order: <strong>role chip</strong>, <strong>country flag emoji</strong> (no chrome — just the glyph), and the <strong>Wackens chip</strong>. Wackens chip only renders when the user has at least one Wacken year saved; tapping the count reveals the year list via the native tooltip.</p>
+        <p><strong>Wackens chip rules:</strong></p>
+        <ul style="margin: 0 0 12px 18px; color: #888; font-size: 14px;">
+          <li>Reuses the shared <code>Chip</code> primitive with the <em>default</em> (muted gray) variant — same palette as a normal vira-lata role chip. Discreet on purpose: it's ambient metadata, not a CTA. No accent dot, no colored fill.</li>
+          <li>Label is plural-aware: <code>{count} Wacken</code> when count = 1, <code>{count} Wackens</code> otherwise. German collapses to <code>{count}× Wacken</code> for both cases. Strings live in <code>ProfilePage_*.json</code> under <code>wackenCountSingular</code> / <code>wackenCountPlural</code>.</li>
+          <li>Tooltip exposes the sorted list of years (<code>wackenCountTooltip</code>) — useful for inspecting veterans on the team.</li>
+          <li>Always sits to the <em>right</em> of the country flag and wraps on narrow widths via <code>.pfMeta { flex-wrap: wrap }</code>.</li>
+          <li>Replaces the earlier diamond-shaped <code>.pfYearDiamond</code> badge — kept the badge in pill form because users could not read the year count from a clipped diamond. An earlier red-accented version was reverted to the default gray Chip for visual quietness.</li>
+        </ul>
+        <div class="component-demo" style="background: #0a0a0a; padding: 24px; display: flex; flex-direction: column; gap: 18px; align-items: center;">
+          <style>
+            .ds-pf-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+            .ds-pf-chip { display: inline-flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 3px 8px; border-radius: 999px; border: 1px solid #2a2a2a; background: #141414; color: #888; white-space: nowrap; line-height: 1; }
+            .ds-pf-chip-godlike { color: #d97706; border-color: rgba(217,119,6,.45); background: rgba(217,119,6,.08); }
+            .ds-pf-chip-manager { color: #3b82f6; border-color: rgba(59,130,246,.45); background: rgba(59,130,246,.08); }
+            .ds-pf-flag { font-size: 1.25rem; line-height: 1; }
+            .ds-pf-stack { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+            .ds-pf-stack-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: .1em; }
+          </style>
+
+          <div class="ds-pf-stack">
+            <span class="ds-pf-stack-label">Godlike · BR · 5 Wackens (default)</span>
+            <div class="ds-pf-meta">
+              <span class="ds-pf-chip ds-pf-chip-godlike">Godlike</span>
+              <span class="ds-pf-flag">🇧🇷</span>
+              <span class="ds-pf-chip">5 Wackens</span>
+            </div>
+          </div>
+
+          <div class="ds-pf-stack">
+            <span class="ds-pf-stack-label">Manager · DE · 1 Wacken (singular)</span>
+            <div class="ds-pf-meta">
+              <span class="ds-pf-chip ds-pf-chip-manager">Manager</span>
+              <span class="ds-pf-flag">🇩🇪</span>
+              <span class="ds-pf-chip">1× Wacken</span>
+            </div>
+          </div>
+
+          <div class="ds-pf-stack">
+            <span class="ds-pf-stack-label">Vira-lata · ES · no Wackens yet (chip hidden)</span>
+            <div class="ds-pf-meta">
+              <span class="ds-pf-chip">Vira-latas</span>
+              <span class="ds-pf-flag">🇪🇸</span>
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>displayName</td><td>string</td><td>Vira-latas name shown under the avatar.</td></tr>
+            <tr><td>initial</td><td>string</td><td>Single-letter monogram fallback for the avatar.</td></tr>
+            <tr><td>avatarUrl</td><td>string | null</td><td>Profile picture URL.</td></tr>
+            <tr><td>email</td><td>string</td><td>Account email (mono caption).</td></tr>
+            <tr><td>userRole</td><td>'normal' | 'manager' | 'godlike' | null</td><td>Drives the leading role chip variant.</td></tr>
+            <tr><td>savedCountry</td><td>string | null</td><td>ISO2 country code → flag emoji (<code>br</code>, <code>de</code>, <code>us</code>, <code>be</code>, <code>co</code>, <code>es</code>).</td></tr>
+            <tr><td>savedWackenYears</td><td>number[]</td><td>Years attended. <code>length</code> drives chip label; values feed the tooltip. Chip hidden when empty.</td></tr>
+            <tr><td>t</td><td>TFn</td><td>i18n function — must resolve <code>wackenCountSingular</code>, <code>wackenCountPlural</code>, and <code>wackenCountTooltip</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="component-section">
         <h3>ClusterRow <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/now/CrewGroupsSection.tsx</span></h3>
         <p>Collapsed stacked-avatar row used on all 4 live page card types. Replaces the always-visible member pill list. Max 5 avatars shown; overflow shown as +N. Tapping the parent card opens the LiveCardSheet.</p>
         <div class="component-demo" style="background: #0a0a0a; padding: 20px; display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">

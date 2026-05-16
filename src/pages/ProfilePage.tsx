@@ -91,6 +91,7 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
         userRole={userRole}
         savedCountry={savedCountry}
         savedWackenYears={savedWackenYears}
+        t={t}
       />
 
       <section className={styles.pfSection}>

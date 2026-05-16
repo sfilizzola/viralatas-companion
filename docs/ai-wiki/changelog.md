@@ -4,6 +4,20 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-16 (later)
+
+### Changed
+- `src/components/profile/ProfileHeader.tsx` — restored the inline **Wackens chip** that lives next to the country flag in `.pfMeta`. Replaces the diamond-shaped `.pfYearDiamond` badge (which clipped the count and was hard to read on small screens). The chip reuses the shared `Chip` primitive in its default (muted gray) variant and exposes the comma-separated year list as a native tooltip. Header now also receives `t` so the label can be localised.
+- `src/pages/ProfilePage.tsx` — passes the `t` function down to `ProfileHeader` so the chip can resolve `wackenCountSingular` / `wackenCountPlural` / `wackenCountTooltip`.
+- `src/pages/ProfilePage.module.css` — dropped `.pfYearDiamond` and the (already orphan) `.pfYearsPill`; introduced a thin `.pfWackenChip` override (cursor + intent doc) that lets the chip inherit the default Chip palette.
+- `src/i18n/ProfilePage_{br,en,es,de}.json` — added `wackenCountSingular`, `wackenCountPlural`, and `wackenCountTooltip` (German collapses singular/plural to `{count}× Wacken`).
+- `public/Design System.html` — added a `ProfileHeader` component section documenting the metadata row (role chip · flag · Wackens chip) with three live variants (godlike default, manager singular, vira-lata empty-state) and a prop table; rationale notes why the diamond was retired and why the chip stays in the default gray palette.
+
+### Architectural Notes
+- The Wackens chip is intentionally rendered through the shared `Chip` primitive (default variant) rather than a bespoke `<span>`, so the role chip and the Wackens chip stay visually consistent if Chip ever evolves (border-radius, mono font, padding tokens). It deliberately stays in the muted gray palette: it's ambient metadata, not a CTA — coloured fills would compete with the role chip for attention.
+
+---
+
 ## 2026-05-16
 
 ### Added

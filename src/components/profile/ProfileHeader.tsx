@@ -23,6 +23,7 @@ type ProfileHeaderProps = {
   userRole: UserRole | null;
   savedCountry: string | null;
   savedWackenYears: number[];
+  t: (key: string, values?: Record<string, string | number>) => string;
 };
 
 export default function ProfileHeader({
@@ -33,6 +34,7 @@ export default function ProfileHeader({
   userRole,
   savedCountry,
   savedWackenYears,
+  t,
 }: ProfileHeaderProps) {
   const flag = countryFlag(savedCountry);
   const roleVariant =
@@ -41,6 +43,13 @@ export default function ProfileHeader({
       : userRole === 'manager'
         ? 'role-manager'
         : 'role-normal';
+  const wackenCount = savedWackenYears.length;
+  const wackenLabel =
+    wackenCount === 1
+      ? t('wackenCountSingular', { count: wackenCount })
+      : t('wackenCountPlural', { count: wackenCount });
+  const sortedYears = [...savedWackenYears].sort((a, b) => a - b);
+  const wackenTooltip = t('wackenCountTooltip', { years: sortedYears.join(', ') });
 
   return (
     <div className={styles.pfHead}>
@@ -54,10 +63,10 @@ export default function ProfileHeader({
           </Chip>
         )}
         {flag && <span className={styles.pfCountryFlag}>{flag}</span>}
-        {savedWackenYears.length > 0 && (
-          <span className={styles.pfYearDiamond} title={savedWackenYears.join(', ')}>
-            {savedWackenYears.length}×
-          </span>
+        {wackenCount > 0 && (
+          <Chip className={styles.pfWackenChip}>
+            <span title={wackenTooltip}>{wackenLabel}</span>
+          </Chip>
         )}
       </div>
     </div>
