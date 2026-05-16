@@ -63,7 +63,7 @@
    STRIPE — left edge, 4px stage color
    ============================================================ */
 .stripe {
-  background: var(--accent);
+  background: var(--stage-color, var(--accent));
 }
 
 /* ============================================================
@@ -73,7 +73,7 @@
   width: 56px;
   height: 56px;
   margin: var(--s-3) 0 var(--s-3) var(--s-3);
-  background: var(--bg-elevated);
+  background: var(--stage-color, var(--bg-elevated));
   border-radius: var(--r-1);
   display: flex;
   align-items: center;
@@ -81,7 +81,7 @@
   font-family: var(--font-display);
   font-size: 22px;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-white);
   overflow: hidden;
   flex-shrink: 0;
 }
@@ -122,7 +122,7 @@
   font-size: 10px;
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
-  margin-top: 4px;
+  margin-top: var(--s-1);
 }
 
 /* ============================================================
@@ -175,7 +175,7 @@
   display: flex;
   align-items: center;
   gap: var(--s-2);
-  margin-top: 6px;
+  margin-top: var(--s-1);
   flex-wrap: wrap;
 }
 
@@ -185,9 +185,11 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 2px;
+  color: var(--text-white);
+  background: var(--stage-color, var(--accent));
+  border-color: transparent;
+  padding: var(--s-1) var(--s-2);
+  border-radius: var(--r-0);
 }
 
 .time {
@@ -236,15 +238,15 @@
 .overlapChip {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--s-1);
   background: rgba(243, 156, 18, 0.12);
-  color: #f9c66b;
+  color: var(--signal-warn-light);
   border: 1px solid rgba(243, 156, 18, 0.4);
   border-radius: var(--r-pill);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
-  padding: 2px 8px;
+  padding: var(--s-1) var(--s-2);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   cursor: pointer;
@@ -256,22 +258,22 @@
 
 .overlapChipActive {
   background: var(--signal-warn);
-  color: #1a0d00;
+  color: var(--text-on-warn);
   border-color: var(--signal-warn);
 }
 
 .conflictChipHard {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--s-1);
   background: rgba(192, 57, 43, 0.12);
-  color: #e74c3c;
+  color: var(--accent-hover);
   border: 1px solid rgba(192, 57, 43, 0.4);
   border-radius: var(--r-pill);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 600;
-  padding: 2px 8px;
+  padding: var(--s-1) var(--s-2);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   cursor: pointer;
@@ -283,7 +285,7 @@
 
 .conflictChipHardActive {
   background: var(--signal-live);
-  color: #fff;
+  color: var(--text-white);
   border-color: var(--signal-live);
 }
 
@@ -304,7 +306,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition: background var(--duration-fast), color var(--duration-fast);
 }
 
 .pick:hover {
@@ -335,7 +337,7 @@
 }
 
 .pickAnimating svg {
-  animation: pickPop 0.32s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: pickPop var(--duration-normal) cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -415,7 +417,7 @@
   justify-content: center;
   border-radius: 50%;
   background: var(--accent);
-  color: #fff;
+  color: var(--text-white);
   font-family: var(--font-display);
   font-size: 13px;
   font-weight: 700;
@@ -438,11 +440,11 @@
 }
 
 .attendeeCount b {
-  color: #fff;
+  color: var(--text-white);
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: 700;
-  margin-right: 4px;
+  margin-right: var(--s-1);
 }
 
 .attendeeOverflow {

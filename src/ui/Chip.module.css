@@ -18,15 +18,15 @@
 /* --- Role variants --- */
 
 .roleGodlike {
-  color: #d97706;
-  border-color: rgba(217, 119, 6, 0.45);
-  background: rgba(217, 119, 6, 0.08);
+  color: var(--role-godlike);
+  border-color: var(--role-godlike-border);
+  background: var(--role-godlike-bg);
 }
 
 .roleManager {
-  color: #3b82f6;
-  border-color: rgba(59, 130, 246, 0.45);
-  background: rgba(59, 130, 246, 0.08);
+  color: var(--role-manager);
+  border-color: var(--role-manager-border);
+  background: var(--role-manager-bg);
 }
 
 .roleNormal {

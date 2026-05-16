@@ -93,6 +93,7 @@
   --text: #e8e8e8;
   --text-muted: #888;
   --text-faint: #555;
+  --text-white: #fff;
 
   /* ---------- brand accent (W.E.T. red, also semantic 'live/now') ---------- */
   --accent: #c0392b;
@@ -101,8 +102,22 @@
   /* ---------- semantic states ---------- */
   --signal-live: #c0392b;
   --signal-warn: #f39c12;
+  --signal-warn-light: #f9c66b;
   --signal-ok: #16a085;
   --signal-lost: #a855f7;
+
+  /* ---------- role colors ---------- */
+  --role-godlike: #d97706;
+  --role-godlike-bg: rgba(217, 119, 6, 0.08);
+  --role-godlike-border: rgba(217, 119, 6, 0.45);
+  --role-manager: #3b82f6;
+  --role-manager-bg: rgba(59, 130, 246, 0.08);
+  --role-manager-border: rgba(59, 130, 246, 0.45);
+
+  /* ---------- button states ---------- */
+  --btn-destructive: #dc2626;
+  --btn-destructive-hover: #b91c1c;
+  --text-on-warn: #1a0d00;
 
   /* ---------- ceremony ---------- */
   --ceremony-gold:     #d4af37;
@@ -141,6 +156,13 @@
   --r-2: 8px;
   --r-3: 12px;
   --r-pill: 999px;
+
+  /* ---------- motion & animation ---------- */
+  --duration-fast: 0.15s;
+  --duration-normal: 0.3s;
+  --duration-slow: 0.5s;
+  --easing-ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-ease-in: cubic-bezier(0.4, 0, 1, 1);
 
   /* ---------- legacy aliases (kept for components not yet migrated) ---------- */
   --radius: 8px;
@@ -274,7 +296,7 @@ input {
   height: 6px;
   border-radius: 50%;
   background: var(--signal-warn);
-  animation: pending-pulse 1.4s infinite;
+  animation: pending-pulse 1.4s ease-in-out infinite;
 }
 
 @keyframes pending-pulse {

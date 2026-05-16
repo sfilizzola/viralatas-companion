@@ -9,17 +9,25 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ### Added
 - `supabase/functions/send-test-push/index.ts` — new `send-test-push` Edge Function; authenticates caller via JWT, queries their `push_subscriptions`, sends a real VAPID Web Push directly to them; provides inline diagnostic feedback (`no_subscription`, `sent`, `failed`)
 - `docs/ai-wiki/flows/duck.md` — new flow document covering the full duck quack lifecycle: button press → cooldown → online/offline quack → Realtime in-app DuckToast → Database Webhook → `send-duck-push` → Web Push → SW push handler; also documents admin test flows (Test Quack vs Test Push)
+- `public/Design System.html` — comprehensive design system audit & reference: token inventory (colors, spacing, radii, typography, motion), component docs (Button, Input, Chip, Modal, BandCard, Avatar), audit score 72/100, implementation checklist with 7 priority issues.
+- `src/index.css` — new CSS tokens: `--role-godlike`, `--role-godlike-bg/border`, `--role-manager`, `--role-manager-bg/border`, `--btn-destructive`, `--btn-destructive-hover`, `--signal-warn-light`, `--text-on-warn`, `--text-white`; motion tokens: `--duration-fast`, `--duration-normal`, `--duration-slow`, `--easing-ease-out`, `--easing-ease-in`.
 
 ### Changed
+- `src/ui/Chip.module.css` — role variant colors (`#d97706`, `#3b82f6`) replaced with `--role-godlike` / `--role-manager` token set.
+- `src/ui/Button.module.css` — destructive variant colors (`#dc2626`, `#b91c1c`) replaced with `--btn-destructive` / `--btn-destructive-hover`; transition duration uses `--duration-fast`.
+- `src/components/BandCard.module.css` — all hardcoded hex values replaced with CSS variables; hardcoded spacing (`2px`, `4px`, `6px`) replaced with `--s-1`/`--s-2`; stripe/thumb now use `--stage-color` custom property; transition uses `--duration-fast/normal`.
+- `src/components/BandCard.tsx` — removed inline `style={{ background: color }}` from stripe and thumb; set `--stage-color` as a CSS custom property on the article root; replaced `Chip` with `styles.stageBadge` class for stage label (no more `color: '#fff'` inline).
 - `src/components/profile/GodlikeAdminPanel.tsx` — added "📲 Test Push Notification" button in Godlike Powers panel; calls `send-test-push` and shows inline success/error feedback; the existing "Test Quack" description updated to clarify it only tests the in-app DuckToast (no push)
 - `src/i18n/ProfilePage_{br,en,de,es}.json` — updated `testQuackDescription` to clarify in-app-only scope; added keys: `testPushTitle`, `testPushDescription`, `testPushButton`, `testPushSent`, `testPushNoSubscription`, `testPushFailed`, `testPushError`
 - `docs/ai-wiki/domain-model.md` — fixed duplicate entity numbering (Announcement was erroneously numbered 6, BlockedPoster 7 — now 8 and 9); added full `### DuckQuack` and `### PushSubscription` entity sections with TypeScript types, invariants, business rules, lifecycle, and relevant source files
 - `src/version.ts` + `CLAUDE.md` — bumped to version `1.0.23`
 
 ### Fixed
-- `docs/ai-wiki/ArrivalMap`: removed force-collapse useEffect that prevented user interaction after festival starts; initial state still defaults to collapsed when festival is active (ArrivalMap.tsx)
+- ArrivalMap: removed force-collapse useEffect that prevented user interaction after festival starts; initial state still defaults to collapsed when festival is active (ArrivalMap.tsx)
 
 ### Architectural Notes
+- Stage color is now propagated as a CSS custom property (`--stage-color`) on the BandCard root element, eliminating multiple inline style objects. The stripe, thumb, and stage badge all consume it via `var(--stage-color, <fallback>)`.
+- All role and destructive action colors are now globally overridable via CSS tokens, making future theming straightforward.
 - The "Test Quack" button and "Test Push Notification" button test different things and must remain separate. Test Quack fires a local window event only (for DuckToast component testing). Test Push exercises the real Web Push stack (VAPID, push_subscriptions, Service Worker) and is the correct tool for diagnosing push delivery failures on a real device.
 
 ---
@@ -674,3 +682,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - GodlikeAdminPanel: "Test Quack" section with a 15-second local cooldown DuckButton that dispatches a quack toast (band: Queen) after cooldown — no database write
 - DuckQuackEventDetail: added optional `bandName` field to allow direct bandName override in test scenarios
 - DuckToast: uses `detail.bandName` if present, skips IndexedDB lookup
+
+---
+
+## 2026-05-16 (exp/cluster — Live page avatar cluster + themed bottom sheet)
+
+### Added
+- `src/components/now/LiveCardSheet.tsx` — new bottom sheet component opened when any live page group card is tapped; receives `group: CrewLiveGroup` and renders an atmospheric header (colour-matched to card type), a "Here now" section (pulsing live dot per member), and a "Heading next" section (stage-coloured next-band pill per member with `plan.nextBand`); state lives at `RightNowPage` level so only one sheet is open at a time
+- `src/components/now/LiveCardSheet.module.css` — full CSS module for the sheet; all 4 card-type colour variants driven by `--sheet-*` CSS variables injected inline; slide-up entrance (280ms `cubic-bezier(0.32, 0.72, 0, 1)`); backdrop fade-in (200ms); pulsing `@keyframes livePulse` on the live dot
+- `public/Design System.html` — added `ClusterRow` and `LiveCardSheet` component sections with live interactive previews of all 4 card types (band/metal_place/camping/lost); component count updated 18 → 20
+
+### Changed
+- `src/components/now/CrewGroupsSection.tsx` — replaced always-visible `memberList` / `CrewMember` pills with new `ClusterRow` sub-component (stacked `Avatar` circles, max 5 + overflow count + per-kind count label); all 4 `groupCard` article elements are now tappable (`onClick`, `cursor: pointer`) and receive a new `onGroupSelect` prop; `skipButton` `onClick` uses `e.stopPropagation()` to prevent card tap propagation; removed unused `truncateDisplayName` and `CrewMember` helpers
+- `src/pages/RightNowPage.tsx` — adds `activeGroup: CrewLiveGroup | null` state; passes `onGroupSelect={setActiveGroup}` to `CrewGroupsSection`; renders `<LiveCardSheet>` at page root when `activeGroup !== null`
+- `src/pages/RightNowPage.module.css` — added cluster styles: `.clusterRow`, `.clusterAvatars`, `.clusterAvatar` (stacked overlap via negative `margin-left: -8px` + `border: 2px solid var(--bg-surface)`), `.clusterOverflow`, `.clusterCount`
+- `src/i18n/RightNowPage_{br,en,es,de}.json` — added 6 new keys: `metalPlaceCountLabel`, `campingCountLabel`, `lostCountLabel`, `hereNowSection`, `headingNextSection`, `noUpcomingPicks`
+
+### Architectural Notes
+- Member classification in the sheet is based on `plan.nextBand` not presence: all members in a group are already "here now" by definition (CrewGroupsSection only puts a member in a group when that is their current plan). The "Here now" / "Heading next" split reflects whether they have a next band queued, not whether they've arrived.
+- `groupAccentColor()` helper centralises the colour mapping: band → `stageColor(stage)`, metal_place → `rgba(217, 119, 6, 1)`, camping → `var(--signal-ok)`, lost → `var(--signal-lost)`. Sheet CSS variables are injected as inline style, keeping the CSS module free of card-type conditionals.
+- `activeGroup` state at page level mirrors the pattern used by `BandDetailModal` on `PopularPage` — consistent architecture, clean z-index (sheet is `position: fixed`, covers BottomNav).

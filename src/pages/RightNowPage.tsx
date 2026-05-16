@@ -1,11 +1,14 @@
 import { useI18n, type Language } from '../lib/i18n';
 import { useNowData } from '../hooks/useNowData';
+import type { CrewLiveGroup } from '../services/livePreview';
+import { useState } from 'react';
 import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BadgesDisplay from '../components/BadgesDisplay';
 import PresenceToggle from '../components/PresenceToggle';
 import LatestAnnouncementBanner from '../components/now/LatestAnnouncementBanner';
 import CrewGroupsSection from '../components/now/CrewGroupsSection';
+import LiveCardSheet from '../components/now/LiveCardSheet';
 import styles from './RightNowPage.module.css';
 
 const DATE_LOCALES: Record<Language, string> = {
@@ -26,6 +29,7 @@ function nowLabel(date: Date, language: Language) {
 
 export default function RightNowPage() {
   const { language, t } = useI18n('RightNowPage');
+  const [activeGroup, setActiveGroup] = useState<CrewLiveGroup | null>(null);
   const {
     user,
     userId,
@@ -105,6 +109,7 @@ export default function RightNowPage() {
               onSkip={handleSkip}
               onDuck={duckBandId ? duckQuack : undefined}
               duckCooldownUntil={duckCooldownUntil}
+              onGroupSelect={setActiveGroup}
               t={t}
             />
           </>
@@ -124,6 +129,17 @@ export default function RightNowPage() {
 
       <div className={styles.navSpacer} />
       <BottomNav />
+
+      {activeGroup && (
+        <LiveCardSheet
+          group={activeGroup}
+          crewPlans={crewPlans}
+          userId={userId}
+          metalPlaceConfig={metalPlaceConfig}
+          onClose={() => setActiveGroup(null)}
+          t={t}
+        />
+      )}
     </div>
   );
 }
