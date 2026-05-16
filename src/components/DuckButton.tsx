@@ -74,7 +74,7 @@ export default function DuckButton({ onDuck, isOnCooldown, cooldownUntil, inBody
         <img
           src="/rubber-duck.png"
           alt=""
-          className={`${styles.duckImg} ${tile ? styles.duckImgTile : ''}`}
+          className={`${styles.duckImg} ${tile ? styles.duckImgTile : ''} ${isOnCooldown ? styles.duckImgCooldown : ''}`}
         />
 
         {isOnCooldown && (

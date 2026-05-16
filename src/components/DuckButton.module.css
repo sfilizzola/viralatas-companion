@@ -86,11 +86,17 @@
   display: block;
   user-select: none;
   pointer-events: none;
+  transition: filter 0.4s ease;
 }
 
 .duckImgTile {
   width: 46px;
   height: 46px;
+}
+
+.duckImgCooldown {
+  filter: grayscale(1);
+  transition: filter 0.4s ease;
 }
 
 /* Drain overlay — dark area sweeps CW from 12 o'clock, representing elapsed cooldown.
