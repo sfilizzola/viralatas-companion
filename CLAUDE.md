@@ -402,6 +402,22 @@ Example: `"Phase 11.A: Fix /now header datetime stacking on mobile\n\nCo-Authore
 
 ---
 
+## Pre-commit checklist for main branch
+
+Before committing to `main`, you **must** complete both checks in order:
+
+1. **Build check** — Run `rtk npm run build`
+   - If the build fails, fix all errors and stage the fixes before proceeding.
+   - Do not commit to `main` while the build is broken.
+
+2. **Test check** — Run `rtk npm test`
+   - If any tests fail, fix them and stage the fixes before proceeding.
+   - Do not commit to `main` while tests are red.
+
+Only when **both the build and all tests are green** may you proceed with the commit to `main`.
+
+---
+
 ## Automatic versioning (main branch only)
 
 **Current version:** `20`
