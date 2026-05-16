@@ -125,5 +125,12 @@
   "noPatchesAssigned": "Sin patches asignados aún",
   "clickToRevoke": "clic para revocar",
   "testQuackTitle": "🦆 Test Quack",
-  "testQuackDescription": "Simula una notificación de quack. Presiona el pato — después de 15 s recibirás un toast de Queen. Sin escritura en la base de datos."
+  "testQuackDescription": "Simula solo el toast in-app (sin push). Presiona el pato — después de 15 s verás el toast flotante de Queen. Sin escritura en la base de datos.",
+  "testPushTitle": "📲 Probar Push Notification",
+  "testPushDescription": "Envía un Web Push real a este dispositivo mediante la Edge Function. Úsalo para verificar que las claves VAPID, la suscripción push y el Service Worker estén correctamente configurados.",
+  "testPushButton": "Enviar Push de Prueba",
+  "testPushSent": "✅ ¡Push enviado! Revisa tus notificaciones del sistema.",
+  "testPushNoSubscription": "⚠️ No se encontró suscripción push. Asegúrate de haber concedido permisos de notificación en este dispositivo.",
+  "testPushFailed": "❌ Error en la entrega del push. Verifica las claves VAPID y los secretos de Supabase.",
+  "testPushError": "❌ Error al llamar a la Edge Function. ¿Está desplegado send-test-push?"
 }

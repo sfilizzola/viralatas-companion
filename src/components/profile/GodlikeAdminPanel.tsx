@@ -57,6 +57,9 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
   const [testQuackCooldownUntil, setTestQuackCooldownUntil] = useState<number | null>(null);
   const isTestQuackOnCooldown = testQuackCooldownUntil !== null && testQuackCooldownUntil > Date.now();
 
+  const [testPushLoading, setTestPushLoading] = useState(false);
+  const [testPushResult, setTestPushResult] = useState<{ ok: boolean; message: string } | null>(null);
+
   useEffect(() => {
     async function loadRole() {
       const role = await announcementsRepository.fetchCurrentUserRole(userId);
@@ -317,6 +320,37 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
     },
     [assignModalUser],
   );
+
+  const handleTestPush = useCallback(async () => {
+    setTestPushLoading(true);
+    setTestPushResult(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await supabase.functions.invoke('send-test-push', {
+        headers: { Authorization: `Bearer ${session?.access_token}` },
+      });
+
+      if (res.error) {
+        setTestPushResult({ ok: false, message: t('testPushError') });
+        return;
+      }
+
+      const data = res.data as { sent?: number; failed?: number; error?: string };
+
+      if (data.error === 'no_subscription') {
+        setTestPushResult({ ok: false, message: t('testPushNoSubscription') });
+      } else if (data.sent && data.sent > 0) {
+        setTestPushResult({ ok: true, message: t('testPushSent') });
+      } else {
+        setTestPushResult({ ok: false, message: t('testPushFailed') });
+      }
+    } catch {
+      setTestPushResult({ ok: false, message: t('testPushError') });
+    } finally {
+      setTestPushLoading(false);
+      setTimeout(() => setTestPushResult(null), 6000);
+    }
+  }, [t]);
 
   if (loading || userRole !== 'godlike') return null;
 
@@ -629,6 +663,24 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                 isOnCooldown={isTestQuackOnCooldown}
                 cooldownUntil={testQuackCooldownUntil}
               />
+            </div>
+
+            <div className={styles.liveBandTestSection}>
+              <h4 className={styles.liveBandTestSectionTitle}>{t('testPushTitle')}</h4>
+              <p className={styles.liveBandTestDescription}>{t('testPushDescription')}</p>
+              {testPushResult && (
+                <p className={testPushResult.ok ? styles.resetMessage : styles.metalPlaceError}>
+                  {testPushResult.message}
+                </p>
+              )}
+              <button
+                className={styles.saveButton}
+                onClick={handleTestPush}
+                disabled={testPushLoading}
+                type="button"
+              >
+                {testPushLoading ? '⏳ …' : t('testPushButton')}
+              </button>
             </div>
 
             <TimeTravelSection />
