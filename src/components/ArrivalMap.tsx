@@ -196,13 +196,6 @@ export default function ArrivalMap({
     localStorage.setItem('arrivals_map_view_state', view);
   }, [view]);
 
-  // Force collapse if festival has started
-  useEffect(() => {
-    if (isFestivalActive && view !== 'collapsed') {
-      setView('collapsed');
-    }
-  }, [isFestivalActive, view]);
-
   const groupedByArrivalDay = useMemo(() => {
     const grouped: Record<ArrivalDay | 'not-set', CrewUser[]> = {
       'sun-jul26': [],

@@ -6,8 +6,18 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ## 2026-05-16
 
+### Fixed
+- ArrivalMap: removed force-collapse useEffect that prevented user interaction after festival starts; initial state still defaults to collapsed when festival is active (ArrivalMap.tsx)
+
 ### Changed
 - Removed hard-coded 📌 emoji from Pin/Unpin announcement card action buttons (AnnouncementsPage.tsx)
+
+---
+
+## 2026-05-16
+
+### Changed
+- DuckButton: duck image renders grayscale during cooldown and transitions smoothly back to colour when cooldown ends (DuckButton.tsx, DuckButton.module.css)
 
 ---
 
