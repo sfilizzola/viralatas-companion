@@ -458,7 +458,7 @@
 
     <div class="summary">
       <div class="metric">
-        <div class="metric-value">18</div>
+        <div class="metric-value">20</div>
         <div class="metric-label">Core Components</div>
       </div>
       <div class="metric">
@@ -982,6 +982,184 @@
       </div>
 
       <div class="component-section">
+        <h3>ClusterRow <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/now/CrewGroupsSection.tsx</span></h3>
+        <p>Collapsed stacked-avatar row used on all 4 live page card types. Replaces the always-visible member pill list. Max 5 avatars shown; overflow shown as +N. Tapping the parent card opens the LiveCardSheet.</p>
+        <div class="component-demo" style="background: #0a0a0a; padding: 20px; display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+          <!-- Band cluster -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .08em;">band card</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="display: flex;">
+                <div style="width:24px;height:24px;border-radius:50%;background:#2980b9;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">S</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:#333;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ccc;margin-left:-8px;">R</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:#333;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ccc;margin-left:-8px;">M</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:#333;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ccc;margin-left:-8px;">A</div>
+              </div>
+              <span style="font-size:12px;color:#888;">4 vira-latas</span>
+            </div>
+          </div>
+          <!-- Metal Place cluster -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .08em;">metal place</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="display: flex;">
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(217,119,6,.55);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">C</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(217,119,6,.55);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">P</div>
+              </div>
+              <span style="font-size:12px;color:#888;">2 here</span>
+            </div>
+          </div>
+          <!-- Camping cluster with overflow -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .08em;">camping (overflow)</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="display: flex; align-items: center;">
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">T</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">V</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">L</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">N</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">B</div>
+                <span style="font-size:11px;color:#888;margin-left:4px;">+3</span>
+              </div>
+              <span style="font-size:12px;color:#888;">8 resting</span>
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>members</td><td>CrewLivePlan[]</td><td>Crew members in this group</td></tr>
+            <tr><td>kind</td><td>'band' | 'metal_place' | 'camping' | 'lost'</td><td>Card type — drives count label text</td></tr>
+            <tr><td>t</td><td>TFn</td><td>i18n function for count labels</td></tr>
+          </tbody>
+        </table>
+        <p><strong>Count labels by kind:</strong> band → <em>"N vira-latas"</em> · metal_place → <em>"N here"</em> · camping → <em>"N resting"</em> · lost → <em>"N wandering"</em></p>
+      </div>
+
+      <div class="component-section">
+        <h3>LiveCardSheet <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/now/LiveCardSheet.tsx</span></h3>
+        <p>Themed bottom sheet opened by tapping any live page group card. Slide-up entrance (280ms iOS spring). Tapping the backdrop dismisses. State lives at <code>RightNowPage</code> level — only one sheet open at a time.</p>
+        <p><strong>Sections:</strong> Members with no next band → "Here now" (pulsing live dot). Members with <code>plan.nextBand</code> → "Heading next" (stage-coloured pill). Sections omitted when empty. Divider only shown when both sections non-empty.</p>
+
+        <!-- Live preview of all 4 sheet types -->
+        <div class="component-demo" style="background: #050505; padding: 20px; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end;">
+          <style>
+            .ds-sheet { border-radius: 14px; overflow: hidden; width: 180px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; color: #f0f0f0; border-top: 2px solid var(--ds-accent); background: var(--ds-bg); }
+            .ds-sheet-handle { width: 28px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.15); margin: 8px auto 10px; }
+            .ds-sheet-header { padding: 0 12px 10px; border-bottom: 1px solid rgba(255,255,255,.07); }
+            .ds-stage-row { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
+            .ds-stage-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ds-accent); }
+            .ds-stage-name { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ds-accent); }
+            .ds-stage-time { font-size: 9px; color: rgba(255,255,255,.3); }
+            .ds-title { font-size: 14px; font-weight: 800; letter-spacing: -.02em; color: var(--ds-title, #fff); }
+            .ds-count { font-size: 10px; color: rgba(255,255,255,.3); margin-top: 2px; }
+            .ds-members { padding: 8px 12px 12px; }
+            .ds-section-label { font-family: 'JetBrains Mono', monospace; font-size: 8px; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.2); margin-bottom: 5px; margin-top: 8px; }
+            .ds-section-label:first-child { margin-top: 0; }
+            .ds-divider { height: 1px; background: rgba(255,255,255,.06); margin: 6px 0; }
+            .ds-row { display: flex; align-items: center; gap: 7px; padding: 3px 0; }
+            .ds-av { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; background: var(--ds-avatar-bg); }
+            .ds-av.you { background: var(--ds-accent); }
+            .ds-name { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.85); flex: 1; }
+            .ds-you-tag { font-size: 8px; background: rgba(255,255,255,.08); color: var(--ds-accent); border-radius: 3px; padding: 1px 4px; }
+            .ds-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-accent); animation: ds-pulse 2.2s ease-in-out infinite; flex-shrink: 0; }
+            @keyframes ds-pulse { 0%,100%{box-shadow:0 0 0 0 var(--ds-accent)}50%{box-shadow:0 0 0 4px transparent} }
+            .ds-next-pill { display: flex; align-items: center; gap: 3px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.09); border-radius: 20px; padding: 2px 5px 2px 4px; flex-shrink: 0; }
+            .ds-next-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
+            .ds-next-name { font-size: 9px; color: rgba(255,255,255,.5); white-space: nowrap; }
+          </style>
+
+          <!-- Band (blue) -->
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#2980b9;text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px;">Band</div>
+            <div class="ds-sheet" style="--ds-accent:#2980b9;--ds-bg:#0a1929;--ds-avatar-bg:rgba(41,128,185,.3);">
+              <div class="ds-sheet-handle"></div>
+              <div class="ds-sheet-header">
+                <div class="ds-stage-row"><div class="ds-stage-dot"></div><span class="ds-stage-name">Faster</span><span class="ds-stage-time">20:30–22:00</span></div>
+                <div class="ds-title">Judas Priest</div>
+                <div class="ds-count">3 vira-latas</div>
+              </div>
+              <div class="ds-members">
+                <div class="ds-section-label">Here now</div>
+                <div class="ds-row"><div class="ds-av you">S</div><span class="ds-name">sfilizzola <span class="ds-you-tag">you</span></span><div class="ds-live-dot"></div></div>
+                <div class="ds-row"><div class="ds-av">R</div><span class="ds-name">rodrigo</span><div class="ds-live-dot"></div></div>
+                <div class="ds-divider"></div>
+                <div class="ds-section-label">Heading next</div>
+                <div class="ds-row"><div class="ds-av">M</div><span class="ds-name">marcos</span><div class="ds-next-pill"><div class="ds-next-dot" style="background:#e67e22;"></div><span class="ds-next-name">Slipknot</span></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Metal Place (amber) -->
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(217,119,6,1);text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px;">Metal Place</div>
+            <div class="ds-sheet" style="--ds-accent:rgba(217,119,6,1);--ds-bg:rgba(217,119,6,.09);--ds-avatar-bg:rgba(217,119,6,.4);--ds-title:rgba(253,224,71,.95);">
+              <div class="ds-sheet-handle"></div>
+              <div class="ds-sheet-header">
+                <div class="ds-stage-row"><div class="ds-stage-dot"></div><span class="ds-stage-name" style="color:rgba(217,119,6,1);">Special zone</span><span class="ds-stage-time">14:00–22:00</span></div>
+                <div class="ds-title">Metal Place ⚡</div>
+                <div class="ds-count">2 here</div>
+              </div>
+              <div class="ds-members">
+                <div class="ds-row"><div class="ds-av">A</div><span class="ds-name">ana</span><div class="ds-next-pill"><div class="ds-next-dot" style="background:#2980b9;"></div><span class="ds-next-name">Judas P.</span></div></div>
+                <div class="ds-row"><div class="ds-av">C</div><span class="ds-name">carlos</span><div class="ds-live-dot"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Camping (teal) -->
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#16a085;text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px;">Camping</div>
+            <div class="ds-sheet" style="--ds-accent:#16a085;--ds-bg:rgba(22,160,133,.09);--ds-avatar-bg:rgba(22,160,133,.35);">
+              <div class="ds-sheet-handle"></div>
+              <div class="ds-sheet-header">
+                <div class="ds-title">Vira-Latas HQ 🏕</div>
+                <div class="ds-count">2 resting</div>
+              </div>
+              <div class="ds-members">
+                <div class="ds-row"><div class="ds-av">T</div><span class="ds-name">tiago</span><div class="ds-next-pill"><div class="ds-next-dot" style="background:#2980b9;"></div><span class="ds-next-name">Judas P.</span></div></div>
+                <div class="ds-row"><div class="ds-av">V</div><span class="ds-name">vitor</span><span style="font-size:9px;color:rgba(255,255,255,.2);font-style:italic;">no picks</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lost (purple) -->
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#a855f7;text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px;">Lost</div>
+            <div class="ds-sheet" style="--ds-accent:rgba(168,85,247,.9);--ds-bg:rgba(88,28,135,.3);--ds-avatar-bg:rgba(88,28,135,.5);">
+              <div class="ds-sheet-handle"></div>
+              <div class="ds-sheet-header">
+                <div class="ds-title" style="color:rgba(233,213,255,.95);text-shadow:0 0 12px rgba(168,85,247,.4);">Lost in the pit 🤘</div>
+                <div class="ds-count">2 wandering</div>
+              </div>
+              <div class="ds-members">
+                <div class="ds-row"><div class="ds-av">L</div><span class="ds-name">lucas</span><div class="ds-next-pill"><div class="ds-next-dot" style="background:#e67e22;"></div><span class="ds-next-name">Slipknot</span></div></div>
+                <div class="ds-row"><div class="ds-av">N</div><span class="ds-name">nanda</span><span style="font-size:9px;color:rgba(255,255,255,.2);font-style:italic;">no picks</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-top: 12px;"><strong>Colour system:</strong> All 4 sheet types use a <code>--sheet-*</code> CSS variable bundle injected inline by a <code>groupAccentColor()</code> helper. Band cards derive accent from <code>stageColor(stage)</code>; presence cards use fixed values: metal_place <code>rgba(217,119,6,1)</code> · camping <code>var(--signal-ok)</code> · lost <code>var(--signal-lost)</code>.</p>
+        <p><strong>Animation:</strong> Sheet entrance: <code>translateY(100%) → 0</code> over 280ms <code>cubic-bezier(0.32, 0.72, 0, 1)</code>. Backdrop: opacity 0→0.55 over 200ms. Live dot pulses with CSS <code>box-shadow</code> animation every 2.2s.</p>
+        <table>
+          <thead>
+            <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>group</td><td>CrewLiveGroup</td><td>The card group that was tapped</td></tr>
+            <tr><td>crewPlans</td><td>CrewLivePlan[]</td><td>Full crew plans from useNowData (already in scope)</td></tr>
+            <tr><td>userId</td><td>string | null</td><td>Current user — drives "you" tag</td></tr>
+            <tr><td>metalPlaceConfig</td><td>MetalPlaceConfig | null</td><td>W.E.T. time window for Metal Place header</td></tr>
+            <tr><td>onClose</td><td>() => void</td><td>Called on backdrop tap</td></tr>
+            <tr><td>t</td><td>TFn</td><td>i18n function</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="component-section">
         <h3>Other Components</h3>
         <ul>
           <li><strong>SectionTitle</strong> — Display section headings (no CSS module, uses t-h class)</li>
@@ -1268,7 +1446,7 @@
 
     <div class="section" style="margin-top: 60px; padding-top: 40px; border-top: 2px solid #2a2a2a;">
       <p style="color: #555; font-size: 12px;">
-        <strong>Last updated:</strong> 2026-05-16 by Claude (design-system audit skill)<br>
+        <strong>Last updated:</strong> 2026-05-16 by Claude (exp/cluster — live page cluster + bottom sheet)<br>
         <strong>Next review:</strong> After Phase 21 completes<br>
         <strong>Reference:</strong> See docs/ai-wiki/ for component implementation details
       </p>

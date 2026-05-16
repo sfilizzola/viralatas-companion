@@ -60,5 +60,11 @@
   "liveTestBanner": "🧪 Live test: {band}",
   "crewCountLabel": "vira-latas",
   "readMore": "ver todo",
-  "nextUp": "próxima"
+  "nextUp": "próxima",
+  "metalPlaceCountLabel": "aquí",
+  "campingCountLabel": "descansando",
+  "lostCountLabel": "vagando",
+  "hereNowSection": "Aquí ahora",
+  "headingNextSection": "Yendo a",
+  "noUpcomingPicks": "sin próximas picks"
 }
