@@ -682,3 +682,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - GodlikeAdminPanel: "Test Quack" section with a 15-second local cooldown DuckButton that dispatches a quack toast (band: Queen) after cooldown — no database write
 - DuckQuackEventDetail: added optional `bandName` field to allow direct bandName override in test scenarios
 - DuckToast: uses `detail.bandName` if present, skips IndexedDB lookup
+
+---
+
+## 2026-05-16 (exp/cluster — Live page avatar cluster + themed bottom sheet)
+
+### Added
+- `src/components/now/LiveCardSheet.tsx` — new bottom sheet component opened when any live page group card is tapped; receives `group: CrewLiveGroup` and renders an atmospheric header (colour-matched to card type), a "Here now" section (pulsing live dot per member), and a "Heading next" section (stage-coloured next-band pill per member with `plan.nextBand`); state lives at `RightNowPage` level so only one sheet is open at a time
+- `src/components/now/LiveCardSheet.module.css` — full CSS module for the sheet; all 4 card-type colour variants driven by `--sheet-*` CSS variables injected inline; slide-up entrance (280ms `cubic-bezier(0.32, 0.72, 0, 1)`); backdrop fade-in (200ms); pulsing `@keyframes livePulse` on the live dot
+- `public/Design System.html` — added `ClusterRow` and `LiveCardSheet` component sections with live interactive previews of all 4 card types (band/metal_place/camping/lost); component count updated 18 → 20
+
+### Changed
+- `src/components/now/CrewGroupsSection.tsx` — replaced always-visible `memberList` / `CrewMember` pills with new `ClusterRow` sub-component (stacked `Avatar` circles, max 5 + overflow count + per-kind count label); all 4 `groupCard` article elements are now tappable (`onClick`, `cursor: pointer`) and receive a new `onGroupSelect` prop; `skipButton` `onClick` uses `e.stopPropagation()` to prevent card tap propagation; removed unused `truncateDisplayName` and `CrewMember` helpers
+- `src/pages/RightNowPage.tsx` — adds `activeGroup: CrewLiveGroup | null` state; passes `onGroupSelect={setActiveGroup}` to `CrewGroupsSection`; renders `<LiveCardSheet>` at page root when `activeGroup !== null`
+- `src/pages/RightNowPage.module.css` — added cluster styles: `.clusterRow`, `.clusterAvatars`, `.clusterAvatar` (stacked overlap via negative `margin-left: -8px` + `border: 2px solid var(--bg-surface)`), `.clusterOverflow`, `.clusterCount`
+- `src/i18n/RightNowPage_{br,en,es,de}.json` — added 6 new keys: `metalPlaceCountLabel`, `campingCountLabel`, `lostCountLabel`, `hereNowSection`, `headingNextSection`, `noUpcomingPicks`
+
+### Architectural Notes
+- Member classification in the sheet is based on `plan.nextBand` not presence: all members in a group are already "here now" by definition (CrewGroupsSection only puts a member in a group when that is their current plan). The "Here now" / "Heading next" split reflects whether they have a next band queued, not whether they've arrived.
+- `groupAccentColor()` helper centralises the colour mapping: band → `stageColor(stage)`, metal_place → `rgba(217, 119, 6, 1)`, camping → `var(--signal-ok)`, lost → `var(--signal-lost)`. Sheet CSS variables are injected as inline style, keeping the CSS module free of card-type conditionals.
+- `activeGroup` state at page level mirrors the pattern used by `BandDetailModal` on `PopularPage` — consistent architecture, clean z-index (sheet is `position: fixed`, covers BottomNav).
