@@ -6,6 +6,8 @@ import { loadBands, loadAllUserPicks, loadLiveBandTestConfig, loadMetalPlaceConf
 import { getRegistrationEnabled, setRegistrationEnabled } from '../../lib/appSettings';
 import { saveLiveBandTestConfigRemote } from '../../services/liveBandTest';
 import { Avatar, Collapsible, Select } from '../../ui';
+import DuckButton from '../DuckButton';
+import { DUCK_QUACK_EVENT } from '../../hooks/useDuckNotifications';
 import TimeTravelSection from './TimeTravelSection';
 import TestBadgeSection from './TestBadgeSection';
 import AssignBadgeModal from './AssignBadgeModal';
@@ -50,6 +52,10 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
   const [liveBandTestActiveBandId, setLiveBandTestActiveBandId] = useState<string | null>(null);
   const [bandsByPopularity, setBandsByPopularity] = useState<Array<Band & { pickCount: number }>>([]);
   const [assignModalUser, setAssignModalUser] = useState<UserWithLoading | null>(null);
+
+  const TEST_QUACK_COOLDOWN_MS = 15_000;
+  const [testQuackCooldownUntil, setTestQuackCooldownUntil] = useState<number | null>(null);
+  const isTestQuackOnCooldown = testQuackCooldownUntil !== null && testQuackCooldownUntil > Date.now();
 
   useEffect(() => {
     async function loadRole() {
@@ -143,6 +149,24 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
     }
     if (userRole === 'godlike') loadLiveBandTest();
   }, [userRole]);
+
+  useEffect(() => {
+    if (!testQuackCooldownUntil) return;
+    const remaining = testQuackCooldownUntil - Date.now();
+    if (remaining <= 0) {
+      setTestQuackCooldownUntil(null);
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setTestQuackCooldownUntil(null);
+      window.dispatchEvent(
+        new CustomEvent(DUCK_QUACK_EVENT, {
+          detail: { bandId: 'godlike-test-quack', bandName: 'Queen' },
+        }),
+      );
+    }, remaining);
+    return () => window.clearTimeout(timer);
+  }, [testQuackCooldownUntil]);
 
   const handleResetAllData = useCallback(async () => {
     if (!window.confirm(t('resetConfirm'))) return;
@@ -578,6 +602,20 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                 </div>
               </div>
             )}
+
+            <div className={styles.liveBandTestSection}>
+              <h4 className={styles.liveBandTestSectionTitle}>{t('testQuackTitle')}</h4>
+              <p className={styles.liveBandTestDescription}>{t('testQuackDescription')}</p>
+              <DuckButton
+                inBody
+                onDuck={() => {
+                  if (isTestQuackOnCooldown) return;
+                  setTestQuackCooldownUntil(Date.now() + TEST_QUACK_COOLDOWN_MS);
+                }}
+                isOnCooldown={isTestQuackOnCooldown}
+                cooldownUntil={testQuackCooldownUntil}
+              />
+            </div>
 
             <TimeTravelSection />
 

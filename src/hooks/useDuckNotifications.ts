@@ -5,6 +5,7 @@ export const DUCK_QUACK_EVENT = 'viralatas:duck-quack';
 
 export type DuckQuackEventDetail = {
   bandId: string;
+  bandName?: string; // optional override — bypasses IndexedDB lookup (used for test quacks)
 };
 
 /**

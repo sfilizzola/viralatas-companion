@@ -654,3 +654,12 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - **ManagerAdminPanel** — wired `.actionUnblock` class on the unblock button
 - **badges.md** — corrected `BadgeModal.tsx` reference to `BadgesDisplay.tsx`; added "Badge Detail Modal & Fullscreen Zoom" section documenting the new interaction; updated manual testing checklist
 - **Design System.html** — added zoom button to badge detail modal demo; added fullscreen overlay section with live preview
+
+---
+
+## 2026-05-16
+
+### Added
+- GodlikeAdminPanel: "Test Quack" section with a 15-second local cooldown DuckButton that dispatches a quack toast (band: Queen) after cooldown — no database write
+- DuckQuackEventDetail: added optional `bandName` field to allow direct bandName override in test scenarios
+- DuckToast: uses `detail.bandName` if present, skips IndexedDB lookup

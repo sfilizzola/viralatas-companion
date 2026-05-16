@@ -35,9 +35,12 @@ export default function DuckToast() {
     async function handleDuckQuack(event: Event) {
       const detail = (event as CustomEvent<DuckQuackEventDetail>).detail;
 
-      const bands = await loadBands();
-      const band = bands.find((b) => b.id === detail.bandId);
-      const bandName = band?.name ?? '';
+      let bandName = detail.bandName ?? '';
+      if (!bandName) {
+        const bands = await loadBands();
+        const band = bands.find((b) => b.id === detail.bandId);
+        bandName = band?.name ?? '';
+      }
 
       clearTimers();
 

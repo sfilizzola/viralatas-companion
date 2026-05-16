@@ -123,5 +123,7 @@
   "assignedPatches": "Assigned patches",
   "availablePatches": "Available",
   "noPatchesAssigned": "No patches assigned yet",
-  "clickToRevoke": "click to revoke"
+  "clickToRevoke": "click to revoke",
+  "testQuackTitle": "🦆 Test Quack",
+  "testQuackDescription": "Simulates a quack notification. Press the duck — after 15 s you'll receive a toast from Queen. No database write."
 }
