@@ -35,6 +35,8 @@ import { useAuth } from './useAuth';
 import { useNow } from './useNow';
 import type { PresenceLocation } from '../components/PresenceToggle';
 
+const DUCK_WINDOW_MS = 15 * 60 * 1000;
+
 export type NowData = {
   userId: string | null;
   user: ReturnType<typeof useAuth>['user'];
@@ -285,12 +287,14 @@ export function useNowData(): NowData {
     setUndoState(null);
   }, [undoState, userId, undoTimerId]);
 
-  // Duck quack for the user's current live band (if any and not a ceremony)
+  // Duck quack for the user's current live band (if any and not a ceremony),
+  // only during the first 15 minutes of the set.
   const duckBandId = useMemo(() => {
     if (myPlan.status !== 'current' || !myPlan.band) return null;
     if (myPlan.band.category === 'ceremony') return null;
+    if (now.getTime() >= new Date(myPlan.band.start_time).getTime() + DUCK_WINDOW_MS) return null;
     return myPlan.band.id;
-  }, [myPlan]);
+  }, [myPlan, now]);
 
   const { quack: duckQuack, cooldownUntil: duckCooldownUntil } = useDuckQuack(userId, duckBandId);
 
