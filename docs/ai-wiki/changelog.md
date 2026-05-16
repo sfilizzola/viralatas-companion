@@ -4,6 +4,13 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-16
+
+### Changed
+- Removed hard-coded 📌 emoji from Pin/Unpin announcement card action buttons (AnnouncementsPage.tsx)
+
+---
+
 ## 2026-05-15 (Phase 21 — Live Card Monument Redesign)
 
 ### Changed
