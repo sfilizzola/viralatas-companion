@@ -320,7 +320,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
 
   if (loading || userRole !== 'godlike') return null;
 
-  const trigger = (
+  const toolsTrigger = (
     <span className={styles.adminTriggerInner}>
       <span className={`${styles.adminTriggerIcon} ${styles.godlikeTriggerIcon}`}>
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
@@ -331,9 +331,23 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
     </span>
   );
 
+  const servantsTrigger = (
+    <span className={styles.adminTriggerInner}>
+      <span className={`${styles.adminTriggerIcon} ${styles.godlikeTriggerIcon}`}>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
+          <circle cx="9" cy="7" r="3" />
+          <path d="M3 21v-2a4 4 0 0 1 4-4h4" />
+          <circle cx="17" cy="11" r="3" />
+          <path d="M13 21v-2a4 4 0 0 1 4-4h0a4 4 0 0 1 4 4v2" />
+        </svg>
+      </span>
+      <span className={`${styles.adminTriggerLabel} ${styles.godlikeTriggerLabel}`}>Servants of Metal</span>
+    </span>
+  );
+
   return (
     <div className={styles.godlikeSection}>
-      <Collapsible trigger={trigger} className={styles.godlikeCollapsible}>
+      <Collapsible trigger={toolsTrigger} className={styles.godlikeCollapsible}>
         <div className={styles.conflictsInner}>
           <div className={styles.godlikeSectionContent}>
             <div className={styles.resetSection}>
@@ -620,112 +634,113 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
             <TimeTravelSection />
 
             <TestBadgeSection t={t} />
-
-            <div className={styles.userManagementSection}>
-              <h4 className={styles.userManagementTitle}>{t('registeredUsers')}</h4>
-              {usersLoading ? (
-                <p className={styles.userListLoading}>{t('registeredUsersLoading')}</p>
-              ) : allUsers.length === 0 ? (
-                <p className={styles.emptyUserList}>{t('registeredUsersEmpty')}</p>
-              ) : (
-                <div className={styles.userList}>
-                  {allUsers.map((user) => (
-                    <div key={user.id} className={styles.userRow}>
-                      <div className={styles.userInfo}>
-                        <Avatar
-                          size={40}
-                          src={user.avatar_url}
-                          initial={getInitial(user.display_name, user.email)}
-                        />
-                        <div className={styles.userDetails}>
-                          <div className={styles.userDisplayName}>
-                            {user.display_name || user.email}
-                          </div>
-                          <div className={styles.userEmail}>{user.email}</div>
-                        </div>
-                        <div className={`${styles.roleBadge} ${styles[`roleBadge_${user.role}`]}`}>
-                          {roleLabel(user.role)}
-                        </div>
-                      </div>
-
-                      <div className={styles.userActionArea}>
-                        {user.special_badges.length > 0 && (
-                          <span className={styles.assignedBadgeChip}>
-                            {t('assignedBadgeCount', { count: user.special_badges.length })}
-                          </span>
-                        )}
-
-                        <button
-                          className={`${styles.userActionButton} ${styles.actionBadge}`}
-                          onClick={() => setAssignModalUser(user)}
-                          type="button"
-                        >
-                          {t('assignBadgeBtn')}
-                        </button>
-
-                        {user.role !== 'godlike' && (
-                          <button
-                            className={`${styles.userActionButton} ${
-                              user.role === 'normal' ? styles.actionPromote : ''
-                            } ${user.loading ? styles.loading : ''}`}
-                            onClick={() => handlePromoteOrDemote(user.id, user.role)}
-                            disabled={user.loading}
-                            type="button"
-                          >
-                            {user.loading ? (
-                              <span className={styles.spinner}>⏳</span>
-                            ) : user.role === 'normal' ? (
-                              t('promoverManager')
-                            ) : (
-                              t('removerManager')
-                            )}
-                          </button>
-                        )}
-
-                        {user.role !== 'godlike' && (
-                          <button
-                            className={`${styles.userActionButton} ${
-                              user.is_friend ? '' : styles.actionFriend
-                            } ${user.loading ? styles.loading : ''}`}
-                            onClick={() => handleToggleFriend(user.id, user.is_friend)}
-                            disabled={user.loading}
-                            type="button"
-                          >
-                            {user.loading ? (
-                              <span className={styles.spinner}>⏳</span>
-                            ) : user.is_friend ? (
-                              t('removerAmigo')
-                            ) : (
-                              t('marcarAmigo')
-                            )}
-                          </button>
-                        )}
-
-                        {blockedPosters.some((bp) => bp.user_id === user.id) && (
-                          <button
-                            className={`${styles.userActionButton} ${styles.actionUnblock} ${
-                              user.loading ? styles.loading : ''
-                            }`}
-                            onClick={() => handleUnblock(user.id)}
-                            disabled={user.loading}
-                            type="button"
-                          >
-                            {user.loading ? (
-                              <span className={styles.spinner}>⏳</span>
-                            ) : (
-                              t('unblockUser')
-                            )}
-                          </button>
-                        )}
-                      </div>
-
-                      {user.error && <p className={styles.userRowError}>{user.error}</p>}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
+        </div>
+      </Collapsible>
+
+      <Collapsible trigger={servantsTrigger} className={styles.godlikeCollapsible}>
+        <div className={styles.userManagementSection}>
+          {usersLoading ? (
+            <p className={styles.userListLoading}>{t('registeredUsersLoading')}</p>
+          ) : allUsers.length === 0 ? (
+            <p className={styles.emptyUserList}>{t('registeredUsersEmpty')}</p>
+          ) : (
+            <div className={styles.userList}>
+              {allUsers.map((user) => (
+                <div key={user.id} className={styles.userRow}>
+                  <div className={styles.userInfo}>
+                    <Avatar
+                      size={40}
+                      src={user.avatar_url}
+                      initial={getInitial(user.display_name, user.email)}
+                    />
+                    <div className={styles.userDetails}>
+                      <div className={styles.userDisplayName}>
+                        {user.display_name || user.email}
+                      </div>
+                      <div className={styles.userEmail}>{user.email}</div>
+                    </div>
+                    <div className={`${styles.roleBadge} ${styles[`roleBadge_${user.role}`]}`}>
+                      {roleLabel(user.role)}
+                    </div>
+                  </div>
+
+                  <div className={styles.userActionArea}>
+                    {user.special_badges.length > 0 && (
+                      <span className={styles.assignedBadgeChip}>
+                        {t('assignedBadgeCount', { count: user.special_badges.length })}
+                      </span>
+                    )}
+
+                    <button
+                      className={`${styles.userActionButton} ${styles.actionBadge}`}
+                      onClick={() => setAssignModalUser(user)}
+                      type="button"
+                    >
+                      {t('assignBadgeBtn')}
+                    </button>
+
+                    {user.role !== 'godlike' && (
+                      <button
+                        className={`${styles.userActionButton} ${
+                          user.role === 'normal' ? styles.actionPromote : ''
+                        } ${user.loading ? styles.loading : ''}`}
+                        onClick={() => handlePromoteOrDemote(user.id, user.role)}
+                        disabled={user.loading}
+                        type="button"
+                      >
+                        {user.loading ? (
+                          <span className={styles.spinner}>⏳</span>
+                        ) : user.role === 'normal' ? (
+                          t('promoverManager')
+                        ) : (
+                          t('removerManager')
+                        )}
+                      </button>
+                    )}
+
+                    {user.role !== 'godlike' && (
+                      <button
+                        className={`${styles.userActionButton} ${
+                          user.is_friend ? '' : styles.actionFriend
+                        } ${user.loading ? styles.loading : ''}`}
+                        onClick={() => handleToggleFriend(user.id, user.is_friend)}
+                        disabled={user.loading}
+                        type="button"
+                      >
+                        {user.loading ? (
+                          <span className={styles.spinner}>⏳</span>
+                        ) : user.is_friend ? (
+                          t('removerAmigo')
+                        ) : (
+                          t('marcarAmigo')
+                        )}
+                      </button>
+                    )}
+
+                    {blockedPosters.some((bp) => bp.user_id === user.id) && (
+                      <button
+                        className={`${styles.userActionButton} ${styles.actionUnblock} ${
+                          user.loading ? styles.loading : ''
+                        }`}
+                        onClick={() => handleUnblock(user.id)}
+                        disabled={user.loading}
+                        type="button"
+                      >
+                        {user.loading ? (
+                          <span className={styles.spinner}>⏳</span>
+                        ) : (
+                          t('unblockUser')
+                        )}
+                      </button>
+                    )}
+                  </div>
+
+                  {user.error && <p className={styles.userRowError}>{user.error}</p>}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </Collapsible>
 
