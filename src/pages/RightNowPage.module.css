@@ -304,7 +304,17 @@
 }
 
 /* ============================================================
-   CREW LOCATION CARDS  (/now — grouped by where crew are)
+   CREW LOCATION CARDS  (/now — Monument grammar, Phase 21)
+   --------------------------------------------------------------
+   Layout:
+     6px full-height stage rail (col 1) + body (col 2)
+     body has:
+       .groupMain  — left content (kicker/title/sub/pills) + right
+                     twin tiles (count + duck, both 64×64 transparent)
+       .groupActions — footer for "I am weak" with top divider
+   --------------------------------------------------------------
+   Variants (same grammar, palette shifts):
+     .band (default), .metal_place, .camping, .lost
    ============================================================ */
 
 .crewGroups {
@@ -317,29 +327,36 @@
   border-radius: var(--r-2);
   background: var(--bg-surface);
   overflow: hidden;
+  display: grid;
+  grid-template-columns: 6px 1fr;
 }
 
+/* You-are-here: per-variant left rail color is set on .locStrip;
+   the card itself gains a subtle elevated bg */
 .youAreHere {
-  border-left: 2px solid var(--accent);
   background: var(--bg-elevated);
 }
 
-.youAreHere .groupCard {
-  background: var(--bg-elevated);
-}
-
-/* 4px stage/status strip at top of each card */
+/* Full-height stage/kind rail — replaces the old 4px top strip */
 .locStrip {
-  height: 4px;
+  align-self: stretch;
   background: var(--text-muted);
 }
 
-.groupHeader {
+.groupBody {
+  min-width: 0;
+  padding: var(--s-3) var(--s-4);
+}
+
+.groupMain {
   display: grid;
   grid-template-columns: 1fr auto;
   gap: var(--s-3);
-  padding: var(--s-3) var(--s-4);
-  align-items: end;
+  align-items: start;
+}
+
+.groupLeft {
+  min-width: 0;
 }
 
 .groupKicker {
@@ -353,6 +370,7 @@
   gap: 6px;
 }
 
+/* "You are here" presence dot — colored per variant via cascade below */
 .liveDot {
   width: 6px;
   height: 6px;
@@ -364,11 +382,12 @@
 
 .groupTitle {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 26px;
   font-weight: 700;
   text-transform: uppercase;
   line-height: 1;
   margin-top: 4px;
+  letter-spacing: 0.01em;
 }
 
 .groupSubtitle {
@@ -381,8 +400,32 @@
   letter-spacing: 0.04em;
 }
 
+.groupNextUp {
+  margin: 6px 0 0;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Right column: twin 64×64 tiles when duck is shown, otherwise count auto */
+.groupCountCol {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* When duck is rendered alongside count, force matching square footprint */
+.groupCountCol:has(button) {
+  width: 64px;
+}
+
 .groupCount {
-  background: var(--bg-elevated);
+  background: rgba(255, 255, 255, 0.02);
   color: var(--text);
   font-family: var(--font-display);
   font-size: 22px;
@@ -390,29 +433,36 @@
   line-height: 1;
   padding: 6px 10px;
   border-radius: var(--r-1);
-  border: 1px solid var(--border-strong);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   font-variant-numeric: tabular-nums;
   text-align: center;
+}
+
+/* When duck is rendered, count grows into a square tile to match */
+.groupCountCol:has(button) .groupCount {
+  padding: 8px 4px;
 }
 
 .locCountLabel {
   display: block;
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin-top: 2px;
+  letter-spacing: 0.04em;
+  margin-top: 4px;
+  white-space: nowrap;
 }
 
+/* Crew pills sit immediately under the title block (left column) */
 .memberList {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
   list-style: none;
-  padding: 0 var(--s-4) var(--s-4);
-  margin: 0;
+  margin: var(--s-3) 0 0;
+  padding: 0;
 }
 
 .memberPill {
@@ -480,39 +530,41 @@
   max-width: 180px;
 }
 
-.groupNextUp {
-  margin: 2px 0 0;
-  color: var(--accent);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .groupEmpty {
-  padding: 0 var(--s-4) var(--s-4);
-  color: var(--text-muted);
-  font-size: 12px;
+  margin: var(--s-3) 0 0;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 11px;
   font-style: italic;
+  line-height: 1.4;
 }
 
+/* Footer action zone: separated by a hairline divider so "I am weak"
+   is visually disconnected from the duck (opposite emotional actions) */
 .groupActions {
-  display: flex;
-  justify-content: flex-start;
-  padding: 0 var(--s-4) var(--s-4);
+  border-top: 1px solid var(--border);
+  margin-top: var(--s-3);
+  padding-top: var(--s-3);
 }
 
-.groupActions .skipButton {
-  margin-top: 0;
+/* — Band variants: stage color is set inline on .locStrip via React.
+     You-here state highlights the rail with the accent red. — */
+.band.youAreHere .locStrip {
+  background: var(--accent) !important;
 }
 
 /* — Metal Place — */
 .metal_place {
   border-color: rgba(217, 119, 6, 0.55);
   background:
-    linear-gradient(135deg, rgba(217, 119, 6, 0.18) 0%, rgba(253, 224, 71, 0.06) 50%, transparent 70%),
+    linear-gradient(135deg, rgba(217, 119, 6, 0.14) 0%, transparent 65%),
     var(--bg-surface);
+}
+
+.metal_place.youAreHere {
+  background:
+    linear-gradient(135deg, rgba(217, 119, 6, 0.18) 0%, rgba(253, 224, 71, 0.06) 50%, transparent 70%),
+    var(--bg-elevated);
 }
 
 .metal_place .locStrip {
@@ -520,15 +572,28 @@
 }
 
 .metal_place .groupKicker {
-  color: rgba(253, 224, 71, 0.95);
+  color: rgba(253, 224, 71, 0.7);
+}
+
+.metal_place.youAreHere .groupKicker {
+  color: rgba(253, 224, 71, 1);
 }
 
 .metal_place .groupTitle {
-  color: #fff;
+  color: rgba(253, 224, 71, 0.95);
+}
+
+.metal_place .groupSubtitle {
+  color: rgba(253, 224, 71, 0.45);
+}
+
+.metal_place .liveDot {
+  background: rgba(253, 224, 71, 0.95);
+  box-shadow: 0 0 10px rgba(253, 224, 71, 0.5);
 }
 
 .metal_place .groupCount {
-  background: rgba(217, 119, 6, 0.15);
+  background: rgba(217, 119, 6, 0.12);
   color: rgba(253, 224, 71, 0.95);
   border-color: rgba(217, 119, 6, 0.3);
 }
@@ -539,7 +604,7 @@
 }
 
 .metal_place .avatar {
-  background: rgba(217, 119, 6, 0.4);
+  background: rgba(217, 119, 6, 0.55);
   color: #fff;
 }
 
@@ -547,8 +612,14 @@
 .camping {
   border-color: rgba(22, 160, 133, 0.45);
   background:
-    linear-gradient(135deg, rgba(22, 160, 133, 0.16) 0%, transparent 70%),
+    linear-gradient(135deg, rgba(22, 160, 133, 0.14) 0%, transparent 70%),
     var(--bg-surface);
+}
+
+.camping.youAreHere {
+  background:
+    linear-gradient(135deg, rgba(22, 160, 133, 0.18) 0%, transparent 70%),
+    var(--bg-elevated);
 }
 
 .camping .locStrip {
@@ -556,7 +627,24 @@
 }
 
 .camping .groupKicker {
+  color: rgba(95, 208, 187, 0.7);
+}
+
+.camping.youAreHere .groupKicker {
   color: #5fd0bb;
+}
+
+.camping .groupTitle {
+  color: #fff;
+}
+
+.camping .groupSubtitle {
+  color: rgba(95, 208, 187, 0.55);
+}
+
+.camping .liveDot {
+  background: var(--signal-ok);
+  box-shadow: 0 0 10px rgba(22, 160, 133, 0.55);
 }
 
 .camping .groupCount {
@@ -584,18 +672,38 @@
   box-shadow: 0 0 18px rgba(168, 85, 247, 0.12);
 }
 
+.lost.youAreHere {
+  background:
+    linear-gradient(135deg, rgba(88, 28, 135, 0.4) 0%, rgba(168, 85, 247, 0.08) 60%, transparent),
+    var(--bg-elevated);
+  box-shadow: 0 0 22px rgba(168, 85, 247, 0.18);
+}
+
 .lost .locStrip {
   background: var(--signal-lost);
 }
 
 .lost .groupKicker {
-  color: rgba(196, 148, 255, 0.85);
+  color: rgba(196, 148, 255, 0.7);
+}
+
+.lost.youAreHere .groupKicker {
+  color: rgba(196, 148, 255, 0.95);
 }
 
 .lost .groupTitle {
   color: rgba(233, 213, 255, 0.95);
   text-shadow: 0 0 12px rgba(168, 85, 247, 0.5);
   letter-spacing: 0.04em;
+}
+
+.lost .groupSubtitle {
+  color: rgba(196, 148, 255, 0.55);
+}
+
+.lost .liveDot {
+  background: var(--signal-lost);
+  box-shadow: 0 0 12px rgba(168, 85, 247, 0.6);
 }
 
 .lost .groupCount {
@@ -629,27 +737,44 @@
   margin: 0;
 }
 
+/* "I am weak 🤘" — Phase 21 ghost variant.
+   Intentionally recessive so the duck is the unambiguous hero CTA.
+   Reads as a tertiary mono-caps micro-link, framed by the .groupActions
+   hairline divider above it. Hover reveals an accent-tinted underline. */
 .skipButton {
-  margin-top: 0.75rem;
-  padding: 0.55rem 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--bg-elevated);
-  color: var(--text);
-  font-size: 0.85rem;
-  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.16s ease, border-color 0.16s ease;
-  display: inline-block;
+  transition: color 0.16s ease, border-color 0.16s ease, letter-spacing 0.18s ease;
 }
 
 .skipButton:hover {
-  background: var(--bg);
-  border-color: var(--accent-hover);
+  color: var(--text-muted);
+  border-bottom-color: var(--border-strong);
+  letter-spacing: 0.18em;
 }
 
 .skipButton:active {
-  background: rgba(234, 179, 8, 0.1);
+  color: var(--text);
+  border-bottom-color: var(--accent-hover);
+}
+
+.skipButton:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 4px;
+  color: var(--text-muted);
 }
 
 .undoToast {
@@ -732,7 +857,7 @@
     grid-template-columns: 1fr;
   }
 
-  .groupCount {
-    font-size: 18px;
+  .groupTitle {
+    font-size: 24px;
   }
 }

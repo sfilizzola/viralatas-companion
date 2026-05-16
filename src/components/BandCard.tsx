@@ -84,7 +84,9 @@ export default function BandCard({
       ? styles.variantTimeline
       : variant === 'ranked'
         ? styles.variantRanked
-        : styles.variantSchedule;
+        : showDuck && onDuck
+          ? styles.variantScheduleWithDuck
+          : styles.variantSchedule;
 
   const cardClasses = [
     styles.card,
@@ -194,7 +196,8 @@ export default function BandCard({
           {pending && <span className="pending-chip">{t('pendingSync')}</span>}
         </div>
 
-        {showDuck && onDuck && variant !== 'ranked' && (
+        {/* Timeline variant: duck stays below meta inside body */}
+        {showDuck && onDuck && variant === 'timeline' && (
           <div className={styles.duckRow}>
             <DuckButton
               onDuck={onDuck}
@@ -202,7 +205,7 @@ export default function BandCard({
                 duckCooldownUntil !== undefined && duckCooldownUntil > Date.now()
               }
               cooldownUntil={duckCooldownUntil ?? null}
-              inBody
+              tile
             />
           </div>
         )}
@@ -217,6 +220,20 @@ export default function BandCard({
         )}
         {children}
       </div>
+
+      {/* Schedule variant: duck as inline grid column between body and star */}
+      {showDuck && onDuck && variant === 'schedule' && (
+        <div className={styles.duckColumn}>
+          <DuckButton
+            onDuck={onDuck}
+            isOnCooldown={
+              duckCooldownUntil !== undefined && duckCooldownUntil > Date.now()
+            }
+            cooldownUntil={duckCooldownUntil ?? null}
+            tile
+          />
+        </div>
+      )}
 
       {showPick && (
         <button

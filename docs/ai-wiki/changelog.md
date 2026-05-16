@@ -4,6 +4,55 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-16
+
+### Fixed
+- ArrivalMap: removed force-collapse useEffect that prevented user interaction after festival starts; initial state still defaults to collapsed when festival is active (ArrivalMap.tsx)
+
+### Changed
+- Removed hard-coded 📌 emoji from Pin/Unpin announcement card action buttons (AnnouncementsPage.tsx)
+
+---
+
+## 2026-05-16
+
+### Changed
+- DuckButton: duck image renders grayscale during cooldown and transitions smoothly back to colour when cooldown ends (DuckButton.tsx, DuckButton.module.css)
+
+---
+
+## 2026-05-15 (Phase 21 — Live Card Monument Redesign)
+
+### Changed
+- `src/pages/RightNowPage.module.css` — rewrote the `CREW LOCATION CARDS` block as **Monument grammar**:
+  - `.groupCard` now uses `display: grid; grid-template-columns: 6px 1fr` — 6 px full-height left rail (`.locStrip`) replaces the old 4 px top strip.
+  - New `.groupBody` wraps everything; `.groupMain` is a 2-col grid (`1fr auto`) with `.groupLeft` (kicker / title / subtitle / pills) and `.groupCountCol` (twin tiles).
+  - Crew pills (`.memberList`) now sit inside `.groupLeft` immediately under the subtitle (no gap row between title and pills).
+  - `.groupCount` redesigned as a soft transparent tile (`rgba(255,255,255,0.02)` bg, `rgba(255,255,255,0.08)` border) instead of `--bg-elevated` + `--border-strong`.
+  - `.groupCountCol:has(button)` selector grows the right column to `64 px` width when the duck is rendered, so count + duck become matching 64×64 tiles. Without a duck, the count tile auto-sizes.
+  - `.groupActions` now has `border-top: 1px solid var(--border)` + top padding/margin — visually decouples the "I am weak 🤘" footer from the duck above.
+  - `.groupTitle` bumped from 22 px to 26 px; `.locCountLabel` font-size dropped to 8 px with `white-space: nowrap` so "vira-latas" caption never wraps.
+  - All four kinds (`band`, `metal_place`, `camping`, `lost`) now have explicit `.youAreHere` palette overrides (rail color = accent for bands; per-kind gradient backdrops for the others).
+  - Removed `.youAreHere { border-left: 2px solid var(--accent) }` — the rail itself communicates the highlight now.
+- `src/components/now/CrewGroupsSection.tsx` — restructured JSX to match the new grammar:
+  - Wrapped header + pills + actions inside a single `.groupBody` div.
+  - Crew pills moved into `.groupLeft` (under title + subtitle); empty-state copy uses `.groupEmpty` with mono italic styling.
+  - Skip button kept in `.groupActions` footer below the main grid.
+  - `youAreHere` presence dot (`.liveDot`) is rendered for **all** kinds (not only `band`) — the `kicker` flow is now consistent across band / metal_place / camping / lost.
+- `.skipButton` ("I am weak 🤘") redesigned as a **ghost mono-caps micro-link**: transparent background, no border, `--font-mono` 10 px / 600 / uppercase / 0.16 em letter-spacing, `--text-faint` at rest. Hover lifts to `--text-muted`, draws a `--border-strong` bottom rule, and eases letter-spacing to 0.18 em. Active snaps to `--accent-hover` bottom rule. The intent: the duck is the unambiguous hero CTA on a live picked band; the skip button is a tertiary escape hatch and must visually recede.
+- `src/components/DuckButton.tsx` — added optional `tile?: boolean` prop. When true, renders a 64×64 rounded-square button (`.buttonTile`) with transparent background, soft border, 46 px duck image, and square-cornered cooldown drain (`.drainOverlayTile`). Default circular variant is unchanged for `BandCard` usage.
+- `src/components/DuckButton.module.css` — added `.wrapperTile`, `.buttonTile`, `.duckImgTile`, `.drainOverlayTile` styles; the tile variant pulls `border-radius` from `var(--r-1)` to match the count tile.
+- `public/Design System.html` §11 — replaced the live card simulation with six new examples covering the full Monument grammar (band you-here ready · band you-here cooldown · band others-only · metal_place you-here · camping empty · lost with members) and rewrote the Element Inventory + Component Ownership notes to match.
+- `public/Design System.html` changelog — added v2.3 entry documenting the Phase 21 Monument redesign.
+
+### Architectural Notes
+- **One grammar, four kinds.** The same body grid handles every `/now` card (band, metal_place, camping, lost). Variants only override the rail color, kicker color, count tile palette, pill palette, and gradient backdrop. This keeps future card kinds cheap to add.
+- **`:has()` for layout adaptation.** `.groupCountCol:has(button)` uses CSS native `:has()` to grow the column to 64 px and tighten the count's padding only when a duck button is present. No JS branching needed; the CSS adapts to the React conditional render.
+- **Duck stays the hero CTA, weak is a true ghost.** The 64×64 transparent tile beside the count makes the duck visually equal in footprint to the count metric — both are first-class signals. The skip button drops to a 10 px mono-caps micro-link tucked under a hairline divider, reinforcing that quack and weak are opposite emotional actions and that the duck is the unambiguous primary action on a live picked band.
+- **No regression on `BandCard`.** `BandCard` still passes only `inBody` (no `tile`), so the duck on `/schedule` and `/my-picks` keeps the legacy 40 px circular treatment.
+
+---
+
 ## 2026-05-15 (Phase 20 — The Duck 🦆)
 
 ### Added
@@ -605,3 +654,12 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - **ManagerAdminPanel** — wired `.actionUnblock` class on the unblock button
 - **badges.md** — corrected `BadgeModal.tsx` reference to `BadgesDisplay.tsx`; added "Badge Detail Modal & Fullscreen Zoom" section documenting the new interaction; updated manual testing checklist
 - **Design System.html** — added zoom button to badge detail modal demo; added fullscreen overlay section with live preview
+
+---
+
+## 2026-05-16
+
+### Added
+- GodlikeAdminPanel: "Test Quack" section with a 15-second local cooldown DuckButton that dispatches a quack toast (band: Queen) after cooldown — no database write
+- DuckQuackEventDetail: added optional `bandName` field to allow direct bandName override in test scenarios
+- DuckToast: uses `detail.bandName` if present, skips IndexedDB lookup

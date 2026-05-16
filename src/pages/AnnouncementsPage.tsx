@@ -389,7 +389,7 @@ export default function AnnouncementsPage() {
                             aria-label={a.is_pinned ? t('unpin') : t('pin')}
                             type="button"
                           >
-                            {a.is_pinned ? `📌 ${t('unpin')}` : `📌 ${t('pin')}`}
+                            {a.is_pinned ? t('unpin') : t('pin')}
                           </button>
                         )}
                         {showBlock && (

@@ -10,9 +10,11 @@ type DuckButtonProps = {
   cooldownUntil: number | null;
   /** When true, removes the column border-left and fixed width (for in-body placement) */
   inBody?: boolean;
+  /** When true, renders as a 64×64 rounded-square tile (Monument design — used on /now). */
+  tile?: boolean;
 };
 
-export default function DuckButton({ onDuck, isOnCooldown, cooldownUntil, inBody }: DuckButtonProps) {
+export default function DuckButton({ onDuck, isOnCooldown, cooldownUntil, inBody, tile }: DuckButtonProps) {
   const { t } = useI18n('DuckButton');
   const [drainAngle, setDrainAngle] = useState(0);
   const [popping, setPopping] = useState(false);
@@ -55,21 +57,29 @@ export default function DuckButton({ onDuck, isOnCooldown, cooldownUntil, inBody
   }
 
   return (
-    <div className={`${styles.wrapper} ${inBody ? styles.wrapperInBody : ''}`}>
+    <div
+      className={`${styles.wrapper} ${inBody ? styles.wrapperInBody : ''} ${
+        tile ? styles.wrapperTile : ''
+      }`}
+    >
       <button
         type="button"
-        className={`${styles.button} ${popping ? styles.popping : ''}`}
+        className={`${styles.button} ${tile ? styles.buttonTile : ''} ${popping ? styles.popping : ''}`}
         onClick={handleClick}
         disabled={isOnCooldown}
         aria-label={isOnCooldown ? t('cooldownLabel') : t('quackLabel')}
         aria-disabled={isOnCooldown}
         onAnimationEnd={handleAnimationEnd}
       >
-        <img src="/rubber-duck.png" alt="" className={styles.duckImg} />
+        <img
+          src="/rubber-duck.png"
+          alt=""
+          className={`${styles.duckImg} ${tile ? styles.duckImgTile : ''} ${isOnCooldown ? styles.duckImgCooldown : ''}`}
+        />
 
         {isOnCooldown && (
           <div
-            className={styles.drainOverlay}
+            className={`${styles.drainOverlay} ${tile ? styles.drainOverlayTile : ''}`}
             style={{ '--drain-angle': `${drainAngle}deg` } as React.CSSProperties}
             aria-hidden
           />

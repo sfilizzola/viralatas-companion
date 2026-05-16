@@ -20,6 +20,14 @@
   border-left: none;
 }
 
+/* Tile placement (Monument design — /now live cards):
+   wrapper fills its 64×64 grid cell so the button can square out */
+.wrapperTile {
+  width: 100%;
+  height: 64px;
+  border-left: none;
+}
+
 .button {
   position: relative;
   width: 40px;
@@ -55,6 +63,22 @@
   outline-offset: 2px;
 }
 
+/* Tile button — 64×64 rounded square, transparent background, lighter border.
+   Sits flush in the right column of /now live cards beside the count tile. */
+.buttonTile {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--r-1);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+}
+
+.buttonTile:hover:not(:disabled) {
+  background: rgba(255, 215, 0, 0.06);
+  border-color: rgba(255, 215, 0, 0.45);
+  transform: scale(1.04);
+}
+
 .duckImg {
   width: 26px;
   height: 26px;
@@ -62,6 +86,17 @@
   display: block;
   user-select: none;
   pointer-events: none;
+  transition: filter 0.4s ease;
+}
+
+.duckImgTile {
+  width: 46px;
+  height: 46px;
+}
+
+.duckImgCooldown {
+  filter: grayscale(1);
+  transition: filter 0.4s ease;
 }
 
 /* Drain overlay — dark area sweeps CW from 12 o'clock, representing elapsed cooldown.
@@ -76,6 +111,11 @@
     transparent var(--drain-angle, 0deg) 360deg
   );
   pointer-events: none;
+}
+
+/* Tile-shaped drain overlay — squared corners to match the tile button */
+.drainOverlayTile {
+  border-radius: var(--r-1);
 }
 
 /* Pop animation on successful quack */

@@ -123,5 +123,7 @@
   "assignedPatches": "Patches asignados",
   "availablePatches": "Disponibles",
   "noPatchesAssigned": "Sin patches asignados aún",
-  "clickToRevoke": "clic para revocar"
+  "clickToRevoke": "clic para revocar",
+  "testQuackTitle": "🦆 Test Quack",
+  "testQuackDescription": "Simula una notificación de quack. Presiona el pato — después de 15 s recibirás un toast de Queen. Sin escritura en la base de datos."
 }

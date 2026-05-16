@@ -22,31 +22,59 @@
     --text:         #e8e8e8;
     --text-muted:   #888;
     --text-faint:   #555;
+    --white:        #ffffff;
 
     /* ---- brand accent (W.E.T. red, also semantic 'live/now') ---- */
     --accent:       #c0392b;
     --accent-hover: #e74c3c;
+    --accent-soft:  rgba(192,57,43,0.1);
+    --accent-muted: rgba(192,57,43,0.3);
 
     /* ---- semantic states ---- */
-    --signal-live:  #c0392b;  /* now / unread */
-    --signal-warn:  #f39c12;  /* conflict / queued */
+    --signal-live:  #c0392b;  /* now / unread (alias: stage-wet) */
+    --signal-warn:  #f39c12;  /* conflict / queued (alias: stage-jungle) */
+    --signal-warn-soft: rgba(243,156,18,0.12);
+    --signal-warn-muted: rgba(243,156,18,0.3);
     --signal-ok:    #16a085;  /* synced / camping ok */
+    --signal-ok-bright: #5fd0bb; /* camping location indicator (tinted) */
+    --signal-ok-soft: rgba(22,160,133,0.08);
+    --signal-ok-muted: rgba(22,160,133,0.3);
+    --signal-ok-dim: rgba(22,160,133,0.15);
+    --signal-ok-glow: rgba(22,160,133,0.4);
     --signal-lost:  #a855f7;  /* LOST 🤘 */
 
     /* ---- ceremony ---- */
     --ceremony-gold:     #d4af37;              /* Wacken Farewell closing ceremony */
     --ceremony-gold-dim: rgba(212,175,55,0.55);
     --ceremony-gold-bg:  rgba(212,175,55,0.07);
+    --ceremony-gold-soft: rgba(212,175,55,0.1);
+    --ceremony-gold-muted: rgba(212,175,55,0.25);
+    --ceremony-gold-border: rgba(212,175,55,0.4);
+
+    /* ---- location indicators ---- */
+    --metal-place-bright: #f3c26a;             /* Metal Place location highlight */
+    --metal-place:  var(--metal-place);    /* bright location indicator */
+    --metal-place-dim: var(--metal-place-dim); /* muted location text */
+    --metal-place-bg: var(--metal-place-bg);  /* very dim background tint */
+
+    /* ---- role colors ---- */
+    --role-manager:  #3b82f6;
+    --role-manager-soft: rgba(59,130,246,0.08);
+    --role-manager-muted: rgba(59,130,246,0.45);
+    --role-godlike:  #d97706;
+    --role-godlike-soft: rgba(217,119,6,0.08);
+    --role-godlike-muted: rgba(217,119,6,0.45);
+    --role-conflict: #f9c66b;
 
     /* ---- stages (canonical, never reinterpret) ---- */
     --stage-faster:     #2980b9;
     --stage-harder:     #e67e22;
     --stage-louder:     #8e44ad;
-    --stage-wet:        #c0392b;
+    --stage-wet:        #c0392b;  /* same as signal-live, role-based (5× Wacken) */
     --stage-headbangers:#16a085;
     --stage-wasteland:  #2c3e50;
     --stage-wackinger:  #95a5a6;
-    --stage-jungle:     #f39c12;
+    --stage-jungle:     #f39c12;  /* same as signal-warn */
 
     /* ---- type ---- */
     --font-display: 'Oswald', 'Helvetica Neue Condensed', 'Arial Narrow', sans-serif;
@@ -213,7 +241,7 @@
     flex-direction: column;
     justify-content: space-between;
     padding: var(--s-3);
-    color: #fff;
+    color: var(--white);
     font-family: var(--font-mono);
     font-size: 10px;
     letter-spacing: 0.06em;
@@ -365,7 +393,7 @@
     display: flex; align-items: center; justify-content: center;
     font-family: var(--font-display);
     font-size: 22px; font-weight: 700;
-    color: #fff;
+    color: var(--white);
   }
   .bcard .body { padding: var(--s-3) var(--s-4); display: flex; flex-direction: column; justify-content: center; min-width: 0; }
   .bcard .name { font-family: var(--font-display); font-weight: 700; font-size: 19px; line-height: 1.05; text-transform: uppercase; letter-spacing: 0.005em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -376,7 +404,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #fff;
+    color: var(--white);
     padding: 2px 6px;
     border-radius: 2px;
   }
@@ -394,16 +422,16 @@
     transition: background 0.15s, color 0.15s;
   }
   .bcard .pick:hover { background: var(--bg-elevated); color: var(--text); }
-  .bcard .pick.on { color: var(--accent-hover); background: rgba(192,57,43,0.1); }
+  .bcard .pick.on { color: var(--accent-hover); background: var(--accent-soft); }
   .bcard .pick svg { width: 22px; height: 22px; }
 
   .conflict-chip {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: rgba(243,156,18,0.12);
-    color: #f9c66b;
-    border: 1px solid rgba(243,156,18,0.4);
+    background: var(--signal-warn-soft);
+    color: var(--role-conflict);
+    border: 1px solid var(--signal-warn-muted);
     border-radius: var(--r-pill);
     font-family: var(--font-mono);
     font-size: 10px;
@@ -454,9 +482,9 @@
   }
   .bcard.ceremony .stripe { background: var(--ceremony-gold); }
   .bcard.ceremony .thumb {
-    background: rgba(212,175,55,0.1);
+    background: var(--ceremony-gold-soft);
     color: var(--ceremony-gold);
-    border: 1px solid rgba(212,175,55,0.25);
+    border: 1px solid var(--ceremony-gold-muted);
   }
   .bcard.ceremony .ceremony-label {
     font-family: var(--font-mono);
@@ -467,12 +495,12 @@
     color: var(--ceremony-gold);
     padding: 2px 6px;
     border-radius: 2px;
-    border: 1px solid rgba(212,175,55,0.4);
-    background: rgba(212,175,55,0.1);
+    border: 1px solid var(--ceremony-gold-border);
+    background: var(--ceremony-gold-soft);
   }
   .bcard.ceremony .pick.on {
     color: var(--ceremony-gold);
-    background: rgba(212,175,55,0.1);
+    background: var(--ceremony-gold-soft);
   }
 
   /* ============================================================
@@ -494,7 +522,7 @@
     transition: background 0.15s, color 0.15s;
   }
   .pill:hover { color: var(--text); }
-  .pill.on { color: #fff; }
+  .pill.on { color: var(--white); }
 
   /* ============================================================
      DAY TAB BAR
@@ -553,7 +581,7 @@
   .crew-card .who { display: flex; align-items: center; gap: var(--s-3); margin-bottom: var(--s-3); }
   .crew-card .who .avatar {
     width: 40px; height: 40px; border-radius: 50%;
-    background: var(--accent); color: #fff;
+    background: var(--accent); color: var(--white);
     font-family: var(--font-display); font-size: 18px; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
     border: 2px solid var(--bg-surface);
@@ -589,14 +617,14 @@
     transition: all 0.15s;
   }
   .picktoggle:hover { color: var(--text); border-color: var(--border-strong); }
-  .picktoggle.on { color: var(--accent-hover); border-color: var(--accent); background: rgba(192,57,43,0.1); }
+  .picktoggle.on { color: var(--accent-hover); border-color: var(--accent); background: var(--accent-soft); }
   .picktoggle svg { width: 22px; height: 22px; }
 
   /* ============================================================
      AVATAR + CLUSTER
      ============================================================ */
   .avatar-row { display: flex; align-items: center; gap: var(--s-4); }
-  .av { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--accent); color: #fff; font-family: var(--font-display); font-weight: 700; border: 2px solid var(--bg); }
+  .av { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--accent); color: var(--white); font-family: var(--font-display); font-weight: 700; border: 2px solid var(--bg); }
   .av.s24 { width: 24px; height: 24px; font-size: 10px; }
   .av.s32 { width: 32px; height: 32px; font-size: 13px; }
   .av.s40 { width: 40px; height: 40px; font-size: 16px; }
@@ -682,22 +710,22 @@
      .conflictWarning — hard conflict (exact same slot) — red signal-live
      .overlapWarning  — soft overlap (adjacent time) — amber signal-warn */
   .modal .conflict-warn {
-    background: rgba(192,57,43,0.1);
-    border: 1px solid rgba(192,57,43,0.3);
+    background: var(--accent-soft);
+    border: 1px solid var(--accent-muted);
     border-radius: var(--r-1);
     padding: var(--s-3);
-    color: #e74c3c;
+    color: var(--accent-hover);
     font-size: 13px;
     display: grid;
     grid-template-columns: 20px 1fr;
     gap: var(--s-3);
   }
   .modal .overlap-warn {
-    background: rgba(243,156,18,0.1);
-    border: 1px solid rgba(243,156,18,0.3);
+    background: var(--signal-warn-soft);
+    border: 1px solid var(--signal-warn-muted);
     border-radius: var(--r-1);
     padding: var(--s-3);
-    color: #f9c66b;
+    color: var(--role-conflict);
     font-size: 13px;
     display: grid;
     grid-template-columns: 20px 1fr;
@@ -728,7 +756,7 @@
     transition: all 0.15s;
   }
   .toggle-track.on { background: rgba(22,160,133,0.4); border-color: var(--signal-ok); }
-  .toggle-track.on::after { left: 18px; background: #fff; }
+  .toggle-track.on::after { left: 18px; background: var(--white); }
 
   .modal .actions { display: flex; gap: var(--s-2); padding: var(--s-3) var(--s-5) var(--s-5); border-top: 1px solid var(--border); }
   .btn {
@@ -743,7 +771,7 @@
     cursor: pointer;
   }
   .btn:hover { background: var(--border); }
-  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--white); }
   .btn.primary:hover { background: var(--accent-hover); }
   .btn.ghost { background: transparent; }
 
@@ -815,7 +843,7 @@
   .badge.unlocked .medal {
     background: linear-gradient(135deg, var(--accent), #7d2419);
     border-color: var(--accent-hover);
-    color: #fff;
+    color: var(--white);
   }
   .badge .label { font-family: var(--font-display); font-size: 13px; font-weight: 600; text-transform: uppercase; line-height: 1.15; letter-spacing: 0.02em; }
   .badge .desc  { font-size: 11px; color: var(--text-muted); margin-top: 4px; line-height: 1.35; }
@@ -854,8 +882,8 @@
      ✅ Sprint 0 resolved: AnnouncementsPage.module.css previously had diverged values.
      Both files now use the canonical values below. */
   .role-chip.normal   { background: var(--bg-elevated); color: var(--text-muted); }
-  .role-chip.manager  { background: rgba(59,130,246,0.08); color: #3b82f6; border: 1px solid rgba(59,130,246,0.45); }
-  .role-chip.godlike  { background: rgba(217,119,6,0.08); color: #d97706; border: 1px solid rgba(217,119,6,0.45); }
+  .role-chip.manager  { background: var(--role-manager-soft); color: var(--role-manager); border: 1px solid var(--role-manager-muted); }
+  .role-chip.godlike  { background: var(--role-godlike-soft); color: var(--role-godlike); border: 1px solid var(--role-godlike-muted); }
   .announce .head .ts { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); margin-left: auto; }
   .announce .body { grid-column: 2; margin-top: var(--s-1); font-size: 14px; line-height: 1.5; }
   .announce .actions { grid-column: 2; margin-top: var(--s-3); display: flex; gap: var(--s-3); }
@@ -900,9 +928,9 @@
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    background: rgba(243,156,18,0.12);
+    background: var(--signal-warn-soft);
     color: var(--signal-warn);
-    border: 1px solid rgba(243,156,18,0.3);
+    border: 1px solid var(--signal-warn-muted);
     border-radius: var(--r-pill);
     padding: 2px 8px;
     font-family: var(--font-mono);
@@ -1094,7 +1122,7 @@
   }
   .now-hero .meta { display: flex; gap: var(--s-2); margin-top: var(--s-2); font-family: var(--font-mono); font-size: 11px; }
   .now-hero .meta .stage {
-    color: #fff;
+    color: var(--white);
     background: var(--accent);
     padding: 2px 6px;
     font-size: 10px;
@@ -1153,13 +1181,13 @@
     align-items: stretch;
   }
   .frame-bcard .stripe { background: var(--accent); }
-  .frame-bcard .thumb { width: 36px; height: 36px; margin: 6px 0 6px 6px; border-radius: 3px; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 14px; font-weight: 700; color: #fff; }
+  .frame-bcard .thumb { width: 36px; height: 36px; margin: 6px 0 6px 6px; border-radius: 3px; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 14px; font-weight: 700; color: var(--white); }
   .frame-bcard .body { padding: 6px 8px; min-width: 0; }
   .frame-bcard .name { font-family: var(--font-display); font-size: 13px; font-weight: 700; text-transform: uppercase; line-height: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .frame-bcard .meta { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); margin-top: 3px; display: flex; gap: 6px; }
-  .frame-bcard .meta .stage { color: #fff; padding: 1px 4px; font-size: 8px; text-transform: uppercase; letter-spacing: 0.04em; border-radius: 1px; }
+  .frame-bcard .meta .stage { color: var(--white); padding: 1px 4px; font-size: 8px; text-transform: uppercase; letter-spacing: 0.04em; border-radius: 1px; }
   .frame-bcard .pick { width: 36px; border-left: 1px solid var(--border); display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
-  .frame-bcard .pick.on { color: var(--accent-hover); background: rgba(192,57,43,0.1); }
+  .frame-bcard .pick.on { color: var(--accent-hover); background: var(--accent-soft); }
   .frame-bcard .pick svg { width: 14px; height: 14px; }
 
   /* timeline frame */
@@ -1179,7 +1207,7 @@
   .timeline-bcard .body { padding: 6px 8px; }
   .timeline-bcard .body .name { font-family: var(--font-display); font-size: 13px; font-weight: 700; text-transform: uppercase; line-height: 1.05; }
   .timeline-bcard .body .meta { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); margin-top: 3px; }
-  .timeline-bcard .body .meta .stage { color: #fff; padding: 1px 4px; font-size: 8px; }
+  .timeline-bcard .body .meta .stage { color: var(--white); padding: 1px 4px; font-size: 8px; }
   /* ✅ Sprint 0 resolved: conflict-mini was a duplicate of conflict-chip at a different size.
      Canonical overlap chip is .overlapChip in BandCard.module.css (amber pill, pill border-radius).
      The .conflict-chip class below is the DS spec; .conflict-mini was removed from dead code. */
@@ -1195,7 +1223,7 @@
   }
   .pop-bcard .rk { font-family: var(--font-display); font-weight: 700; font-size: 18px; text-align: center; color: var(--text-muted); font-variant-numeric: tabular-nums; line-height: 1; }
   .pop-bcard .rk.top { color: var(--accent); }
-  .pop-bcard .thumb { width: 32px; height: 32px; border-radius: 3px; margin: 6px 0; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 13px; font-weight: 700; color: #fff; }
+  .pop-bcard .thumb { width: 32px; height: 32px; border-radius: 3px; margin: 6px 0; background: var(--bg-elevated); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 13px; font-weight: 700; color: var(--white); }
   .pop-bcard .body { padding: 6px 0 6px 8px; min-width: 0; }
   .pop-bcard .body .name { font-family: var(--font-display); font-size: 12px; font-weight: 700; text-transform: uppercase; line-height: 1; }
   .pop-bcard .body .meta { font-family: var(--font-mono); font-size: 9px; color: var(--text-muted); margin-top: 3px; display: flex; gap: 4px; align-items: center; }
@@ -1233,7 +1261,7 @@
   }
   .profile-badge.unlocked {
     background: linear-gradient(135deg, var(--accent), #7d2419);
-    border-color: var(--accent-hover); color: #fff;
+    border-color: var(--accent-hover); color: var(--white);
   }
   .admin-row {
     display: flex; align-items: center; justify-content: space-between;
@@ -1357,8 +1385,8 @@
     color: var(--text);
     box-shadow: inset 0 0 0 1px var(--border-strong);
   }
-  .presence-toggle button.on.camping { color: #5fd0bb; }
-  .presence-toggle button.on.metal { color: rgba(253,224,71,0.95); }
+  .presence-toggle button.on.camping { color: var(--signal-ok-bright); }
+  .presence-toggle button.on.metal { color: var(--metal-place); }
   .presence-toggle button .dot {
     width: 6px; height: 6px; border-radius: 50%;
     background: currentColor;
@@ -1445,16 +1473,16 @@
   .loc.lost .loc-count { background: rgba(88,28,135,0.35); color: rgba(196,148,255,0.95); border-color: rgba(168,85,247,0.35); }
   .loc.camping { background: linear-gradient(135deg, rgba(22,160,133,0.16) 0%, transparent 70%), var(--bg-surface); border-color: rgba(22,160,133,0.45); }
   .loc.camping .loc-strip { background: var(--signal-ok); }
-  .loc.camping .kicker { color: #5fd0bb; }
+  .loc.camping .kicker { color: var(--signal-ok-bright); }
   /* All camping crew chips and avatars use the teal location tint
      (overrides per-person avatar colors) — matches RightNowPage.module.css */
-  .loc.camping .loc-chip { border-color: rgba(22,160,133,0.35); background: rgba(22,160,133,0.08); }
-  .loc.camping .av { background: rgba(22,160,133,0.4) !important; color: #fff !important; }
-  .loc.camping .loc-count { background: rgba(22,160,133,0.15); color: #5fd0bb; border-color: rgba(22,160,133,0.3); }
-  .loc.metal { background: linear-gradient(135deg, rgba(217,119,6,0.18) 0%, rgba(253,224,71,0.06) 50%, transparent 70%), var(--bg-surface); border-color: rgba(217,119,6,0.55); }
+  .loc.camping .loc-chip { border-color: var(--signal-ok-muted); background: var(--signal-ok-soft); }
+  .loc.camping .av { background: var(--signal-ok-glow) !important; color: #fff !important; }
+  .loc.camping .loc-count { background: var(--signal-ok-dim); color: var(--signal-ok-bright); border-color: var(--signal-ok-muted); }
+  .loc.metal { background: linear-gradient(135deg, rgba(217,119,6,0.18) 0%, var(--metal-place-bg) 50%, transparent 70%), var(--bg-surface); border-color: rgba(217,119,6,0.55); }
   .loc.metal .loc-strip { background: rgba(217,119,6,1); }
-  .loc.metal .kicker { color: rgba(253,224,71,0.95); }
-  .loc.metal .title { color: #fff; }
+  .loc.metal .kicker { color: var(--metal-place); }
+  .loc.metal .title { color: var(--white); }
   .loc-empty {
     padding: 0 var(--s-4) var(--s-4);
     color: var(--text-muted);
@@ -1524,7 +1552,7 @@
     border: 3px solid var(--border-strong);
     display: flex; align-items: center; justify-content: center;
     font-family: var(--font-display); font-weight: 700;
-    font-size: 28px; color: #fff;
+    font-size: 28px; color: var(--white);
     position: relative;
     box-shadow: 0 2px 0 rgba(0,0,0,0.5), inset 0 0 0 2px rgba(0,0,0,0.4);
     cursor: pointer;
@@ -1549,7 +1577,7 @@
     display: flex; align-items: center; justify-content: center;
     font-family: var(--font-mono); font-size: 9px;
     font-weight: 700; letter-spacing: 0.01em;
-    color: #fff;
+    color: var(--white);
     background: linear-gradient(145deg, #d93025 0%, #b32020 60%, #7a1010 100%);
     filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.9));
     line-height: 1;
@@ -1677,7 +1705,7 @@
   }
   .ds-zoom-btn:hover {
     background: rgba(255,255,255,0.15);
-    color: #fff;
+    color: var(--white);
     border-color: rgba(255,255,255,0.4);
     transform: scale(1.1);
   }
@@ -1714,7 +1742,7 @@
     clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
     display: flex; align-items: center; justify-content: center;
     font-family: var(--font-mono); font-size: 14px; font-weight: 700;
-    letter-spacing: 0.01em; color: #fff; line-height: 1;
+    letter-spacing: 0.01em; color: var(--white); line-height: 1;
     background: linear-gradient(145deg, #d93025 0%, #b32020 60%, #7a1010 100%);
     filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.95));
     pointer-events: none; z-index: 1;
@@ -1733,7 +1761,7 @@
     clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
     margin-top: var(--s-3);
     background: linear-gradient(145deg, #d93025 0%, #b32020 60%, #7a1010 100%);
-    color: #fff;
+    color: var(--white);
     font-family: var(--font-mono); font-size: 14px; font-weight: 700;
     letter-spacing: 0.01em;
     filter: drop-shadow(0 3px 8px rgba(0,0,0,0.95));
@@ -1756,7 +1784,7 @@
     cursor: pointer;
   }
   .filter-trigger .ct {
-    background: var(--accent); color: #fff;
+    background: var(--accent); color: var(--white);
     border-radius: var(--r-pill);
     font-family: var(--font-display); font-size: 10px;
     font-weight: 700;
@@ -1830,7 +1858,7 @@
     border-right: 1px solid var(--border-strong);
   }
   .lang-seg button:last-child { border-right: 0; }
-  .lang-seg button.on { background: var(--accent); color: #fff; }
+  .lang-seg button.on { background: var(--accent); color: var(--white); }
   .pf-collapse {
     border-top: 1px solid var(--border);
     padding: 12px 0;
@@ -1841,8 +1869,8 @@
   .pf-collapse .left svg { width: 14px; height: 14px; }
   .pf-collapse .label { font-family: var(--font-display); font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; }
   .pf-collapse .chev { color: var(--text-muted); font-family: var(--font-mono); font-size: 10px; }
-  .pf-collapse.manager .label { color: #3b82f6; }
-  .pf-collapse.godlike .label { color: #d97706; }
+  .pf-collapse.manager .label { color: var(--role-manager); }
+  .pf-collapse.godlike .label { color: var(--role-godlike); }
 
   /* ============================================================
      UTILS
@@ -2041,7 +2069,7 @@
     user-select: none;
   }
   .duck-btn:hover:not(.duck-btn--cooldown) {
-    border-color: #f3c26a;
+    border-color: var(--metal-place-bright);
     transform: scale(1.08);
   }
   .duck-btn:active:not(.duck-btn--cooldown) {
@@ -2051,6 +2079,10 @@
     cursor: not-allowed;
     border-color: var(--border);
     opacity: 0.8;
+  }
+  .duck-btn--cooldown img {
+    filter: grayscale(1);
+    transition: filter 0.4s ease;
   }
   .duck-drain {
     position: absolute;
@@ -2087,7 +2119,7 @@
     font-size: 9px;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #f3c26a;
+    color: var(--metal-place-bright);
     margin-bottom: 2px;
   }
   .duck-toast-band {
@@ -2189,7 +2221,69 @@
     </div>
     <p class="t-small" style="margin-top:var(--s-3)">Use stage colors as solid fills (badges, stripes, pills, hero strips). When tinting at low alpha, target 8–18% over surface; never tint backgrounds above 25% — they stop reading as accent.</p>
 
-    <div class="subhead">Semantic state</div>
+    <div class="subhead" style="margin-top:var(--s-8)">Stage color token map</div>
+    <table style="width:100%;border-collapse:collapse;margin-top:var(--s-4);font-family:var(--font-mono);font-size:13px;border:1px solid var(--border)">
+      <thead>
+        <tr style="background:var(--bg-surface);border-bottom:1px solid var(--border)">
+          <th style="padding:var(--s-3) var(--s-4);text-align:left;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.06em;font-size:11px">Stage</th>
+          <th style="padding:var(--s-3) var(--s-4);text-align:left;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.06em;font-size:11px">Token Name</th>
+          <th style="padding:var(--s-3) var(--s-4);text-align:left;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.06em;font-size:11px">Hex Value</th>
+          <th style="padding:var(--s-3) var(--s-4);text-align:left;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.06em;font-size:11px">Use Case / Semantic</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#2980b9;border-radius:2px;margin-right:8px;vertical-align:middle"></span>Faster</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-faster</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#2980B9</code></td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Main Infield stage badge</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#e67e22;border-radius:2px;margin-right:8px;vertical-align:middle"></span>Harder</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-harder</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#E67E22</code></td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Main Infield stage badge</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#8e44ad;border-radius:2px;margin-right:8px;vertical-align:middle"></span>Louder</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-louder</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#8E44AD</code></td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Main Infield stage badge</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#c0392b;border-radius:2px;margin-right:8px;vertical-align:middle"></span>W.E.T.</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-wet</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#C0392B</code></td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Outside Infield; also --signal-live / --accent (5× Wacken role)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#16a085;border-radius:2px;margin-right:8px;vertical-align:middle"></span>Headbangers</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-headbangers</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#16A085</code></td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Outside Infield; also --signal-ok (camping state)</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#2c3e50;border-radius:2px;margin-right:8px;vertical-align:middle"></span>Wasteland</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-wasteland</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#2C3E50</code></td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Specialized venue</td>
+        </tr>
+        <tr style="border-bottom:1px solid var(--border)">
+          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#95a5a6;border-radius:2px;margin-right:8px;vertical-align:middle"></span>Wackinger</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-wackinger</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#95A5A6</code></td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Specialized venue</td>
+        </tr>
+        <tr>
+          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#f39c12;border-radius:2px;margin-right:8px;vertical-align:middle"></span>W.T.J.</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-jungle</td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#F39C12</code></td>
+          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Specialized venue; also --signal-warn (conflict state)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="subhead" style="margin-top:var(--s-8)">Semantic state</div>
     <div class="swatch-grid">
       <div class="swatch"><div class="chip" style="background:#c0392b">#c0392b</div><div class="meta"><div class="name">Live / Now</div><div class="tok">--signal-live</div><div class="hex">also primary accent</div></div></div>
       <div class="swatch"><div class="chip" style="background:#f39c12">#f39c12</div><div class="meta"><div class="name">Warn / Conflict / Queued</div><div class="tok">--signal-warn</div><div class="hex">overlap, offline pending</div></div></div>
@@ -2552,8 +2646,8 @@
           </div>
           <div class="help">When off, your location auto-resolves from your current pick. If you have no active pick, you fall to <b>Lost 🤘</b>.</div>
           <div class="presence-toggle has-metal" style="margin-top:12px">
-            <button><span class="dot" style="color:#5fd0bb"></span>Camping</button>
-            <button class="on metal"><span class="dot" style="color:rgba(253,224,71,0.95)"></span>Metal Place</button>
+            <button><span class="dot" style="color:var(--signal-ok-bright)"></span>Camping</button>
+            <button class="on metal"><span class="dot" style="color:var(--metal-place)"></span>Metal Place</button>
           </div>
           <div class="help">Metal Place appears only while the configured event window is active. Camping and Metal Place are mutually exclusive; tapping the active option clears the manual override.</div>
         </div>
@@ -2707,7 +2801,7 @@
                   </div>
                 </div>
                 <div>
-                  <h5><b class="label" style="color:#5fd0bb">Saw it</b><span class="ct" style="color:#5fd0bb">5</span></h5>
+                  <h5><b class="label" style="color:var(--signal-ok-bright)">Saw it</b><span class="ct" style="color:var(--signal-ok-bright)">5</span></h5>
                   <div class="who-rows">
                     <div class="who-row saw"><span class="av s24" style="background:#c0392b">SF</span><span class="nm">Salvatore</span></div>
                     <div class="who-row saw"><span class="av s24" style="background:#2980b9">JP</span><span class="nm">Joana</span></div>
@@ -3202,8 +3296,8 @@
             <div class="where-am-i" style="margin-bottom:var(--s-3)">
               <div class="legend"><b>Onde estou</b><span>self</span></div>
               <div class="presence-toggle has-metal">
-                <button style="font-size:11px;padding:7px 4px"><span class="dot" style="color:#5fd0bb"></span>Camping</button>
-                <button class="on metal" style="font-size:11px;padding:7px 4px"><span class="dot" style="color:rgba(253,224,71,0.95)"></span>Metal Pl.</button>
+                <button style="font-size:11px;padding:7px 4px"><span class="dot" style="color:var(--signal-ok-bright)"></span>Camping</button>
+                <button class="on metal" style="font-size:11px;padding:7px 4px"><span class="dot" style="color:var(--metal-place)"></span>Metal Pl.</button>
               </div>
             </div>
             <div class="loc-stack">
@@ -3571,7 +3665,7 @@
               </div>
               <div class="pf-row">
                 <span class="lbl">Notifications</span>
-                <span class="val" style="color:#5fd0bb">● ON</span>
+                <span class="val" style="color:var(--signal-ok-bright)">● ON</span>
               </div>
             </div>
 
@@ -4064,7 +4158,7 @@
           <li><b>Hover</b> <code>scale(1.08)</code> + amber border · 120 ms — no effect during cooldown</li>
           <li><b>Active press</b> <code>scale(0.94)</code> · 80 ms</li>
           <li><b>Cooldown drain</b> <code>conic-gradient(from -90deg, rgba(0,0,0,0.62) {elapsed}deg, transparent {elapsed}deg)</code> — dark overlay sweeps CW from 12 o'clock over 90 s</li>
-          <li><b>Cooldown state</b> <code>cursor: not-allowed · opacity: 0.8</code> · press handler is a no-op</li>
+          <li><b>Cooldown state</b> <code>cursor: not-allowed · opacity: 0.8</code> · press handler is a no-op · duck image renders <code>grayscale(1)</code> via <code>.duckImgCooldown</code>; transitions back to colour in 0.4 s when cooldown ends</li>
           <li><b>Visibility rule</b> only rendered when <code>isBandLive &amp;&amp; isPicked &amp;&amp; band.category !== 'ceremony'</code></li>
           <li><b>Cooldown storage</b> <code>localStorage</code> key <code>duck_cooldown:{userId}:{bandId}</code> — value is epoch ms of unlock time</li>
           <li><b>Props</b> <code>onDuck: () =&gt; void</code> · <code>isOnCooldown: boolean</code> · <code>cooldownUntil: number</code></li>
@@ -4111,141 +4205,248 @@
       </div>
     </div>
 
-    <div class="subhead">Live card — full simulation · <code>BandCard.tsx</code> + <code>CrewGroupsSection.tsx</code></div>
+    <div class="subhead">Live "/now" cards — Monument grammar · <code>CrewGroupsSection.tsx</code> + <code>RightNowPage.module.css</code></div>
+    <p class="desc" style="margin-top:0">
+      Phase 21 redesign. One grammar — <b>6 px full-height left rail</b> + <b>body</b> with title-block on the left and twin <b>64×64 transparent tiles</b>
+      (count + duck) on the right — applied across all <code>/now</code> card kinds (<code>band</code>, <code>metal_place</code>, <code>camping</code>, <code>lost</code>).
+      Crew pills sit directly under the subtitle inside the title-block; the <code>I am weak 🤘</code> action lives in a footer separated by a hairline divider.
+    </p>
     <div class="demo">
       <div class="demo-stage" style="display:flex;gap:var(--s-8);flex-wrap:wrap;align-items:flex-start">
 
-        <!-- ① Duck ready -->
+        <!-- ① Live band · you-are-here · duck ready -->
         <div>
-          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-3)">Duck ready · cooldown not active</div>
-          <div style="background:var(--bg-elevated);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:var(--r-2);overflow:hidden;width:340px">
-            <div style="height:4px;background:var(--stage-louder)"></div>
-            <div style="display:grid;grid-template-columns:1fr auto;gap:var(--s-3);padding:var(--s-3) var(--s-4);align-items:end">
-              <div>
-                <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:6px">
-                  <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px rgba(229,85,85,0.45);flex-shrink:0;display:inline-block"></span>
-                  Live · you here
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-3)">Band · you-are-here · duck ready</div>
+          <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-2);overflow:hidden;width:360px;display:grid;grid-template-columns:6px 1fr">
+            <div style="background:var(--stage-louder)"></div>
+            <div style="padding:var(--s-3) var(--s-4)">
+              <div style="display:grid;grid-template-columns:1fr 64px;gap:var(--s-3);align-items:start">
+                <div style="min-width:0">
+                  <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:6px">
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px rgba(229,85,85,0.45);flex-shrink:0;display:inline-block"></span>
+                    Live · you here
+                  </div>
+                  <div style="font-family:var(--font-display);font-size:26px;font-weight:700;text-transform:uppercase;line-height:1;letter-spacing:0.01em;margin-top:4px">POWERWOLF</div>
+                  <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:5px">Louder · 22:00 – 23:30</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s-3)">
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(229,85,85,0.12);border:1px solid rgba(229,85,85,0.75);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">SF</span>Salvatore
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:#8e44ad;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">RC</span>Rafael
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:#e67e22;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">DK</span>Diogo
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:#2c3e50;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">FF</span>Felipe
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:#16a085;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">MM</span>Marina
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:#2980b9;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">JP</span>Joana
+                    </span>
+                  </div>
                 </div>
-                <div style="font-family:var(--font-display);font-size:22px;font-weight:700;text-transform:uppercase;line-height:1;margin-top:4px">POWERWOLF</div>
-                <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:5px">Louder · 22:00 – 23:30</div>
-              </div>
-              <div style="display:flex;align-items:center;gap:var(--s-2)">
-                <div style="background:var(--bg-surface);color:var(--text);font-family:var(--font-display);font-size:22px;font-weight:700;line-height:1;padding:6px 10px;border-radius:var(--r-1);border:1px solid var(--border-strong);text-align:center">
-                  8<small style="display:block;font-family:var(--font-mono);font-size:9px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px">crew</small>
+                <div style="display:flex;flex-direction:column;align-items:stretch;gap:6px;flex-shrink:0;width:64px">
+                  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:var(--r-1);padding:8px 4px;text-align:center;font-family:var(--font-display);font-size:22px;font-weight:700;line-height:1">
+                    6<small style="display:block;font-family:var(--font-mono);font-size:8px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:4px;white-space:nowrap">vira-latas</small>
+                  </div>
+                  <button style="position:relative;width:64px;height:64px;border:1px solid rgba(255,255,255,0.08);border-radius:var(--r-1);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
+                    <img src="rubber-duck.png" alt="quack" style="width:46px;height:46px;object-fit:contain" />
+                  </button>
                 </div>
-                <button class="duck-btn"><img src="rubber-duck.png" alt="quack" /></button>
               </div>
-            </div>
-            <!-- 8 member pills -->
-            <div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 var(--s-4) var(--s-3)">
-              <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(229,85,85,0.12);border:1px solid rgba(229,85,85,0.75);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">SF</span>Salvatore
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#8e44ad;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">RC</span>Rafael
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#e67e22;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">DK</span>Diogo
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#2c3e50;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">FF</span>Felipe
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#16a085;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">MM</span>Marina
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#2980b9;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">JP</span>Joana
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#16a085;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">LM</span>Lucas
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#f39c12;color:#0a0a0a;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">VB</span>Victor
-              </span>
-            </div>
-            <!-- "I am weak" button -->
-            <div style="padding:0 var(--s-4) var(--s-4)">
-              <button style="padding:0.55rem 0.75rem;border:1px solid var(--border);border-radius:4px;background:var(--bg-elevated);color:var(--text);font-size:0.85rem;font-weight:700;cursor:pointer">I am weak 🤘</button>
+              <div style="border-top:1px solid var(--border);margin-top:var(--s-3);padding-top:var(--s-3)">
+                <button style="display:inline-flex;align-items:center;gap:6px;padding:2px 0;margin:0;background:transparent;border:none;border-bottom:1px solid transparent;color:var(--text-faint);font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer;transition:color 0.16s ease,border-color 0.16s ease,letter-spacing 0.18s ease" onmouseover="this.style.color='var(--text-muted)';this.style.borderBottomColor='var(--border-strong)';this.style.letterSpacing='0.18em'" onmouseout="this.style.color='var(--text-faint)';this.style.borderBottomColor='transparent';this.style.letterSpacing='0.16em'" onmousedown="this.style.borderBottomColor='var(--accent-hover)'" onmouseup="this.style.borderBottomColor='var(--border-strong)'">I am weak</button>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- ② Duck on cooldown ~50% -->
+        <!-- ② Live band · you-are-here · duck on cooldown ~50% -->
         <div>
-          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-3)">Duck on cooldown · ~50% elapsed</div>
-          <div style="background:var(--bg-elevated);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:var(--r-2);overflow:hidden;width:340px">
-            <div style="height:4px;background:var(--stage-louder)"></div>
-            <div style="display:grid;grid-template-columns:1fr auto;gap:var(--s-3);padding:var(--s-3) var(--s-4);align-items:end">
-              <div>
-                <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:6px">
-                  <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px rgba(229,85,85,0.45);flex-shrink:0;display:inline-block"></span>
-                  Live · you here
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-3)">Band · you-are-here · duck cooldown ~50%</div>
+          <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-2);overflow:hidden;width:360px;display:grid;grid-template-columns:6px 1fr">
+            <div style="background:var(--stage-louder)"></div>
+            <div style="padding:var(--s-3) var(--s-4)">
+              <div style="display:grid;grid-template-columns:1fr 64px;gap:var(--s-3);align-items:start">
+                <div style="min-width:0">
+                  <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:6px">
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px rgba(229,85,85,0.45);flex-shrink:0;display:inline-block"></span>
+                    Live · you here
+                  </div>
+                  <div style="font-family:var(--font-display);font-size:26px;font-weight:700;text-transform:uppercase;line-height:1;letter-spacing:0.01em;margin-top:4px">POWERWOLF</div>
+                  <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:5px">Louder · 22:00 – 23:30</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s-3)">
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(229,85,85,0.12);border:1px solid rgba(229,85,85,0.75);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">SF</span>Salvatore
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:#16a085;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">MM</span>Marina
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:#2980b9;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">JP</span>Joana
+                    </span>
+                  </div>
                 </div>
-                <div style="font-family:var(--font-display);font-size:22px;font-weight:700;text-transform:uppercase;line-height:1;margin-top:4px">POWERWOLF</div>
-                <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-top:5px">Louder · 22:00 – 23:30</div>
+                <div style="display:flex;flex-direction:column;align-items:stretch;gap:6px;flex-shrink:0;width:64px">
+                  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:var(--r-1);padding:8px 4px;text-align:center;font-family:var(--font-display);font-size:22px;font-weight:700;line-height:1">
+                    3<small style="display:block;font-family:var(--font-mono);font-size:8px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:4px;white-space:nowrap">vira-latas</small>
+                  </div>
+                  <button style="position:relative;width:64px;height:64px;border:1px solid rgba(255,255,255,0.08);border-radius:var(--r-1);background:transparent;cursor:not-allowed;display:flex;align-items:center;justify-content:center;padding:0;overflow:hidden">
+                    <img src="rubber-duck.png" alt="quack" style="width:46px;height:46px;object-fit:contain" />
+                    <div style="position:absolute;inset:0;border-radius:var(--r-1);background:conic-gradient(from -90deg, rgba(0,0,0,0.62) 0deg 180deg, transparent 180deg 360deg);pointer-events:none"></div>
+                  </button>
+                </div>
               </div>
-              <div style="display:flex;align-items:center;gap:var(--s-2)">
-                <div style="background:var(--bg-surface);color:var(--text);font-family:var(--font-display);font-size:22px;font-weight:700;line-height:1;padding:6px 10px;border-radius:var(--r-1);border:1px solid var(--border-strong);text-align:center">
-                  8<small style="display:block;font-family:var(--font-mono);font-size:9px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px">crew</small>
-                </div>
-                <button class="duck-btn duck-btn--cooldown">
-                  <img src="rubber-duck.png" alt="quack" />
-                  <div class="duck-drain duck-drain--50"></div>
-                </button>
+              <div style="border-top:1px solid var(--border);margin-top:var(--s-3);padding-top:var(--s-3)">
+                <button style="display:inline-flex;align-items:center;gap:6px;padding:2px 0;margin:0;background:transparent;border:none;border-bottom:1px solid transparent;color:var(--text-faint);font-family:var(--font-mono);font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;cursor:pointer;transition:color 0.16s ease,border-color 0.16s ease,letter-spacing 0.18s ease" onmouseover="this.style.color='var(--text-muted)';this.style.borderBottomColor='var(--border-strong)';this.style.letterSpacing='0.18em'" onmouseout="this.style.color='var(--text-faint)';this.style.borderBottomColor='transparent';this.style.letterSpacing='0.16em'" onmousedown="this.style.borderBottomColor='var(--accent-hover)'" onmouseup="this.style.borderBottomColor='var(--border-strong)'">I am weak</button>
               </div>
             </div>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 var(--s-4) var(--s-3)">
-              <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(229,85,85,0.12);border:1px solid rgba(229,85,85,0.75);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">SF</span>Salvatore
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#8e44ad;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">RC</span>Rafael
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#e67e22;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">DK</span>Diogo
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#2c3e50;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">FF</span>Felipe
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#16a085;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">MM</span>Marina
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#2980b9;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">JP</span>Joana
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#16a085;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">LM</span>Lucas
-              </span>
-              <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-surface);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
-                <span style="width:22px;height:22px;border-radius:50%;background:#f39c12;color:#0a0a0a;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">VB</span>Victor
-              </span>
+          </div>
+        </div>
+
+        <!-- ③ Live band · others-only (no duck, no skip) -->
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-3)">Band · others watching · no duck/skip</div>
+          <div style="background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--r-2);overflow:hidden;width:360px;display:grid;grid-template-columns:6px 1fr">
+            <div style="background:var(--stage-faster)"></div>
+            <div style="padding:var(--s-3) var(--s-4)">
+              <div style="display:grid;grid-template-columns:1fr auto;gap:var(--s-3);align-items:start">
+                <div style="min-width:0">
+                  <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em">Live · 2 vira-latas</div>
+                  <div style="font-family:var(--font-display);font-size:26px;font-weight:700;text-transform:uppercase;line-height:1;letter-spacing:0.01em;margin-top:4px">BLIND GUARDIAN</div>
+                  <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:5px">Faster · 21:30 – 23:00</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s-3)">
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:#16a085;color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">LM</span>Lucas
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:var(--bg-elevated);border:1px solid var(--border);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:#f39c12;color:#0a0a0a;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">VB</span>Victor
+                    </span>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:stretch;gap:6px;flex-shrink:0">
+                  <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.08);border-radius:var(--r-1);padding:6px 10px;text-align:center;font-family:var(--font-display);font-size:22px;font-weight:700;line-height:1">
+                    2<small style="display:block;font-family:var(--font-mono);font-size:8px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:4px;white-space:nowrap">vira-latas</small>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div style="padding:0 var(--s-4) var(--s-4)">
-              <button style="padding:0.55rem 0.75rem;border:1px solid var(--border);border-radius:4px;background:var(--bg-elevated);color:var(--text);font-size:0.85rem;font-weight:700;cursor:pointer">I am weak 🤘</button>
+          </div>
+        </div>
+
+        <!-- ④ Metal Place · you-are-here -->
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-3)">Metal Place · you-are-here</div>
+          <div style="background:linear-gradient(135deg, rgba(217,119,6,0.18) 0%, var(--metal-place-bg) 50%, transparent 70%), var(--bg-elevated);border:1px solid rgba(217,119,6,0.55);border-radius:var(--r-2);overflow:hidden;width:360px;display:grid;grid-template-columns:6px 1fr">
+            <div style="background:rgba(217,119,6,1)"></div>
+            <div style="padding:var(--s-3) var(--s-4)">
+              <div style="display:grid;grid-template-columns:1fr auto;gap:var(--s-3);align-items:start">
+                <div style="min-width:0">
+                  <div style="font-family:var(--font-mono);font-size:10px;color:rgba(253,224,71,1);text-transform:uppercase;letter-spacing:0.1em;display:flex;align-items:center;gap:6px">
+                    <span style="width:6px;height:6px;border-radius:50%;background:var(--metal-place);box-shadow:0 0 10px rgba(253,224,71,0.5);flex-shrink:0;display:inline-block"></span>
+                    Special Zone — You Are Here
+                  </div>
+                  <div style="font-family:var(--font-display);font-size:26px;font-weight:700;text-transform:uppercase;line-height:1;letter-spacing:0.01em;margin-top:4px;color:var(--metal-place)">METAL PLACE</div>
+                  <div style="font-family:var(--font-mono);font-size:11px;color:var(--metal-place-dim);text-transform:uppercase;letter-spacing:0.04em;margin-top:5px">🍺 18:00 — 22:00</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s-3)">
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(229,85,85,0.12);border:1px solid rgba(229,85,85,0.75);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">SF</span>Salvatore
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(217,119,6,0.08);border:1px solid rgba(217,119,6,0.35);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:rgba(217,119,6,0.55);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">RC</span>Rafael
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(217,119,6,0.08);border:1px solid rgba(217,119,6,0.35);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:rgba(217,119,6,0.55);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">MM</span>Marina
+                    </span>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:stretch;gap:6px;flex-shrink:0">
+                  <div style="background:rgba(217,119,6,0.12);border:1px solid rgba(217,119,6,0.3);border-radius:var(--r-1);padding:6px 10px;text-align:center;font-family:var(--font-display);font-size:22px;font-weight:700;line-height:1;color:var(--metal-place)">
+                    3<small style="display:block;font-family:var(--font-mono);font-size:8px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:4px;white-space:nowrap">vira-latas</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑤ Camping · empty -->
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-3)">Camping / HQ · empty</div>
+          <div style="background:linear-gradient(135deg, rgba(22,160,133,0.14) 0%, transparent 70%), var(--bg-surface);border:1px solid rgba(22,160,133,0.45);border-radius:var(--r-2);overflow:hidden;width:360px;display:grid;grid-template-columns:6px 1fr">
+            <div style="background:var(--signal-ok)"></div>
+            <div style="padding:var(--s-3) var(--s-4)">
+              <div style="display:grid;grid-template-columns:1fr auto;gap:var(--s-3);align-items:start">
+                <div style="min-width:0">
+                  <div style="font-family:var(--font-mono);font-size:10px;color:rgba(95,208,187,0.7);text-transform:uppercase;letter-spacing:0.1em">Base Camp</div>
+                  <div style="font-family:var(--font-display);font-size:26px;font-weight:700;text-transform:uppercase;line-height:1;letter-spacing:0.01em;margin-top:4px">CAMPING / HQ</div>
+                  <div style="font-family:var(--font-mono);font-size:11px;color:rgba(95,208,187,0.55);text-transform:uppercase;letter-spacing:0.04em;margin-top:5px">Tents · gear · downtime</div>
+                  <p style="margin:var(--s-3) 0 0;color:var(--text-faint);font-family:var(--font-mono);font-size:11px;font-style:italic;line-height:1.4">No vira-latas resting yet</p>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:stretch;gap:6px;flex-shrink:0">
+                  <div style="background:rgba(22,160,133,0.15);border:1px solid rgba(22,160,133,0.3);border-radius:var(--r-1);padding:6px 10px;text-align:center;font-family:var(--font-display);font-size:22px;font-weight:700;line-height:1;color:var(--signal-ok-bright)">
+                    0<small style="display:block;font-family:var(--font-mono);font-size:8px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:4px;white-space:nowrap">vira-latas</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ⑥ Lost · with members -->
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-3)">Lost · adrift</div>
+          <div style="background:linear-gradient(135deg, rgba(88,28,135,0.32) 0%, rgba(168,85,247,0.06) 60%, transparent), var(--bg-surface);border:1px solid rgba(168,85,247,0.5);border-radius:var(--r-2);overflow:hidden;width:360px;display:grid;grid-template-columns:6px 1fr;box-shadow:0 0 18px rgba(168,85,247,0.12)">
+            <div style="background:var(--signal-lost)"></div>
+            <div style="padding:var(--s-3) var(--s-4)">
+              <div style="display:grid;grid-template-columns:1fr auto;gap:var(--s-3);align-items:start">
+                <div style="min-width:0">
+                  <div style="font-family:var(--font-mono);font-size:10px;color:rgba(196,148,255,0.7);text-transform:uppercase;letter-spacing:0.1em">Off the grid</div>
+                  <div style="font-family:var(--font-display);font-size:26px;font-weight:700;text-transform:uppercase;line-height:1.04;letter-spacing:0.04em;margin-top:4px;color:rgba(233,213,255,0.95);text-shadow:0 0 12px rgba(168,85,247,0.5)">LOST</div>
+                  <div style="font-family:var(--font-mono);font-size:11px;color:rgba(196,148,255,0.55);text-transform:uppercase;letter-spacing:0.04em;margin-top:5px">No active pick · adrift in the festival</div>
+                  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:var(--s-3)">
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(88,28,135,0.2);border:1px solid rgba(168,85,247,0.35);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:rgba(88,28,135,0.6);color:rgba(233,213,255,1);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">FF</span>Felipe
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(88,28,135,0.2);border:1px solid rgba(168,85,247,0.35);border-radius:999px;padding:3px 10px 3px 3px;font-size:12px;font-weight:600">
+                      <span style="width:22px;height:22px;border-radius:50%;background:rgba(88,28,135,0.6);color:rgba(233,213,255,1);font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">DK</span>Diogo
+                    </span>
+                  </div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:stretch;gap:6px;flex-shrink:0">
+                  <div style="background:rgba(88,28,135,0.35);border:1px solid rgba(168,85,247,0.35);border-radius:var(--r-1);padding:6px 10px;text-align:center;font-family:var(--font-display);font-size:22px;font-weight:700;line-height:1;color:rgba(196,148,255,0.95)">
+                    2<small style="display:block;font-family:var(--font-mono);font-size:8px;font-weight:500;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-top:4px;white-space:nowrap">vira-latas</small>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
       </div>
       <div class="demo-notes">
-        <h4>Element inventory</h4>
+        <h4>Element inventory (Monument grammar)</h4>
         <ul>
-          <li><b>Stage strip (4px)</b> — stage color from <code>stageColor(band.stage)</code></li>
-          <li><b>Live dot + "you here" kicker</b> — <code>--accent</code> dot with red glow (<code>box-shadow: 0 0 10px rgba(229,85,85,0.45)</code>); "Live · you here" only when <code>isUserHere === true</code></li>
-          <li><b>Band title</b> — <code>var(--font-display)</code> · 22px · 700 · uppercase</li>
-          <li><b>Subtitle</b> — stage + time range · mono · 11px · --text-muted</li>
-          <li><b>Count badge</b> — <code>var(--font-display)</code> · 22px · bg-surface · border-strong · "crew" mono label below</li>
-          <li><b>DuckButton</b> — 44px circle · shown only when <code>isBandLive &amp;&amp; isPicked &amp;&amp; category !== 'ceremony'</code> · Phase 20 addition · props: <code>onDuck</code> · <code>duckCooldownUntil</code></li>
-          <li><b>Current-user pill</b> — <code>rgba(229,85,85,0.12)</code> bg · accent border · marks you in the crew list</li>
-          <li><b>Crew pills</b> — bg-surface · border · 22px avatar circle · 12px 600 name text</li>
-          <li><b>"I am weak 🤘"</b> — <code>skipButton</code> class · bg-elevated · border · 0.85rem · 700 · only rendered when <code>isUserHere &amp;&amp; group.kind === 'band' &amp;&amp; myPlan.status === 'current'</code></li>
-          <li><b>Card highlight</b> — <code>border-left: 2px solid var(--accent)</code> · bg: <code>--bg-elevated</code> when <code>youAreHere</code></li>
+          <li><b>6 px full-height left rail</b> (<code>.locStrip</code>) — colored by <code>stageColor(band.stage)</code> for bands; per-kind palette for metal_place / camping / lost. Replaces the old 4 px top strip — gives every card a quiet vertical anchor.</li>
+          <li><b>Body grid</b> (<code>.groupBody</code> → <code>.groupMain</code>) — left column flexes (<code>1fr</code>) for content; right column auto-sizes (or <code>64 px</code> when the duck is rendered).</li>
+          <li><b>Kicker + presence dot</b> — mono · 10 px · uppercase · per-kind color. The <code>.liveDot</code> with glow is shown <b>whenever the user is here</b>, not just on band cards. Copy: "Live · you here" / "Special Zone — You Are Here" / "Base Camp" / "Off the grid".</li>
+          <li><b>Title</b> — <code>var(--font-display)</code> · 26 px · 700 · uppercase · per-kind color. (Up from 22 px to anchor the card.)</li>
+          <li><b>Subtitle</b> — mono · 11 px · uppercase · 0.04 em letter-spacing · muted variant of the kind palette.</li>
+          <li><b>Crew pills</b> — sit directly under the subtitle inside the left column (no longer a separate row). Current-user pill keeps the accent-red treatment regardless of card kind.</li>
+          <li><b>Count tile</b> (<code>.groupCount</code>) — soft transparent surface (<code>rgba(255,255,255,0.02)</code>) · 1 px <code>rgba(255,255,255,0.08)</code> border · display 22 px · "vira-latas" mono caption (8 px, no-wrap). Becomes a 64×64 square when the duck is rendered alongside; otherwise auto-width.</li>
+          <li><b>DuckButton (<code>tile</code> variant)</b> — 64×64 rounded square · transparent background · matching soft border · 46 px duck image · cooldown drain uses square-cornered conic gradient. Renders only when <code>isBandLive &amp;&amp; isPicked &amp;&amp; category !== 'ceremony'</code>.</li>
+          <li><b>Footer action</b> (<code>.groupActions</code>) — separated by a 1 px <code>--border</code> top divider. Hosts a <b>ghost-style "I am weak 🤘" micro-link</b>: <code>--font-mono</code> · 10 px · 600 · uppercase · <code>0.16em</code> letter-spacing · <code>--text-faint</code> at rest · transparent background · no border. Hover lifts color to <code>--text-muted</code>, draws a <code>--border-strong</code> bottom rule, and eases letter-spacing to 0.18em. Press snaps to <code>--accent-hover</code> bottom rule. Visual decoupling makes it unambiguous that <i>quack</i> is the hero CTA and <i>weak</i> is a tertiary escape hatch — opposite emotional actions, opposite visual weight.</li>
+          <li><b>Card highlight</b> — when <code>youAreHere</code>, the body bg shifts to <code>--bg-elevated</code> (or the kind's "you-here" gradient) and the rail itself is the accent color. No more separate <code>border-left: 2px solid var(--accent)</code> override.</li>
         </ul>
         <h4>Component ownership</h4>
         <ul>
-          <li><b>DuckButton</b> — injected into <code>BandCard</code> via <code>onDuck?: () =&gt; void</code> · <code>duckCooldownUntil?: number</code> props (Phase 20)</li>
-          <li><b>"I am weak 🤘"</b> — owned by <code>CrewGroupsSection.tsx</code> · rendered via <code>onSkip</code> prop from <code>/now</code> page · pre-existing feature</li>
-          <li>Both buttons co-exist on <code>/now</code> when the current user is watching a live picked band</li>
+          <li><b>DuckButton</b> — injected into <code>CrewGroupsSection</code> via <code>onDuck?: () =&gt; void</code> · <code>duckCooldownUntil?: number</code> props · rendered inside the right twin-tile column (<code>.groupCountCol</code>) with <code>inBody</code> + <code>tile</code> props. <code>BandCard</code> on /schedule and /my-picks still uses the legacy 40 px circle (no <code>tile</code> prop).</li>
+          <li><b>"I am weak 🤘"</b> — owned by <code>CrewGroupsSection.tsx</code> · rendered via <code>onSkip</code> prop from <code>/now</code> page · only when <code>isUserHere &amp;&amp; group.kind === 'band' &amp;&amp; myPlan.status === 'current'</code>.</li>
+          <li><b>Card kinds</b> — <code>band</code>, <code>metal_place</code>, <code>camping</code>, <code>lost</code>. Same grammar; only the rail color, kicker color, count tile palette, pill palette, and gradient backdrop change per kind.</li>
         </ul>
       </div>
     </div>
@@ -4278,6 +4479,19 @@
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
 
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v2.3 — Phase 21 · May 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li>Rewrote §11 "Live card — full simulation" as Monument grammar — 6 px full-height left rail + body grid (title-block left · twin 64×64 transparent tiles right) + footer action with hairline divider</li>
+          <li>Replaced 4 px top stage strip with full-height rail; pills now hug the subtitle inside the title-block (no gap row)</li>
+          <li>Added new <code>tile</code> variant to <code>DuckButton</code>: 64×64 rounded square, transparent background, 46 px duck image, square-cornered cooldown drain — rendered only on /now live cards</li>
+          <li>Bumped band title from 22 px to 26 px; "vira-latas" caption replaces "crew" on the count tile</li>
+          <li>Documented all four /now card kinds (band · metal_place · camping · lost) under the same grammar — only rail color, palette, and gradient backdrop change per kind</li>
+          <li><code>youAreHere</code> presence dot is now shown on every kind (not just bands), colored to match the kind's palette</li>
+          <li>Redesigned <code>.skipButton</code> ("I am weak 🤘") as a ghost mono-caps micro-link — transparent · 10 px · 0.16 em letter-spacing · <code>--text-faint</code> · hover draws a subtle bottom rule. Recedes behind the duck so the duck is the unambiguous hero CTA.</li>
+        </ul>
+      </div>
+
+      <div style="border-left:2px solid var(--border-strong);padding-left:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v2.2 — May 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
           <li>Added §11 Phase 20: The Duck — documents <code>DuckButton</code> (4 cooldown states, conic-gradient drain animation), <code>DuckToast</code> (entrance/exit spring, positioning, stacking), and BandCard integration</li>
