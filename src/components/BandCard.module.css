@@ -209,11 +209,12 @@
   color: var(--text-muted);
 }
 
-/* Duck button row — right-aligned, below the crew count in body */
+/* Duck button row — right-aligned tile container (64×64 to match tile variant) */
 .duckRow {
-  display: flex;
-  justify-content: flex-end;
+  width: 64px;
+  height: 64px;
   margin-top: var(--s-2);
+  margin-left: auto;
 }
 
 /* ============================================================

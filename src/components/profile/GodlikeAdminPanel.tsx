@@ -607,7 +607,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
               <h4 className={styles.liveBandTestSectionTitle}>{t('testQuackTitle')}</h4>
               <p className={styles.liveBandTestDescription}>{t('testQuackDescription')}</p>
               <DuckButton
-                inBody
+                tile
                 onDuck={() => {
                   if (isTestQuackOnCooldown) return;
                   setTestQuackCooldownUntil(Date.now() + TEST_QUACK_COOLDOWN_MS);

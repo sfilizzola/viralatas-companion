@@ -202,7 +202,7 @@ export default function BandCard({
                 duckCooldownUntil !== undefined && duckCooldownUntil > Date.now()
               }
               cooldownUntil={duckCooldownUntil ?? null}
-              inBody
+              tile
             />
           </div>
         )}
