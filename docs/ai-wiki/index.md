@@ -59,6 +59,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[Flow: Live Now](flows/live-now.md)** — Time-based band display, crew attendance, conflict detection
 - **[Flow: Announcements](flows/announcements.md)** — Posting, realtime sync, moderation, soft-delete
 - **[Flow: Authentication](flows/authentication.md)** — Login, signup, trigger, session persistence, test users, RLS
+- **[Flow: Duck Quack](flows/duck.md)** — Duck button → cooldown → quack → Realtime in-app DuckToast + Web Push system notification; offline queuing; admin test flows
 
 ### Architectural Decisions (ADRs)
 - **[ADR: IndexedDB as Primary Store](decisions/indexeddb-primary-store.md)** — Why IDB, not Supabase-primary
@@ -211,6 +212,7 @@ window.addEventListener('viralatas:picks-changed', () => {
 | **PWA** | `vite.config.ts` (Workbox setup), `public/manifest.json`, Service Worker auto-generated |
 | **Stage Colors** | `src/services/stageColors.ts`, `src/index.css` (CSS custom properties) |
 | **Band Seed** | `supabase/seed/bands.ts`, `docs/ai-wiki/lineup.md`, `docs/ai-wiki/stages.md` |
+| **Duck / Push** | `src/repositories/duck.ts`, `src/hooks/useDuckQuack.ts`, `src/hooks/useDuckNotifications.ts`, `src/lib/pushSubscription.ts`, `src/components/DuckButton.tsx`, `src/components/DuckToast.tsx`, `src/workers/sw.ts`, `supabase/functions/send-duck-push/index.ts`, `supabase/functions/send-test-push/index.ts` |
 
 ---
 
@@ -361,6 +363,15 @@ Understanding or debugging the `/now` page, crew groups, time system.
 1. [Flow: Live Now](flows/live-now.md) — Band time model, crew grouping, Metal Place, conflicts
 2. [Architecture Overview](architecture.md) — `useNowData`, `livePreview.ts`, `bandTime.ts`
 3. [Glossary](glossary.md) — LivePlan, CrewLiveGroup, Metal Place Window, CEST
+
+---
+
+### Path 8: Duck & Web Push (30 min)
+Understanding or debugging the duck button, DuckToast, push subscriptions, or `send-duck-push`.
+
+1. [Flow: Duck Quack](flows/duck.md) — Full lifecycle: button → cooldown → quack → DuckToast + Web Push
+2. [Domain Model](domain-model.md) — `DuckQuack`, `PushSubscription` entity sections
+3. [Sync Engine](sync-engine.md) — `DuckSync` (offline queue flush) in startup flow
 
 ---
 

@@ -6,13 +6,24 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ## 2026-05-16
 
-### Fixed
-- ArrivalMap: removed force-collapse useEffect that prevented user interaction after festival starts; initial state still defaults to collapsed when festival is active (ArrivalMap.tsx)
+### Added
+- `supabase/functions/send-test-push/index.ts` — new `send-test-push` Edge Function; authenticates caller via JWT, queries their `push_subscriptions`, sends a real VAPID Web Push directly to them; provides inline diagnostic feedback (`no_subscription`, `sent`, `failed`)
+- `docs/ai-wiki/flows/duck.md` — new flow document covering the full duck quack lifecycle: button press → cooldown → online/offline quack → Realtime in-app DuckToast → Database Webhook → `send-duck-push` → Web Push → SW push handler; also documents admin test flows (Test Quack vs Test Push)
 
 ### Changed
-- Removed hard-coded 📌 emoji from Pin/Unpin announcement card action buttons (AnnouncementsPage.tsx)
+- `src/components/profile/GodlikeAdminPanel.tsx` — added "📲 Test Push Notification" button in Godlike Powers panel; calls `send-test-push` and shows inline success/error feedback; the existing "Test Quack" description updated to clarify it only tests the in-app DuckToast (no push)
+- `src/i18n/ProfilePage_{br,en,de,es}.json` — updated `testQuackDescription` to clarify in-app-only scope; added keys: `testPushTitle`, `testPushDescription`, `testPushButton`, `testPushSent`, `testPushNoSubscription`, `testPushFailed`, `testPushError`
+- `docs/ai-wiki/domain-model.md` — fixed duplicate entity numbering (Announcement was erroneously numbered 6, BlockedPoster 7 — now 8 and 9); added full `### DuckQuack` and `### PushSubscription` entity sections with TypeScript types, invariants, business rules, lifecycle, and relevant source files
+- `src/version.ts` + `CLAUDE.md` — bumped to version `1.0.23`
+
+### Fixed
+- `docs/ai-wiki/ArrivalMap`: removed force-collapse useEffect that prevented user interaction after festival starts; initial state still defaults to collapsed when festival is active (ArrivalMap.tsx)
+
+### Architectural Notes
+- The "Test Quack" button and "Test Push Notification" button test different things and must remain separate. Test Quack fires a local window event only (for DuckToast component testing). Test Push exercises the real Web Push stack (VAPID, push_subscriptions, Service Worker) and is the correct tool for diagnosing push delivery failures on a real device.
 
 ---
+
 
 ## 2026-05-16
 

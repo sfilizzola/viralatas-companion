@@ -25,8 +25,8 @@ Viralatas Metaleiros is a small group (~20 people) attending Wacken Open Air 202
 5. **UserMissedBand** — A band the vira-lata actually watched (marked after the fact)
 6. **DuckQuack** — A social "quack" signal sent by a vira-lata during a live band set (Phase 20)
 7. **PushSubscription** — A device-level Web Push subscription for background notifications (Phase 20)
-6. **Announcement** — A mural post from any vira-lata
-7. **BlockedPoster** — Manager blocking moderation rules
+8. **Announcement** — A mural post from any vira-lata
+9. **BlockedPoster** — Manager blocking moderation rules
 
 ---
 
@@ -192,6 +192,98 @@ type UserMissedBand = {
 2. Taps "Não vi essa banda" (I didn't watch this one)
 3. Record created in IndexedDB immediately
 4. Async write to Supabase; if offline, queued
+
+---
+
+### DuckQuack
+
+**Essence**: A social signal emitted by a vira-lata to say "I'm live at this band right now — come join me!" Delivered in-app via Supabase Realtime and as a Web Push system notification to devices in background/closed state.
+
+```typescript
+type DuckQuack = {
+  id: string;         // uuid, auto-generated
+  user_id: string;    // uuid FK → users — who quacked
+  band_id: string;    // uuid FK → bands — which band
+  quacked_at: string; // ISO 8601 — when the quack was sent
+};
+```
+
+**Invariants:**
+- A quack is INSERT-only; there is no update or delete
+- RLS: INSERT own (user_id = auth.uid()); SELECT all authenticated users
+- Realtime is enabled on the table so all connected clients receive INSERTs
+- The quacker never receives their own notification (filtered in `useDuckNotifications` and `send-duck-push`)
+
+**Business Rules:**
+- Duck button is only visible when: band is currently live AND the logged-in user has picked that band AND the band is not `category = 'ceremony'`
+- 90-second per-user per-band cooldown enforced client-side via `localStorage` key `duck_cooldown:{userId}:{bandId}`
+- Cooldown is per-user; other users' cooldowns are independent
+- Offline quacks are queued in the `offline_duck_quacks` IndexedDB store and flushed on reconnect (even if the band set has ended — stale but harmless)
+
+**Delivery paths:**
+1. **In-app (foreground):** `useDuckNotifications` → Realtime INSERT event → `viralatas:duck-quack` window event → `DuckToast` shows floating duck notification
+2. **Background / closed app:** `send-duck-push` Edge Function (triggered by Database Webhook on INSERT) → Web Push via VAPID → Service Worker `push` event → OS system notification
+
+**Lifecycle:**
+1. User presses duck button on a live picked band
+2. `useDuckQuack.quack()` called → cooldown set in localStorage
+3. `duckRepository.quackBand(userId, bandId)` → INSERT to Supabase (or enqueue offline)
+4. Supabase Database Webhook fires `send-duck-push` Edge Function
+5. Edge Function queries other pickers of same band (excluding quacker), fetches their `push_subscriptions`, sends Web Push
+6. Other users' devices with app open: receive Realtime event → DuckToast appears
+7. Other users' devices with app backgrounded/closed: receive OS system notification
+
+**Relevant source files:**
+- `src/repositories/duck.ts` — `quackBand`, `flushOfflineDucks`
+- `src/hooks/useDuckQuack.ts` — cooldown management + quack call
+- `src/hooks/useDuckNotifications.ts` — Realtime listener, window event dispatcher
+- `src/components/DuckButton.tsx` — UI with drain animation
+- `src/components/DuckToast.tsx` — in-app floating notification
+- `supabase/functions/send-duck-push/index.ts` — Web Push Edge Function
+- `supabase/functions/send-test-push/index.ts` — Admin diagnostic: sends a test push to the caller's own device
+
+---
+
+### PushSubscription
+
+**Essence**: A device-level registration that lets Supabase Edge Functions send Web Push notifications to a specific user's device even when the app is closed.
+
+```typescript
+type PushSubscription = {
+  id: string;        // uuid, auto-generated
+  user_id: string;   // uuid FK → users
+  endpoint: string;  // UNIQUE — push service URL (browser-specific)
+  p256dh: string;    // ECDH public key for payload encryption
+  auth: string;      // Auth secret for payload encryption
+  created_at: string; // ISO 8601
+};
+```
+
+**Invariants:**
+- `endpoint` is UNIQUE — one row per browser/device registration
+- RLS: INSERT own; DELETE own; SELECT own only (other users never see your subscription)
+- One user can have multiple rows (multiple devices)
+
+**Business Rules:**
+- Created when `subscribeToPush(userId)` is called in `PushSetup` (mounted in `App.tsx` after auth)
+- Requires: `VITE_VAPID_PUBLIC_KEY` env var on the client; `VAPID_PUBLIC_KEY` + `VAPID_PRIVATE_KEY` + `VAPID_SUBJECT` Supabase secrets on the server
+- On iOS, the PWA must be installed to the Home Screen (not just opened in Safari) before push permission can be granted
+- `subscribeToPush` is idempotent: reuses an existing `PushManager` subscription if one exists
+- If `VITE_VAPID_PUBLIC_KEY` is absent, `subscribeToPush` exits silently (no error)
+- Stale subscriptions (device uninstalled/expired) cause `send-duck-push` to receive a 410 Gone; those rows should ideally be cleaned up (currently not implemented)
+
+**Lifecycle:**
+1. User logs in → `PushSetup` calls `subscribeToPush(userId)`
+2. `Notification.requestPermission()` — prompts the user
+3. `registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })` → browser registers with push service
+4. `push_subscriptions` row upserted on `endpoint` conflict
+5. When a `duck_quacks` INSERT fires, `send-duck-push` queries this table to find recipient subscriptions
+
+**Relevant source files:**
+- `src/lib/pushSubscription.ts` — `subscribeToPush(userId)`
+- `src/workers/sw.ts` — `push` event handler (shows OS notification), `notificationclick` handler
+- `supabase/functions/send-duck-push/index.ts` — reads this table to send quack pushes
+- `supabase/functions/send-test-push/index.ts` — reads this table to send a diagnostic test push
 
 ---
 

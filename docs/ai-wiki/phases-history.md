@@ -320,4 +320,9 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `supabase/functions/send-duck-push/index.ts` — Edge Function for Web Push via `npm:web-push`; triggered by Supabase Database Webhook on `duck_quacks` INSERT
 - `public/Design System.html` §11 — pre-authored DuckButton states (ready/cooldown drain at 10/50/85%), DuckToast entrance/exit, live card simulation with 8 crew + "I am weak" + duck button
 
+**Post-phase additions (2026-05-16):**
+- `supabase/functions/send-test-push/index.ts` — diagnostic Edge Function for godlike admins; authenticates caller, looks up their `push_subscriptions`, sends a real VAPID push directly to their own device; allows end-to-end push stack verification without needing a second user
+- `src/components/profile/GodlikeAdminPanel.tsx` — "📲 Test Push Notification" button calling `send-test-push`; inline feedback for success, no-subscription, and failure states
+- `docs/ai-wiki/flows/duck.md` — full flow document (was missing after Phase 20 closed)
+
 ---
