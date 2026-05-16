@@ -145,11 +145,11 @@ export default function LiveCardSheet({
             </div>
           )}
 
-          {!isBandCard && metalPlaceConfig && group.kind === 'metal_place' && (
+          {group.kind === 'metal_place' && (
             <div className={styles.stageRow}>
               <div className={styles.stageDot} />
-              <span className={styles.stageName}>W.E.T.</span>
-              {metalPlaceConfig.start_time && metalPlaceConfig.end_time && (
+              <span className={styles.stageName}>{t('metalPlaceGroupKicker')}</span>
+              {metalPlaceConfig?.start_time && metalPlaceConfig?.end_time && (
                 <span className={styles.stageTime}>
                   {formatHm(metalPlaceConfig.start_time)} – {formatHm(metalPlaceConfig.end_time)}
                 </span>
