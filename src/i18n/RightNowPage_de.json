@@ -60,5 +60,11 @@
   "liveTestBanner": "🧪 Live test: {band}",
   "crewCountLabel": "vira-latas",
   "readMore": "alles lesen",
-  "nextUp": "als nächstes"
+  "nextUp": "als nächstes",
+  "metalPlaceCountLabel": "hier",
+  "campingCountLabel": "erholt sich",
+  "lostCountLabel": "unterwegs",
+  "hereNowSection": "Jetzt hier",
+  "headingNextSection": "Geht als nächstes zu",
+  "noUpcomingPicks": "keine weiteren Picks"
 }

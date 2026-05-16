@@ -6,15 +6,52 @@ import type {
 } from '../../services/livePreview';
 import { formatFestivalTime } from '../../services/livePreview';
 import { stageColor } from '../../services/stageColors';
+import Avatar from '../../ui/Avatar';
 import Icon from '../icons/Icon';
 import DuckButton from '../DuckButton';
 import styles from '../../pages/RightNowPage.module.css';
 
 type TFn = (key: string, values?: Record<string, string | number>) => string;
 
-function truncateDisplayName(name: string): string {
-  if (name.length <= 17) return name;
-  return name.slice(0, 17) + '...';
+function clusterCountLabel(kind: string, count: number, t: TFn): string {
+  if (kind === 'band') return `${count} ${t('crewCountLabel')}`;
+  if (kind === 'metal_place') return `${count} ${t('metalPlaceCountLabel')}`;
+  if (kind === 'camping') return `${count} ${t('campingCountLabel')}`;
+  return `${count} ${t('lostCountLabel')}`;
+}
+
+function ClusterRow({
+  members,
+  kind,
+  t,
+}: {
+  members: CrewLivePlan[];
+  kind: string;
+  t: TFn;
+}) {
+  const visible = members.slice(0, 5);
+  const overflow = members.length - visible.length;
+  return (
+    <div className={styles.clusterRow}>
+      <div className={styles.clusterAvatars}>
+        {visible.map((m) => (
+          <Avatar
+            key={m.id}
+            size={24}
+            src={m.avatar_url}
+            initial={m.label.charAt(0).toUpperCase()}
+            className={styles.clusterAvatar}
+          />
+        ))}
+        {overflow > 0 && (
+          <span className={styles.clusterOverflow}>+{overflow}</span>
+        )}
+      </div>
+      <span className={styles.clusterCount}>
+        {clusterCountLabel(kind, members.length, t)}
+      </span>
+    </div>
+  );
 }
 
 function groupTitle(group: CrewLiveGroup, t: TFn) {
@@ -63,30 +100,6 @@ function emptyGroupMessage(group: CrewLiveGroup, t: (key: string) => string) {
   return group.kind === 'camping' ? t('campingGroupEmpty') : t('lostGroupEmpty');
 }
 
-function CrewMember({ crew, isCurrentUser }: { crew: CrewLivePlan; isCurrentUser: boolean }) {
-  const hasNext = !crew.plan.band && !!crew.plan.nextBand;
-  return (
-    <li className={`${styles.memberPill} ${isCurrentUser ? styles.me : ''}`}>
-      <span className={styles.avatar}>
-        {crew.avatar_url ? (
-          <img className={styles.avatarImg} src={crew.avatar_url} alt="" loading="lazy" />
-        ) : (
-          <span aria-hidden>{crew.label.charAt(0).toUpperCase()}</span>
-        )}
-      </span>
-      {hasNext ? (
-        <span className={styles.memberText}>
-          <span className={styles.crewName}>{truncateDisplayName(crew.label)}</span>
-          <span className={styles.memberMeta}>
-            {formatFestivalTime(crew.plan.nextBand!.start_time)} · {crew.plan.nextBand!.name}
-          </span>
-        </span>
-      ) : (
-        <span className={styles.crewName}>{truncateDisplayName(crew.label)}</span>
-      )}
-    </li>
-  );
-}
 
 type CrewGroupsSectionProps = {
   crewGroups: CrewLiveGroup[];
@@ -97,6 +110,7 @@ type CrewGroupsSectionProps = {
   onSkip: () => Promise<void>;
   onDuck?: () => void;
   duckCooldownUntil?: number | null;
+  onGroupSelect: (group: CrewLiveGroup) => void;
   t: TFn;
 };
 
@@ -109,6 +123,7 @@ export default function CrewGroupsSection({
   onSkip,
   onDuck,
   duckCooldownUntil,
+  onGroupSelect,
   t,
 }: CrewGroupsSectionProps) {
   if (crewPlans.length === 0) {
@@ -136,6 +151,8 @@ export default function CrewGroupsSection({
               isUserHere ? styles.youAreHere : ''
             }`}
             key={group.kind === 'band' ? group.band.id : group.kind}
+            onClick={() => onGroupSelect(group)}
+            style={{ cursor: 'pointer' }}
           >
             <div
               className={styles.locStrip}
@@ -156,11 +173,7 @@ export default function CrewGroupsSection({
                     </p>
                   )}
                   {group.members.length > 0 ? (
-                    <ul className={styles.memberList}>
-                      {group.members.map((crew) => (
-                        <CrewMember crew={crew} isCurrentUser={crew.id === userId} key={crew.id} />
-                      ))}
-                    </ul>
+                    <ClusterRow members={group.members} kind={group.kind} t={t} />
                   ) : (
                     <p className={styles.groupEmpty}>{emptyGroupMessage(group, t)}</p>
                   )}
@@ -187,7 +200,7 @@ export default function CrewGroupsSection({
               </div>
               {showWeakButton && (
                 <div className={styles.groupActions}>
-                  <button className={styles.skipButton} onClick={onSkip}>
+                  <button className={styles.skipButton} onClick={(e) => { e.stopPropagation(); void onSkip(); }}>
                     {t('souFraco')}
                   </button>
                 </div>
