@@ -106,11 +106,12 @@ export default function BandCard({
       onClick={onClick}
       onKeyDown={handleKeyDown}
       aria-pressed={interactive ? isPicked : undefined}
+      style={{ '--stage-color': color } as React.CSSProperties}
     >
-      <div className={styles.stripe} style={{ background: color }} aria-hidden />
+      <div className={styles.stripe} aria-hidden />
 
       {variant === 'schedule' && (
-        <div className={styles.thumb} style={{ background: color }} aria-hidden>
+        <div className={styles.thumb} aria-hidden>
           {band.image_url ? (
             <img
               src={band.image_url}
@@ -148,7 +149,7 @@ export default function BandCard({
               ✦ {t('scheduleClosingCeremony')}
             </span>
           ) : (
-            <Chip style={{ background: color, color: '#fff', borderColor: 'transparent' }}>
+            <Chip className={styles.stageBadge}>
               {band.stage}
             </Chip>
           )}
