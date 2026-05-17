@@ -127,6 +127,8 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
       const conditionIndex = arrivalDayOrder.indexOf(condition.day);
       return userIndex >= 0 && userIndex < conditionIndex;
     }
+    case 'wacken_arrived_on':
+      return ctx.wacken_arrival_day === condition.day;
     case 'location_visit_count_min':
       return (ctx.locationVisits[condition.location] ?? 0) >= condition.count;
     case 'crew_at_location_min':

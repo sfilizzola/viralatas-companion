@@ -36,6 +36,8 @@ export type BadgeCondition =
   | { type: 'band_seen_named'; name: string }
   // Arrival day: earned when arrival day sorts before condition.day
   | { type: 'wacken_arrived_before'; day: string }
+  // Arrival day: earned when arrival day matches condition.day exactly
+  | { type: 'wacken_arrived_on'; day: string }
   // Location visit count: earned when user has toggled into a location N+ times
   | { type: 'location_visit_count_min'; location: 'camping' | 'metal_place' | 'lost'; count: number }
   // Crew at location: earned when user is at a location AND N+ crew are there; permanent once earned

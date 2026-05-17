@@ -4,6 +4,33 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-17 (Badges: arrival-day patches — `wacken_arrived_on`)
+
+### Added
+- `src/services/badges/types.ts` / `engine.ts` — new `BadgeCondition` predicate `{ type: 'wacken_arrived_on'; day: string }`. Exact-match counterpart to the existing strictly-less-than `wacken_arrived_before`. Evaluated as `ctx.wacken_arrival_day === condition.day`; returns `false` when the user has no `wacken_arrival_day` set. Brings the supported predicate count to **27**.
+- `src/services/badges/registry.ts` — four new 2026 arrival-day badges, mutually exclusive on `user_metadata.wacken_arrival_day`:
+  - `civil-engineers-of-doom` → `sun-jul26` (Sunday) — `/badges/badge_civil.png`
+  - `beerforcement` → `mon-jul27` (Monday) — `/badges/badge_beerforcement.png`
+  - `campfire-veteran` → `tue-jul28` (Tuesday) — `/badges/badge_veteran.png`
+  - `spawn-point-infield` → `wed-jul29` (Wednesday) — `/badges/badge_spawn-infield.png`
+  All carry `year: 2026` (year chip on the patch). None set `persist: true` — the badge reflects the user's currently self-reported arrival; if they edit `wacken_arrival_day` on their profile, the patch they own swaps accordingly. Inventory grows 36 → 40.
+- `src/i18n/Badges_{br,en,es,de}.json` — added `badgeCivilEngineersOfDoom`, `badgeBeerforcement`, `badgeCampfireVeteran`, `badgeSpawnPointInfield` (and `*Description`) in all four locales. BR is canonical; ES/DE are coherent translations and EN matches the user-supplied copy verbatim.
+- `src/__tests__/badges.test.ts` — new `describe('evaluateBadge — wacken_arrived_on')` block covering exact match, mismatch, missing-arrival-day, and a registry-level test asserting the four arrival badges are pairwise mutually exclusive across `sun-jul26 | mon-jul27 | tue-jul28 | wed-jul29`.
+
+### Changed
+- `docs/ai-wiki/badges.md` — predicate count 26 → 27; added a `wacken_arrived_on` subsection alongside `wacken_arrived_before`; added a new **Arrival Day 2026 (4)** section to the inventory; appended a row to the cheat sheet; bumped the file footer date.
+- `.claude/context/badges.md` — predicate header updated to "All 27 `BadgeCondition` types"; "Profile attributes" sub-table grew from (2) to (3) with the new `wacken_arrived_on` row plus a one-line description.
+- `src/services/badges/registry.ts` (comment block) — added the `wacken_arrived_on` reference example next to `wacken_arrived_before`.
+
+### Architectural Notes
+- **Why an exact-match predicate.** `wacken_arrived_before` only expresses *strictly less than* in the camping-open day order. Expressing "arrived on day X" with the existing predicate would require `before(X+1) AND NOT before(X)`, which the engine doesn't support (each badge has exactly one `condition`). Adding a single new predicate keeps each badge a single declarative rule and matches the "minimum surface area for badge logic" pattern set by the rest of the engine.
+- **Mutual exclusivity.** `user_metadata.wacken_arrival_day` is a single string from the fixed enum `{sun-jul26, mon-jul27, tue-jul28, wed-jul29, thu-plus}`. Because the four new badges each pin one distinct value, exactly one of them evaluates `true` for any non-null arrival day. A user with `thu-plus` gets none of the four (intentional — there is no "arrived Thursday or later" patch in this set). The new test enforces this invariant against the real registry.
+- **Why `persist: false`.** Persistence is reserved for *historic moments that should survive data churn* (visited Metal Place, crew bonded at a location, picked 30+ bands once). Arrival day is profile metadata the user can edit at any point; treating it as historic would make a profile edit silently grant a *second* arrival badge. Live evaluation keeps the four-badge set a clean partition of `{sun, mon, tue, wed}`.
+- **No image-naming churn.** Image filenames `badge_civil.png`, `badge_beerforcement.png`, `badge_veteran.png`, `badge_spawn-infield.png` were already supplied. The registry's `imagePath` honors them as-is rather than enforcing the `badge_{slug}.png` convention — the convention is documentation guidance, not a runtime constraint, and the same exception is precedented elsewhere in the registry (e.g. `puppy` → `badge_new-puppy.png`, `pack-member` → `badge_vira-latas-pack.png`).
+- **Offline-first.** Badge evaluation is fully client-side and reads from `user.user_metadata` already cached for the session. No new IndexedDB store, no new network call, no Edge Function — these patches light up at Wacken with zero signal.
+
+---
+
 ## 2026-05-17 (react-hooks/purity: duck cooldown)
 
 ### Added

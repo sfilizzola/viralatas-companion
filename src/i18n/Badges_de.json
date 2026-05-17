@@ -72,5 +72,13 @@
   "badgeBullheadHeat": "Bullhead-Hitze",
   "badgeBullheadHeatDescription": "Der Feuerherrscher des heiligen Landes erwärmt dein Herz. 🤘",
   "badgeMelon": "Melon",
-  "badgeMelonDescription": "Du bist ein echter vira-latas-Freund, du campst nicht mit uns, aber du gehörst zum Rudel! Wau!"
+  "badgeMelonDescription": "Du bist ein echter vira-latas-Freund, du campst nicht mit uns, aber du gehörst zum Rudel! Wau!",
+  "badgeCivilEngineersOfDoom": "Bauingenieure des Untergangs",
+  "badgeCivilEngineersOfDoomDescription": "Du hast das Camp aufgebaut, bevor es Zivilisation gab.",
+  "badgeBeerforcement": "Beerforcement",
+  "badgeBeerforcementDescription": "Du hast das Bier, die Ersatzplane und den emotionalen Beistand mitgebracht.",
+  "badgeCampfireVeteran": "Lagerfeuer-Veteran",
+  "badgeCampfireVeteranDescription": "Warmes Bier, Grillrauch und furchtbare Entscheidungen. Wacken auf dem Höhepunkt.",
+  "badgeSpawnPointInfield": "Spawn Point: Infield",
+  "badgeSpawnPointInfieldDescription": "Kein Warm-up. Du bist direkt im Chaos gespawnt."
 }

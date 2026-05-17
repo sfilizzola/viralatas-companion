@@ -38,7 +38,7 @@ type BadgeConfig = {
 
 ---
 
-## All 26 `BadgeCondition` types
+## All 27 `BadgeCondition` types
 
 Conditions evaluate against a `BadgeContext` built once per profile load. **A predicate not in this list is unsupported — adding a new one requires changing `types.ts`, `engine.ts`, the wiki, and this file.**
 
@@ -50,11 +50,12 @@ Conditions evaluate against a `BadgeContext` built once per profile load. **A pr
 | `wacken_years_count_min` | `count: number` | User attended ≥ N Wackens total |
 | `wacken_attended_in_year` | `year: number` | User attended this specific edition |
 
-### Profile attributes (2)
+### Profile attributes (3)
 | Type | Inputs | Meaning |
 |---|---|---|
 | `country_is` | `country: string` | ISO code match (`'br'`, `'de'`, `'us'`, `'be'`, `'co'`, `'es'`, …) |
 | `wacken_arrived_before` | `day: string` | User's arrival day sorts **strictly before** `day` in the ordered enum below |
+| `wacken_arrived_on` | `day: string` | User's arrival day matches `day` **exactly**. One badge per camping-open day. |
 
 Arrival-day enum (order matters): `'sun-jul26' < 'mon-jul27' < 'tue-jul28' < 'wed-jul29' < 'thu-plus'`. Field stored in `user_metadata.wacken_arrival_day`. No other strings are valid.
 

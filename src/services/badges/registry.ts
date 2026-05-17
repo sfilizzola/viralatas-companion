@@ -302,6 +302,39 @@ export const BADGES: BadgeConfig[] = [
     condition: { type: 'bands_seen_stages_min', stages: ['Faster', 'Harder'], count: 6 },
     year: 2026,
   },
+  // Festival 2026 — Arrival-day badges (one per camping-open day, exact match)
+  {
+    slug: 'civil-engineers-of-doom',
+    imagePath: '/badges/badge_civil.png',
+    labelKey: 'badgeCivilEngineersOfDoom',
+    descriptionKey: 'badgeCivilEngineersOfDoomDescription',
+    condition: { type: 'wacken_arrived_on', day: 'sun-jul26' },
+    year: 2026,
+  },
+  {
+    slug: 'beerforcement',
+    imagePath: '/badges/badge_beerforcement.png',
+    labelKey: 'badgeBeerforcement',
+    descriptionKey: 'badgeBeerforcementDescription',
+    condition: { type: 'wacken_arrived_on', day: 'mon-jul27' },
+    year: 2026,
+  },
+  {
+    slug: 'campfire-veteran',
+    imagePath: '/badges/badge_veteran.png',
+    labelKey: 'badgeCampfireVeteran',
+    descriptionKey: 'badgeCampfireVeteranDescription',
+    condition: { type: 'wacken_arrived_on', day: 'tue-jul28' },
+    year: 2026,
+  },
+  {
+    slug: 'spawn-point-infield',
+    imagePath: '/badges/badge_spawn-infield.png',
+    labelKey: 'badgeSpawnPointInfield',
+    descriptionKey: 'badgeSpawnPointInfieldDescription',
+    condition: { type: 'wacken_arrived_on', day: 'wed-jul29' },
+    year: 2026,
+  },
 ];
 
 // ─── CONDITION EXAMPLES ───────────────────────────────────────────────────────
@@ -346,6 +379,12 @@ export const BADGES: BadgeConfig[] = [
 //   sun-jul26 → mon-jul27 → tue-jul28 → wed-jul29 → thu-plus
 //   Example: arrived Sunday or Monday (before Tuesday)
 //   { slug: 'early-bird', condition: { type: 'wacken_arrived_before', day: 'tue-jul28' } }
+//
+// wacken_arrived_on
+//   User's arrival day matches the given day exactly. Use one badge per arrival day
+//   when you want a different patch per camping-open day.
+//   Example: arrived Sunday (the campsite-builders)
+//   { slug: 'civil-engineers-of-doom', condition: { type: 'wacken_arrived_on', day: 'sun-jul26' } }
 //
 // ── BAND PICKS ────────────────────────────────────────────────────────────────
 //

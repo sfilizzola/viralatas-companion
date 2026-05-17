@@ -133,7 +133,7 @@ type BadgeConfig = {
 
 ---
 
-## BadgeCondition Types (26 Total)
+## BadgeCondition Types (27 Total)
 
 ### WACKEN HISTORY — Attendance Records
 
@@ -205,6 +205,18 @@ User's arrival day sorts **before** the given day in the camping-open order.
 **Example**: `early-bird` badge for those arriving Sun/Mon/Tue
 
 **Note**: Field name is `wacken_arrival_day` in user_metadata, stored as string like `'wed-jul29'`
+
+#### `wacken_arrived_on`
+User's arrival day matches the given day **exactly**.
+
+```typescript
+{ type: 'wacken_arrived_on', day: 'sun-jul26' }
+```
+
+**Use case**: One unique badge per camping-open day (sun/mon/tue/wed). Each user only ever earns one of the four.
+**Example badges (2026)**: `civil-engineers-of-doom` (sun-jul26), `beerforcement` (mon-jul27), `campfire-veteran` (tue-jul28), `spawn-point-infield` (wed-jul29).
+
+**Mutual exclusivity**: For any single value of `wacken_arrival_day` only one of these four badges can be earned. Switching the field in profile re-evaluates the set on next load (these badges are **not** `persist: true` by design — they reflect current self-reported arrival).
 
 ---
 
@@ -461,7 +473,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 
 ---
 
-## Current Badges Inventory (36 Total)
+## Current Badges Inventory (40 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -493,6 +505,15 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `wackinger-regular` — Display label "Wackinger Viking". Saw 3+ bands on the Wackinger stage (`bands_seen_stage_min`).
 - `wasteland-warrior` — Saw 1+ band on the Wasteland stage (`bands_seen_stage_min`). Low threshold by design — Wasteland is the "you went there at all" badge.
 - `bullhead-heat` — "Bullhead Heat" / "Calor do Bullhead" / "Calor del Bullhead" / "Bullhead-Hitze". Loyalty to the flaming bullhead between Faster ↔ Harder: saw 6+ bands across Faster ∪ Harder (`bands_seen_stages_min`, "more than 5" interpreted as strictly > 5).
+
+### Arrival Day 2026 (4) — `wacken_arrived_on`, mutually exclusive
+
+One badge per camping-open day; each user earns exactly one based on `user_metadata.wacken_arrival_day`. Not persistent — reflects the current self-reported arrival.
+
+- `civil-engineers-of-doom` — Arrived **Sunday** (sun-jul26). "Built the camp before civilization existed."
+- `beerforcement` — Arrived **Monday** (mon-jul27). "You brought the beer, backup tarp, and emotional support."
+- `campfire-veteran` — Arrived **Tuesday** (tue-jul28). "Warm beers, grill smoke, and terrible decisions. Peak Wacken."
+- `spawn-point-infield` — Arrived **Wednesday** (wed-jul29). "No warm-up. You spawned directly into the chaos."
 
 ### Genres present in lineup with NO corresponding badge
 
@@ -869,6 +890,7 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 | `wacken_attended_in_year` | `year: number` | `2016` → 10-year anniversary |
 | `country_is` | `country: string` | `'br'` → Brazil |
 | `wacken_arrived_before` | `day: string` | `'wed-jul29'` → early arrival |
+| `wacken_arrived_on` | `day: string` | `'sun-jul26'` → arrived exactly Sunday |
 | `bands_picked_min` | `count: number` | `10` → picked 10+ |
 | `band_attendance_min` | `count: number` | `10` → share pick with 10+ crew |
 | `bands_picked_genre_min` | `genre, count` | `'Death Metal', 3` → 3+ Death Metal |
@@ -907,4 +929,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-14 — bumped `lost-together` threshold 5 → 10 (registry, all 4 i18n descriptions, inventory bullets).
+**Last updated:** 2026-05-17 — added `wacken_arrived_on` exact-day predicate and 4 mutually-exclusive arrival-day badges (civil-engineers-of-doom, beerforcement, campfire-veteran, spawn-point-infield). Total predicates 26 → 27, inventory 36 → 40.

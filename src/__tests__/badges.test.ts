@@ -638,6 +638,57 @@ describe('evaluateBadge — wacken_attended_in_year', () => {
   });
 });
 
+describe('evaluateBadge — wacken_arrived_on', () => {
+  it('returns true when arrival_day matches exactly', () => {
+    const ctx = buildBadgeContext(
+      authUser({ wacken_arrival_day: 'sun-jul26' }),
+      [],
+      new Map(),
+      new Map(),
+    );
+    expect(evaluateBadge(badge({ type: 'wacken_arrived_on', day: 'sun-jul26' }), ctx)).toBe(true);
+  });
+
+  it('returns false when arrival_day differs', () => {
+    const ctx = buildBadgeContext(
+      authUser({ wacken_arrival_day: 'mon-jul27' }),
+      [],
+      new Map(),
+      new Map(),
+    );
+    expect(evaluateBadge(badge({ type: 'wacken_arrived_on', day: 'sun-jul26' }), ctx)).toBe(false);
+  });
+
+  it('returns false when arrival_day is null', () => {
+    const ctx = buildBadgeContext(authUser(), [], new Map(), new Map());
+    expect(evaluateBadge(badge({ type: 'wacken_arrived_on', day: 'wed-jul29' }), ctx)).toBe(false);
+  });
+
+  it('matches each of the four arrival-day badges to its day', () => {
+    const cases: Array<[string, string]> = [
+      ['sun-jul26', 'civil-engineers-of-doom'],
+      ['mon-jul27', 'beerforcement'],
+      ['tue-jul28', 'campfire-veteran'],
+      ['wed-jul29', 'spawn-point-infield'],
+    ];
+    for (const [day, slug] of cases) {
+      const ctx = buildBadgeContext(
+        authUser({ wacken_arrival_day: day }),
+        [],
+        new Map(),
+        new Map(),
+      );
+      const earned = BADGES.filter((b) => evaluateBadge(b, ctx)).map((b) => b.slug);
+      expect(earned).toContain(slug);
+      // The other three arrival-day badges must NOT be earned for this day
+      const otherSlugs = cases.filter(([d]) => d !== day).map(([, s]) => s);
+      for (const other of otherSlugs) {
+        expect(earned).not.toContain(other);
+      }
+    }
+  });
+});
+
 describe('evaluateBadge — assigned (Phase 11.E)', () => {
   it('returns true when badge slug is in assignedBadges', () => {
     const ctx = buildBadgeContext(
