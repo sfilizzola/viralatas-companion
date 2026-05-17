@@ -1,6 +1,6 @@
 # Viralatas Companion — Architectural Wiki
 
-**Last Updated**: 2026-05-12
+**Last Updated**: 2026-05-17
 
 ## Purpose
 

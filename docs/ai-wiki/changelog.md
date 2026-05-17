@@ -4,6 +4,22 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-17 (later)
+
+### Changed
+- `.claude/context/stages-and-lineup.md` — reconciled with `docs/ai-wiki/stages.md` and `docs/ai-wiki/lineup.md`. Corrected band total (78+ → 192: 167 confirmed, 25 TBD, 1 ceremony at FAS17). Replaced the misleading all-✅ per-day matrix with an explicit "HARDER opens on Day 2" note. Updated the stage-colors source pointer to `src/index.css` (CSS custom properties) + `src/services/stageColors.ts:getStageColor()`. Added stage abbreviations, day codes (D1–D4 plus overnight D1n–D4n), CEST note, pairing rules (HARDER↔FASTER, W.E.T.↔HEADBANGERS), and per-stage slot ranges. Long-form slot grid and band assignments stay in the wiki — the context file now just points to them.
+- `.claude/context/auth-trigger.md` — completed the `handle_new_user` behavior list with the `display_name` / `avatar_url` coalesce rules and the role-preserving `ON CONFLICT` branch, matching `supabase/migrations/`.
+- `.claude/context/key-decisions.md` — added the missing ADRs to the decision/choice/reason matrix: `custom-hooks-events-no-redux`, `workbox-caching-strategy`, and the "Edge Functions for LLM calls" rationale (API key never reaches the client).
+- `.claude/context/llm-alerts.md` — dropped the stale Phase 6 marker; added the server-side cooldown rule (cooldowns enforced in the Edge Function, not in the client) to match `supabase/functions/*` reality.
+- `.claude/context/wiki-template.md` — rewritten as two explicit variants: **Template A** (core pages: Purpose · Relevant Source Files · Data Flow · Key Hooks/Services/Repositories · Offline Behavior · Synchronization Behavior · Risks/Caveats · Open Questions) and **Template B** (flow pages: Purpose · Trigger · Happy Path · Offline Behavior · Sync Behavior on Reconnect · Relevant Source Files · Data Flow Diagram · Edge Cases), reflecting the section names actually used across `docs/ai-wiki/` today.
+- `docs/ai-wiki/index.md` — corrected the top `Last Updated` stamp from `2026-05-12` to `2026-05-17` so it agrees with the `Last edited` footer.
+
+### Architectural Notes
+- No source code or schema change. This pass only reconciles `.claude/context/*` on-demand reference files with the wiki (which remains source of truth for system behavior). Confirms the intentional split: `docs/ai-wiki/` documents *the system*; `.claude/context/` documents *operational rules and procedures Claude loads on demand*. When the two disagree, the wiki wins and `.claude/context/` is the side that gets corrected — as happened here.
+- No Design System change (no UI moved). No offline-first, RLS, or AlertContext contract change.
+
+---
+
 ## 2026-05-17
 
 ### Added
