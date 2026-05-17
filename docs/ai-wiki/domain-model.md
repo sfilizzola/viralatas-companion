@@ -63,6 +63,7 @@ type Country = 'de' | 'es' | 'br' | 'us' | 'co' | 'be' | 'other';
 - Only godlike can assign badges, edit test configs, time travel
 - Only manager+ can block posters
 - `is_friend = true` → user does not appear in camping/lost crew groups; `PresenceToggle` is hidden; location badges (`metal-place-2026`, `bbq-crew`, `lost-together`) cannot be earned; they are excluded from `crewLocationCounts` used to gate crew-location badges for others
+- `is_friend = true` → user is excluded from the `ArrivalMap` (`/announcements`) — rows, avatar clusters, and the collapsed-view "X arrived · Y to arrive" totals all derive from non-friend crew members only. The matching arrival-day picker in `EditProfileForm` (`/profile`) is also hidden for friend users; `wacken_arrival_day` is set to `null` on save when the picker is hidden so a stale value cannot be re-published.
 - Only godlike can toggle `is_friend` (via admin panel)
 - `NULL` and `false` are both treated as non-friend
 

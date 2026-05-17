@@ -1,6 +1,7 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import { supabase } from '../../lib/supabase';
+import { CREW_USERS_CHANGED_EVENT, loadCrewUsers } from '../../lib/db';
 import { type Language } from '../../lib/i18n';
 import { Button, Collapsible, Input, Select, SegmentedControl } from '../../ui';
 import PatchesBackgroundPicker from './PatchesBackgroundPicker';
@@ -163,11 +164,41 @@ export default function EditProfileForm({
   const [newArrivalDay, setNewArrivalDay] = useState<string>(
     (user.user_metadata?.['wacken_arrival_day'] as string | undefined) ?? '',
   );
+  const [isFriend, setIsFriend] = useState<boolean>(false);
+
+  // Read `is_friend` from the IDB-cached `crew_users` store so the picker
+  // visibility works offline. Listen to `CREW_USERS_CHANGED_EVENT` so the
+  // flag flips immediately if a godlike admin toggles it from the same tab.
+  useEffect(() => {
+    let active = true;
+
+    async function refreshFriendFlag() {
+      try {
+        const crew = await loadCrewUsers();
+        if (!active) return;
+        const me = crew.find((u) => u.id === user.id);
+        setIsFriend(me?.is_friend === true);
+      } catch {
+        if (active) setIsFriend(false);
+      }
+    }
+
+    refreshFriendFlag();
+    window.addEventListener(CREW_USERS_CHANGED_EVENT, refreshFriendFlag);
+    return () => {
+      active = false;
+      window.removeEventListener(CREW_USERS_CHANGED_EVENT, refreshFriendFlag);
+    };
+  }, [user.id]);
 
   async function handleSave(e: FormEvent) {
     e.preventDefault();
     setSaving(true);
     setLanguage(newLanguage);
+    // Friends never coordinate camping arrival with the group — when the
+    // picker is hidden we also stop writing the value so a stale cache
+    // entry can't be re-published on save.
+    const arrivalDayPayload = isFriend ? null : newArrivalDay || null;
     await supabase.auth.updateUser({
       data: {
         display_name: newName,
@@ -175,7 +206,7 @@ export default function EditProfileForm({
         avatar_url: newAvatarUrl,
         wacken_years: newWackenYears,
         country: newCountry || null,
-        wacken_arrival_day: newArrivalDay || null,
+        wacken_arrival_day: arrivalDayPayload,
       },
     });
     await supabase
@@ -186,7 +217,7 @@ export default function EditProfileForm({
         avatar_url: newAvatarUrl,
         wacken_years: newWackenYears,
         country: newCountry || null,
-        wacken_arrival_day: newArrivalDay || null,
+        wacken_arrival_day: arrivalDayPayload,
       })
       .eq('id', user.id);
     setSaving(false);
@@ -291,11 +322,13 @@ export default function EditProfileForm({
           <option value="other">{t('countryOther')}</option>
         </Select>
 
-        <ArrivalDayPicker
-          selectedDay={newArrivalDay}
-          onSelect={setNewArrivalDay}
-          t={t}
-        />
+        {!isFriend && (
+          <ArrivalDayPicker
+            selectedDay={newArrivalDay}
+            onSelect={setNewArrivalDay}
+            t={t}
+          />
+        )}
 
         <Button type="submit" fullWidth disabled={saving}>
           {saved ? t('saveDone') : saving ? t('saveLoading') : t('saveProfile')}

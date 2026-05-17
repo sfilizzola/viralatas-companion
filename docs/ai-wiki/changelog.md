@@ -4,6 +4,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-17 (Friend privacy: arrival data)
+
+### Changed
+- `src/components/ArrivalMap.tsx` — added a `visibleUsers` derivation (`crewUsers.filter((u) => u.is_friend !== true)`) and routed the per-day grouping, totals, and empty-state checks through it. Users flagged as `is_friend` no longer surface in any of the three `ArrivalMap` view states (collapsed summary, day cluster, full details), and they no longer contribute to the "X arrived · Y to arrive" counters on `/announcements`.
+- `src/components/profile/EditProfileForm.tsx` — added an `isFriend` state hydrated from the IDB-cached `crew_users` store via `loadCrewUsers()` and refreshed on `CREW_USERS_CHANGED_EVENT`. When `isFriend === true` the `ArrivalDayPicker` is not rendered on `/profile`, and `handleSave` writes `wacken_arrival_day: null` to both the auth metadata and the `users` row so a previously-set value cannot be re-published while the picker is hidden.
+- `docs/ai-wiki/domain-model.md` — extended the `User` invariants list to capture the friend-privacy rule for arrival data (ArrivalMap exclusion + EditProfileForm picker hidden + null-on-save).
+- `public/Design System.html` (canonical: `public/Design-System.html`) — extended the `ArrivalMap` subhead in §9 with a "Friend filtering" bullet that describes the dual-surface suppression (map + picker) and the null-on-save behavior.
+
+### Architectural Notes
+- This change is purely **read/write filtering on top of the existing `is_friend` flag** — no schema migration, no new IDB store, no new RLS policy. The flag remains godlike-toggle-only via the admin panel.
+- **Offline-first preserved.** Both surfaces read `is_friend` from the IDB-cached `crew_users` store (`loadCrewUsers()` plus `CREW_USERS_CHANGED_EVENT`), so the filter and the hidden picker keep working when the device is offline. The same cache already powers the existing friend behaviors (`useNowData.isFriend`, `BadgesDisplay` location-badge exclusion, `livePreview.groupCrewLivePlans` skip rule).
+- **Single direction of truth.** The user-facing surfaces consult `is_friend` independently — the map filters and the picker hides on the same flag — but both sides go through the IDB cache rather than re-querying Supabase, so a stale-while-revalidate read never produces an inconsistent view.
+- **Why null-on-save (not just hide-on-render).** A user could be flagged friend after they had already set an arrival day. Hiding the picker without zeroing the value would leave a stale `wacken_arrival_day` in `users` and `auth.users.user_metadata` that other read paths (badges, future arrival surfaces) might still see. Writing `null` whenever the picker is hidden keeps the data and UI consistent.
+- **No new badge interaction.** Existing `wacken_arrival_day`-keyed badges (Phase 12) are awarded from the picked value at evaluation time; nulling out the field for a friend simply means they cannot earn the arrival-keyed badges, which matches the broader friend-exclusion stance that already covers location badges.
+
+---
+
 ## 2026-05-17 (Phase 21)
 
 ### Added

@@ -3952,6 +3952,7 @@
         <li><b>Day row</b> — `border-left: 4px solid var(--accent)` (red), bg-surface, --r-1 (4px)</li>
         <li><b>Collapsed view strip</b> — `border-left: 4px solid var(--signal-ok)` (teal) when the user has marked arrival</li>
         <li>Avatar chips inside each row follow the standard `.av` sizing (22px)</li>
+        <li><b>Friend filtering</b> — users with <code>is_friend === true</code> are excluded from every row, every avatar cluster, and the collapsed-view totals. The crew does not coordinate camping logistics with friends, so friend arrivals stay private. The matching <i>"When do you arrive?"</i> picker inside <code>EditProfileForm</code> on <b>/profile</b> is also hidden for friend users (and <code>wacken_arrival_day</code> is no longer persisted on save), so the data is suppressed at the source as well as the surface.</li>
         <li>No DS section — fully undocumented; see <code>src/components/ArrivalMap.tsx</code></li>
       </ul>
     </div>

@@ -196,6 +196,15 @@ export default function ArrivalMap({
     localStorage.setItem('arrivals_map_view_state', view);
   }, [view]);
 
+  // Friends attend Wacken but are not part of the group's logistics — the
+  // crew does not need to know when a friend will arrive, so we drop anyone
+  // flagged as `is_friend` from the arrival map entirely (rows, totals, and
+  // empty-state checks all derive from this list).
+  const visibleUsers = useMemo(
+    () => crewUsers.filter((user) => user.is_friend !== true),
+    [crewUsers],
+  );
+
   const groupedByArrivalDay = useMemo(() => {
     const grouped: Record<ArrivalDay | 'not-set', CrewUser[]> = {
       'sun-jul26': [],
@@ -206,7 +215,7 @@ export default function ArrivalMap({
       'not-set': [],
     };
 
-    crewUsers.forEach((user) => {
+    visibleUsers.forEach((user) => {
       const day = (user.wacken_arrival_day as ArrivalDay) || null;
       if (day && grouped[day]) {
         grouped[day].push(user);
@@ -216,7 +225,7 @@ export default function ArrivalMap({
     });
 
     return grouped;
-  }, [crewUsers]);
+  }, [visibleUsers]);
 
   const sortedDays = useMemo(() => {
     const days: (ArrivalDay | 'not-set')[] = [...ARRIVAL_DAY_ORDER, 'not-set'];
