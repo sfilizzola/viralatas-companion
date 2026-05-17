@@ -225,12 +225,13 @@ Found in: **Godlike Powers → Test Push Notification**
 
 | File | Role |
 |------|------|
-| `src/hooks/useDuckQuack.ts` | Cooldown state + quack dispatch |
+| `src/hooks/useDuckQuack.ts` | Cooldown state + quack dispatch (derives `isOnCooldown` via `useCooldown`) |
+| `src/hooks/useCooldown.ts` | Render-pure cooldown derivation. Takes a `cooldownUntil: number \| null \| undefined`, returns whether the deadline is still in the future; flips to `false` automatically via a `setTimeout` inside `useEffect`. Used by `DuckButton`, `useDuckQuack`, and the Godlike Test Quack tile. |
 | `src/hooks/useDuckNotifications.ts` | Realtime subscription + window event |
 | `src/repositories/duck.ts` | Supabase INSERT + offline queue |
 | `src/lib/db.ts` | `offline_duck_quacks` IDB store |
 | `src/lib/pushSubscription.ts` | Push subscription registration |
-| `src/components/DuckButton.tsx` | Button UI with drain animation |
+| `src/components/DuckButton.tsx` | Button UI with drain animation. **Prop contract:** `{ onDuck, cooldownUntil, inBody?, tile? }` — `isOnCooldown` is derived internally via `useCooldown(cooldownUntil)`, never passed in. |
 | `src/components/DuckToast.tsx` | Floating in-app toast |
 | `src/workers/sw.ts` | `push` + `notificationclick` SW handlers |
 | `src/App.tsx` | `DuckSync`, `PushSetup`, `DuckNotificationsListener`, `DuckToast` mounting |

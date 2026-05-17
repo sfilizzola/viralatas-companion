@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { duckRepository } from '../repositories/duck';
+import { useCooldown } from './useCooldown';
 
 const COOLDOWN_MS = 90_000;
 
@@ -52,7 +53,7 @@ export function useDuckQuack(userId: string | null, bandId: string | null) {
     return () => window.clearTimeout(timer);
   }, [cooldownUntil, userId, bandId]);
 
-  const isOnCooldown = cooldownUntil !== null && cooldownUntil > Date.now();
+  const isOnCooldown = useCooldown(cooldownUntil);
 
   const quack = useCallback(async () => {
     if (!userId || !bandId || isOnCooldown) return;

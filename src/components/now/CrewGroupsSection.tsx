@@ -186,11 +186,6 @@ export default function CrewGroupsSection({
                   {showWeakButton && onDuck && (
                     <DuckButton
                       onDuck={onDuck}
-                      isOnCooldown={
-                        duckCooldownUntil !== null &&
-                        duckCooldownUntil !== undefined &&
-                        duckCooldownUntil > Date.now()
-                      }
                       cooldownUntil={duckCooldownUntil ?? null}
                       inBody
                       tile

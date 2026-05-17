@@ -10,6 +10,7 @@ import {
   setDuckEnabled,
 } from '../../lib/appSettings';
 import { useRefreshDuckEnabled } from '../../contexts/DuckEnabledContext';
+import { useCooldown } from '../../hooks/useCooldown';
 import { saveLiveBandTestConfigRemote } from '../../services/liveBandTest';
 import { Avatar, Collapsible, Select } from '../../ui';
 import DuckButton from '../DuckButton';
@@ -65,7 +66,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
 
   const TEST_QUACK_COOLDOWN_MS = 15_000;
   const [testQuackCooldownUntil, setTestQuackCooldownUntil] = useState<number | null>(null);
-  const isTestQuackOnCooldown = testQuackCooldownUntil !== null && testQuackCooldownUntil > Date.now();
+  const isTestQuackOnCooldown = useCooldown(testQuackCooldownUntil);
 
   const [testPushLoading, setTestPushLoading] = useState(false);
   const [testPushResult, setTestPushResult] = useState<{ ok: boolean; message: string } | null>(null);
@@ -728,7 +729,6 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                   if (isTestQuackOnCooldown) return;
                   setTestQuackCooldownUntil(Date.now() + TEST_QUACK_COOLDOWN_MS);
                 }}
-                isOnCooldown={isTestQuackOnCooldown}
                 cooldownUntil={testQuackCooldownUntil}
               />
             </div>

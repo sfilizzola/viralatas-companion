@@ -202,9 +202,6 @@ export default function BandCard({
           <div className={styles.duckRow}>
             <DuckButton
               onDuck={onDuck}
-              isOnCooldown={
-                duckCooldownUntil !== undefined && duckCooldownUntil > Date.now()
-              }
               cooldownUntil={duckCooldownUntil ?? null}
               tile
             />
@@ -227,9 +224,6 @@ export default function BandCard({
         <div className={styles.duckColumn}>
           <DuckButton
             onDuck={onDuck}
-            isOnCooldown={
-              duckCooldownUntil !== undefined && duckCooldownUntil > Date.now()
-            }
             cooldownUntil={duckCooldownUntil ?? null}
             tile
           />

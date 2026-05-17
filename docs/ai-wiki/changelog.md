@@ -4,6 +4,31 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-17 (react-hooks/purity: duck cooldown)
+
+### Added
+- `src/hooks/useCooldown.ts` — render-pure cooldown derivation. Given an expiry timestamp (`number | null | undefined`), returns whether the cooldown is still active. Replaces the `cooldownUntil > Date.now()` pattern that was being computed in JSX / hook bodies. Implementation uses a lazy-initialized `useRef<number>` snapshot of `Date.now()` plus a `useReducer` tick that only fires from the `setTimeout` callback — keeping render pure (no `Date.now()` calls) and avoiding sync `setState` inside `useEffect` bodies.
+
+### Changed
+- `src/components/DuckButton.tsx` — removed the `isOnCooldown: boolean` prop from `DuckButtonProps`. The component now derives `isOnCooldown` internally via `useCooldown(cooldownUntil)`. The existing RAF loop for the conic-gradient drain animation is unchanged (its `Date.now()` runs inside `useEffect`, which is allowed by `react-hooks/purity`).
+- `src/components/BandCard.tsx` — both `DuckButton` placements (timeline-variant `duckRow` and schedule-variant `duckColumn`) no longer pass `isOnCooldown`. Pass only `cooldownUntil={duckCooldownUntil ?? null}`.
+- `src/components/now/CrewGroupsSection.tsx` — `DuckButton` placement in the live-band group card no longer passes `isOnCooldown`.
+- `src/components/profile/GodlikeAdminPanel.tsx` — Test Quack tile no longer passes `isOnCooldown` to `DuckButton`. The local `isTestQuackOnCooldown` value, still consumed by the `onDuck` callback as a press-time guard, is now derived via `useCooldown(testQuackCooldownUntil)` instead of `testQuackCooldownUntil !== null && testQuackCooldownUntil > Date.now()` at render time.
+- `src/hooks/useDuckQuack.ts` — replaced the in-hook `const isOnCooldown = cooldownUntil !== null && cooldownUntil > Date.now()` line with `const isOnCooldown = useCooldown(cooldownUntil)`. The returned `isOnCooldown` value is the same shape; callers (e.g. `SchedulePage.DuckableBandCard`) keep working unchanged.
+- `docs/ai-wiki/flows/duck.md` — updated the `DuckButton` row in the source-file table to note the new prop contract (single `cooldownUntil` prop), and added a one-line reference to `useCooldown` as the cooldown derivation primitive used by both `useDuckQuack` and the Godlike Test Quack tile.
+
+### Architectural Notes
+- **Why:** `eslint-plugin-react-hooks` v6 (React Compiler / React 19 ruleset) introduced `react-hooks/purity`, which forbids calling impure functions like `Date.now()` during render. Render must be idempotent so the compiler's memoization is sound — otherwise a parent re-render could silently flip a derived boolean mid-cooldown without any prop or state change driving it.
+- **Single owner of cooldown truth.** Previously two consumers (`BandCard` callsites, `CrewGroupsSection`, `GodlikeAdminPanel`) and the producer (`useDuckQuack`) each independently computed `cooldownUntil > Date.now()`. After this change, `useCooldown` is the canonical answer, used by `DuckButton` itself plus the two hook/consumer sites where the boolean is needed outside the button (the `quack` guard inside `useDuckQuack`, and the Test Quack click-guard in `GodlikeAdminPanel`).
+- **Visual behavior preserved.** The conic-gradient drain animation still ticks via `requestAnimationFrame` inside `DuckButton`'s effect; only the gating boolean's *source* changed. The cooldown still:
+  - lasts 90 seconds per user per band (90 s per real duck via `useDuckQuack`),
+  - lasts 15 seconds for the Godlike Test Quack diagnostic tile,
+  - is stored per-band in `localStorage` for the real ducks (unchanged).
+- **No DB / no schema / no RLS change.** Purely client-side render correctness.
+- **Out of scope.** The same lint rollout also surfaces `react-hooks/set-state-in-effect` violations in unrelated hooks (`useOfflinePendingBandIds`, `DuckEnabledContext`, `AnnouncementsPage`, etc.). Those are pre-existing tech debt and will be addressed under a separate cleanup pass. `useCooldown` is the only new hook authored here and it is clean against both rules.
+
+---
+
 ## 2026-05-17 (Friend privacy: arrival data)
 
 ### Changed

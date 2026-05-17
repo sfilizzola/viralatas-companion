@@ -1,12 +1,14 @@
 import { type MouseEvent, useEffect, useRef, useState } from 'react';
 import { useI18n } from '../lib/i18n';
+import { useCooldown } from '../hooks/useCooldown';
 import styles from './DuckButton.module.css';
 
 const COOLDOWN_MS = 90_000;
 
 type DuckButtonProps = {
   onDuck: () => void;
-  isOnCooldown: boolean;
+  /** Expiry timestamp (ms since epoch) of the current cooldown, or null when idle.
+   * `isOnCooldown` is derived from this internally via `useCooldown` — render-pure. */
   cooldownUntil: number | null;
   /** When true, removes the column border-left and fixed width (for in-body placement) */
   inBody?: boolean;
@@ -14,8 +16,9 @@ type DuckButtonProps = {
   tile?: boolean;
 };
 
-export default function DuckButton({ onDuck, isOnCooldown, cooldownUntil, inBody, tile }: DuckButtonProps) {
+export default function DuckButton({ onDuck, cooldownUntil, inBody, tile }: DuckButtonProps) {
   const { t } = useI18n('DuckButton');
+  const isOnCooldown = useCooldown(cooldownUntil);
   const [drainAngle, setDrainAngle] = useState(0);
   const [popping, setPopping] = useState(false);
   const rafRef = useRef<number | null>(null);
