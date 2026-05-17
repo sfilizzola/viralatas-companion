@@ -25,4 +25,4 @@
 
 **Stage colors** are defined in `src/pages/SchedulePage.tsx`. Unknown stages gracefully fall back to `var(--accent)`.
 
-To update the lineup: edit `supabase/seed/bands.ts`, run `npm run seed:bands`, and add a migration if the schema changes.
+To update the lineup: edit `supabase/seed/bands.ts`, never run `npm run seed:bands`, the user has to be asked this is a destructive call. Add a migration if the schema changes.
