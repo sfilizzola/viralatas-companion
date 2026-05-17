@@ -393,6 +393,15 @@ When you discover new information or fix an error:
 3. If adding a new flow, create `flows/name.md` following the template below
 4. If documenting a decision, create `decisions/name.md`
 
+### Where related project memory lives
+
+`CLAUDE.md` and two sibling locations supplement this wiki without duplicating it:
+
+- **`.claude/context/`** — On-demand reference material loaded by Claude when a task needs it (RTK command catalog, stage lineup snapshot, badge contract, LLM alert prompt rules, `handle_new_user` auth-trigger contract, key technical decisions, the 8-section wiki page template). These files document operational rules and procedures.
+- **`.claude/agents/`** — Specialized subagent definitions (`wiki-curator`, `phase-closer`, `migration-validator`, `edge-function-reviewer`, `badge-author`, `offline-sync-auditor`, `pwa-auditor`). Each agent is invoked for a specific class of change and reads `CLAUDE.md` plus its own system prompt.
+
+This wiki remains the source of truth for **system behavior** — offline-first guarantees, sync semantics, domain modeling, flows, and ADRs. The `.claude/` tree is the source of truth for **how Claude works on the codebase**. Wiki pages should not restate `.claude/context/` content; they should link to source files and explain the *why*.
+
 ### Template: Flow Documents
 
 ```markdown
@@ -442,4 +451,4 @@ Window events dispatched by hooks/components (not from db.ts):
 
 ---
 
-**Last edited**: 2026-05-15 by Claude Sonnet 4.6
+**Last edited**: 2026-05-17 by Claude Opus 4.7

@@ -4,6 +4,26 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-17
+
+### Added
+- `.claude/context/` directory — on-demand reference material that `CLAUDE.md` now points to instead of inlining: `rtk-reference.md` (full RTK command catalog), `stages-and-lineup.md` (stage table + festival schedule + lineup update procedure), `llm-alerts.md` (`AlertContext` shape, prompt language and tone rules), `badges.md` (`BadgeConfig` contract + supported conditions + add-a-badge procedure), `auth-trigger.md` (`handle_new_user` contract and the four behaviors), `key-decisions.md` (decision/choice/reason matrix), `wiki-template.md` (the 8-section wiki page template).
+- `.claude/agents/` directory — seven specialized subagent system prompts: `wiki-curator`, `phase-closer`, `migration-validator`, `edge-function-reviewer`, `badge-author`, `offline-sync-auditor`, `pwa-auditor`. Each is invoked on a specific class of change (see `CLAUDE.md` → "Subagent locations" for the trigger map).
+
+### Changed
+- `CLAUDE.md` slimmed from ~370 lines to a rules-and-pointers index. Long-form reference material moved to `.claude/context/` and is loaded on demand. Stale markers refreshed; `npm run seed:bands` flagged as destructive.
+- `docs/ai-wiki/index.md` — added a "Where related project memory lives" subsection under "Contributing to This Wiki" pointing readers at `.claude/context/` (on-demand reference material) and `.claude/agents/` (specialized subagent definitions); refreshed the `Last edited` line.
+
+### Architectural Notes
+- Project institutional memory now lives in three locations with deliberately non-overlapping scopes:
+  - `docs/ai-wiki/` — system behavior: offline-first guarantees, sync semantics, domain modeling, flows, ADRs (this wiki).
+  - `.claude/context/` — operational rules and procedures loaded by Claude on demand (RTK, stages, badges, alerts, auth trigger, decisions matrix, wiki template).
+  - `.claude/agents/` — specialized subagent system prompts that define how Claude operates on specific classes of change.
+- The split is intentional: the wiki documents *the system*; `.claude/` documents *how AI agents work the codebase*. Wiki pages should not restate `.claude/context/` content; they should link to source files and explain the *why*.
+- This change does not modify any source code path under `src/` or `supabase/`, does not alter system behavior, and does not affect the offline-first contract or RLS posture. No Design System change (no UI moved).
+
+---
+
 ## 2026-05-16 (later)
 
 ### Changed
