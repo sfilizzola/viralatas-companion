@@ -89,21 +89,33 @@ Update **all three**:
 ├── src/
 │   ├── components/       # Shared UI components
 │   ├── pages/            # Route-level page components
+│   ├── ui/               # Lower-level UI primitives
 │   ├── hooks/            # Custom React hooks
+│   ├── repositories/     # Data access (picks, announcements, duck, ...)
+│   ├── services/         # Domain services (badges, time, stage colors, ...)
 │   ├── lib/
-│   │   ├── supabase.ts   # Supabase client + types
+│   │   ├── supabase.ts   # Supabase client
 │   │   ├── db.ts         # IndexedDB helpers (offline store)
-│   │   ├── alerts.ts     # Alert queue logic
-│   │   └── announcements.ts  # Announcement data layer
+│   │   ├── sync.ts       # Sync engine entrypoint
+│   │   ├── pushSubscription.ts  # Web Push setup
+│   │   └── i18n.ts       # i18n bootstrap
 │   ├── workers/
 │   │   └── sw.ts         # Service Worker
 │   ├── types/            # Shared TypeScript types
-│   └── i18n/             # Translations (Brazilian Portuguese, English)
+│   ├── i18n/             # Translations (br, en, es, de)
+│   └── __tests__/        # Vitest unit/integration tests
 ├── supabase/
 │   ├── migrations/       # SQL migrations (source of truth)
-│   └── functions/        # Edge Functions (one folder per function)
+│   ├── functions/        # Edge Functions (one folder per function)
+│   └── seed/             # Seed scripts (bands, test users, live-now)
+├── public/
+│   ├── badges/           # Badge PNG assets
+│   └── Design System.html  # Living UI spec
 ├── docs/
-│   └── ai-wiki/          # Architecture wiki (14 pages)
+│   └── ai-wiki/          # Architecture wiki (core/, flows/, decisions/)
+├── .claude/
+│   ├── context/          # On-demand context files
+│   └── agents/           # Specialized subagents
 ├── CLAUDE.md             # ← you are here
 ├── PHASES.md             # Current and upcoming development phases
 └── README.md             # User-facing setup & features
@@ -119,7 +131,7 @@ Update **all three**:
 - `/schedule` — Full band schedule with filters (stage, day, time)
 - `/my-picks` — Current user's picked bands
 - `/popular` — Vira-latas popularity: bands sorted by total picks
-- `/announcements` — Mural-style announcements board (Phase 5)
+- `/announcements` — Mural-style announcements board
 - `/profile` — Profile, preferences, godlike/manager UI, logout
 
 Unknown routes redirect to `/now`.
@@ -294,9 +306,7 @@ Only when **both the build and all tests are green** may you proceed with the co
 
 ## Testing
 
-- **Unit tests:** `src/__tests__/` (128 tests verified after Phase 7)
-  - Registration validation, login flows, auth integration, RLS enforcement
-  - Run with `npm test` or `npm test:coverage`
+- **Unit tests:** `src/__tests__/` — run with `npm test` or `npm test:coverage`. Coverage details and conventions → `docs/ai-wiki/testing.md`.
 
 - **Seed scripts:** `supabase/seed/` and `npm run seed:*`
   - `npm run seed:bands` — Refresh band lineup (cascades to picks)
