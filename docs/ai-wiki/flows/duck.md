@@ -179,6 +179,23 @@ self.addEventListener('notificationclick', (event) => {
 
 ---
 
+## Killswitch (Phase 21)
+
+The duck feature has a global killswitch managed from **Godlike Powers → Duck feature**.
+
+- **Source of truth:** `app_settings.duck_enabled boolean default true not null`. Inherits the existing `app_settings_select` (anyone can read) and `app_settings_update` (godlike only) RLS policies — no new policies were added.
+- **Read path:** fetched once at app boot via `getDuckEnabled()` in `src/lib/appSettings.ts`, cached in `DuckEnabledProvider` (`src/contexts/DuckEnabledContext.tsx`), consumed by `useDuckEnabled()`.
+- **UI gate points:** three consumer call-sites read the cached value:
+  - `src/pages/RightNowPage.tsx` — passes `undefined` to `CrewGroupsSection`'s `onDuck` prop when off
+  - `src/pages/SchedulePage.tsx` (`DuckableBandCard`) — `canDuck` short-circuits to `false` when off
+  - `src/components/profile/GodlikeAdminPanel.tsx` — renders a "currently disabled for all users" hint above the Test Quack tile when off (the tile itself stays functional)
+- **Propagation:** *next load only*. There is no Realtime subscription on `app_settings`; a user mid-session won't see the change until reload. The admin's own session refreshes the context value immediately after a successful toggle via `useRefreshDuckEnabled()`.
+- **Default-on resilience:** `getDuckEnabled()` returns `true` on any read failure. A transient network error never silently disables the feature.
+- **Server-side is untouched.** `send-duck-push`, `duck_quacks` INSERT, and `useDuckNotifications` Realtime subscription are all gate-free. Offline-queued ducks still flush on reconnect even if the switch was flipped to OFF in the meantime — this respects the user's intent at press time (offline-first principle: never silently drop a queued action). Recipients still receive the in-app toast / Web Push for those legitimately-intent ducks.
+- **The killswitch is purely a "future button visibility" gate**, not a data block. A press that already happened gets honored; a press that hasn't happened yet simply has no button to press.
+
+---
+
 ## Admin Test Flows
 
 ### Test Quack (in-app toast only)
@@ -188,6 +205,7 @@ Found in: **Godlike Powers → Test Quack**
 - After 15 seconds: dispatches `viralatas:duck-quack` window event with `{ bandName: 'Queen' }` locally
 - `DuckToast` shows the floating toast
 - **No database write. No Web Push. Only tests the DuckToast component.**
+- Remains visible and functional even when the Phase 21 killswitch is OFF — a "currently disabled for all users" hint appears above the button so the admin knows users aren't seeing the feature.
 
 ### Test Push Notification (full Web Push stack)
 Found in: **Godlike Powers → Test Push Notification**
@@ -220,7 +238,9 @@ Found in: **Godlike Powers → Test Push Notification**
 | `src/pages/SchedulePage.tsx` | `DuckableBandCard` wrapper |
 | `src/components/now/CrewGroupsSection.tsx` | DuckButton in live band group card |
 | `src/components/BandCard.tsx` | `onDuck?` prop + `.withDuck` grid variant |
-| `src/components/profile/GodlikeAdminPanel.tsx` | Test Quack + Test Push buttons |
+| `src/components/profile/GodlikeAdminPanel.tsx` | Test Quack + Test Push buttons + Duck feature killswitch toggle |
+| `src/contexts/DuckEnabledContext.tsx` | Phase 21 killswitch Context provider + `useDuckEnabled` / `useRefreshDuckEnabled` hooks |
+| `src/lib/appSettings.ts` | `getDuckEnabled` / `setDuckEnabled` helpers (alongside registration killswitch helpers) |
 | `supabase/functions/send-duck-push/index.ts` | Web Push for real quacks |
 | `supabase/functions/send-test-push/index.ts` | Diagnostic test push for admins |
 

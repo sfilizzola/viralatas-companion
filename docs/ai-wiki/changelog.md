@@ -4,6 +4,32 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-17 (Phase 21)
+
+### Added
+- `supabase/migrations/20260517000000_app_settings_duck_enabled.sql` — adds `duck_enabled boolean default true not null` to the existing single-row `public.app_settings` table. Inherits the existing RLS policies (anyone reads, only the godlike user updates). No new policies or Realtime publication changes.
+- `src/lib/appSettings.ts` — `getDuckEnabled()` and `setDuckEnabled()` helpers, mirroring the existing `getRegistrationEnabled` / `setRegistrationEnabled` shape. Both default to `true` on any read failure so a transient network error never silently disables the feature.
+- `src/contexts/DuckEnabledContext.tsx` — `DuckEnabledProvider` (wrapped around the app tree in `src/App.tsx`), `useDuckEnabled()` consumer hook, and `useRefreshDuckEnabled()` setter used by the Godlike admin panel after a successful toggle.
+- `src/components/profile/GodlikeAdminPanel.tsx` — new **"Duck feature 🦆"** toggle section (mirroring the existing **"Control registration"** section). Adds a `testQuackDisabledHint` line above the Test Quack button when the feature is OFF, so the admin always knows whether end users are seeing the duck.
+- `docs/ai-wiki/flows/duck.md` — new **Killswitch (Phase 21)** section documenting the read path, propagation rule (next load), default-on resilience, and the explicit "server-side stays dumb on purpose" rule.
+- `docs/ai-wiki/supabase-schema.md` — new `public.app_settings` table section documenting both `registration_enabled` and `duck_enabled` columns with their RLS and non-Realtime behavior. (This filled a pre-existing gap — `app_settings` had been missing from the schema doc since the registration killswitch shipped.)
+
+### Changed
+- `src/App.tsx` — app tree is now wrapped in `<DuckEnabledProvider>` so the cached killswitch value is available throughout the routes.
+- `src/pages/RightNowPage.tsx` — `onDuck` is passed to `CrewGroupsSection` only when `duckEnabled && duckBandId`.
+- `src/pages/SchedulePage.tsx` — `DuckableBandCard.canDuck` short-circuits to `false` when `duckEnabled` is `false`.
+- `src/i18n/ProfilePage_{br,en,es,de}.json` — added 7 new keys: `duckToggle`, `duckToggleDescription`, `duckEnabled`, `duckDisabled`, `duckLoading`, `duckToggleError`, `testQuackDisabledHint`.
+- `public/Design System.html` — BandCard component-section now documents the killswitch visibility rule and where the toggle lives.
+- `PHASES.md` — Phase 20 details removed (already preserved in `phases-history.md`); Phase 21 written out as the active phase.
+
+### Architectural Notes
+- The killswitch is a **future button visibility gate**, not a data block. `send-duck-push`, `duck_quacks` INSERT, RLS on `duck_quacks`, and the `useDuckNotifications` Realtime subscription are all **untouched**. Offline-queued ducks still flush and broadcast on reconnect even if the switch was flipped to OFF in the meantime — this respects the user's intent at press time and preserves the offline-first contract.
+- **Next-load propagation only.** No Realtime subscription on `app_settings`; mid-session users won't see the change until reload. The admin's own session is the exception: a successful toggle triggers `useRefreshDuckEnabled()` so the cached Context value updates immediately (so the Test Quack hint appears/disappears in real time within the admin panel).
+- The Test Quack tile is the **only non-gated duck render**. It uses a local-only window event (no DB write, no other user affected), so leaving it functional during killswitch=off is safe — and the explicit `testQuackDisabledHint` makes the disabled state unambiguous.
+- The `useDuckEnabled` Context defaults to `true` while the initial fetch is in flight, so users never see a flash of missing duck button on a slow first paint.
+
+---
+
 ## 2026-05-17 (later)
 
 ### Changed

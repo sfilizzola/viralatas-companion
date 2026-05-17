@@ -10,6 +10,7 @@ import { useMyPicks } from '../hooks/useMyPicks';
 import { useNow } from '../hooks/useNow';
 import { usePickCounts } from '../hooks/usePickCounts';
 import { useDuckQuack } from '../hooks/useDuckQuack';
+import { useDuckEnabled } from '../contexts/DuckEnabledContext';
 import { useI18n } from '../lib/i18n';
 import { useOfflinePendingBandIds } from '../hooks/useOfflinePendingBandIds';
 import BottomNav from '../components/BottomNav';
@@ -42,7 +43,8 @@ function DuckableBandCard({
   pending: boolean;
   isBandEnded: boolean;
 }) {
-  const canDuck = isLive && isPicked && band.category !== 'ceremony';
+  const duckEnabled = useDuckEnabled();
+  const canDuck = duckEnabled && isLive && isPicked && band.category !== 'ceremony';
   const { quack, isOnCooldown, cooldownUntil } = useDuckQuack(
     canDuck ? userId : null,
     canDuck ? band.id : null,

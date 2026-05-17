@@ -943,6 +943,7 @@
         <p>Displays band information with pick toggles and attendance counts.</p>
         <p><strong>Variants:</strong> schedule, timeline, ranked, ceremony</p>
         <p><strong>Features:</strong> duck button, conflict indicators, stage badge, attendee avatars</p>
+        <p><strong>Duck button visibility:</strong> only when band is currently live, the user has picked it, <code>band.category !== 'ceremony'</code>, AND the global <code>duck_enabled</code> killswitch (Phase 21) is on. The killswitch is a single boolean on <code>app_settings</code>, fetched once at app boot via <code>DuckEnabledProvider</code> and toggled from Godlike Powers → Duck feature. When off, the duck button is not rendered anywhere; offline-queued ducks still flush on reconnect.</p>
         <p><strong>Status:</strong> <span class="status-warn">⚠ Hardcoded colors in component—needs refactor</span></p>
       </div>
 

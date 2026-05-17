@@ -226,16 +226,19 @@ export type Database = {
         Row: {
           id: string;
           registration_enabled: boolean;
+          duck_enabled: boolean;
           updated_at: string;
         };
         Insert: {
           id?: string;
           registration_enabled?: boolean;
+          duck_enabled?: boolean;
           updated_at?: string;
         };
         Update: {
           id?: string;
           registration_enabled?: boolean;
+          duck_enabled?: boolean;
           updated_at?: string;
         };
         Relationships: [];

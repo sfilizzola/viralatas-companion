@@ -443,6 +443,36 @@ INSERT INTO public.meta (key, cache_version) VALUES ('cache', '1');
 
 ---
 
+### `public.app_settings`
+
+**Purpose**: Single-row table holding global app-wide feature flags. Read by everyone, written only by the godlike user.
+
+```sql
+CREATE TABLE public.app_settings (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  registration_enabled boolean DEFAULT true NOT NULL,
+  duck_enabled boolean DEFAULT true NOT NULL,
+  updated_at timestamptz DEFAULT now() NOT NULL
+);
+
+-- Exactly one row is expected; created by the original migration.
+INSERT INTO public.app_settings DEFAULT VALUES;
+```
+
+**Columns:**
+
+- `registration_enabled` — when `false`, the registration screen is closed; only existing vira-latas can log in. Read by `/register` to render the closed state.
+- `duck_enabled` (Phase 21) — when `false`, the duck/quack button is not rendered anywhere in the app. Fetched once at app boot via `getDuckEnabled()` and exposed via `DuckEnabledProvider`. See `docs/ai-wiki/flows/duck.md` for full behavior.
+
+**RLS:**
+
+- `app_settings_select` — `using (true)` — anyone can read.
+- `app_settings_update` — `using (auth.jwt() ->> 'email' = 'sfilizzola@gmail.com')` — only the godlike user can update. Applies to both columns.
+
+**Not realtime**. State is fetched once at app boot; mid-session changes require a reload (next-load propagation).
+
+---
+
 ## Realtime Configuration
 
 **Enabled Tables**:

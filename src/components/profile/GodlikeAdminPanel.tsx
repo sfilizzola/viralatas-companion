@@ -3,7 +3,13 @@ import type { Band, LiveBandTestConfig, UserRole } from '../../types';
 import { supabase } from '../../lib/supabase';
 import { announcementsRepository, bandsRepository, presenceRepository } from '../../repositories';
 import { loadBands, loadAllUserPicks, loadLiveBandTestConfig, loadMetalPlaceConfig } from '../../lib/db';
-import { getRegistrationEnabled, setRegistrationEnabled } from '../../lib/appSettings';
+import {
+  getRegistrationEnabled,
+  setRegistrationEnabled,
+  getDuckEnabled,
+  setDuckEnabled,
+} from '../../lib/appSettings';
+import { useRefreshDuckEnabled } from '../../contexts/DuckEnabledContext';
 import { saveLiveBandTestConfigRemote } from '../../services/liveBandTest';
 import { Avatar, Collapsible, Select } from '../../ui';
 import DuckButton from '../DuckButton';
@@ -36,6 +42,10 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
   const [registrationEnabled, setRegistrationEnabledState] = useState(true);
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
+  const [duckFeatureEnabled, setDuckFeatureEnabledState] = useState(true);
+  const [duckFeatureLoading, setDuckFeatureLoading] = useState(false);
+  const [duckFeatureError, setDuckFeatureError] = useState<string | null>(null);
+  const refreshDuckEnabled = useRefreshDuckEnabled();
   const [metalPlaceLoading, setMetalPlaceLoading] = useState(true);
   const [metalPlaceSaving, setMetalPlaceSaving] = useState(false);
   const [metalPlaceError, setMetalPlaceError] = useState<string | null>(null);
@@ -97,6 +107,18 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
       }
     }
     if (userRole === 'godlike') loadRegistrationStatus();
+  }, [userRole]);
+
+  useEffect(() => {
+    async function loadDuckFeatureStatus() {
+      try {
+        const enabled = await getDuckEnabled();
+        setDuckFeatureEnabledState(enabled);
+      } catch (error) {
+        console.error('Failed to load duck killswitch status:', error);
+      }
+    }
+    if (userRole === 'godlike') loadDuckFeatureStatus();
   }, [userRole]);
 
   useEffect(() => {
@@ -203,6 +225,26 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
       setRegistrationLoading(false);
     }
   }, [registrationEnabled, t]);
+
+  const handleToggleDuckFeature = useCallback(async () => {
+    setDuckFeatureLoading(true);
+    setDuckFeatureError(null);
+    try {
+      const newValue = !duckFeatureEnabled;
+      await setDuckEnabled(newValue);
+      setDuckFeatureEnabledState(newValue);
+      // Refresh the global Context so the admin's own /now and /schedule pages
+      // (within this same tab) react immediately. Other users still see the
+      // change on next app load — per Phase 21 design decision.
+      await refreshDuckEnabled();
+    } catch (error) {
+      console.error('Failed to toggle duck killswitch:', error);
+      setDuckFeatureError(t('duckToggleError'));
+      setTimeout(() => setDuckFeatureError(null), 3000);
+    } finally {
+      setDuckFeatureLoading(false);
+    }
+  }, [duckFeatureEnabled, refreshDuckEnabled, t]);
 
   const handlePromoteOrDemote = useCallback(
     async (targetUserId: string, currentRole: string) => {
@@ -417,6 +459,29 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                 </button>
                 <span className={styles.registrationStatus}>
                   {registrationEnabled ? '🟢' : '🔴'}
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.registrationSection}>
+              <h4 className={styles.registrationSectionTitle}>{t('duckToggle')}</h4>
+              <p className={styles.registrationSectionDescription}>{t('duckToggleDescription')}</p>
+              {duckFeatureError && <p className={styles.registrationError}>{duckFeatureError}</p>}
+              <div className={styles.registrationControlRow}>
+                <button
+                  className={`${styles.registrationToggleButton} ${duckFeatureEnabled ? styles.enabled : styles.disabled}`}
+                  onClick={handleToggleDuckFeature}
+                  disabled={duckFeatureLoading}
+                  type="button"
+                >
+                  {duckFeatureLoading
+                    ? t('duckLoading')
+                    : duckFeatureEnabled
+                      ? t('duckEnabled')
+                      : t('duckDisabled')}
+                </button>
+                <span className={styles.registrationStatus}>
+                  {duckFeatureEnabled ? '🟢' : '🔴'}
                 </span>
               </div>
             </div>
@@ -654,6 +719,9 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
             <div className={styles.liveBandTestSection}>
               <h4 className={styles.liveBandTestSectionTitle}>{t('testQuackTitle')}</h4>
               <p className={styles.liveBandTestDescription}>{t('testQuackDescription')}</p>
+              {!duckFeatureEnabled && (
+                <p className={styles.testModeHint}>{t('testQuackDisabledHint')}</p>
+              )}
               <DuckButton
                 tile
                 onDuck={() => {

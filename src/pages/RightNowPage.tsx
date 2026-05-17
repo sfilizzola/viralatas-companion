@@ -1,5 +1,6 @@
 import { useI18n, type Language } from '../lib/i18n';
 import { useNowData } from '../hooks/useNowData';
+import { useDuckEnabled } from '../contexts/DuckEnabledContext';
 import type { CrewLiveGroup } from '../services/livePreview';
 import { useState } from 'react';
 import BottomNav from '../components/BottomNav';
@@ -29,6 +30,7 @@ function nowLabel(date: Date, language: Language) {
 
 export default function RightNowPage() {
   const { language, t } = useI18n('RightNowPage');
+  const duckEnabled = useDuckEnabled();
   const [activeGroup, setActiveGroup] = useState<CrewLiveGroup | null>(null);
   const {
     user,
@@ -107,7 +109,7 @@ export default function RightNowPage() {
               myPlan={myPlan}
               metalPlaceConfig={metalPlaceConfig}
               onSkip={handleSkip}
-              onDuck={duckBandId ? duckQuack : undefined}
+              onDuck={duckEnabled && duckBandId ? duckQuack : undefined}
               duckCooldownUntil={duckCooldownUntil}
               onGroupSelect={setActiveGroup}
               t={t}

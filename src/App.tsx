@@ -18,6 +18,7 @@ import { syncBands } from './lib/sync';
 import { subscribeToPush } from './lib/pushSubscription';
 import { PICKS_CHANGED_EVENT, loadUserPicks } from './lib/db';
 import { picksRepository, usersRepository, presenceRepository, announcementsRepository, bandsRepository, duckRepository } from './repositories';
+import { DuckEnabledProvider } from './contexts/DuckEnabledContext';
 
 function emitSyncComplete() {
   window.dispatchEvent(new Event(SYNC_COMPLETE_EVENT));
@@ -164,69 +165,71 @@ function DuckNotificationsListener() {
 export default function App() {
   return (
     <BrowserRouter>
-      <CacheVersionCheck />
-      <BandSync />
-      <PickSync />
-      <AnnouncementSync />
-      <DuckSync />
-      <PushSetup />
-      <DuckNotificationsListener />
-      <SyncToast />
-      <DuckToast />
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route
-          path="/schedule"
-          element={
-            <PrivateRoute>
-              <SchedulePage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/my-picks"
-          element={
-            <PrivateRoute>
-              <MyPicksPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/popular"
-          element={
-            <PrivateRoute>
-              <PopularPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/now"
-          element={
-            <PrivateRoute>
-              <RightNowPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/announcements"
-          element={
-            <PrivateRoute>
-              <AnnouncementsPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute>
-              <ProfilePage />
-            </PrivateRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/now" replace />} />
-      </Routes>
+      <DuckEnabledProvider>
+        <CacheVersionCheck />
+        <BandSync />
+        <PickSync />
+        <AnnouncementSync />
+        <DuckSync />
+        <PushSetup />
+        <DuckNotificationsListener />
+        <SyncToast />
+        <DuckToast />
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route
+            path="/schedule"
+            element={
+              <PrivateRoute>
+                <SchedulePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/my-picks"
+            element={
+              <PrivateRoute>
+                <MyPicksPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/popular"
+            element={
+              <PrivateRoute>
+                <PopularPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/now"
+            element={
+              <PrivateRoute>
+                <RightNowPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/announcements"
+            element={
+              <PrivateRoute>
+                <AnnouncementsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <ProfilePage />
+              </PrivateRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/now" replace />} />
+        </Routes>
+      </DuckEnabledProvider>
     </BrowserRouter>
   );
 }

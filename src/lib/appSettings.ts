@@ -52,3 +52,58 @@ export async function setRegistrationEnabled(enabled: boolean): Promise<boolean>
     throw err;
   }
 }
+
+// Defaults to true on any error so a transient network failure never silently
+// disables the feature for the entire app (offline-first principle).
+export async function getDuckEnabled(): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from('app_settings')
+      .select('duck_enabled')
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.error('Failed to fetch duck killswitch:', error);
+      return true;
+    }
+
+    return data?.duck_enabled ?? true;
+  } catch (err) {
+    console.error('Error fetching duck killswitch:', err);
+    return true;
+  }
+}
+
+export async function setDuckEnabled(enabled: boolean): Promise<boolean> {
+  try {
+    const { data: settings, error: fetchError } = await supabase
+      .from('app_settings')
+      .select('id')
+      .limit(1)
+      .single();
+
+    if (fetchError || !settings) {
+      console.error('Failed to fetch app settings row:', fetchError);
+      throw fetchError ?? new Error('App settings row not found');
+    }
+
+    const { error } = await supabase
+      .from('app_settings')
+      .update({
+        duck_enabled: enabled,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', settings.id);
+
+    if (error) {
+      console.error('Failed to update duck killswitch:', error);
+      throw error;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Error updating duck killswitch:', err);
+    throw err;
+  }
+}
