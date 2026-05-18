@@ -433,6 +433,22 @@ export const BADGES: BadgeConfig[] = [
     condition: { type: 'assigned' },
     year: 2026,
   },
+  {
+    slug: 'beer-master',
+    imagePath: '/badges/badge_beer-master.png',
+    labelKey: 'badgeBeerMaster',
+    descriptionKey: 'badgeBeerMasterDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
+  {
+    slug: 'beer-hater',
+    imagePath: '/badges/badge_beer-hater.png',
+    labelKey: 'badgeBeerHater',
+    descriptionKey: 'badgeBeerHaterDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
 ];
 
 // ─── CONDITION EXAMPLES ───────────────────────────────────────────────────────

@@ -4,6 +4,25 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-18 (Badges: beer-master + beer-hater godlike-assigned)
+
+### Added
+- `src/services/badges/registry.ts` — 2 new `BadgeConfig` entries (godlike-assigned, year: 2026):
+  - `beer-master` — "Mestre da Cerveja". You drank Wacken dry and asked for seconds.
+  - `beer-hater` — "Inimigo da Cerveja". Surrounded by oceans of beer and said "no thanks."
+- `public/badges/badge_beer-master.png` — badge asset (pre-existing).
+- `public/badges/badge_beer-hater.png` — badge asset (pre-existing).
+- All 4 × 2 i18n keys (label + description) added to `Badges_br.json`, `Badges_en.json`, `Badges_es.json`, `Badges_de.json`.
+
+### Changed
+- `docs/ai-wiki/badges.md` — inventory 51 → 53; Merit/Assigned 11 → 13; new badges listed.
+- `.claude/context/badges.md` — registry entry count 36 → 53 (corrected running total).
+
+### Architectural Notes
+- Both badges use `condition: { type: 'assigned' }` — no engine or type changes required.
+
+---
+
 ## 2026-05-18 (Badges: new predicate `stage_diversity_min` + 4 new badges)
 
 ### Added

@@ -483,7 +483,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 
 ---
 
-## Current Badges Inventory (51 Total)
+## Current Badges Inventory (53 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -538,7 +538,7 @@ These genres exist on the 2026 lineup but no badge in `src/services/badges/regis
 - `Pirate Metal` — held by 1 band only (`Mr. Hurley und die Pulveraffen`, WAK17, Day 3). Single-band genres are not a good fit for a `bands_seen_genre_min` badge (would be equivalent to `band_seen_named`). If a "pirate" badge is desired, prefer `band_seen_named` against that one band.
 - Most stage-specific or niche genres (Goregrind, Humppa, Horror Punk, etc.) — intentional, to keep the badge inventory curated.
 
-### Merit / Assigned (11)
+### Merit / Assigned (13)
 - `mosh-pit` — Hit the floor, came back (godlike-assigned)
 - `crowdsurfer` — Flew over the crowd (godlike-assigned)
 - `girl-power` — Metal queen (godlike-assigned)
@@ -550,6 +550,8 @@ These genres exist on the 2026 lineup but no badge in `src/services/badges/regis
 - `medic` — "Médico da Matilha" / "Vira-Lata Medic". Held the hair, fetched the water, walked the wounded home (godlike-assigned).
 - `smoke-signals` — "Sinais de Fumaça". The pack always found you by the cloud. Wacken's air got a little spicier (godlike-assigned).
 - `space-brownie` — "Space Brownie". "It's just a brownie," they said. Two hours later you were debating reality with a tent pole (godlike-assigned).
+- `beer-master` — "Mestre da Cerveja". Liquid bread is a food group. You drank Wacken dry and asked for seconds (godlike-assigned).
+- `beer-hater` — "Inimigo da Cerveja". Surrounded by oceans of beer and said "no thanks." Wine, shots, caipirinha — anything but that (godlike-assigned).
 
 ### Location Presence (5)
 - `metal-place-2026` — Visited Metal Place (persist: true)
@@ -952,4 +954,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-18 — added 7 new badges: witching-hour, vampire (late-night seen-after-hour_min tiers), small-stage-champion (W.E.T. ∪ Headbangers loyalty), full-pack, mass-lost (crew-at-location-min 21-person milestones, persist: true), medic (godlike-assigned), and judas-witness (band_seen_named: Judas Priest). Inventory 40 → 47. No new predicates; no engine/types changes.
+**Last updated:** 2026-05-18 — added 2 new godlike-assigned badges: `beer-master` ("Mestre da Cerveja") and `beer-hater` ("Inimigo da Cerveja"). Inventory 51 → 53. Merit/Assigned 11 → 13. No new predicates; no engine/types changes.
