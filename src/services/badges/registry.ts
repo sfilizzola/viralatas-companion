@@ -335,6 +335,69 @@ export const BADGES: BadgeConfig[] = [
     condition: { type: 'wacken_arrived_on', day: 'wed-jul29' },
     year: 2026,
   },
+  // Festival 2026 — late-night endurance badges
+  {
+    slug: 'witching-hour',
+    imagePath: '/badges/badge_witching-hour.png',
+    labelKey: 'badgeWitchingHour',
+    descriptionKey: 'badgeWitchingHourDescription',
+    condition: { type: 'bands_seen_after_hour_min', hour: 22, count: 4 },
+    year: 2026,
+  },
+  {
+    slug: 'vampire',
+    imagePath: '/badges/badge_vampire.png',
+    labelKey: 'badgeVampire',
+    descriptionKey: 'badgeVampireDescription',
+    condition: { type: 'bands_seen_after_hour_min', hour: 22, count: 8 },
+    year: 2026,
+  },
+  // Festival 2026 — small stage loyalty
+  {
+    slug: 'small-stage-champion',
+    imagePath: '/badges/badge_small-stage-champion.png',
+    labelKey: 'badgeSmallStageChampion',
+    descriptionKey: 'badgeSmallStageChampionDescription',
+    condition: { type: 'bands_seen_stages_min', stages: ['W.E.T.', 'Headbangers'], count: 6 },
+    year: 2026,
+  },
+  // Festival 2026 — crew presence milestones (persist: true — full crew moments)
+  {
+    slug: 'full-pack',
+    imagePath: '/badges/badge_full-pack.png',
+    labelKey: 'badgeFullPack',
+    descriptionKey: 'badgeFullPackDescription',
+    condition: { type: 'crew_at_location_min', location: 'camping', count: 21 },
+    year: 2026,
+    persist: true,
+  },
+  {
+    slug: 'mass-lost',
+    imagePath: '/badges/badge_mass-lost.png',
+    labelKey: 'badgeMassLost',
+    descriptionKey: 'badgeMassLostDescription',
+    condition: { type: 'crew_at_location_min', location: 'lost', count: 21 },
+    year: 2026,
+    persist: true,
+  },
+  // Joke badges — assigned manually by godlike via the assign-badge Edge Function
+  {
+    slug: 'medic',
+    imagePath: '/badges/badge_medic.png',
+    labelKey: 'badgeMedic',
+    descriptionKey: 'badgeMedicDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
+  // Festival 2026 — band-named witness badges
+  {
+    slug: 'judas-witness',
+    imagePath: '/badges/badge_judas-witness.png',
+    labelKey: 'badgeJudasWitness',
+    descriptionKey: 'badgeJudasWitnessDescription',
+    condition: { type: 'band_seen_named', name: 'Judas Priest' },
+    year: 2026,
+  },
 ];
 
 // ─── CONDITION EXAMPLES ───────────────────────────────────────────────────────

@@ -473,7 +473,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 
 ---
 
-## Current Badges Inventory (40 Total)
+## Current Badges Inventory (47 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -490,7 +490,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `5-wackens` — Attended 5+ editions
 - `10-wackens` — Attended 10+ editions
 
-### Festival 2026 (14)
+### Festival 2026 (18)
 - `early-bird` — Saw 5+ bands before 1 PM (CEST)
 - `dreamer` — "I'm Tripping" / 30+ picked bands (persist: true)
 - `death-metal` — Saw 3+ Death Metal bands
@@ -505,6 +505,10 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `wackinger-regular` — Display label "Wackinger Viking". Saw 3+ bands on the Wackinger stage (`bands_seen_stage_min`).
 - `wasteland-warrior` — Saw 1+ band on the Wasteland stage (`bands_seen_stage_min`). Low threshold by design — Wasteland is the "you went there at all" badge.
 - `bullhead-heat` — "Bullhead Heat" / "Calor do Bullhead" / "Calor del Bullhead" / "Bullhead-Hitze". Loyalty to the flaming bullhead between Faster ↔ Harder: saw 6+ bands across Faster ∪ Harder (`bands_seen_stages_min`, "more than 5" interpreted as strictly > 5).
+- `witching-hour` — "Hora das Bruxas". Late-night endurance: saw 4+ bands starting at or after 22:00 CEST (`bands_seen_after_hour_min`).
+- `vampire` — "Vampiro". Extreme night owl: saw 8+ bands starting at or after 22:00 CEST (`bands_seen_after_hour_min`). Tiers with `witching-hour`.
+- `small-stage-champion` — "Campeão dos Pequenos Palcos". Underground loyalty: saw 6+ bands across W.E.T. ∪ Headbangers stages (`bands_seen_stages_min`).
+- `judas-witness` — "Testemunha de Judas". Saw *Judas Priest* (band_seen_named). You stood before the metal gods themselves.
 
 ### Arrival Day 2026 (4) — `wacken_arrived_on`, mutually exclusive
 
@@ -522,7 +526,7 @@ These genres exist on the 2026 lineup but no badge in `src/services/badges/regis
 - `Pirate Metal` — held by 1 band only (`Mr. Hurley und die Pulveraffen`, WAK17, Day 3). Single-band genres are not a good fit for a `bands_seen_genre_min` badge (would be equivalent to `band_seen_named`). If a "pirate" badge is desired, prefer `band_seen_named` against that one band.
 - Most stage-specific or niche genres (Goregrind, Humppa, Horror Punk, etc.) — intentional, to keep the badge inventory curated.
 
-### Merit / Assigned (8)
+### Merit / Assigned (9)
 - `mosh-pit` — Hit the floor, came back (godlike-assigned)
 - `crowdsurfer` — Flew over the crowd (godlike-assigned)
 - `girl-power` — Metal queen (godlike-assigned)
@@ -531,11 +535,14 @@ These genres exist on the 2026 lineup but no badge in `src/services/badges/regis
 - `jagger-king` — Jagger King (godlike-assigned)
 - `total-kaput-2026` — Total Kaput (godlike-assigned)
 - `melon` — True vira-latas friend not camping with the group (godlike-assigned)
+- `medic` — "Médico da Matilha" / "Vira-Lata Medic". Held the hair, fetched the water, walked the wounded home (godlike-assigned).
 
-### Location Presence (3)
+### Location Presence (5)
 - `metal-place-2026` — Visited Metal Place (persist: true)
 - `bbq-crew` — 15+ crew camping together (persist: true)
 - `lost-together` — 10+ crew lost together (persist: true)
+- `full-pack` — All 21 vira-latas in camping at the same time (`crew_at_location_min`, location: camping, count: 21; persist: true). The "everyone showed up" miracle badge.
+- `mass-lost` — All 21 vira-latas lost in the infield at the same time (`crew_at_location_min`, location: lost, count: 21; persist: true). Counterpart to `full-pack`.
 
 ---
 
@@ -931,4 +938,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-17 — added `wacken_arrived_on` exact-day predicate and 4 mutually-exclusive arrival-day badges (civil-engineers-of-doom, beerforcement, campfire-veteran, spawn-point-infield). Total predicates 26 → 27, inventory 36 → 40.
+**Last updated:** 2026-05-18 — added 7 new badges: witching-hour, vampire (late-night seen-after-hour_min tiers), small-stage-champion (W.E.T. ∪ Headbangers loyalty), full-pack, mass-lost (crew-at-location-min 21-person milestones, persist: true), medic (godlike-assigned), and judas-witness (band_seen_named: Judas Priest). Inventory 40 → 47. No new predicates; no engine/types changes.

@@ -80,5 +80,19 @@
   "badgeCampfireVeteran": "Veterano de la Fogata",
   "badgeCampfireVeteranDescription": "Cervezas tibias, humo de parrilla y decisiones terribles. Wacken al máximo.",
   "badgeSpawnPointInfield": "Spawn Point: Infield",
-  "badgeSpawnPointInfieldDescription": "Sin calentamiento. Apareciste directo en el caos."
+  "badgeSpawnPointInfieldDescription": "Sin calentamiento. Apareciste directo en el caos.",
+  "badgeWitchingHour": "La Hora de las Brujas",
+  "badgeWitchingHourDescription": "Dormir es para los débiles. La noche es tuya, los riffs son tuyos, el dolor de cabeza de mañana también.",
+  "badgeVampire": "Vampiro",
+  "badgeVampireDescription": "El sol es tu enemigo. La parrilla se enfrió. Tú no.",
+  "badgeSmallStageChampion": "Campeón de los Pequeños Escenarios",
+  "badgeSmallStageChampionDescription": "Te saltaste los headliners y encontraste las joyas ocultas. El underground se inclina ante ti.",
+  "badgeFullPack": "Manada Completa",
+  "badgeFullPackDescription": "Todos los vira-latas en el camping al mismo tiempo. Nadie se perdió. Un milagro, básicamente.",
+  "badgeMassLost": "Perdición Masiva",
+  "badgeMassLostDescription": "Todos los vira-latas perdidos en el infield al mismo tiempo. La manada se dispersó. Manda el GPS.",
+  "badgeMedic": "Médico de la Manada",
+  "badgeMedicDescription": "Sostuvo el pelo, buscó el agua, llevó al herido a casa. La manada te debe una.",
+  "badgeJudasWitness": "Testigo de Judas",
+  "badgeJudasWitnessDescription": "Breaking the law, breaking the law. Estuviste ante los propios dioses del metal."
 }

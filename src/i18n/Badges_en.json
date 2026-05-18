@@ -80,5 +80,19 @@
   "badgeCampfireVeteran": "Campfire Veteran",
   "badgeCampfireVeteranDescription": "Warm beers, grill smoke, and terrible decisions. Peak Wacken.",
   "badgeSpawnPointInfield": "Spawn Point: Infield",
-  "badgeSpawnPointInfieldDescription": "No warm-up. You spawned directly into the chaos."
+  "badgeSpawnPointInfieldDescription": "No warm-up. You spawned directly into the chaos.",
+  "badgeWitchingHour": "Witching Hour",
+  "badgeWitchingHourDescription": "Sleep is for the weak. The night is yours, the riffs are yours, the headache tomorrow is also yours.",
+  "badgeVampire": "Vampire",
+  "badgeVampireDescription": "The sun is your enemy. The grill is cold. You are not.",
+  "badgeSmallStageChampion": "Small Stage Champion",
+  "badgeSmallStageChampionDescription": "You skipped the headliners and found the real gems. The underground bows to you.",
+  "badgeFullPack": "Full Pack",
+  "badgeFullPackDescription": "All vira-latas in camping at the same time. No one got lost. A miracle, basically.",
+  "badgeMassLost": "Mass Lost",
+  "badgeMassLostDescription": "All vira-latas lost in the infield at the same time. The pack scattered. Send GPS.",
+  "badgeMedic": "Vira-Lata Medic",
+  "badgeMedicDescription": "Held the hair, fetched the water, walked the wounded home. The pack owes you one.",
+  "badgeJudasWitness": "Judas Witness",
+  "badgeJudasWitnessDescription": "Breaking the law, breaking the law. You stood before the metal gods themselves."
 }

@@ -4,6 +4,30 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-18 (Badges: 7 new badges — late-night, small-stage, crew milestones, medic, Judas Priest)
+
+### Added
+- `src/services/badges/registry.ts` — 7 new `BadgeConfig` entries appended to `BADGES[]`:
+  - `witching-hour` — Saw 4+ bands starting at or after 22:00 CEST (`bands_seen_after_hour_min`, hour: 22, count: 4). Year: 2026.
+  - `vampire` — Saw 8+ bands starting at or after 22:00 CEST (`bands_seen_after_hour_min`, hour: 22, count: 8). Tiers with `witching-hour`. Year: 2026.
+  - `small-stage-champion` — Saw 6+ bands across W.E.T. ∪ Headbangers stages (`bands_seen_stages_min`). Year: 2026.
+  - `full-pack` — All 21 vira-latas at camping simultaneously (`crew_at_location_min`, location: camping, count: 21, persist: true). Year: 2026.
+  - `mass-lost` — All 21 vira-latas lost in infield simultaneously (`crew_at_location_min`, location: lost, count: 21, persist: true). Year: 2026.
+  - `medic` — Godlike-assigned (`assigned`). Year: 2026. "Vira-Lata Medic" — held the hair, fetched the water, walked the wounded home.
+  - `judas-witness` — Saw Judas Priest (`band_seen_named`, name: 'Judas Priest'). Year: 2026.
+- All 7 × 2 i18n keys (label + description) added to all four locale files: `Badges_br.json`, `Badges_en.json`, `Badges_es.json`, `Badges_de.json`.
+- PNG assets for all 7 badges were already present in `public/badges/`.
+
+### Changed
+- `docs/ai-wiki/badges.md` — updated inventory count 40 → 47, added 7 badges under their appropriate sections (Festival 2026 14 → 18, Merit/Assigned 8 → 9, Location Presence 3 → 5). Updated "Last updated" line.
+
+### Architectural Notes
+- No new predicates were added; all 7 badges use existing `BadgeCondition` types already covered by the test suite. No changes to `types.ts` or `engine.ts`.
+- `full-pack` and `mass-lost` use `crew_at_location_min` with count: 21 (the full ~21-person vira-latas group). Both carry `persist: true` because the crew disperses quickly — the badge must survive the moment.
+- `witching-hour` / `vampire` form a tiered pair (4 → 8 late-night bands) sharing the same `bands_seen_after_hour_min` predicate.
+
+---
+
 ## 2026-05-18 (Ops: `festival-reset` script)
 
 ### Added

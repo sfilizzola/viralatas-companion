@@ -80,5 +80,19 @@
   "badgeCampfireVeteran": "Lagerfeuer-Veteran",
   "badgeCampfireVeteranDescription": "Warmes Bier, Grillrauch und furchtbare Entscheidungen. Wacken auf dem Höhepunkt.",
   "badgeSpawnPointInfield": "Spawn Point: Infield",
-  "badgeSpawnPointInfieldDescription": "Kein Warm-up. Du bist direkt im Chaos gespawnt."
+  "badgeSpawnPointInfieldDescription": "Kein Warm-up. Du bist direkt im Chaos gespawnt.",
+  "badgeWitchingHour": "Hexenstunde",
+  "badgeWitchingHourDescription": "Schlafen ist für Schwächlinge. Die Nacht gehört dir, die Riffs gehören dir, der Kater morgen früh auch.",
+  "badgeVampire": "Vampir",
+  "badgeVampireDescription": "Die Sonne ist dein Feind. Der Grill ist kalt. Du nicht.",
+  "badgeSmallStageChampion": "Champion der kleinen Bühnen",
+  "badgeSmallStageChampionDescription": "Du hast die Headliner links liegen lassen und die echten Schätze gefunden. Der Underground verneigt sich.",
+  "badgeFullPack": "Volle Meute",
+  "badgeFullPackDescription": "Alle Vira-Latas gleichzeitig auf dem Campingplatz. Niemand hat sich verirrt. Ein Wunder, im Grunde.",
+  "badgeMassLost": "Massenverirrung",
+  "badgeMassLostDescription": "Alle Vira-Latas gleichzeitig im Infield verloren. Die Meute hat sich zerstreut. GPS schicken.",
+  "badgeMedic": "Meuten-Sanitäter",
+  "badgeMedicDescription": "Hat die Haare gehalten, Wasser geholt, den Verletzten heimgebracht. Die Meute schuldet dir was.",
+  "badgeJudasWitness": "Judas-Zeuge",
+  "badgeJudasWitnessDescription": "Breaking the law, breaking the law. Du standest vor den Göttern des Metal höchstpersönlich."
 }
