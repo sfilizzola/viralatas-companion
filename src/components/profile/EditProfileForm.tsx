@@ -42,11 +42,11 @@ function ArrivalDayPicker({
   selectedDay,
   onSelect,
   t,
-}: {
+}: Readonly<{
   selectedDay: string;
   onSelect: (day: string) => void;
   t: TFn;
-}) {
+}>) {
   return (
     <div className={styles.label}>
       {t('wackenArrivalDay')}
@@ -88,11 +88,11 @@ function WackenYearPicker({
   selectedYears,
   onToggle,
   t,
-}: {
+}: Readonly<{
   selectedYears: number[];
   onToggle: (year: number, checked: boolean) => void;
   t: TFn;
-}) {
+}>) {
   return (
     <div className={styles.label}>
       {t('wackenYears')}
@@ -104,16 +104,18 @@ function WackenYearPicker({
               {years.map((year) => {
                 const selected = selectedYears.includes(year);
                 return (
-                  <button
+                  <label
                     key={year}
-                    type="button"
-                    role="checkbox"
-                    aria-checked={selected}
                     className={`${styles.yearPill} ${selected ? styles.yearPillSelected : ''}`}
-                    onClick={() => onToggle(year, !selected)}
                   >
+                    <input
+                      type="checkbox"
+                      checked={selected}
+                      onChange={(e) => onToggle(year, e.target.checked)}
+                      style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
+                    />
                     {year}
-                  </button>
+                  </label>
                 );
               })}
             </div>
@@ -121,7 +123,7 @@ function WackenYearPicker({
         ))}
       </div>
       <p className={styles.yearCounter}>
-        ● {selectedYears.length} Wacken{selectedYears.length !== 1 ? 's' : ''}
+        ● {selectedYears.length} Wacken{selectedYears.length === 1 ? '' : 's'}
       </p>
     </div>
   );
@@ -145,7 +147,7 @@ export default function EditProfileForm({
   currentAvatarUrl,
   onAvatarChange,
   t,
-}: EditProfileFormProps) {
+}: Readonly<EditProfileFormProps>) {
   const [newName, setNewName] = useState(displayName);
   const [newLanguage, setNewLanguage] = useState<Language>(language);
   const [newAvatarUrl, setNewAvatarUrl] = useState(currentAvatarUrl);
@@ -184,10 +186,10 @@ export default function EditProfileForm({
     }
 
     refreshFriendFlag();
-    window.addEventListener(CREW_USERS_CHANGED_EVENT, refreshFriendFlag);
+    globalThis.addEventListener(CREW_USERS_CHANGED_EVENT, refreshFriendFlag);
     return () => {
       active = false;
-      window.removeEventListener(CREW_USERS_CHANGED_EVENT, refreshFriendFlag);
+      globalThis.removeEventListener(CREW_USERS_CHANGED_EVENT, refreshFriendFlag);
     };
   }, [user.id]);
 
@@ -260,6 +262,15 @@ export default function EditProfileForm({
 
   const trigger = <span className={styles.pfCollapseLabel}>{t('editProfile')}</span>;
 
+  let saveButtonLabel: string;
+  if (saved) {
+    saveButtonLabel = t('saveDone');
+  } else if (saving) {
+    saveButtonLabel = t('saveLoading');
+  } else {
+    saveButtonLabel = t('saveProfile');
+  }
+
   return (
     <Collapsible trigger={trigger} className={styles.pfCollapse}>
       <form onSubmit={handleSave} className={styles.form}>
@@ -331,7 +342,7 @@ export default function EditProfileForm({
         )}
 
         <Button type="submit" fullWidth disabled={saving}>
-          {saved ? t('saveDone') : saving ? t('saveLoading') : t('saveProfile')}
+          {saveButtonLabel}
         </Button>
       </form>
     </Collapsible>
