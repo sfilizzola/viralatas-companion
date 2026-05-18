@@ -13,6 +13,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 | 3 | Unit tests: IDB layer (`lib/db.ts`) | Medium | Low — requires `fake-indexeddb` dev dependency; isolated from app runtime | pending |
 | 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — `renderHook` + mocked IDB and Supabase; no network | pending |
 | 5 | Unit tests: Component and page integration | High | Low — replaces misleading stub tests; mounts pages with RTL + mocked hooks | pending |
+| 6 | Festival minimap with live user positions | Medium | Medium — requires maintained image asset, presence data accuracy, mobile layout fit | pending |
 
 ---
 
@@ -111,7 +112,7 @@ Regras:
 
 ---
 
-## Idea 2 — Badge consolidation (Previously Achieved)
+## Idea 2 — Badge consolidation
 
 **Goal:** After a festival ends, snapshot every user's earned year-specific badges into a permanent DB table so 2026 wins are still visible in 2027 alongside fresh badge content — and in future years as the history grows.
 
@@ -128,7 +129,7 @@ All badge types qualify:
 - `persist: true` (already stored in `user_metadata.achieved_badge_slugs`)
 - `assigned` (stored in `users.special_badges`)
 
-Evergreen badges (`puppy`, `pais-tropical`, `belga`, etc.) have no `year` field and are intentionally excluded — they remain live and re-earnable each Wacken.
+Evergreen badges ( `pais-tropical`, `belga`, etc.) have no `year` field and are intentionally excluded — they remain live and re-earnable each Wacken.
 
 ---
 
@@ -187,7 +188,7 @@ Auth: Bearer token — must belong to a godlike user (403 otherwise)
 **Steps:**
 
 1. Verify caller has `role = 'godlike'` in `public.users`.
-2. Fetch all active users: exclude `is_test_user = true` and `is_friend = true`.
+2. Fetch all active users: exclude `is_test_user = true`.
 3. For each user, assemble a server-side `BadgeContext` by reading:
    - `public.user_picks` + `public.bands` → `pickedBands`, `bandsPicked`, `maxAttendanceInPicks`, `seenBands`
    - `public.user_missed_bands` → `missedBandIds`
@@ -394,3 +395,77 @@ coverage: {
 - [ ] `SchedulePage` filter and toggle behavior tested end-to-end through the component tree.
 - [ ] Auth page tests assert on real form validation logic and correct Supabase call shapes.
 - [ ] All new tests pass with `npm test`.
+
+---
+
+## Idea 6 — Festival minimap with live user positions
+
+**Goal:** Show a cartoonish, schematic image of the Wacken festival grounds — infield stages + camping area — as a minimap, with vira-latas' avatars (or colored dots) overlaid on their current location. Purely visual social awareness; not a GPS map, not a real-distance representation.
+
+---
+
+### Concept
+
+A static PNG or SVG asset representing the festival layout (not to scale, not accurate geographically) — think treasure-map style or hand-drawn cartoon. The image contains:
+- Named zones for each stage (clickable or labelled)
+- A camping zone
+- An "elsewhere" zone (rest of the image, non-specific)
+
+Over this image, live presence dots are rendered using absolute positioning (or SVG `<circle>` elements), driven by the existing `user_presence` data already in Supabase Realtime.
+
+---
+
+### User placement logic
+
+| Presence state | Where they appear on the map |
+|---|---|
+| `stage = <stage_name>` | Dot placed inside the bounding box for that stage zone |
+| `is_camping = true` | Dot placed inside the camping zone bounding box |
+| Unknown / no presence data | Dot placed randomly within the "outside areas" region of the image |
+
+Placement within each zone is **random jitter inside the zone's bounding box** — not tied to any real coordinate. The goal is visual density awareness, not navigation.
+
+---
+
+### Asset dependency
+
+This feature requires **one custom image asset**: a cartoonish festival map with clearly delimited zones. The zones must be mapped to pixel bounding boxes (e.g., `{ stage: 'MAIN STAGE 1', x: 120, y: 80, w: 200, h: 150 }`). This config lives in a static JS/TS file alongside the component — if the asset changes, the bounding boxes are updated in that config.
+
+The image asset is not part of the codebase until someone produces it. This is the **single hardest prerequisite** for the feature.
+
+---
+
+### Architecture sketch
+
+```
+MinimapPage (or overlay on /now)
+  ├── <img src="/minimap.png"> (static asset, cached by SW)
+  ├── <svg overlay> (absolute-positioned on top of image)
+  │   ├── <circle> per user at stage zone (jittered inside bbox)
+  │   ├── <circle> per camping user (jittered inside camping bbox)
+  │   └── <circle> per unknown user (random in "elsewhere" region)
+  └── Data source: usePresence() hook → already drives /now page
+```
+
+No new backend work is needed — `user_presence` is already synced via Supabase Realtime and cached in IndexedDB.
+
+---
+
+### Open questions before implementation
+
+1. **Who creates the image asset?** This is a design/illustration task, not a coding task.
+2. **Where does the minimap live in the app?** Options: dedicated `/map` route, collapsible section on `/now`, bottom sheet on `/popular`.
+3. **Dot labeling?** Show display names on hover/tap, or always show initials inside the dot?
+4. **Privacy:** Should presence on the map be opt-in or opt-out? Some vira-latas may not want to be locatable.
+5. **Offline behavior:** Minimap shows last known positions when offline (from IndexedDB) — acceptable, but stale positions should be visually de-emphasized (e.g. grayed out dots).
+
+---
+
+### Acceptance criteria (when implemented)
+
+- [ ] Minimap image is cacheable offline (added to Workbox precache list).
+- [ ] Dots are driven by `user_presence` realtime data; update within 3 s when a user changes location.
+- [ ] Stage zone bounding boxes are defined in a single config file — no magic numbers scattered across components.
+- [ ] "Unknown" users appear in the non-zone region of the image, not on top of a stage or camping zone.
+- [ ] Privacy consideration addressed (opt-in/out mechanism or explicit decision documented).
+- [ ] Works on mobile at 375 px width — image scales, dot positions scale proportionally.
