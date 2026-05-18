@@ -10,8 +10,8 @@ Document testing approach, test organization, offline scenario testing, and how 
 
 - `src/__tests__/` — All test files (355 tests)
 - `vitest.config.ts` — Test runner configuration
-- `package.json` — Test scripts
-- `supabase/seed/` — Seed scripts for test data
+- `package.json` — Test scripts (`test`, `test:coverage`) and seed scripts (`seed:bands`, `seed:test-users`, `seed:live-now`, `festival:reset`)
+- `supabase/seed/` — Seed scripts for test data and the destructive `festival-reset.ts` operator script (see `docs/ai-wiki/festival-reset.md`)
 
 ---
 
@@ -429,6 +429,8 @@ it('should show band as live when now equals start_time', () => {
 - [ ] Multiple tabs open, pick in one, see in other
 - [ ] Clear IndexedDB mid-session (redirects to login)
 - [ ] Very old browser (CSS variables, IndexedDB support)
+- [ ] **Festival reset dry-run on staging** — `npm run festival:reset -- --dry-run` prints accurate pre-flight counts and writes nothing. See `docs/ai-wiki/festival-reset.md`.
+- [ ] **Festival reset on staging with bands** — `npm run festival:reset -- --with-bands --force` wipes pre-festival activity, strips persistent badge keys from `auth.users` metadata (positive-strip pattern), bumps `public.app_config.cache_version`, and re-seeds the lineup. Verify a connected client picks up realtime DELETEs and re-fetches on next reload.
 
 ---
 
@@ -441,4 +443,4 @@ it('should show band as live when now equals start_time', () => {
 
 ---
 
-**Last updated:** 2026-05-12
+**Last updated:** 2026-05-18 — added `festival:reset` to the seed-script catalog and pre-release manual-test list.

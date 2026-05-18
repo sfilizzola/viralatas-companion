@@ -181,7 +181,18 @@ Connected clients
 
 ## Cross-References
 
-- `docs/ai-wiki/supabase-schema.md` — Full table DDL and RLS policies for everything wiped/preserved.
-- `docs/ai-wiki/badges.md` — Explains what `achieved_badge_slugs` and `crew_earned_badge_slugs` mean, plus the `persist: true` semantics.
-- `docs/ai-wiki/sync-engine.md` — `CacheVersionCheck` mechanics; how clients react to the bump.
+- `docs/ai-wiki/supabase-schema.md` — Full table DDL and RLS policies for everything wiped/preserved (including the `public.app_config` row this script bumps).
+- `docs/ai-wiki/badges.md` — Explains what `achieved_badge_slugs` and `crew_earned_badge_slugs` mean, plus the `persist: true` semantics that this script intentionally undoes.
+- `docs/ai-wiki/sync-engine.md` — `CacheVersionCheck` mechanics; how clients react to the bump on next app load.
+- `docs/ai-wiki/testing.md` — Manual seed-script catalog; this script lives alongside `seed:bands` / `seed:test-users` / `seed:live-now`.
+- `docs/ai-wiki/glossary.md` — `Festival Reset` and `Cache Version` entries.
 - `docs/superpowers/specs/2026-05-18-festival-reset-design.md` — The full design doc (problem statement, alternatives considered, risk assessment).
+
+---
+
+## Open Questions
+
+- **Bundling with `--with-bands` by default?** Today the bands re-seed is opt-in. If we observe the operator forgetting `--with-bands` at festival start, consider flipping the default — but at the cost of every test/staging run also CASCADE-wiping `user_picks`.
+- **Push-subscription handling.** Push subscription fields in `auth.users.raw_user_meta_data` are preserved by the positive-strip pattern. If the festival ever needs to invalidate stale push endpoints (e.g. users who reinstalled the PWA), that needs a separate operation — this script intentionally does not touch them.
+- **Future persistent-badge keys.** The `PERSISTENT_BADGE_METADATA_KEYS` constant is the single source of truth for the strip list. There is no automated reminder to extend it when a new persistent-badge key is introduced; the badge author has to remember. A lint rule or a registry-derived constant would harden this.
+- **Multi-festival reuse.** The script wipes 2026 state without any year-awareness. For Wacken 2027, decide whether `wacken_arrival_day` (currently preserved as profile data) should reset too, or whether the 2027 reset should additionally null out `wacken_arrival_day` so users re-declare each year.

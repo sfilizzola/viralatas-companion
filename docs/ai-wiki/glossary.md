@@ -73,7 +73,7 @@ Window event dispatched when IndexedDB changes. Components listen via `window.ad
 Process of pushing offline queue to Supabase and fetching crew data. Happens on startup and 'online' event.
 
 ### Cache Version
-String stored in IndexedDB meta. If server version differs, all local data wiped (forced refresh). Used when band lineup changes.
+String compared on every login: client-side value (in IndexedDB `meta` store, key `'cache_version'`) vs server-side value (in `public.app_config` row `key='cache_version'`). If they differ, `wipeAllLocalData()` clears every IndexedDB store except `session` and forces a fresh fetch. Bumped server-side by the godlike "Reset all data" admin button or by `npm run festival:reset` (see `docs/ai-wiki/festival-reset.md`). Used when the band lineup changes or pre-festival state needs invalidating.
 
 ---
 
@@ -475,7 +475,13 @@ Supabase remote procedure call (`supabase.rpc('set_user_role', ...)`) used by ma
 Function in `src/lib/db.ts` that clears all IndexedDB stores (except `session`). Called when `CacheVersionCheck` detects a cache version mismatch. Triggers full re-sync from Supabase on next app init.
 
 ### CacheVersionCheck
-`App.tsx` sync component. On login, fetches `meta.cache_version` from Supabase and compares to local version. If mismatch, calls `wipeAllLocalData()` to force a fresh sync. Prevents stale band data after lineup changes.
+`App.tsx` sync component. On login, fetches the `public.app_config` row with `key='cache_version'` from Supabase and compares its `value` to the locally-stored version (IndexedDB `meta` store). If mismatch, calls `wipeAllLocalData()` to force a fresh sync. Prevents stale band data after lineup changes or after a festival reset.
+
+### Festival Reset
+The `npm run festival:reset` operator script (`supabase/seed/festival-reset.ts`). One-shot pre-festival wipe: deletes every row in `public.announcements`, `public.blocked_posters`, and `public.user_presence`; clears `public.users.special_badges` for every user; strips `achieved_badge_slugs`, `crew_earned_badge_slugs`, and `location_visits` from `auth.users.raw_user_meta_data` via positive-strip; bumps `public.app_config.cache_version` so connected clients invalidate IndexedDB on next load. Optionally chains the bands re-seed via `--with-bands`. Flags: `--dry-run` (preview), `--force` (skip 5s countdown), `--with-bands` (cascade-replace lineup). Destructive, no undo. Full contract: `docs/ai-wiki/festival-reset.md`.
+
+### Positive-Strip Pattern
+The pattern used by `festival-reset.ts` to remove specific keys from `auth.users.raw_user_meta_data` without losing unrelated keys. The script copies the existing metadata object and `delete`s only the three known persistent-badge keys, then writes the result back via `supabase.auth.admin.updateUserById(id, { user_metadata })`. Since that admin call **replaces** the metadata object entirely, an allow-list ("only keep these keys") would silently drop any future metadata key (push subscriptions, future-year Wacken state, etc.); the positive-strip pattern is forward-compatible by construction.
 
 ### emitSyncComplete
 Function that dispatches a `viralatas:sync-complete` event after a successful offline queue flush. `SyncToast` listens for this event to show "✓ Synced N items".
@@ -488,4 +494,4 @@ Navigation guide in the wiki index recommending which documents to read first ba
 
 ---
 
-**Last updated:** 2026-05-13
+**Last updated:** 2026-05-18 — corrected the Cache Version / CacheVersionCheck entries to reference `public.app_config` (not the non-existent `public.meta`); added Festival Reset and Positive-Strip Pattern entries.

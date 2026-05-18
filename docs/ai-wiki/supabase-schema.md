@@ -425,21 +425,33 @@ INSERT INTO public.live_band_test_config (id) VALUES (1);
 
 ---
 
-### `public.meta`
+### `public.app_config`
 
-**Purpose**: Cache version and system metadata.
+**Purpose**: Generic key/value config table. Currently holds the single `cache_version` row used to invalidate every client's IndexedDB on next app load.
 
 ```sql
-CREATE TABLE public.meta (
-  key text PRIMARY KEY,
-  cache_version text,
-  updated_at timestamptz DEFAULT now()
+CREATE TABLE public.app_config (
+  key   text PRIMARY KEY,
+  value text NOT NULL
 );
 
-INSERT INTO public.meta (key, cache_version) VALUES ('cache', '1');
+INSERT INTO public.app_config (key, value) VALUES ('cache_version', '1')
+ON CONFLICT (key) DO NOTHING;
 ```
 
-**Not realtime**. Checked manually on app init.
+**Migration**: `supabase/migrations/20260504000006_cache_version.sql`.
+
+**RLS**:
+- All authenticated users can `SELECT` (everyone needs to read the version on app boot).
+- Only the godlike user can `UPDATE` (enforced via `public.users.role = 'godlike'` check).
+
+**Not realtime** — clients read once on app init via `bandsRepository.checkAndApplyCacheVersion()`. A change only propagates on next page load.
+
+**Bumped by**:
+1. The godlike "Reset all data" button in the admin panel (writes a fresh ISO timestamp).
+2. The `npm run festival:reset` operator script — see `docs/ai-wiki/festival-reset.md`.
+
+When the bumped value differs from the client's locally-cached version, `wipeAllLocalData()` clears every IndexedDB store (except `session`) and forces a fresh fetch.
 
 ---
 
@@ -487,7 +499,8 @@ INSERT INTO public.app_settings DEFAULT VALUES;
 - public.bands (rarely changes)
 - public.users (rarely changes, privacy concern)
 - public.blocked_posters (not used yet)
-- public.meta (checked manually)
+- public.app_config (read once on app init; cache_version bump propagates on next reload)
+- public.app_settings (read once on app init; godlike feature flags propagate on next reload)
 
 **Subscription Pattern** (in hooks):
 ```typescript
@@ -575,12 +588,16 @@ Scripts to populate test data (in `supabase/seed/`):
 | `bands.ts` | Import Wacken 2026 lineup |
 | `test-users.ts` | Create fake vira-latas for testing |
 | `live-now.ts` | Time-shift bands for live preview testing |
+| `festival-reset.ts` | One-shot pre-festival wipe (announcements, blocked_posters, user_presence, assigned + persistent badges) + `cache_version` bump; chains bands re-seed via `--with-bands`. See `docs/ai-wiki/festival-reset.md`. |
 
 **Run**:
 ```bash
 npm run seed:bands
 npm run seed:test-users
 npm run seed:live-now
+npm run festival:reset             # state-only wipe (destructive; 5s countdown)
+npm run festival:reset -- --dry-run
+npm run festival:reset -- --with-bands --force
 ```
 
 ---
@@ -619,4 +636,4 @@ npm run seed:live-now
 
 ---
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-18 — corrected the cache-version table (was documented as the non-existent `public.meta`; the real table is `public.app_config`); added `festival-reset.ts` to the seed-scripts catalog.

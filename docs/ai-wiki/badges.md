@@ -698,9 +698,11 @@ Reflect **current state** — re-evaluated on every profile load.
 - `bbq-crew` — 15 crew camping together once; recorded forever even if crew disperses
 - `lost-together` — 10 crew lost together once; recorded forever
 
-**Storage**: Slug stored in `user.user_metadata.achieved_badge_slugs[]` (for standard persist) or `crew_earned_badge_slugs[]` (for location crew badges)
+**Storage**: Slug stored in `user.user_metadata.achieved_badge_slugs[]` (for standard persist) or `crew_earned_badge_slugs[]` (for location crew badges). The companion `location_visits` counter (used by `location_visit_count_min`) is also stored in `user_metadata`.
 
 **Why persistent**: Some achievements are historic — you visited Metal Place, the 15 of you were together, those are facts. No takebacks.
+
+**Reset path (operator-only)**: `npm run festival:reset` clears `users.special_badges` (assigned badges) and strips `achieved_badge_slugs`, `crew_earned_badge_slugs`, and `location_visits` from `auth.users.raw_user_meta_data` for every user. This is the *only* sanctioned way to undo persistent-badge state and is intended to be run once at festival start so the live counts and patches reflect the festival itself, not pre-festival exploration. See `docs/ai-wiki/festival-reset.md`. **If a future phase introduces a new persistent-badge metadata key, add it to `PERSISTENT_BADGE_METADATA_KEYS` in `supabase/seed/festival-reset.ts`** — that constant is the single source of truth for the strip list, and the positive-strip pattern intentionally preserves any key it doesn't know about.
 
 **When to use `persist: true`**:
 - Location visits (visit once, recorded forever)

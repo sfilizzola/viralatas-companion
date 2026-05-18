@@ -433,15 +433,16 @@ async function syncCrewFromRemote(): Promise<void> {
 export const bandsRepository = {
   async checkAndApplyCacheVersion() {
     const { data } = await supabase
-      .from('meta')
-      .select('cache_version')
+      .from('app_config')
+      .select('*')
+      .eq('key', 'cache_version')
       .single();
 
-    const serverVersion = data?.cache_version;
+    const serverVersion = data?.value;
     const localVersion = await loadCacheVersion();
 
     if (serverVersion && serverVersion !== localVersion) {
-      // Mismatch: lineup changed, clear all
+      // Mismatch: lineup changed (or operator bumped), clear all
       await wipeAllLocalData();
       await saveCacheVersion(serverVersion);
       // Force re-fetch on next sync
@@ -450,9 +451,11 @@ export const bandsRepository = {
 };
 ```
 
-**Purpose**: Invalidate cache when band lineup changes.
+**Purpose**: Invalidate cache when the band lineup changes or an operator bumps the version (godlike "Reset all data" button, or `npm run festival:reset` — see `docs/ai-wiki/festival-reset.md`).
 
-**Trigger**: On every login
+**Server table**: `public.app_config` row with `key = 'cache_version'`, `value = <ISO timestamp string>` (defined in `supabase/migrations/20260504000006_cache_version.sql`).
+
+**Trigger**: On every login.
 
 **Side effect**: Clears all picks, announcements, crew data if version mismatch.
 
@@ -534,4 +537,4 @@ console.log(`Local cache version: ${version}`);
 
 ---
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-18 — corrected the `checkAndApplyCacheVersion` snippet to read from `public.app_config` (was incorrectly documented as `public.meta`).
