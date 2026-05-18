@@ -4,6 +4,25 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-18 (Ops: `festival-reset` script)
+
+### Added
+- `supabase/seed/festival-reset.ts` — new one-shot operator script (run via `tsx`). Wipes pre-festival activity (`public.announcements`, `public.blocked_posters`, `public.user_presence`), clears assigned badges (`public.users.special_badges`), strips three persistent-badge keys from `auth.users.raw_user_meta_data` (`achieved_badge_slugs`, `crew_earned_badge_slugs`, `location_visits`), bumps `public.app_config.cache_version` so connected clients invalidate IndexedDB on next load, and optionally chains the bands re-seed via `--with-bands`. Flags: `--dry-run` (preview only), `--force` (skip the 5-second countdown), `--with-bands` (delegate to `supabase/seed/bands.ts --force` as a subprocess afterward).
+- `docs/ai-wiki/festival-reset.md` — new wiki page documenting purpose, when-to-run, the flag matrix, the explicit wiped-vs-preserved scope guard, edge cases, the positive-strip pattern for `auth.users` metadata, and the realtime + cache-version invalidation behavior. Cross-linked from `docs/ai-wiki/index.md`.
+
+### Changed
+- `package.json` — new npm script `"festival:reset": "tsx supabase/seed/festival-reset.ts"` alongside the existing `seed:*` entries.
+- `docs/ai-wiki/index.md` — added a "Operational Tooling" section linking the new `festival-reset.md` page; updated the "Last Updated" date.
+
+### Architectural Notes
+- **Why a script, not a godlike button.** The reset is a one-time operation. Adding it to `GodlikeAdminPanel.tsx` would create permanent in-product surface area (risk of accidental tap from a phone mid-festival) and would need a new Edge Function (writes to `auth.users` require the service role key, which must never reach the client). The script approach matches the established seed-script idiom (`bands.ts`, `test-users.ts`), gates the destructive operation behind a laptop with the right `.env.local`, and adds zero UI.
+- **Positive-strip pattern for `auth.users` metadata.** `auth.admin.updateUserById(id, { user_metadata })` REPLACES the metadata object entirely. The script copies the existing object and `delete`s the three known keys instead of building a fresh object with an allow-list. The positive-strip pattern guarantees that future metadata keys (push subscription fields, new profile attributes, future-year Wacken state) are never silently dropped — only the three named keys are removed.
+- **Cache invalidation strategy.** `announcements`, `user_presence`, and `user_picks` have realtime publications, so their `DELETE`s converge on connected clients within seconds. Badges and `users.special_badges` don't have realtime, so a `cache_version` bump on `public.app_config` is needed: the existing `CacheVersionCheck` in `src/repositories/bands.ts` detects the mismatch on next app load, wipes IndexedDB, and refetches. The script writes directly to the `app_config` row rather than calling `bandsRepository.invalidateCacheForAllUsers()` because the latter also wipes the operator's local IndexedDB — meaningless from a Node process.
+- **`--with-bands` is opt-in, not bundled.** Default behavior wipes state only and prints a reminder to seed bands separately. The festival reset and the bands re-seed are independent operations: an operator may want to reset state without touching bands (e.g. a test run on staging), or seed bands without wiping state (existing `seed:bands` flow). Bundling on by default would force every state reset to also nuke `user_picks` via CASCADE, which isn't always desired.
+- **Type fix specific to this file.** The first version of the script used `type Sb = ReturnType<typeof createClient>` to annotate the supabase client argument. That type resolves to `SupabaseClient<unknown, ..., never, never, ...>` (the generic's default constraints) and is incompatible with the actual call-site type `SupabaseClient<any, "public", "public", any, any>` returned by `createClient(url, key)`. Switched to `type Sb = SupabaseClient<any>` (importing `SupabaseClient` as a type), which matches the runtime shape. The seed scripts are NOT included in any `tsconfig.*.json`'s `include` list, so the regular `npm run build` would not catch this — IDE typechecking does. Other seed scripts (`test-users.ts`) have the same latent pattern; not refactored in this commit to limit scope.
+
+---
+
 ## 2026-05-17 (Badges: arrival-day patches — `wacken_arrived_on`)
 
 ### Added

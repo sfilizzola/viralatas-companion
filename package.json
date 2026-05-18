@@ -14,7 +14,8 @@
     "seed:bands": "tsx supabase/seed/bands.ts",
     "seed:live-now": "tsx supabase/seed/live-now.ts",
     "seed:test-users": "tsx supabase/seed/test-users.ts reset",
-    "seed:test-users:delete": "tsx supabase/seed/test-users.ts delete"
+    "seed:test-users:delete": "tsx supabase/seed/test-users.ts delete",
+    "festival:reset": "tsx supabase/seed/festival-reset.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.1",

@@ -1,6 +1,6 @@
 # Viralatas Companion — Architectural Wiki
 
-**Last Updated**: 2026-05-17
+**Last Updated**: 2026-05-18
 
 ## Purpose
 
@@ -72,6 +72,9 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[Testing Strategy](testing.md)** — Unit tests, integration tests, offline scenarios
 - **[Glossary](glossary.md)** — 140+ terms: architecture, auth, sync, flows, caching, roles, badges
 - **[Changelog](changelog.md)** — All wiki modifications, discoveries, corrections
+
+### Operational Tooling
+- **[Festival Reset](festival-reset.md)** — `npm run festival:reset` one-shot script: state wipe (announcements, blocked_posters, user_presence, assigned + persistent badges, cache_version bump) with optional bands re-seed via `--with-bands`. Flag matrix, scope guard, edge cases.
 
 ---
 
