@@ -45,6 +45,8 @@ export type BadgeCondition =
   // Time-based: count bands whose CEST start_time >= hour (symmetric to `before` variants)
   | { type: 'bands_picked_after_hour_min'; hour: number; count: number }
   | { type: 'bands_seen_after_hour_min'; hour: number; count: number }
+  // Stage diversity: earned when user has seen at least 1 band on N+ distinct stages
+  | { type: 'stage_diversity_min'; count: number }
   // Assigned: godlike manually assigns this badge slug via the assign-badge Edge Function
   | { type: 'assigned' };
 

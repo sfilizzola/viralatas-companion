@@ -38,7 +38,7 @@ type BadgeConfig = {
 
 ---
 
-## All 27 `BadgeCondition` types
+## All 28 `BadgeCondition` types
 
 Conditions evaluate against a `BadgeContext` built once per profile load. **A predicate not in this list is unsupported — adding a new one requires changing `types.ts`, `engine.ts`, the wiki, and this file.**
 
@@ -72,7 +72,7 @@ Arrival-day enum (order matters): `'sun-jul26' < 'mon-jul27' < 'tue-jul28' < 'we
 | `bands_picked_after_hour_min` | `hour, count` | ≥ N picks with **CEST start hour** `>= hour` |
 | `band_picked_named` | `name: string` | ≥ 1 pick with `name === n` (exact, case-sensitive) |
 
-### Seen-based (8) — picks past `end_time`, minus `user_missed_bands` opt-outs
+### Seen-based (9) — picks past `end_time`, minus `user_missed_bands` opt-outs
 | Type | Inputs | Meaning |
 |---|---|---|
 | `bands_seen_min` | `count` | ≥ N seen |
@@ -83,6 +83,7 @@ Arrival-day enum (order matters): `'sun-jul26' < 'mon-jul27' < 'tue-jul28' < 'we
 | `bands_seen_before_hour_min` | `hour, count` | ≥ N seen with CEST start hour `< hour` |
 | `bands_seen_after_hour_min` | `hour, count` | ≥ N seen with CEST start hour `>= hour` |
 | `band_seen_named` | `name: string` | ≥ 1 seen with `name === n` |
+| `stage_diversity_min` | `count: number` | ≥ N distinct stages represented in `seenBands` |
 
 A band is **seen** when `now > band.end_time` AND its id is **not** in `missedBandIds`. `pickedBands` always excludes bands with `category === 'ceremony'`, so ceremonies never count toward any pick or seen badge.
 

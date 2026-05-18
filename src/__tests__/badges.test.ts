@@ -1099,6 +1099,129 @@ describe('registry — 2026 image-driven badges', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// stage_diversity_min — distinct stage count across seenBands
+// ─────────────────────────────────────────────────────────────────────────────
+describe('stage_diversity_min predicate', () => {
+  const findBadge = (slug: string): BadgeConfig => {
+    const found = BADGES.find((b) => b.slug === slug);
+    if (!found) throw new Error(`Badge not found in BADGES[]: ${slug}`);
+    return found;
+  };
+
+  const now = new Date('2026-08-02T23:00:00.000Z');
+  const endPast = '2026-07-29T11:00:00.000Z';
+
+  const bandsById = new Map<string, BadgeBand>([
+    ['s1', band({ id: 's1', stage: 'Faster', end_time: endPast })],
+    ['s2', band({ id: 's2', stage: 'Harder', end_time: endPast })],
+    ['s3', band({ id: 's3', stage: 'Louder', end_time: endPast })],
+    ['s4', band({ id: 's4', stage: 'Wasteland', end_time: endPast })],
+    ['s5', band({ id: 's5', stage: 'Wackinger', end_time: endPast })],
+    ['s6', band({ id: 's6', stage: 'Headbangers', end_time: endPast })],
+    ['s7', band({ id: 's7', stage: 'W.E.T.', end_time: endPast })],
+    ['s8', band({ id: 's8', stage: 'Harder', end_time: endPast })], // duplicate stage
+  ]);
+
+  it('earns stage_diversity_min:4 when seenBands span 4 distinct stages', () => {
+    const cfg = badge({ type: 'stage_diversity_min', count: 4 });
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['s1', 's2', 's3', 's4'],
+      new Map(),
+      bandsById,
+      new Set(),
+      now,
+    );
+    expect(evaluateBadge(cfg, ctx)).toBe(true);
+  });
+
+  it('does NOT earn stage_diversity_min:4 when seenBands span only 3 distinct stages', () => {
+    const cfg = badge({ type: 'stage_diversity_min', count: 4 });
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['s1', 's2', 's3'],
+      new Map(),
+      bandsById,
+      new Set(),
+      now,
+    );
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+
+  it('counts distinct stages — duplicate stages do not inflate count', () => {
+    const cfg = badge({ type: 'stage_diversity_min', count: 3 });
+    // s1=Faster, s2=Harder, s8=Harder — only 2 distinct stages
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['s1', 's2', 's8'],
+      new Map(),
+      bandsById,
+      new Set(),
+      now,
+    );
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+
+  it('earns stage-hopper badge (stage_diversity_min:4) via registry', () => {
+    const cfg = findBadge('stage-hopper');
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['s1', 's2', 's3', 's4'],
+      new Map(),
+      bandsById,
+      new Set(),
+      now,
+    );
+    expect(evaluateBadge(cfg, ctx)).toBe(true);
+  });
+
+  it('does NOT earn stage-hopper badge with only 3 stages seen', () => {
+    const cfg = findBadge('stage-hopper');
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['s1', 's2', 's3'],
+      new Map(),
+      bandsById,
+      new Set(),
+      now,
+    );
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+
+  it('earns octopus badge (stage_diversity_min:8) with 7 distinct stages from seenBands', () => {
+    const cfg = findBadge('octopus');
+    // s1..s7 are 7 distinct stages — not enough for count: 8
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['s1', 's2', 's3', 's4', 's5', 's6', 's7'],
+      new Map(),
+      bandsById,
+      new Set(),
+      now,
+    );
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+
+  it('earns octopus badge persist: once achieved slug is recorded, stays earned even with fewer stages', () => {
+    const cfg = findBadge('octopus');
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['s1'], // only 1 stage now
+      new Map(),
+      bandsById,
+      new Set(),
+      now,
+      [],
+      {},
+      null,
+      {},
+      new Set(['octopus']), // previously achieved
+    );
+    expect(evaluateBadge(cfg, ctx)).toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Phase 19 — Ceremony entry badge regression
 // Picking or seeing a ceremony entry must NEVER satisfy any music-badge condition.
 // ─────────────────────────────────────────────────────────────────────────────

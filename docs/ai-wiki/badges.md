@@ -133,7 +133,7 @@ type BadgeConfig = {
 
 ---
 
-## BadgeCondition Types (27 Total)
+## BadgeCondition Types (28 Total)
 
 ### WACKEN HISTORY — Attendance Records
 
@@ -398,6 +398,16 @@ User is credited with **seeing a specific band** (exact name match).
 **Use case**: Witnessed legendary performance badges
 **Example badge**: `alestorm` (saw Alestorm live)
 
+#### `stage_diversity_min`
+User has seen at least 1 band on **N+ distinct stages**.
+
+```typescript
+{ type: 'stage_diversity_min', count: 4 }
+```
+**Use case**: Nomadic explorer badges — reward vira-latas who roam across multiple stages rather than camping at one.
+**Semantics**: Counts the number of unique `stage` values in `seenBands`. Duplicate stages don't inflate the count. Ceremony bands are excluded (already filtered from `seenBands`).
+**Example badges**: `stage-hopper` (4 distinct stages), `octopus` (all 8 stages)
+
 ---
 
 ### LOCATION PRESENCE — Camping, Metal Place, Lost
@@ -473,7 +483,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 
 ---
 
-## Current Badges Inventory (47 Total)
+## Current Badges Inventory (51 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -490,7 +500,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `5-wackens` — Attended 5+ editions
 - `10-wackens` — Attended 10+ editions
 
-### Festival 2026 (18)
+### Festival 2026 (20)
 - `early-bird` — Saw 5+ bands before 1 PM (CEST)
 - `dreamer` — "I'm Tripping" / 30+ picked bands (persist: true)
 - `death-metal` — Saw 3+ Death Metal bands
@@ -509,6 +519,8 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `vampire` — "Vampiro". Extreme night owl: saw 8+ bands starting at or after 22:00 CEST (`bands_seen_after_hour_min`). Tiers with `witching-hour`.
 - `small-stage-champion` — "Campeão dos Pequenos Palcos". Underground loyalty: saw 6+ bands across W.E.T. ∪ Headbangers stages (`bands_seen_stages_min`).
 - `judas-witness` — "Testemunha de Judas". Saw *Judas Priest* (band_seen_named). You stood before the metal gods themselves.
+- `stage-hopper` — "Nômade dos Palcos". Saw bands on 4+ distinct stages (`stage_diversity_min`, count: 4). Four stages, four vibes, zero loyalty.
+- `octopus` — "Polvo". Saw bands on all 8 distinct stages (`stage_diversity_min`, count: 8; persist: true). All 8 stages conquered — you have no favorites, only victims.
 
 ### Arrival Day 2026 (4) — `wacken_arrived_on`, mutually exclusive
 
@@ -526,7 +538,7 @@ These genres exist on the 2026 lineup but no badge in `src/services/badges/regis
 - `Pirate Metal` — held by 1 band only (`Mr. Hurley und die Pulveraffen`, WAK17, Day 3). Single-band genres are not a good fit for a `bands_seen_genre_min` badge (would be equivalent to `band_seen_named`). If a "pirate" badge is desired, prefer `band_seen_named` against that one band.
 - Most stage-specific or niche genres (Goregrind, Humppa, Horror Punk, etc.) — intentional, to keep the badge inventory curated.
 
-### Merit / Assigned (9)
+### Merit / Assigned (11)
 - `mosh-pit` — Hit the floor, came back (godlike-assigned)
 - `crowdsurfer` — Flew over the crowd (godlike-assigned)
 - `girl-power` — Metal queen (godlike-assigned)
@@ -536,6 +548,8 @@ These genres exist on the 2026 lineup but no badge in `src/services/badges/regis
 - `total-kaput-2026` — Total Kaput (godlike-assigned)
 - `melon` — True vira-latas friend not camping with the group (godlike-assigned)
 - `medic` — "Médico da Matilha" / "Vira-Lata Medic". Held the hair, fetched the water, walked the wounded home (godlike-assigned).
+- `smoke-signals` — "Sinais de Fumaça". The pack always found you by the cloud. Wacken's air got a little spicier (godlike-assigned).
+- `space-brownie` — "Space Brownie". "It's just a brownie," they said. Two hours later you were debating reality with a tent pole (godlike-assigned).
 
 ### Location Presence (5)
 - `metal-place-2026` — Visited Metal Place (persist: true)

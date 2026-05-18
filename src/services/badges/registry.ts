@@ -398,6 +398,41 @@ export const BADGES: BadgeConfig[] = [
     condition: { type: 'band_seen_named', name: 'Judas Priest' },
     year: 2026,
   },
+  // Festival 2026 — stage diversity badges (stage_diversity_min)
+  {
+    slug: 'stage-hopper',
+    imagePath: '/badges/badge_stage-hopper.png',
+    labelKey: 'badgeStageHopper',
+    descriptionKey: 'badgeStageHopperDescription',
+    condition: { type: 'stage_diversity_min', count: 4 },
+    year: 2026,
+  },
+  {
+    slug: 'octopus',
+    imagePath: '/badges/badge_octopus.png',
+    labelKey: 'badgeOctopus',
+    descriptionKey: 'badgeOctopusDescription',
+    condition: { type: 'stage_diversity_min', count: 8 },
+    year: 2026,
+    persist: true,
+  },
+  // Joke badges — assigned manually by godlike via the assign-badge Edge Function
+  {
+    slug: 'smoke-signals',
+    imagePath: '/badges/badge_smoke-signals.png',
+    labelKey: 'badgeSmokeSignals',
+    descriptionKey: 'badgeSmokeSignalsDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
+  {
+    slug: 'space-brownie',
+    imagePath: '/badges/badge_space-brownie.png',
+    labelKey: 'badgeSpaceBrownie',
+    descriptionKey: 'badgeSpaceBrownieDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
 ];
 
 // ─── CONDITION EXAMPLES ───────────────────────────────────────────────────────

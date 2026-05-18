@@ -4,6 +4,31 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-18 (Badges: new predicate `stage_diversity_min` + 4 new badges)
+
+### Added
+- `src/services/badges/types.ts` — new `BadgeCondition` variant `stage_diversity_min` (count: number). Earns when user has seen bands on N+ distinct stages.
+- `src/services/badges/engine.ts` — new `case 'stage_diversity_min'` in `evaluateBadge`: builds a `Set` of stage names from `seenBands`, returns `size >= count`.
+- `src/services/badges/registry.ts` — 4 new `BadgeConfig` entries:
+  - `stage-hopper` — 4+ distinct stages seen (`stage_diversity_min`, count: 4). Year: 2026.
+  - `octopus` — All 8 stages seen (`stage_diversity_min`, count: 8, persist: true). Year: 2026.
+  - `smoke-signals` — Godlike-assigned (`assigned`). Year: 2026.
+  - `space-brownie` — Godlike-assigned (`assigned`). Year: 2026.
+- `public/badges/badge_stage-hopper.png` — new 512×512 px badge asset (metal patch style, jumping figure over stages).
+- `public/badges/badge_octopus.png` — new 512×512 px badge asset (badass octopus with 8 stage tentacles).
+- All 4 × 2 i18n keys (label + description) added to `Badges_br.json`, `Badges_en.json`, `Badges_es.json`, `Badges_de.json`.
+- `src/__tests__/badges.test.ts` — 10 new tests covering `stage_diversity_min` predicate: earn at N stages, fail at N-1, duplicate stage deduplication, registry integration (stage-hopper + octopus), and persist short-circuit.
+
+### Changed
+- `.claude/context/badges.md` — count updated 27 → 28; "Seen-based (8)" → "Seen-based (9)"; new predicate row added to seen-based table.
+- `docs/ai-wiki/badges.md` — count updated 27 → 28; `stage_diversity_min` section added under BANDS SEEN; inventory updated 47 → 51 (Festival 2026: 18 → 20; Merit/Assigned: 9 → 11); new badges listed.
+
+### Architectural Notes
+- `stage_diversity_min` counts distinct `stage` string values in `seenBands`. Ceremony bands are already excluded from `seenBands` by `buildBadgeContext` so they cannot inflate the stage count.
+- `octopus` uses `persist: true` — once all 8 stages are conquered the badge survives pick removals.
+
+---
+
 ## 2026-05-18 (Badges: 7 new badges — late-night, small-stage, crew milestones, medic, Judas Priest)
 
 ### Added

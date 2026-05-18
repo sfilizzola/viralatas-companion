@@ -146,6 +146,10 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
         ctx.seenBands.filter((b) => festivalLocalHour(b.start_time) >= condition.hour).length >=
         condition.count
       );
+    case 'stage_diversity_min': {
+      const distinctStages = new Set(ctx.seenBands.map((b) => b.stage));
+      return distinctStages.size >= condition.count;
+    }
     case 'assigned':
       return ctx.assignedBadges.includes(badge.slug);
   }
