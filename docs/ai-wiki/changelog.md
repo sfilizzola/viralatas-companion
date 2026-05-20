@@ -4,6 +4,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-20 (Phase 22: Vercel Speed Insights)
+
+### Added
+- `@vercel/speed-insights` production dependency — tracks Core Web Vitals (LCP, CLS, INP, FCP, TTFB) per route via Vercel's RUM pipeline.
+- `<SpeedInsights />` component mounted in `src/App.tsx` inside `<BrowserRouter>` and `<DuckEnabledProvider>`, before the sync components — fires a single beacon POST per page navigation.
+
+### Changed
+- `docs/ai-wiki/architecture.md` — Added "Observability" subsection under Layer 1 (Presentation) describing the Speed Insights integration and its non-blocking, network-only nature.
+- `docs/ai-wiki/architecture.md` — `src/App.tsx` entry in Relevant Source Files updated to reflect the new `<SpeedInsights />` mount point; "Last updated" bumped to 2026-05-20.
+
+### Architectural Notes
+- Beacon POSTs to `vitals.vercel-insights.com` are network-only requests; Workbox does not cache or intercept them, so no Service Worker changes were needed.
+- Speed Insights is a pure observability layer: it has no effect on IndexedDB, sync, offline behavior, or Supabase.
+- Data is visible only in the Vercel dashboard (production only).
+
+---
+
 ## 2026-05-18 (Badges: beer-master + beer-hater godlike-assigned)
 
 ### Added
