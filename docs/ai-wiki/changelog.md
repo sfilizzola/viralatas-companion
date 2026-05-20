@@ -4,6 +4,34 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-20 (Wacken 2026 Running Order — stages.md + lineup.md sync)
+
+### Changed
+- `docs/ai-wiki/stages.md` — Synchronized the entire Stage Schedules grid with the official Wacken running order at https://www.wacken.com/en/line-up/running-order-music/. All previously-unconfirmed timeslots on stages that appear in the running order are now `Confirmed = YES`. Only the **Welcome to the Jungle** stage remains `NO` because it is not (yet) in the official running order.
+- `docs/ai-wiki/stages.md` — Slot ID ranges updated to reflect added/removed slots:
+  - **HAR**: HAR1–HAR12 → HAR1–HAR14 (added HAR8 for Sepultura on D3, added HAR14 for Sabaton on D4 — Farewell ceremony also moved to Harder as HAR13).
+  - **FAS**: FAS1–FAS18 → FAS1–FAS17 (removed one D4 slot — Sabaton and the Farewell ceremony moved from Faster to Harder per official running order).
+  - **WET**: WET1–WET35 → WET1–WET36 (added a new D4 slot at 11:00–11:55 TBA).
+  - **HBA**: HBA1–HBA35 → HBA1–HBA36 (added D2 closer at 00:00*–03:00* for Cowgirls From Hell).
+  - **WAS**: WAS1–WAS29 → WAS1–WAS32 (added one D2 slot for Year of the Goat at 23:00, plus two D4 TBA slots at 23:00–00:00 and 00:30*–01:11*).
+  - **WAK**: WAK1–WAK28 → WAK1–WAK29 (added one D3 slot — Faun at 22:15–23:15).
+  - LOU and JUN ranges unchanged.
+- `docs/ai-wiki/stages.md` — Many slot start/end times updated to match the official running order (e.g. D1 HBA10/HBA11, D1 WET11, all of D2 HAR/FAS, D2 LOU12, all of D3 HAR/FAS, D3 LOU18, all of D3 WAK except WAK15, all of D3/D4 WAS, all of D4 HAR/FAS, D4 LOU26/LOU27).
+- `docs/ai-wiki/stages.md` — "Last updated" bumped to 2026-05-20.
+- `docs/ai-wiki/lineup.md` — Rewrote every day × stage band-assignment table to mirror the official running order. Bands moved substantially between stages and days (e.g. The Gathering Faster→Louder D1; Hämatom Louder→Faster D1; Sepultura Harder D3 final slot; Sabaton+Farewell ceremony moved to Harder D4; Cowgirls From Hell from Wasteland D2 to Headbangers D2 closer; etc.). Image URLs follow their bands to their new slots.
+- `docs/ai-wiki/lineup.md` — Metal Battle slots whose representative band is not yet announced are filled with the placeholder string `TDB MTB` (31 slots total: 18 on D1, 12 on D2, 1 D3 W.E.T. Award Ceremony). Non-MTB slots that the running order lists as "TBA" use the existing `TBD` placeholder (Day 4 LOU21 12:00–13:00, WET30 11:00–11:55, WAS24 14:00–14:30, WAS32 00:30*–01:11*).
+- `docs/ai-wiki/lineup.md` — Added a new `TDB MTB` status to the Band Status legend.
+- `docs/ai-wiki/lineup.md` — Summary updated: 167 CONFIRMED · 25 TBD · 192 total → **155 CONFIRMED · 31 `TDB MTB` · 12 TBD · 199 total · 1 ceremony (now HAR13, was FAS17)**.
+- `docs/ai-wiki/lineup.md` — Removed per-day "Band placement algorithm" notes (no longer relevant once the official running order is the source of truth); replaced with a "Source" note pointing to the running order URL.
+
+### Architectural Notes
+- The previous lineup contained a number of bands that **do not appear** in the official running order on any stage/day (e.g. E.N.D., Elvicho, Force, Given By The Flames, I See Red, Maschine's Late Night Show, Midhaven, Novelization, Sinamort, Thomas Nicholas Band, Gagamania, TBS, Ballroom Hamburg DJ Team, Sir Henry Hot Memorial, President, Wüstenberg formerly at WET17 — though Wüstenberg now appears at WAK8 D2). These were dropped from `lineup.md`. They should also be reviewed for removal from `supabase/seed/bands.ts`, but that is out of scope for this docs-only sync.
+- **Welcome to the Jungle (JUN)** is not in the official running order. JUN slot times in `stages.md` remain `Confirmed = NO`, and in `lineup.md` all JUN slots are now `TBD` (the bands previously placed at JUN — Phantom, Diabolisches Werk, Kupfergold, Craft, Deafheaven, Municipal Waste, Kim Dracula, Focus. — are all confirmed on other stages now, so they cannot also be on JUN).
+- Several long-set / unusual slots preserved as published: D2 HBA22 Cowgirls From Hell **00:00*–03:00*** (3-hour set), D4 WAS32 TBA **00:30*–01:11*** (unusual end time retained verbatim from running order).
+- Metal Battle Cyprus is explicitly named in the running order: **Speak in Whispers** at WET2 (D1 11:50–12:10). All other MB country slots remain `TDB MTB`.
+
+---
+
 ## 2026-05-20 (Phase 22: Vercel Speed Insights)
 
 ### Added
