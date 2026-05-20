@@ -58,6 +58,14 @@ Components are organized by concern:
 
 **Pattern**: All pages read from custom hooks, never call repositories directly.
 
+### Observability (Phase 22)
+
+`src/App.tsx` mounts `<SpeedInsights />` from `@vercel/speed-insights/react` inside `<BrowserRouter>` and `<DuckEnabledProvider>`, before the sync components. This fires a single beacon POST to `vitals.vercel-insights.com` per navigation, reporting Core Web Vitals (LCP, CLS, INP, FCP, TTFB) per route.
+
+- **No Service Worker impact** — beacon POSTs are network-only; Workbox does not intercept or cache them.
+- **No offline impact** — if the beacon fails (e.g. no signal at Wacken), it is silently dropped. Speed Insights never retries and never queues.
+- **Production only** — metrics are visible in the Vercel dashboard; no client-side UI is added.
+
 ```typescript
 // ❌ Wrong
 const picks = await picksRepository.load();
@@ -531,4 +539,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-05-12
+**Last updated:** 2026-05-20
