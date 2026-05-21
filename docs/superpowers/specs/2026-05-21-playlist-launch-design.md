@@ -1,7 +1,7 @@
 # Phase 22: Playlist Launch — Design Spec
 
 **Date:** 2026-05-21  
-**Status:** Approved  
+**Status:** Approved · Design: Variant A selected  
 **Author:** Claude Sonnet 4.6
 
 ---
