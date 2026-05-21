@@ -172,6 +172,53 @@ All changes contained in ≤5 locations.
 
 ---
 
+## Design Specification
+
+**Design language baseline:** dark metal — `#0a0a0a` background, Oswald display font (uppercase), JetBrains Mono for meta labels, WET red `#c0392b` as primary accent.
+
+**Color for this feature:** `--signal-ok` (`#16a085`, teal) — already in the design system, used for "Saw" section headers. Carries the semantic meaning of "positive completed action". No new color tokens introduced.
+
+### Three variants (mockup: `_temp/playlist-button-design.html`)
+
+**Variant A — Full-width action strip (recommended)**
+
+Mirrors the existing conflict banner pattern exactly:
+- Full-width strip below the page header, above the band list
+- `rgba(22, 160, 133, 0.06)` background tint, `rgba(22, 160, 133, 0.18)` border-bottom
+- Left: Spotify logo icon + two-line text stack (main label in mono uppercase 11px 600 / sub-label in mono 10px muted)
+- Right: `→` arrow in mono
+- Main label: `GENERATE SETLIST`
+- Sub-label: `Opens Play[my W:O:A]list` (clarifies redirect — no surprise)
+
+Why: consistent with existing UI pattern, clear affordance, full thumb width, sub-label removes ambiguity about destination.
+
+**Variant B — Compact button in header**
+
+Small tinted chip (`border-radius: 3px`) in the header's right column, below the summary lines:
+- Spotify icon + `SETLIST` label in mono 10px
+- Teal tint border chip
+- Minimal footprint, no extra page row
+
+Why: least intrusive. Trade-off: small tap target, no room for sub-label.
+
+**Variant C — Sticky above nav**
+
+Full-width row above `BottomNav`, always in thumb zone:
+- Oswald 14px bold uppercase label + Spotify icon + live band count (e.g. `18 bands`)
+- `border-top: 1px solid rgba(22,160,133,0.25)`, `bg-surface` background
+
+Why: maximum discoverability. Trade-off: heavier real estate cost.
+
+### Recommendation
+
+**Variant A.** It reuses the existing conflict-banner CSS pattern (same tint, border, mono text), introduces zero visual complexity, and includes a sub-label that prevents "where is this taking me?" confusion. The band count can be added as the sub-label: `18 BANDS → Play[my W:O:A]list`.
+
+### CSS implementation note
+
+Component ships its own `.module.css` (isolated, same as the rest of the codebase). No new CSS custom properties added to `index.css` — uses existing `--signal-ok`, `--font-mono`, `--s-*` tokens.
+
+---
+
 ## Out of Scope
 
 - Edge function / backend proxy
