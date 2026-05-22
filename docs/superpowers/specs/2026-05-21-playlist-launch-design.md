@@ -146,17 +146,16 @@ User opens /picks (has ≥1 pick, flag visible to them)
 
 ---
 
-## Removal Plan (post-testing)
+## Post-testing Graduation Plan
 
-When feature is stable and permanent:
+When testing is complete and feature is approved for everyone:
 
-1. Delete `src/components/PlaylistLaunchButton.tsx`
-2. Remove `<PlaylistLaunchButton ... />` from `MyPicksPage`
-3. Remove the admin toggle block from `GodlikeAdminPanel`
-4. Drop the `playlist_testing` column from `app_settings` (migration)
-5. Update i18n files if any keys were added
+1. Remove the admin toggle block from `GodlikeAdminPanel`
+2. Drop the `playlist_testing` column from `app_settings` (migration)
+3. Remove the flag-check + role-check logic from `PlaylistLaunchButton` — component becomes always-visible (when user has ≥1 pick)
+4. Update i18n files if any admin-panel-only keys were added
 
-All changes contained in ≤5 locations.
+**The component and its usage in `MyPicksPage` stay permanently.** Only the feature flag infrastructure is deleted.
 
 ---
 
