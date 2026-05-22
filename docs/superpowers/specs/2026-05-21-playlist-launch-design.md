@@ -177,19 +177,23 @@ When testing is complete and feature is approved for everyone:
 
 **Color for this feature:** `--signal-ok` (`#16a085`, teal) — already in the design system, used for "Saw" section headers. Carries the semantic meaning of "positive completed action". No new color tokens introduced.
 
-### Three variants (mockup: `_temp/playlist-button-design.html`)
+**No Spotify branding.** The button represents the setlist app (Play[my W:O:A]list), not Spotify. Spotify is an internal implementation detail of the external service. The icon used is the Play[my W:O:A]list app icon (PNG, 22×22 with rounded corners, `object-fit: cover`).
+
+### Variants (mockup: `_temp/playlist-button-design-v2.html`)
 
 **Variant A — Full-width action strip (recommended)**
 
 Mirrors the existing conflict banner pattern exactly:
 - Full-width strip below the page header, above the band list
 - `rgba(22, 160, 133, 0.06)` background tint, `rgba(22, 160, 133, 0.18)` border-bottom
-- Left: Spotify logo icon + two-line text stack (main label in mono uppercase 11px 600 / sub-label in mono 10px muted)
+- Left: Play[my W:O:A]list app icon (22×22 rounded PNG) + two-line text stack
+  - Main label: `GENERATE SETLIST` in JetBrains Mono 11px 600 uppercase (A1) or Oswald 13px 700 (A2)
+  - Sub-label: `Play[my W:O:A]list · 18 bands` in mono 10px muted teal
 - Right: `→` arrow in mono
-- Main label: `GENERATE SETLIST`
-- Sub-label: `Opens Play[my W:O:A]list` (clarifies redirect — no surprise)
 
-Why: consistent with existing UI pattern, clear affordance, full thumb width, sub-label removes ambiguity about destination.
+**No Spotify logo or branding anywhere.** Spotify is an internal detail of the external service.
+
+Why: consistent with existing UI pattern, clear affordance, full thumb width, band count in sub-label shows scope.
 
 **Variant B — Compact button in header**
 
@@ -210,7 +214,7 @@ Why: maximum discoverability. Trade-off: heavier real estate cost.
 
 ### Recommendation
 
-**Variant A.** It reuses the existing conflict-banner CSS pattern (same tint, border, mono text), introduces zero visual complexity, and includes a sub-label that prevents "where is this taking me?" confusion. The band count can be added as the sub-label: `18 BANDS → Play[my W:O:A]list`.
+**Variant A1** (mono label) or **A2** (Oswald display label) — both use the Play[my W:O:A]list app icon PNG (22×22, `border-radius: 5px`). A2 feels slightly more metal since it uses Oswald like the rest of the app's headings. Zero Spotify branding anywhere — the button represents the setlist app, not Spotify.
 
 ### CSS implementation note
 
