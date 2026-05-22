@@ -9,5 +9,7 @@
   "conflictWarningBanner": "You have {count} conflict(s). Easy to fix in your profile →",
   "dayPickCount": "{count} picks",
   "sectionSaw": "Saw ({count})",
-  "sectionDidntSee": "Didn't See ({count})"
+  "sectionDidntSee": "Didn't See ({count})",
+  "generateSetlist": "GENERATE SETLIST",
+  "generateSetlistSub": "Setlist Vira-Latas · {count} bands"
 }

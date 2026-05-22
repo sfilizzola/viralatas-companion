@@ -356,3 +356,28 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `useDuckEnabled` defaults to `true` while loading so users never see a flash of missing duck button on a slow first paint.
 
 ---
+
+### Phase 22 — Playlist Launch
+**Status:** ✅ Complete
+
+**Goal:** Add a "Generate setlist" strip to `/my-picks` that deep-links the user to **Setlist Vira-Latas** (`setlist.viralatas.org`) with their picked band names pre-filled. The external app shows a track preview; the user taps "Generate" and lands in Spotify with their personal playlist. Shipped behind a feature flag so the godlike can test with managers before releasing to all vira-latas.
+
+**Deliverables:**
+- `supabase/migrations/20260522000000_playlist_testing.sql` — adds `playlist_testing boolean DEFAULT true NOT NULL` to `public.app_settings`; inherits existing RLS (anyone reads, only godlike updates)
+- `src/lib/supabase.types.ts` — `app_settings` Row/Insert/Update types extended with `playlist_testing`
+- `src/lib/appSettings.ts` — `getPlaylistTesting()` + `setPlaylistTesting()` helpers (duck pattern)
+- `src/components/PlaylistLaunchButton.tsx` — self-contained component: reads `playlist_testing`, user role, and `preferred_language` on mount; hidden when 0 picks; hidden to `normal` role when `playlist_testing = true`; builds `/launch` URL via `URLSearchParams` with repeated `bands` params, `user_name` trimmed to 20 chars, `lang` mapped (`br` → `pt-BR`, else `en`); renders as `<a target="_blank">`
+- `src/components/PlaylistLaunchButton.module.css` — full-width teal strip using design-system tokens only
+- `src/pages/MyPicksPage.tsx` — `<PlaylistLaunchButton bands={myBands} userName={displayName} />` below conflict banner, above band sections
+- `src/components/profile/GodlikeAdminPanel.tsx` — new "Playlist feature" toggle section in Godlike Powers, mirroring the duck toggle pattern
+- `src/i18n/MyPicksPage_{br,en,es,de}.json` — `generateSetlist` + `generateSetlistSub` keys
+- `src/i18n/ProfilePage_{br,en,es,de}.json` — `playlistToggle`, `playlistTesting`, `playlistLive`, `playlistToggleError` keys
+- `public/Design System.html` — `PlaylistLaunchButton` documented in a new component section
+
+**Part 2 (integration, no code changes):** Deep-link confirmed working end-to-end — opens `setlist.viralatas.org` with correct `user_name`, all picked band names, and `lang`; track preview loads; "Generate" lands in Spotify with the user's personal playlist.
+
+**Architectural notes:**
+- `PlaylistLaunchButton` reads `playlist_testing` directly from Supabase on mount (not cached in IndexedDB). This is intentional — the flag is low-frequency and the button is purely a convenience deep-link out of the app; offline-first treatment is unnecessary.
+- The flag graduation path (when `playlist_testing` is removed) requires only deleting the flag column, the role-check logic inside the component, and the admin toggle — the component itself stays permanently.
+
+---

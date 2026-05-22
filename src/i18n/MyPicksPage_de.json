@@ -9,5 +9,7 @@
   "conflictWarningBanner": "Du hast {count} Konflikt(e). Einfach im Profil lösen →",
   "dayPickCount": "{count} Picks",
   "sectionSaw": "Gesehen ({count})",
-  "sectionDidntSee": "Nicht gesehen ({count})"
+  "sectionDidntSee": "Nicht gesehen ({count})",
+  "generateSetlist": "SETLIST ERSTELLEN",
+  "generateSetlistSub": "Setlist Vira-Latas · {count} Bands"
 }

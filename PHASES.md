@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 22 — Playlist Launch
 
-**Status:** 🔧 Ready to implement Part 1 — Part 2 blocked on Setlist Vira-Latas going live
+**Status:** ✅ Complete (Part 1 + Part 2 confirmed end-to-end)
 
 **Goal:** Add a "Generate setlist" button to `/picks` that deep-links the user to **Setlist Vira-Latas** (setlist viralatas) with their picked band names pre-filled. The external app shows a track preview; the user taps "Generate" and lands in Spotify with their personal playlist. The button ships behind a feature flag so the godlike can test it with managers before releasing it to all vira-latas.
 

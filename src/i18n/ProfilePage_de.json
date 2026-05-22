@@ -142,5 +142,9 @@
   "testPushSent": "✅ Push gesendet! Prüfe deine Systembenachrichtigungen.",
   "testPushNoSubscription": "⚠️ Keine Push-Subscription gefunden. Stelle sicher, dass du auf diesem Gerät die Benachrichtigungsberechtigung erteilt hast.",
   "testPushFailed": "❌ Push-Zustellung fehlgeschlagen. Überprüfe die VAPID-Schlüssel und Supabase-Secrets.",
-  "testPushError": "❌ Fehler beim Aufruf der Edge Function. Ist send-test-push deployed?"
+  "testPushError": "❌ Fehler beim Aufruf der Edge Function. Ist send-test-push deployed?",
+  "playlistToggle": "🎵 Setlist-Funktion",
+  "playlistTesting": "Testphase (nur Manager)",
+  "playlistLive": "Live (alle sehen es)",
+  "playlistToggleError": "Aktualisierung fehlgeschlagen. Erneut versuchen."
 }

@@ -227,18 +227,21 @@ export type Database = {
           id: string;
           registration_enabled: boolean;
           duck_enabled: boolean;
+          playlist_testing: boolean;
           updated_at: string;
         };
         Insert: {
           id?: string;
           registration_enabled?: boolean;
           duck_enabled?: boolean;
+          playlist_testing?: boolean;
           updated_at?: string;
         };
         Update: {
           id?: string;
           registration_enabled?: boolean;
           duck_enabled?: boolean;
+          playlist_testing?: boolean;
           updated_at?: string;
         };
         Relationships: [];

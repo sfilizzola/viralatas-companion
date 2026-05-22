@@ -464,6 +464,7 @@ CREATE TABLE public.app_settings (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   registration_enabled boolean DEFAULT true NOT NULL,
   duck_enabled boolean DEFAULT true NOT NULL,
+  playlist_testing boolean DEFAULT true NOT NULL,
   updated_at timestamptz DEFAULT now() NOT NULL
 );
 
@@ -475,13 +476,14 @@ INSERT INTO public.app_settings DEFAULT VALUES;
 
 - `registration_enabled` — when `false`, the registration screen is closed; only existing vira-latas can log in. Read by `/register` to render the closed state.
 - `duck_enabled` (Phase 21) — when `false`, the duck/quack button is not rendered anywhere in the app. Fetched once at app boot via `getDuckEnabled()` and exposed via `DuckEnabledProvider`. See `docs/ai-wiki/flows/duck.md` for full behavior.
+- `playlist_testing` (Phase 22 Part 1) — feature-flag for the Playlist Launch button on `/my-picks`. When `true` (default), the button is shown only to `godlike`/`manager` roles (testing mode). When `false`, the button is visible to all vira-latas. The button is always hidden when the user has 0 picks. Read by `PlaylistLaunchButton` on mount via `getPlaylistTesting()` / `setPlaylistTesting()` from `src/lib/appSettings.ts`.
 
 **RLS:**
 
 - `app_settings_select` — `using (true)` — anyone can read.
-- `app_settings_update` — `using (auth.jwt() ->> 'email' = 'sfilizzola@gmail.com')` — only the godlike user can update. Applies to both columns.
+- `app_settings_update` — `using (auth.jwt() ->> 'email' = 'sfilizzola@gmail.com')` — only the godlike user can update. Applies to all columns.
 
-**Not realtime**. State is fetched once at app boot; mid-session changes require a reload (next-load propagation).
+**Not realtime**. State is fetched once per page mount (not at app boot); the `PlaylistLaunchButton` reads the flag directly on mount. Mid-session admin changes require a page navigation or reload to propagate.
 
 ---
 
@@ -636,4 +638,4 @@ npm run festival:reset -- --with-bands --force
 
 ---
 
-**Last updated:** 2026-05-18 — corrected the cache-version table (was documented as the non-existent `public.meta`; the real table is `public.app_config`); added `festival-reset.ts` to the seed-scripts catalog.
+**Last updated:** 2026-05-22 — added `playlist_testing` column to `app_settings` (Phase 22 Part 1); updated DDL, column descriptions, and RLS notes.

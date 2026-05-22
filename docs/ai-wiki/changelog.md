@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-22 (Phase 22 — Playlist Launch, Parts 1 & 2)
+
+### Added
+- **`playlist_testing` column on `app_settings`** — new `boolean DEFAULT true NOT NULL` column added via migration `20260522000000_playlist_testing.sql`. Controls visibility of the Playlist Launch button: `true` = testing mode (godlike/manager only), `false` = live mode (all vira-latas). Managed by `getPlaylistTesting()` / `setPlaylistTesting()` in `src/lib/appSettings.ts` (duck pattern).
+- **`PlaylistLaunchButton` component** (`src/components/PlaylistLaunchButton.tsx`) — self-contained feature component that reads `playlist_testing`, user role, and `preferred_language` on mount; renders a full-width teal strip with a link to `https://setlist.viralatas.org/launch` carrying `bands` (repeated params) + `user_name` (trimmed to 20 chars) + `lang` (br→pt-BR, others→en). Always hidden when user has 0 picks. Opens in `target="_blank"`.
+- **`PlaylistLaunchButton.module.css`** — full-width teal strip design using design-system tokens only (`--signal-ok`, `--font-display`, `--font-mono`, `--s-*`).
+- **Playlist toggle in GodlikeAdminPanel** (`src/components/profile/GodlikeAdminPanel.tsx`) — new collapsible section in Godlike Powers for toggling `playlist_testing` on/off, following the same pattern as the duck toggle.
+- **i18n keys** — `generateSetlist` + `generateSetlistSub` added to `MyPicksPage_{br,en,es,de}.json`; `playlistToggle`, `playlistTesting`, `playlistLive`, `playlistToggleError` added to `ProfilePage_{br,en,es,de}.json`.
+
+### Changed
+- **`supabase-schema.md`** — `app_settings` DDL updated with `playlist_testing boolean DEFAULT true NOT NULL`; column descriptions and RLS notes expanded to cover the new flag; "Last updated" bumped to 2026-05-22.
+- **`architecture.md`** — no structural changes; existing Phase 22 observability note already present.
+
+### Architectural Notes
+- `PlaylistLaunchButton` reads `playlist_testing` directly from Supabase on mount (not cached in IndexedDB). This is intentional — it is a low-frequency flag that doesn't need offline-first treatment, since the button is purely a convenience deep-link out of the app.
+- The component is placed in `MyPicksPage` below the conflict banner, above `<main>` — same slot as other non-pick content.
+- URL encoding follows the pattern `lang=pt-BR` for Brazilian Portuguese and `lang=en` for all other locales, matching the target service's expected parameter format.
+- **Part 2 — Integration confirmed working end-to-end.** Deep-link from the strip opens `setlist.viralatas.org` with correct `user_name`, all picked band names, and `lang`; track preview loads; "Generate" lands in Spotify with the user's personal playlist. No code changes required for Part 2 — the URL construction in `PlaylistLaunchButton` was already correct.
+
+---
+
 ## 2026-05-20 (Wacken 2026 Running Order — stages.md + lineup.md sync)
 
 ### Changed

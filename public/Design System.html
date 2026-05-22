@@ -1179,6 +1179,52 @@
       </div>
 
       <div class="component-section">
+        <h3>PlaylistLaunchButton <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/PlaylistLaunchButton.tsx</span></h3>
+        <p>Full-width action strip shown on <code>/picks</code> (below conflict banner, above band list) that deep-links the user to <strong>Setlist Vira-Latas</strong> (<code>setlist.viralatas.org</code>) with their picked bands pre-filled. Ships behind a feature flag (<code>playlist_testing</code> on <code>app_settings</code>).</p>
+        <p><strong>Visibility rules:</strong> hidden when user has 0 picks; hidden to <code>normal</code> role while <code>playlist_testing = true</code>; visible to all when <code>playlist_testing = false</code>. Godlike toggles the flag in the admin panel.</p>
+        <p><strong>URL construction:</strong> <code>GET /launch</code> on Setlist Vira-Latas with repeated <code>bands</code> params, <code>user_name</code> trimmed to 20 chars, <code>lang</code> mapped (<code>br → pt-BR</code>, else <code>en</code>). Renders as <code>&lt;a target="_blank"&gt;</code> — no loading state, instant redirect.</p>
+        <p><strong>Layout:</strong> left side = 22×22 inline SVG icon (playlist motif, teal, border-radius 5px) + two-line text stack (Oswald 13px 700 uppercase label + JetBrains Mono 10px sub-label with band count); right side = <code>→</code> arrow in mono.</p>
+        <p><strong>Tokens used:</strong> <code>--signal-ok</code>, <code>--font-display</code>, <code>--font-mono</code>, <code>--s-3</code>, <code>--s-4</code>. No new custom properties.</p>
+        <div class="component-demo" style="background: #0a0a0a; padding: 0; overflow: hidden;">
+          <style>
+            .ds-plb { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(22,160,133,0.06); border-bottom: 1px solid rgba(22,160,133,0.18); text-decoration: none; cursor: pointer; }
+            .ds-plb-left { display: flex; align-items: center; gap: 10px; }
+            .ds-plb-icon { flex-shrink: 0; width: 22px; height: 22px; border-radius: 5px; overflow: hidden; }
+            .ds-plb-stack { display: flex; flex-direction: column; gap: 2px; }
+            .ds-plb-label { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #16a085; line-height: 1; }
+            .ds-plb-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(22,160,133,0.65); line-height: 1; }
+            .ds-plb-arrow { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(22,160,133,0.65); margin-left: 12px; }
+          </style>
+          <div class="ds-plb">
+            <div class="ds-plb-left">
+              <div class="ds-plb-icon">
+                <svg viewBox="0 0 22 22" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="22" height="22" rx="5" fill="rgba(22,160,133,0.18)" />
+                  <line x1="6" y1="7" x2="16" y2="7" stroke="#16a085" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="6" y1="11" x2="16" y2="11" stroke="#16a085" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="6" y1="15" x2="12" y2="15" stroke="#16a085" stroke-width="1.6" stroke-linecap="round" />
+                  <circle cx="16" cy="15" r="2" stroke="#16a085" stroke-width="1.4" />
+                  <line x1="18" y1="13.5" x2="18" y2="11" stroke="#16a085" stroke-width="1.4" stroke-linecap="round" />
+                </svg>
+              </div>
+              <div class="ds-plb-stack">
+                <span class="ds-plb-label">GENERATE SETLIST</span>
+                <span class="ds-plb-sub">Setlist Vira-Latas · 18 bands</span>
+              </div>
+            </div>
+            <span class="ds-plb-arrow">→</span>
+          </div>
+        </div>
+        <table class="prop-table" style="margin-top: 16px;">
+          <thead><tr><th>Prop</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>bands</td><td>Band[]</td><td>User's picked bands. Component is hidden when empty.</td></tr>
+            <tr><td>userName</td><td>string</td><td>User display name. Trimmed to 20 chars before inclusion in the deep-link URL.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="component-section">
         <h3>ClusterRow <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/now/CrewGroupsSection.tsx</span></h3>
         <p>Collapsed stacked-avatar row used on all 4 live page card types. Replaces the always-visible member pill list. Max 5 avatars shown; overflow shown as +N. Tapping the parent card opens the LiveCardSheet.</p>
         <div class="component-demo" style="background: #0a0a0a; padding: 20px; display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">

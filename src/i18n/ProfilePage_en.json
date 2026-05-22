@@ -142,5 +142,9 @@
   "testPushSent": "✅ Push sent! Check your system notifications.",
   "testPushNoSubscription": "⚠️ No push subscription found. Make sure you granted notification permission on this device.",
   "testPushFailed": "❌ Push delivery failed. Check the VAPID keys and Supabase secrets.",
-  "testPushError": "❌ Error calling the Edge Function. Is send-test-push deployed?"
+  "testPushError": "❌ Error calling the Edge Function. Is send-test-push deployed?",
+  "playlistToggle": "🎵 Playlist feature",
+  "playlistTesting": "Testing (managers only)",
+  "playlistLive": "Live (everyone sees it)",
+  "playlistToggleError": "Failed to update. Try again."
 }

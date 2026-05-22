@@ -142,5 +142,9 @@
   "testPushSent": "✅ Push enviado! Verifique suas notificações do sistema.",
   "testPushNoSubscription": "⚠️ Nenhuma subscrição push encontrada. Verifique se você concedeu permissão de notificação neste dispositivo.",
   "testPushFailed": "❌ Falha na entrega do push. Verifique as chaves VAPID e os segredos do Supabase.",
-  "testPushError": "❌ Erro ao chamar a Edge Function. O send-test-push está deployado?"
+  "testPushError": "❌ Erro ao chamar a Edge Function. O send-test-push está deployado?",
+  "playlistToggle": "🎵 Recurso de setlist",
+  "playlistTesting": "Testando (só managers veem)",
+  "playlistLive": "Live (todos veem)",
+  "playlistToggleError": "Erro ao atualizar. Tente de novo."
 }

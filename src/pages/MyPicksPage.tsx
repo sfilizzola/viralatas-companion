@@ -16,6 +16,7 @@ import OfflineBanner from '../components/OfflineBanner';
 import BandCard from '../components/BandCard';
 import BandDetailModal from '../components/BandDetailModal';
 import Icon from '../components/icons/Icon';
+import PlaylistLaunchButton from '../components/PlaylistLaunchButton';
 import styles from './SchedulePage.module.css';
 
 export default function MyPicksPage() {
@@ -23,6 +24,12 @@ export default function MyPicksPage() {
   const { t: tSchedule } = useI18n('SchedulePage');
   const { session } = useAuth();
   const userId = session?.user?.id ?? null;
+  const displayName =
+    (session?.user?.user_metadata?.['display_name'] as string | undefined) ??
+    session?.user?.email?.split('@')[0] ??
+    '';
+
+  const FESTIVAL_START = new Date('2026-07-29T00:00:00+01:00');
 
   const [bands, setBands] = useState<Band[]>([]);
   const [loading, setLoading] = useState(true);
@@ -97,6 +104,7 @@ export default function MyPicksPage() {
     return map;
   }, [allMissed]);
 
+  const isFestivalActive = currentNow >= FESTIVAL_START;
   const conflicts = useBandConflicts(myBands);
 
   const activeBand = useMemo(
@@ -243,6 +251,10 @@ export default function MyPicksPage() {
           <Icon name="conflict" size={14} />
           {t('conflictWarningBanner', { count: totalConflicts })}
         </a>
+      )}
+
+      {!isFestivalActive && (
+        <PlaylistLaunchButton bands={myBands} userName={displayName} />
       )}
 
       <main className={styles.list}>
@@ -406,6 +418,11 @@ export default function MyPicksPage() {
             </section>
           );
         })()}
+        {isFestivalActive && (
+          <div className={styles.playlistBottom}>
+            <PlaylistLaunchButton bands={myBands} userName={displayName} />
+          </div>
+        )}
       </main>
 
       {activeBand && (

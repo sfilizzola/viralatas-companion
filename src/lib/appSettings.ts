@@ -107,3 +107,58 @@ export async function setDuckEnabled(enabled: boolean): Promise<boolean> {
     throw err;
   }
 }
+
+// Default true = testing mode (restricted). Fails safe to true (testing) so a
+// network error never accidentally reveals the feature to all users.
+export async function getPlaylistTesting(): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from('app_settings')
+      .select('playlist_testing')
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.error('Failed to fetch playlist_testing flag:', error);
+      return true;
+    }
+
+    return data?.playlist_testing ?? true;
+  } catch (err) {
+    console.error('Error fetching playlist_testing flag:', err);
+    return true;
+  }
+}
+
+export async function setPlaylistTesting(testing: boolean): Promise<boolean> {
+  try {
+    const { data: settings, error: fetchError } = await supabase
+      .from('app_settings')
+      .select('id')
+      .limit(1)
+      .single();
+
+    if (fetchError || !settings) {
+      console.error('Failed to fetch app settings row:', fetchError);
+      throw fetchError ?? new Error('App settings row not found');
+    }
+
+    const { error } = await supabase
+      .from('app_settings')
+      .update({
+        playlist_testing: testing,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', settings.id);
+
+    if (error) {
+      console.error('Failed to update playlist_testing flag:', error);
+      throw error;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Error updating playlist_testing flag:', err);
+    throw err;
+  }
+}

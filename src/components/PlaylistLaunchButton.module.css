@@ -1,0 +1,98 @@
+.strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--s-3) var(--s-4);
+  background: rgba(22, 160, 133, 0.05);
+  border-bottom: 1px solid rgba(22, 160, 133, 0.15);
+  margin-top: 4px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.strip:hover,
+.strip:focus,
+.strip:active,
+.strip:visited {
+  text-decoration: none;
+  color: inherit;
+}
+
+.strip:hover {
+  background: rgba(22, 160, 133, 0.09);
+}
+
+.strip:active {
+  background: rgba(22, 160, 133, 0.13);
+}
+
+/* Show a subtle teal ring only on keyboard navigation */
+.strip:focus-visible {
+  outline: 2px solid rgba(22, 160, 133, 0.5);
+  outline-offset: -2px;
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  min-width: 0;
+}
+
+.iconWrap {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.textStack {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--signal-ok);
+  line-height: 1;
+}
+
+.sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(22, 160, 133, 0.55);
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.03em;
+}
+
+.arrow {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: rgba(22, 160, 133, 0.5);
+  flex-shrink: 0;
+  margin-left: var(--s-3);
+  transition: transform 0.18s ease, color 0.18s ease;
+}
+
+.strip:hover .arrow {
+  transform: translateX(3px);
+  color: var(--signal-ok);
+}

@@ -9,5 +9,7 @@
   "conflictWarningBanner": "Você tem {count} conflito(s). Resolva fácil no seu perfil →",
   "dayPickCount": "{count} escolhas",
   "sectionSaw": "Vi ({count})",
-  "sectionDidntSee": "Não vi ({count})"
+  "sectionDidntSee": "Não vi ({count})",
+  "generateSetlist": "GERAR SETLIST",
+  "generateSetlistSub": "Setlist Vira-Latas · {count} bandas"
 }

@@ -8,6 +8,8 @@ import {
   setRegistrationEnabled,
   getDuckEnabled,
   setDuckEnabled,
+  getPlaylistTesting,
+  setPlaylistTesting,
 } from '../../lib/appSettings';
 import { useRefreshDuckEnabled } from '../../contexts/DuckEnabledContext';
 import { useCooldown } from '../../hooks/useCooldown';
@@ -47,6 +49,9 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
   const [duckFeatureLoading, setDuckFeatureLoading] = useState(false);
   const [duckFeatureError, setDuckFeatureError] = useState<string | null>(null);
   const refreshDuckEnabled = useRefreshDuckEnabled();
+  const [playlistTestingEnabled, setPlaylistTestingEnabledState] = useState(true);
+  const [playlistTestingLoading, setPlaylistTestingLoading] = useState(false);
+  const [playlistTestingError, setPlaylistTestingError] = useState<string | null>(null);
   const [metalPlaceLoading, setMetalPlaceLoading] = useState(true);
   const [metalPlaceSaving, setMetalPlaceSaving] = useState(false);
   const [metalPlaceError, setMetalPlaceError] = useState<string | null>(null);
@@ -120,6 +125,18 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
       }
     }
     if (userRole === 'godlike') loadDuckFeatureStatus();
+  }, [userRole]);
+
+  useEffect(() => {
+    async function loadPlaylistTestingStatus() {
+      try {
+        const testing = await getPlaylistTesting();
+        setPlaylistTestingEnabledState(testing);
+      } catch (error) {
+        console.error('Failed to load playlist_testing flag:', error);
+      }
+    }
+    if (userRole === 'godlike') loadPlaylistTestingStatus();
   }, [userRole]);
 
   useEffect(() => {
@@ -246,6 +263,22 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
       setDuckFeatureLoading(false);
     }
   }, [duckFeatureEnabled, refreshDuckEnabled, t]);
+
+  const handleTogglePlaylistTesting = useCallback(async () => {
+    setPlaylistTestingLoading(true);
+    setPlaylistTestingError(null);
+    try {
+      const newValue = !playlistTestingEnabled;
+      await setPlaylistTesting(newValue);
+      setPlaylistTestingEnabledState(newValue);
+    } catch (error) {
+      console.error('Failed to toggle playlist_testing flag:', error);
+      setPlaylistTestingError(t('playlistToggleError'));
+      setTimeout(() => setPlaylistTestingError(null), 3000);
+    } finally {
+      setPlaylistTestingLoading(false);
+    }
+  }, [playlistTestingEnabled, t]);
 
   const handlePromoteOrDemote = useCallback(
     async (targetUserId: string, currentRole: string) => {
@@ -483,6 +516,28 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
                 </button>
                 <span className={styles.registrationStatus}>
                   {duckFeatureEnabled ? '🟢' : '🔴'}
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.registrationSection}>
+              <h4 className={styles.registrationSectionTitle}>{t('playlistToggle')}</h4>
+              {playlistTestingError && <p className={styles.registrationError}>{playlistTestingError}</p>}
+              <div className={styles.registrationControlRow}>
+                <button
+                  className={`${styles.registrationToggleButton} ${playlistTestingEnabled ? styles.disabled : styles.enabled}`}
+                  onClick={handleTogglePlaylistTesting}
+                  disabled={playlistTestingLoading}
+                  type="button"
+                >
+                  {playlistTestingLoading
+                    ? t('duckLoading')
+                    : playlistTestingEnabled
+                      ? t('playlistTesting')
+                      : t('playlistLive')}
+                </button>
+                <span className={styles.registrationStatus}>
+                  {playlistTestingEnabled ? '🧪' : '🟢'}
                 </span>
               </div>
             </div>
