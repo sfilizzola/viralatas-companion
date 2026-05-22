@@ -39,7 +39,7 @@ const MOCKS: Record<string, MoshSplitBalance> = {
   loading: { found: true, balance: 0, currency: 'EUR', festival: 'Wacken 2026' },
 };
 
-const ACTIVE_MOCK = MOCKS.owes;
+const ACTIVE_MOCK = MOCKS.not_found; // Phase 23 Part 1 hidden — awaiting review
 
 // Cycle order for the dev CTA tap: owes → owed → settled → owes ...
 const CYCLE: MoshSplitBalance[] = [MOCKS.owes, MOCKS.owed, MOCKS.settled];

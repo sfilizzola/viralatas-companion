@@ -61,7 +61,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 23 — MoshSplit Balance Section
 
-**Status:** ✅ Part 1 complete — awaiting MoshSplit API docs for Part 2
+**Status:** 🙈 Part 1 hidden — awaiting review; Part 2 blocked on MoshSplit API docs
 
 **Goal:** Add a self-contained collapsible `MoshSplitSection` component to the Profile page that shows the user's net balance from **MoshSplit** (`split.viralatas.org`) — the festival finance app used by the vira-latas at Wacken. Shipped in two parts: Part 1 (mocked UI for approval), Part 2 (real API connection, blocked on MoshSplit API docs).
 
