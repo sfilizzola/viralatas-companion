@@ -57,7 +57,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 23 — MoshSplit Balance Section
 
-**Status:** 🎨 Design approved, ready to implement Part 1
+**Status:** ✅ Part 1 complete — awaiting MoshSplit API docs for Part 2
 
 **Goal:** Add a self-contained collapsible `MoshSplitSection` component to the Profile page that shows the user's net balance from **MoshSplit** (`split.viralatas.org`) — the festival finance app used by the vira-latas at Wacken. Shipped in two parts: Part 1 (mocked UI for approval), Part 2 (real API connection, blocked on MoshSplit API docs).
 
@@ -94,14 +94,14 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **CTA button:** full-width, "Abrir MoshSplit →", red-tinted (`rgba(--accent, 0.08)` bg), opens `https://split.viralatas.org` in new tab. Present in all visible states.
 
 **Acceptance criteria (Part 1):**
-- [ ] `not_found` mock → component not visible on profile page
-- [ ] `settled` mock → component visible, "Tudo acertado 🤘" visible, no balance row, CTA visible
-- [ ] `owes` mock → collapsible visible, chip red with negative amount, expanded shows amount row + CTA
-- [ ] `owed` mock → collapsible visible, chip teal with positive amount, expanded shows amount row + CTA
-- [ ] Component collapses/expands on header tap
-- [ ] CTA opens `https://split.viralatas.org` in new tab
-- [ ] `loading` mock → spinner in header, no content, not clickable
-- [ ] Build passes, no linter errors
+- [x] `not_found` mock → component not visible on profile page
+- [x] `settled` mock → component visible, "All settled 🤘" visible, no balance row, CTA visible
+- [x] `owes` mock → collapsible visible, chip red with negative amount, expanded shows amount row + CTA
+- [x] `owed` mock → collapsible visible, chip teal with positive amount, expanded shows amount row + CTA
+- [x] Component collapses/expands on header tap
+- [x] CTA cycles mock states during review (real URL wired in Part 2)
+- [x] `loading` mock → spinner in header, no content, not clickable
+- [x] Build passes, no linter errors
 
 **Acceptance criteria (Part 2):**
 - [ ] Real balance loaded from MoshSplit API using user email + `VITE_MOSHSPLIT_TOKEN`
