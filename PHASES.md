@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 22 — Playlist Launch
 
-**Status:** 🔧 Ready to implement
+**Status:** 🔧 Ready to implement Part 1 — Part 2 blocked on Setlist Vira-Latas going live
 
 **Goal:** Add a "Generate setlist" button to `/picks` that deep-links the user to **Setlist Vira-Latas** (setlist viralatas) with their picked band names pre-filled. The external app shows a track preview; the user taps "Generate" and lands in Spotify with their personal playlist. The button ships behind a feature flag so the godlike can test it with managers before releasing it to all vira-latas.
 
@@ -45,13 +45,17 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 - Remove admin toggle block from `GodlikeAdminPanel`
 - Remove admin toggle i18n keys
 
-**Acceptance criteria:**
+**Acceptance criteria (Part 1):**
 - [ ] Godlike and manager see the strip on `/picks` immediately after migration (flag defaults to `true` = testing mode)
 - [ ] Normal users do not see the strip while `playlist_testing = true`
 - [ ] Godlike can flip flag to `false` in admin panel; all users see the strip on next page load
-- [ ] Tapping the strip opens Setlist Vira-Latas `/launch` URL in a new tab with correct `user_name`, all picked band names, and `lang`
+- [ ] Strip renders with correct `user_name`, band list, and `lang` in the URL (verify in browser before tapping — link leads to a dead domain until Part 2)
 - [ ] Strip is hidden when user has 0 picks
 - [ ] Build passes, no new linter errors
+
+**Acceptance criteria (Part 2 — triggered when `setlist.viralatas.org` goes live):**
+- [ ] Tapping the strip opens Setlist Vira-Latas with correct `user_name`, all picked band names, and `lang`
+- [ ] Track preview loads and "Generate" lands in Spotify with the user's playlist
 
 ---
 
