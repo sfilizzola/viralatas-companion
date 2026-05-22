@@ -483,7 +483,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 
 ---
 
-## Current Badges Inventory (53 Total)
+## Current Badges Inventory (54 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -552,6 +552,7 @@ These genres exist on the 2026 lineup but no badge in `src/services/badges/regis
 - `space-brownie` — "Space Brownie". "It's just a brownie," they said. Two hours later you were debating reality with a tent pole (godlike-assigned).
 - `beer-master` — "Mestre da Cerveja". Liquid bread is a food group. You drank Wacken dry and asked for seconds (godlike-assigned).
 - `beer-hater` — "Inimigo da Cerveja". Surrounded by oceans of beer and said "no thanks." Wine, shots, caipirinha — anything but that (godlike-assigned).
+- `code-wizards` — "Magos do Código". Three wizards, three apps, one pack. Built the magic so we could find, listen and pay each other (godlike-assigned).
 
 ### Location Presence (5)
 - `metal-place-2026` — Visited Metal Place (persist: true)
@@ -954,4 +955,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-18 — added 2 new godlike-assigned badges: `beer-master` ("Mestre da Cerveja") and `beer-hater` ("Inimigo da Cerveja"). Inventory 51 → 53. Merit/Assigned 11 → 13. No new predicates; no engine/types changes.
+**Last updated:** 2026-05-22 — added godlike-assigned badge `code-wizards` ("Magos do Código"). Inventory 53 → 54. No new predicates; no engine/types changes.

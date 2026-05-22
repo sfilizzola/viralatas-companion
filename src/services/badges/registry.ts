@@ -449,6 +449,14 @@ export const BADGES: BadgeConfig[] = [
     condition: { type: 'assigned' },
     year: 2026,
   },
+  {
+    slug: 'code-wizards',
+    imagePath: '/badges/badge_code-wizards.png',
+    labelKey: 'badgeCodeWizards',
+    descriptionKey: 'badgeCodeWizardsDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
 ];
 
 // ─── CONDITION EXAMPLES ───────────────────────────────────────────────────────

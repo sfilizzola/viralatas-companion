@@ -4,6 +4,13 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-22
+
+### Added
+- **`code-wizards` badge** — godlike-assigned badge "Magos do Código" / "Code Wizards". Registry entry, PNG asset, and i18n in all four locales.
+
+---
+
 ## 2026-05-22 (Phase 22 — Playlist Launch, Parts 1 & 2)
 
 ### Added
