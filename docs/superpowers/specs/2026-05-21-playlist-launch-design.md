@@ -8,7 +8,7 @@
 
 ## Overview
 
-Add a "Create playlist" button to `/picks` that deep-links the user to **Play[my W:O:A]list** (setlist viralatas) with their picked bands pre-filled. The external app shows a track preview, the user taps "Generate", and lands in Spotify with their playlist.
+Add a "Create playlist" button to `/picks` that deep-links the user to **Setlist Vira-Latas** (setlist viralatas) with their picked bands pre-filled. The external app shows a track preview, the user taps "Generate", and lands in Spotify with their playlist.
 
 The feature ships behind a feature flag — while testing, only godlike and manager users see it. When the flag is flipped to "released", everyone sees it. When the feature is mature and permanent, the flag and visibility logic are deleted.
 
@@ -16,7 +16,7 @@ The feature ships behind a feature flag — while testing, only godlike and mana
 
 ## External API Contract
 
-**Service:** Play[my W:O:A]list (`https://your-app.vercel.app` — **placeholder, replace before implementation**)  
+**Service:** Setlist Vira-Latas (`https://your-app.vercel.app` — **placeholder, replace before implementation**)  
 **Surface used:** `GET /launch` — deep-link to preview
 
 ### URL format
@@ -177,7 +177,7 @@ When testing is complete and feature is approved for everyone:
 
 **Color for this feature:** `--signal-ok` (`#16a085`, teal) — already in the design system, used for "Saw" section headers. Carries the semantic meaning of "positive completed action". No new color tokens introduced.
 
-**No Spotify branding.** The button represents the setlist app (Play[my W:O:A]list), not Spotify. Spotify is an internal implementation detail of the external service. The icon used is the Play[my W:O:A]list app icon (PNG, 22×22 with rounded corners, `object-fit: cover`).
+**No Spotify branding.** The button represents the setlist app (Setlist Vira-Latas), not Spotify. Spotify is an internal implementation detail of the external service. The icon used is the Setlist Vira-Latas app icon (PNG, 22×22 with rounded corners, `object-fit: cover`).
 
 ### Variants (mockup: `_temp/playlist-button-design-v2.html`)
 
@@ -186,9 +186,9 @@ When testing is complete and feature is approved for everyone:
 Mirrors the existing conflict banner pattern exactly:
 - Full-width strip below the page header, above the band list
 - `rgba(22, 160, 133, 0.06)` background tint, `rgba(22, 160, 133, 0.18)` border-bottom
-- Left: Play[my W:O:A]list app icon (22×22 rounded PNG) + two-line text stack
+- Left: Setlist Vira-Latas app icon (22×22 rounded PNG) + two-line text stack
   - Main label: `GENERATE SETLIST` in JetBrains Mono 11px 600 uppercase (A1) or Oswald 13px 700 (A2)
-  - Sub-label: `Play[my W:O:A]list · 18 bands` in mono 10px muted teal
+  - Sub-label: `Setlist Vira-Latas · 18 bands` in mono 10px muted teal
 - Right: `→` arrow in mono
 
 **No Spotify logo or branding anywhere.** Spotify is an internal detail of the external service.
@@ -214,7 +214,7 @@ Why: maximum discoverability. Trade-off: heavier real estate cost.
 
 ### Recommendation
 
-**Variant A2** — Play[my W:O:A]list app icon PNG (22×22, `border-radius: 5px`) + Oswald 13px 700 uppercase label + mono 10px muted sub-label with band count. Zero Spotify branding — the button represents the setlist app, not Spotify.
+**Variant A2** — Setlist Vira-Latas app icon PNG (22×22, `border-radius: 5px`) + Oswald 13px 700 uppercase label + mono 10px muted sub-label with band count. Zero Spotify branding — the button represents the setlist app, not Spotify.
 
 ### CSS implementation note
 

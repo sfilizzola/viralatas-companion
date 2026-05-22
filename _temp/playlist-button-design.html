@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlaylistLaunchButton — Design Variants</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+  :root {
+    --bg: #0a0a0a;
+    --bg-surface: #141414;
+    --bg-elevated: #1e1e1e;
+    --border: #2a2a2a;
+    --border-strong: #3a3a3a;
+    --text: #e8e8e8;
+    --text-muted: #888;
+    --text-faint: #555;
+    --accent: #c0392b;
+    --accent-hover: #e74c3c;
+    --signal-live: #c0392b;
+    --signal-warn: #f39c12;
+    --signal-ok: #16a085;
+    --font-display: 'Oswald', sans-serif;
+    --font-sans: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+    --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #050505;
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 56px;
+    align-items: center;
+  }
+
+  h1 {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--text-faint);
+    text-align: center;
+  }
+
+  /* ── Phone frame ─────────────────────────────────── */
+  .phone {
+    width: 375px;
+    background: var(--bg);
+    border-radius: 20px;
+    border: 1px solid #1a1a1a;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+    flex-shrink: 0;
+  }
+
+  /* ── Shared page chrome ─────────────────────────── */
+  .page-header {
+    padding: var(--s-4) var(--s-4) var(--s-3);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .page-summary {
+    display: grid;
+    gap: 2px;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1.25;
+    text-align: right;
+    text-transform: uppercase;
+  }
+  .day-header {
+    padding: var(--s-3) var(--s-4) 0;
+    border-top: 2px solid var(--accent);
+    margin: var(--s-3) var(--s-4);
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .band-row {
+    margin: 6px var(--s-4);
+    padding: 10px 12px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .band-name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  .band-meta {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+  .nav-bar {
+    height: 56px;
+    background: var(--bg-surface);
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    margin-top: 8px;
+  }
+  .nav-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--text-faint);
+  }
+  .nav-dot.active { background: var(--accent); }
+
+  /* ── Label ──────────────────────────────────────── */
+  .variant-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-faint);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .variant-rec {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--signal-ok);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .variant-note {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-faint);
+    line-height: 1.5;
+    text-align: center;
+    max-width: 375px;
+    margin-top: 10px;
+  }
+
+  /* ════════════════════════════════════════════════
+     VARIANT A — Full-width strip (conflict-banner style)
+     Below header, above band list. Teal tint.
+  ════════════════════════════════════════════════ */
+  .playlist-strip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-2);
+    padding: var(--s-3) var(--s-4);
+    background: rgba(22, 160, 133, 0.06);
+    border-bottom: 1px solid rgba(22, 160, 133, 0.18);
+    color: var(--signal-ok);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .playlist-strip:hover {
+    background: rgba(22, 160, 133, 0.11);
+  }
+  .playlist-strip-left {
+    display: flex;
+    align-items: center;
+    gap: var(--s-3);
+  }
+  .playlist-strip-icon {
+    width: 20px; height: 20px;
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+  .playlist-strip-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .playlist-strip-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1;
+  }
+  .playlist-strip-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(22,160,133,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  .playlist-strip-arrow {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  /* ════════════════════════════════════════════════
+     VARIANT B — Compact button in header (right side)
+     Replaces the text summary with a tappable element
+  ════════════════════════════════════════════════ */
+  .header-with-btn {
+    padding: var(--s-4) var(--s-4) var(--s-3);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--s-3);
+  }
+  .header-right-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--s-2);
+  }
+  .playlist-header-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(22, 160, 133, 0.10);
+    border: 1px solid rgba(22, 160, 133, 0.30);
+    border-radius: 3px;
+    padding: 5px 9px;
+    color: var(--signal-ok);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .playlist-header-btn-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    line-height: 1;
+  }
+  .playlist-header-btn-icon {
+    width: 13px; height: 13px;
+    flex-shrink: 0;
+  }
+
+  /* ════════════════════════════════════════════════
+     VARIANT C — Sticky above nav bar
+     Full-width, thumb zone, Oswald display text
+  ════════════════════════════════════════════════ */
+  .sticky-wrapper {
+    position: relative;
+  }
+  .playlist-sticky {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--s-3);
+    padding: 13px var(--s-4);
+    background: var(--bg-surface);
+    border-top: 1px solid rgba(22, 160, 133, 0.25);
+    color: var(--signal-ok);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .playlist-sticky-icon {
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+    opacity: 0.8;
+  }
+  .playlist-sticky-label {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  .playlist-sticky-arrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    opacity: 0.5;
+    margin-left: auto;
+  }
+  .playlist-sticky-count {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: rgba(22,160,133,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-left: -8px;
+  }
+
+  /* Spotify icon (embedded SVG-as-data so it works offline) */
+  .spotify-logo {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    background: currentColor;
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z'/%3E%3C/svg%3E");
+    mask-repeat: no-repeat;
+    mask-size: contain;
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z'/%3E%3C/svg%3E");
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+  }
+
+  .row { display: flex; gap: 32px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+  .col { display: flex; flex-direction: column; align-items: center; }
+</style>
+</head>
+<body>
+
+<h1>PlaylistLaunchButton · Design Variants · Phase 22</h1>
+
+<div class="row">
+
+  <!-- ═══ VARIANT A ═══ -->
+  <div class="col">
+    <div class="variant-rec">★ Variant A — Recommended · Full-width action strip</div>
+    <div class="phone">
+      <!-- Header -->
+      <div class="page-header">
+        <span class="page-title">My Picks</span>
+        <div class="page-summary">
+          <span>18 bands · 4 days</span>
+          <span>2 conflicts</span>
+        </div>
+      </div>
+
+      <!-- ★ PLAYLIST STRIP (the feature) -->
+      <a class="playlist-strip" href="#">
+        <div class="playlist-strip-left">
+          <span class="spotify-logo playlist-strip-icon"></span>
+          <div class="playlist-strip-text">
+            <span class="playlist-strip-label">Generate setlist</span>
+            <span class="playlist-strip-sub">Opens Setlist Vira-Latas</span>
+          </div>
+        </div>
+        <span class="playlist-strip-arrow">→</span>
+      </a>
+
+      <!-- Day header -->
+      <div class="day-header">
+        <span>Wednesday 29/07</span>
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">5 bands</span>
+      </div>
+      <div class="band-row">
+        <span class="band-name">Metallica</span>
+        <span class="band-meta">W:E:T Stage · 20:00–22:30</span>
+      </div>
+      <div class="band-row">
+        <span class="band-name">Airbourne</span>
+        <span class="band-meta">Faster Stage · 18:00–19:15</span>
+      </div>
+      <div class="band-row">
+        <span class="band-name">Alestorm</span>
+        <span class="band-meta">Harder Stage · 17:30–18:30</span>
+      </div>
+      <div style="height:8px"></div>
+      <div class="nav-bar">
+        <div class="nav-dot"></div>
+        <div class="nav-dot active"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+      </div>
+    </div>
+    <div class="variant-note">
+      Pattern: mirrors the conflict banner (rgba tint + border-bottom + mono text).<br>
+      Teal = signal-ok (already in DS). No new colors. Instant visual association with "positive action".<br>
+      Sub-label clarifies where user is going (no surprise redirect).
+    </div>
+  </div>
+
+  <!-- ═══ VARIANT B ═══ -->
+  <div class="col">
+    <div class="variant-label">Variant B · Compact header button</div>
+    <div class="phone">
+      <!-- Header w/ button -->
+      <div class="header-with-btn">
+        <span class="page-title">My Picks</span>
+        <div class="header-right-stack">
+          <div class="page-summary">
+            <span>18 bands · 4 days</span>
+            <span>2 conflicts</span>
+          </div>
+          <a class="playlist-header-btn" href="#">
+            <span class="spotify-logo playlist-header-btn-icon"></span>
+            <span class="playlist-header-btn-label">Setlist</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Day header -->
+      <div class="day-header">
+        <span>Wednesday 29/07</span>
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">5 bands</span>
+      </div>
+      <div class="band-row">
+        <span class="band-name">Metallica</span>
+        <span class="band-meta">W:E:T Stage · 20:00–22:30</span>
+      </div>
+      <div class="band-row">
+        <span class="band-name">Airbourne</span>
+        <span class="band-meta">Faster Stage · 18:00–19:15</span>
+      </div>
+      <div class="band-row">
+        <span class="band-name">Alestorm</span>
+        <span class="band-meta">Harder Stage · 17:30–18:30</span>
+      </div>
+      <div class="band-row">
+        <span class="band-name">Rammstein</span>
+        <span class="band-meta">W:E:T Stage · 15:00–16:30</span>
+      </div>
+      <div style="height:8px"></div>
+      <div class="nav-bar">
+        <div class="nav-dot"></div>
+        <div class="nav-dot active"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+      </div>
+    </div>
+    <div class="variant-note">
+      Minimal footprint — no extra row. Small tinted chip in the header.<br>
+      Risk: small tap target, label truncated. Better for users who<br>
+      already know what the button does (after first use).
+    </div>
+  </div>
+
+  <!-- ═══ VARIANT C ═══ -->
+  <div class="col">
+    <div class="variant-label">Variant C · Sticky above nav</div>
+    <div class="phone">
+      <!-- Header -->
+      <div class="page-header">
+        <span class="page-title">My Picks</span>
+        <div class="page-summary">
+          <span>18 bands · 4 days</span>
+          <span>2 conflicts</span>
+        </div>
+      </div>
+
+      <!-- Day header -->
+      <div class="day-header">
+        <span>Wednesday 29/07</span>
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);">5 bands</span>
+      </div>
+      <div class="band-row">
+        <span class="band-name">Metallica</span>
+        <span class="band-meta">W:E:T Stage · 20:00–22:30</span>
+      </div>
+      <div class="band-row">
+        <span class="band-name">Airbourne</span>
+        <span class="band-meta">Faster Stage · 18:00–19:15</span>
+      </div>
+      <div class="band-row">
+        <span class="band-name">Alestorm</span>
+        <span class="band-meta">Harder Stage · 17:30–18:30</span>
+      </div>
+      <div class="band-row">
+        <span class="band-name">Rammstein</span>
+        <span class="band-meta">W:E:T Stage · 15:00–16:30</span>
+      </div>
+
+      <!-- ★ STICKY STRIP (above nav) -->
+      <div style="margin-top:8px">
+        <a class="playlist-sticky" href="#">
+          <span class="spotify-logo playlist-sticky-icon"></span>
+          <span class="playlist-sticky-label">Generate setlist</span>
+          <span class="playlist-sticky-count">18 bands</span>
+          <span class="playlist-sticky-arrow">→</span>
+        </a>
+      </div>
+      <div class="nav-bar">
+        <div class="nav-dot"></div>
+        <div class="nav-dot active"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+        <div class="nav-dot"></div>
+      </div>
+    </div>
+    <div class="variant-note">
+      Maximum discoverability, lives in thumb zone, always visible.<br>
+      Oswald display text reads metal/purposeful. Band count shows intent.<br>
+      Risk: feels heavier — takes real estate from band list.
+    </div>
+  </div>
+
+</div>
+
+<!-- Design system color reference -->
+<div style="margin-top:16px;font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-align:center;letter-spacing:0.1em;text-transform:uppercase;">
+  All colors from existing design system · No new tokens introduced ·
+  <span style="color:var(--signal-ok)">■</span> signal-ok #16a085 used for action tint
+</div>
+
+</body>
+</html>

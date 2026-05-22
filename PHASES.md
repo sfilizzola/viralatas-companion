@@ -11,11 +11,11 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Status:** 🔧 Ready to implement
 
-**Goal:** Add a "Generate setlist" button to `/picks` that deep-links the user to **Play[my W:O:A]list** (setlist viralatas) with their picked band names pre-filled. The external app shows a track preview; the user taps "Generate" and lands in Spotify with their personal playlist. The button ships behind a feature flag so the godlike can test it with managers before releasing it to all vira-latas.
+**Goal:** Add a "Generate setlist" button to `/picks` that deep-links the user to **Setlist Vira-Latas** (setlist viralatas) with their picked band names pre-filled. The external app shows a track preview; the user taps "Generate" and lands in Spotify with their personal playlist. The button ships behind a feature flag so the godlike can test it with managers before releasing it to all vira-latas.
 
 **Design:** `_temp/playlist-button-design-v2.html` · Spec: `docs/superpowers/specs/2026-05-21-playlist-launch-design.md`
 
-**External API:** `GET /launch` deep-link on Play[my W:O:A]list — `user_name` (trimmed to 20 chars) + repeated `bands` params + `lang`. No edge function required. URL to be confirmed before implementation (placeholder: `https://your-app.vercel.app`).
+**External API:** `GET /launch` deep-link on Setlist Vira-Latas — `user_name` (trimmed to 20 chars) + repeated `bands` params + `lang`. No edge function required. URL to be confirmed before implementation (placeholder: `https://your-app.vercel.app`).
 
 **Architectural shape:** Single self-contained component `PlaylistLaunchButton` — all logic inside (flag check, role check, URL construction). One `<PlaylistLaunchButton bands={myBands} userName={displayName} />` in `MyPicksPage`. Feature flag `playlist_testing boolean default true` added as a column to the existing `app_settings` singleton table (same pattern as `duck_enabled`). Godlike toggles it in `GodlikeAdminPanel`. When flag graduates, only the flag infrastructure is deleted — the component stays permanently.
 
@@ -30,7 +30,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
   - Renders as `<a href={url} target="_blank" rel="noopener noreferrer">` — no loading state, instant redirect
 - `src/components/PlaylistLaunchButton.module.css` — component-scoped styles:
   - Full-width strip: `rgba(22,160,133,0.06)` background, `rgba(22,160,133,0.18)` border-bottom
-  - Left: Play[my W:O:A]list app icon (22×22, `border-radius: 5px`) + Oswald 13px 700 uppercase label + JetBrains Mono 10px muted sub-label with band count
+  - Left: Setlist Vira-Latas app icon (22×22, `border-radius: 5px`) + Oswald 13px 700 uppercase label + JetBrains Mono 10px muted sub-label with band count
   - Right: `→` arrow in mono
   - No new CSS custom properties in `index.css` — uses existing `--signal-ok`, `--font-display`, `--font-mono`, `--s-*` tokens
 - `src/pages/MyPicksPage.tsx` — add `<PlaylistLaunchButton bands={myBands} userName={displayName} />` below the conflicts summary banner, above the band sections; derive `displayName` from session/profile
@@ -49,7 +49,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 - [ ] Godlike and manager see the strip on `/picks` immediately after migration (flag defaults to `true` = testing mode)
 - [ ] Normal users do not see the strip while `playlist_testing = true`
 - [ ] Godlike can flip flag to `false` in admin panel; all users see the strip on next page load
-- [ ] Tapping the strip opens Play[my W:O:A]list `/launch` URL in a new tab with correct `user_name`, all picked band names, and `lang`
+- [ ] Tapping the strip opens Setlist Vira-Latas `/launch` URL in a new tab with correct `user_name`, all picked band names, and `lang`
 - [ ] Strip is hidden when user has 0 picks
 - [ ] Build passes, no new linter errors
 
