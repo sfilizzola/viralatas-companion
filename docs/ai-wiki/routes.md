@@ -186,14 +186,16 @@ export default function PrivateRoute({ children }: Props) {
   - Soft conflicts (10-30 min overlap, user might make it)
   - Hard conflicts (major overlap, impossible to attend both)
 - **Conflict banner** — If 3+ conflicts, show warning banner at top
+- **Playlist Launch strip** — `PlaylistLaunchButton` below conflict banner, above band list. Deep-links to Setlist Vira-Latas (`setlist.viralatas.org/launch`) with picked band names. Hidden when 0 picks; gated by `app_settings.playlist_testing` flag (see [Flow: Playlist Launch](flows/playlist-launch.md)).
 - **Quick actions** — Remove pick, view details
-- **Offline** — Works fully, shows pending picks with chip
+- **Offline** — Works fully, shows pending picks with chip. Playlist strip requires live Supabase read on mount — hidden if offline at load time.
 
 **Data Flows**:
 - `useMyPicks()` — User's picked band IDs
 - `useBandConflicts()` — Overlap detection
 - `useNow()` — Highlight current/past/future bands
 - `usePickCounts()` — Live attendance on detail modal
+- `PlaylistLaunchButton` — Direct Supabase read for `playlist_testing` + user role (not IndexedDB)
 
 ---
 
@@ -282,6 +284,15 @@ export default function PrivateRoute({ children }: Props) {
 - Organized by severity (soft/hard)
 - Quick-access to /my-picks
 
+#### MoshSplit (Collapsible, Phase 23)
+- **`MoshSplitSection`** — placed after Conflicts, before Edit Profile
+- Shows net balance from MoshSplit (`split.viralatas.org`) when user has an account
+- Four states: `loading`, `not_found` (hidden), `settled`, `active` (owes/owed)
+- CTA opens `https://split.viralatas.org` in new tab
+- **Part 1:** mock data; `ACTIVE_MOCK = not_found` → section invisible in production
+- **Part 2:** real API via `VITE_MOSHSPLIT_TOKEN` + user email (blocked on API docs)
+- See [Flow: MoshSplit Balance Section](flows/moshsplit.md)
+
 #### Time Travel (Godlike only, Collapsible)
 - Current time display
 - Quick-jump chips: D-1 (day before), D1-D4 (each festival day), D+1 (day after)
@@ -290,6 +301,8 @@ export default function PrivateRoute({ children }: Props) {
 
 #### Godlike Admin Panel (Godlike only, Collapsible)
 - **Band lineup** — Button to "Refresh from Wacken" (calls seed script)
+- **Playlist feature toggle** — Flip `app_settings.playlist_testing` between Testing (godlike/manager only) and Live (all vira-latas). Mirrors duck toggle pattern.
+- **Duck feature toggle** — Enable/disable duck quacks globally
 - **Metal Place config**:
   - Festival day (picker)
   - Start time (HH:MM input)
@@ -435,4 +448,4 @@ AnnouncementsPage (offline)
 
 ---
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-22 — added PlaylistLaunchButton on `/my-picks`, MoshSplitSection on `/profile`, playlist admin toggle

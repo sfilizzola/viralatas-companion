@@ -538,7 +538,7 @@ These genres exist on the 2026 lineup but no badge in `src/services/badges/regis
 - `Pirate Metal` — held by 1 band only (`Mr. Hurley und die Pulveraffen`, WAK17, Day 3). Single-band genres are not a good fit for a `bands_seen_genre_min` badge (would be equivalent to `band_seen_named`). If a "pirate" badge is desired, prefer `band_seen_named` against that one band.
 - Most stage-specific or niche genres (Goregrind, Humppa, Horror Punk, etc.) — intentional, to keep the badge inventory curated.
 
-### Merit / Assigned (13)
+### Merit / Assigned (14)
 - `mosh-pit` — Hit the floor, came back (godlike-assigned)
 - `crowdsurfer` — Flew over the crowd (godlike-assigned)
 - `girl-power` — Metal queen (godlike-assigned)
@@ -552,7 +552,7 @@ These genres exist on the 2026 lineup but no badge in `src/services/badges/regis
 - `space-brownie` — "Space Brownie". "It's just a brownie," they said. Two hours later you were debating reality with a tent pole (godlike-assigned).
 - `beer-master` — "Mestre da Cerveja". Liquid bread is a food group. You drank Wacken dry and asked for seconds (godlike-assigned).
 - `beer-hater` — "Inimigo da Cerveja". Surrounded by oceans of beer and said "no thanks." Wine, shots, caipirinha — anything but that (godlike-assigned).
-- `code-wizards` — "Magos do Código". Three wizards, three apps, one pack. Built the magic so we could find, listen and pay each other (godlike-assigned).
+- `code-wizards` — "Magos do Código". **Honors the builders of the Viralatas app pack** — Companion (find), Setlist Vira-Latas (listen), MoshSplit (pay). Three wizards, three apps, one pack. Godlike-assigned via `users.special_badges[]`. See [Architecture: Viralatas App Pack](architecture.md#viralatas-app-pack-phase-22–23).
 
 ### Location Presence (5)
 - `metal-place-2026` — Visited Metal Place (persist: true)
@@ -955,4 +955,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-22 — added godlike-assigned badge `code-wizards` ("Magos do Código"). Inventory 53 → 54. No new predicates; no engine/types changes.
+**Last updated:** 2026-05-22 — added godlike-assigned badge `code-wizards` with app-pack cross-link; inventory 53 → 54. No new predicates; no engine/types changes.

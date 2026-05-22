@@ -1,6 +1,6 @@
 # Viralatas Companion — Architectural Wiki
 
-**Last Updated**: 2026-05-18
+**Last Updated**: 2026-05-22
 
 ## Purpose
 
@@ -14,6 +14,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 3. Sees live attendance counts and who's going where (via Realtime)
 4. Receives proactive AI alerts powered by Claude
 5. Works fully offline after first load (IndexedDB + Service Worker caching)
+6. Deep-links to **Setlist Vira-Latas** (Spotify playlist) and **MoshSplit** (expense splits) — satellite PWAs in the [Viralatas App Pack](architecture.md#viralatas-app-pack-phase-22–23)
 
 **Key constraint**: Wacken has terrible signal → entire app must work offline.
 
@@ -60,6 +61,8 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[Flow: Announcements](flows/announcements.md)** — Posting, realtime sync, moderation, soft-delete
 - **[Flow: Authentication](flows/authentication.md)** — Login, signup, trigger, session persistence, test users, RLS
 - **[Flow: Duck Quack](flows/duck.md)** — Duck button → cooldown → quack → Realtime in-app DuckToast + Web Push system notification; offline queuing; admin test flows
+- **[Flow: Playlist Launch](flows/playlist-launch.md)** — `/my-picks` strip → Setlist Vira-Latas deep-link; `playlist_testing` feature flag; godlike admin toggle
+- **[Flow: MoshSplit Balance](flows/moshsplit.md)** — `/profile` balance section → MoshSplit deep-link; Part 1 mock (hidden), Part 2 API (blocked)
 
 ### Architectural Decisions (ADRs)
 - **[ADR: IndexedDB as Primary Store](decisions/indexeddb-primary-store.md)** — Why IDB, not Supabase-primary
@@ -216,6 +219,7 @@ window.addEventListener('viralatas:picks-changed', () => {
 | **Stage Colors** | `src/services/stageColors.ts`, `src/index.css` (CSS custom properties) |
 | **Band Seed** | `supabase/seed/bands.ts`, `docs/ai-wiki/lineup.md`, `docs/ai-wiki/stages.md` |
 | **Duck / Push** | `src/repositories/duck.ts`, `src/hooks/useDuckQuack.ts`, `src/hooks/useDuckNotifications.ts`, `src/lib/pushSubscription.ts`, `src/components/DuckButton.tsx`, `src/components/DuckToast.tsx`, `src/workers/sw.ts`, `supabase/functions/send-duck-push/index.ts`, `supabase/functions/send-test-push/index.ts` |
+| **App Pack integrations** | `src/components/PlaylistLaunchButton.tsx`, `src/components/profile/MoshSplitSection.tsx`, `src/lib/appSettings.ts` (`playlist_testing`) |
 
 ---
 
@@ -378,6 +382,16 @@ Understanding or debugging the duck button, DuckToast, push subscriptions, or `s
 
 ---
 
+### Path 9: App Pack Integrations (30 min)
+Understanding Setlist and MoshSplit deep-links, feature flags, and offline boundaries.
+
+1. [Architecture: Viralatas App Pack](architecture.md#viralatas-app-pack-phase-22–23) — Three-app ecosystem, integration rules
+2. [Flow: Playlist Launch](flows/playlist-launch.md) — Setlist strip, `playlist_testing` flag
+3. [Flow: MoshSplit Balance](flows/moshsplit.md) — Profile balance section, Part 1/2 status
+4. [Routing: /my-picks and /profile](routes.md) — Where components mount
+
+---
+
 ## Open Questions
 
 - **Rate limiting**: Are offline queues ever sized? What if a user picks 100+ bands offline?
@@ -454,4 +468,4 @@ Window events dispatched by hooks/components (not from db.ts):
 
 ---
 
-**Last edited**: 2026-05-17 by Claude Opus 4.7
+**Last edited**: 2026-05-22 — App Pack flows, reading path 9

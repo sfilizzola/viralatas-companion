@@ -16,6 +16,8 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/hooks/` — Custom hooks for state management
 - `src/pages/` — Route-level page components
 - `src/components/` — Shared UI components, modals, sections
+- `src/components/PlaylistLaunchButton.tsx` — Setlist deep-link strip (Phase 22)
+- `src/components/profile/MoshSplitSection.tsx` — MoshSplit balance section (Phase 23 Part 1)
 - `vite.config.ts` — PWA configuration and caching strategy
 
 ---
@@ -57,6 +59,27 @@ Components are organized by concern:
 - `/profile` (ProfilePage) — User info, role controls, godlike admin
 
 **Pattern**: All pages read from custom hooks, never call repositories directly.
+
+### Viralatas App Pack (Phase 22–23)
+
+The festival tooling for this vira-lata group spans **three separate PWAs**. Companion is the coordination hub; the other two are linked via deep-links, not shared backend or IndexedDB.
+
+| App | URL | Role in the pack | Companion integration |
+|-----|-----|------------------|----------------------|
+| **Companion** (this repo) | Companion PWA | Find each other — picks, live attendance, alerts, badges | Primary offline-first store |
+| **Setlist Vira-Latas** | `setlist.viralatas.org` | Listen — Spotify playlist from picked bands | `PlaylistLaunchButton` on `/my-picks` → `GET /launch?bands=…&user_name=…&lang=…` |
+| **MoshSplit** | `split.viralatas.org` | Pay each other — festival expense splits | `MoshSplitSection` on `/profile` → balance read + CTA (Part 2) |
+
+**Architectural rules for satellite integrations:**
+
+1. **No shared database** — Setlist and MoshSplit have their own backends. Companion never writes to them.
+2. **No IndexedDB cache** for satellite flags or balance — reads are mount-time Supabase (`playlist_testing`) or network fetch (MoshSplit Part 2).
+3. **Deep-link only** — both integrations open external tabs (`target="_blank"`). Failure modes are silent hide or error UI, never blocking core picks/sync.
+4. **Feature flags** — `app_settings.playlist_testing` gates Setlist strip visibility (godlike toggles in admin panel). MoshSplit Part 1 uses compile-time `ACTIVE_MOCK` until API is ready.
+
+The godlike-assigned **`code-wizards`** badge honors the builders of all three apps. See [Badge System — Merit / Assigned](badges.md#merit--assigned-14).
+
+**Flow docs:** [Playlist Launch](flows/playlist-launch.md) · [MoshSplit Balance](flows/moshsplit.md)
 
 ### Observability (Phase 22)
 
@@ -539,4 +562,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-05-20
+**Last updated:** 2026-05-22 — Viralatas App Pack section (Companion + Setlist + MoshSplit deep-links)

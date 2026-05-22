@@ -8,6 +8,18 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ### Added
 - **`code-wizards` badge** — godlike-assigned badge "Magos do Código" / "Code Wizards". Registry entry, PNG asset, and i18n in all four locales.
+- **`flows/playlist-launch.md`** — Full flow doc for Setlist Vira-Latas deep-link from `/my-picks`.
+- **`flows/moshsplit.md`** — Full flow doc for MoshSplit balance section on `/profile` (Part 1 mock, Part 2 blocked).
+
+### Changed
+- **`architecture.md`** — New "Viralatas App Pack" section: Companion + Setlist + MoshSplit table, integration rules, cross-links to flows and `code-wizards` badge.
+- **`routes.md`** — `/my-picks` documents `PlaylistLaunchButton`; `/profile` documents `MoshSplitSection`; Godlike Admin documents playlist toggle.
+- **`badges.md`** — `code-wizards` entry expanded with app-pack context and architecture cross-link.
+- **`index.md`** — App Pack in core loop, two new flow nav links, Key Files row, Reading Path 9.
+
+### Architectural Notes
+- Satellite app integrations (Setlist, MoshSplit) intentionally bypass IndexedDB — mount-time network reads only. Documented as explicit exception to offline-first for non-core deep-links.
+- Phase 23 Part 1 remains hidden (`ACTIVE_MOCK = not_found`); wiki documents current state without closing the phase.
 
 ---
 
