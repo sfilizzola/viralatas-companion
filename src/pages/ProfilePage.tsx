@@ -12,6 +12,7 @@ import BadgesDisplay from '../components/BadgesDisplay';
 import ProfileHeader from '../components/profile/ProfileHeader';
 import EditProfileForm from '../components/profile/EditProfileForm';
 import ConflictSection from '../components/profile/ConflictSection';
+import MoshSplitSection from '../components/profile/MoshSplitSection';
 import GodlikeAdminPanel from '../components/profile/GodlikeAdminPanel';
 import ManagerAdminPanel from '../components/profile/ManagerAdminPanel';
 import styles from './ProfilePage.module.css';
@@ -100,6 +101,7 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
       </section>
 
       <ConflictSection userId={user.id} t={t} />
+      <MoshSplitSection userEmail={user.email ?? ''} />
 
       <EditProfileForm
         user={user}

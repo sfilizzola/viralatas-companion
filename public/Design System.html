@@ -1048,6 +1048,137 @@
       </div>
 
       <div class="component-section">
+        <h3>MoshSplitSection <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/profile/MoshSplitSection.tsx</span></h3>
+        <p>Collapsible profile section showing the current user's net balance from <strong>MoshSplit</strong> (<code>split.viralatas.org</code>) — the festival finance app used by the vira-latas at Wacken. Placed after <code>&lt;ConflictSection&gt;</code>, before <code>&lt;EditProfileForm&gt;</code>. Accepts only <code>userEmail: string</code>; fetches (or mocks) its own data.</p>
+        <p><strong>Four render states:</strong></p>
+        <ul style="margin: 0 0 12px 18px; color: #888; font-size: 14px;">
+          <li><strong>loading</strong> — spinner chip in header, shimmer skeleton in body.</li>
+          <li><strong>not_found</strong> — <code>return null</code>, component fully invisible.</li>
+          <li><strong>settled</strong> (balance = 0) — teal "Quitado" chip + "Tudo acertado 🤘" message + CTA.</li>
+          <li><strong>active</strong> (balance ≠ 0) — red chip if owes, teal chip if owed + festival/amount row + CTA.</li>
+        </ul>
+        <p><strong>Collapsible trigger layout:</strong> logo (22×22, border-radius 5px, remote SVG with wallet fallback) → label group (Oswald 14px + mono sub-label) → balance chip (right-aligned). Uses <code>&lt;Collapsible&gt;</code> from <code>src/ui</code> with <code>defaultOpen={false}</code>. Wrapper: <code>margin: var(--s-3) var(--s-4)</code>, max-width 400px.</p>
+        <p><strong>Chip palette:</strong> owes = <code>rgba(--accent, 0.20)</code> bg / <code>--accent-hover</code> text; owed = <code>rgba(--signal-ok, 0.20)</code> bg / teal text; settled = attenuated teal. Font mono 11px tabular-nums.</p>
+        <p><strong>CTA button:</strong> full-width, "Abrir MoshSplit →", <code>rgba(--accent, 0.08)</code> bg, opens <code>https://split.viralatas.org</code> in new tab. Visible in settled and active states.</p>
+        <p><strong>Part 1 / Part 2:</strong> Part 1 ships with mock data (<code>ACTIVE_MOCK</code> constant + <code>setTimeout(200ms)</code>). Part 2 (blocked on MoshSplit API docs) replaces mock with real <code>fetch</code> using <code>VITE_MOSHSPLIT_TOKEN</code> + user email.</p>
+        <div class="component-demo" style="background: #060606; padding: 24px; display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; justify-content: center;">
+          <style>
+            .ds-ms-wrap { border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; width: 280px; }
+            .ds-ms-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #1e1e1e; }
+            .ds-ms-left { display: flex; align-items: center; gap: 10px; }
+            .ds-ms-logo { width: 22px; height: 22px; border-radius: 5px; background: #1a1a1a; border: 1px solid #3a3a3a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+            .ds-ms-lg { display: flex; flex-direction: column; gap: 1px; }
+            .ds-ms-lbl { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; color: #e8e8e8; line-height: 1; }
+            .ds-ms-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; letter-spacing: .04em; }
+            .ds-ms-chip { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; letter-spacing: .02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+            .ds-ms-chip-owes { background: rgba(192,57,43,.20); color: #e74c3c; border: 1px solid rgba(192,57,43,.40); }
+            .ds-ms-chip-owed { background: rgba(22,160,133,.20); color: #1abc9c; border: 1px solid rgba(22,160,133,.40); }
+            .ds-ms-chip-settled { background: rgba(22,160,133,.10); color: #16a085; border: 1px solid rgba(22,160,133,.25); }
+            .ds-ms-inner { border-top: 1px solid #2a2a2a; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+            .ds-ms-settled-msg { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: rgba(22,160,133,.08); border: 1px solid rgba(22,160,133,.20); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: #1abc9c; letter-spacing: .02em; }
+            .ds-ms-row { display: flex; align-items: center; justify-content: space-between; }
+            .ds-ms-festival { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #888; }
+            .ds-ms-amount { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+            .ds-ms-amount-owes { color: #e74c3c; }
+            .ds-ms-amount-owed { color: #1abc9c; }
+            .ds-ms-divider { height: 1px; background: #2a2a2a; margin: 2px 0; }
+            .ds-ms-cta { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; background: rgba(192,57,43,.08); border: 1px solid rgba(192,57,43,.25); border-radius: 4px; color: #e74c3c; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; text-decoration: none; }
+            .ds-ms-stack { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+            .ds-ms-stack-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: .1em; }
+            .ds-ms-chevron { width: 20px; height: 20px; color: #888; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+          </style>
+
+          <!-- Owes state -->
+          <div class="ds-ms-stack">
+            <span class="ds-ms-stack-lbl">Active — owes (expanded)</span>
+            <div class="ds-ms-wrap">
+              <div class="ds-ms-trigger">
+                <div class="ds-ms-left">
+                  <div class="ds-ms-logo">
+                    <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="#555" stroke-width="1.3"/><path d="M4 3V2.5a3 3 0 0 1 6 0V3" stroke="#555" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="7.5" r="1" fill="#555"/></svg>
+                  </div>
+                  <div class="ds-ms-lg">
+                    <span class="ds-ms-lbl">MoshSplit</span>
+                    <span class="ds-ms-sub">split.viralatas.org</span>
+                  </div>
+                  <span class="ds-ms-chip ds-ms-chip-owes">- R$42,50</span>
+                </div>
+                <span class="ds-ms-chevron">▲</span>
+              </div>
+              <div class="ds-ms-inner">
+                <div class="ds-ms-row">
+                  <span class="ds-ms-festival">Wacken 2026</span>
+                  <span class="ds-ms-amount ds-ms-amount-owes">- R$42,50</span>
+                </div>
+                <div class="ds-ms-divider"></div>
+                <a href="#" class="ds-ms-cta"><span>Abrir MoshSplit</span><span>→</span></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Owed state -->
+          <div class="ds-ms-stack">
+            <span class="ds-ms-stack-lbl">Active — owed (expanded)</span>
+            <div class="ds-ms-wrap">
+              <div class="ds-ms-trigger">
+                <div class="ds-ms-left">
+                  <div class="ds-ms-logo">
+                    <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="#555" stroke-width="1.3"/><path d="M4 3V2.5a3 3 0 0 1 6 0V3" stroke="#555" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="7.5" r="1" fill="#555"/></svg>
+                  </div>
+                  <div class="ds-ms-lg">
+                    <span class="ds-ms-lbl">MoshSplit</span>
+                    <span class="ds-ms-sub">split.viralatas.org</span>
+                  </div>
+                  <span class="ds-ms-chip ds-ms-chip-owed">+ R$15,00</span>
+                </div>
+                <span class="ds-ms-chevron">▲</span>
+              </div>
+              <div class="ds-ms-inner">
+                <div class="ds-ms-row">
+                  <span class="ds-ms-festival">Wacken 2026</span>
+                  <span class="ds-ms-amount ds-ms-amount-owed">+ R$15,00</span>
+                </div>
+                <div class="ds-ms-divider"></div>
+                <a href="#" class="ds-ms-cta"><span>Abrir MoshSplit</span><span>→</span></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settled state -->
+          <div class="ds-ms-stack">
+            <span class="ds-ms-stack-lbl">Settled (expanded)</span>
+            <div class="ds-ms-wrap">
+              <div class="ds-ms-trigger">
+                <div class="ds-ms-left">
+                  <div class="ds-ms-logo">
+                    <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="#555" stroke-width="1.3"/><path d="M4 3V2.5a3 3 0 0 1 6 0V3" stroke="#555" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="7.5" r="1" fill="#555"/></svg>
+                  </div>
+                  <div class="ds-ms-lg">
+                    <span class="ds-ms-lbl">MoshSplit</span>
+                    <span class="ds-ms-sub">split.viralatas.org</span>
+                  </div>
+                  <span class="ds-ms-chip ds-ms-chip-settled">Quitado</span>
+                </div>
+                <span class="ds-ms-chevron">▲</span>
+              </div>
+              <div class="ds-ms-inner">
+                <div class="ds-ms-settled-msg"><span>🤘</span><span>Tudo acertado</span></div>
+                <a href="#" class="ds-ms-cta"><span>Abrir MoshSplit</span><span>→</span></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>userEmail</td><td>string</td><td>Current user's email. Used in Part 2 for the balance API call. Part 1 ignores the value (mock data).</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="component-section">
         <h3>ClusterRow <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/now/CrewGroupsSection.tsx</span></h3>
         <p>Collapsed stacked-avatar row used on all 4 live page card types. Replaces the always-visible member pill list. Max 5 avatars shown; overflow shown as +N. Tapping the parent card opens the LiveCardSheet.</p>
         <div class="component-demo" style="background: #0a0a0a; padding: 20px; display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">

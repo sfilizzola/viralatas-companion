@@ -1,0 +1,290 @@
+/* MoshSplitSection — Phase 23 Part 1
+   All tokens come from src/index.css — no new custom properties. */
+
+.wrap {
+  width: 100%;
+  max-width: 400px;
+  align-self: center;
+  margin: var(--s-3) var(--s-4);
+}
+
+/* ── Collapsible override: tinted border for MoshSplit ── */
+.collapsible {
+  border: 1px solid var(--border);
+  border-radius: var(--r-2);
+  overflow: hidden;
+}
+
+/* ── Trigger row ── */
+.triggerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+  min-width: 0;
+  gap: var(--s-2);
+}
+
+.triggerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 7px;
+  flex-shrink: 0;
+  overflow: hidden;
+  background: #1a1a1a;
+  border: 1px solid var(--border-strong);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.logoFallback {
+  width: 18px;
+  height: 18px;
+  color: var(--text-faint);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.labelGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  color: var(--text);
+}
+
+.sublabel {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+  letter-spacing: 0.04em;
+}
+
+/* ── Balance chip (in trigger right) ── */
+.chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: var(--r-pill);
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chipOwes {
+  background: rgba(192, 57, 43, 0.20);
+  color: var(--accent-hover);
+  border: 1px solid rgba(192, 57, 43, 0.40);
+}
+
+.chipOwed {
+  background: rgba(22, 160, 133, 0.20);
+  color: #1abc9c;
+  border: 1px solid rgba(22, 160, 133, 0.40);
+}
+
+.chipSettled {
+  background: rgba(22, 160, 133, 0.10);
+  color: var(--signal-ok);
+  border: 1px solid rgba(22, 160, 133, 0.25);
+}
+
+/* ── Loading state ── */
+.loadingChip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--text-muted);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Expanded content ── */
+.inner {
+  border-top: 1px solid var(--border);
+  padding: var(--s-3) var(--s-4) var(--s-4);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Expense list */
+.expenseList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.expenseRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.expenseLabel {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--text-muted);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: var(--s-2);
+}
+
+.expenseAmount {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+/* Festival + amount row */
+.balanceRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.festivalName {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.balanceAmount {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.balanceOwes { color: var(--accent-hover); }
+.balanceOwed { color: #1abc9c; }
+
+/* Settled message */
+.settledMsg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: rgba(22, 160, 133, 0.08);
+  border: 1px solid rgba(22, 160, 133, 0.20);
+  border-radius: var(--r-1);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: #1abc9c;
+  letter-spacing: 0.02em;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 2px 0;
+}
+
+/* CTA button — also used as <button> during mock dev */
+.cta {
+  appearance: none;
+  font-family: var(--font-display);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 12px;
+  background: rgba(192, 57, 43, 0.08);
+  border: 1px solid rgba(192, 57, 43, 0.25);
+  border-radius: var(--r-1);
+  color: var(--accent-hover);
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.cta:hover {
+  background: rgba(192, 57, 43, 0.14);
+  border-color: rgba(192, 57, 43, 0.45);
+}
+
+.ctaArrow {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  opacity: 0.7;
+}
+
+/* ── Loading skeleton (inside content area) ── */
+.skeleton {
+  padding: 2px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skelLine {
+  height: 10px;
+  border-radius: var(--r-1);
+  background: linear-gradient(
+    90deg,
+    var(--border) 0%,
+    var(--border-strong) 50%,
+    var(--border) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+.skelLineLong { width: 100%; }
+.skelLineShort { width: 60%; }
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
