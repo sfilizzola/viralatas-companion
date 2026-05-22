@@ -15,7 +15,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Design:** `_temp/playlist-button-design-v2.html` · Spec: `docs/superpowers/specs/2026-05-21-playlist-launch-design.md`
 
-**External API:** `GET /launch` deep-link on Setlist Vira-Latas — `user_name` (trimmed to 20 chars) + repeated `bands` params + `lang`. No edge function required. URL to be confirmed before implementation (placeholder: `https://your-app.vercel.app`).
+**External API:** `GET /launch` deep-link on Setlist Vira-Latas — `user_name` (trimmed to 20 chars) + repeated `bands` params + `lang`. No edge function required. Base URL: `https://setlist.viralatas.org`.
 
 **Architectural shape:** Single self-contained component `PlaylistLaunchButton` — all logic inside (flag check, role check, URL construction). One `<PlaylistLaunchButton bands={myBands} userName={displayName} />` in `MyPicksPage`. Feature flag `playlist_testing boolean default true` added as a column to the existing `app_settings` singleton table (same pattern as `duck_enabled`). Godlike toggles it in `GodlikeAdminPanel`. When flag graduates, only the flag infrastructure is deleted — the component stays permanently.
 
