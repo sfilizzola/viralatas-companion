@@ -1,7 +1,7 @@
 # Phase 22: Playlist Launch — Design Spec
 
 **Date:** 2026-05-21  
-**Status:** Approved · Design: Variant A selected  
+**Status:** Approved · Design: Variant A2 selected (Oswald label + setlist app icon)  
 **Author:** Claude Sonnet 4.6
 
 ---
@@ -214,7 +214,7 @@ Why: maximum discoverability. Trade-off: heavier real estate cost.
 
 ### Recommendation
 
-**Variant A1** (mono label) or **A2** (Oswald display label) — both use the Play[my W:O:A]list app icon PNG (22×22, `border-radius: 5px`). A2 feels slightly more metal since it uses Oswald like the rest of the app's headings. Zero Spotify branding anywhere — the button represents the setlist app, not Spotify.
+**Variant A2** — Play[my W:O:A]list app icon PNG (22×22, `border-radius: 5px`) + Oswald 13px 700 uppercase label + mono 10px muted sub-label with band count. Zero Spotify branding — the button represents the setlist app, not Spotify.
 
 ### CSS implementation note
 
