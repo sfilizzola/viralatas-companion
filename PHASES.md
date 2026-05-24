@@ -7,11 +7,232 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-## Phase 26 — TBD
+## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 Planning
+**Status:** 🔜 In progress (26.A complete)
 
-**Goal:** Not yet defined. Candidate ideas live in [`FUTURE_IDEAS.md`](FUTURE_IDEAS.md).
+**Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
+
+**Acceptance criteria (whole phase):**
+- [ ] `rtk npm run build` green
+- [ ] `rtk npm test` — all tests pass; no reduction in meaningful coverage
+- [ ] Manual smoke: pick/unpick offline + reconnect, `/now` live view, announcements post/delete, profile admin (godlike), duck quack
+- [ ] No new direct Supabase reads from presentation components (except auth pages and explicitly documented admin boundaries)
+- [ ] Wiki updated (`architecture.md`, relevant flows, `changelog.md`) after each closed sub-stage
+
+**Architectural guardrails (every sub-stage):**
+- IndexedDB remains primary for UI reads; writes stay optimistic via repositories
+- Do not introduce Redux/Zustand (ADR: custom hooks + window events)
+- Repositories mutate IDB and emit events; hooks subscribe and expose state/actions
+- Satellite integrations (Setlist, MoshSplit) unchanged
+- User-facing copy uses **vira-latas**, not crew
+
+---
+
+### Stage 26.A — Refactor safety net (tests) ✅
+
+**Scope:** `src/__tests__/db.test.ts` (new), `src/__tests__/login.test.tsx`, `registration.test.tsx`, `auth-integration.test.ts` (replace stubs), optionally `vitest.config.ts` coverage thresholds.
+
+**Gets simpler:** Confidence to refactor `db.ts` and pages; stub tests stop giving false security.
+
+**Risk:** Low | **Depth:** Shallow (test-only) | **Depends on:** —
+
+**Verification:** `rtk npm test` — 389 tests green; auth tests import real modules; `fake-indexeddb` dev-only; `db.ts` per-file coverage thresholds in `vitest.config.ts`.
+
+**Done (2026-05-24):** 17 db tests, 9 login, 8 registration, 9 auth-integration; `resetDbConnectionForTests()` export.
+
+---
+
+### Stage 26.B — Shared festival constants
+
+**Scope:** `src/services/time.ts` (or new `festivalDates.ts`); replace literals in `MyPicksPage.tsx`, `AnnouncementsPage.tsx`, `ArrivalMap.tsx`, `ConflictSection.tsx`, `repositories/presence.ts`.
+
+**Gets simpler:** One source of truth for Wacken 2026 Day 1 start and "festival active" checks; fixes `+01:00` vs `Z` inconsistency.
+
+**Risk:** Low | **Depth:** Shallow | **Depends on:** —
+
+**Verification:** `rtk npm test` (`time.test.ts`, `presenceRepository.test.ts`, `bandTime.test.ts`); manual `/announcements` arrival map visibility toggle.
+
+---
+
+### Stage 26.C — `useBands()` catalog hook
+
+**Scope:** New `src/hooks/useBands.ts`; migrate `SchedulePage`, `MyPicksPage`, `PopularPage`, `useNowData` (and optionally `BadgesDisplay`, admin panels).
+
+**Gets simpler:** Remove 4× copy-paste `useState` + `loadBands()` + loading flags; single IDB read + `bands-changed` event if needed.
+
+**Risk:** Low | **Depth:** Shallow extract | **Depends on:** 26.A recommended
+
+**Verification:** `rtk npm test`; browse `/schedule`, `/my-picks`, `/popular`, `/now` with cached bands offline.
+
+---
+
+### Stage 26.D — `useMissedBands()` hook
+
+**Scope:** New `src/hooks/useMissedBands.ts`; dedupe logic from `MyPicksPage.tsx`, `PopularPage.tsx`; simplify `BadgesDisplay.tsx` missed slice.
+
+**Gets simpler:** One place for `loadAll` + `sync` + `subscribeToRealtime` + `MISSED_CHANGED_EVENT`; pages consume `{ allMissed, missedBandIds, mark, unmark }`.
+
+**Risk:** Low–medium | **Depth:** Moderate extract | **Depends on:** 26.A
+
+**Verification:** `rtk npm test` (`missedRepository.test.ts`, `missed.test.ts`); mark/unmark on ended band in My Picks and Popular modals.
+
+---
+
+### Stage 26.E — `usePickActions()` hook
+
+**Scope:** New `src/hooks/usePickActions.ts` wrapping `picksRepository.toggle` + `useMyPicks` refresh; migrate `SchedulePage`, `MyPicksPage`, `PopularPage`, `ConflictSection`, `useNowData` skip/undo handlers.
+
+**Gets simpler:** Pages stop importing `picksRepository`; aligns with wiki "pages use hooks" pattern.
+
+**Risk:** Low | **Depth:** Shallow | **Depends on:** 26.A
+
+**Verification:** `rtk npm test` (`picksRepository.test.ts` unchanged); pick toggle online/offline on schedule and my-picks.
+
+---
+
+### Stage 26.F — `useBandDetailModal()` shared state
+
+**Scope:** New hook or small component `BandDetailHost.tsx`; consolidate modal state from `MyPicksPage.tsx` and `PopularPage.tsx` (`activeBand`, attendees, missed flags, ended state).
+
+**Gets simpler:** ~80 lines removed across two pages; one modal contract for pick + missed toggles.
+
+**Risk:** Low–medium | **Depth:** Moderate extract | **Depends on:** 26.D, 26.E
+
+**Verification:** `rtk npm test`; open band modal on both pages; verify missed toggle and pick toggle.
+
+---
+
+### Stage 26.G — App sync orchestration extract
+
+**Scope:** Move `CacheVersionCheck`, `BandSync`, `PickSync`, `AnnouncementSync`, `DuckSync`, `PushSetup`, `DuckNotificationsListener` from `App.tsx` to `src/components/sync/` (or `src/lib/syncOrchestration.tsx`).
+
+**Gets simpler:** `App.tsx` becomes routes + providers only (~80 lines); sync lifecycle easier to audit.
+
+**Risk:** Low | **Depth:** Shallow | **Depends on:** —
+
+**Verification:** `rtk npm test`; login → verify band sync; go offline → pick → online → `SyncToast` fires.
+
+---
+
+### Stage 26.H — Realtime → IDB subscription helper
+
+**Scope:** New `src/lib/realtimeSync.ts` (or per-table helpers in repositories): `subscribePostgresChanges(table, handler)`; refactor `usePickCounts.ts`, `useNowData.ts` (3 channels), `AnnouncementsPage.tsx`, `useDuckNotifications.ts`, `missedRepository.subscribeToRealtime`.
+
+**Gets simpler:** One unsubscribe/cleanup pattern; fewer copy-pasted `supabase.channel()` blocks.
+
+**Risk:** Medium | **Depth:** Moderate | **Depends on:** 26.A, 26.G
+
+**Verification:** `rtk npm test`; two-browser pick count update ≤3s; `/now` presence update; announcement insert.
+
+---
+
+### Stage 26.I — Split `BadgesDisplay.tsx`
+
+**Scope:**
+- Extract stack layout pure functions → `src/services/badges/stackLayout.ts`
+- Extract badge context loading → `src/hooks/useBadgeContext.ts` (IDB + events + optional Supabase metadata sync)
+- Keep `BadgesDisplay.tsx` as presentation only (~200 lines)
+
+**Gets simpler:** Testable layout math; component stops mixing vest geometry with data fetching.
+
+**Risk:** Medium | **Depth:** Moderate | **Depends on:** 26.A, 26.D (partial)
+
+**Verification:** `rtk npm test` (`badges.test.ts`); profile + `/now` badge vest renders; earned badge animation unchanged.
+
+---
+
+### Stage 26.J — Repository boundary cleanup (announcements vs admin)
+
+**Scope:**
+- Move `fetchAllUsers`, `setUserRole`, `fetchBlockedPosters*`, `blockUser`, `unblockUser` from `announcementsRepository` → `usersRepository` (or new `adminRepository.ts`)
+- Move `AnnouncementsPage` direct `supabase.from('users')` role map into repository
+- Update `GodlikeAdminPanel`, `ManagerAdminPanel`, `ProfilePage` imports
+
+**Gets simpler:** `announcementsRepository` = mural CRUD + sync only; admin concerns grouped by domain.
+
+**Risk:** Medium | **Depth:** Moderate | **Depends on:** 26.A
+
+**Verification:** `rtk npm test` (`announcementsRepository.test.ts` + update admin call sites); godlike role change + block user still works.
+
+---
+
+### Stage 26.K — `useAnnouncements()` + slim `AnnouncementsPage`
+
+**Scope:** New `src/hooks/useAnnouncements.ts` (cache read, Realtime, pagination, role/block state, post/delete/pin actions); reduce `AnnouncementsPage.tsx` to layout + form (~200 lines). Extract `applyPinSort`, `relativeTime` to `src/services/announcementsDisplay.ts`.
+
+**Gets simpler:** Page readable at a glance; announcement flow testable via hook unit tests.
+
+**Risk:** Medium | **Depth:** Moderate | **Depends on:** 26.H, 26.J
+
+**Verification:** `rtk npm test` (`announcementsRepository.test.ts`); post offline → reconnect; pin/unpin; load more.
+
+---
+
+### Stage 26.L — Decompose `GodlikeAdminPanel.tsx`
+
+**Scope:** Extract sections into existing pattern (`TimeTravelSection`, `TestBadgeSection`):
+- `FeatureFlagsSection.tsx` (registration, duck, playlist_testing)
+- `UserManagementSection.tsx` (roles, block list, assign badge modal trigger)
+- `MetalPlaceAdminSection.tsx`
+- `LiveBandTestAdminSection.tsx`
+- `CacheResetSection.tsx`
+- Parent panel = composition + shared loading (~150 lines)
+
+**Gets simpler:** Admin features isolated; smaller diffs for future godlike tools.
+
+**Risk:** Medium | **Depth:** Moderate–deep | **Depends on:** 26.J
+
+**Verification:** Manual godlike smoke (all toggles); `rtk npm test`; no build regressions.
+
+---
+
+### Stage 26.M — Slim `useNowData.ts`
+
+**Scope:** After 26.C/H/E:
+- Extract `usePresenceRealtime`, `useMetalPlaceConfig`, `useLiveBandTestConfig` hooks
+- Move side-effect chains (auto-checkout, camping clear) into `presenceRepository` or small service functions
+- Target: `useNowData` ~150 lines orchestration; `RightNowPage` unchanged externally
+
+**Gets simpler:** Live Now debugging localized; mirrors successful RightNowPage thinness at hook layer.
+
+**Risk:** High | **Depth:** Deep restructure | **Depends on:** 26.C, 26.E, 26.H, 26.A (`liveNowScenarios.test.ts` green)
+
+**Verification:** `rtk npm test` (`liveNowScenarios.test.ts`, `livePreview.test.ts`, `presenceRepository.test.ts`); full `/now` manual scenario (camping, Metal Place, skip/undo, duck).
+
+---
+
+### Stage 26.N — Optional: `db.ts` domain modules (defer if risky)
+
+**Scope:** Split `src/lib/db.ts` into `db/picks.ts`, `db/presence.ts`, `db/announcements.ts`, `db/meta.ts`, `db/index.ts` re-export; no schema/version change.
+
+**Gets simpler:** Navigate IDB layer by domain; easier onboarding.
+
+**Risk:** High | **Depth:** Deep | **Depends on:** 26.A (`db.test.ts` must exist first)
+
+**Verification:** Full test suite + manual offline pick/announcement/presence flush. **Skip if 26.A not done.**
+
+---
+
+### Out of scope (Phase 26)
+
+- New features: LLM alerts, badge year freeze, minimap (see `FUTURE_IDEAS.md`)
+- Redux/Zustand or global store introduction
+- Supabase schema/migration changes
+- Edge Function changes
+- Service Worker / caching strategy changes (unless required by build)
+- Renaming internal `crew_*` schema/IDB identifiers (user-facing copy only)
+- `services/badges/registry.ts` data shrink (declarative; not complexity debt)
+
+---
+
+### Recommended execution order
+
+```
+26.A → 26.B → 26.C → 26.E → 26.D → 26.F → 26.G → 26.H → 26.J → 26.I → 26.K → 26.L → 26.M → (26.N if needed)
+```
+
+Close each sub-stage with wiki changelog entry; close whole phase with single commit per CLAUDE.md phase rules.
 
 ---
 

@@ -1,4 +1,5 @@
 import { vi } from 'vitest';
+import '@testing-library/jest-dom/vitest';
 
 // Mock IndexedDB
 const mockIndexedDB = {
@@ -9,6 +10,7 @@ const mockIndexedDB = {
 Object.defineProperty(window, 'indexedDB', {
   value: mockIndexedDB,
   writable: true,
+  configurable: true,
 });
 
 // Mock environment variables

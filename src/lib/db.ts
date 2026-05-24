@@ -106,6 +106,15 @@ type ViralatasDB = {
 
 let dbPromise: Promise<IDBPDatabase<ViralatasDB>> | null = null;
 
+/** Test-only: close cached connection so the next IDB op opens a fresh database. */
+export async function resetDbConnectionForTests(): Promise<void> {
+  if (dbPromise) {
+    const db = await dbPromise;
+    db.close();
+    dbPromise = null;
+  }
+}
+
 function getDB() {
   if (!dbPromise) {
     dbPromise = openDB<ViralatasDB>(DB_NAME, DB_VERSION, {

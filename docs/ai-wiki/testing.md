@@ -8,7 +8,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 
 ## Relevant Source Files
 
-- `src/__tests__/` — All test files (443 tests)
+- `src/__tests__/` — All test files (389 tests)
 - `vitest.config.ts` — Test runner configuration
 - `package.json` — Test scripts (`test`, `test:coverage`) and seed scripts (`seed:bands`, `seed:bands:sync`, `seed:bands:backfill-slot-id`, `seed:bands:move`, `seed:test-users`, `seed:live-now`, `festival:reset`)
 - `supabase/seed/` — Seed scripts for test data and the destructive `festival-reset.ts` operator script (see `docs/ai-wiki/festival-reset.md`)
@@ -25,9 +25,10 @@ Document testing approach, test organization, offline scenario testing, and how 
 
 | Test File | Coverage |
 |-----------|----------|
-| `registration.test.ts` | Email validation, password validation, signup flow |
-| `login.test.ts` | Login validation, session persistence |
-| `auth-integration.test.ts` | Full auth flow (signup → login → session) |
+| `registration.test.tsx` | `getRegistrationEnabled`, `RegisterPage` signup flow and form constraints |
+| `login.test.tsx` | `useAuth` hook, `LoginPage` sign-in and profile verification |
+| `auth-integration.test.ts` | IDB auth storage, trigger metadata contract, mocked signup → profile flow |
+| `db.test.ts` | IndexedDB layer: session, bands, picks, queues, presence, announcements, events |
 | `schedule.test.ts` | Band filtering, sorting, time logic |
 | `time.test.ts` | Festival day calculation, time utilities, formatting |
 | `useBandConflicts.test.ts` | Conflict detection, overlap logic, severity |
@@ -49,7 +50,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `bandsRepository.test.ts` | `checkAndApplyCacheVersion()` match/mismatch/no-data (3 tests) |
 | `missedRepository.test.ts` | Mark/unmark missed band online and offline (4 tests) |
 
-**Coverage**: 443 tests across all files
+**Coverage**: 389 tests across all files
 
 **Run**:
 ```bash

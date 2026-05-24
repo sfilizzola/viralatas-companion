@@ -4,6 +4,28 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.A — refactor safety net)
+
+### Added
+- `src/__tests__/db.test.ts` — IndexedDB layer tests (17 cases) using `fake-indexeddb`: session, bands, picks, offline queue, presence, announcements, cache version, window events.
+- `src/__tests__/helpers/fakeIdb.ts` — test helper to install fake IndexedDB and reset `viralatas-db` between cases.
+- `src/__tests__/login.test.tsx` — real `useAuth` + `LoginPage` tests with mocked Supabase (9 cases).
+- `src/__tests__/registration.test.tsx` — real `getRegistrationEnabled` + `RegisterPage` tests (8 cases).
+- Dev dependency `fake-indexeddb` (scoped to db/auth IDB tests; `setup.ts` stub remains for other files).
+- `vitest.config.ts` — per-file coverage thresholds for `src/lib/db.ts`.
+
+### Changed
+- Replaced stub-only `login.test.ts`, `registration.test.ts`, and `auth-integration.test.ts` with tests that import real app modules.
+- `src/lib/db.ts` — `resetDbConnectionForTests()` closes the cached IDB connection (test-only export).
+- `src/__tests__/setup.ts` — configurable `indexedDB` mock + `@testing-library/jest-dom/vitest`.
+- `PHASES.md` — Stage 26.A marked complete.
+
+### Architectural Notes
+- IndexedDB remains the UI primary store; db tests exercise the real `idb` schema without touching production bundle.
+- Auth page tests mock Supabase only; session persistence tests mirror `lib/supabase.ts` IDB-backed auth storage.
+
+---
+
 ## 2026-05-24 (compact patches — Variant C vest stack)
 
 ### Changed

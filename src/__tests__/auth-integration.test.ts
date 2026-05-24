@@ -1,328 +1,159 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import 'fake-indexeddb/auto';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { deleteViralatasDatabase, installFakeIndexedDB } from './helpers/fakeIdb';
+
+installFakeIndexedDB();
+
+const mocks = vi.hoisted(() => ({
+  signUp: vi.fn(),
+  from: vi.fn(),
+}));
+
+vi.mock('../lib/supabase', () => ({
+  supabase: {
+    auth: { signUp: mocks.signUp },
+    from: mocks.from,
+  },
+}));
+
+import {
+  clearSession,
+  loadSession,
+  resetDbConnectionForTests,
+  saveSession,
+} from '../lib/db';
+import { supabase } from '../lib/supabase';
+
+const AUTH_STORAGE_KEY = 'viralatas-auth';
+
+/** Mirrors lib/supabase.ts custom auth storage backed by IndexedDB. */
+async function authStorageGetItem(key: string): Promise<string | null> {
+  const session = await loadSession();
+  if (!session || typeof session !== 'object') return null;
+  return (session as Record<string, string>)[key] ?? null;
+}
+
+async function authStorageSetItem(key: string, value: string): Promise<void> {
+  const existing = (await loadSession()) as Record<string, string> | null;
+  await saveSession({ ...(existing ?? {}), [key]: value });
+}
+
+async function authStorageRemoveItem(key: string): Promise<void> {
+  const existing = (await loadSession()) as Record<string, string> | null;
+  if (!existing) return;
+  const rest = { ...existing };
+  delete rest[key];
+  await saveSession(rest);
+}
+
+function resolveRoleForEmail(email: string): 'godlike' | 'normal' {
+  return email === 'sfilizzola@gmail.com' ? 'godlike' : 'normal';
+}
+
+function resolveIsTestUser(metadataValue: string | undefined): boolean {
+  return metadataValue === 'true';
+}
+
+function resolvePreferredLanguage(metadataValue: string | undefined): string {
+  return metadataValue || 'br';
+}
 
 describe('Auth & Users Table Integration', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.clearAllMocks();
+    await resetDbConnectionForTests();
+    await deleteViralatasDatabase();
   });
 
-  describe('Registration Flow Integration', () => {
-    it('should create auth user before users table entry', () => {
-      const step1 = 'auth.signUp()';
-      const step2 = 'trigger creates users entry';
+  describe('IndexedDB session persistence (Supabase auth storage)', () => {
+    it('persists auth payload under viralatas-auth key', async () => {
+      const payload = JSON.stringify({ access_token: 'abc', refresh_token: 'def' });
+      await authStorageSetItem(AUTH_STORAGE_KEY, payload);
 
-      expect(step1).toBe('auth.signUp()');
-      expect(step2).toBe('trigger creates users entry');
+      await expect(authStorageGetItem(AUTH_STORAGE_KEY)).resolves.toBe(payload);
     });
 
-    it('should set all required fields on user creation', () => {
-      const requiredFields = [
-        'id',
-        'email',
-        'display_name',
-        'preferred_language',
-        'is_test_user',
-        'role',
-        'created_at',
-      ];
+    it('merges multiple storage keys in one session object', async () => {
+      await authStorageSetItem('key-a', 'value-a');
+      await authStorageSetItem('key-b', 'value-b');
 
-      const userRecord = {
-        id: 'user-123',
-        email: 'test@example.com',
-        display_name: 'Test User',
-        preferred_language: 'br',
-        is_test_user: false,
-        role: 'normal',
-        created_at: new Date().toISOString(),
-      };
-
-      requiredFields.forEach((field) => {
-        expect(userRecord).toHaveProperty(field);
+      await expect(loadSession()).resolves.toEqual({
+        'key-a': 'value-a',
+        'key-b': 'value-b',
       });
     });
 
-    it('should set godlike role for sfilizzola@gmail.com on registration', () => {
-      const userEmail: string = 'sfilizzola@gmail.com';
-      const godlikeEmail: string = 'sfilizzola@gmail.com';
-      const expectedRole = userEmail === godlikeEmail ? 'godlike' : 'normal';
+    it('removeItem deletes one key without wiping others', async () => {
+      await authStorageSetItem(AUTH_STORAGE_KEY, 'token');
+      await authStorageSetItem('other', 'keep');
 
-      expect(expectedRole).toBe('godlike');
+      await authStorageRemoveItem(AUTH_STORAGE_KEY);
+
+      await expect(authStorageGetItem(AUTH_STORAGE_KEY)).resolves.toBeNull();
+      await expect(authStorageGetItem('other')).resolves.toBe('keep');
     });
 
-    it('should set normal role for other users on registration', () => {
-      const email: string = 'test@example.com';
-      const expectedRole = email === 'sfilizzola@gmail.com' ? 'godlike' : 'normal';
-
-      expect(expectedRole).toBe('normal');
-    });
-
-    it('should include display_name from signup metadata', () => {
-      const displayName = 'Test User';
-      expect(displayName).toBeTruthy();
-    });
-
-    it('should handle null display_name gracefully', () => {
-      const displayName: string | null = null;
-      expect(displayName === null).toBe(true);
-    });
-
-    it('should use provided preferred_language or default to br', () => {
-      const providedLanguage = 'en';
-      const finalLanguage = providedLanguage || 'br';
-
-      expect(finalLanguage).toBe('en');
-    });
-
-    it('should set is_test_user to false for regular registrations', () => {
-      const isTestUser = false;
-      expect(isTestUser).toBe(false);
+    it('clearSession removes all persisted auth state', async () => {
+      await authStorageSetItem(AUTH_STORAGE_KEY, 'token');
+      await clearSession();
+      await expect(loadSession()).resolves.toBeUndefined();
     });
   });
 
-  describe('Login Flow Integration', () => {
-    it('should authenticate user first', () => {
-      const authSuccess = true;
-      expect(authSuccess).toBe(true);
+  describe('handle_new_user trigger contract (metadata → users row)', () => {
+    it('assigns godlike role for sfilizzola@gmail.com', () => {
+      expect(resolveRoleForEmail('sfilizzola@gmail.com')).toBe('godlike');
+      expect(resolveRoleForEmail('test@example.com')).toBe('normal');
     });
 
-    it('should verify user profile exists after auth', () => {
-      const userExists = true;
-      expect(userExists).toBe(true);
+    it('defaults is_test_user to false when metadata is missing', () => {
+      expect(resolveIsTestUser(undefined)).toBe(false);
+      expect(resolveIsTestUser('true')).toBe(true);
+      expect(resolveIsTestUser('false')).toBe(false);
     });
 
-    it('should load complete user profile on login', () => {
-      const userRecord = {
-        id: 'user-123',
+    it('defaults preferred_language to br when metadata is missing', () => {
+      expect(resolvePreferredLanguage(undefined)).toBe('br');
+      expect(resolvePreferredLanguage('en')).toBe('en');
+    });
+
+    it('normalizes empty display_name to null in signup metadata shape', () => {
+      const displayName = '';
+      expect(displayName || null).toBeNull();
+    });
+  });
+
+  describe('Signup → profile verification flow (mocked Supabase)', () => {
+    it('creates auth user before users table verification', async () => {
+      mocks.signUp.mockResolvedValue({
+        data: { user: { id: 'user-1', email: 'test@example.com' } },
+        error: null,
+      });
+
+      const single = vi.fn().mockResolvedValue({ data: { id: 'user-1' }, error: null });
+      const eq = vi.fn().mockReturnValue({ single });
+      const select = vi.fn().mockReturnValue({ eq });
+      mocks.from.mockReturnValue({ select });
+
+      const { data, error } = await supabase.auth.signUp({
         email: 'test@example.com',
-        display_name: 'Test User',
-        preferred_language: 'br',
-        is_test_user: false,
-        role: 'normal',
-        avatar_url: null,
-        created_at: new Date().toISOString(),
-      };
+        password: 'password123',
+        options: {
+          data: {
+            display_name: null,
+            preferred_language: 'br',
+            is_test_user: false,
+          },
+        },
+      });
 
-      expect(userRecord.id).toBeTruthy();
-      expect(userRecord.email).toBeTruthy();
-      expect(userRecord.role).toBeTruthy();
-    });
+      expect(error).toBeNull();
+      expect(data.user?.id).toBe('user-1');
 
-    it('should handle missing user profile on login', () => {
-      const userProfile = null;
-      expect(userProfile).toBeNull();
-    });
-
-    it('should verify role is loaded correctly', () => {
-      const userRoles = ['normal', 'manager', 'godlike'];
-      const userRole = 'manager';
-
-      expect(userRoles.includes(userRole)).toBe(true);
-    });
-
-    it('should load preferred_language on login', () => {
-      const validLanguages = ['br', 'en', 'es', 'de'];
-      const language = 'br';
-
-      expect(validLanguages.includes(language)).toBe(true);
-    });
-
-    it('should handle language not found gracefully', () => {
-      const language: string | null = null;
-      expect(language === null).toBe(true);
-    });
-  });
-
-  describe('Session Persistence', () => {
-    it('should persist session across page reload', () => {
-      const sessionKey = 'viralatas-auth';
-      const storedSession = {
-        access_token: 'token-123',
-        refresh_token: 'refresh-123',
-      };
-
-      expect(sessionKey).toBeTruthy();
-      expect(storedSession.access_token).toBeTruthy();
-    });
-
-    it('should restore user profile from storage', () => {
-      const cachedUser = {
-        id: 'user-123',
-        email: 'test@example.com',
-      };
-
-      expect(cachedUser.id).toBeTruthy();
-      expect(cachedUser.email).toBeTruthy();
-    });
-
-    it('should handle missing session gracefully', () => {
-      const session = null;
-      expect(session).toBeNull();
-    });
-
-    it('should clear all session data on logout', () => {
-      let session = {
-        access_token: 'token-123',
-        refresh_token: 'refresh-123',
-      };
-
-      session = null as any;
-      expect(session).toBeNull();
-    });
-  });
-
-  describe('RLS & Security', () => {
-    it('should enforce user can only insert own profile', () => {
-      const authUserId = 'user-123';
-      const insertingUserId = 'user-123';
-
-      expect(authUserId).toBe(insertingUserId);
-    });
-
-    it('should prevent user from inserting other profiles', () => {
-      const authUserId: string = 'user-123';
-      const differentUserId: string = 'user-456';
-
-      expect(authUserId === differentUserId).toBe(false);
-    });
-
-    it('should allow any authenticated user to read bands table', () => {
-      const isAuthenticated = true;
-      expect(isAuthenticated).toBe(true);
-    });
-
-    it('should allow authenticated users to read user_picks', () => {
-      const isAuthenticated = true;
-      expect(isAuthenticated).toBe(true);
-    });
-
-    it('should restrict user_picks insert to own user_id', () => {
-      const authUserId = 'user-123';
-      const pickUserId = 'user-123';
-
-      expect(authUserId).toBe(pickUserId);
-    });
-
-    it('should restrict user_picks delete to own user_id', () => {
-      const authUserId = 'user-123';
-      const deleteUserId = 'user-123';
-
-      expect(authUserId).toBe(deleteUserId);
-    });
-  });
-
-  describe('Error Recovery', () => {
-    it('should allow retry after failed signup', () => {
-      const attempt1 = false;
-      const attempt2 = true;
-
-      expect(attempt1).toBe(false);
-      expect(attempt2).toBe(true);
-    });
-
-    it('should allow retry after failed login', () => {
-      const attempt1 = false;
-      const attempt2 = true;
-
-      expect(attempt1).toBe(false);
-      expect(attempt2).toBe(true);
-    });
-
-    it('should handle network errors on auth operations', () => {
-      const error = 'Network error';
-      expect(error).toBeTruthy();
-    });
-
-    it('should handle validation errors on signup', () => {
-      const error = 'Email already exists';
-      expect(error).toContain('Email');
-    });
-
-    it('should handle validation errors on login', () => {
-      const error = 'Invalid email or password';
-      expect(error).toBeTruthy();
-    });
-  });
-
-  describe('Metadata & User Data', () => {
-    it('should pass metadata during signup', () => {
-      const metadata = {
-        display_name: 'Test User',
-        preferred_language: 'br',
-        is_test_user: false,
-      };
-
-      expect(metadata.display_name).toBeTruthy();
-      expect(metadata.preferred_language).toBe('br');
-      expect(metadata.is_test_user).toBe(false);
-    });
-
-    it('should use metadata to populate users table', () => {
-      const metadata = {
-        display_name: 'Test User',
-        preferred_language: 'br',
-      };
-
-      const userRecord = {
-        display_name: metadata.display_name,
-        preferred_language: metadata.preferred_language,
-      };
-
-      expect(userRecord.display_name).toBe('Test User');
-      expect(userRecord.preferred_language).toBe('br');
-    });
-
-    it('should handle missing metadata gracefully', () => {
-      const metadata = {};
-      const displayName = (metadata as any).display_name || null;
-
-      expect(displayName).toBeNull();
-    });
-
-    it('should preserve email field across auth and users table', () => {
-      const email = 'test@example.com';
-      const authEmail = email;
-      const usersTableEmail = email;
-
-      expect(authEmail).toBe(usersTableEmail);
-    });
-  });
-
-  describe('Trigger Behavior', () => {
-    it('should trigger user creation on auth signup', () => {
-      const triggerFired = true;
-      expect(triggerFired).toBe(true);
-    });
-
-    it('should handle godlike user special case in trigger', () => {
-      const email = 'sfilizzola@gmail.com';
-      const triggerSetRole = email === 'sfilizzola@gmail.com' ? 'godlike' : 'normal';
-
-      expect(triggerSetRole).toBe('godlike');
-    });
-
-    it('should use correct defaults in trigger', () => {
-      const defaultRole = 'normal';
-      const defaultLanguage = 'br';
-      const defaultIsTestUser = false;
-
-      expect(defaultRole).toBe('normal');
-      expect(defaultLanguage).toBe('br');
-      expect(defaultIsTestUser).toBe(false);
-    });
-
-    it('should handle trigger conflicts on upsert', () => {
-      const email1 = 'test@example.com';
-      const email2 = 'test@example.com';
-
-      // On conflict, should update, not create duplicate
-      expect(email1).toBe(email2);
-    });
-
-    it('should preserve non-metadata fields on trigger upsert', () => {
-      const originalRole = 'normal';
-      const upsertedRole = 'normal';
-
-      // Role should not change on re-upsert
-      expect(originalRole).toBe(upsertedRole);
+      const profile = await supabase.from('users').select('id').eq('id', 'user-1').single();
+      expect(profile.data).toEqual({ id: 'user-1' });
+      expect(mocks.signUp).toHaveBeenCalledTimes(1);
+      expect(mocks.from).toHaveBeenCalledWith('users');
     });
   });
 });

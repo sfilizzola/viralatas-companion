@@ -11,6 +11,14 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],
+      thresholds: {
+        'src/lib/db.ts': {
+          lines: 60,
+          branches: 40,
+          functions: 50,
+          statements: 60,
+        },
+      },
     },
   },
   resolve: {
