@@ -4,6 +4,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.N.h — Extract admin config db module)
+
+### Added
+- `src/lib/db/config.ts` — `loadMetalPlaceConfig`, `saveMetalPlaceConfig`, `clearMetalPlaceConfig`, `loadLiveBandTestConfig`, `saveLiveBandTestConfig`, `clearLiveBandTestConfig` + `METAL_PLACE_CONFIG_CHANGED_EVENT` / `LIVE_BAND_TEST_CONFIG_CHANGED_EVENT` emits (verbatim extract).
+
+### Changed
+- `src/lib/db.ts` — imports and re-exports admin config from `./db/config` module (168 → 122 lines).
+
+### Architectural Notes
+- Verbatim move; zero consumer import path changes. Next: 26.N.i duck offline queue.
+
+---
+
 ## 2026-05-24 (Phase 26.N.g — Extract missed bands db module)
 
 ### Added

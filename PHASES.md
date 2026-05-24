@@ -401,6 +401,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test`; manual Metal Place window + live band test banner toggles.
 
+**Done (2026-05-24):** `src/lib/db/config.ts` — `metal_place_config` + `live_band_test_config` stores, load/save/clear helpers, and config-changed event emits; `db.ts` re-exports unchanged public surface (168 → 122 lines); zero consumer import path changes.
+
 #### Stage 26.N.i — Duck offline queue
 
 **Scope:** New `src/lib/db/duck.ts` — `offline_duck_quacks` queue ops only.
