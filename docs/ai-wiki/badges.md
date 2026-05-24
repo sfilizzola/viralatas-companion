@@ -14,15 +14,19 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 |---|---|
 | `src/services/badges/types.ts` | `BadgeBand`, `BadgeCondition`, `BadgeConfig`, `BadgeContext` type definitions |
 | `src/services/badges/engine.ts` | `buildBadgeContext`, `evaluateBadge`, `getEarnedBadges` — pure evaluation logic |
+| `src/services/badges/stackLayout.ts` | Vest collapsed scatter layout — `buildStackPoses`, `stackStyle`, anti-bury placement math |
 | `src/services/badges/registry.ts` | `BADGES[]` array — all badge definitions + condition-examples reference |
 | `src/services/badges/index.ts` | Barrel re-export — preserves all existing `from '…/services/badges'` import paths |
+| `src/hooks/useBadgeContext.ts` | IDB-first badge context loading + events + Supabase metadata drift sync |
 | `src/__tests__/badges.test.ts` | 50+ tests covering all condition types |
+| `src/__tests__/stackLayout.test.ts` | Vest scatter layout unit tests |
+| `src/__tests__/useBadgeContext.test.ts` | Hook tests for context build and refresh |
 | `public/badges/` | Badge PNG images (96×96 px recommended) |
 | `src/i18n/Badges_br.json` | Brazilian Portuguese labels + descriptions |
 | `src/i18n/Badges_en.json` | English labels + descriptions |
 | `src/i18n/Badges_es.json` | Spanish labels + descriptions (if available) |
 | `src/i18n/Badges_de.json` | German labels + descriptions (if available) |
-| `src/components/BadgesDisplay.tsx` | Vest-stack patches grid, detail modal, fullscreen zoom, spread/collapse |
+| `src/components/BadgesDisplay.tsx` | Vest-stack patches presentation (collapsed + expanded), detail modal, fullscreen zoom |
 | `src/components/ProfilePage.tsx` | Patches section + admin assign-badge UI |
 | `src/lib/patchesBackground.ts` | Per-device patches grid background preference (localStorage) |
 | `src/components/profile/PatchesBackgroundPicker.tsx` | 4-swatch fabric selector in profile |
@@ -42,7 +46,7 @@ The patches UI uses a **collapsed kutte stack** by default (fixed **112 px** hei
 
 ### Collapsed (default)
 
-- **Scatter:** `buildStackPoses()` places badges sequentially on a virtual slot grid (`stackGrid`) with hash jitter; `clutter` factor grows with badge count so overlap intensifies inside the fixed box.
+- **Scatter:** `buildStackPoses()` in `stackLayout.ts` places badges sequentially on a virtual slot grid (`stackGrid`) with hash jitter; `clutter` factor grows with badge count so overlap intensifies inside the fixed box.
 - **Reseed:** `scatterSeed` is random on mount and regenerated on **Close vest** — each collapse produces a new pile layout.
 - **Rotation:** ±55° (`(h % 111) - 55`) plus a tiny per-index twist; scale 0.88–0.99.
 - **Anti-bury:** if a new center would land within `minDist` of a prior center (aspect-corrected via `VEST_ASPECT`), up to 12 deterministic nudge attempts run before placement.
@@ -1041,4 +1045,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-24 — Vest Stack (Variant C): collapsed kutte layout, meadow scatter, Open/Close vest toggle, `data-bg` on both states.
+**Last updated:** 2026-05-24 — Phase 26.I: `stackLayout.ts` + `useBadgeContext.ts` extract; `BadgesDisplay.tsx` presentation-only.

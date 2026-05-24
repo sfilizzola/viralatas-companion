@@ -4,6 +4,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.I — Split BadgesDisplay)
+
+### Added
+- `src/services/badges/stackLayout.ts` — pure vest scatter layout (`buildStackPoses`, `stackStyle`, anti-bury math).
+- `src/hooks/useBadgeContext.ts` — IDB-first badge context + `PICKS_CHANGED`/`PRESENCE_CHANGED`/`CREW_USERS_CHANGED` refresh + Supabase `special_badges` drift sync + persist badge earning.
+- `src/__tests__/stackLayout.test.ts` — 7 tests for grid, clamp, aspect distance, pose stability, CSS vars.
+- `src/__tests__/useBadgeContext.test.ts` — 3 tests for IDB context build, picks refresh, metadata drift sync.
+
+### Changed
+- `BadgesDisplay.tsx` — presentation only (vest toggle, modal, glow ack); 599 → 258 lines.
+- `docs/ai-wiki/badges.md` — key files table updated for new modules.
+
+### Architectural Notes
+- Offline-first preserved: Phase 1 reads IDB + cached `user_metadata`; Phase 2 Supabase `users` row syncs assigned badges in background. Layout math is now unit-testable without React.
+
+---
+
 ## 2026-05-24 (Phase 26.J — Repository boundary cleanup)
 
 ### Added

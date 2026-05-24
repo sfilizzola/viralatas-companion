@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E, 26.F, 26.G, 26.H, 26.J complete)
+**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E, 26.F, 26.G, 26.H, 26.I, 26.J complete)
 
 **Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
 
@@ -141,7 +141,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-### Stage 26.I — Split `BadgesDisplay.tsx`
+### Stage 26.I — Split `BadgesDisplay.tsx` ✅
 
 **Scope:**
 - Extract stack layout pure functions → `src/services/badges/stackLayout.ts`
@@ -152,7 +152,9 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Risk:** Medium | **Depth:** Moderate | **Depends on:** 26.A, 26.D (partial)
 
-**Verification:** `rtk npm test` (`badges.test.ts`); profile + `/now` badge vest renders; earned badge animation unchanged.
+**Verification:** `rtk npm test` (`badges.test.ts`, `stackLayout.test.ts`, `useBadgeContext.test.ts`); profile + `/now` badge vest renders; earned badge animation unchanged.
+
+**Done (2026-05-24):** `stackLayout.ts` (scatter poses + CSS vars); `useBadgeContext.ts` (IDB-first context + drift sync); `BadgesDisplay.tsx` 599 → 258 lines; 7 stackLayout + 3 useBadgeContext tests.
 
 ---
 
