@@ -248,7 +248,7 @@ User picked **N+** bands in a specific genre (exact match).
 ```
 **Use case**: Genre specialization badges
 **Example badge**: `death-metal` (picked 3+ Death Metal bands)
-**Genre values**: Must match `Band.genre` exactly (e.g., "Death Metal", "Power Metal", "Party Metal")
+**Genre values**: Must match `Band.genre` exactly. After Phase 25 collapse, only **13 canonical labels** exist on band rows (see [domain-model.md](domain-model.md#band) · `src/services/genreGuide.ts`). Pre-collapse subgenre strings (e.g. `Grindcore`, `Melodic Death Metal`) no longer appear on `Band.genre`.
 
 #### `bands_picked_stage_min`
 User picked **N+** bands on a specific stage (exact match).
@@ -276,11 +276,11 @@ User picked **N+** bands whose `genre` is any of the listed genres — **set mem
 ```typescript
 {
   type: 'bands_picked_genres_min',
-  genres: ['Death Metal', 'Black Metal', 'Grindcore', 'Brutal Death Metal'],
+  genres: ['Death Metal', 'Black Metal', 'Thrash Metal'],
   count: 5,
 }
 ```
-**Use case**: Genre-family badges — e.g. *Extreme Picker* across heavy sub-genres.
+**Use case**: Genre-family badges — e.g. *Extreme Picker* across canonical heavy genres.
 **Semantics**: Same OR-within-the-array rule as `bands_picked_stages_min`.
 **Bands with `genre: null`** are never counted (no string to match).
 **Single-element** behaves identically to the singular `bands_picked_genre_min`.
@@ -364,11 +364,11 @@ User **seen N+** bands whose `genre` is any of the listed genres — **set membe
 ```typescript
 {
   type: 'bands_seen_genres_min',
-  genres: ['Death Metal', 'Black Metal', 'Grindcore', 'Brutal Death Metal'],
+  genres: ['Death Metal', 'Black Metal', 'Thrash Metal'],
   count: 5,
 }
 ```
-**Use case**: Genre-family devotee badges — e.g. *Extreme Devotee*.
+**Use case**: Genre-family devotee badges — e.g. *Extreme Devotee* across canonical heavy genres.
 **Bands with `genre: null`** are never counted.
 **Missed opt-outs** (`user_missed_bands`) are correctly excluded — the count operates over `seenBands` which already removes those.
 
@@ -511,13 +511,13 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `dreamer` — "I'm Tripping" / 30+ picked bands (persist: true)
 - `death-metal` — Saw 3+ Death Metal bands
 - `power-metal` — Saw 3+ Power Metal bands
-- `party-metal` — Saw 2 Party Metal bands. **In the 2026 lineup the `Party Metal` genre is held by exactly 2 bands: `Alestorm` (FAS16, Day 4) and `Airbourne` (HAR11, Day 4) — so this badge effectively requires seeing both. Note their slots overlap (Alestorm 19:15–20:45, Airbourne 21:00–22:30) on the paired Faster↔Harder stages, so the badge is reachable in a single Day-4 evening.**
+- `party-metal` — Saw 2 Party Metal bands. **In the 2026 lineup the `Party Metal` genre is held by exactly 2 bands: `Airbourne` (FAS15, Day 4, 17:30–18:45 Faster) and `Alestorm` (FAS17, Day 4→5 after midnight, 01:00–02:00 Faster) — so this badge effectively requires seeing both. Both play Faster on Day 4 evening/night; no Harder-stage overlap.**
 - `alestorm` — Saw Alestorm live (band_seen_named) — distinct from the genre-based `party-metal` above.
 - `roots` — "Roots, Bloody Roots" — Saw Sepultura's farewell show (band_seen_named: `Sepultura`, HAR6 Day 3, 19:00–20:30).
 - `live-beast` — Saw 22+ bands
-- `wacken-firefighters` — Saw the *Wacken Firefighters* (band_seen_named) — they open Day 1 12:00 (WAK1) and close Day 4 12:00 (WAK22) on the Wackinger stage. Tribute to the volunteer brass-band tradition.
-- `gutalax` — Saw *Gutalax* (band_seen_named) — Goregrind, Wasteland Day 3 21:30 (WAS20). Inside-joke description references "Osmar".
-- `heavysaurus` — Display label "Mighty Roar". Saw *Heavysaurus* (band_seen_named) — Children's Metal dinosaur band, Wasteland Day 4 21:30 (WAS28).
+- `wacken-firefighters` — Saw the *Wacken Firefighters* (band_seen_named) — they open Day 1 12:00 (WAK1) and return Day 4 12:00 (WAK23) on the Wackinger stage. Tribute to the volunteer brass-band tradition.
+- `gutalax` — Saw *Gutalax* (band_seen_named) — `Death Metal` (formerly Goregrind before Phase 25 collapse), Faster Day 3 12:30 (FAS8). Inside-joke description references "Osmar".
+- `heavysaurus` — Display label "Mighty Roar". Saw *Heavysaurus* (band_seen_named) — children's metal act tagged `Metal`, Harder Day 4 11:30 (HAR9).
 - `wackinger-regular` — Display label "Wackinger Viking". Saw 3+ bands on the Wackinger stage (`bands_seen_stage_min`).
 - `wasteland-warrior` — Saw 1+ band on the Wasteland stage (`bands_seen_stage_min`). Low threshold by design — Wasteland is the "you went there at all" badge.
 - `bullhead-heat` — "Bullhead Heat" / "Calor do Bullhead" / "Calor del Bullhead" / "Bullhead-Hitze". Loyalty to the flaming bullhead between Faster ↔ Harder: saw 6+ bands across Faster ∪ Harder (`bands_seen_stages_min`, "more than 5" interpreted as strictly > 5).
@@ -537,12 +537,14 @@ One badge per camping-open day; each user earns exactly one based on `user_metad
 - `campfire-veteran` — Arrived **Tuesday** (tue-jul28). "Warm beers, grill smoke, and terrible decisions. Peak Wacken."
 - `spawn-point-infield` — Arrived **Wednesday** (wed-jul29). "No warm-up. You spawned directly into the chaos."
 
-### Genres present in lineup with NO corresponding badge
+### Canonical genres with NO corresponding badge
 
-These genres exist on the 2026 lineup but no badge in `src/services/badges/registry.ts` references them:
+After Phase 25, every band carries one of **13 canonical genre labels**. Most have no dedicated badge — only `death-metal`, `power-metal`, and `party-metal` use `bands_seen_genre_min` in the 2026 registry. Examples of canonical labels without a genre badge:
 
-- `Pirate Metal` — held by 1 band only (`Mr. Hurley und die Pulveraffen`, WAK17, Day 3). Single-band genres are not a good fit for a `bands_seen_genre_min` badge (would be equivalent to `band_seen_named`). If a "pirate" badge is desired, prefer `band_seen_named` against that one band.
-- Most stage-specific or niche genres (Goregrind, Humppa, Horror Punk, etc.) — intentional, to keep the badge inventory curated.
+- `Folk Metal` — includes former niche tags like Pirate Metal (`Mr. Hurley und die Pulveraffen`, LOU13 Day 3). Single-band absorption is not a good fit for `bands_seen_genre_min`; prefer `band_seen_named` if a pirate badge is desired.
+- `Metal`, `Metal Battle`, `Hard Rock`, `Punk`, etc. — intentional curation; the badge inventory stays small.
+
+Pre-collapse subgenre strings (Goregrind, Humppa, Horror Punk, Melodic Death Metal, …) were merged into these buckets and **no longer appear** on `Band.genre`. See `src/services/genreGuide.ts` for the full old→new map.
 
 ### Merit / Assigned (14)
 - `mosh-pit` — Hit the floor, came back (godlike-assigned)
@@ -971,4 +973,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-24 — `assigned` badge offline-first fix: Edge Function now mirrors `users.special_badges` into `auth.users.raw_user_meta_data`; `BadgesDisplay` reads from `user_metadata` cache (offline-safe); `isCurrentUserFriend` reads from IDB; drift detection fires background `refreshSession()`.
+**Last updated:** 2026-05-24 — Phase 25 genre collapse: badge docs aligned to 13 canonical labels; fixed party-metal / gutalax / wacken-firefighters / heavysaurus slot references.

@@ -17,7 +17,7 @@
  *     JUN1-JUN8, LOU21, WET30, WAS24, WAS32).
  *   - Slots whose `Name` is `TDB MTB` (Metal Battle placeholders) ARE seeded
  *     with the literal name `TDB MTB`, the genre column from lineup.md
- *     (e.g. "Metal Battle Hungary"), and `image_url = PLACEHOLDER`. Once
+ *     (e.g. "Metal Battle"), and `image_url = PLACEHOLDER`. Once
  *     Wacken announces the representative band, replace `name` + `image_url`
  *     here AND update lineup.md (`Band Status` → CONFIRMED, `Name` → real
  *     band, `Image URL` → real URL) — see Speak in Whispers (WET2) as the
@@ -356,7 +356,7 @@ export const bands: BandSeed[] = [
   // ═══════════════════════════════════════════════════════
 
   // HARDER STAGE — Day 4
-  { slot_id: 'HAR9', name: 'Heavysaurus',   stage: STAGES.HARDER, start_time: t(D4,11,30), end_time: t(D4,12,15),  genre: "Children's Metal",    image_url: `${WOA}/fileadmin/_processed_/3/0/csm_heavysaurus_26_9d1aa2a6db.jpg` },     
+  { slot_id: 'HAR9', name: 'Heavysaurus',   stage: STAGES.HARDER, start_time: t(D4,11,30), end_time: t(D4,12,15),  genre: 'Metal',    image_url: `${WOA}/fileadmin/_processed_/3/0/csm_heavysaurus_26_9d1aa2a6db.jpg` },     
   { slot_id: 'HAR10', name: 'Orbit Culture', stage: STAGES.HARDER, start_time: t(D4,13,45), end_time: t(D4,14,45),  genre: 'Death Metal', image_url: `${WOA}/fileadmin/_processed_/d/c/csm_Orbit_Culture-WOA26_e0ccb2b84a.jpg` }, 
   { slot_id: 'HAR11', name: 'Lamb of God',   stage: STAGES.HARDER, start_time: t(D4,16,15), end_time: t(D4,17,15),  genre: 'Metal',        image_url: `${WOA}/fileadmin/_processed_/7/4/csm_lamb_of_god_26b_d0cd004159.jpg` },    
   { slot_id: 'HAR12', name: 'Arch Enemy',    stage: STAGES.HARDER, start_time: t(D4,19, 0), end_time: t(D4,20,30),  genre: 'Death Metal', image_url: `${WOA}/fileadmin/_processed_/c/c/csm_arch_enemy_26c_e1e9c04c76.jpg` },     

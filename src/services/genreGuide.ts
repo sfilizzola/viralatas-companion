@@ -108,6 +108,7 @@ export const GENRE_COLLAPSE_MAP: Record<string, CanonicalGenre> = {
   'Visual Kei Metal': 'Metal',
   'Dark Electronic': 'Metal',
   'Orchestral / Film Music': 'Metal',
+  "Children's Metal": 'Metal',
 };
 
 export function collapseGenre(genre: string): CanonicalGenre {

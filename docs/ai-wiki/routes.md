@@ -151,7 +151,7 @@ export default function PrivateRoute({ children }: Props) {
 - **Full band grid** — All bands across 4 days, 8 stages
 - **Filters**:
   - By stage (Faster, Harder, Louder, W.E.T., etc.)
-  - By genre (Metal, Punk, Folk Metal, etc.)
+  - By genre — 13 canonical labels as single-select pills (+ inline genre guide in filter drawer; see Phase 25)
   - By day (Wed, Thu, Fri, Sat)
   - By time (hour range)
   - By search (band name, substring)

@@ -19,6 +19,12 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - `public/Design-System.html` — genre pills + GenreGuideCollapsible documented.
 - `docs/ai-wiki/domain-model.md` — canonical 13-genre list on Band entity.
 
+### Changed (doc audit)
+- `docs/ai-wiki/badges.md` — aligned to 13 canonical labels; fixed party-metal / gutalax / wacken-firefighters / heavysaurus slot refs; replaced stale Pirate Metal section.
+- `docs/ai-wiki/routes.md` — schedule genre filter documents canonical pills + guide.
+- `docs/superpowers/specs/2026-05-24-genre-collapse-design.md` — status → Complete; `Children's Metal` in Metal bucket.
+- `supabase/seed/bands.ts` — Heavysaurus `Children's Metal` → `Metal` (restores seed/lineup 13-genre parity).
+
 ### Architectural Notes
 - No schema change — rename in-place only; deploy via `seed:bands:sync --apply`.
 - `death-metal` / `power-metal` badge thresholds stay at 3; `party-metal` unchanged.

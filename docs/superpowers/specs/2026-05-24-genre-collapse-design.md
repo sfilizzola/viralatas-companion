@@ -2,7 +2,7 @@
 
 **Date:** 2026-05-24  
 **Phase:** 25  
-**Status:** Locked for implementation
+**Status:** Complete (Phase 25)
 
 ## Goal
 
@@ -37,7 +37,7 @@ Implementation: `src/services/genreGuide.ts` (`GENRE_COLLAPSE_MAP` + `collapseGe
 | Punk | Punk Rock, Punk Metal, Horror Punk, Folk Punk |
 | Party Metal | *(unchanged — Alestorm, Airbourne only)* |
 | Metal Battle | All `Metal Battle *` country variants + Award Ceremony |
-| Metal | TBD / Generic Metal, Alternative Metal, Industrial Metal, Industrial / Gothic, Groove Metal, Nu Metal, Rap Metal, Progressive Metal, Visual Kei Metal, Dark Electronic, Orchestral / Film Music |
+| Metal | TBD / Generic Metal / Children's Metal, Alternative Metal, Industrial Metal, Industrial / Gothic, Groove Metal, Nu Metal, Rap Metal, Progressive Metal, Visual Kei Metal, Dark Electronic, Orchestral / Film Music |
 
 ## Badge review
 
@@ -47,7 +47,7 @@ Implementation: `src/services/genreGuide.ts` (`GENRE_COLLAPSE_MAP` + `collapseGe
 
 ## UI
 
-See PHASES.md § Design — genre pills + inline GenreGuideCollapsible in filter drawer.
+See `docs/superpowers/specs/2026-05-24-genre-collapse-design.md` and `docs/ai-wiki/phases-history.md` (Phase 25) — genre pills + inline GenreGuideCollapsible in filter drawer.
 
 ## Out of scope
 
