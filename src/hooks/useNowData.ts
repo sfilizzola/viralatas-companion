@@ -9,7 +9,6 @@ import {
   PRESENCE_CHANGED_EVENT,
   loadAllUserPicks,
   loadAllUserPresence,
-  loadBands,
   loadCrewUsers,
   loadLatestAnnouncement,
   loadLiveBandTestConfig,
@@ -34,6 +33,7 @@ import { useDuckQuack } from './useDuckQuack';
 import { syncLiveBandTestConfig } from '../services/liveBandTest';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
+import { useBands } from './useBands';
 import { useNow } from './useNow';
 const DUCK_WINDOW_MS = 15 * 60 * 1000;
 
@@ -72,13 +72,18 @@ export function useNowData(): NowData {
   const userDisplayName =
     (user?.user_metadata?.['display_name'] as string | undefined) ?? user?.email ?? null;
 
-  const [bands, setBands] = useState<Band[]>([]);
   const [picks, setPicks] = useState<UserPick[]>([]);
   const [crewUsers, setCrewUsers] = useState<CrewUser[]>([]);
   const [presence, setPresence] = useState<UserPresence[]>([]);
   const [latestAnnouncement, setLatestAnnouncement] = useState<Announcement | null>(null);
   const now = useNow(30_000);
-  const [loading, setLoading] = useState(true);
+  const { bands: rawBands, loading: bandsLoading } = useBands();
+  const bands = useMemo(
+    () => rawBands.slice().sort((a, b) => a.start_time.localeCompare(b.start_time)),
+    [rawBands],
+  );
+  const [cacheLoading, setCacheLoading] = useState(true);
+  const loading = bandsLoading || cacheLoading;
   const [undoState, setUndoState] = useState<{ bandId: string; bandName: string } | null>(null);
   const [undoTimerId, setUndoTimerId] = useState<ReturnType<typeof setTimeout> | null>(null);
   const [metalPlaceConfig, setMetalPlaceConfig] = useState<MetalPlaceConfig | null>(null);
@@ -86,20 +91,18 @@ export function useNowData(): NowData {
 
   const refreshFromCache = useCallback(async () => {
     try {
-      const [cachedBands, cachedPicks, cachedUsers, cachedPresence, ann] = await Promise.all([
-        loadBands(),
+      const [cachedPicks, cachedUsers, cachedPresence, ann] = await Promise.all([
         loadAllUserPicks(),
         loadCrewUsers(),
         loadAllUserPresence(),
         loadLatestAnnouncement(),
       ]);
-      setBands(cachedBands.sort((a, b) => a.start_time.localeCompare(b.start_time)));
       setPicks(cachedPicks);
       setCrewUsers(cachedUsers);
       setPresence(cachedPresence);
       setLatestAnnouncement(ann ?? null);
     } finally {
-      setLoading(false);
+      setCacheLoading(false);
     }
   }, []);
 

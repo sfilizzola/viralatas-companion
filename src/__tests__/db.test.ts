@@ -5,6 +5,7 @@ installFakeIndexedDB();
 
 import {
   ANNOUNCEMENTS_CHANGED_EVENT,
+  BANDS_CHANGED_EVENT,
   CREW_USERS_CHANGED_EVENT,
   PICKS_CHANGED_EVENT,
   PRESENCE_CHANGED_EVENT,
@@ -94,6 +95,14 @@ describe('IndexedDB layer (lib/db.ts)', () => {
       const bands = await loadBands();
       expect(bands).toHaveLength(1);
       expect(bands[0]).toEqual(sampleBand);
+    });
+
+    it('fires BANDS_CHANGED_EVENT after saveBands', async () => {
+      const handler = vi.fn();
+      window.addEventListener(BANDS_CHANGED_EVENT, handler);
+      await saveBands([sampleBand]);
+      expect(handler).toHaveBeenCalledOnce();
+      window.removeEventListener(BANDS_CHANGED_EVENT, handler);
     });
   });
 

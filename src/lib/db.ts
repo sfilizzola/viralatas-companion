@@ -4,6 +4,7 @@ import type { Announcement, Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig
 const DB_NAME = 'viralatas-db';
 const DB_VERSION = 9;
 
+export const BANDS_CHANGED_EVENT = 'viralatas:bands-changed';
 export const PICKS_CHANGED_EVENT = 'viralatas:picks-changed';
 export const CREW_USERS_CHANGED_EVENT = 'viralatas:crew-users-changed';
 export const PRESENCE_CHANGED_EVENT = 'viralatas:presence-changed';
@@ -176,6 +177,12 @@ function getDB() {
   return dbPromise;
 }
 
+function emitBandsChanged() {
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(BANDS_CHANGED_EVENT));
+  }
+}
+
 function emitPicksChanged() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(PICKS_CHANGED_EVENT));
@@ -238,6 +245,7 @@ export async function saveBands(bands: Band[]) {
   const tx = db.transaction('bands', 'readwrite');
   await Promise.all(bands.map((b) => tx.store.put(b)));
   await tx.done;
+  emitBandsChanged();
 }
 
 export async function loadBands(): Promise<Band[]> {

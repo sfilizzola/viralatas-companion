@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Band, UserMissedBand } from '../types';
-import { loadBands, MISSED_CHANGED_EVENT } from '../lib/db';
+import { MISSED_CHANGED_EVENT } from '../lib/db';
 import { picksRepository, missedRepository } from '../repositories';
 import { bandDay } from '../services/bandTime';
 import { useAuth } from '../hooks/useAuth';
+import { useBands } from '../hooks/useBands';
 import { useBandAttendees } from '../hooks/useBandAttendees';
 import { useMyPicks } from '../hooks/useMyPicks';
 import { usePickCounts } from '../hooks/usePickCounts';
@@ -30,24 +31,20 @@ export default function MyPicksPage() {
     session?.user?.email?.split('@')[0] ??
     '';
 
-  const [bands, setBands] = useState<Band[]>([]);
-  const [loading, setLoading] = useState(true);
   const [highlightedConflict, setHighlightedConflict] = useState<string | null>(null);
   const [activeBandId, setActiveBandId] = useState<string | null>(null);
   const [allMissed, setAllMissed] = useState<UserMissedBand[]>([]);
   const [collapsedDays, setCollapsedDays] = useState<Set<string>>(new Set());
+  const { bands: rawBands, loading } = useBands();
+  const bands = useMemo(
+    () => rawBands.slice().sort((a, b) => a.start_time.localeCompare(b.start_time)),
+    [rawBands],
+  );
   const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
   const attendeesByBand = useBandAttendees();
   const pickCounts = usePickCounts();
   const currentNow = useNow(60_000);
   const pendingBandIds = useOfflinePendingBandIds();
-
-  useEffect(() => {
-    loadBands().then((data) => {
-      setBands(data.sort((a, b) => a.start_time.localeCompare(b.start_time)));
-      setLoading(false);
-    });
-  }, []);
 
   useEffect(() => {
     async function refreshMissed() {

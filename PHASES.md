@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 In progress (26.A, 26.B complete)
+**Status:** 🔜 In progress (26.A, 26.B, 26.C complete)
 
 **Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
 
@@ -57,7 +57,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-### Stage 26.C — `useBands()` catalog hook
+### Stage 26.C — `useBands()` catalog hook ✅
 
 **Scope:** New `src/hooks/useBands.ts`; migrate `SchedulePage`, `MyPicksPage`, `PopularPage`, `useNowData` (and optionally `BadgesDisplay`, admin panels).
 
@@ -66,6 +66,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Risk:** Low | **Depth:** Shallow extract | **Depends on:** 26.A recommended
 
 **Verification:** `rtk npm test`; browse `/schedule`, `/my-picks`, `/popular`, `/now` with cached bands offline.
+
+**Done (2026-05-24):** `useBands()` hook with `BANDS_CHANGED_EVENT`; `saveBands` emits event; four primary consumers migrated; 2 hook tests + 1 db event test.
 
 ---
 

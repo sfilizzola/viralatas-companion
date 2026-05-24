@@ -116,6 +116,7 @@ Hooks encapsulate state logic and subscriptions. They:
 | Hook | Pattern | Data Source |
 |------|---------|------------|
 | `useAuth()` | Session state | IDB + Supabase Auth |
+| `useBands()` | Band catalog | IDB + `BANDS_CHANGED_EVENT` |
 | `useMyPicks()` | User's picks | IDB + window events |
 | `usePickCounts()` | Attendance per band | IDB + Realtime + window events |
 | `useBandAttendees(bandId)` | Users going to a band | IDB + Realtime |
@@ -423,6 +424,7 @@ INSERT into user_picks
 | Hook | Returns | Subscribes To | Used By |
 |------|---------|---------------|---------|
 | `useAuth()` | `{ session, user }` | Supabase auth state | All pages |
+| `useBands()` | `{ bands, loading, refresh }` | `BANDS_CHANGED_EVENT` | SchedulePage, MyPicksPage, PopularPage, useNowData |
 | `useMyPicks()` | `Set<bandId>` | `PICKS_CHANGED_EVENT`, Realtime | MyPicksPage |
 | `usePickCounts()` | `Record<bandId, count>` | `PICKS_CHANGED_EVENT`, Realtime | RightNowPage, PopularPage — `countPicks` is an exported pure fn |
 | `useBandAttendees(bandId)` | `User[]` | Realtime | BandDetailModal |

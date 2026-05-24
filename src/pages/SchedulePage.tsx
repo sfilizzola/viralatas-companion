@@ -1,11 +1,11 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import type { Band } from '../types';
-import { loadBands } from '../lib/db';
 import { picksRepository } from '../repositories';
 import { bandDay } from '../services/bandTime';
 import { filterBands } from '../services/bandFilter';
 import { loadStoredFilters, saveStoredFilters } from '../services/scheduleFilterStorage';
 import { useAuth } from '../hooks/useAuth';
+import { useBands } from '../hooks/useBands';
 import { useMyPicks } from '../hooks/useMyPicks';
 import { useNow } from '../hooks/useNow';
 import { usePickCounts } from '../hooks/usePickCounts';
@@ -66,31 +66,28 @@ export default function SchedulePage() {
   const { session } = useAuth();
   const userId = session?.user?.id ?? null;
 
-  const [bands, setBands] = useState<Band[]>([]);
-  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<BandFilterValue>(loadStoredFilters);
 
+  const { bands, loading } = useBands();
+  const hashRestoredRef = useRef(false);
   const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
   const pickCounts = usePickCounts();
   const currentTime = useNow();
   const pendingBandIds = useOfflinePendingBandIds();
 
   useEffect(() => {
-    loadBands().then((data) => {
-      setBands(data);
-      setLoading(false);
+    if (loading || hashRestoredRef.current) return;
+    hashRestoredRef.current = true;
 
-      // Restore day from URL hash (#day-1, #day-2, ...) on initial load
-      const hashMatch = /^#day-(\d+)$/.exec(globalThis.location.hash);
-      if (hashMatch) {
-        const dayIdx = Number.parseInt(hashMatch[1], 10) - 1;
-        const uniqueDays = [...new Set(data.map(bandDay))].sort();
-        if (uniqueDays[dayIdx]) {
-          setFilters((prev) => ({ ...prev, day: uniqueDays[dayIdx] }));
-        }
+    const hashMatch = /^#day-(\d+)$/.exec(globalThis.location.hash);
+    if (hashMatch) {
+      const dayIdx = Number.parseInt(hashMatch[1], 10) - 1;
+      const uniqueDays = [...new Set(bands.map(bandDay))].sort();
+      if (uniqueDays[dayIdx]) {
+        setFilters((prev) => ({ ...prev, day: uniqueDays[dayIdx] }));
       }
-    });
-  }, []);
+    }
+  }, [loading, bands]);
 
   useEffect(() => {
     saveStoredFilters(filters);

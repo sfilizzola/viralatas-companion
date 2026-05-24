@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Band, UserMissedBand } from '../types';
-import { loadBands, MISSED_CHANGED_EVENT } from '../lib/db';
+import type { UserMissedBand } from '../types';
+import { MISSED_CHANGED_EVENT } from '../lib/db';
 import { picksRepository, missedRepository } from '../repositories';
 import { useBandConflicts } from '../hooks/useBandConflicts';
 import { useAuth } from '../hooks/useAuth';
+import { useBands } from '../hooks/useBands';
 import { useBandAttendees } from '../hooks/useBandAttendees';
 import { useMyPicks } from '../hooks/useMyPicks';
 import { usePickCounts } from '../hooks/usePickCounts';
@@ -20,21 +21,13 @@ export default function PopularPage() {
   const { session } = useAuth();
   const userId = session?.user?.id ?? null;
 
-  const [bands, setBands] = useState<Band[]>([]);
-  const [loading, setLoading] = useState(true);
   const [activeBandId, setActiveBandId] = useState<string | null>(null);
   const [allMissed, setAllMissed] = useState<UserMissedBand[]>([]);
+  const { bands, loading } = useBands();
   const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
   const attendeesByBand = useBandAttendees();
   const pickCounts = usePickCounts();
   const currentNow = useNow(60_000);
-
-  useEffect(() => {
-    loadBands().then((data) => {
-      setBands(data);
-      setLoading(false);
-    });
-  }, []);
 
   useEffect(() => {
     async function refreshMissed() {

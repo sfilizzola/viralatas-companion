@@ -4,6 +4,22 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.C — useBands catalog hook)
+
+### Added
+- `src/hooks/useBands.ts` — `{ bands, loading, refresh }` from IndexedDB; subscribes to `BANDS_CHANGED_EVENT`.
+- `BANDS_CHANGED_EVENT` in `lib/db.ts` — emitted by `saveBands()` so band sync refreshes all hook consumers.
+- `src/__tests__/useBands.test.ts` — mount load + post-sync refresh (2 cases).
+
+### Changed
+- `SchedulePage`, `MyPicksPage`, `PopularPage`, `useNowData` — replaced duplicate `useState` + `loadBands()` patterns with `useBands()`.
+- `src/__tests__/db.test.ts` — `saveBands` event emission test.
+
+### Architectural Notes
+- Band catalog reads stay offline-first (`UI → IndexedDB`); `BandSync` → `saveBands` → event → hook refresh preserves live lineup updates without direct Supabase reads in pages.
+
+---
+
 ## 2026-05-24 (Phase 26.B — shared festival constants)
 
 ### Added
