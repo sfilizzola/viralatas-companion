@@ -4,6 +4,17 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26 closed — Complexity Reduction & Simplification)
+
+### Changed
+- `docs/ai-wiki/phases-history.md` — Phase 26 complete entry (26.A–26.N.k deliverables, acceptance criteria).
+- `PHASES.md` — Phase 26 closed; active phase → Phase 27 TBD (`FUTURE_IDEAS.md`).
+
+### Architectural Notes
+- Whole phase complete: hooks extracted (`useBands`, `usePickActions`, `useMissedBands`, `useAnnouncements`, `useBandDetailModal`, `useNowData` composables), god components slimmed (`App`, `BadgesDisplay`, `GodlikeAdminPanel`, `AnnouncementsPage`), `db.ts` split into 12 domain modules, test safety nets at 488 tests. Zero user-visible behavior change; offline-first invariants preserved.
+
+---
+
 ## 2026-05-24 (Phase 26.N.k — Finalize db module barrel)
 
 ### Added

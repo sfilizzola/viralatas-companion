@@ -496,3 +496,41 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Doom Metal absorbs Gothic Metal and related tags (Gothic / Industrial, Sludge, Post-Metal, Stoner Rock, Occult Rock).
 
 ---
+
+### Phase 26 — Complexity Reduction & Simplification
+**Status:** ✅ Complete
+
+**Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
+
+**Deliverables:**
+- **26.A — Refactor safety net:** `db.test.ts`, real auth module tests (`login`, `registration`, `auth-integration`), `fake-indexeddb`, `resetDbConnectionForTests()`
+- **26.B — Festival constants:** `FESTIVAL_DAY_1_START`, `isFestivalActive()`, `getFestivalDay()`, `wackenLocalMidnight()` in `time.ts`; five consumers migrated
+- **26.C — `useBands()`:** catalog hook + `BANDS_CHANGED_EVENT`; Schedule, My Picks, Popular, useNowData
+- **26.D — `useMissedBands()`:** deduped missed-band loading/sync/realtime across My Picks, Popular, BadgesDisplay
+- **26.E — `usePickActions()`:** pick toggle wrapper; five consumers migrated
+- **26.F — `useBandDetailModal()` + `BandDetailModalHost`:** shared modal state for My Picks and Popular
+- **26.G — Sync orchestration:** `src/components/sync/` extracts from `App.tsx` (238 → 84 lines)
+- **26.H — Realtime helper:** `subscribePostgresChanges()` in `realtimeSync.ts`; six call sites refactored
+- **26.I — BadgesDisplay split:** `stackLayout.ts`, `useBadgeContext.ts`; component 599 → 258 lines
+- **26.J — Repository boundaries:** admin user ops → `usersRepository`; announcements repo mural-only
+- **26.K — `useAnnouncements()`:** hook + `announcementsDisplay.ts`; AnnouncementsPage 437 → 299 lines
+- **26.L — GodlikeAdminPanel:** five section components; panel 933 → 203 lines
+- **26.M — Slim `useNowData()`:** config/realtime/cache/plan hooks + presence side effects in repository; hook 335 → 162 lines
+- **26.N — `db.ts` domain modules:** monolith (~555 lines) → 12 modules under `src/lib/db/` + barrel; public import path unchanged
+
+**Acceptance criteria (all met):**
+- [x] `rtk npm run build` green
+- [x] `rtk npm test` — 488 tests pass; coverage thresholds tightened (95% stmts/lines/funcs on `src/lib/db/**`)
+- [x] No new direct Supabase reads from presentation components (admin boundaries preserved)
+- [x] Offline-first invariants preserved — IndexedDB primary, repositories emit events, hooks subscribe
+- [x] Wiki updated (`architecture.md`, flows, per-sub-stage `changelog.md` entries)
+
+**Wiki:** `docs/ai-wiki/architecture.md` · `docs/ai-wiki/changelog.md` (26.A–26.N.k entries)
+
+**Architectural notes:**
+- Hooks + window events pattern unchanged (no Redux/Zustand). Pages consume hooks; repositories own IDB writes and event emission.
+- `src/lib/db.ts` is a one-line shim re-exporting `src/lib/db/index.ts`; ~40 importers unchanged.
+- `useNowData()` composes `useMetalPlaceConfig`, `useLiveBandTestConfig`, `usePresenceRealtime`, `useNowCache`, `useNowPlans`; presence toggles delegate to `applyPresenceToggle()` in `presenceRepository`.
+- Sub-stages landed as 29 individual commits on `dev` (26.A through 26.N.k); phase closed with docs commit.
+
+---
