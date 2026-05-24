@@ -1049,29 +1049,59 @@
 
       <div class="component-section">
         <h3>BadgesDisplay <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/BadgesDisplay.tsx</span></h3>
-        <p>Earned patches on <code>/now</code> and <code>/profile</code>. <strong>Variant C — Vest Stack:</strong> collapsed kutte with chaotic overlapping patches (fixed ~112 px tall); tap <em>Open vest</em> to expand into a 4×48 px grid on the user&apos;s battle-vest background with staggered settle animation. Glowing unacknowledged badges sort to the top of the stack and get higher z-index. Collapse via <em>Close vest</em>.</p>
-        <p><strong>Collapsed chaos:</strong> per-collapse seed → meadow scatter, rotation ±55°, scale 0.88–0.99, anti-bury nudge; glow only on unacknowledged badges. <strong>Expanded:</strong> <code>settlePatch</code> keyframe (stagger 42 ms × index). <code>prefers-reduced-motion</code> disables settle.</p>
-        <p><strong>Preserved:</strong> detail modal, fullscreen zoom, year chips, vest <code>data-bg</code> variants (collapsed + expanded), offline evaluation, <code>badgeAcknowledged</code> glow.</p>
+        <p>Earned patches on <code>/now</code> and <code>/profile</code>. <strong>Variant C — Vest Stack:</strong> collapsed kutte (fixed <strong>112 px</strong> tall, max-width 480 px) with chaotic overlapping <strong>48 px</strong> patches; <em>Open vest</em> expands into a 4-column grid on the user&apos;s battle-vest background with staggered <code>settlePatch</code> animation. <em>Close vest</em> reshuffles the pile.</p>
+        <p><strong>Collapsed:</strong> meadow scatter via <code>buildStackPoses()</code> — per-collapse <code>scatterSeed</code>, rotation ±55°, scale 0.88–0.99, anti-bury center distance, glow-only on unacknowledged badges, patches non-clickable, user <code>data-bg</code> on <code>.vestStack</code>. <strong>Expanded:</strong> clickable patches → detail modal + fullscreen zoom; same <code>data-bg</code> variants.</p>
+        <table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
+          <thead>
+            <tr style="border-bottom:1px solid #333; text-align:left;">
+              <th style="padding:6px 8px; color:#aaa;">Prop / state</th>
+              <th style="padding:6px 8px; color:#aaa;">Detail</th>
+            </tr>
+          </thead>
+          <tbody style="color:#888;">
+            <tr><td style="padding:6px 8px;"><code>user</code></td><td style="padding:6px 8px;">Supabase auth user — badge context built offline-first (two-phase load).</td></tr>
+            <tr><td style="padding:6px 8px;">Collapsed</td><td style="padding:6px 8px;"><code>.vestStack</code> 112 px · 48 px patches · <code>aria-hidden</code> divs · i18n <em>Open vest</em></td></tr>
+            <tr><td style="padding:6px 8px;">Expanded</td><td style="padding:6px 8px;"><code>.vestSpread.patchesGrid</code> 4 cols · 48 px · <code>settlePatch</code> stagger 42 ms · i18n <em>Close vest</em></td></tr>
+            <tr><td style="padding:6px 8px;"><code>data-bg</code></td><td style="padding:6px 8px;"><code>none</code> · <code>grid</code> · <code>steel</code> (default) · <code>indigo</code> · <code>leather</code> — from <code>patchesBackground.ts</code></td></tr>
+            <tr><td style="padding:6px 8px;">Glow</td><td style="padding:6px 8px;"><code>badgeGlow</code> on unacknowledged slugs; cleared via <code>localStorage badgeAcknowledged</code></td></tr>
+          </tbody>
+        </table>
         <div class="component-demo" style="background: #0a0a0a; padding: 24px; max-width: 360px;">
           <style>
             .ds-bd-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
             .ds-bd-kicker { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #666; }
             .ds-bd-btn { font-family: 'JetBrains Mono', monospace; font-size: 9px; padding: 4px 10px; border-radius: 999px; border: 1px solid #333; background: none; color: #888; }
-            .ds-bd-stack { position: relative; height: 108px; border-radius: 8px; background: #121820; border: 1px solid #2a2a2a; overflow: hidden; }
-            .ds-bd-patch { position: absolute; width: 44px; height: 44px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #444, #1a1a1a); border: 1px solid #333; box-shadow: 0 2px 6px rgba(0,0,0,.6); }
+            .ds-bd-stack {
+              position: relative; height: 112px; border-radius: 8px; overflow: hidden;
+              background-color: #18293f;
+              background-image:
+                radial-gradient(ellipse 130% 110% at 50% 50%, transparent 50%, rgba(0,0,0,.38) 100%),
+                repeating-linear-gradient(-52deg, rgba(255,255,255,.035) 0 2px, transparent 2px 8px);
+              border: 1px solid #0e1e30;
+              box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
+            }
+            .ds-bd-patch {
+              position: absolute; width: 48px; height: 48px; border-radius: 50%;
+              background: radial-gradient(circle at 35% 30%, #444, #1a1a1a);
+              border: 1px solid #333; box-shadow: 0 2px 6px rgba(0,0,0,.65);
+              transform: translate(-50%, -50%);
+            }
           </style>
           <div class="ds-bd-header">
-            <span class="ds-bd-kicker">PATCHES · 15</span>
+            <span class="ds-bd-kicker">PATCHES · 22</span>
             <span class="ds-bd-btn">Open vest</span>
           </div>
           <div class="ds-bd-stack">
-            <div class="ds-bd-patch" style="left: 8px; top: 12px; transform: rotate(-11deg) scale(.92); z-index: 2;"></div>
-            <div class="ds-bd-patch" style="left: 38px; top: 6px; transform: rotate(7deg) scale(.98); z-index: 5;"></div>
-            <div class="ds-bd-patch" style="left: 72px; top: 18px; transform: rotate(-4deg) scale(.9); z-index: 3;"></div>
-            <div class="ds-bd-patch" style="left: 108px; top: 8px; transform: rotate(12deg) scale(.95); z-index: 8; box-shadow: 0 0 12px rgba(255,160,40,.5);"></div>
-            <div class="ds-bd-patch" style="left: 142px; top: 22px; transform: rotate(-8deg); z-index: 4;"></div>
-            <div class="ds-bd-patch" style="left: 178px; top: 10px; transform: rotate(5deg) scale(.88); z-index: 6;"></div>
+            <div class="ds-bd-patch" style="left: 18%; top: 38%; transform: translate(-50%,-50%) rotate(-48deg) scale(.94); z-index: 2;"></div>
+            <div class="ds-bd-patch" style="left: 42%; top: 62%; transform: translate(-50%,-50%) rotate(35deg) scale(.91); z-index: 5;"></div>
+            <div class="ds-bd-patch" style="left: 68%; top: 30%; transform: translate(-50%,-50%) rotate(-55deg) scale(.97); z-index: 3;"></div>
+            <div class="ds-bd-patch" style="left: 31%; top: 78%; transform: translate(-50%,-50%) rotate(22deg) scale(.89); z-index: 4;"></div>
+            <div class="ds-bd-patch" style="left: 55%; top: 44%; transform: translate(-50%,-50%) rotate(41deg) scale(.96); z-index: 9; box-shadow: 0 0 14px rgba(255,160,40,.55);"></div>
+            <div class="ds-bd-patch" style="left: 80%; top: 58%; transform: translate(-50%,-50%) rotate(-31deg) scale(.92); z-index: 6;"></div>
+            <div class="ds-bd-patch" style="left: 12%; top: 70%; transform: translate(-50%,-50%) rotate(52deg) scale(.88); z-index: 7;"></div>
+            <div class="ds-bd-patch" style="left: 88%; top: 42%; transform: translate(-50%,-50%) rotate(-18deg) scale(.95); z-index: 8;"></div>
           </div>
+          <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:10px 0 0;">Collapsed demo — steel <code>data-bg</code>, 48 px patches, ±55° scatter, fixed 112 px height.</p>
         </div>
       </div>
 

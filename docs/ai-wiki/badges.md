@@ -31,28 +31,60 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 
 ## Patches Vest Stack (Variant C)
 
-The patches UI uses a **collapsed kutte stack** by default (fixed **112 px** height) so large collections do not dominate `/now` or `/profile`.
+The patches UI uses a **collapsed kutte stack** by default (fixed **112 px** height, max-width **480 px**) so large collections (15–22+ badges) do not dominate `/now` or `/profile`. Unified on both routes via `<BadgesDisplay user={user} />`; the deprecated `heading` prop is ignored — kicker + count render internally.
+
+### Layout constants
+
+| State | Patch size | Container | Interaction |
+|---|---|---|---|
+| **Collapsed** | 48 px (`.stackPatchImg`) | `.vestStack` — fixed 112 px, `overflow: hidden` | Non-interactive `<div>` patches (`pointer-events: none`, `aria-hidden`) |
+| **Expanded** | 48 px (`.patchImg`) | `.vestStack.vestSpread.patchesGrid` — 4-col grid, auto height | Clickable `<button>` → detail modal + fullscreen zoom |
 
 ### Collapsed (default)
 
-- **Layout:** 48 px patches scattered on a fixed-height vest (`.vestStack`); overlap increases with badge count.
-- **Chaos:** meadow scatter with per-collapse `scatterSeed`; rotation ±55°, scale 0.88–0.99; anti-bury nudge so no patch is fully hidden under another.
-- **Glow:** only unacknowledged badges animate (`badgeGlow`); no idle motion otherwise.
-- **Interaction:** patches are non-interactive; header **Open vest** expands. User `data-bg` applies to collapsed vest.
+- **Scatter:** `buildStackPoses()` places badges sequentially on a virtual slot grid (`stackGrid`) with hash jitter; `clutter` factor grows with badge count so overlap intensifies inside the fixed box.
+- **Reseed:** `scatterSeed` is random on mount and regenerated on **Close vest** — each collapse produces a new pile layout.
+- **Rotation:** ±55° (`(h % 111) - 55`) plus a tiny per-index twist; scale 0.88–0.99.
+- **Anti-bury:** if a new center would land within `minDist` of a prior center (aspect-corrected via `VEST_ASPECT`), up to 12 deterministic nudge attempts run before placement.
+- **Glow:** only unacknowledged badges animate (`badgeGlow` on `.glowing`); no idle wobble or hover motion when collapsed.
+- **Background:** user `data-bg` preference (`patchesBackground.ts`) applies to `.vestStack[data-bg=…]` — same variants as expanded (`none`, `grid`, `steel`, `indigo`, `leather`).
 
 ### Expanded
 
 - **Layout:** 4-column grid, 48 px patches, same `data-bg` battle-vest background.
-- **Animation:** `settlePatch` keyframe with stagger (`42 ms × index`).
-- **Collapse:** **Close vest** reshuffles scatter seed and returns to kutte stack; patches clickable → detail modal.
+- **Animation:** `settlePatch` keyframe with stagger (`42 ms × index` via `--settle-i`).
+- **Interaction:** tap patch → detail modal; magnifying glass → fullscreen overlay. Acknowledging a glowing badge clears glow via `localStorage['badgeAcknowledged']`.
+- **Collapse:** **Close vest** reshuffles `scatterSeed` and returns to kutte stack.
 
-### i18n keys (`Badges_*.json`)
+### Header & i18n
 
-- `patchesKicker`, `patchesSpread` (Open vest), `patchesCollapse` (Close vest)
+| Key | EN copy | Role |
+|---|---|---|
+| `patchesKicker` | PATCHES | Mono uppercase kicker |
+| `patchesSpread` | Open vest | Shown when collapsed |
+| `patchesCollapse` | Close vest | Shown when expanded |
+
+Count suffix: `· {earned.length}` inline in kicker. Toggle exposes `aria-expanded`.
+
+### Key CSS classes (`BadgesDisplay.module.css`)
+
+| Class | Purpose |
+|---|---|
+| `.patchesHeader` | Kicker + count + vest toggle row |
+| `.vestStack` | Collapsed/expanded shell; height fixed when not `.vestSpread` |
+| `.vestStackMeadow` | Absolute scatter canvas (collapsed) |
+| `.patchBtn.patchStackItem` | Collapsed patch — `position: absolute`, CSS vars `--stack-left/top/rot/scale` |
+| `.patchGridItem` | Expanded patch — `settlePatch` animation |
+| `.vestSpread` | Grid mode overrides on `.vestStack` |
 
 ### Accessibility
 
-- `aria-expanded` on vest toggle; `aria-label` per patch when expanded; collapsed patches `aria-hidden`; `prefers-reduced-motion` disables settle animation.
+- `aria-expanded` on vest toggle; `aria-label` per patch when expanded; collapsed patches `aria-hidden`.
+- `prefers-reduced-motion` disables `settlePatch` and reduces glow to static filter.
+
+### Design comparison canvas
+
+Layout variants A–D were compared in `_temp/patches-layout-variants/index.html` before shipping Variant C. Not shipped to production; kept for reference only.
 
 ---
 
@@ -87,7 +119,7 @@ If `localStorage` is unavailable (private mode, SSR), `loadPatchesBackground()` 
 
 ### Detail Modal
 
-Tapping any earned badge in the patches grid opens a detail modal via the `<Modal>` component. The modal shows:
+Tapping any earned badge **while the vest is open** opens a detail modal via the `<Modal>` component. The modal shows:
 - The badge image (136 px) inside a 145 px circular spotlight (`radial-gradient` black)
 - The badge name (display font, uppercase)
 - The badge description (muted text)
@@ -1001,12 +1033,12 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 - **src/services/badges/types.ts** — Type definitions
 - **src/services/badges/index.ts** — Barrel re-export
 - **src/__tests__/badges.test.ts** — 50+ test cases
-- **src/components/BadgesDisplay.tsx** — Patches grid, detail modal, and fullscreen zoom overlay
-- **src/components/ProfilePage.tsx** — Badge grid + godlike assign UI
+- **src/components/BadgesDisplay.tsx** — Vest-stack patches (collapsed + expanded), detail modal, fullscreen zoom
+- **src/components/ProfilePage.tsx** — Patches section + godlike assign UI
 - **src/i18n/Badges_*.json** — All 4 language translations
 - **public/badges/** — All badge PNG files
 - **docs/ai-wiki/changelog.md** — When badges were added/updated
 
 ---
 
-**Last updated:** 2026-05-24 — Phase 25 genre collapse: badge docs aligned to 13 canonical labels; fixed party-metal / gutalax / wacken-firefighters / heavysaurus slot references.
+**Last updated:** 2026-05-24 — Vest Stack (Variant C): collapsed kutte layout, meadow scatter, Open/Close vest toggle, `data-bg` on both states.

@@ -18,7 +18,7 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/components/` — Shared UI components, modals, sections
 - `src/components/PlaylistLaunchButton.tsx` — Setlist deep-link strip (Phase 22)
 - `src/components/profile/MoshSplitSection.tsx` — MoshSplit balance section (Phase 23 Part 2 — real API via Vercel proxy)
-- `src/components/BadgesDisplay.tsx` — Two-phase badge loader (IndexedDB-first + background Supabase fetch)
+- `src/components/BadgesDisplay.tsx` — Vest-stack patches UI + two-phase badge loader (IndexedDB-first + background Supabase fetch)
 - `vite.config.ts` — PWA configuration, caching strategy, and local dev proxy for MoshSplit API
 - `vercel.json` — Vercel rewrites including MoshSplit CORS proxy (`/api/moshsplit/:path*`)
 
