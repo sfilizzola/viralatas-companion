@@ -4,6 +4,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.N.0 — IDB safety net)
+
+### Added
+- `src/__tests__/db.test.ts` — 23 new tests (41 total): all 8 `*-changed` event constants; `loadAllUserPresence` / `replaceUserPresence` (scoped + full clear); offline presence / announcement / missed / duck quack queues; bulk `saveAnnouncements` + `removeAnnouncementFromCache`; metal place + live band test config load/save/clear + save events; all missed-band CRUD + `MISSED_CHANGED_EVENT`; full `wipeAllLocalData` characterization (10 cleared stores, 5 preserved: session, meta, metal_place_config, live_band_test_config, offline_duck_quacks); 15 object stores created on first open.
+
+### Changed
+- `vitest.config.ts` — per-file `db.ts` coverage thresholds raised to 95% statements/lines/functions, 55% branches.
+
+### Architectural Notes
+- Test-only stage; no production code changes. Characterization tests guard store lists, event names, and cross-store wipe before 26.N domain file splits.
+
+---
+
 ## 2026-05-24 (Phase 26.M.d — Consolidate presence side effects)
 
 ### Added

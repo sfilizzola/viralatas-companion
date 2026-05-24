@@ -287,15 +287,143 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-### Stage 26.N — Optional: `db.ts` domain modules (defer if risky)
+### Stage 26.N — Optional: `db.ts` domain modules
 
-**Scope:** Split `src/lib/db.ts` into `db/picks.ts`, `db/presence.ts`, `db/announcements.ts`, `db/meta.ts`, `db/index.ts` re-export; no schema/version change.
+**Depends on:** 26.A, 26.M complete
 
-**Gets simpler:** Navigate IDB layer by domain; easier onboarding.
+**Target:** `src/lib/db/` domain files (`events`, `connection`, `session`, `catalog`, `picks`, `presence`, `announcements`, `missed`, `config`, `duck`, `meta`); public import path stays `lib/db` via barrel re-export. **No `DB_VERSION` or schema change.**
 
-**Risk:** High | **Depth:** Deep | **Depends on:** 26.A (`db.test.ts` must exist first)
+**Risk note:** High if done in one commit. `db.ts` is ~555 lines, 15 object stores, ~49 exports, ~40 importers, one cross-store `wipeAllLocalData` transaction. Split into sub-stages below; one commit per sub-stage.
 
-**Verification:** Full test suite + manual offline pick/announcement/presence flush. **Skip if 26.A not done.**
+#### Stage 26.N.0 — IDB safety net (tests only)
+
+**Scope:** Expand `src/__tests__/db.test.ts` — missed/config/duck domains, offline queues (`offline_picks`, `offline_presence`, `offline_missed_bands`, `offline_duck_quacks`, `pending_announcements`), replace helpers, all 8 event constants, full `wipeAllLocalData` characterization (exact store list preserved).
+
+**Gets simpler:** Confidence to split `db.ts` by domain; characterization tests guard store lists, event names, and cross-store wipe before any file moves.
+
+**Risk:** Low | **Depth:** Shallow (test-only) | **Depends on:** 26.A
+
+**Verification:** `rtk npm test`; no production code changes.
+
+**Done (2026-05-24):** `src/__tests__/db.test.ts` — 41 tests (+23); all 8 event constants, presence/missed/config/duck domains, 5 offline queues, full `wipeAllLocalData` characterization (10 cleared / 5 preserved stores), connection store creation; `vitest.config.ts` thresholds tightened (95% stmts/lines/funcs, 55% branches); no production code changes.
+
+#### Stage 26.N.a — Pure constants, events, types
+
+**Scope:** New `src/lib/db/events.ts` (all 8 `*-changed` event constants), `src/lib/db/types.ts` (shared IDB row interfaces); `db.ts` re-exports unchanged public surface.
+
+**Gets simpler:** Event names and types in one place; zero behavioral change — first safe file move.
+
+**Risk:** Low | **Depth:** Shallow extract | **Depends on:** 26.N.0 recommended
+
+**Verification:** `rtk npm test` (`db.test.ts` event constant tests); no import path changes for consumers.
+
+#### Stage 26.N.b — Connection layer
+
+**Scope:** New `src/lib/db/connection.ts` — `DB_NAME`, `DB_VERSION`, `getDB()`, `upgrade()` (all 15 object store definitions), `resetDbConnectionForTests()`; `db.ts` delegates connection calls.
+
+**Gets simpler:** Schema bootstrap isolated; single place to audit IDB version and store creation.
+
+**Risk:** Medium | **Depth:** Moderate extract | **Depends on:** 26.N.a
+
+**Verification:** `rtk npm test` (`db.test.ts`, any test using `resetDbConnectionForTests`); fresh IDB open + upgrade path unchanged.
+
+#### Stage 26.N.c — Session + catalog
+
+**Scope:** New `src/lib/db/session.ts` (session CRUD), `src/lib/db/catalog.ts` (`bands`, `crew_users` stores); move verbatim helpers from `db.ts`.
+
+**Gets simpler:** Auth/session and read-mostly catalog data separated from sync queues.
+
+**Risk:** Low–medium | **Depth:** Moderate extract | **Depends on:** 26.N.b
+
+**Verification:** `rtk npm test`; login → bands cached; `/schedule` offline browse.
+
+#### Stage 26.N.d — Picks domain
+
+**Scope:** New `src/lib/db/picks.ts` — `user_picks` + `offline_picks` stores and queue helpers; re-export from `db.ts`.
+
+**Gets simpler:** Pick offline queue ops navigable without scrolling the monolith.
+
+**Risk:** Medium | **Depth:** Moderate extract | **Depends on:** 26.N.b, 26.N.a
+
+**Verification:** `rtk npm test` (`db.test.ts`, `picksRepository.test.ts`); offline pick → reconnect flush.
+
+#### Stage 26.N.e — Presence domain
+
+**Scope:** New `src/lib/db/presence.ts` — `user_presence` + `offline_presence` stores and queue helpers.
+
+**Gets simpler:** Presence IDB layer matches repository domain boundary.
+
+**Risk:** Medium | **Depth:** Moderate extract | **Depends on:** 26.N.b
+
+**Verification:** `rtk npm test` (`db.test.ts`, `presenceRepository.test.ts`); two-browser presence update ≤3s.
+
+#### Stage 26.N.f — Announcements domain
+
+**Scope:** New `src/lib/db/announcements.ts` — `announcements` + `pending_announcements` stores and queue helpers.
+
+**Gets simpler:** Mural cache and offline post queue isolated.
+
+**Risk:** Medium | **Depth:** Moderate extract | **Depends on:** 26.N.b
+
+**Verification:** `rtk npm test` (`db.test.ts`, `announcementsRepository.test.ts`); post offline → reconnect.
+
+#### Stage 26.N.g — Missed bands domain
+
+**Scope:** New `src/lib/db/missed.ts` — `user_missed_bands` + `offline_missed_bands` stores and queue helpers.
+
+**Gets simpler:** Missed-band sync queue co-located with its primary store.
+
+**Risk:** Medium | **Depth:** Moderate extract | **Depends on:** 26.N.b
+
+**Verification:** `rtk npm test` (`db.test.ts`, `missedRepository.test.ts`); mark/unmark offline flush.
+
+#### Stage 26.N.h — Admin config domain
+
+**Scope:** New `src/lib/db/config.ts` — `metal_place_config`, `live_band_test_config` stores; godlike override reads/writes.
+
+**Gets simpler:** Admin config stores grouped; `/now` config hooks unchanged at import boundary.
+
+**Risk:** Low–medium | **Depth:** Moderate extract | **Depends on:** 26.N.b, 26.N.a
+
+**Verification:** `rtk npm test`; manual Metal Place window + live band test banner toggles.
+
+#### Stage 26.N.i — Duck offline queue
+
+**Scope:** New `src/lib/db/duck.ts` — `offline_duck_quacks` queue ops only.
+
+**Gets simpler:** Smallest domain slice; duck sync path easy to locate.
+
+**Risk:** Low | **Depth:** Shallow extract | **Depends on:** 26.N.b
+
+**Verification:** `rtk npm test`; manual quack offline → reconnect.
+
+#### Stage 26.N.j — Meta + wipe (cross-store)
+
+**Scope:** New `src/lib/db/meta.ts` — cache version store + `wipeAllLocalData()` (exact store lists and transaction scope preserved verbatim).
+
+**Gets simpler:** Cross-store wipe centralized after all domain modules exist; highest-risk move last among functional splits.
+
+**Risk:** High | **Depth:** Deep extract | **Depends on:** 26.N.c–26.N.i
+
+**Verification:** `rtk npm test` (`db.test.ts` wipe characterization); manual godlike cache reset smoke.
+
+#### Stage 26.N.k — Optional: finalize barrel
+
+**Scope:** New `src/lib/db/index.ts` barrel re-export; update vitest coverage glob for `src/lib/db/**`; retire monolithic `db.ts` body (thin re-export shim or delete after import audit).
+
+**Gets simpler:** `import … from 'lib/db'` resolves to focused modules; onboarding reads domain files directly.
+
+**Risk:** Medium | **Depth:** Moderate | **Depends on:** 26.N.a–26.N.j
+
+**Verification:** `rtk npm test`; `rtk npm run build`; grep importers — no broken paths; full offline smoke (pick, announcement, presence, duck, cache reset).
+
+**Recommended 26.N execution order:**
+
+```
+26.N.0 → 26.N.a → 26.N.b → 26.N.c → 26.N.d → 26.N.e → 26.N.f → 26.N.g → 26.N.h → 26.N.i → 26.N.j → 26.N.k (optional)
+```
+
+**Skip 26.N entirely if:** optional budget exhausted, N.0/N.b/N.j cannot land without behavior change, or monolith acceptable after 26.M.
 
 ---
 
@@ -314,7 +442,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 ### Recommended execution order
 
 ```
-26.A → 26.B → 26.C → 26.E → 26.D → 26.F → 26.G → 26.H → 26.J → 26.I → 26.K → 26.L → 26.M.0 → 26.M.a → 26.M.b → 26.M.c → 26.M.d (optional) → (26.N if needed)
+26.A → 26.B → 26.C → 26.E → 26.D → 26.F → 26.G → 26.H → 26.J → 26.I → 26.K → 26.L → 26.M.0 → 26.M.a → 26.M.b → 26.M.c → 26.M.d (optional) → 26.N.0 → 26.N.a → 26.N.b → 26.N.c → 26.N.d → 26.N.e → 26.N.f → 26.N.g → 26.N.h → 26.N.i → 26.N.j → 26.N.k (optional, if needed)
 ```
 
 Close each sub-stage with wiki changelog entry; close whole phase with single commit per CLAUDE.md phase rules.

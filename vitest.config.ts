@@ -13,10 +13,10 @@ export default defineConfig({
       reporter: ['text', 'html'],
       thresholds: {
         'src/lib/db.ts': {
-          lines: 60,
-          branches: 40,
-          functions: 50,
-          statements: 60,
+          lines: 95,
+          branches: 55,
+          functions: 95,
+          statements: 95,
         },
       },
     },
