@@ -4,6 +4,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.N.g — Extract missed bands db module)
+
+### Added
+- `src/lib/db/missed.ts` — `saveMissedBand`, `removeMissedBand`, `loadMissedBands`, `loadAllMissedBands`, `replaceUserMissedBands`, offline queue ops (`enqueueOfflineMissed`, `loadOfflineMissedQueue`, `removeFromOfflineMissedQueue`) + `MISSED_CHANGED_EVENT` emit (verbatim extract).
+
+### Changed
+- `src/lib/db.ts` — imports and re-exports missed bands from `./db/missed` module (213 → 168 lines).
+
+### Architectural Notes
+- Verbatim move; zero consumer import path changes. Next: 26.N.h admin config domain.
+
+---
+
 ## 2026-05-24 (Phase 26.N.f — Extract announcements db module)
 
 ### Added

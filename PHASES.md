@@ -389,6 +389,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test` (`db.test.ts`, `missedRepository.test.ts`); mark/unmark offline flush.
 
+**Done (2026-05-24):** `src/lib/db/missed.ts` — `user_missed_bands` + `offline_missed_bands` stores, queue helpers, and `MISSED_CHANGED_EVENT` emit; `db.ts` re-exports unchanged public surface (213 → 168 lines); zero consumer import path changes.
+
 #### Stage 26.N.h — Admin config domain
 
 **Scope:** New `src/lib/db/config.ts` — `metal_place_config`, `live_band_test_config` stores; godlike override reads/writes.

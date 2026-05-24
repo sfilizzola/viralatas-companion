@@ -1,13 +1,11 @@
-import type { LiveBandTestConfig, MetalPlaceConfig, UserMissedBand } from '../types';
+import type { LiveBandTestConfig, MetalPlaceConfig } from '../types';
 import { getDB } from './db/connection';
 import {
   LIVE_BAND_TEST_CONFIG_CHANGED_EVENT,
   METAL_PLACE_CONFIG_CHANGED_EVENT,
-  MISSED_CHANGED_EVENT,
 } from './db/events';
 import type {
   OfflineDuckQuackOp,
-  OfflineMissedOp,
 } from './db/types';
 
 export {
@@ -53,6 +51,16 @@ export {
   loadOfflineAnnouncementsQueue,
   removeFromOfflineAnnouncementsQueue,
 } from './db/announcements';
+export {
+  saveMissedBand,
+  removeMissedBand,
+  loadMissedBands,
+  loadAllMissedBands,
+  replaceUserMissedBands,
+  enqueueOfflineMissed,
+  loadOfflineMissedQueue,
+  removeFromOfflineMissedQueue,
+} from './db/missed';
 
 function emitMetalPlaceConfigChanged() {
   if (typeof window !== 'undefined') {
@@ -63,12 +71,6 @@ function emitMetalPlaceConfigChanged() {
 function emitLiveBandTestConfigChanged() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(LIVE_BAND_TEST_CONFIG_CHANGED_EVENT));
-  }
-}
-
-function emitMissedChanged() {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event(MISSED_CHANGED_EVENT));
   }
 }
 
@@ -108,55 +110,6 @@ export async function saveLiveBandTestConfig(config: LiveBandTestConfig) {
 export async function clearLiveBandTestConfig() {
   const db = await getDB();
   await db.delete('live_band_test_config', 'current');
-}
-
-// --- User Missed Bands ---
-
-export async function saveMissedBand(record: UserMissedBand) {
-  const db = await getDB();
-  await db.put('user_missed_bands', record);
-  emitMissedChanged();
-}
-
-export async function removeMissedBand(userId: string, bandId: string) {
-  const db = await getDB();
-  await db.delete('user_missed_bands', [userId, bandId]);
-  emitMissedChanged();
-}
-
-export async function loadMissedBands(userId: string): Promise<UserMissedBand[]> {
-  const db = await getDB();
-  return db.getAllFromIndex('user_missed_bands', 'by_user', userId);
-}
-
-export async function loadAllMissedBands(): Promise<UserMissedBand[]> {
-  const db = await getDB();
-  return db.getAll('user_missed_bands');
-}
-
-export async function replaceUserMissedBands(records: UserMissedBand[], userId: string) {
-  const db = await getDB();
-  const tx = db.transaction('user_missed_bands', 'readwrite');
-  const existing = await tx.store.index('by_user').getAll(userId);
-  await Promise.all(existing.map((r) => tx.store.delete([r.user_id, r.band_id])));
-  await Promise.all(records.map((r) => tx.store.put(r)));
-  await tx.done;
-  emitMissedChanged();
-}
-
-export async function enqueueOfflineMissed(op: OfflineMissedOp) {
-  const db = await getDB();
-  await db.put('offline_missed_bands', op);
-}
-
-export async function loadOfflineMissedQueue(): Promise<OfflineMissedOp[]> {
-  const db = await getDB();
-  return db.getAll('offline_missed_bands');
-}
-
-export async function removeFromOfflineMissedQueue(id: string) {
-  const db = await getDB();
-  await db.delete('offline_missed_bands', id);
 }
 
 // --- Cache version invalidation ---
