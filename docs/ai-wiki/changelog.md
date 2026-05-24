@@ -4,6 +4,21 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.M.c — Extract cache and plan derivations)
+
+### Added
+- `src/hooks/useNowCache.ts` — IDB cache load (`picks`, `crewUsers`, `presence`, `latestAnnouncement`) + window event listeners for `PICKS_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, `ANNOUNCEMENTS_CHANGED_EVENT` (verbatim extract from `useNowData`); accepts `undoTimerId` so effect cleanup clears skip/undo timer on re-run/unmount.
+- `src/hooks/useNowPlans.ts` — live plan memos (`myRawPlan`, `myPlan`, `crewPlans`, `crewGroups`, `presenceValue`, `duckBandId`, MP window, live test band) (verbatim extract from `useNowData`).
+
+### Changed
+- `src/hooks/useNowData.ts` — composes `useNowCache()` and `useNowPlans()`; no behavior change (270 → 169 lines).
+- `docs/ai-wiki/architecture.md` — hooks table documents `useNowCache()` and `useNowPlans()`.
+
+### Architectural Notes
+- IDB/event wiring separated from live plan math before optional 26.M.d side-effect consolidation.
+
+---
+
 ## 2026-05-24 (Phase 26.M.b — Extract usePresenceRealtime)
 
 ### Added

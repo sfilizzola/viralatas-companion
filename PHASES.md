@@ -263,6 +263,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test` (`liveNowScenarios.test.ts`, `useNowData.test.ts`); skip/undo manual smoke.
 
+**Done (2026-05-24):** `useNowCache(undoTimerId)` — verbatim IDB cache + window event listeners (undo timer cleanup preserved in effect deps); `useNowPlans()` — plan memos + duckBandId; `useNowData` composes both (270 → 169 lines).
+
 #### Stage 26.M.d — Optional side-effect consolidation
 
 **Scope:** Move camping auto-clear + `handlePresenceChange` orchestration into `presenceRepository` helpers (e.g. `applyPresenceToggle`). Only after M.0–M.c green.

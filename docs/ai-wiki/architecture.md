@@ -445,7 +445,9 @@ INSERT into user_picks
 | `useMetalPlaceConfig()` | `MetalPlaceConfig \| null` | `METAL_PLACE_CONFIG_CHANGED_EVENT`, Realtime | useNowData |
 | `useLiveBandTestConfig()` | `LiveBandTestConfig \| null` | `LIVE_BAND_TEST_CONFIG_CHANGED_EVENT`, Realtime | useNowData |
 | `usePresenceRealtime()` | `void` | Realtime (`user_presence`), mount sync | useNowData |
-| `useNowData()` | `{ current, next }` | `useNow()`, `PICKS_CHANGED_EVENT` | RightNowPage |
+| `useNowCache(undoTimerId)` | `{ picks, crewUsers, presence, latestAnnouncement, cacheLoading }` | `PICKS_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, `ANNOUNCEMENTS_CHANGED_EVENT` | useNowData |
+| `useNowPlans({…})` | `{ myPlan, crewPlans, crewGroups, presenceValue, duckBandId, … }` | None (computed from cache + config + time) | useNowData |
+| `useNowData()` | `{ current, next }` | composes hooks above + `useNow()` | RightNowPage |
 | `useBandConflicts(bandIds)` | `Conflict[]` | None (computed) | MyPicksPage |
 | `useNow()` | `{ now, override }` | localStorage, window events | Time-based views |
 | `useOfflinePendingBandIds()` | `Set<bandId>` | `PICKS_CHANGED_EVENT` | BandCard (show pending chip) |

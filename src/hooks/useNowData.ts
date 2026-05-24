@@ -1,26 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Announcement, Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserPick, UserPresence } from '../types';
-import {
-  ANNOUNCEMENTS_CHANGED_EVENT,
-  CREW_USERS_CHANGED_EVENT,
-  PICKS_CHANGED_EVENT,
-  PRESENCE_CHANGED_EVENT,
-  loadAllUserPicks,
-  loadAllUserPresence,
-  loadCrewUsers,
-  loadLatestAnnouncement,
-} from '../lib/db';
-import {
-  derivePresenceValue,
-  findLivePlan,
-  groupCrewLivePlans,
-  mapCrewLivePlans,
-  resolveFocusUserLivePlan,
-  type CrewLiveGroup,
-  type CrewLivePlan,
-  type LivePlan,
-  type PresenceLocation,
-} from '../services/livePreview';
+import type { CrewLiveGroup, CrewLivePlan, LivePlan, PresenceLocation } from '../services/livePreview';
 import { presenceRepository } from '../repositories';
 import { usePickActions } from './usePickActions';
 import { useDuckQuack } from './useDuckQuack';
@@ -29,8 +9,9 @@ import { useBands } from './useBands';
 import { useLiveBandTestConfig } from './useLiveBandTestConfig';
 import { useMetalPlaceConfig } from './useMetalPlaceConfig';
 import { usePresenceRealtime } from './usePresenceRealtime';
+import { useNowCache } from './useNowCache';
+import { useNowPlans } from './useNowPlans';
 import { useNow } from './useNow';
-const DUCK_WINDOW_MS = 15 * 60 * 1000;
 
 export type NowData = {
   userId: string | null;
@@ -67,10 +48,6 @@ export function useNowData(): NowData {
   const userDisplayName =
     (user?.user_metadata?.['display_name'] as string | undefined) ?? user?.email ?? null;
 
-  const [picks, setPicks] = useState<UserPick[]>([]);
-  const [crewUsers, setCrewUsers] = useState<CrewUser[]>([]);
-  const [presence, setPresence] = useState<UserPresence[]>([]);
-  const [latestAnnouncement, setLatestAnnouncement] = useState<Announcement | null>(null);
   const now = useNow(30_000);
   const { bands: rawBands, loading: bandsLoading } = useBands();
   const bands = useMemo(
@@ -78,118 +55,49 @@ export function useNowData(): NowData {
     [rawBands],
   );
   const { unpickBand, pickBand } = usePickActions(userId);
-  const [cacheLoading, setCacheLoading] = useState(true);
-  const loading = bandsLoading || cacheLoading;
   const [undoState, setUndoState] = useState<{ bandId: string; bandName: string } | null>(null);
   const [undoTimerId, setUndoTimerId] = useState<ReturnType<typeof setTimeout> | null>(null);
   const metalPlaceConfig = useMetalPlaceConfig();
   const liveBandTestConfig = useLiveBandTestConfig();
   usePresenceRealtime();
 
-  const refreshFromCache = useCallback(async () => {
-    try {
-      const [cachedPicks, cachedUsers, cachedPresence, ann] = await Promise.all([
-        loadAllUserPicks(),
-        loadCrewUsers(),
-        loadAllUserPresence(),
-        loadLatestAnnouncement(),
-      ]);
-      setPicks(cachedPicks);
-      setCrewUsers(cachedUsers);
-      setPresence(cachedPresence);
-      setLatestAnnouncement(ann ?? null);
-    } finally {
-      setCacheLoading(false);
-    }
-  }, []);
+  const { picks, crewUsers, presence, latestAnnouncement, cacheLoading } =
+    useNowCache(undoTimerId);
+  const loading = bandsLoading || cacheLoading;
 
-  useEffect(() => {
-    function handleCacheChange() {
-      refreshFromCache();
-    }
-    window.queueMicrotask(handleCacheChange);
-    window.addEventListener(PICKS_CHANGED_EVENT, handleCacheChange);
-    window.addEventListener(CREW_USERS_CHANGED_EVENT, handleCacheChange);
-    window.addEventListener(PRESENCE_CHANGED_EVENT, handleCacheChange);
-    window.addEventListener(ANNOUNCEMENTS_CHANGED_EVENT, handleCacheChange);
-    return () => {
-      window.removeEventListener(PICKS_CHANGED_EVENT, handleCacheChange);
-      window.removeEventListener(CREW_USERS_CHANGED_EVENT, handleCacheChange);
-      window.removeEventListener(PRESENCE_CHANGED_EVENT, handleCacheChange);
-      window.removeEventListener(ANNOUNCEMENTS_CHANGED_EVENT, handleCacheChange);
-      if (undoTimerId) clearTimeout(undoTimerId);
-    };
-  }, [refreshFromCache, undoTimerId]);
-
-  const isMetalPlaceWindowActive = useMemo(
-    () => presenceRepository.isTimeWithinMetalPlaceWindow(metalPlaceConfig, now),
-    [metalPlaceConfig, now],
-  );
-
-  const liveTestBandId = useMemo(
-    () =>
-      liveBandTestConfig?.enabled && liveBandTestConfig.band_id
-        ? liveBandTestConfig.band_id
-        : null,
-    [liveBandTestConfig],
-  );
-
-  const liveTestBand = useMemo(
-    () => (liveTestBandId ? bands.find((b) => b.id === liveTestBandId) ?? null : null),
-    [bands, liveTestBandId],
-  );
+  const {
+    isMetalPlaceWindowActive,
+    liveTestBand,
+    myRawPlan,
+    isFriend,
+    isCamping,
+    isAtMetalPlace,
+    presenceValue,
+    myPlan,
+    crewPlans,
+    crewGroups,
+    duckBandId,
+  } = useNowPlans({
+    bands,
+    picks,
+    crewUsers,
+    presence,
+    userId,
+    userDisplayName,
+    now,
+    metalPlaceConfig,
+    liveBandTestConfig,
+  });
 
   useEffect(() => {
     if (!metalPlaceConfig || !userId) return;
     presenceRepository.validateAndAutoCheckout(metalPlaceConfig, userId).catch(() => {});
   }, [metalPlaceConfig, userId, isMetalPlaceWindowActive]);
 
-  const myRawPlan = useMemo(() => {
-    if (!userId) return { status: 'empty', band: null } satisfies LivePlan;
-    return findLivePlan(
-      bands,
-      new Set(picks.filter((pick) => pick.user_id === userId).map((pick) => pick.band_id)),
-      now,
-      liveTestBandId,
-    );
-  }, [bands, picks, userId, now, liveTestBandId]);
-
-  const myPresence = useMemo(
-    () => (userId ? presence.find((item) => item.user_id === userId) : undefined),
-    [presence, userId],
-  );
-
-  const isFriend = useMemo(
-    () => crewUsers.find((u) => u.id === userId)?.is_friend === true,
-    [crewUsers, userId],
-  );
-
-  const isCamping = myPresence?.is_camping ?? false;
-  const isAtMetalPlace = myPresence?.is_at_metal_place ?? false;
-  const presenceValue = derivePresenceValue(myPresence, myRawPlan, isMetalPlaceWindowActive);
-
-  const myPlan = useMemo(
-    () => resolveFocusUserLivePlan(myRawPlan, myPresence, isMetalPlaceWindowActive),
-    [myRawPlan, myPresence, isMetalPlaceWindowActive],
-  );
-
   useEffect(() => {
     if (!userId || !isCamping || myRawPlan.status !== 'current') return;
     presenceRepository.setCampingStatus(userId, false).catch(() => {});
   }, [userId, isCamping, myRawPlan.status]);
-
-  const crewPlans = useMemo(() => {
-    const users = [...crewUsers];
-    if (userId && !users.some((crewUser) => crewUser.id === userId)) {
-      users.push({ id: userId, display_name: userDisplayName, avatar_url: null });
-    }
-    return mapCrewLivePlans(bands, picks, users, presence, now, liveTestBandId);
-  }, [bands, picks, crewUsers, presence, userId, userDisplayName, now, liveTestBandId]);
-
-  const crewGroups = useMemo(
-    () => groupCrewLivePlans(crewPlans, { metalPlaceWindowActive: isMetalPlaceWindowActive }),
-    [crewPlans, isMetalPlaceWindowActive],
-  );
 
   const handleSkip = useCallback(async () => {
     if (!myPlan.band || !userId) return;
@@ -209,15 +117,6 @@ export function useNowData(): NowData {
     await pickBand(undoState.bandId);
     setUndoState(null);
   }, [undoState, userId, undoTimerId, pickBand]);
-
-  // Duck quack for the user's current live band (if any and not a ceremony),
-  // only during the first 15 minutes of the set.
-  const duckBandId = useMemo(() => {
-    if (myPlan.status !== 'current' || !myPlan.band) return null;
-    if (myPlan.band.category === 'ceremony') return null;
-    if (now.getTime() >= new Date(myPlan.band.start_time).getTime() + DUCK_WINDOW_MS) return null;
-    return myPlan.band.id;
-  }, [myPlan, now]);
 
   const { quack: duckQuack, cooldownUntil: duckCooldownUntil } = useDuckQuack(userId, duckBandId);
 
