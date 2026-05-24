@@ -185,9 +185,9 @@ Used for live data across 4 tables:
 | Table | Hook | Events | Purpose |
 |-------|------|--------|---------|
 | `user_picks` | `usePickCounts`, `useBandAttendees` | INSERT, DELETE | Crew pick counts |
-| `user_presence` | `useNowData` | * | Crew location status |
-| `metal_place_config` | `useNowData` | * | Festival config |
-| `live_band_test_config` | `useNowData` | * | Test mode config |
+| `user_presence` | `usePresenceRealtime` | * | Crew location status |
+| `metal_place_config` | `useMetalPlaceConfig` | * | Festival config |
+| `live_band_test_config` | `useLiveBandTestConfig` | * | Test mode config |
 
 ### Edge Functions
 

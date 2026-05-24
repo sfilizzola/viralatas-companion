@@ -4,6 +4,21 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.M.b — Extract usePresenceRealtime)
+
+### Added
+- `src/hooks/usePresenceRealtime.ts` — mount `syncCrewFromRemote()` + `user_presence` realtime channel via `subscribePostgresChanges` (verbatim extract from `useNowData`).
+
+### Changed
+- `src/hooks/useNowData.ts` — composes `usePresenceRealtime()`; no behavior change (281 → 270 lines).
+- `docs/ai-wiki/architecture.md` — hooks table documents `usePresenceRealtime()`.
+- `docs/ai-wiki/sync-engine.md` — realtime consumer table: `user_presence_live` owned by `usePresenceRealtime`.
+
+### Architectural Notes
+- Crew presence live updates isolated before 26.M.c–d extractions.
+
+---
+
 ## 2026-05-24 (Phase 26.M.a — Extract config hooks)
 
 ### Added

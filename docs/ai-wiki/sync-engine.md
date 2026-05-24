@@ -485,7 +485,7 @@ Each subscription is managed by a hook or repository and cleaned up on unmount v
 | usePickCounts | pick_counts | INSERT, DELETE on user_picks | Saves to user_picks IDB |
 | useMetalPlaceConfig | metal_place_config_live | * on metal_place_config | Saves to metal_place_config IDB |
 | useLiveBandTestConfig | live_band_test_config_live | * on live_band_test_config | Saves to live_band_test_config IDB |
-| useNowData | user_presence_live | * on user_presence | Saves to user_presence IDB |
+| usePresenceRealtime | user_presence_live | * on user_presence | Saves to user_presence IDB |
 | AnnouncementsPage | announcements_live | INSERT/UPDATE/DELETE announcements; INSERT/DELETE blocked_posters | IDB + local block-set state |
 | useDuckNotifications | duck_quacks_realtime | INSERT on duck_quacks | Dispatches `viralatas:duck-quack` event |
 | missedRepository | missed_bands | INSERT, DELETE on user_missed_bands | Saves to user_missed_bands IDB |

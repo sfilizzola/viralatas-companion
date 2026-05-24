@@ -444,6 +444,7 @@ INSERT into user_picks
 | `useBandAttendees(bandId)` | `User[]` | Realtime | BandDetailModal |
 | `useMetalPlaceConfig()` | `MetalPlaceConfig \| null` | `METAL_PLACE_CONFIG_CHANGED_EVENT`, Realtime | useNowData |
 | `useLiveBandTestConfig()` | `LiveBandTestConfig \| null` | `LIVE_BAND_TEST_CONFIG_CHANGED_EVENT`, Realtime | useNowData |
+| `usePresenceRealtime()` | `void` | Realtime (`user_presence`), mount sync | useNowData |
 | `useNowData()` | `{ current, next }` | `useNow()`, `PICKS_CHANGED_EVENT` | RightNowPage |
 | `useBandConflicts(bandIds)` | `Conflict[]` | None (computed) | MyPicksPage |
 | `useNow()` | `{ now, override }` | localStorage, window events | Time-based views |

@@ -251,6 +251,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test`; two-browser presence update ≤3s.
 
+**Done (2026-05-24):** `usePresenceRealtime()` — verbatim presence channel + mount `syncCrewFromRemote()` extract; `useNowData` composes hook (281 → 270 lines).
+
 #### Stage 26.M.c — Extract cache + plan derivations
 
 **Scope:** `refreshFromCache` + window event listeners → `useNowCache()` (or similar); plan memos → optional `useNowPlans()`. Preserve `undoTimerId` effect dependency behavior exactly.

@@ -9,7 +9,6 @@ import {
   loadAllUserPresence,
   loadCrewUsers,
   loadLatestAnnouncement,
-  saveUserPresence,
 } from '../lib/db';
 import {
   derivePresenceValue,
@@ -25,11 +24,11 @@ import {
 import { presenceRepository } from '../repositories';
 import { usePickActions } from './usePickActions';
 import { useDuckQuack } from './useDuckQuack';
-import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { useAuth } from './useAuth';
 import { useBands } from './useBands';
 import { useLiveBandTestConfig } from './useLiveBandTestConfig';
 import { useMetalPlaceConfig } from './useMetalPlaceConfig';
+import { usePresenceRealtime } from './usePresenceRealtime';
 import { useNow } from './useNow';
 const DUCK_WINDOW_MS = 15 * 60 * 1000;
 
@@ -85,6 +84,7 @@ export function useNowData(): NowData {
   const [undoTimerId, setUndoTimerId] = useState<ReturnType<typeof setTimeout> | null>(null);
   const metalPlaceConfig = useMetalPlaceConfig();
   const liveBandTestConfig = useLiveBandTestConfig();
+  usePresenceRealtime();
 
   const refreshFromCache = useCallback(async () => {
     try {
@@ -120,17 +120,6 @@ export function useNowData(): NowData {
       if (undoTimerId) clearTimeout(undoTimerId);
     };
   }, [refreshFromCache, undoTimerId]);
-
-  useEffect(() => {
-    presenceRepository.syncCrewFromRemote().catch(() => {});
-    return subscribePostgresChanges('user_presence_live', {
-      filter: { event: '*', table: 'user_presence' },
-      handler: async (payload) => {
-        const nextPresence = (payload.new ?? payload.old) as UserPresence | undefined;
-        if (nextPresence) await saveUserPresence(nextPresence);
-      },
-    });
-  }, []);
 
   const isMetalPlaceWindowActive = useMemo(
     () => presenceRepository.isTimeWithinMetalPlaceWindow(metalPlaceConfig, now),
