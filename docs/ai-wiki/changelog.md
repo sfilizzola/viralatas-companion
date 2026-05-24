@@ -4,6 +4,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.N.f — Extract announcements db module)
+
+### Added
+- `src/lib/db/announcements.ts` — `saveAnnouncements`, `saveAnnouncement`, `removeAnnouncementFromCache`, `loadAnnouncementsFromCache`, `loadLatestAnnouncement`, offline queue ops (`enqueueOfflineAnnouncement`, `loadOfflineAnnouncementsQueue`, `removeFromOfflineAnnouncementsQueue`) + `ANNOUNCEMENTS_CHANGED_EVENT` emit (verbatim extract).
+
+### Changed
+- `src/lib/db.ts` — imports and re-exports announcements from `./db/announcements` module (261 → 213 lines).
+
+### Architectural Notes
+- Verbatim move; zero consumer import path changes. Next: 26.N.g missed bands domain.
+
+---
+
 ## 2026-05-24 (Phase 26.N.e — Extract presence db module)
 
 ### Added

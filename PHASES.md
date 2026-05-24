@@ -377,6 +377,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test` (`db.test.ts`, `announcementsRepository.test.ts`); post offline → reconnect.
 
+**Done (2026-05-24):** `src/lib/db/announcements.ts` — `announcements` + `pending_announcements` stores, queue helpers, and `ANNOUNCEMENTS_CHANGED_EVENT` emit; `db.ts` re-exports unchanged public surface (261 → 213 lines); zero consumer import path changes.
+
 #### Stage 26.N.g — Missed bands domain
 
 **Scope:** New `src/lib/db/missed.ts` — `user_missed_bands` + `offline_missed_bands` stores and queue helpers.
