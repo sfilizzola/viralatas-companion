@@ -144,7 +144,14 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       ]);
       if (!active) return;
 
-      const idbCtx = buildCtx({ userPicks, allPicks, bands, allMissed, assignedBadges: [], isCurrentUserFriend: false, presence, crewUsers });
+      // Phase 1 reads special_badges from the cached auth session (user_metadata) so
+      // assigned badges are visible immediately, even offline. The Edge Function mirrors
+      // special_badges into user_metadata on every assign/revoke so the cache stays fresh.
+      const assignedBadgesFromMeta: string[] = (user.user_metadata?.special_badges as string[]) ?? [];
+      // is_friend is already in the crew_users IDB store — no network call needed for Phase 1.
+      const isCurrentUserFriendFromIdb = crewUsers.find((u) => u.id === user.id)?.is_friend === true;
+
+      const idbCtx = buildCtx({ userPicks, allPicks, bands, allMissed, assignedBadges: assignedBadgesFromMeta, isCurrentUserFriend: isCurrentUserFriendFromIdb, presence, crewUsers });
       setCtx(idbCtx);
       setLoading(false);
 
@@ -159,6 +166,21 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       const rowData = userRow.data as { special_badges?: string[]; is_friend?: boolean | null } | null;
       const assignedBadges: string[] = rowData?.special_badges ?? [];
       const isCurrentUserFriend = rowData?.is_friend === true;
+
+      // Drift detection: if DB special_badges differ from cached user_metadata, refresh
+      // the auth session in the background so the next offline visit reflects the change
+      // (covers both new assignments and revocations).
+      const metaBadges = (user.user_metadata?.special_badges as string[]) ?? [];
+      const dbSet = new Set(assignedBadges);
+      const metaSet = new Set(metaBadges);
+      const hasDrift =
+        assignedBadges.some((s) => !metaSet.has(s)) ||
+        metaBadges.some((s) => !dbSet.has(s));
+      if (hasDrift) {
+        supabase.auth.refreshSession().catch(() => {
+          // best-effort; next natural token refresh will sync user_metadata
+        });
+      }
 
       const fullCtx = buildCtx({ userPicks, allPicks, bands, allMissed, assignedBadges, isCurrentUserFriend, presence, crewUsers });
 

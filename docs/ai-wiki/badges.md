@@ -466,8 +466,14 @@ Badge has **no automatic condition**; godlike assigns it manually.
 1. Godlike user opens user's profile
 2. Clicks "Assign Badge" button in admin panel
 3. Selects badge slug from dropdown (only `assigned` condition badges appear)
-4. Badge slug added to `users.special_badges[]` array
-5. Badge appears in user's profile immediately
+4. Badge slug added to `users.special_badges[]` array via the `assign-badge` Edge Function
+5. Edge Function mirrors the updated array into `auth.users.raw_user_meta_data.special_badges` via `supabase.auth.admin.updateUserById` — applies for both assign AND revoke
+6. Supabase JS client updates its localStorage session cache on the next `refreshSession()` call
+7. Badge appears in user's profile immediately; on next offline visit, badge is readable from `user.user_metadata.special_badges`
+
+**Offline behavior**: `BadgesDisplay` reads `assignedBadges` from `user.user_metadata?.special_badges ?? []`. Because the Supabase JS client caches the session (including `user_metadata`) in localStorage, assigned badges load without any network call. If the user is offline, the last-known-good `user_metadata` is used.
+
+**Drift detection**: `BadgesDisplay` compares the DB `special_badges` value (from `crew_users` IDB store) against `user_metadata.special_badges` on render. If they differ, it fires a background `supabase.auth.refreshSession()` to sync the localStorage session cache for the next offline visit — no UI block, no spinner.
 
 **Example badges**:
 - `mosh-pit` (hit the floor and came back)
@@ -685,7 +691,7 @@ type BadgeContext = {
   wacken_years: number[];              // [2022, 2025, 2026]
   country: string | null;              // 'br', 'de', etc.
   wacken_arrival_day: string | null;   // 'wed-jul29'
-  assignedBadges: string[];            // From users.special_badges
+  assignedBadges: string[];            // From user_metadata.special_badges (localStorage cache); DB value used for drift detection
   bandsPicked: number;                 // Total picks
   maxAttendanceInPicks: number;         // Highest crew count in any pick
   pickedBands: BadgeBand[];            // Full band details
@@ -877,7 +883,17 @@ const arrivalDayOrder = ['sun-jul26', 'mon-jul27', 'tue-jul28', 'wed-jul29', 'th
 
 **Comparison**: `'wed-jul29'` arrives BEFORE `'thu-plus'` but AFTER `'tue-jul28'`.
 
-### 6. Assigned Badge Slug vs. Condition
+### 6. Assigned Badges Work Offline
+
+`BadgesDisplay` reads `assignedBadges` from `user.user_metadata?.special_badges ?? []` — not from a live Supabase call. Because the Supabase JS client persists `user_metadata` in localStorage, assigned badges are always available offline after the first online visit.
+
+The Edge Function (`assign-badge`) mirrors `users.special_badges` into `auth.users.raw_user_meta_data` for both assign and revoke operations. This ensures the cached session stays in sync after an online assignment.
+
+**Drift scenario**: If an assignment is made while the target user is offline, their `user_metadata` cache will be stale. On next online visit, `BadgesDisplay` detects the mismatch and calls `supabase.auth.refreshSession()` in the background, silently updating the cache for future offline visits.
+
+**`isCurrentUserFriend` also reads offline**: `BadgesDisplay` determines whether the profile owner is a friend of the current user from the already-loaded `crewUsers` IDB store (`crewUsers.find(u => u.id === user.id)?.is_friend === true`). No extra network call is made.
+
+### 7. Assigned Badge Slug vs. Condition
 
 Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
@@ -955,4 +971,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-22 — added godlike-assigned badge `code-wizards` with app-pack cross-link; inventory 53 → 54. No new predicates; no engine/types changes.
+**Last updated:** 2026-05-24 — `assigned` badge offline-first fix: Edge Function now mirrors `users.special_badges` into `auth.users.raw_user_meta_data`; `BadgesDisplay` reads from `user_metadata` cache (offline-safe); `isCurrentUserFriend` reads from IDB; drift detection fires background `refreshSession()`.

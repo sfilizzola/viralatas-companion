@@ -97,6 +97,12 @@ Deno.serve(async (req) => {
     });
   }
 
+  // Mirror to auth user_metadata so the target user's cached session reflects
+  // the change and assigned badges are visible offline (Phase 1 reads user_metadata).
+  await supabase.auth.admin.updateUserById(targetUserId, {
+    user_metadata: { special_badges: updated },
+  });
+
   return new Response(JSON.stringify({ special_badges: updated }), {
     status: 200,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },

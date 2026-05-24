@@ -1042,3 +1042,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - Member classification in the sheet is based on `plan.nextBand` not presence: all members in a group are already "here now" by definition (CrewGroupsSection only puts a member in a group when that is their current plan). The "Here now" / "Heading next" split reflects whether they have a next band queued, not whether they've arrived.
 - `groupAccentColor()` helper centralises the colour mapping: band → `stageColor(stage)`, metal_place → `rgba(217, 119, 6, 1)`, camping → `var(--signal-ok)`, lost → `var(--signal-lost)`. Sheet CSS variables are injected as inline style, keeping the CSS module free of card-type conditionals.
 - `activeGroup` state at page level mirrors the pattern used by `BandDetailModal` on `PopularPage` — consistent architecture, clean z-index (sheet is `position: fixed`, covers BottomNav).
+
+---
+
+## 2026-05-24
+
+### Changed
+- **`assign-badge` Edge Function** (`supabase/functions/assign-badge/index.ts`) — after writing `users.special_badges`, the function now also calls `supabase.auth.admin.updateUserById(targetUserId, { user_metadata: { special_badges: updated } })` to mirror the array into `auth.users.raw_user_meta_data.special_badges`. Applies for both assign AND revoke actions.
+- **`BadgesDisplay.tsx`** — `assignedBadges` is now read from `user.user_metadata?.special_badges ?? []` instead of a hardcoded `[]`, making assigned badges available offline from the Supabase JS client's localStorage session cache.
+- **`BadgesDisplay.tsx`** — `isCurrentUserFriend` is now resolved from the already-loaded `crewUsers` IDB store (`crewUsers.find(u => u.id === user.id)?.is_friend === true`) instead of a hardcoded `false`; no extra network call.
+- **`BadgesDisplay.tsx`** — drift detection added: if DB `special_badges` (from IDB `crew_users` store) differs from `user_metadata.special_badges`, fires a background `supabase.auth.refreshSession()` to sync the localStorage session cache for the next offline visit.
+- **`docs/ai-wiki/badges.md`** — updated `assigned` condition "How it works" steps to document the metadata mirroring; added "Offline behavior" and "Drift detection" notes to the `assigned` section; added new Edge Case #6 ("Assigned Badges Work Offline") covering the full offline guarantee, drift scenario, and `isCurrentUserFriend` IDB read; updated `BadgeContext.assignedBadges` comment; updated footer.
+
+### Architectural Notes
+- `assign-badge` Edge Function is now the single writer for both `users.special_badges` (the DB source of truth) and `auth.users.raw_user_meta_data.special_badges` (the offline-accessible cache mirror). The two must stay in sync through this function only.
+- The drift detection in `BadgesDisplay` is a safety net, not the primary sync path. Primary sync happens immediately in the Edge Function. Drift is only expected when a badge was assigned while the recipient was offline.
+- `isCurrentUserFriend` reading from IDB (`crew_users` store) is consistent with the architecture rule: UI reads come from IndexedDB, not directly from Supabase.
