@@ -15,7 +15,7 @@ function authUser(metadata: Record<string, unknown> = {}): AuthUser {
     user_metadata: metadata,
     aud: '',
     created_at: '',
-  } as unknown as AuthUser;
+  };
 }
 
 function band(partial: Partial<BadgeBand> & Pick<BadgeBand, 'id'>): BadgeBand {
@@ -50,6 +50,12 @@ function badge(condition: BadgeConfig['condition']): BadgeConfig {
     descriptionKey: 'test',
     condition,
   };
+}
+
+function findBadge(slug: string): BadgeConfig {
+  const found = BADGES.find((b) => b.slug === slug);
+  if (!found) throw new Error(`Badge not found in BADGES[]: ${slug}`);
+  return found;
 }
 
 describe('buildBadgeContext', () => {
@@ -936,12 +942,6 @@ describe('persist flag — generic achievement recording', () => {
 });
 
 describe('registry — 2026 image-driven badges', () => {
-  const findBadge = (slug: string): BadgeConfig => {
-    const found = BADGES.find((b) => b.slug === slug);
-    if (!found) throw new Error(`Badge not found in BADGES[]: ${slug}`);
-    return found;
-  };
-
   describe('wacken-firefighters (band_seen_named: Wacken Firefighters)', () => {
     const cfg = findBadge('wacken-firefighters');
     const now = new Date('2026-08-01T12:00:00.000Z');
@@ -1102,12 +1102,6 @@ describe('registry — 2026 image-driven badges', () => {
 // stage_diversity_min — distinct stage count across seenBands
 // ─────────────────────────────────────────────────────────────────────────────
 describe('stage_diversity_min predicate', () => {
-  const findBadge = (slug: string): BadgeConfig => {
-    const found = BADGES.find((b) => b.slug === slug);
-    if (!found) throw new Error(`Badge not found in BADGES[]: ${slug}`);
-    return found;
-  };
-
   const now = new Date('2026-08-02T23:00:00.000Z');
   const endPast = '2026-07-29T11:00:00.000Z';
 

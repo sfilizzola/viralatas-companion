@@ -20,11 +20,9 @@ import {
 import { Modal } from '../ui';
 import styles from './BadgesDisplay.module.css';
 
-type BadgesDisplayProps = {
+type BadgesDisplayProps = Readonly<{
   user: AuthUser;
-  /** @deprecated Kicker is rendered internally */
-  heading?: string;
-};
+}>;
 
 function yearSuffix(year: number): string {
   return String(year).slice(-2);
@@ -43,8 +41,8 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
       const next = (event as CustomEvent<PatchesBackground>).detail;
       if (next) setBg(next);
     }
-    window.addEventListener(PATCHES_BG_CHANGED_EVENT, onBgChange);
-    return () => window.removeEventListener(PATCHES_BG_CHANGED_EVENT, onBgChange);
+    globalThis.addEventListener(PATCHES_BG_CHANGED_EVENT, onBgChange);
+    return () => globalThis.removeEventListener(PATCHES_BG_CHANGED_EVENT, onBgChange);
   }, []);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
