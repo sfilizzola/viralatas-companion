@@ -27,29 +27,70 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 - Genre rename mapping applied in `lineup.md` + `bands.ts` (`TBD_GENRE` → `Metal`; 31 `Metal Battle *` → `Metal Battle`)
 - `seed:bands:sync` dry-run → `--apply` for prod
 - Badge threshold review for `death-metal` / `power-metal` only (`party-metal` untouched)
+- **Genre filter UX** — replace native `<select>` with single-select pills (see Design below)
 - **Genre guide UI** — inform vira-latas what was collapsed (see below)
 - Wiki: canonical genre list + full old→new mapping in `domain-model.md` / `lineup.md`; changelog
 
-### Genre guide UI (inform users what collapsed)
+### Design (huashu-design review — locked for implementation)
 
-Vira-latas used to ~95 filter labels; now ~13. UI must explain the mapping without spamming.
+Vira-latas built mental models around ~95 filter labels; after collapse, cards show canonical names only. The guide answers: *"Where did the label I used to filter by go?"* — reference content, not onboarding.
 
-**Recommended design:**
-- **Location:** Schedule filter drawer ([`BandFilters.tsx`](src/components/BandFilters.tsx)), below genre `<select>` — link or chevron row: *"What do these genres mean?"* / i18n equivalent
-- **Interaction:** Expands inline accordion **or** small modal listing each **canonical genre** with merged subgenres as secondary text, e.g.:
-  - **Death Metal** — includes Melodic Death Metal, Grindcore, Goregrind, Deathcore, …
-  - **Party Metal** — Alestorm, Airbourne (unchanged)
-- **Data:** Static map in `src/services/genreGuide.ts` (or similar) — single source aligned with collapse spec; not computed from live band list
-- **i18n:** All 4 locales (`SchedulePage_{br,en,es,de}.json`)
-- **Design System:** Document accordion/modal pattern in [`public/Design System.html`](public/Design System.html)
-- **Out of scope:** Per-band "formerly tagged as …" on cards; push notification; one-time blocking banner
+#### Genre filter — pills, not `<select>`
+
+At 13 options, reuse existing [`BandFilters.module.css`](src/components/BandFilters.module.css) `.genrePill` / `.pillRow` (same pattern as stage pills and the "Upcoming bands" toggle). Single-select with `aria-pressed`; clear in section head unchanged.
+
+- Sort: alphabetical; optionally pin `Metal Battle` last (festival bucket)
+- Do **not** keep the native `<select>` — it wastes the mobile usability win
+
+#### Genre guide — inline `Collapsible`, not nested modal
+
+- **Location:** Filter drawer ([`BandFilters.tsx`](src/components/BandFilters.tsx)), directly below genre pill row, above "Upcoming bands"
+- **Trigger:** Text link + chevron row — *"What do these genres mean?"* / i18n (`genreGuideTrigger`); closed by default
+- **Component:** Reuse [`Collapsible`](src/ui/Collapsible.tsx) — **not** a second bottom sheet or `Modal` on top of the filter drawer (z-index stacking feels broken on mobile)
+- **Content:** One flat scrollable list of 13 rows — **not** 13 nested accordions. If guide + drawer exceeds `75dvh`, cap guide list at `max-height: ~28dvh; overflow-y: auto` so Apply stays reachable
+
+**Row anatomy (two lines, no icons, no per-genre colors — stage colors own color semantics):**
+
+```
+DEATH METAL                          ← font-mono, 11px, uppercase, --text
+inclui Melodic Death Metal, Grindcore… ← font-mono, 10–11px, --text-faint; line-clamp 2 on mobile
+```
+
+**Exception rows (footnote copy, not just subgenre lists):**
+
+| Canonical | Secondary line |
+|-----------|----------------|
+| Party Metal | Alestorm, Airbourne — unchanged |
+| Metal Battle | Wacken Metal Battle competition bands |
+| Metal | Catch-all for uncategorized / TBD tags |
+
+**Visual tokens:** guide trigger = mono 10px uppercase `--text-muted` → hover `--accent-hover`; chevron = existing `Icon name="chevron"`; collapsible wrapper = border-top divider only (no full `.wrap` card inside drawer)
+
+**Anti-slop (explicit don'ts):** no "95 → 13" stat banner; no emoji per genre; no 13-color genre palette; no decorative metal icons
+
+#### Data & i18n
+
+- **Data:** Static map in `src/services/genreGuide.ts` — single source aligned with collapse spec; not computed from live band list; works offline
+- **i18n:** All 4 locales (`SchedulePage_{br,en,es,de}.json`). Translate trigger, intro, `"includes"` prefix, exception footnotes. **Do not translate** absorbed subgenre names (proper nouns: Grindcore, Goregrind, …)
+- **Suggested keys:** `genreGuideTrigger`, `genreGuideIntro`, `genreGuideIncludes`, `genreGuidePartyMetalNote`, `genreGuideMetalBattleNote`, `genreGuideMetalNote`
+
+#### Design System
+
+Document in [`public/Design System.html`](public/Design System.html): genre filter pills (replacing select demo), `GenreGuideCollapsible` trigger + expanded states, row anatomy, Party Metal / Metal Battle exceptions, i18n key names. Reference Profile `Collapsible` usage as precedent.
+
+#### Out of scope
+
+Per-band "formerly tagged as …" on cards; push notification; one-time blocking banner; search inside guide; stale-filter toast (optional future: *"Genre filter reset — Melodic Death Metal is now under Death Metal"*)
 
 **Acceptance criteria:**
 - [ ] Distinct genre strings in seed ≤ 13
-- [ ] Schedule genre filter dropdown ≤ 13 options
+- [ ] Schedule genre filter uses **pills** (not native `<select>`); ≤ 13 options
 - [ ] `party-metal` badge unchanged; Alestorm + Airbourne remain `Party Metal`
 - [ ] Zero pick loss after `seed:bands:sync --apply`
-- [ ] Genre guide reachable from schedule filters; shows all 13 canonical labels and what each absorbed
+- [ ] Genre guide reachable in ≤1 tap from open filter drawer (inline collapsible)
+- [ ] Guide shows all 13 canonical labels and what each absorbed; Party Metal exception copy visible
+- [ ] Guide usable at 375px width with Apply button still reachable
+- [ ] Pattern documented in Design System
 - [ ] `lineup.md` + `bands.ts` in sync with live DB
 - [ ] Build + tests green; wiki + changelog updated
 
