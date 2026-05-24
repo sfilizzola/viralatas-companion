@@ -392,3 +392,36 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - The flag graduation path (when `playlist_testing` is removed) requires only deleting the flag column, the role-check logic inside the component, and the admin toggle — the component itself stays permanently.
 
 ---
+
+### Phase 23 — MoshSplit Balance Section
+**Status:** ✅ Complete
+
+**Goal:** Add a self-contained collapsible `MoshSplitSection` component to the Profile page showing the user's net balance from **MoshSplit** (`split.viralatas.org`) — the festival finance app used by the vira-latas at Wacken. Shipped in two parts: Part 1 (mocked UI for approval), Part 2 (real API connection).
+
+**Deliverables:**
+- `src/components/profile/MoshSplitSection.tsx` — self-contained component accepting only `userEmail: string`; fetches `POST /v1/balances/external-summary` via same-origin proxy; five render states: `loading` (spinner in trigger), `not_found` (returns null), `settled` (balance = 0, teal "Quitado" chip), `active` (nonzero balance, red chip if owes / teal if owed), `error` (orange `!` chip + warning message, CTA still visible)
+- `src/components/profile/MoshSplitSection.module.css` — collapsible card styles using existing design-system tokens only (`--bg-elevated`, `--border`, `--signal-ok`, `--accent`, `--font-display`, `--font-mono`, `--s-*`, `--r-*`); no new custom properties
+- `src/pages/ProfilePage.tsx` — `<MoshSplitSection userEmail={user.email ?? ''} />` inserted after `<ConflictSection>`, before `<EditProfileForm>`
+- `vercel.json` — `/api/moshsplit/:path*` → `https://split.viralatas.org/:path*` rewrite added before SPA catch-all; solves CORS (browser never contacts `split.viralatas.org` directly)
+- `vite.config.ts` — `server.proxy` mirrors the Vercel rewrite for local development
+- `README.md` — `VITE_MOSHSPLIT_TOKEN` documented in Environment Setup section
+- `public/Design System.html` — `MoshSplitSection` documented in the profile components section
+- `docs/ai-wiki/flows/moshsplit.md` — new wiki page covering component states, API contract, proxy architecture, and data flow
+- `docs/ai-wiki/architecture.md` — App Pack section extended with MoshSplit integration
+- **Hotfixes shipped during phase:** fix horizontal scroll on iOS mobile (`SchedulePage.module.css`), fix offline gap for godlike-assigned badges (`BadgesDisplay.tsx` two-phase loading with skeleton), hide `PlaylistLaunchButton` once the festival starts
+
+**Acceptance criteria (all met):**
+- [x] Real balance loaded from `POST /v1/balances/external-summary` using user email + `VITE_MOSHSPLIT_TOKEN`
+- [x] `404` response → `not_found` state (component invisible)
+- [x] Network / `4xx` error → error state (warning message visible, CTA still available)
+- [x] Amounts displayed in EUR converted from cents (`total_balance_cents / 100`)
+- [x] CTA "Abrir MoshSplit →" opens `https://split.viralatas.org` in new tab
+- [x] `VITE_MOSHSPLIT_TOKEN` documented in README env var section
+- [x] Build passes, no linter errors; all 416 tests green
+
+**Architectural notes:**
+- The component talks to MoshSplit exclusively through a same-origin Vercel proxy (`/api/moshsplit/*`), mirrored by a Vite dev proxy. This keeps the API token server-side and avoids CORS entirely without a dedicated Edge Function.
+- `MoshSplitSection` is deliberately NOT offline-first: balance data is financial and time-sensitive; showing stale cached amounts would be misleading. If offline, the component stays in the `loading` state (spinner) and shows no balance — same as a network error, but without the error message since the user is simply offline.
+- `BadgesDisplay` was refactored to two-phase loading during this phase: Phase 1 reads from IndexedDB immediately (fast, offline-safe); Phase 2 fetches `special_badges`/`is_friend` from Supabase in the background with a skeleton pulse animation.
+
+---
