@@ -4,6 +4,17 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Release v1.2.0)
+
+### Changed
+- **`src/version.ts`** — `1.2.0` (minor release on `main`).
+- **`CLAUDE.md`** — version counter reset to `0` for the `v1.2.x` line.
+
+### Architectural Notes
+- **v1.2.0** bundles Phase 26 (complexity reduction: hooks, `src/lib/db/` split, sync extract), lost-badge counting fix (`computeCrewLocationCounts`, `lost-together` threshold 15), wiki/CLAUDE agent navigation refresh, and 502 tests green.
+
+---
+
 ## 2026-05-24 (CLAUDE.md agent navigation refresh)
 
 ### Changed

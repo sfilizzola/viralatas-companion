@@ -336,13 +336,13 @@ Only when **both the build and all tests are green** may you proceed with the co
 
 ## Automatic versioning (main branch only)
 
-**Current version:** `9`
+**Current version:** `0`
 
 **Rule:** When a commit is pushed to the `main` branch:
 1. Increment the version number by 1
-2. Only Tag the commit with the version string `v[major].[minor].[version]` (e.g., `v1.1.1`, `v1.1.2`) if there is a change in the minor AND major versions, do not tag versions.
-3. Update this `Current version:` line in CLAUDE.md with the new number, also update versions.ts with the new version.
-4. The prefix `v1.1` is hardcoded and never changes; only the patch number increments
+2. Only Tag the commit with the version string `v[major].[minor].[version]` (e.g., `v1.2.0`, `v1.2.1`) if there is a change in the minor AND major versions; patch-only releases on `main` do not receive a tag.
+3. Update this `Current version:` line in CLAUDE.md with the new number, also update `src/version.ts` with the new version.
+4. The prefix `v1.2` is hardcoded and never changes; only the patch number increments
 
 **Important:** Only the `main` branch receives tags. Dev branch commits are never tagged. This versioning scheme tracks patch releases only; major/minor version increments follow different rules outside this scope.
 
