@@ -4,6 +4,20 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.H — Realtime subscription helper)
+
+### Added
+- `src/lib/realtimeSync.ts` — `subscribePostgresChanges(channelName, subscriptions)` unified Realtime channel setup + `removeChannel` cleanup.
+- `src/__tests__/realtimeSync.test.ts` — channel creation, multi-handler registration, schema default, unsubscribe (4 cases).
+
+### Changed
+- `usePickCounts`, `useNowData` (3 channels), `AnnouncementsPage`, `useDuckNotifications`, `missedRepository.subscribeToRealtime` — use `subscribePostgresChanges` instead of copy-pasted `supabase.channel()` blocks.
+
+### Architectural Notes
+- Pure extract; offline-first unchanged — handlers still write IndexedDB (which emits window events). One unsubscribe pattern across all Realtime subscriptions.
+
+---
+
 ## 2026-05-24 (Phase 26.G — App sync orchestration extract)
 
 ### Added

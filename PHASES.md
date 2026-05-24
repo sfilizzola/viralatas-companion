@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E, 26.F, 26.G complete)
+**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E, 26.F, 26.G, 26.H complete)
 
 **Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
 
@@ -127,7 +127,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-### Stage 26.H — Realtime → IDB subscription helper
+### Stage 26.H — Realtime → IDB subscription helper ✅
 
 **Scope:** New `src/lib/realtimeSync.ts` (or per-table helpers in repositories): `subscribePostgresChanges(table, handler)`; refactor `usePickCounts.ts`, `useNowData.ts` (3 channels), `AnnouncementsPage.tsx`, `useDuckNotifications.ts`, `missedRepository.subscribeToRealtime`.
 
@@ -136,6 +136,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Risk:** Medium | **Depth:** Moderate | **Depends on:** 26.A, 26.G
 
 **Verification:** `rtk npm test`; two-browser pick count update ≤3s; `/now` presence update; announcement insert.
+
+**Done (2026-05-24):** `subscribePostgresChanges(channelName, subscriptions)` in `src/lib/realtimeSync.ts`; six call sites refactored; 4 unit tests; behavior unchanged (write IDB + emit events).
 
 ---
 

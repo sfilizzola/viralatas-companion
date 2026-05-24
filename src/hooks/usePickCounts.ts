@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
 import {
   PICKS_CHANGED_EVENT,
   loadAllUserPicks,
   removeUserPick,
   saveUserPick,
 } from '../lib/db';
+import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { picksRepository } from '../repositories';
 import type { UserPick } from '../types';
 
@@ -37,30 +37,27 @@ export function usePickCounts(): Record<string, number> {
 
     window.addEventListener(PICKS_CHANGED_EVENT, handleLocalChange);
 
-    const channel = supabase
-      .channel('pick_counts')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'user_picks' },
-        async (payload) => {
+    const unsubscribeRealtime = subscribePostgresChanges('pick_counts', [
+      {
+        filter: { event: 'INSERT', table: 'user_picks' },
+        handler: async (payload) => {
           const pick = payload.new as UserPick;
           await saveUserPick(pick);
         },
-      )
-      .on(
-        'postgres_changes',
-        { event: 'DELETE', schema: 'public', table: 'user_picks' },
-        async (payload) => {
+      },
+      {
+        filter: { event: 'DELETE', table: 'user_picks' },
+        handler: async (payload) => {
           const pick = payload.old as UserPick;
           await removeUserPick(pick.user_id, pick.band_id);
         },
-      )
-      .subscribe();
+      },
+    ]);
 
     return () => {
       active = false;
       window.removeEventListener(PICKS_CHANGED_EVENT, handleLocalChange);
-      supabase.removeChannel(channel);
+      unsubscribeRealtime();
     };
   }, []);
 

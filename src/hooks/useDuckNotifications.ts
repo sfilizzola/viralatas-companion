@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { subscribePostgresChanges } from '../lib/realtimeSync';
 
 export const DUCK_QUACK_EVENT = 'viralatas:duck-quack';
 
@@ -21,27 +21,19 @@ export function useDuckNotifications(
   useEffect(() => {
     if (!userId) return;
 
-    const channel = supabase
-      .channel('duck_quacks_realtime')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'duck_quacks' },
-        (payload) => {
-          const row = payload.new as { user_id: string; band_id: string };
-          if (row.user_id === userId) return;
-          if (!pickedBandIds.has(row.band_id)) return;
+    return subscribePostgresChanges('duck_quacks_realtime', {
+      filter: { event: 'INSERT', table: 'duck_quacks' },
+      handler: (payload) => {
+        const row = payload.new as { user_id: string; band_id: string };
+        if (row.user_id === userId) return;
+        if (!pickedBandIds.has(row.band_id)) return;
 
-          window.dispatchEvent(
-            new CustomEvent<DuckQuackEventDetail>(DUCK_QUACK_EVENT, {
-              detail: { bandId: row.band_id },
-            }),
-          );
-        },
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
+        window.dispatchEvent(
+          new CustomEvent<DuckQuackEventDetail>(DUCK_QUACK_EVENT, {
+            detail: { bandId: row.band_id },
+          }),
+        );
+      },
+    });
   }, [userId, pickedBandIds]);
 }

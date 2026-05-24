@@ -10,6 +10,7 @@ import {
 } from '../lib/db';
 import { announcementsRepository } from '../repositories';
 import { supabase } from '../lib/supabase';
+import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { loadUsefulLinks } from '../services/usefulLinks';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n } from '../lib/i18n';
@@ -170,41 +171,35 @@ export default function AnnouncementsPage() {
       setBlockedUserIds(new Set(blocked.map(b => b.user_id)));
     });
 
-    const channel = supabase
-      .channel('announcements_live')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'announcements' },
-        async (payload) => {
+    const unsubscribeRealtime = subscribePostgresChanges('announcements_live', [
+      {
+        filter: { event: 'INSERT', table: 'announcements' },
+        handler: async (payload) => {
           await saveAnnouncement(payload.new as Announcement);
         },
-      )
-      .on(
-        'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'announcements' },
-        async (payload) => {
+      },
+      {
+        filter: { event: 'UPDATE', table: 'announcements' },
+        handler: async (payload) => {
           await saveAnnouncement(payload.new as Announcement);
         },
-      )
-      .on(
-        'postgres_changes',
-        { event: 'DELETE', schema: 'public', table: 'announcements' },
-        async (payload) => {
-          await removeAnnouncementFromCache(payload.old.id);
+      },
+      {
+        filter: { event: 'DELETE', table: 'announcements' },
+        handler: async (payload) => {
+          await removeAnnouncementFromCache(payload.old.id as string);
         },
-      )
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'blocked_posters' },
-        async (payload) => {
+      },
+      {
+        filter: { event: 'INSERT', table: 'blocked_posters' },
+        handler: async (payload) => {
           const blocked = payload.new as { user_id: string };
           setBlockedUserIds(prev => new Set([...prev, blocked.user_id]));
         },
-      )
-      .on(
-        'postgres_changes',
-        { event: 'DELETE', schema: 'public', table: 'blocked_posters' },
-        async (payload) => {
+      },
+      {
+        filter: { event: 'DELETE', table: 'blocked_posters' },
+        handler: async (payload) => {
           const unblocked = payload.old as { user_id: string };
           setBlockedUserIds(prev => {
             const next = new Set(prev);
@@ -212,11 +207,11 @@ export default function AnnouncementsPage() {
             return next;
           });
         },
-      )
-      .subscribe();
+      },
+    ]);
 
     return () => {
-      supabase.removeChannel(channel);
+      unsubscribeRealtime();
     };
   }, []);
 

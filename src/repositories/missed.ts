@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import { subscribePostgresChanges } from '../lib/realtimeSync';
 import {
   saveMissedBand,
   removeMissedBand,
@@ -88,30 +89,23 @@ async function sync(userId: string): Promise<void> {
 }
 
 function subscribeToRealtime(): () => void {
-  const channel = supabase
-    .channel('missed_bands')
-    .on(
-      'postgres_changes',
-      { event: 'INSERT', schema: 'public', table: 'user_missed_bands' },
-      async (payload) => {
+  return subscribePostgresChanges('missed_bands', [
+    {
+      filter: { event: 'INSERT', table: 'user_missed_bands' },
+      handler: async (payload) => {
         await saveMissedBand(payload.new as UserMissedBand);
       },
-    )
-    .on(
-      'postgres_changes',
-      { event: 'DELETE', schema: 'public', table: 'user_missed_bands' },
-      async (payload) => {
+    },
+    {
+      filter: { event: 'DELETE', table: 'user_missed_bands' },
+      handler: async (payload) => {
         const old = payload.old as Partial<UserMissedBand>;
         if (old.user_id && old.band_id) {
           await removeMissedBand(old.user_id, old.band_id);
         }
       },
-    )
-    .subscribe();
-
-  return () => {
-    supabase.removeChannel(channel);
-  };
+    },
+  ]);
 }
 
 export const missedRepository = {

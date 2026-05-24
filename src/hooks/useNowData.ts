@@ -32,7 +32,7 @@ import { presenceRepository } from '../repositories';
 import { usePickActions } from './usePickActions';
 import { useDuckQuack } from './useDuckQuack';
 import { syncLiveBandTestConfig } from '../services/liveBandTest';
-import { supabase } from '../lib/supabase';
+import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { useAuth } from './useAuth';
 import { useBands } from './useBands';
 import { useNow } from './useNow';
@@ -128,18 +128,13 @@ export function useNowData(): NowData {
 
   useEffect(() => {
     presenceRepository.syncCrewFromRemote().catch(() => {});
-    const channel = supabase
-      .channel('user_presence_live')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'user_presence' },
-        async (payload) => {
-          const nextPresence = (payload.new ?? payload.old) as UserPresence | undefined;
-          if (nextPresence) await saveUserPresence(nextPresence);
-        },
-      )
-      .subscribe();
-    return () => { supabase.removeChannel(channel); };
+    return subscribePostgresChanges('user_presence_live', {
+      filter: { event: '*', table: 'user_presence' },
+      handler: async (payload) => {
+        const nextPresence = (payload.new ?? payload.old) as UserPresence | undefined;
+        if (nextPresence) await saveUserPresence(nextPresence);
+      },
+    });
   }, []);
 
   useEffect(() => {
@@ -153,20 +148,16 @@ export function useNowData(): NowData {
     function handleConfigChange() { loadMetalPlaceConfigFromDB(); }
     window.addEventListener(METAL_PLACE_CONFIG_CHANGED_EVENT, handleConfigChange);
 
-    const channel = supabase
-      .channel('metal_place_config_live')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'metal_place_config' },
-        async (payload) => {
-          const next = (payload.new ?? payload.old) as MetalPlaceConfig | undefined;
-          if (next) await saveMetalPlaceConfig(next);
-        },
-      )
-      .subscribe();
+    const unsubscribeRealtime = subscribePostgresChanges('metal_place_config_live', {
+      filter: { event: '*', table: 'metal_place_config' },
+      handler: async (payload) => {
+        const next = (payload.new ?? payload.old) as MetalPlaceConfig | undefined;
+        if (next) await saveMetalPlaceConfig(next);
+      },
+    });
     return () => {
       window.removeEventListener(METAL_PLACE_CONFIG_CHANGED_EVENT, handleConfigChange);
-      supabase.removeChannel(channel);
+      unsubscribeRealtime();
     };
   }, []);
 
@@ -186,20 +177,16 @@ export function useNowData(): NowData {
     function handleConfigChange() { loadFromDB(); }
     window.addEventListener(LIVE_BAND_TEST_CONFIG_CHANGED_EVENT, handleConfigChange);
 
-    const channel = supabase
-      .channel('live_band_test_config_live')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'live_band_test_config' },
-        async (payload) => {
-          const next = (payload.new ?? payload.old) as LiveBandTestConfig | undefined;
-          if (next) await saveLiveBandTestConfig(next);
-        },
-      )
-      .subscribe();
+    const unsubscribeRealtime = subscribePostgresChanges('live_band_test_config_live', {
+      filter: { event: '*', table: 'live_band_test_config' },
+      handler: async (payload) => {
+        const next = (payload.new ?? payload.old) as LiveBandTestConfig | undefined;
+        if (next) await saveLiveBandTestConfig(next);
+      },
+    });
     return () => {
       window.removeEventListener(LIVE_BAND_TEST_CONFIG_CHANGED_EVENT, handleConfigChange);
-      supabase.removeChannel(channel);
+      unsubscribeRealtime();
     };
   }, []);
 

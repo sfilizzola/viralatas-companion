@@ -214,7 +214,7 @@ window.addEventListener('viralatas:picks-changed', () => {
 |---------|-------|
 | **Offline Store** | `src/lib/db.ts`, `src/__tests__/` |
 | **Sync Engine** | `src/repositories/picks.ts`, `src/repositories/announcements.ts`, `src/lib/sync.ts` |
-| **Realtime** | `src/hooks/usePickCounts.ts`, `src/hooks/useBandAttendees.ts` |
+| **Realtime** | `src/lib/realtimeSync.ts`, `src/hooks/usePickCounts.ts`, `src/hooks/useBandAttendees.ts` |
 | **Auth** | `src/lib/supabase.ts`, `src/hooks/useAuth.ts`, `src/pages/LoginPage.tsx` |
 | **Time System** | `src/hooks/useNow.ts`, `src/services/time.ts`, `src/services/bandTime.ts` |
 | **App Shell** | `src/App.tsx` (route setup), `src/components/BottomNav.tsx`, `src/components/PrivateRoute.tsx` |
@@ -279,14 +279,16 @@ if (error) await queuePick(pick, 'add'); // Fallback to queue
 
 ### Pattern: Realtime Auto-Sync
 ```typescript
-// In usePickCounts.ts
-supabase.channel('pick_counts')
-  .on('postgres_changes', { event: 'INSERT', table: 'user_picks' },
-    async (payload) => {
-      await saveUserPick(payload.new);  // IndexedDB
+// In usePickCounts.ts — via src/lib/realtimeSync.ts
+return subscribePostgresChanges('pick_counts', [
+  {
+    filter: { event: 'INSERT', table: 'user_picks' },
+    handler: async (payload) => {
+      await saveUserPick(payload.new as UserPick);  // IndexedDB
       // components listening to PICKS_CHANGED_EVENT re-render
-    })
-  .subscribe();
+    },
+  },
+]);
 ```
 
 ### Pattern: Queue Deduplication

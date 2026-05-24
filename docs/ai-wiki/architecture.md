@@ -11,6 +11,7 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/App.tsx` — App shell, route setup, providers
 - `src/components/sync/` — Sync orchestration (`CacheVersionCheck`, `BandSync`, `PickSync`, `AnnouncementSync`, `DuckSync`, `PushSetup`, `DuckNotificationsListener`)
 - `src/lib/db.ts` — IndexedDB abstraction and event emitters
+- `src/lib/realtimeSync.ts` — Unified Supabase Realtime `postgres_changes` subscription helper
 - `src/lib/supabase.ts` — Supabase client + custom auth storage
 - `src/lib/sync.ts` — Band sync (minimal; most sync logic in repositories)
 - `src/repositories/` — Data access layer (picks, announcements, users, presence, missed, bands)
@@ -149,16 +150,19 @@ export function usePickCounts(): Record<string, number> {
     });
 
     // 4. Subscribe to Realtime
-    const channel = supabase.channel('pick_counts')
-      .on('postgres_changes', { event: 'INSERT', table: 'user_picks' }, 
-        (payload) => saveUserPick(payload.new))
-      .subscribe();
-
-    return () => {
-      // Clean up
-      window.removeEventListener(PICKS_CHANGED_EVENT, handleLocalChange);
-      supabase.removeChannel(channel);
-    };
+    return subscribePostgresChanges('pick_counts', [
+      {
+        filter: { event: 'INSERT', table: 'user_picks' },
+        handler: async (payload) => saveUserPick(payload.new as UserPick),
+      },
+      {
+        filter: { event: 'DELETE', table: 'user_picks' },
+        handler: async (payload) => {
+          const pick = payload.old as UserPick;
+          await removeUserPick(pick.user_id, pick.band_id);
+        },
+      },
+    ]);
   }, []);
 
   return counts;

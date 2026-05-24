@@ -478,23 +478,29 @@ export const bandsRepository = {
 
 ## Realtime Subscriptions
 
-Each subscription is managed by a hook and cleaned up on unmount.
+Each subscription is managed by a hook or repository and cleaned up on unmount via `subscribePostgresChanges` (`src/lib/realtimeSync.ts`).
 
-| Hook | Channel | Events | Stores |
+| Consumer | Channel | Events | Action |
 |------|---------|--------|--------|
 | usePickCounts | pick_counts | INSERT, DELETE on user_picks | Saves to user_picks IDB |
-| useBandAttendees | band_XXXX | INSERT, DELETE on user_picks | Filters and caches |
-| usePresence | presence | INSERT, UPDATE on user_presence | Saves to user_presence IDB |
-| AnnouncementSync | announcements | INSERT, DELETE on announcements | Saves to announcements IDB |
+| useNowData | user_presence_live | * on user_presence | Saves to user_presence IDB |
+| useNowData | metal_place_config_live | * on metal_place_config | Saves to metal_place_config IDB |
+| useNowData | live_band_test_config_live | * on live_band_test_config | Saves to live_band_test_config IDB |
+| AnnouncementsPage | announcements_live | INSERT/UPDATE/DELETE announcements; INSERT/DELETE blocked_posters | IDB + local block-set state |
+| useDuckNotifications | duck_quacks_realtime | INSERT on duck_quacks | Dispatches `viralatas:duck-quack` event |
+| missedRepository | missed_bands | INSERT, DELETE on user_missed_bands | Saves to user_missed_bands IDB |
 
 **Subscription lifecycle**:
 ```typescript
-useEffect(() => {
-  const channel = supabase.channel('pick_counts')
-    .on('postgres_changes', {...}, handler)
-    .subscribe();
+import { subscribePostgresChanges } from '../lib/realtimeSync';
 
-  return () => supabase.removeChannel(channel);  // Clean up
+useEffect(() => {
+  return subscribePostgresChanges('pick_counts', [
+    {
+      filter: { event: 'INSERT', table: 'user_picks' },
+      handler: async (payload) => saveUserPick(payload.new as UserPick),
+    },
+  ]);
 }, []);
 ```
 
