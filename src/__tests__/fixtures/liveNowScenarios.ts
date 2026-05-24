@@ -2,7 +2,6 @@ import { expect } from 'vitest';
 import type { Band, CrewUser, MetalPlaceConfig, UserPick, UserPresence } from '../../types';
 import type { CrewGroupKind, LivePlanStatus, PresenceLocation } from '../../services/livePreview';
 import {
-  applyPresenceToLivePlan,
   derivePresenceValue,
   findLivePlan,
   findUserCrewGroup,

@@ -185,7 +185,6 @@ describe('derivePresenceValue', () => {
 });
 
 describe('groupCrewLivePlans', () => {
-  const NOW = new Date('2026-07-29T20:00:00.000Z');
   const liveA = band('a', '2026-07-29T18:00:00Z', '2026-07-29T21:00:00Z', { name: 'A' });
   const liveB = band('b', '2026-07-29T18:30:00Z', '2026-07-29T21:30:00Z', { name: 'B' });
 
