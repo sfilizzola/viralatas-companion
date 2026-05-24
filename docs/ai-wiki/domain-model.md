@@ -87,9 +87,17 @@ type Band = {
   start_time: string;          // ISO 8601, e.g., "2026-07-29T18:30:00+02:00"
   end_time: string;            // ISO 8601
   image_url: string | null;    // Thumbnail from wacken.com
-  genre: string | null;        // "Metal", "Punk", "Folk Metal", etc.
+  genre: string | null;        // One of 13 canonical labels (Phase 25 collapse)
 };
 ```
+
+**Canonical genres (13)** — after Phase 25 collapse, every band carries one of:
+
+`Black Metal` · `Death Metal` · `Doom Metal` · `Folk Metal` · `Hard Rock` · `Heavy Metal` · `Metal` · `Metal Battle` · `Metalcore` · `Party Metal` · `Power Metal` · `Punk` · `Thrash Metal`
+
+Full old→new mapping: `src/services/genreGuide.ts` (`GENRE_COLLAPSE_MAP`) and `docs/superpowers/specs/2026-05-24-genre-collapse-design.md`.
+
+**Party Metal** is locked to Alestorm + Airbourne only (badge condition unchanged).
 
 **Invariants:**
 - Each band appears once per stage-time (unique constraint)

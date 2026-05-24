@@ -12,6 +12,8 @@
 
 **Summary:** 155 bands CONFIRMED · 31 `TDB MTB` Metal Battle placeholders · 12 TBD · 199 total · 1 ceremony (Farewell & Announcements, HAR13)
 
+**Genres:** 13 canonical labels after Phase 25 collapse (`Metal`, `Heavy Metal`, `Black Metal`, … — see [domain-model.md](domain-model.md#band) and `src/services/genreGuide.ts`). Unknown/TBD tags in this file seed as `Metal`.
+
 ---
 
 ## Stable Identity (`slot_id`)
@@ -72,63 +74,63 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 ### Faster Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
+| ------ | Metal | ------ | ------------- | ----------- |
 | Lovebites | Heavy Metal | FAS1 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/d/csm_lovebites_26b_38ca926080.jpg |
-| The Butcher Sisters | TBD | FAS2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/a/csm_the_butcher_sisters26_63acf7d891.jpg |
-| Electric Bassboy | TBD | FAS3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/3/csm_electric_bassboy26_c1af9b52ad.jpg |
-| Hämatom | Industrial Metal | FAS4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/e/csm_haematom_26_a104ede3d5.jpg |
+| The Butcher Sisters | Metal | FAS2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/a/csm_the_butcher_sisters26_63acf7d891.jpg |
+| Electric Bassboy | Metal | FAS3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/3/csm_electric_bassboy26_c1af9b52ad.jpg |
+| Hämatom | Metal | FAS4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/e/csm_haematom_26_a104ede3d5.jpg |
 
 ### Louder Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Broken By The Scream | Visual Kei Metal | LOU1 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/5/csm_Broken_By_The_Scream-WOA26_8ad83f8245.jpg |
-| Visions of Atlantis | Symphonic Metal | LOU2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/6/csm_visions_of_atlantis_26_2bfe817394.jpg |
-| Thundermother | Rock | LOU3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/a/csm_Thundermother-Band-2023_d61771d790.jpg |
-| The Hardkiss | Rock | LOU4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/8/csm_The_Hardkiss-WOA26_2db7165b54.jpg |
-| The Gathering | Gothic Metal | LOU5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/2/csm_The_Gathering-WOA26_57ded7843d.jpg |
-| Lacuna Coil | Gothic Metal | LOU6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/3/csm_lacuna_coil_26_289f52868d.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Broken By The Scream | Metal | LOU1 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/5/csm_Broken_By_The_Scream-WOA26_8ad83f8245.jpg |
+| Visions of Atlantis | Power Metal | LOU2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/6/csm_visions_of_atlantis_26_2bfe817394.jpg |
+| Thundermother | Hard Rock | LOU3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/a/csm_Thundermother-Band-2023_d61771d790.jpg |
+| The Hardkiss | Hard Rock | LOU4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/8/csm_The_Hardkiss-WOA26_2db7165b54.jpg |
+| The Gathering | Doom Metal | LOU5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/2/csm_The_Gathering-WOA26_57ded7843d.jpg |
+| Lacuna Coil | Doom Metal | LOU6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/3/csm_lacuna_coil_26_289f52868d.jpg |
 
 ### W.E.T. Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| TDB MTB | Metal Battle Hungary | WET1 | TDB MTB | PLACEHOLDER |
-| Speak in Whispers | Metal Battle Cyprus | WET2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/9/csm_speak_in_whispers_26_157b14e684.jpg |
-| TDB MTB | Metal Battle Greece | WET3 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Sweden | WET4 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Austria | WET5 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle France | WET6 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Luxembourg | WET7 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Belgium | WET8 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Mexico | WET9 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Latvia | WET10 | TDB MTB | PLACEHOLDER |
-| Velvet Rush | AOR | WET11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/c/csm_velvet_rush_26_79ee43e0e7.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| TDB MTB | Metal Battle | WET1 | TDB MTB | PLACEHOLDER |
+| Speak in Whispers | Metal Battle | WET2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/9/csm_speak_in_whispers_26_157b14e684.jpg |
+| TDB MTB | Metal Battle | WET3 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | WET4 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | WET5 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | WET6 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | WET7 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | WET8 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | WET9 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | WET10 | TDB MTB | PLACEHOLDER |
+| Velvet Rush | Hard Rock | WET11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/c/csm_velvet_rush_26_79ee43e0e7.jpg |
 | Rose Tattoo | Hard Rock | WET12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/5/csm_rose_tattoo26_a5747c907d.jpg |
 
 ### Headbangers Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| TDB MTB | Metal Battle USA | HBA1 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Canada | HBA2 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Sub Saharan Africa | HBA3 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Ireland | HBA4 | TDB MTB | PLACEHOLDER |
-| Expellow | TBD | HBA5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/b/csm_expellow_26b_f274263240.jpg |
-| TDB MTB | Metal Battle Lithuania | HBA6 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Italy | HBA7 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Finland | HBA8 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Norway | HBA9 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Iceland | HBA10 | TDB MTB | PLACEHOLDER |
-| Kadavar | Stoner Rock | HBA11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/9/csm_kadavar_26b_5241b42bda.jpg |
-| Mambo Kurt | TBD | HBA12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/4/csm_mambo_kurt_25_d25410db45.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| TDB MTB | Metal Battle | HBA1 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | HBA2 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | HBA3 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | HBA4 | TDB MTB | PLACEHOLDER |
+| Expellow | Metal | HBA5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/b/csm_expellow_26b_f274263240.jpg |
+| TDB MTB | Metal Battle | HBA6 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | HBA7 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | HBA8 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | HBA9 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | HBA10 | TDB MTB | PLACEHOLDER |
+| Kadavar | Doom Metal | HBA11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/9/csm_kadavar_26b_5241b42bda.jpg |
+| Mambo Kurt | Metal | HBA12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/4/csm_mambo_kurt_25_d25410db45.jpg |
 
 ### Wasteland Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Diabolisches Werk | TBD | WAS1 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/3/csm_diabolisches_werk_26_584e2240f9.jpg |
-| Battlecreek | TBD | WAS2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/e/csm_Battlecreek-WOA26_ebdf45051d.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Diabolisches Werk | Metal | WAS1 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/3/csm_diabolisches_werk_26_584e2240f9.jpg |
+| Battlecreek | Metal | WAS2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/e/csm_Battlecreek-WOA26_ebdf45051d.jpg |
 | Poison The Preacher | Metal | WAS3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/c/csm_poison_the_preacher_26_719f682a4a.jpg |
 | Phantom | Heavy Metal | WAS4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/7/csm_phantom_26_2946b95d36.jpg |
 | Crypt Sermon | Doom Metal | WAS5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/4/csm_crypt_sermon_26_25a80f0eed.jpg |
@@ -138,23 +140,23 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 ### Wackinger Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Wacken Firefighters | TBD | WAK1 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/6/csm_wacken_firefighters_25_5f6d39317e.jpg |
-| Alien Rockin Explosion | Rock | WAK2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/4/csm_alien_rockin_explosion_26_dba5a44bfe.jpg |
-| 5th Avenue | TBD | WAK3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/f/csm_5th_Avenue25_9d44c97386.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Wacken Firefighters | Metal | WAK1 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/6/csm_wacken_firefighters_25_5f6d39317e.jpg |
+| Alien Rockin Explosion | Hard Rock | WAK2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/4/csm_alien_rockin_explosion_26_dba5a44bfe.jpg |
+| 5th Avenue | Metal | WAK3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/f/csm_5th_Avenue25_9d44c97386.jpg |
 | Ricky Warwick | Hard Rock | WAK4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/d/csm_ricky_warwick26c_9f35eea5b5.jpg |
-| Vanir | Viking Metal | WAK5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/f/csm_vanir_26_4989af5ab2.jpg |
-| Dirty Shirt | Crossover Metal | WAK6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/d/csm_dirty_Shirt_26_d6b1aa60da.jpg |
-| Unzucht | Industrial / Gothic | WAK7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/2/csm_unzucht_26_5662cb7925.jpg |
+| Vanir | Black Metal | WAK5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/f/csm_vanir_26_4989af5ab2.jpg |
+| Dirty Shirt | Thrash Metal | WAK6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/d/csm_dirty_Shirt_26_d6b1aa60da.jpg |
+| Unzucht | Metal | WAK7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/2/csm_unzucht_26_5662cb7925.jpg |
 
 ### Welcome to the Jungle Stage
 
 > Welcome to the Jungle has not been published in the official running order yet — slots and bands here are TBD.
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| TBD | TBD | JUN1 | TBD | PLACEHOLDER |
-| TBD | TBD | JUN2 | TBD | PLACEHOLDER |
+| ------ | Metal | ------ | ------------- | ----------- |
+| TBD | Metal | JUN1 | TBD | PLACEHOLDER |
+| TBD | Metal | JUN2 | TBD | PLACEHOLDER |
 
 ---
 
@@ -165,83 +167,83 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 ### Harder Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Uli Jon Roth | Rock | HAR1 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/b/csm_uli_jon_roth26_db0812a7ce.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Uli Jon Roth | Hard Rock | HAR1 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/b/csm_uli_jon_roth26_db0812a7ce.jpg |
 | Europe | Hard Rock | HAR2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/3/csm_Europe-WOA26_9d76063492.jpg |
 | Def Leppard | Hard Rock | HAR3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/4/csm_Def_Leppard-WOA26_27e5f4ed42.jpg |
 
 ### Faster Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Skyline | TBD | FAS5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/5/csm_skyline_2024_a76c70015c.jpg |
-| Yngwie Malmsteen | Neoclassical Metal | FAS6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/0/csm_yngwie_malmsteen_26_451945c4f5.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Skyline | Metal | FAS5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/5/csm_skyline_2024_a76c70015c.jpg |
+| Yngwie Malmsteen | Heavy Metal | FAS6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/0/csm_yngwie_malmsteen_26_451945c4f5.jpg |
 | Savatage | Heavy Metal | FAS7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/9/csm_Savatage-WOA26_6be2e38515.jpg |
 
 ### Louder Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Alien Ant Farm | Alternative Rock | LOU7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/b/csm_alien_ant_farm_26_f4695d8f52.jpg |
-| H-Blockx | Rap Metal | LOU8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/7/csm_H_Blockx-WOA26_c10c9dda61.jpg |
-| Therapy? | Alternative Rock | LOU9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/5/csm_therapy26_acbd2ac94b.jpg |
-| Life of Agony | Alternative Metal | LOU10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/4/csm_life_of_agony26_68ef27b061.jpg |
-| P.O.D. | Nu Metal | LOU11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/0/csm_POD_26_52d8ce1512.jpg |
-| Turbonegro | Punk Rock | LOU12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/b/csm_turbonegro26_2118d824cd.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Alien Ant Farm | Hard Rock | LOU7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/b/csm_alien_ant_farm_26_f4695d8f52.jpg |
+| H-Blockx | Metal | LOU8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/7/csm_H_Blockx-WOA26_c10c9dda61.jpg |
+| Therapy? | Hard Rock | LOU9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/5/csm_therapy26_acbd2ac94b.jpg |
+| Life of Agony | Metal | LOU10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/4/csm_life_of_agony26_68ef27b061.jpg |
+| P.O.D. | Metal | LOU11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/0/csm_POD_26_52d8ce1512.jpg |
+| Turbonegro | Punk | LOU12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/b/csm_turbonegro26_2118d824cd.jpg |
 
 ### W.E.T. Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| TDB MTB | Metal Battle Balkan Regions | WET13 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Malta | WET14 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Bulgaria | WET15 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Philippines | WET16 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Japan | WET17 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Spain | WET18 | TDB MTB | PLACEHOLDER |
+| ------ | Metal | ------ | ------------- | ----------- |
+| TDB MTB | Metal Battle | WET13 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | WET14 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | WET15 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | WET16 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | WET17 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | WET18 | TDB MTB | PLACEHOLDER |
 | Craft | Black Metal | WET19 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/d/csm_Craft_cropped_size_-_photo_by_Soile_Siirtola_fabe03b40f.jpg |
 | Spectral Wound | Black Metal | WET20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/e/csm_spectral_wound26_3263ad4710.jpg |
-| Misery Index | Death Metal / Grindcore | WET21 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/a/csm_Misery_Index-WOA26_477d278139.jpg |
+| Misery Index | Death Metal | WET21 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/a/csm_Misery_Index-WOA26_477d278139.jpg |
 | Misþyrming & Nergal | Black Metal | WET22 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/c/csm_Sventevith-Logo-2_da655748b4.jpg |
 
 ### Headbangers Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| TDB MTB | Metal Battle Netherlands | HBA13 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Czech Republic | HBA14 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Chile | HBA15 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle India | HBA16 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle El Salvador | HBA17 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle Switzerland | HBA18 | TDB MTB | PLACEHOLDER |
+| ------ | Metal | ------ | ------------- | ----------- |
+| TDB MTB | Metal Battle | HBA13 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | HBA14 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | HBA15 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | HBA16 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | HBA17 | TDB MTB | PLACEHOLDER |
+| TDB MTB | Metal Battle | HBA18 | TDB MTB | PLACEHOLDER |
 | Firespawn | Death Metal | HBA19 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/3/csm_Firespawn-WOA26_b9d52bcc7e.jpg |
 | Blood Red Throne | Death Metal | HBA20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/a/csm_blood_red_throne26_98867522b5.jpg |
-| Anaal Nathrakh | Black Metal / Grindcore | HBA21 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/6/csm_AnaalNathrakh1_1706ff6610.jpg |
-| Cowgirls From Hell | TBD | HBA22 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/0/csm_cowgirls_from_hell_26_30a60185cc.jpg |
+| Anaal Nathrakh | Black Metal | HBA21 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/6/csm_AnaalNathrakh1_1706ff6610.jpg |
+| Cowgirls From Hell | Metal | HBA22 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/0/csm_cowgirls_from_hell_26_30a60185cc.jpg |
 
 ### Wasteland Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Saviourself | TBD | WAS8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/5/csm_saviourself_26_2359155f97.jpg |
-| Black Tish | TBD | WAS9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/6/csm_black_tish_26_9887b0d604.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Saviourself | Metal | WAS8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/5/csm_saviourself_26_2359155f97.jpg |
+| Black Tish | Metal | WAS9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/6/csm_black_tish_26_9887b0d604.jpg |
 | Brunhilde | Folk Metal | WAS10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/4/csm_brunhilde_26_489882e4fb.jpg |
-| 9mm Headshot | TBD | WAS11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/c/csm_9mm_26_b14cffe6c2.jpg |
-| Wytch Hazel | Traditional Heavy Metal | WAS12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/5/csm_Wytch_Hazel-WOA26_3a3c5566d4.jpg |
-| Temple of the Absurd | TBD | WAS13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/a/csm_temple_of_the_absurd_26_ad20ecb9ce.jpg |
-| Evil Jared & Krogi | TBD | WAS14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/5/csm_evil_jared_krogi26_9d4bb77d9d.jpg |
-| Year of the Goat | Occult Rock | WAS15 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/e/csm_year_of_the_goat_26_f271ba4dd9.jpg |
+| 9mm Headshot | Metal | WAS11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/c/csm_9mm_26_b14cffe6c2.jpg |
+| Wytch Hazel | Heavy Metal | WAS12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/5/csm_Wytch_Hazel-WOA26_3a3c5566d4.jpg |
+| Temple of the Absurd | Metal | WAS13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/a/csm_temple_of_the_absurd_26_ad20ecb9ce.jpg |
+| Evil Jared & Krogi | Metal | WAS14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/5/csm_evil_jared_krogi26_9d4bb77d9d.jpg |
+| Year of the Goat | Doom Metal | WAS15 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/e/csm_year_of_the_goat_26_f271ba4dd9.jpg |
 
 ### Wackinger Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Wüstenberg | TBD | WAK8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/1/csm_wuestenberg_26_7a5a7ede3d.jpg |
-| Katerfahrt | Rock | WAK9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/0/csm_Katerfahrt-WOA26_4213c9f3a0.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Wüstenberg | Metal | WAK8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/1/csm_wuestenberg_26_7a5a7ede3d.jpg |
+| Katerfahrt | Hard Rock | WAK9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/0/csm_Katerfahrt-WOA26_4213c9f3a0.jpg |
 | Vogelfrey | Folk Metal | WAK10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/3/csm_vogelfrey_26_b_0c6f4b5859.jpg |
 | Sagenbringer | Folk Metal | WAK11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/2/csm_sagenbringer_26_b57d26c84d.jpg |
 | Storm Seeker | Folk Metal | WAK12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/9/csm_stormseeker26_ffac69751b.jpg |
-| Kupfergold | TBD | WAK13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/c/csm_Kupfergold-WOA26_1d73350ab6.jpg |
+| Kupfergold | Metal | WAK13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/c/csm_Kupfergold-WOA26_1d73350ab6.jpg |
 | Manntra | Folk Metal | WAK14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/3/csm_manntra_26_a22fae1fff.jpg |
 
 ### Welcome to the Jungle Stage
@@ -249,9 +251,9 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 > Welcome to the Jungle has not been published in the official running order yet — slots and bands here are TBD.
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| TBD | TBD | JUN3 | TBD | PLACEHOLDER |
-| TBD | TBD | JUN4 | TBD | PLACEHOLDER |
+| ------ | Metal | ------ | ------------- | ----------- |
+| TBD | Metal | JUN3 | TBD | PLACEHOLDER |
+| TBD | Metal | JUN4 | TBD | PLACEHOLDER |
 
 ---
 
@@ -262,69 +264,69 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 ### Harder Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Vreid | TBD | HAR4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/0/csm_vreid_26_f92e6e9af1.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Vreid | Metal | HAR4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/0/csm_vreid_26_f92e6e9af1.jpg |
 | Danko Jones | Hard Rock | HAR5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/e/csm_danko_jones_26_3405a63446.jpg |
 | Saxon | Heavy Metal | HAR6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/6/csm_saxon_26_0097ea04d2.jpg |
 | Judas Priest | Heavy Metal | HAR7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/d/csm_judas_priest26_47424c35d1.jpg |
-| Sepultura | Groove Metal | HAR8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/1/csm_Sepultura-WOA26_f6b8328d6d.jpg |
+| Sepultura | Metal | HAR8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/1/csm_Sepultura-WOA26_f6b8328d6d.jpg |
 
 ### Faster Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Gutalax | Goregrind | FAS8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/4/csm_Gutalax-WOA26_6c3c4625c6.jpg |
-| Paradise Lost | Gothic Metal | FAS9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/a/csm_oaradise_lost_26_339356239c.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Gutalax | Death Metal | FAS8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/4/csm_Gutalax-WOA26_6c3c4625c6.jpg |
+| Paradise Lost | Doom Metal | FAS9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/a/csm_oaradise_lost_26_339356239c.jpg |
 | Black Label Society | Heavy Metal | FAS10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/4/csm_Blacl_Label_Society_26_315019e5cb.jpg |
-| In Flames | Melodic Death Metal | FAS11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/6/csm_In-Flames-WOA26_9e6947d658.jpg |
-| Running Wild | Speed Metal | FAS12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/f/csm_Running_Wild-WOA26_5c9b78de18.jpg |
+| In Flames | Death Metal | FAS11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/6/csm_In-Flames-WOA26_9e6947d658.jpg |
+| Running Wild | Heavy Metal | FAS12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/f/csm_Running_Wild-WOA26_5c9b78de18.jpg |
 
 ### Louder Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Mr. Hurley und die Pulveraffen | Pirate Metal | LOU13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/0/csm_mr_hurley_und_die_pulveraffen_26_39b0d12506.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Mr. Hurley und die Pulveraffen | Folk Metal | LOU13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/0/csm_mr_hurley_und_die_pulveraffen_26_39b0d12506.jpg |
 | Future Palace | Metalcore | LOU14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/6/csm_Future_Palace-WOA26_03d8bb4d08.jpg |
 | Mantar | Doom Metal | LOU15 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/1/csm_Mantar-WOA26_41ea1e294a.jpg |
 | Paleface Swiss | Metal | LOU16 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/2/csm_Paleface_Swiss-WOA26_9755b4556f.jpg |
 | Hatebreed | Metalcore | LOU17 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/6/csm_hatebreed_26_1a7dea75de.jpg |
-| Blood Fire Death | Black Metal (Bathory tribute) | LOU18 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/d/csm_Blood_Fire_Death-WOA26_c420b03929.jpg |
+| Blood Fire Death | Black Metal | LOU18 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/d/csm_Blood_Fire_Death-WOA26_c420b03929.jpg |
 | Emperor | Black Metal | LOU19 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/2/csm_Emperor-WOA26_d4f869c941.jpg |
-| Subway to Sally | Medieval Rock | LOU20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/3/csm_subway_to_sally_26_c89a7c04fa.jpg |
+| Subway to Sally | Hard Rock | LOU20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/3/csm_subway_to_sally_26_c89a7c04fa.jpg |
 
 ### W.E.T. Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| TDB MTB | Metal Battle Award Ceremony | WET23 | TDB MTB | PLACEHOLDER |
+| ------ | Metal | ------ | ------------- | ----------- |
+| TDB MTB | Metal Battle | WET23 | TDB MTB | PLACEHOLDER |
 | Employed to Serve | Metalcore | WET24 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/a/csm_employed_to_serve26_631874c4dd.jpg |
-| Deafheaven | Blackgaze | WET25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/0/csm_deafheaven_26_4d801d532f.jpg |
-| The Haunted | Melodic Death Metal | WET26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/3/csm_The_Haunted-WOA26_849d3b2a7e.jpg |
-| Animals as Leaders | Progressive Metal | WET27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/b/csm_animals_as_leaders26_0a9b3dfbf5.jpg |
-| Crematory | Gothic / Industrial Metal | WET28 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/c/csm_crematory_26_8ae2e22d82.jpg |
-| Skynd | Dark Electronic | WET29 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/3/csm_skynd26_fdaccaa45e.jpg |
+| Deafheaven | Black Metal | WET25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/0/csm_deafheaven_26_4d801d532f.jpg |
+| The Haunted | Death Metal | WET26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/3/csm_The_Haunted-WOA26_849d3b2a7e.jpg |
+| Animals as Leaders | Metal | WET27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/b/csm_animals_as_leaders26_0a9b3dfbf5.jpg |
+| Crematory | Doom Metal | WET28 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/c/csm_crematory_26_8ae2e22d82.jpg |
+| Skynd | Metal | WET29 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/3/csm_skynd26_fdaccaa45e.jpg |
 
 ### Headbangers Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
+| ------ | Metal | ------ | ------------- | ----------- |
 | Ten56. | Metalcore | HBA23 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/b/csm_Ten56-WOA26_515bdac59e.jpg |
 | Grand Magus | Heavy Metal | HBA24 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/a/csm_Grand_Magus-WOA26_00bbab917e.jpg |
 | Any Given Day | Metalcore | HBA25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/f/csm_Any_given_Day-WOA26_45b0bb14e2.jpg |
-| Pig Destroyer | Grindcore | HBA26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/9/csm_Pig_Destroyer-WOA26_111d076650.jpg |
-| Bear McCreary | Orchestral / Film Music | HBA27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/e/csm_bear_mccreary_26b_802dfd47bf.jpg |
+| Pig Destroyer | Death Metal | HBA26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/9/csm_Pig_Destroyer-WOA26_111d076650.jpg |
+| Bear McCreary | Metal | HBA27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/e/csm_bear_mccreary_26b_802dfd47bf.jpg |
 | Bleed from Within | Metalcore | HBA28 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/6/csm_bleed_from_within_26_c38f26c402.jpg |
-| Alcest | Post-Black Metal | HBA29 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/2/csm_alcest_26_ca67b9d832.jpg |
+| Alcest | Black Metal | HBA29 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/2/csm_alcest_26_ca67b9d832.jpg |
 
 ### Wasteland Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
+| ------ | Metal | ------ | ------------- | ----------- |
 | Heartless Human Harvest | Death Metal | WAS16 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/9/csm_heartless_human_harvest_26_5c7a455a4e.jpg |
 | Cursed Abyss | Black Metal | WAS17 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/d/csm_cursed_abyss_26_924d9b9653.jpg |
-| Chaosbay | Melodic Death Metal | WAS18 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/8/csm_chaos_bay_26_6d40a05540.jpg |
-| Luna Kills | Symphonic Metal | WAS19 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/3/csm_Luna_Kills-WOA26_9c2715ab09.jpg |
-| Insanity Alert | Crossover Thrash | WAS20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/3/csm_Insanity_Alert-WOA26_32944b8820.jpg |
+| Chaosbay | Death Metal | WAS18 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/8/csm_chaos_bay_26_6d40a05540.jpg |
+| Luna Kills | Power Metal | WAS19 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/3/csm_Luna_Kills-WOA26_9c2715ab09.jpg |
+| Insanity Alert | Thrash Metal | WAS20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/3/csm_Insanity_Alert-WOA26_32944b8820.jpg |
 | Arroganz | Metal | WAS21 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/f/csm_arroganz_26b_b0fc829592.jpg |
 | Divlje Jagode | Hard Rock | WAS22 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/0/csm_divlje_jagode_26_e0a2c64203.jpg |
 | Alfahanne | Black Metal | WAS23 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/6/csm_alfahanne_26_9c1f0784c4.jpg |
@@ -332,23 +334,23 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 ### Wackinger Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
+| ------ | Metal | ------ | ------------- | ----------- |
 | tuXedoo | Heavy Metal | WAK15 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/b/csm_tuxedoo_26_2cbaa64988.jpg |
-| Blaas of Glory | Folk / Brass Metal | WAK16 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/5/csm_blaas_of_glory_26_f53a31927e.jpg |
-| Metaklapa | Folk | WAK17 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/7/csm_metaklapa_2024_ec19d5fd80.jpg |
+| Blaas of Glory | Folk Metal | WAK16 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/5/csm_blaas_of_glory_26_f53a31927e.jpg |
+| Metaklapa | Folk Metal | WAK17 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/7/csm_metaklapa_2024_ec19d5fd80.jpg |
 | Trold | Black Metal | WAK18 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/2/csm_trold_26_e2d88c204e.jpg |
 | Cruachan | Folk Metal | WAK19 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/0/csm_cruachan_26_fe9f62c6a3.jpg |
-| Eläkeläiset | Humppa | WAK20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/d/csm_Elaekelaeiset-WOA26_0517340ca3.jpg |
-| Dubioza Kolektiv | Ska / Reggae Metal | WAK21 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/8/csm_dubioza_kollektiv26_190126a762.jpg |
-| Faun | Folk | WAK22 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/4/csm_Faun2-WOA26_dec165b202.jpg |
+| Eläkeläiset | Folk Metal | WAK20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/d/csm_Elaekelaeiset-WOA26_0517340ca3.jpg |
+| Dubioza Kolektiv | Folk Metal | WAK21 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/8/csm_dubioza_kollektiv26_190126a762.jpg |
+| Faun | Folk Metal | WAK22 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/4/csm_Faun2-WOA26_dec165b202.jpg |
 
 ### Welcome to the Jungle Stage
 
 > Welcome to the Jungle has not been published in the official running order yet — slot and band TBD.
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| TBD | TBD | JUN5 | TBD | PLACEHOLDER |
+| ------ | Metal | ------ | ------------- | ----------- |
+| TBD | Metal | JUN5 | TBD | PLACEHOLDER |
 
 ---
 
@@ -359,9 +361,9 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 ### Faster Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Kim Dracula | Alternative Metal | FAS13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/4/csm_kim_dracula26_6085add158.jpg |
-| Nevermore | Progressive Metal | FAS14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/6/csm_nevermore_26b_55b9630985.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Kim Dracula | Metal | FAS13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/4/csm_kim_dracula26_6085add158.jpg |
+| Nevermore | Metal | FAS14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/6/csm_nevermore_26b_55b9630985.jpg |
 | Airbourne | Party Metal | FAS15 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/e/csm_Airborn-WOA26_24e9c1f588.jpg |
 | Powerwolf | Power Metal | FAS16 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/f/csm_Powerwolf-WOA26_acf32b8b68.jpg |
 | Alestorm | Party Metal | FAS17 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/d/csm_alestorm_26_9ddf45fa2e.jpg |
@@ -369,85 +371,85 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 ### Harder Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Heavysaurus | Children's Metal | HAR9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/0/csm_heavysaurus_26_9d1aa2a6db.jpg |
-| Orbit Culture | Melodic Death Metal | HAR10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/c/csm_Orbit_Culture-WOA26_e0ccb2b84a.jpg |
-| Lamb of God | Groove Metal | HAR11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/4/csm_lamb_of_god_26b_d0cd004159.jpg |
-| Arch Enemy | Melodic Death Metal | HAR12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/c/csm_arch_enemy_26c_e1e9c04c76.jpg |
-| Farewell & Announcements | — | HAR13 | CEREMONY | — |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Heavysaurus | Metal | HAR9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/0/csm_heavysaurus_26_9d1aa2a6db.jpg |
+| Orbit Culture | Death Metal | HAR10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/c/csm_Orbit_Culture-WOA26_e0ccb2b84a.jpg |
+| Lamb of God | Metal | HAR11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/4/csm_lamb_of_god_26b_d0cd004159.jpg |
+| Arch Enemy | Death Metal | HAR12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/c/csm_arch_enemy_26c_e1e9c04c76.jpg |
+| Farewell & Announcements | Metal | HAR13 | CEREMONY | — |
 | Sabaton | Power Metal | HAR14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/4/csm_sabaton_26_143decf5a4.jpg |
 
 ### Louder Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| TBD | TBD | LOU21 | TBD | PLACEHOLDER |
+| ------ | Metal | ------ | ------------- | ----------- |
+| TBD | Metal | LOU21 | TBD | PLACEHOLDER |
 | Kittie | Heavy Metal | LOU22 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/6/csm_kittie_26_31697daab6.jpg |
-| Thrown | Post-Metal | LOU23 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/9/csm_Thrown-WOA26_f70cc40622.jpg |
+| Thrown | Doom Metal | LOU23 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/9/csm_Thrown-WOA26_f70cc40622.jpg |
 | Of Mice and Men | Metalcore | LOU24 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/2/csm_of_mice_and_men_26_26aab5f25c.jpg |
-| Kärbholz | Folk Punk | LOU25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/4/csm_kaerbholz_26_85a563b793.jpg |
-| Thy Art Is Murder | Deathcore | LOU26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/0/csm_thy_art_is_murder_26_9e88fcd95e.jpg |
-| Triptykon | Black / Doom Metal | LOU27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/c/csm_Triptykon-WOA26_0599ad9698.jpg |
+| Kärbholz | Punk | LOU25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/4/csm_kaerbholz_26_85a563b793.jpg |
+| Thy Art Is Murder | Death Metal | LOU26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/0/csm_thy_art_is_murder_26_9e88fcd95e.jpg |
+| Triptykon | Black Metal | LOU27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/c/csm_Triptykon-WOA26_0599ad9698.jpg |
 
 ### W.E.T. Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| TBD | TBD | WET30 | TBD | PLACEHOLDER |
-| Blood Command | Punk Metal | WET31 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/8/csm_Blood_Command-WOA26_f82b942e22.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| TBD | Metal | WET30 | TBD | PLACEHOLDER |
+| Blood Command | Punk | WET31 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/8/csm_Blood_Command-WOA26_f82b942e22.jpg |
 | Our Promise | Metal | WET32 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/0/csm_our_promise_26_661c3c384d.jpg |
-| Hardline | AOR / Hard Rock | WET33 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/5/csm_hardline_26_73180980cd.jpg |
-| Lagwagon | Melodic Hardcore | WET34 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/e/csm_lagwagon26_9b4cccaa2b.jpg |
-| Corrosion of Conformity | Sludge Metal | WET35 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/b/csm_corrosion_of_conformity_26_8ba7dabe09.jpg |
+| Hardline | Hard Rock | WET33 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/5/csm_hardline_26_73180980cd.jpg |
+| Lagwagon | Metalcore | WET34 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/e/csm_lagwagon26_9b4cccaa2b.jpg |
+| Corrosion of Conformity | Doom Metal | WET35 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/b/csm_corrosion_of_conformity_26_8ba7dabe09.jpg |
 | Fit For An Autopsy | Death Metal | WET36 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/7/csm_fit_for_an_autopsy_26_1695f9334e.jpg |
 
 ### Headbangers Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Focus. | TBD | HBA30 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/9/csm_focus_26_a98ab7e760.jpg |
-| Crimson Glory | Progressive Metal | HBA31 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/2/csm_crimson_glory_26_59c22b790e.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Focus. | Metal | HBA30 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/9/csm_focus_26_a98ab7e760.jpg |
+| Crimson Glory | Metal | HBA31 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/2/csm_crimson_glory_26_59c22b790e.jpg |
 | Angelus Apatrida | Thrash Metal | HBA32 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/0/csm_angelus_apatrida_26_0bf97316dd.jpg |
 | Municipal Waste | Thrash Metal | HBA33 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/1/csm_municipal_waste26_b40cb13d64.jpg |
 | Dritte Wahl | Punk | HBA34 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/8/csm_Dritte_Wahl_26_89eac3e241.jpg |
-| Vended | Nu Metal | HBA35 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/7/csm_vended_26_a96222e9bb.jpg |
-| The Limit | TBD | HBA36 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/6/csm_the_limit_26_954965f6df.jpg |
+| Vended | Metal | HBA35 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/7/csm_vended_26_a96222e9bb.jpg |
+| The Limit | Metal | HBA36 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/6/csm_the_limit_26_954965f6df.jpg |
 
 ### Wackinger Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| Wacken Firefighters | TBD | WAK23 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/6/csm_wacken_firefighters_25_5f6d39317e.jpg |
-| Minotaurus | TBD | WAK24 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/0/csm_minotaurus_26_1ab67a12ae.jpg |
-| Dieter "Maschine" Birr | TBD | WAK25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/5/csm_dieter_maschine_birr_26b_a569706c0c.jpg |
-| Zeltinger Band | TBD | WAK26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/0/csm_zeltinger_26_74420c1905.jpg |
-| Ad Infinitum | Symphonic Metal | WAK27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/a/csm_ad_infinitum_26_cb9028b792.jpg |
+| ------ | Metal | ------ | ------------- | ----------- |
+| Wacken Firefighters | Metal | WAK23 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/6/csm_wacken_firefighters_25_5f6d39317e.jpg |
+| Minotaurus | Metal | WAK24 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/0/csm_minotaurus_26_1ab67a12ae.jpg |
+| Dieter "Maschine" Birr | Metal | WAK25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/5/csm_dieter_maschine_birr_26b_a569706c0c.jpg |
+| Zeltinger Band | Metal | WAK26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/0/csm_zeltinger_26_74420c1905.jpg |
+| Ad Infinitum | Power Metal | WAK27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/a/csm_ad_infinitum_26_cb9028b792.jpg |
 | Finsterforst | Folk Metal | WAK28 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/8/csm_finsterforst_26_1eb394d15b.jpg |
-| Einherjer | Viking Metal | WAK29 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/2/csm_Einherjer-WOA26_9393fba15b.jpg |
+| Einherjer | Black Metal | WAK29 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/2/csm_Einherjer-WOA26_9393fba15b.jpg |
 
 ### Wasteland Stage
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| TBD | TBD | WAS24 | TBD | PLACEHOLDER |
+| ------ | Metal | ------ | ------------- | ----------- |
+| TBD | Metal | WAS24 | TBD | PLACEHOLDER |
 | Stonem | Metal | WAS25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/9/csm_stonem_26_e1ff4b71dd.jpg |
 | Asrock | Metal | WAS26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/a/csm_asrock_26_85c4a23518.jpg |
 | Allt | Black Metal | WAS27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/f/csm_Allt-WOA26_20072966da.jpg |
-| The Other | Horror Punk | WAS28 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/8/csm_the_other_26_bb6a90d46d.jpg |
+| The Other | Punk | WAS28 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/8/csm_the_other_26_bb6a90d46d.jpg |
 | Castle Rat | Heavy Metal | WAS29 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/3/csm_castle_Rat_26_29b54db683.jpg |
 | Guilt Trip | Metal | WAS30 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/b/csm_guilt_trip_26_524191a47e.jpg |
 | Hackneyed | Death Metal | WAS31 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/f/csm_hacknayed_26_2bf550c457.jpg |
-| TBD | TBD | WAS32 | TBD | PLACEHOLDER |
+| TBD | Metal | WAS32 | TBD | PLACEHOLDER |
 
 ### Welcome to the Jungle Stage
 
 > Welcome to the Jungle has not been published in the official running order yet — slots and bands here are TBD.
 
 | Name | Genre | Slot | Band Status | Image URL |
-|------|-------|------|-------------|-----------|
-| TBD | TBD | JUN6 | TBD | PLACEHOLDER |
-| TBD | TBD | JUN7 | TBD | PLACEHOLDER |
-| TBD | TBD | JUN8 | TBD | PLACEHOLDER |
+| ------ | Metal | ------ | ------------- | ----------- |
+| TBD | Metal | JUN6 | TBD | PLACEHOLDER |
+| TBD | Metal | JUN7 | TBD | PLACEHOLDER |
+| TBD | Metal | JUN8 | TBD | PLACEHOLDER |
 
 ---
 

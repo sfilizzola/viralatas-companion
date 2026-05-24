@@ -53,5 +53,11 @@
   "sortTimeAsc": "Früheste zuerst",
   "sortTimeDesc": "Späteste zuerst",
   "sortAlpha": "Alphabetisch",
-  "scheduleClosingCeremony": "Abschlusszeremonie"
+  "scheduleClosingCeremony": "Abschlusszeremonie",
+  "genreGuideTrigger": "Was bedeuten diese Genres?",
+  "genreGuideIntro": "Wir haben viele Wacken-Subgenre-Tags in 13 Filter zusammengefasst. Dein altes Filter-Label steckt jetzt vielleicht in einem breiteren Bucket.",
+  "genreGuideIncludes": "enthält",
+  "genreGuidePartyMetalNote": "Alestorm, Airbourne — unverändert",
+  "genreGuideMetalBattleNote": "Bands des Wacken Metal Battle-Wettbewerbs",
+  "genreGuideMetalNote": "Sammelbecken für unkategorisierte / TBD-Tags"
 }

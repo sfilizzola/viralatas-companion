@@ -13,7 +13,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Goal:** Collapse ~95 distinct genre strings down to **13 canonical labels** by renaming band genres in-place. Deploy via `seed:bands:sync --apply` only. Schedule genre filter becomes usable on mobile.
 
-**Design source:** [`docs/superpowers/specs/2026-05-24-genre-collapse-design.md`](docs/superpowers/specs/2026-05-24-genre-collapse-design.md) (to be written)
+**Design source:** [`docs/superpowers/specs/2026-05-24-genre-collapse-design.md`](docs/superpowers/specs/2026-05-24-genre-collapse-design.md)
 
 **Canonical genres (13):** Heavy Metal · Black Metal · Death Metal · Thrash Metal · Power Metal · Folk Metal · Doom Metal · Metalcore · Hard Rock · Punk · Party Metal · Metal Battle · Metal
 

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { useI18n } from '../lib/i18n';
+import { sortFilterGenres } from '../services/genreGuide';
 import { stageColor } from '../services/stageColors';
+import GenreGuideCollapsible from './GenreGuideCollapsible';
 import Icon, { type IconName } from './icons/Icon';
 import type { BandFilterValue } from './bandFilterValue';
 import styles from './BandFilters.module.css';
@@ -83,6 +85,12 @@ export default function BandFilters({
     const has = value.stage.includes(stage);
     update('stage', has ? value.stage.filter((s) => s !== stage) : [...value.stage, stage]);
   }
+
+  function toggleGenre(genre: string) {
+    update('genre', value.genre === genre ? null : genre);
+  }
+
+  const sortedGenres = sortFilterGenres(genres);
 
   function clearAll() {
     onChange({
@@ -290,17 +298,22 @@ export default function BandFilters({
                       </button>
                     )}
                   </div>
-                  <select
-                    className={styles.genreSelect}
-                    value={value.genre ?? ''}
-                    onChange={(e) => update('genre', e.target.value || null)}
-                    aria-label={t('genero')}
-                  >
-                    <option value="">{t('todosGeneros')}</option>
-                    {genres.map((genre) => (
-                      <option key={genre} value={genre}>{genre}</option>
-                    ))}
-                  </select>
+                  <div className={styles.pillRowScroll}>
+                    {sortedGenres.map((genre) => {
+                      const on = value.genre === genre;
+                      return (
+                        <button
+                          key={genre}
+                          className={`${styles.genrePill} ${on ? styles.genrePillOn : ''}`}
+                          onClick={() => toggleGenre(genre)}
+                          aria-pressed={on}
+                        >
+                          {genre}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <GenreGuideCollapsible />
                 </>
               )}
 

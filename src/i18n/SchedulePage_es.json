@@ -53,5 +53,11 @@
   "sortTimeAsc": "Más temprano primero",
   "sortTimeDesc": "Más tarde primero",
   "sortAlpha": "Alfabético",
-  "scheduleClosingCeremony": "Ceremonia de Cierre"
+  "scheduleClosingCeremony": "Ceremonia de Cierre",
+  "genreGuideTrigger": "¿Qué significan estos géneros?",
+  "genreGuideIntro": "Agrupamos muchas etiquetas de subgénero de Wacken en 13 filtros. La etiqueta que usabas antes puede estar en un bucket más amplio.",
+  "genreGuideIncludes": "incluye",
+  "genreGuidePartyMetalNote": "Alestorm, Airbourne — sin cambios",
+  "genreGuideMetalBattleNote": "Bandas de la competición Wacken Metal Battle",
+  "genreGuideMetalNote": "Genérico para etiquetas sin categoría / TBD"
 }

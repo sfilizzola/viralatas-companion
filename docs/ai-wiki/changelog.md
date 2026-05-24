@@ -4,6 +4,28 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 25 — Genre Collapse)
+
+### Added
+- `docs/superpowers/specs/2026-05-24-genre-collapse-design.md` — collapse spec + old→new mapping table.
+- `src/services/genreGuide.ts` — `GENRE_COLLAPSE_MAP`, `GENRE_GUIDE`, `sortFilterGenres()`.
+- `src/components/GenreGuideCollapsible.tsx` — inline genre guide in filter drawer.
+- `scripts/apply-genre-collapse.ts` — one-shot rename helper for seed + lineup.
+
+### Changed
+- `supabase/seed/bands.ts` + `docs/ai-wiki/lineup.md` — ~93 genre strings collapsed to 13 canonical labels; `TBD_GENRE` → `Metal`; all `Metal Battle *` → `Metal Battle`.
+- `src/components/BandFilters.tsx` — genre filter uses single-select pills (not native `<select>`); GenreGuide collapsible below pill row.
+- `src/i18n/SchedulePage_{br,en,es,de}.json` — genre guide keys (`genreGuideTrigger`, `genreGuideIntro`, …).
+- `public/Design-System.html` — genre pills + GenreGuideCollapsible documented.
+- `docs/ai-wiki/domain-model.md` — canonical 13-genre list on Band entity.
+
+### Architectural Notes
+- No schema change — rename in-place only; deploy via `seed:bands:sync --apply`.
+- `death-metal` / `power-metal` badge thresholds stay at 3; `party-metal` unchanged.
+- Guide data is static (offline-safe), not computed from live band list.
+
+---
+
 ## 2026-05-24 (production database safety)
 
 ### Added

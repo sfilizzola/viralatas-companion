@@ -3949,6 +3949,61 @@
       </div>
     </div>
 
+    <div class="subhead">BandFilters genre pills + GenreGuideCollapsible · <code>src/components/BandFilters.tsx</code> · <code>src/components/GenreGuideCollapsible.tsx</code></div>
+    <div class="demo">
+      <div class="demo-stage" style="display:flex;flex-direction:column;gap:var(--s-3);max-width:360px">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em">Gênero</div>
+        <div style="display:flex;flex-wrap:wrap;gap:var(--s-2)">
+          <button class="pill">Black Metal</button>
+          <button class="pill on">Death Metal</button>
+          <button class="pill">Doom Metal</button>
+          <button class="pill">Folk Metal</button>
+          <button class="pill">Hard Rock</button>
+          <button class="pill">Heavy Metal</button>
+          <button class="pill">Metal</button>
+          <button class="pill">Metalcore</button>
+          <button class="pill">Party Metal</button>
+          <button class="pill">Power Metal</button>
+          <button class="pill">Punk</button>
+          <button class="pill">Thrash Metal</button>
+          <button class="pill">Metal Battle</button>
+        </div>
+        <div style="border-top:1px solid var(--border);padding-top:var(--s-2)">
+          <button style="display:flex;align-items:center;justify-content:space-between;width:100%;background:transparent;border:none;padding:var(--s-2) 0;cursor:pointer">
+            <span style="font-family:var(--font-mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-muted)">What do these genres mean?</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          </button>
+          <div style="max-height:28dvh;overflow-y:auto;display:flex;flex-direction:column;gap:var(--s-2);margin-top:var(--s-2)">
+            <div>
+              <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text)">Death Metal</div>
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);line-height:1.35">includes Melodic Death Metal, Grindcore, Goregrind…</div>
+            </div>
+            <div>
+              <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text)">Party Metal</div>
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint)">Alestorm, Airbourne — unchanged</div>
+            </div>
+            <div>
+              <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;text-transform:uppercase;color:var(--text)">Metal Battle</div>
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint)">Wacken Metal Battle competition bands</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Genre filter (Phase 25)</h4>
+        <ul>
+          <li>Replaces native <code>&lt;select&gt;</code> — single-select pills with <code>aria-pressed</code>; reuse <code>.genrePill</code> / <code>.pillRowScroll</code> from <code>BandFilters.module.css</code></li>
+          <li>13 canonical labels; alphabetical sort with <b>Metal Battle</b> pinned last</li>
+          <li><b>GenreGuideCollapsible</b> — inline <code>Collapsible</code> below pill row (not nested modal); closed by default</li>
+          <li>Row anatomy: mono 11px uppercase label + mono 10px faint secondary (<code>line-clamp: 2</code> on mobile)</li>
+          <li>Exception footnotes: Party Metal, Metal Battle, Metal — not subgenre lists</li>
+          <li>Static data: <code>src/services/genreGuide.ts</code> · i18n keys: <code>genreGuideTrigger</code>, <code>genreGuideIntro</code>, <code>genreGuideIncludes</code>, <code>genreGuidePartyMetalNote</code>, <code>genreGuideMetalBattleNote</code>, <code>genreGuideMetalNote</code></li>
+          <li>Precedent: Profile <code>Collapsible</code> usage (<code>EditProfileForm</code>, admin panels)</li>
+          <li>Anti-slop: no stat banner, no emoji per genre, no 13-color palette, no decorative metal icons</li>
+        </ul>
+      </div>
+    </div>
+
     <div class="subhead">ArrivalMap · <code>src/components/ArrivalMap.module.css</code></div>
     <div class="demo-notes" style="border-left:0;padding-left:0;margin-bottom:var(--s-6)">
       <h4>Component purpose</h4>
