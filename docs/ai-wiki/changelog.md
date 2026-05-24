@@ -4,6 +4,20 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.B — shared festival constants)
+
+### Added
+- `src/services/time.ts` — `FESTIVAL_DAY_1_START`, `FESTIVAL_DAY_1_START_ISO`, `WACKEN_CEST_OFFSET`, `FESTIVAL_DAY_MS`, `wackenLocalMidnight()`, `isFestivalActive()`, `getFestivalDay()` as the single source of truth for Wacken 2026 calendar boundaries (midnight CEST).
+
+### Changed
+- `MyPicksPage.tsx`, `AnnouncementsPage.tsx`, `ArrivalMap.tsx`, `ConflictSection.tsx`, `repositories/presence.ts` — replaced hardcoded `+01:00` / `Z` festival date literals with shared constants.
+- `src/__tests__/time.test.ts` — 4 tests for festival constant helpers.
+
+### Architectural Notes
+- Festival day boundaries now align with CEST (`+02:00`), matching `bandTime.ts` and wiki schedule docs. Resolves prior 1–2 h drift between UI "festival active" checks (old `+01:00`) and metal-place day math (old UTC midnight).
+
+---
+
 ## 2026-05-24 (Phase 26.A — refactor safety net)
 
 ### Added

@@ -32,3 +32,28 @@ export function clearTimeOverride(): void {
 export function isTimeOverrideActive(): boolean {
   return getTimeOverride() !== null;
 }
+
+/** Wacken 2026 runs in CEST (UTC+2); Berlin is always CEST during the festival window. */
+export const WACKEN_CEST_OFFSET = '+02:00';
+
+/** Midnight CEST on festival Day 1 (Wed 2026-07-29). Canonical instant for day boundaries. */
+export const FESTIVAL_DAY_1_START_ISO = `2026-07-29T00:00:00${WACKEN_CEST_OFFSET}`;
+
+export const FESTIVAL_DAY_1_START = new Date(FESTIVAL_DAY_1_START_ISO);
+
+export const FESTIVAL_DAY_MS = 24 * 60 * 60 * 1000;
+
+/** Calendar date at midnight CEST (YYYY-MM-DD). */
+export function wackenLocalMidnight(isoDate: string): Date {
+  return new Date(`${isoDate}T00:00:00${WACKEN_CEST_OFFSET}`);
+}
+
+export function isFestivalActive(at: Date = now()): boolean {
+  return at >= FESTIVAL_DAY_1_START;
+}
+
+/** 1-based festival day (Day 1 = Wed 2026-07-29). Values ≤ 0 are before the festival. */
+export function getFestivalDay(at: Date): number {
+  const dayOffset = Math.floor((at.getTime() - FESTIVAL_DAY_1_START.getTime()) / FESTIVAL_DAY_MS);
+  return dayOffset + 1;
+}

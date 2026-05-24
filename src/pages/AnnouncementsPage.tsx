@@ -18,6 +18,7 @@ import Icon from '../components/icons/Icon';
 import ArrivalMap from '../components/ArrivalMap';
 import { Avatar, Chip } from '../ui';
 import { useNow } from '../hooks/useNow';
+import { isFestivalActive } from '../services/time';
 import styles from './AnnouncementsPage.module.css';
 
 const PAGE_SIZE = 10;
@@ -268,9 +269,9 @@ export default function AnnouncementsPage() {
   }
 
   const canModerate = role === 'manager' || role === 'godlike';
-  const isFestivalActive = currentTime >= new Date('2026-07-29T00:00:00+01:00');
-  const showArrivalMapTop = userId && crewUsers.length > 0 && !isFestivalActive;
-  const showArrivalMapBottom = userId && crewUsers.length > 0 && isFestivalActive;
+  const festivalActive = isFestivalActive(currentTime);
+  const showArrivalMapTop = userId && crewUsers.length > 0 && !festivalActive;
+  const showArrivalMapBottom = userId && crewUsers.length > 0 && festivalActive;
 
   return (
     <div className={styles.page}>

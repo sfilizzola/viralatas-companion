@@ -20,9 +20,13 @@ vi.mock('../lib/db', () => ({
   saveMetalPlaceConfig: vi.fn().mockResolvedValue(undefined),
 }));
 
-vi.mock('../services/time', () => ({
-  now: vi.fn(),
-}));
+vi.mock('../services/time', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../services/time')>();
+  return {
+    ...actual,
+    now: vi.fn(),
+  };
+});
 
 import { supabase } from '../lib/supabase';
 import * as db from '../lib/db';

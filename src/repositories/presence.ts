@@ -9,7 +9,7 @@ import {
   saveUserPresence,
 } from '../lib/db';
 import { supabase } from '../lib/supabase';
-import { now } from '../services/time';
+import { getFestivalDay, now } from '../services/time';
 
 function presenceOpId(userId: string) {
   const unique = crypto.randomUUID?.() ?? `${Date.now()}:${Math.random()}`;
@@ -167,10 +167,7 @@ function isTimeWithinMetalPlaceWindow(config: MetalPlaceConfig | null, nowDate: 
     if (config.festival_day === null || config.festival_day === undefined) {
       return false;
     }
-    const WACKEN_START = new Date('2026-07-29T00:00:00Z');
-    const DAY_DURATION_MS = 24 * 60 * 60 * 1000;
-    const dayOffset = Math.floor((nowDate.getTime() - WACKEN_START.getTime()) / DAY_DURATION_MS);
-    const currentFestivalDay = dayOffset + 1;
+    const currentFestivalDay = getFestivalDay(nowDate);
     if (currentFestivalDay !== config.festival_day) {
       return false;
     }

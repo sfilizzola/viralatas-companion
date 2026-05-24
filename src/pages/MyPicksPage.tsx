@@ -11,6 +11,7 @@ import { useBandConflicts } from '../hooks/useBandConflicts';
 import { useI18n } from '../lib/i18n';
 import { useNow } from '../hooks/useNow';
 import { useOfflinePendingBandIds } from '../hooks/useOfflinePendingBandIds';
+import { isFestivalActive } from '../services/time';
 import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BandCard from '../components/BandCard';
@@ -28,8 +29,6 @@ export default function MyPicksPage() {
     (session?.user?.user_metadata?.['display_name'] as string | undefined) ??
     session?.user?.email?.split('@')[0] ??
     '';
-
-  const FESTIVAL_START = new Date('2026-07-29T00:00:00+01:00');
 
   const [bands, setBands] = useState<Band[]>([]);
   const [loading, setLoading] = useState(true);
@@ -104,7 +103,7 @@ export default function MyPicksPage() {
     return map;
   }, [allMissed]);
 
-  const isFestivalActive = currentNow >= FESTIVAL_START;
+  const festivalActive = isFestivalActive(currentNow);
   const conflicts = useBandConflicts(myBands);
 
   const activeBand = useMemo(
@@ -253,7 +252,7 @@ export default function MyPicksPage() {
         </a>
       )}
 
-      {!isFestivalActive && (
+      {!festivalActive && (
         <PlaylistLaunchButton bands={myBands} userName={displayName} />
       )}
 

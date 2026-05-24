@@ -1,6 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
 import type { CrewUser } from '../types';
 import { useI18n } from '../lib/i18n';
+import {
+  FESTIVAL_DAY_1_START,
+  isFestivalActive,
+  wackenLocalMidnight,
+} from '../services/time';
 import styles from './ArrivalMap.module.css';
 
 type ArrivalMapProps = {
@@ -13,21 +18,23 @@ type ArrivalDay = 'sun-jul26' | 'mon-jul27' | 'tue-jul28' | 'wed-jul29' | 'thu-p
 type ViewState = 'collapsed' | 'days' | 'details';
 
 const ARRIVAL_DAY_ORDER: ArrivalDay[] = ['sun-jul26', 'mon-jul27', 'tue-jul28', 'wed-jul29', 'thu-plus'];
-const FESTIVAL_DAY_1_START = new Date('2026-07-29T00:00:00+01:00');
 
 function isToday(day: ArrivalDay | null, currentTime: Date): boolean {
   if (day !== 'wed-jul29') return false;
-  return currentTime >= new Date('2026-07-29T00:00:00+01:00') && currentTime < new Date('2026-07-30T00:00:00+01:00');
+  return (
+    currentTime >= FESTIVAL_DAY_1_START &&
+    currentTime < wackenLocalMidnight('2026-07-30')
+  );
 }
 
 function isPastDay(day: ArrivalDay | null, currentTime: Date): boolean {
   if (!day) return false;
   const dayMap: Record<ArrivalDay, Date> = {
-    'sun-jul26': new Date('2026-07-26T00:00:00+01:00'),
-    'mon-jul27': new Date('2026-07-27T00:00:00+01:00'),
-    'tue-jul28': new Date('2026-07-28T00:00:00+01:00'),
-    'wed-jul29': new Date('2026-07-29T00:00:00+01:00'),
-    'thu-plus': new Date('2026-07-30T00:00:00+01:00'),
+    'sun-jul26': wackenLocalMidnight('2026-07-26'),
+    'mon-jul27': wackenLocalMidnight('2026-07-27'),
+    'tue-jul28': wackenLocalMidnight('2026-07-28'),
+    'wed-jul29': FESTIVAL_DAY_1_START,
+    'thu-plus': wackenLocalMidnight('2026-07-30'),
   };
   return currentTime > dayMap[day];
 }
@@ -176,7 +183,7 @@ export default function ArrivalMap({
   currentTime,
 }: ArrivalMapProps) {
   const { t } = useI18n('AnnouncementsPage');
-  const isFestivalActive = currentTime >= FESTIVAL_DAY_1_START;
+  const festivalActive = isFestivalActive(currentTime);
 
   // Load saved view state from localStorage, or use default
   const getSavedViewState = (): ViewState => {
@@ -185,7 +192,7 @@ export default function ArrivalMap({
       return saved;
     }
     // Default: collapsed if festival is active, days view before
-    return isFestivalActive ? 'collapsed' : 'days';
+    return festivalActive ? 'collapsed' : 'days';
   };
 
   const [view, setView] = useState<ViewState>(getSavedViewState);

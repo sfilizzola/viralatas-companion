@@ -2,11 +2,16 @@ import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from 'vite
 import {
   TIME_OVERRIDE_CHANGED_EVENT,
   TIME_OVERRIDE_STORAGE_KEY,
+  FESTIVAL_DAY_1_START,
+  FESTIVAL_DAY_1_START_ISO,
   clearTimeOverride,
+  getFestivalDay,
   getTimeOverride,
+  isFestivalActive,
   isTimeOverrideActive,
   now,
   setTimeOverride,
+  wackenLocalMidnight,
 } from '../services/time';
 
 beforeAll(() => {
@@ -107,5 +112,28 @@ describe('time override', () => {
 
     expect(listener).toHaveBeenCalledTimes(1);
     window.removeEventListener(TIME_OVERRIDE_CHANGED_EVENT, listener);
+  });
+});
+
+describe('festival constants', () => {
+  it('FESTIVAL_DAY_1_START is midnight CEST on 2026-07-29', () => {
+    expect(FESTIVAL_DAY_1_START_ISO).toBe('2026-07-29T00:00:00+02:00');
+    expect(FESTIVAL_DAY_1_START.toISOString()).toBe('2026-07-28T22:00:00.000Z');
+  });
+
+  it('wackenLocalMidnight returns midnight CEST for a calendar date', () => {
+    expect(wackenLocalMidnight('2026-07-30').toISOString()).toBe('2026-07-29T22:00:00.000Z');
+  });
+
+  it('isFestivalActive is false before Day 1 midnight CEST and true at/after', () => {
+    expect(isFestivalActive(new Date('2026-07-28T21:59:59.999Z'))).toBe(false);
+    expect(isFestivalActive(new Date('2026-07-28T22:00:00.000Z'))).toBe(true);
+  });
+
+  it('getFestivalDay returns 1-based day from CEST midnight boundaries', () => {
+    expect(getFestivalDay(new Date('2026-07-28T22:00:00.000Z'))).toBe(1);
+    expect(getFestivalDay(new Date('2026-07-29T21:59:59.999Z'))).toBe(1);
+    expect(getFestivalDay(new Date('2026-07-29T22:00:00.000Z'))).toBe(2);
+    expect(getFestivalDay(new Date('2026-07-30T13:00:00.000Z'))).toBe(2);
   });
 });

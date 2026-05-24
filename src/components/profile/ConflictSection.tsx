@@ -3,18 +3,10 @@ import type { Band, UserPick } from '../../types';
 import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../../lib/db';
 import { picksRepository } from '../../repositories';
 import { computeBandOverlaps } from '../../hooks/useBandConflicts';
+import { getFestivalDay } from '../../services/time';
 import { Button, Collapsible, Modal } from '../../ui';
 import Icon from '../icons/Icon';
 import styles from '../../pages/ProfilePage.module.css';
-
-const WACKEN_START = new Date('2026-07-29T00:00:00Z');
-const DAY_DURATION_MS = 24 * 60 * 60 * 1000;
-
-function getFestivalDay(isoTime: string): number {
-  const time = new Date(isoTime);
-  const dayOffset = Math.floor((time.getTime() - WACKEN_START.getTime()) / DAY_DURATION_MS);
-  return dayOffset + 1;
-}
 
 type ConflictPair = {
   bandA: Band;
@@ -41,7 +33,7 @@ function detectConflicts(bands: Band[]): ConflictPair[] {
       conflicts.push({
         bandA,
         bandB,
-        day: getFestivalDay(bandA.start_time),
+        day: getFestivalDay(new Date(bandA.start_time)),
       });
     }
   }

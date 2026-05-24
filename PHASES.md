@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 In progress (26.A complete)
+**Status:** 🔜 In progress (26.A, 26.B complete)
 
 **Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
 
@@ -43,7 +43,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-### Stage 26.B — Shared festival constants
+### Stage 26.B — Shared festival constants ✅
 
 **Scope:** `src/services/time.ts` (or new `festivalDates.ts`); replace literals in `MyPicksPage.tsx`, `AnnouncementsPage.tsx`, `ArrivalMap.tsx`, `ConflictSection.tsx`, `repositories/presence.ts`.
 
@@ -52,6 +52,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Risk:** Low | **Depth:** Shallow | **Depends on:** —
 
 **Verification:** `rtk npm test` (`time.test.ts`, `presenceRepository.test.ts`, `bandTime.test.ts`); manual `/announcements` arrival map visibility toggle.
+
+**Done (2026-05-24):** `FESTIVAL_DAY_1_START`, `isFestivalActive()`, `getFestivalDay()`, `wackenLocalMidnight()` in `time.ts`; five consumers migrated; 4 new time tests.
 
 ---
 
