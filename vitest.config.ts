@@ -12,7 +12,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'html'],
       thresholds: {
-        'src/lib/db.ts': {
+        'src/lib/db/**': {
           lines: 95,
           branches: 55,
           functions: 95,

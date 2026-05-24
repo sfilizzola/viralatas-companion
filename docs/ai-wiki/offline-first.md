@@ -8,7 +8,7 @@ Document the guarantees, tradeoffs, and mechanics of the offline-first architect
 
 ## Relevant Source Files
 
-- `src/lib/db.ts` — IndexedDB abstraction, stores, event emission
+- `src/lib/db/` — IndexedDB domain modules (barrel at `index.ts`; public shim `src/lib/db.ts`), stores, event emission
 - `src/repositories/picks.ts`, `announcements.ts`, `presence.ts`, `missed.ts` — Offline queue logic
 - `src/App.tsx` — Sync orchestration (BandSync, PickSync, AnnouncementSync)
 - `vite.config.ts` — PWA / Service Worker caching strategy

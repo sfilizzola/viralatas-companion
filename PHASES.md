@@ -437,6 +437,10 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test`; `rtk npm run build`; grep importers — no broken paths; full offline smoke (pick, announcement, presence, duck, cache reset).
 
+**Done (2026-05-24):** `src/lib/db/index.ts` — barrel re-exporting all 12 domain modules; `src/lib/db.ts` — one-line shim (`export * from './db/index'`); `vitest.config.ts` coverage glob `src/lib/db/**`; zero consumer import path changes; build + 488+ tests green.
+
+**Stage 26.N complete (2026-05-24):** N.0–N.k done; monolithic `db.ts` (~555 lines) split into 12 domain modules + barrel; public import path unchanged (`from '../lib/db'`).
+
 **Recommended 26.N execution order:**
 
 ```

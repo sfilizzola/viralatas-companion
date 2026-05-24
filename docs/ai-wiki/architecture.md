@@ -10,7 +10,7 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 
 - `src/App.tsx` — App shell, route setup, providers
 - `src/components/sync/` — Sync orchestration (`CacheVersionCheck`, `BandSync`, `PickSync`, `AnnouncementSync`, `DuckSync`, `PushSetup`, `DuckNotificationsListener`)
-- `src/lib/db.ts` — IndexedDB abstraction and event emitters
+- `src/lib/db/` — IndexedDB domain modules + barrel (`index.ts`); public entry `src/lib/db.ts` re-exports unchanged surface
 - `src/lib/realtimeSync.ts` — Unified Supabase Realtime `postgres_changes` subscription helper
 - `src/lib/supabase.ts` — Supabase client + custom auth storage
 - `src/lib/sync.ts` — Band sync (minimal; most sync logic in repositories)
@@ -41,7 +41,7 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
    └─ src/repositories/*, src/services/*, src/lib/sync.ts
 
 4. STORAGE (IndexedDB + Supabase)
-   └─ src/lib/db.ts, src/lib/supabase.ts
+   └─ src/lib/db.ts → src/lib/db/, src/lib/supabase.ts
 ```
 
 ### Layer 1: Presentation (React Components)
@@ -215,7 +215,9 @@ emitPicksChanged();               // Components re-render
 
 ### Layer 4: Storage
 
-#### IndexedDB (src/lib/db.ts)
+#### IndexedDB (`src/lib/db/`)
+
+Public import path remains `src/lib/db.ts` (thin re-export shim). Domain modules live under `src/lib/db/` (`connection`, `session`, `catalog`, `picks`, `presence`, `announcements`, `missed`, `config`, `duck`, `meta`, `events`, `types`).
 
 **Version**: 8 (incremented on schema changes)
 

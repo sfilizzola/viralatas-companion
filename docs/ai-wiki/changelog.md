@@ -4,6 +4,20 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.N.k — Finalize db module barrel)
+
+### Added
+- `src/lib/db/index.ts` — barrel re-exporting all 12 domain modules (`events`, `types`, `connection`, `session`, `catalog`, `picks`, `presence`, `announcements`, `missed`, `config`, `duck`, `meta`).
+
+### Changed
+- `src/lib/db.ts` — one-line public shim (`export * from './db/index'`); consumers still import `from '../lib/db'`.
+- `vitest.config.ts` — coverage thresholds glob `src/lib/db.ts` → `src/lib/db/**`.
+
+### Architectural Notes
+- Zero behavior/schema change; zero consumer import path changes. Stage 26.N complete (N.0–N.k).
+
+---
+
 ## 2026-05-24 (Phase 26.N.j — Extract meta and wipe db module)
 
 ### Added
