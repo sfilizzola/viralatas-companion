@@ -4,6 +4,24 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.L — Decompose GodlikeAdminPanel)
+
+### Added
+- `src/components/profile/CacheResetSection.tsx` — godlike cache invalidation.
+- `src/components/profile/FeatureFlagsSection.tsx` — registration, duck, playlist_testing toggles.
+- `src/components/profile/MetalPlaceAdminSection.tsx` — Metal Place config + test mode.
+- `src/components/profile/LiveBandTestAdminSection.tsx` — live band test override.
+- `src/components/profile/UserManagementSection.tsx` — roles, block list, assign badge modal.
+
+### Changed
+- `GodlikeAdminPanel.tsx` — composition + shared loading + test quack/push; 933 → 203 lines.
+- Metal Place / Live Band Test mutual-exclusion logic bridged via parent refs (no behavior change).
+
+### Architectural Notes
+- Pure decompose: admin user ops remain on `usersRepository` (26.J); no new Supabase reads from parent.
+
+---
+
 ## 2026-05-24 (Phase 26.K — useAnnouncements hook)
 
 ### Added

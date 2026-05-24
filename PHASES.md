@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E, 26.F, 26.G, 26.H, 26.I, 26.J, 26.K complete)
+**Status:** 🔜 In progress (26.A–26.L complete)
 
 **Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
 
@@ -189,7 +189,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-### Stage 26.L — Decompose `GodlikeAdminPanel.tsx`
+### Stage 26.L — Decompose `GodlikeAdminPanel.tsx` ✅
 
 **Scope:** Extract sections into existing pattern (`TimeTravelSection`, `TestBadgeSection`):
 - `FeatureFlagsSection.tsx` (registration, duck, playlist_testing)
@@ -204,6 +204,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Risk:** Medium | **Depth:** Moderate–deep | **Depends on:** 26.J
 
 **Verification:** Manual godlike smoke (all toggles); `rtk npm test`; no build regressions.
+
+**Done (2026-05-24):** Five section components extracted; `GodlikeAdminPanel.tsx` 933 → 203 lines; Metal Place / Live Band Test conflict bridged via parent refs; test quack + test push remain in parent.
 
 ---
 
