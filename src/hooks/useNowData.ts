@@ -3,18 +3,12 @@ import type { Announcement, Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig
 import {
   ANNOUNCEMENTS_CHANGED_EVENT,
   CREW_USERS_CHANGED_EVENT,
-  LIVE_BAND_TEST_CONFIG_CHANGED_EVENT,
-  METAL_PLACE_CONFIG_CHANGED_EVENT,
   PICKS_CHANGED_EVENT,
   PRESENCE_CHANGED_EVENT,
   loadAllUserPicks,
   loadAllUserPresence,
   loadCrewUsers,
   loadLatestAnnouncement,
-  loadLiveBandTestConfig,
-  loadMetalPlaceConfig,
-  saveLiveBandTestConfig,
-  saveMetalPlaceConfig,
   saveUserPresence,
 } from '../lib/db';
 import {
@@ -31,10 +25,11 @@ import {
 import { presenceRepository } from '../repositories';
 import { usePickActions } from './usePickActions';
 import { useDuckQuack } from './useDuckQuack';
-import { syncLiveBandTestConfig } from '../services/liveBandTest';
 import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { useAuth } from './useAuth';
 import { useBands } from './useBands';
+import { useLiveBandTestConfig } from './useLiveBandTestConfig';
+import { useMetalPlaceConfig } from './useMetalPlaceConfig';
 import { useNow } from './useNow';
 const DUCK_WINDOW_MS = 15 * 60 * 1000;
 
@@ -88,8 +83,8 @@ export function useNowData(): NowData {
   const loading = bandsLoading || cacheLoading;
   const [undoState, setUndoState] = useState<{ bandId: string; bandName: string } | null>(null);
   const [undoTimerId, setUndoTimerId] = useState<ReturnType<typeof setTimeout> | null>(null);
-  const [metalPlaceConfig, setMetalPlaceConfig] = useState<MetalPlaceConfig | null>(null);
-  const [liveBandTestConfig, setLiveBandTestConfig] = useState<LiveBandTestConfig | null>(null);
+  const metalPlaceConfig = useMetalPlaceConfig();
+  const liveBandTestConfig = useLiveBandTestConfig();
 
   const refreshFromCache = useCallback(async () => {
     try {
@@ -137,58 +132,10 @@ export function useNowData(): NowData {
     });
   }, []);
 
-  useEffect(() => {
-    async function loadMetalPlaceConfigFromDB() {
-      const config = await loadMetalPlaceConfig();
-      setMetalPlaceConfig(config);
-    }
-    loadMetalPlaceConfigFromDB();
-    presenceRepository.syncMetalPlaceConfig().catch(() => {});
-
-    function handleConfigChange() { loadMetalPlaceConfigFromDB(); }
-    window.addEventListener(METAL_PLACE_CONFIG_CHANGED_EVENT, handleConfigChange);
-
-    const unsubscribeRealtime = subscribePostgresChanges('metal_place_config_live', {
-      filter: { event: '*', table: 'metal_place_config' },
-      handler: async (payload) => {
-        const next = (payload.new ?? payload.old) as MetalPlaceConfig | undefined;
-        if (next) await saveMetalPlaceConfig(next);
-      },
-    });
-    return () => {
-      window.removeEventListener(METAL_PLACE_CONFIG_CHANGED_EVENT, handleConfigChange);
-      unsubscribeRealtime();
-    };
-  }, []);
-
   const isMetalPlaceWindowActive = useMemo(
     () => presenceRepository.isTimeWithinMetalPlaceWindow(metalPlaceConfig, now),
     [metalPlaceConfig, now],
   );
-
-  useEffect(() => {
-    async function loadFromDB() {
-      const config = await loadLiveBandTestConfig();
-      setLiveBandTestConfig(config);
-    }
-    loadFromDB();
-    syncLiveBandTestConfig().catch(() => {});
-
-    function handleConfigChange() { loadFromDB(); }
-    window.addEventListener(LIVE_BAND_TEST_CONFIG_CHANGED_EVENT, handleConfigChange);
-
-    const unsubscribeRealtime = subscribePostgresChanges('live_band_test_config_live', {
-      filter: { event: '*', table: 'live_band_test_config' },
-      handler: async (payload) => {
-        const next = (payload.new ?? payload.old) as LiveBandTestConfig | undefined;
-        if (next) await saveLiveBandTestConfig(next);
-      },
-    });
-    return () => {
-      window.removeEventListener(LIVE_BAND_TEST_CONFIG_CHANGED_EVENT, handleConfigChange);
-      unsubscribeRealtime();
-    };
-  }, []);
 
   const liveTestBandId = useMemo(
     () =>

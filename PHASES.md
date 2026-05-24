@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 In progress (26.A–26.L complete; 26.M.0 ✅)
+**Status:** 🔜 In progress (26.A–26.L complete; 26.M.0 ✅, 26.M.a ✅)
 
 **Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
 
@@ -238,6 +238,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Risk:** Low | **Depth:** Shallow extract | **Depends on:** 26.M.0 recommended
 
 **Verification:** `rtk npm test`; manual MP window toggle + live band test banner.
+
+**Done (2026-05-24):** `useMetalPlaceConfig()`, `useLiveBandTestConfig()` — verbatim IDB + sync + window event + realtime extracts; `useNowData` composes both (335 → 281 lines).
 
 #### Stage 26.M.b — Extract `usePresenceRealtime()`
 

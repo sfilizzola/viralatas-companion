@@ -4,6 +4,21 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.M.a — Extract config hooks)
+
+### Added
+- `src/hooks/useMetalPlaceConfig.ts` — IDB load, `syncMetalPlaceConfig`, `METAL_PLACE_CONFIG_CHANGED_EVENT`, and `metal_place_config` realtime channel (verbatim extract from `useNowData`).
+- `src/hooks/useLiveBandTestConfig.ts` — IDB load, `syncLiveBandTestConfig`, `LIVE_BAND_TEST_CONFIG_CHANGED_EVENT`, and `live_band_test_config` realtime channel (verbatim extract from `useNowData`).
+
+### Changed
+- `src/hooks/useNowData.ts` — composes `useMetalPlaceConfig()` and `useLiveBandTestConfig()`; no behavior change (335 → 281 lines).
+- `docs/ai-wiki/architecture.md` — hooks table documents new config hooks.
+
+### Architectural Notes
+- Config wiring isolated before 26.M.b–d extractions; realtime ownership moves from `useNowData` to dedicated hooks.
+
+---
+
 ## 2026-05-24 (Phase 26.M.0 — useNowData hook safety net)
 
 ### Added
