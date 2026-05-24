@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E, 26.F complete)
+**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E, 26.F, 26.G complete)
 
 **Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
 
@@ -113,7 +113,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-### Stage 26.G — App sync orchestration extract
+### Stage 26.G — App sync orchestration extract ✅
 
 **Scope:** Move `CacheVersionCheck`, `BandSync`, `PickSync`, `AnnouncementSync`, `DuckSync`, `PushSetup`, `DuckNotificationsListener` from `App.tsx` to `src/components/sync/` (or `src/lib/syncOrchestration.tsx`).
 
@@ -122,6 +122,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Risk:** Low | **Depth:** Shallow | **Depends on:** —
 
 **Verification:** `rtk npm test`; login → verify band sync; go offline → pick → online → `SyncToast` fires.
+
+**Done (2026-05-24):** `src/components/sync/` — one file per sync component + `SyncOrchestration` composite; `App.tsx` 238 → 84 lines; behavior unchanged.
 
 ---
 

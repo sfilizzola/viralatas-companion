@@ -4,6 +4,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.G — App sync orchestration extract)
+
+### Added
+- `src/components/sync/` — `CacheVersionCheck`, `BandSync`, `PickSync`, `AnnouncementSync`, `DuckSync`, `PushSetup`, `DuckNotificationsListener`, `SyncOrchestration`, `emitSyncComplete`.
+
+### Changed
+- `src/App.tsx` — routes + providers only; mounts `<SyncOrchestration />` instead of inline sync components (238 → 84 lines).
+
+### Architectural Notes
+- Pure extract; offline-first sync lifecycle unchanged. Sync orchestration now auditable in one folder; ready for 26.H realtime helper refactor.
+
+---
+
 ## 2026-05-24 (Phase 26.F — useBandDetailModal shared state)
 
 ### Added

@@ -8,7 +8,8 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 
 ## Relevant Source Files
 
-- `src/App.tsx` — App shell, route setup, sync orchestration
+- `src/App.tsx` — App shell, route setup, providers
+- `src/components/sync/` — Sync orchestration (`CacheVersionCheck`, `BandSync`, `PickSync`, `AnnouncementSync`, `DuckSync`, `PushSetup`, `DuckNotificationsListener`)
 - `src/lib/db.ts` — IndexedDB abstraction and event emitters
 - `src/lib/supabase.ts` — Supabase client + custom auth storage
 - `src/lib/sync.ts` — Band sync (minimal; most sync logic in repositories)
@@ -363,7 +364,7 @@ Window 'online' event fires
          │
          ▼
 ┌────────────────────────────────────┐
-│ App.tsx PickSync detects 'online'  │
+│ App.tsx SyncOrchestration detects 'online'  │
 │ Calls picksRepository.flushQueue() │
 └────────┬─────────────────────────┘
          │
@@ -489,17 +490,17 @@ INSERT into user_picks
 
 ### On App Startup
 
-1. `App.tsx` mounts with `BandSync` component
+1. `App.tsx` mounts `<SyncOrchestration />` (includes `BandSync`, `CacheVersionCheck`, etc.)
 2. Fetches bands from Supabase (if online), overwrites IndexedDB
-3. Mounts `CacheVersionCheck` — compares local cache version with server
+3. `CacheVersionCheck` — compares local cache version with server
    - If mismatch: `wipeAllLocalData()` (forces fresh sync)
-4. Mounts `PickSync` — flushes offline queues if online
-5. Mounts `AnnouncementSync` — flushes pending announcements if online
+4. `PickSync` — flushes offline queues if online
+5. `AnnouncementSync` — flushes pending announcements if online
 
 ### On `'online'` Event
 
 ```typescript
-// src/App.tsx PickSync
+// src/components/sync/PickSync.tsx
 window.addEventListener('online', () => {
   picksRepository.flushOfflineQueue();        // Flush picks
   presenceRepository.flushOfflineQueue();     // Flush presence
