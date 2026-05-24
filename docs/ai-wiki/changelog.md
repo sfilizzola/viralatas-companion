@@ -4,6 +4,16 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (MoshSplit API path fix)
+
+### Fixed
+- **`MoshSplitSection` API path** — fetch URL updated from `/v1/balances/external-summary` to `/pitboss/v1/balances/external-summary`. The bare `/v1/…` path returns 404; the Pitboss prefix is required per MoshSplit API docs.
+
+### Changed
+- **`README.md`**, **`flows/moshsplit.md`**, **`architecture.md`**, **`Design System.html`** — endpoint paths updated to include `/pitboss`.
+
+---
+
 ## 2026-05-24 (assigned-badge drift loop fix)
 
 ### Fixed

@@ -79,7 +79,7 @@ export default function MoshSplitSection({ userEmail }: MoshSplitSectionProps) {
 
     async function fetchBalance() {
       try {
-        const res = await fetch(`${MOSHSPLIT_PROXY}/v1/balances/external-summary`, {
+        const res = await fetch(`${MOSHSPLIT_PROXY}/pitboss/v1/balances/external-summary`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

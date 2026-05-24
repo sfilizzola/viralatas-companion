@@ -1049,7 +1049,7 @@
 
       <div class="component-section">
         <h3>MoshSplitSection <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/profile/MoshSplitSection.tsx</span></h3>
-        <p>Collapsible profile section showing the current user's net balance from <strong>MoshSplit</strong> (<code>split.viralatas.org</code>) — the festival finance app used by the vira-latas at Wacken. Placed after <code>&lt;ConflictSection&gt;</code>, before <code>&lt;EditProfileForm&gt;</code>. Accepts only <code>userEmail: string</code>; fetches live data via <code>POST /api/moshsplit/v1/balances/external-summary</code> (Vercel proxy → <code>split.viralatas.org</code>, bearer token from <code>VITE_MOSHSPLIT_TOKEN</code>).</p>
+        <p>Collapsible profile section showing the current user's net balance from <strong>MoshSplit</strong> (<code>split.viralatas.org</code>) — the festival finance app used by the vira-latas at Wacken. Placed after <code>&lt;ConflictSection&gt;</code>, before <code>&lt;EditProfileForm&gt;</code>. Accepts only <code>userEmail: string</code>; fetches live data via <code>POST /api/moshsplit/pitboss/v1/balances/external-summary</code> (Vercel proxy → <code>split.viralatas.org</code>, bearer token from <code>VITE_MOSHSPLIT_TOKEN</code>).</p>
         <p><strong>Five render states:</strong></p>
         <ul style="margin: 0 0 12px 18px; color: #888; font-size: 14px;">
           <li><strong>loading</strong> — spinner chip in header, pulse-skeleton in body.</li>

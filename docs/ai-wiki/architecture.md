@@ -78,7 +78,7 @@ The festival tooling for this vira-lata group spans **three separate PWAs**. Com
 2. **No IndexedDB cache** for satellite flags or balance — reads are mount-time Supabase (`playlist_testing`) or network fetch (MoshSplit).
 3. **Deep-link only** — both integrations open external tabs (`target="_blank"`). Failure modes are silent hide or error UI, never blocking core picks/sync.
 4. **Feature flags** — `app_settings.playlist_testing` gates Setlist strip visibility (godlike toggles in admin panel).
-5. **MoshSplit uses a Vercel proxy** — `POST /api/moshsplit/v1/balances/external-summary` in the browser is rewritten by Vercel to `https://split.viralatas.org/v1/balances/external-summary`. The bearer token (`VITE_MOSHSPLIT_TOKEN`) travels inside the same-origin request; no CORS headers are required on the external service. `vite.config.ts` mirrors this rewrite locally via `server.proxy`.
+5. **MoshSplit uses a Vercel proxy** — `POST /api/moshsplit/pitboss/v1/balances/external-summary` in the browser is rewritten by Vercel to `https://split.viralatas.org/pitboss/v1/balances/external-summary`. The bearer token (`VITE_MOSHSPLIT_TOKEN`) travels inside the same-origin request; no CORS headers are required on the external service. `vite.config.ts` mirrors this rewrite locally via `server.proxy`.
 
 The godlike-assigned **`code-wizards`** badge honors the builders of all three apps. See [Badge System — Merit / Assigned](badges.md#merit--assigned-14).
 

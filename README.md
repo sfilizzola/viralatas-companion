@@ -77,7 +77,7 @@ To enable the MoshSplit balance section on the Profile page, add the app token:
 VITE_MOSHSPLIT_TOKEN=sat_...
 ```
 
-This token is used client-side to call the MoshSplit external summary API (`POST /v1/balances/external-summary`). It grants read-only access to event balances by email. Without it the section will show an error state but remain visible. Obtain the token from the MoshSplit admin panel at `split.viralatas.org`.
+This token is used client-side to call the MoshSplit external summary API (`POST /pitboss/v1/balances/external-summary`). It grants read-only access to event balances by email. Without it the section will show an error state but remain visible. Obtain the token from the MoshSplit admin panel at `split.viralatas.org`.
 
 To run the band seed script, also add a service role key locally:
 

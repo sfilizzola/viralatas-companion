@@ -24,10 +24,10 @@ User opens /profile
         ▼
 MoshSplitSection useEffect
   ├─ setLoadState('loading') — spinner chip in header, skeleton body
-  ├─ POST /api/moshsplit/v1/balances/external-summary
+  ├─ POST /api/moshsplit/pitboss/v1/balances/external-summary
   │    Bearer: VITE_MOSHSPLIT_TOKEN
   │    Body:   { email: userEmail }
-  │    ↓ Vercel rewrites → https://split.viralatas.org/v1/balances/external-summary
+  │    ↓ Vercel rewrites → https://split.viralatas.org/pitboss/v1/balances/external-summary
   └─ Map response → render state
         │
         ├─ 404          → not_found  → return null (invisible)
@@ -80,7 +80,7 @@ No sync queue. Balance is fetched fresh on each profile page mount (Part 2). Use
 └────────┬────────┘
          │ userEmail prop
          ▼
-┌─────────────────┐    POST /api/moshsplit/v1/balances/external-summary
+┌─────────────────┐    POST /api/moshsplit/pitboss/v1/balances/external-summary
 │ MoshSplitSection│ ──────────────────────────────────────────────────►
 └─────────────────┘    Bearer: VITE_MOSHSPLIT_TOKEN  Body: {email}
                                         │
