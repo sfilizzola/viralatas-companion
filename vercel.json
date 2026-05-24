@@ -1,5 +1,9 @@
 {
   "rewrites": [
+    {
+      "source": "/api/moshsplit/:path*",
+      "destination": "https://split.viralatas.org/:path*"
+    },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

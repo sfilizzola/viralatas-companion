@@ -2,47 +2,36 @@ import { useState, useEffect } from 'react';
 import { Collapsible } from '../../ui';
 import styles from './MoshSplitSection.module.css';
 
-// ── Mock data — swap ACTIVE_MOCK to test all states during review ──
+const MOSHSPLIT_PROXY = '/api/moshsplit';
+const MOSHSPLIT_DIRECT = 'https://split.viralatas.org';
+const MOSHSPLIT_TOKEN = import.meta.env.VITE_MOSHSPLIT_TOKEN as string | undefined;
+
+// ── Internal types ────────────────────────────────────────────────
+
 type Expense = {
   label: string;
-  amount: number; // negative = you owe your share, positive = others owe you
+  amount: number; // negative = you owe, positive = you are owed
 };
 
 type MoshSplitBalance = {
-  found: boolean;
   balance: number;
   currency: string;
   festival: string;
-  expenses?: Expense[];
+  expenses: Expense[];
 };
 
-const MOCKS: Record<string, MoshSplitBalance> = {
-  not_found: { found: false, balance: 0,     currency: 'EUR', festival: 'Wacken 2026' },
-  settled:   { found: true,  balance: 0,     currency: 'EUR', festival: 'Wacken 2026' },
-  owes: {
-    found: true, balance: -42.5, currency: 'EUR', festival: 'Wacken 2026',
-    expenses: [
-      { label: 'Hotel — night 1',    amount: -20   },
-      { label: 'Supermarket run',    amount: -12.5 },
-      { label: 'Taxi to campsite',   amount:  -6   },
-      { label: 'Parking split',      amount:  -4   },
-    ],
-  },
-  owed: {
-    found: true, balance: 15, currency: 'EUR', festival: 'Wacken 2026',
-    expenses: [
-      { label: 'Beer round (×3)',    amount:  30  },
-      { label: 'Festival shuttle',   amount:  -8  },
-      { label: 'Merch haul split',   amount:  -7  },
-    ],
-  },
-  loading: { found: true, balance: 0, currency: 'EUR', festival: 'Wacken 2026' },
+// ── API response shape ────────────────────────────────────────────
+
+type ApiItem = {
+  amount_cents: number;
+  title: string;
 };
 
-const ACTIVE_MOCK = MOCKS.not_found; // Phase 23 Part 1 hidden — awaiting review
-
-// Cycle order for the dev CTA tap: owes → owed → settled → owes ...
-const CYCLE: MoshSplitBalance[] = [MOCKS.owes, MOCKS.owed, MOCKS.settled];
+type ApiResponse = {
+  event_name: string;
+  items: ApiItem[];
+  total_balance_cents: number;
+};
 
 // ── Helpers ──────────────────────────────────────────────────────
 
@@ -74,40 +63,69 @@ type MoshSplitSectionProps = Readonly<{
   userEmail: string;
 }>;
 
-type LoadState = 'loading' | 'not_found' | 'settled' | 'active';
+type LoadState = 'loading' | 'not_found' | 'settled' | 'active' | 'error';
 
-function applyMock(mock: MoshSplitBalance, setData: (d: MoshSplitBalance) => void, setLoadState: (s: LoadState) => void) {
-  setData(mock);
-  if (!mock.found) setLoadState('not_found');
-  else if (mock.balance === 0) setLoadState('settled');
-  else setLoadState('active');
-}
-
-export default function MoshSplitSection({ userEmail: _userEmail }: MoshSplitSectionProps) {
+export default function MoshSplitSection({ userEmail }: MoshSplitSectionProps) {
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [data, setData] = useState<MoshSplitBalance | null>(null);
   const [logoError, setLogoError] = useState(false);
-  const [cycleIdx, setCycleIdx] = useState(() => CYCLE.indexOf(ACTIVE_MOCK));
 
   useEffect(() => {
+    if (!userEmail) return;
+
+    let cancelled = false;
     setLoadState('loading');
     setData(null);
 
-    // Part 1: mock fetch with 200ms latency
-    const timer = setTimeout(() => {
-      if (ACTIVE_MOCK === MOCKS.loading) return; // stays in loading for demo
-      applyMock(ACTIVE_MOCK, setData, setLoadState);
-    }, 200);
+    async function fetchBalance() {
+      try {
+        const res = await fetch(`${MOSHSPLIT_PROXY}/v1/balances/external-summary`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${MOSHSPLIT_TOKEN ?? ''}`,
+          },
+          body: JSON.stringify({ email: userEmail }),
+        });
 
-    return () => clearTimeout(timer);
-  }, []);
+        if (cancelled) return;
 
-  function handleCtaClick(e: React.MouseEvent) {
-    e.preventDefault();
-    const nextIdx = (cycleIdx + 1) % CYCLE.length;
-    setCycleIdx(nextIdx);
-    applyMock(CYCLE[nextIdx], setData, setLoadState);
-  }
+        if (res.status === 404) {
+          setLoadState('not_found');
+          return;
+        }
+
+        if (!res.ok) {
+          setLoadState('error');
+          return;
+        }
+
+        const json: ApiResponse = await res.json();
+        if (cancelled) return;
+
+        const balance = json.total_balance_cents / 100;
+        const expenses: Expense[] = (json.items ?? []).map((item) => ({
+          label: item.title,
+          amount: item.amount_cents / 100,
+        }));
+
+        setData({
+          balance,
+          currency: 'EUR',
+          festival: json.event_name,
+          expenses,
+        });
+
+        if (balance === 0) setLoadState('settled');
+        else setLoadState('active');
+      } catch {
+        if (!cancelled) setLoadState('error');
+      }
+    }
+
+    fetchBalance();
+    return () => { cancelled = true; };
+  }, [userEmail]);
 
   // not_found → render nothing
   if (loadState === 'not_found') return null;
@@ -121,6 +139,9 @@ export default function MoshSplitSection({ userEmail: _userEmail }: MoshSplitSec
           <div className={styles.spinner} />
         </div>
       );
+    }
+    if (loadState === 'error') {
+      return <span className={`${styles.chip} ${styles.chipError}`}>!</span>;
     }
     if (loadState === 'settled') {
       return <span className={`${styles.chip} ${styles.chipSettled}`}>Settled</span>;
@@ -144,7 +165,7 @@ export default function MoshSplitSection({ userEmail: _userEmail }: MoshSplitSec
             <LogoFallback />
           ) : (
             <img
-              src="https://split.viralatas.org/moshsplit/assets/logo.svg"
+              src={`${MOSHSPLIT_DIRECT}/moshsplit/assets/logo.svg`}
               alt="MoshSplit"
               onError={() => setLogoError(true)}
             />
@@ -157,6 +178,20 @@ export default function MoshSplitSection({ userEmail: _userEmail }: MoshSplitSec
       </div>
       {chipNode}
     </div>
+  );
+
+  // ── CTA ───────────────────────────────────────────────────────
+
+  const ctaButton = (
+    <a
+      href={MOSHSPLIT_DIRECT}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={styles.cta}
+    >
+      <span>Open MoshSplit</span>
+      <span className={styles.ctaArrow}>→</span>
+    </a>
   );
 
   // ── Expanded content ──────────────────────────────────────────
@@ -173,6 +208,18 @@ export default function MoshSplitSection({ userEmail: _userEmail }: MoshSplitSec
       );
     }
 
+    if (loadState === 'error') {
+      return (
+        <div className={styles.inner}>
+          <div className={styles.errorMsg}>
+            <span>⚠</span>
+            <span>Could not load MoshSplit data</span>
+          </div>
+          {ctaButton}
+        </div>
+      );
+    }
+
     if (loadState === 'settled') {
       return (
         <div className={styles.inner}>
@@ -180,10 +227,7 @@ export default function MoshSplitSection({ userEmail: _userEmail }: MoshSplitSec
             <span>🤘</span>
             <span>All settled</span>
           </div>
-          <button type="button" className={styles.cta} onClick={handleCtaClick}>
-            <span>Open MoshSplit</span>
-            <span className={styles.ctaArrow}>→</span>
-          </button>
+          {ctaButton}
         </div>
       );
     }
@@ -192,7 +236,7 @@ export default function MoshSplitSection({ userEmail: _userEmail }: MoshSplitSec
       const isOwes = data.balance < 0;
       return (
         <div className={styles.inner}>
-          {data.expenses && data.expenses.length > 0 && (
+          {data.expenses.length > 0 && (
             <div className={styles.expenseList}>
               {data.expenses.map((exp) => (
                 <div key={exp.label} className={styles.expenseRow}>
@@ -212,10 +256,7 @@ export default function MoshSplitSection({ userEmail: _userEmail }: MoshSplitSec
             </span>
           </div>
           <div className={styles.divider} />
-          <button type="button" className={styles.cta} onClick={handleCtaClick}>
-            <span>Open MoshSplit</span>
-            <span className={styles.ctaArrow}>→</span>
-          </button>
+          {ctaButton}
         </div>
       );
     }

@@ -4,7 +4,7 @@
 
 Documents how the **MoshSplit** collapsible section on `/profile` shows a vira-lata's net festival balance from **MoshSplit** (`split.viralatas.org`) — the pack's expense-splitting app — and deep-links them to the external app.
 
-**Phase 23 status:** Part 1 (mocked UI) is implemented but **hidden** (`ACTIVE_MOCK = not_found`). Part 2 (real API) is blocked on MoshSplit API docs.
+**Phase 23 status:** Part 2 complete and live. The component fetches real balance data from MoshSplit via a Vercel proxy (`/api/moshsplit/…`). Mock code fully removed.
 
 ---
 
@@ -12,55 +12,41 @@ Documents how the **MoshSplit** collapsible section on `/profile` shows a vira-l
 
 User navigates to `/profile`. `ProfilePage` renders `<MoshSplitSection userEmail={user.email ?? ''} />` after `<ConflictSection>`, before `<EditProfileForm>`.
 
-On mount, the component loads balance data (mock in Part 1, real fetch in Part 2) and renders one of four states.
+On mount, the component fetches live balance data from MoshSplit via the Vercel proxy and renders one of five states.
 
 ---
 
-## Happy Path (Online — Part 2, planned)
+## Happy Path (Online)
 
 ```
 User opens /profile
         │
         ▼
 MoshSplitSection useEffect
-  ├─ setLoadState('loading') — spinner in header
-  ├─ fetch balance API (VITE_MOSHSPLIT_TOKEN + userEmail)
+  ├─ setLoadState('loading') — spinner chip in header, skeleton body
+  ├─ POST /api/moshsplit/v1/balances/external-summary
+  │    Bearer: VITE_MOSHSPLIT_TOKEN
+  │    Body:   { email: userEmail }
+  │    ↓ Vercel rewrites → https://split.viralatas.org/v1/balances/external-summary
   └─ Map response → render state
         │
-        ├─ not_found  → return null (invisible)
-        ├─ settled    → teal "Quitado" chip + "Tudo acertado 🤘" + CTA
-        └─ active     → owes (red) or owed (teal) chip + amount row + CTA
+        ├─ 404          → not_found  → return null (invisible)
+        ├─ !res.ok      → error      → orange "!" chip + warning msg + CTA
+        ├─ balance === 0→ settled    → teal chip + "All settled 🤘" + CTA
+        └─ balance ≠ 0  → active     → owes (red) or owed (teal) chip + expense list + CTA
         │
         ▼
-User taps "Abrir MoshSplit →"
+User taps "Open MoshSplit →"
         │
         ▼
-Opens https://split.viralatas.org (new tab)
-  └─ Part 2 may add token exchange for authenticated redirect (TBD)
+Opens https://split.viralatas.org (new tab, real <a> element)
 ```
-
----
-
-## Happy Path (Part 1 — current, mock)
-
-```
-Mount → setTimeout(200ms) simulates latency
-     → applyMock(ACTIVE_MOCK, ...)
-     → ACTIVE_MOCK = MOCKS.not_found (hidden by default)
-```
-
-Godlike can change `ACTIVE_MOCK` in source during review to cycle `owes` / `owed` / `settled` / `loading`. Dev CTA tap cycles mock states for UI review.
 
 ---
 
 ## Offline Behavior (Disconnected)
 
-**Part 1:** Mock data loads locally after 200ms — offline has no effect on mock path.
-
-**Part 2 (planned):**
-- Balance fetch requires network (`VITE_MOSHSPLIT_TOKEN` + email).
-- On failure → error state: warning message + CTA still visible (user can open MoshSplit manually).
-- No IndexedDB cache for balance — not part of offline-first core data.
+Balance fetch requires network (`VITE_MOSHSPLIT_TOKEN` + email via Vercel proxy). On failure → `error` state: orange `!` chip + warning message + CTA still visible (user can open MoshSplit manually). No IndexedDB cache for balance — not part of offline-first core data.
 
 ---
 
@@ -74,14 +60,14 @@ No sync queue. Balance is fetched fresh on each profile page mount (Part 2). Use
 
 | File | Role |
 |------|------|
-| `src/components/profile/MoshSplitSection.tsx` | Four states, mock data, collapsible UI |
-| `src/components/profile/MoshSplitSection.module.css` | Chip palette, CTA, layout tokens |
-| `src/pages/ProfilePage.tsx` | Mount point after ConflictSection (~line 104) |
-| `src/ui/Collapsible.tsx` | Same collapsible pattern as ConflictSection |
+| `src/components/profile/MoshSplitSection.tsx` | Five states, real API fetch, collapsible UI |
+| `src/components/profile/MoshSplitSection.module.css` | Chip palette (incl. `chipError`), CTA, layout tokens |
+| `src/pages/ProfilePage.tsx` | Mount point after ConflictSection |
+| `src/ui/Collapsible.tsx` | Shared collapsible wrapper |
+| `vercel.json` | `/api/moshsplit/:path*` → `https://split.viralatas.org/:path*` rewrite |
+| `vite.config.ts` | `server.proxy` mirrors Vercel rewrite for local dev |
 
-**Design spec:** `docs/superpowers/specs/2026-05-22-phase23-moshsplit-section-design.md`
-
-**Env (Part 2):** `VITE_MOSHSPLIT_TOKEN` in Vercel / `.env.local` (not committed)
+**Env:** `VITE_MOSHSPLIT_TOKEN` in Vercel / `.env.local` (not committed, documented in `README.md`)
 
 ---
 
@@ -94,28 +80,31 @@ No sync queue. Balance is fetched fresh on each profile page mount (Part 2). Use
 └────────┬────────┘
          │ userEmail prop
          ▼
-┌─────────────────┐     Part 1: mock      ┌──────────────┐
-│ MoshSplitSection│ ────────────────────► │ setTimeout   │
-└────────┬────────┘                       │ + ACTIVE_MOCK│
-         │                                └──────────────┘
-         │ Part 2: fetch (planned)
-         ▼
-┌─────────────────┐
-│ split.          │  External app — separate DB/auth
-│ viralatas.org   │
-└─────────────────┘
+┌─────────────────┐    POST /api/moshsplit/v1/balances/external-summary
+│ MoshSplitSection│ ──────────────────────────────────────────────────►
+└─────────────────┘    Bearer: VITE_MOSHSPLIT_TOKEN  Body: {email}
+                                        │
+                              Vercel rewrite (same origin)
+                                        │
+                                        ▼
+                       ┌───────────────────────────────┐
+                       │ split.viralatas.org            │
+                       │ External app — own DB/auth     │
+                       │ Returns ApiResponse JSON       │
+                       └───────────────────────────────┘
 ```
 
 ---
 
-## Four Render States
+## Five Render States
 
 | State | Condition | UI |
 |-------|-----------|-----|
-| `loading` | Fetch in progress | Spinner chip in header, shimmer body, not expandable |
-| `not_found` | No MoshSplit account for email | `return null` — component invisible |
-| `settled` | `balance === 0` | Teal "Quitado" chip, "Tudo acertado 🤘", CTA |
-| `active` | `balance !== 0` | Red chip if owes, teal if owed; festival + amount row; CTA |
+| `loading` | Fetch in progress | Spinner chip in header, shimmer skeleton body |
+| `not_found` | API returned 404 | `return null` — component invisible |
+| `error` | API error or network failure | Orange `!` chip in header; `⚠ Could not load MoshSplit data` + CTA in body |
+| `settled` | `balance === 0` | Teal chip, "All settled 🤘", CTA |
+| `active` | `balance !== 0` | Red chip if owes, teal if owed; expense list + festival/total row + CTA |
 
 **Collapsible:** `defaultOpen={false}`. Header shows logo, label, sub-label (`split.viralatas.org`), balance chip.
 
@@ -125,11 +114,13 @@ No sync queue. Balance is fetched fresh on each profile page mount (Part 2). Use
 
 | Case | Behavior |
 |------|----------|
-| Empty email | Passed as `''`; Part 2 API likely returns `not_found` |
-| `ACTIVE_MOCK = not_found` | Entire section absent from DOM |
-| Logo load failure | Inline SVG wallet fallback |
-| BRL vs EUR currency | `formatAmount()` handles both display formats |
-| Part 2 API timeout/error | Planned error state with CTA preserved |
+| Empty email | `useEffect` returns early; component stays in `loading` state (invisible until email is available) |
+| API 404 | `not_found` — entire section absent from DOM |
+| Non-OK API response | `error` state — orange chip + warning + CTA |
+| Network failure / exception | `error` state — same UI as above |
+| Logo load failure | Inline SVG wallet fallback (`LogoFallback` component) |
+| EUR currency | `formatAmount()` formats with `de-DE` locale; BRL uses `pt-BR` |
+| Component unmounts mid-fetch | `cancelled` flag prevents state updates after unmount |
 
 ---
 
@@ -143,11 +134,10 @@ No sync queue. Balance is fetched fresh on each profile page mount (Part 2). Use
 
 ## Open Questions
 
-- MoshSplit API endpoint shape and auth for balance read (Part 2 blocker).
-- Token exchange vs plain URL for authenticated redirect to `split.viralatas.org`.
+- Token exchange vs plain URL for authenticated redirect to `split.viralatas.org` (currently opens the app root, user must log in separately).
 - Should balance refresh on Realtime or poll while profile is open? Current design: mount-only.
-- When to flip `ACTIVE_MOCK` from `not_found` to a visible state for production review?
+- Should balance be cached in IndexedDB to show stale data while offline rather than the error state?
 
 ---
 
-**Last updated:** 2026-05-22
+**Last updated:** 2026-05-24 — Phase 23 Part 2 complete; real API via Vercel proxy; error state added; mock code removed

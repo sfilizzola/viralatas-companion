@@ -4,6 +4,26 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 23 Part 2 — MoshSplit real API + BadgesDisplay two-phase loading)
+
+### Added
+- **`error` LoadState in `MoshSplitSection`** — fifth render state: orange `!` chip in trigger, `⚠ Could not load MoshSplit data` message in body with CTA still visible. Handles non-OK HTTP responses and network failures. `.chipError` and `.errorMsg` CSS classes added in `MoshSplitSection.module.css`.
+- **Vercel proxy rewrite** (`vercel.json`) — `/api/moshsplit/:path*` → `https://split.viralatas.org/:path*` added before the SPA catch-all. Solves CORS: browser always calls the same origin; `split.viralatas.org` is never contacted directly from the client.
+- **Vite dev proxy** (`vite.config.ts` `server.proxy`) — mirrors the Vercel rewrite for local development.
+- **`VITE_MOSHSPLIT_TOKEN` documented** in `README.md` Environment Setup section.
+- **BadgesDisplay two-phase loading** (`src/components/BadgesDisplay.tsx`) — Phase 1 reads badges from IndexedDB immediately (instant, offline-safe); Phase 2 fetches `special_badges`/`is_friend` from Supabase in the background. Skeleton pulse animation shown while Phase 2 is in flight.
+
+### Changed
+- **`MoshSplitSection` Part 2 complete** — mock fetch (`setTimeout` + `ACTIVE_MOCK` cycle) replaced with real `POST /api/moshsplit/v1/balances/external-summary`. Bearer token from `VITE_MOSHSPLIT_TOKEN`. CTA upgraded from a `<button>` to a real `<a href="https://split.viralatas.org" target="_blank" rel="noopener noreferrer">`.
+- **`flows/moshsplit.md`** — Updated to reflect Part 2 live status; removed "blocked on API docs" language; added real API endpoint, proxy data-flow diagram, and `error` state to the state table.
+- **`architecture.md`** — App Pack section: `ACTIVE_MOCK` reference removed; MoshSplit row updated to show real proxy-based API; Vercel proxy subsection added to the App Pack rules.
+
+### Architectural Notes
+- MoshSplit balance API is now live via Vercel proxy. The client `POST`s to `/api/moshsplit/…` (same origin); Vercel rewrites to `split.viralatas.org`. No CORS headers are needed on the external service, and the bearer token never appears in cross-origin requests.
+- BadgesDisplay now follows the same two-phase IndexedDB-first pattern used elsewhere in the app: core badge data is always available offline (Phase 1), and dynamic social attributes (`special_badges`, `is_friend`) are layered in when network is available (Phase 2). This keeps the badge UI instant on profile load even at Wacken with poor signal.
+
+---
+
 ## 2026-05-22
 
 ### Changed

@@ -17,8 +17,10 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/pages/` — Route-level page components
 - `src/components/` — Shared UI components, modals, sections
 - `src/components/PlaylistLaunchButton.tsx` — Setlist deep-link strip (Phase 22)
-- `src/components/profile/MoshSplitSection.tsx` — MoshSplit balance section (Phase 23 Part 1)
-- `vite.config.ts` — PWA configuration and caching strategy
+- `src/components/profile/MoshSplitSection.tsx` — MoshSplit balance section (Phase 23 Part 2 — real API via Vercel proxy)
+- `src/components/BadgesDisplay.tsx` — Two-phase badge loader (IndexedDB-first + background Supabase fetch)
+- `vite.config.ts` — PWA configuration, caching strategy, and local dev proxy for MoshSplit API
+- `vercel.json` — Vercel rewrites including MoshSplit CORS proxy (`/api/moshsplit/:path*`)
 
 ---
 
@@ -68,14 +70,15 @@ The festival tooling for this vira-lata group spans **three separate PWAs**. Com
 |-----|-----|------------------|----------------------|
 | **Companion** (this repo) | Companion PWA | Find each other — picks, live attendance, alerts, badges | Primary offline-first store |
 | **Setlist Vira-Latas** | `setlist.viralatas.org` | Listen — Spotify playlist from picked bands | `PlaylistLaunchButton` on `/my-picks` → `GET /launch?bands=…&user_name=…&lang=…` |
-| **MoshSplit** | `split.viralatas.org` | Pay each other — festival expense splits | `MoshSplitSection` on `/profile` → balance read + CTA (Part 2) |
+| **MoshSplit** | `split.viralatas.org` | Pay each other — festival expense splits | `MoshSplitSection` on `/profile` → real balance API (via Vercel proxy) + CTA |
 
 **Architectural rules for satellite integrations:**
 
 1. **No shared database** — Setlist and MoshSplit have their own backends. Companion never writes to them.
-2. **No IndexedDB cache** for satellite flags or balance — reads are mount-time Supabase (`playlist_testing`) or network fetch (MoshSplit Part 2).
+2. **No IndexedDB cache** for satellite flags or balance — reads are mount-time Supabase (`playlist_testing`) or network fetch (MoshSplit).
 3. **Deep-link only** — both integrations open external tabs (`target="_blank"`). Failure modes are silent hide or error UI, never blocking core picks/sync.
-4. **Feature flags** — `app_settings.playlist_testing` gates Setlist strip visibility (godlike toggles in admin panel). MoshSplit Part 1 uses compile-time `ACTIVE_MOCK` until API is ready.
+4. **Feature flags** — `app_settings.playlist_testing` gates Setlist strip visibility (godlike toggles in admin panel).
+5. **MoshSplit uses a Vercel proxy** — `POST /api/moshsplit/v1/balances/external-summary` in the browser is rewritten by Vercel to `https://split.viralatas.org/v1/balances/external-summary`. The bearer token (`VITE_MOSHSPLIT_TOKEN`) travels inside the same-origin request; no CORS headers are required on the external service. `vite.config.ts` mirrors this rewrite locally via `server.proxy`.
 
 The godlike-assigned **`code-wizards`** badge honors the builders of all three apps. See [Badge System — Merit / Assigned](badges.md#merit--assigned-14).
 
@@ -562,4 +565,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-05-22 — Viralatas App Pack section (Companion + Setlist + MoshSplit deep-links)
+**Last updated:** 2026-05-24 — Phase 23 Part 2: MoshSplit real API via Vercel proxy; BadgesDisplay two-phase loading; App Pack proxy rule added

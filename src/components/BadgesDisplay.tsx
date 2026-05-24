@@ -49,6 +49,7 @@ function yearSuffix(year: number): string {
 export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
   const { t } = useI18n('Badges');
   const [ctx, setCtx] = useState<BadgeContext>(EMPTY_CTX);
+  const [loading, setLoading] = useState(true);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
   const [bg, setBg] = useState<PatchesBackground>(() => loadPatchesBackground());
 
@@ -64,18 +65,19 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
   useEffect(() => {
     let active = true;
 
-    async function refresh() {
-      const [userPicks, allPicks, bands, allMissed, userRow, presence, crewUsers] = await Promise.all([
-        loadUserPicks(user.id),
-        loadAllUserPicks(),
-        loadBands(),
-        missedRepository.loadAll(),
-        supabase.from('users').select('special_badges, is_friend').eq('id', user.id).single(),
-        loadAllUserPresence(),
-        loadCrewUsers(),
-      ]);
-      if (!active) return;
+    type IdbSnapshot = {
+      userPicks: { band_id: string }[];
+      allPicks: { band_id: string }[];
+      bands: BadgeBand[];
+      allMissed: { user_id: string; band_id: string }[];
+      presence: { user_id: string; is_camping: boolean; is_at_metal_place?: boolean }[];
+      crewUsers: { id: string; is_friend?: boolean | null }[];
+      assignedBadges: string[];
+      isCurrentUserFriend: boolean;
+    };
 
+    function buildCtx(snap: IdbSnapshot) {
+      const { userPicks, allPicks, bands, allMissed, assignedBadges, isCurrentUserFriend, presence, crewUsers } = snap;
       const userPickBandIds = userPicks.map((p) => p.band_id);
       const allPickCounts = new Map<string, number>();
       allPicks.forEach((p) =>
@@ -85,9 +87,6 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       const userMissedIds = new Set(
         allMissed.filter((m) => m.user_id === user.id).map((m) => m.band_id),
       );
-      const rowData = userRow.data as { special_badges?: string[]; is_friend?: boolean | null } | null;
-      const assignedBadges: string[] = rowData?.special_badges ?? [];
-      const isCurrentUserFriend = rowData?.is_friend === true;
 
       const myPresence = presence.find((p) => p.user_id === user.id);
       const isAtCamping = myPresence?.is_camping ?? false;
@@ -118,7 +117,7 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
         (user.user_metadata?.achieved_badge_slugs as string[]) ?? []
       );
 
-      const newCtx = buildBadgeContext(
+      return buildBadgeContext(
         user,
         userPickBandIds,
         allPickCounts,
@@ -131,8 +130,42 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
         crewLocationCounts,
         achievedBadgeSlugs,
       );
+    }
 
-      const earnedBadges = BADGES.filter((b) => evaluateBadge(b, newCtx));
+    async function refresh() {
+      // Phase 1: IDB-only reads (fast, local) — render badges immediately
+      const [userPicks, allPicks, bands, allMissed, presence, crewUsers] = await Promise.all([
+        loadUserPicks(user.id),
+        loadAllUserPicks(),
+        loadBands(),
+        missedRepository.loadAll(),
+        loadAllUserPresence(),
+        loadCrewUsers(),
+      ]);
+      if (!active) return;
+
+      const idbCtx = buildCtx({ userPicks, allPicks, bands, allMissed, assignedBadges: [], isCurrentUserFriend: false, presence, crewUsers });
+      setCtx(idbCtx);
+      setLoading(false);
+
+      // Phase 2: Supabase call for special_badges + is_friend (network) — update in background
+      const userRow = await supabase
+        .from('users')
+        .select('special_badges, is_friend')
+        .eq('id', user.id)
+        .single();
+      if (!active) return;
+
+      const rowData = userRow.data as { special_badges?: string[]; is_friend?: boolean | null } | null;
+      const assignedBadges: string[] = rowData?.special_badges ?? [];
+      const isCurrentUserFriend = rowData?.is_friend === true;
+
+      const fullCtx = buildCtx({ userPicks, allPicks, bands, allMissed, assignedBadges, isCurrentUserFriend, presence, crewUsers });
+
+      const achievedBadgeSlugs = new Set<string>(
+        (user.user_metadata?.achieved_badge_slugs as string[]) ?? []
+      );
+      const earnedBadges = BADGES.filter((b) => evaluateBadge(b, fullCtx));
       const newlyAchieved = earnedBadges
         .filter((b) => b.persist && !achievedBadgeSlugs.has(b.slug))
         .map((b) => b.slug);
@@ -150,7 +183,7 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
         });
       }
 
-      setCtx(newCtx);
+      setCtx(fullCtx);
     }
 
     refresh();
@@ -187,6 +220,19 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
     localStorage.setItem('badgeAcknowledged', JSON.stringify([...acknowledgedRef.current]));
     setGlowingSlugs((prev) => { const s = new Set(prev); s.delete(slug); return s; });
     setSelectedSlug(slug);
+  }
+
+  if (loading) {
+    return (
+      <>
+        {heading && <div className={styles.patchesHeading}>{heading}</div>}
+        <div className={`${styles.patchesGrid} ${styles.patchesGridSkeleton}`} data-bg={bg} aria-hidden="true">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className={styles.skeletonPatch} />
+          ))}
+        </div>
+      </>
+    );
   }
 
   if (earned.length === 0) return null;

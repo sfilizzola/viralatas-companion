@@ -1049,18 +1049,18 @@
 
       <div class="component-section">
         <h3>MoshSplitSection <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/profile/MoshSplitSection.tsx</span></h3>
-        <p>Collapsible profile section showing the current user's net balance from <strong>MoshSplit</strong> (<code>split.viralatas.org</code>) — the festival finance app used by the vira-latas at Wacken. Placed after <code>&lt;ConflictSection&gt;</code>, before <code>&lt;EditProfileForm&gt;</code>. Accepts only <code>userEmail: string</code>; fetches (or mocks) its own data.</p>
-        <p><strong>Four render states:</strong></p>
+        <p>Collapsible profile section showing the current user's net balance from <strong>MoshSplit</strong> (<code>split.viralatas.org</code>) — the festival finance app used by the vira-latas at Wacken. Placed after <code>&lt;ConflictSection&gt;</code>, before <code>&lt;EditProfileForm&gt;</code>. Accepts only <code>userEmail: string</code>; fetches live data via <code>POST /api/moshsplit/v1/balances/external-summary</code> (Vercel proxy → <code>split.viralatas.org</code>, bearer token from <code>VITE_MOSHSPLIT_TOKEN</code>).</p>
+        <p><strong>Five render states:</strong></p>
         <ul style="margin: 0 0 12px 18px; color: #888; font-size: 14px;">
-          <li><strong>loading</strong> — spinner chip in header, shimmer skeleton in body.</li>
-          <li><strong>not_found</strong> — <code>return null</code>, component fully invisible.</li>
-          <li><strong>settled</strong> (balance = 0) — teal "Quitado" chip + "Tudo acertado 🤘" message + CTA.</li>
-          <li><strong>active</strong> (balance ≠ 0) — red chip if owes, teal chip if owed + festival/amount row + CTA.</li>
+          <li><strong>loading</strong> — spinner chip in header, pulse-skeleton in body.</li>
+          <li><strong>not_found</strong> — API 404; <code>return null</code>, component fully invisible.</li>
+          <li><strong>error</strong> — non-OK response or network failure; orange <code>!</code> chip in header; <code>⚠ Could not load MoshSplit data</code> + CTA in body.</li>
+          <li><strong>settled</strong> (balance = 0) — teal chip + "All settled 🤘" message + CTA.</li>
+          <li><strong>active</strong> (balance ≠ 0) — red chip if owes, teal chip if owed + expense list + festival/total row + CTA.</li>
         </ul>
         <p><strong>Collapsible trigger layout:</strong> logo (22×22, border-radius 5px, remote SVG with wallet fallback) → label group (Oswald 14px + mono sub-label) → balance chip (right-aligned). Uses <code>&lt;Collapsible&gt;</code> from <code>src/ui</code> with <code>defaultOpen={false}</code>. Wrapper: <code>margin: var(--s-3) var(--s-4)</code>, max-width 400px.</p>
-        <p><strong>Chip palette:</strong> owes = <code>rgba(--accent, 0.20)</code> bg / <code>--accent-hover</code> text; owed = <code>rgba(--signal-ok, 0.20)</code> bg / teal text; settled = attenuated teal. Font mono 11px tabular-nums.</p>
-        <p><strong>CTA button:</strong> full-width, "Abrir MoshSplit →", <code>rgba(--accent, 0.08)</code> bg, opens <code>https://split.viralatas.org</code> in new tab. Visible in settled and active states.</p>
-        <p><strong>Part 1 / Part 2:</strong> Part 1 ships with mock data (<code>ACTIVE_MOCK</code> constant + <code>setTimeout(200ms)</code>). Part 2 (blocked on MoshSplit API docs) replaces mock with real <code>fetch</code> using <code>VITE_MOSHSPLIT_TOKEN</code> + user email.</p>
+        <p><strong>Chip palette:</strong> owes = <code>rgba(--accent, 0.20)</code> bg / <code>--accent-hover</code> text; owed = <code>rgba(--signal-ok, 0.20)</code> bg / teal text; settled = attenuated teal; error = <code>rgba(255,165,0,0.20)</code> bg / orange text. Font mono 11px tabular-nums.</p>
+        <p><strong>CTA:</strong> full-width <code>&lt;a&gt;</code> element, "Open MoshSplit →", <code>rgba(--accent, 0.08)</code> bg, opens <code>https://split.viralatas.org</code> in new tab. Visible in settled, active, and error states.</p>
         <div class="component-demo" style="background: #060606; padding: 24px; display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; justify-content: center;">
           <style>
             .ds-ms-wrap { border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; width: 280px; }
@@ -1173,7 +1173,7 @@
             <tr><th>Property</th><th>Type</th><th>Description</th></tr>
           </thead>
           <tbody>
-            <tr><td>userEmail</td><td>string</td><td>Current user's email. Used in Part 2 for the balance API call. Part 1 ignores the value (mock data).</td></tr>
+            <tr><td>userEmail</td><td>string</td><td>Current user's email. Sent as <code>{ email }</code> in the POST body to the MoshSplit balance API. Empty string causes <code>useEffect</code> to bail early (component stays in loading state).</td></tr>
           </tbody>
         </table>
       </div>
