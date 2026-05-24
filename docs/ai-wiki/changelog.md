@@ -4,6 +4,17 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (assigned-badge drift loop fix)
+
+### Fixed
+- **BadgesDisplay drift loop** — replaced `refreshSession()` with one-shot `updateUser({ special_badges })` when DB and cached `user_metadata` diverge; effect depends on `user.id` only and reuses last DB snapshot on later refreshes. Fixes assigned-badge blink and session logout after godlike assignment.
+- **`assign-badge` Edge Function** — auth metadata mirror checks errors and rolls back DB write if `updateUserById` fails.
+
+### Architectural Notes
+- `refreshSession()` only re-fetches JWT metadata from auth server; if `admin.updateUserById` failed or was never run for a legacy assignment, drift never healed and each refresh re-triggered the effect → badge flicker + repeated session refresh → logout.
+
+---
+
 ## 2026-05-24 (Live Now scenario tests)
 
 ### Added
@@ -1069,13 +1080,13 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
-## 2026-05-24
+## 2026-05-24 (offline assigned badges)
 
 ### Changed
 - **`assign-badge` Edge Function** (`supabase/functions/assign-badge/index.ts`) — after writing `users.special_badges`, the function now also calls `supabase.auth.admin.updateUserById(targetUserId, { user_metadata: { special_badges: updated } })` to mirror the array into `auth.users.raw_user_meta_data.special_badges`. Applies for both assign AND revoke actions.
 - **`BadgesDisplay.tsx`** — `assignedBadges` is now read from `user.user_metadata?.special_badges ?? []` instead of a hardcoded `[]`, making assigned badges available offline from the Supabase JS client's localStorage session cache.
 - **`BadgesDisplay.tsx`** — `isCurrentUserFriend` is now resolved from the already-loaded `crewUsers` IDB store (`crewUsers.find(u => u.id === user.id)?.is_friend === true`) instead of a hardcoded `false`; no extra network call.
-- **`BadgesDisplay.tsx`** — drift detection added: if DB `special_badges` (from IDB `crew_users` store) differs from `user_metadata.special_badges`, fires a background `supabase.auth.refreshSession()` to sync the localStorage session cache for the next offline visit.
+- **`BadgesDisplay.tsx`** — drift detection added: if DB `special_badges` differs from `user_metadata.special_badges`, syncs via one-shot `updateUser({ special_badges })` (superseded by drift-loop fix above).
 - **`docs/ai-wiki/badges.md`** — updated `assigned` condition "How it works" steps to document the metadata mirroring; added "Offline behavior" and "Drift detection" notes to the `assigned` section; added new Edge Case #6 ("Assigned Badges Work Offline") covering the full offline guarantee, drift scenario, and `isCurrentUserFriend` IDB read; updated `BadgeContext.assignedBadges` comment; updated footer.
 
 ### Architectural Notes

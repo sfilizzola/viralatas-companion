@@ -21,6 +21,12 @@ import {
 import { Modal } from '../ui';
 import styles from './BadgesDisplay.module.css';
 
+function badgesEqual(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false;
+  const setB = new Set(b);
+  return a.every((s) => setB.has(s));
+}
+
 const EMPTY_CTX: BadgeContext = {
   wacken_years: [],
   country: null,
@@ -62,8 +68,13 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
     return () => window.removeEventListener(PATCHES_BG_CHANGED_EVENT, onBgChange);
   }, []);
 
+  const dbAssignedRef = useRef<string[] | null>(null);
+  const metadataSyncedRef = useRef(false);
+
   useEffect(() => {
     let active = true;
+    dbAssignedRef.current = null;
+    metadataSyncedRef.current = false;
 
     type IdbSnapshot = {
       userPicks: { band_id: string }[];
@@ -76,7 +87,7 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       isCurrentUserFriend: boolean;
     };
 
-    function buildCtx(snap: IdbSnapshot) {
+    function buildCtx(snap: IdbSnapshot, authUser: AuthUser) {
       const { userPicks, allPicks, bands, allMissed, assignedBadges, isCurrentUserFriend, presence, crewUsers } = snap;
       const userPickBandIds = userPicks.map((p) => p.band_id);
       const allPickCounts = new Map<string, number>();
@@ -112,13 +123,13 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
         lost: nonFriendPresence.filter((p) => !p.is_camping && !p.is_at_metal_place).length,
       };
 
-      const locationVisits = (user.user_metadata?.location_visits as Record<string, number>) ?? {};
+      const locationVisits = (authUser.user_metadata?.location_visits as Record<string, number>) ?? {};
       const achievedBadgeSlugs = new Set<string>(
-        (user.user_metadata?.achieved_badge_slugs as string[]) ?? []
+        (authUser.user_metadata?.achieved_badge_slugs as string[]) ?? []
       );
 
       return buildBadgeContext(
-        user,
+        authUser,
         userPickBandIds,
         allPickCounts,
         bandsById,
@@ -133,6 +144,10 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
     }
 
     async function refresh() {
+      const { data: { session } } = await supabase.auth.getSession();
+      const sessionUser = session?.user;
+      if (!sessionUser || sessionUser.id !== user.id) return;
+
       // Phase 1: IDB-only reads (fast, local) — render badges immediately
       const [userPicks, allPicks, bands, allMissed, presence, crewUsers] = await Promise.all([
         loadUserPicks(user.id),
@@ -145,13 +160,24 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       if (!active) return;
 
       // Phase 1 reads special_badges from the cached auth session (user_metadata) so
-      // assigned badges are visible immediately, even offline. The Edge Function mirrors
-      // special_badges into user_metadata on every assign/revoke so the cache stays fresh.
-      const assignedBadgesFromMeta: string[] = (user.user_metadata?.special_badges as string[]) ?? [];
+      // assigned badges are visible immediately, even offline. After Phase 2 has run once,
+      // reuse the DB snapshot so later refreshes (e.g. PICKS_CHANGED) do not flicker.
+      const assignedBadgesFromMeta: string[] =
+        (sessionUser.user_metadata?.special_badges as string[]) ?? [];
+      const assignedForPhase1 = dbAssignedRef.current ?? assignedBadgesFromMeta;
       // is_friend is already in the crew_users IDB store — no network call needed for Phase 1.
       const isCurrentUserFriendFromIdb = crewUsers.find((u) => u.id === user.id)?.is_friend === true;
 
-      const idbCtx = buildCtx({ userPicks, allPicks, bands, allMissed, assignedBadges: assignedBadgesFromMeta, isCurrentUserFriend: isCurrentUserFriendFromIdb, presence, crewUsers });
+      const idbCtx = buildCtx({
+        userPicks,
+        allPicks,
+        bands,
+        allMissed,
+        assignedBadges: assignedForPhase1,
+        isCurrentUserFriend: isCurrentUserFriendFromIdb,
+        presence,
+        crewUsers,
+      }, sessionUser);
       setCtx(idbCtx);
       setLoading(false);
 
@@ -165,27 +191,36 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
 
       const rowData = userRow.data as { special_badges?: string[]; is_friend?: boolean | null } | null;
       const assignedBadges: string[] = rowData?.special_badges ?? [];
+      dbAssignedRef.current = assignedBadges;
       const isCurrentUserFriend = rowData?.is_friend === true;
 
-      // Drift detection: if DB special_badges differ from cached user_metadata, refresh
-      // the auth session in the background so the next offline visit reflects the change
-      // (covers both new assignments and revocations).
-      const metaBadges = (user.user_metadata?.special_badges as string[]) ?? [];
-      const dbSet = new Set(assignedBadges);
-      const metaSet = new Set(metaBadges);
-      const hasDrift =
-        assignedBadges.some((s) => !metaSet.has(s)) ||
-        metaBadges.some((s) => !dbSet.has(s));
-      if (hasDrift) {
-        supabase.auth.refreshSession().catch(() => {
-          // best-effort; next natural token refresh will sync user_metadata
-        });
+      // Drift: DB is source of truth. Push DB value into auth user_metadata once so the
+      // localStorage session cache matches for offline — refreshSession() only re-fetches
+      // stale JWT metadata and caused an infinite loop (blink + logout).
+      const metaBadges = assignedBadgesFromMeta;
+      const hasDrift = !badgesEqual(assignedBadges, metaBadges);
+      if (hasDrift && !metadataSyncedRef.current) {
+        metadataSyncedRef.current = true;
+        supabase.auth
+          .updateUser({ data: { special_badges: assignedBadges } })
+          .catch(() => {
+            metadataSyncedRef.current = false;
+          });
       }
 
-      const fullCtx = buildCtx({ userPicks, allPicks, bands, allMissed, assignedBadges, isCurrentUserFriend, presence, crewUsers });
+      const fullCtx = buildCtx({
+        userPicks,
+        allPicks,
+        bands,
+        allMissed,
+        assignedBadges,
+        isCurrentUserFriend,
+        presence,
+        crewUsers,
+      }, sessionUser);
 
       const achievedBadgeSlugs = new Set<string>(
-        (user.user_metadata?.achieved_badge_slugs as string[]) ?? []
+        (sessionUser.user_metadata?.achieved_badge_slugs as string[]) ?? []
       );
       const earnedBadges = BADGES.filter((b) => evaluateBadge(b, fullCtx));
       const newlyAchieved = earnedBadges
@@ -196,7 +231,7 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
         supabase.auth.updateUser({
           data: {
             achieved_badge_slugs: [
-              ...(user.user_metadata?.achieved_badge_slugs ?? []),
+              ...(sessionUser.user_metadata?.achieved_badge_slugs ?? []),
               ...newlyAchieved,
             ],
           },
@@ -216,7 +251,7 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
       window.removeEventListener(PICKS_CHANGED_EVENT, refresh);
       window.removeEventListener(MISSED_CHANGED_EVENT, refresh);
     };
-  }, [user]);
+  }, [user.id]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
 

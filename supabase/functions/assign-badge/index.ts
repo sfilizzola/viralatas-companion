@@ -99,9 +99,17 @@ Deno.serve(async (req) => {
 
   // Mirror to auth user_metadata so the target user's cached session reflects
   // the change and assigned badges are visible offline (Phase 1 reads user_metadata).
-  await supabase.auth.admin.updateUserById(targetUserId, {
+  const { error: metaError } = await supabase.auth.admin.updateUserById(targetUserId, {
     user_metadata: { special_badges: updated },
   });
+  if (metaError) {
+    // Roll back DB write so users.special_badges and auth metadata stay in sync.
+    await supabase.from('users').update({ special_badges: current }).eq('id', targetUserId);
+    return new Response(JSON.stringify({ error: metaError.message }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
 
   return new Response(JSON.stringify({ special_badges: updated }), {
     status: 200,
