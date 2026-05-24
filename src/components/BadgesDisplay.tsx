@@ -8,7 +8,7 @@ import {
   type BadgeConfig,
   type BadgeContext,
 } from '../services/badges';
-import { loadUserPicks, loadAllUserPicks, loadBands, loadAllUserPresence, loadCrewUsers, PICKS_CHANGED_EVENT, MISSED_CHANGED_EVENT } from '../lib/db';
+import { loadUserPicks, loadAllUserPicks, loadBands, loadAllUserPresence, loadCrewUsers, PICKS_CHANGED_EVENT, MISSED_CHANGED_EVENT, PRESENCE_CHANGED_EVENT, CREW_USERS_CHANGED_EVENT } from '../lib/db';
 import { missedRepository } from '../repositories';
 import { now } from '../services/time';
 import { supabase } from '../lib/supabase';
@@ -372,10 +372,20 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
     refresh();
     window.addEventListener(PICKS_CHANGED_EVENT, refresh);
     window.addEventListener(MISSED_CHANGED_EVENT, refresh);
+    window.addEventListener(PRESENCE_CHANGED_EVENT, refresh);
+    window.addEventListener(CREW_USERS_CHANGED_EVENT, refresh);
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'USER_UPDATED') void refresh();
+    });
+
     return () => {
       active = false;
       window.removeEventListener(PICKS_CHANGED_EVENT, refresh);
       window.removeEventListener(MISSED_CHANGED_EVENT, refresh);
+      window.removeEventListener(PRESENCE_CHANGED_EVENT, refresh);
+      window.removeEventListener(CREW_USERS_CHANGED_EVENT, refresh);
+      subscription.unsubscribe();
     };
   }, [user.id]);
 
