@@ -28,6 +28,10 @@ export type CrewLiveGroup =
       members: CrewLivePlan[];
     };
 
+export type PresenceLocation = 'auto' | 'camping' | 'metal_place';
+
+export type CrewGroupKind = CrewLiveGroup['kind'];
+
 /**
  * Godlike "Live Band Test": when active, splice a virtual copy of the test band
  * into `bands` with start/end times shifted to wrap `now` (preserving the band's
@@ -94,6 +98,44 @@ export function applyPresenceToLivePlan(plan: LivePlan, isCamping: boolean): Liv
     return { status: 'lost', band: null, nextBand: plan.band };
   }
   return { status: 'lost', band: null, nextBand: null };
+}
+
+/** Focus-user plan for /now: camping and Metal Place override a concurrent live pick. */
+export function resolveFocusUserLivePlan(
+  rawPlan: LivePlan,
+  presence: UserPresence | undefined,
+  metalPlaceWindowActive: boolean,
+): LivePlan {
+  const withCamping = applyPresenceToLivePlan(rawPlan, presence?.is_camping ?? false);
+  const isAtMetalPlace = presence?.is_at_metal_place ?? false;
+  if (
+    isAtMetalPlace &&
+    metalPlaceWindowActive &&
+    rawPlan.status === 'current' &&
+    rawPlan.band
+  ) {
+    return { status: 'lost', band: null, nextBand: rawPlan.band };
+  }
+  return withCamping;
+}
+
+export function derivePresenceValue(
+  presence: UserPresence | undefined,
+  rawPlan: LivePlan,
+  metalPlaceWindowActive: boolean,
+): PresenceLocation {
+  const isAtMetalPlace = presence?.is_at_metal_place ?? false;
+  const isCamping = presence?.is_camping ?? false;
+  if (isAtMetalPlace && metalPlaceWindowActive) return 'metal_place';
+  if (isCamping && rawPlan.status !== 'current') return 'camping';
+  return 'auto';
+}
+
+export function findUserCrewGroup(
+  userId: string,
+  groups: CrewLiveGroup[],
+): CrewLiveGroup | null {
+  return groups.find((group) => group.members.some((member) => member.id === userId)) ?? null;
 }
 
 export function mapCrewLivePlans(

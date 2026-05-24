@@ -19,13 +19,15 @@ import {
   saveUserPresence,
 } from '../lib/db';
 import {
-  applyPresenceToLivePlan,
+  derivePresenceValue,
   findLivePlan,
   groupCrewLivePlans,
   mapCrewLivePlans,
+  resolveFocusUserLivePlan,
   type CrewLiveGroup,
   type CrewLivePlan,
   type LivePlan,
+  type PresenceLocation,
 } from '../services/livePreview';
 import { picksRepository, presenceRepository } from '../repositories';
 import { useDuckQuack } from './useDuckQuack';
@@ -33,8 +35,6 @@ import { syncLiveBandTestConfig } from '../services/liveBandTest';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './useAuth';
 import { useNow } from './useNow';
-import type { PresenceLocation } from '../components/PresenceToggle';
-
 const DUCK_WINDOW_MS = 15 * 60 * 1000;
 
 export type NowData = {
@@ -238,16 +238,11 @@ export function useNowData(): NowData {
 
   const isCamping = myPresence?.is_camping ?? false;
   const isAtMetalPlace = myPresence?.is_at_metal_place ?? false;
-  const presenceValue: PresenceLocation =
-    isAtMetalPlace && isMetalPlaceWindowActive
-      ? 'metal_place'
-      : isCamping && myRawPlan.status !== 'current'
-        ? 'camping'
-        : 'auto';
+  const presenceValue = derivePresenceValue(myPresence, myRawPlan, isMetalPlaceWindowActive);
 
   const myPlan = useMemo(
-    () => applyPresenceToLivePlan(myRawPlan, isCamping),
-    [myRawPlan, isCamping],
+    () => resolveFocusUserLivePlan(myRawPlan, myPresence, isMetalPlaceWindowActive),
+    [myRawPlan, myPresence, isMetalPlaceWindowActive],
   );
 
   useEffect(() => {

@@ -1,7 +1,8 @@
 import { useId } from 'react';
+import type { PresenceLocation } from '../services/livePreview';
 import styles from './PresenceToggle.module.css';
 
-export type PresenceLocation = 'auto' | 'camping' | 'metal_place';
+export type { PresenceLocation };
 
 type PresenceToggleLabels = {
   title: string;

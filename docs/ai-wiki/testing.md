@@ -8,7 +8,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 
 ## Relevant Source Files
 
-- `src/__tests__/` — All test files (355 tests)
+- `src/__tests__/` — All test files (443 tests)
 - `vitest.config.ts` — Test runner configuration
 - `package.json` — Test scripts (`test`, `test:coverage`) and seed scripts (`seed:bands`, `seed:test-users`, `seed:live-now`, `festival:reset`)
 - `supabase/seed/` — Seed scripts for test data and the destructive `festival-reset.ts` operator script (see `docs/ai-wiki/festival-reset.md`)
@@ -31,7 +31,8 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `schedule.test.ts` | Band filtering, sorting, time logic |
 | `time.test.ts` | Festival day calculation, time utilities, formatting |
 | `useBandConflicts.test.ts` | Conflict detection, overlap logic, severity |
-| `livePreview.test.ts` | Time travel logic, test mode |
+| `livePreview.test.ts` | Time travel logic, test mode, presence grouping, `derivePresenceValue` |
+| `liveNowScenarios.test.ts` | Table-driven Live Now scenarios: multi-band crew layout, camping/Metal Place/lost transitions |
 | `badges.test.ts` | Badge condition evaluation |
 | `missed.test.ts` | Marking bands as seen/missed |
 | `BandCard.test.tsx` | Component rendering, user interactions |
@@ -48,7 +49,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `bandsRepository.test.ts` | `checkAndApplyCacheVersion()` match/mismatch/no-data (3 tests) |
 | `missedRepository.test.ts` | Mark/unmark missed band online and offline (4 tests) |
 
-**Coverage**: 355 tests across all files
+**Coverage**: 443 tests across all files
 
 **Run**:
 ```bash
@@ -283,6 +284,52 @@ vi.mock('src/lib/supabase', () => ({
   },
 }));
 ```
+
+---
+
+## Live Now Scenario Tests
+
+**Location**: `src/__tests__/liveNowScenarios.test.ts` + `src/__tests__/fixtures/liveNowScenarios.ts`
+
+These tests exercise the `/now` derivation pipeline without mounting React or Supabase:
+
+```
+bands + picks + presence + now
+  → mapCrewLivePlans → groupCrewLivePlans   (crew layout)
+  → findLivePlan → applyPresenceToLivePlan  (focus user card)
+  → derivePresenceValue                     (PresenceToggle value)
+```
+
+**Run only scenario tests:**
+
+```bash
+npm test -- liveNowScenarios.test.ts
+```
+
+**Adding a new scenario:**
+
+1. Build fixtures with `scenarioBand`, `scenarioUser`, `scenarioPick`, `scenarioPresence` (or extend `threeBandLiveFixture()`).
+2. Call `runLiveNowScenario({ bands, users, picks, presence, focusUserId, metalPlaceWindowActive, ... })`.
+3. Assert with `assertLiveNowExpectations(result, { myGroupKind, presenceValue, groupMemberCounts, ... })`.
+
+**Transition flows** (multi-step): run `runLiveNowScenario` once per step with updated `presence` / `now` / `metalPlaceWindowActive`.
+
+**Documented behaviors under test:**
+
+| ID | Flow | Expected end state |
+|----|------|-------------------|
+| T1 | camping → Metal Place → event ends or quit | **Lost** — camping is not restored unless user toggles it |
+| T1b | camping → Metal Place → manual quit (toggle off) | Lost, not camping |
+| T2 | lost → Metal Place → leave | Lost |
+| T3 | at Metal Place → band goes live → leave MP | Current band group |
+| T4 | camping flag + current band | `presenceValue: auto`, band group |
+| T9 | at Metal Place while picked band is live | MP group + `myPlan` lost (band overridden); `myRawPlan` still current |
+| T5 | stale MP flag + event over + live picked band | Band group, MP group hidden |
+| T7 | stale MP flag + event over + no picks | Lost, MP group hidden |
+| T8 | stale MP flag + event over + future pick only | Lost (with nextBand), MP group hidden |
+| T6 | friend off-stage | Hidden from camping/lost |
+
+Pure helpers live in [`src/services/livePreview.ts`](../src/services/livePreview.ts): `derivePresenceValue`, `findUserCrewGroup`, `applyPresenceToLivePlan`, `groupCrewLivePlans`.
 
 ---
 

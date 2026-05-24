@@ -4,6 +4,30 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Live Now scenario tests)
+
+### Added
+- **`derivePresenceValue()` and `findUserCrewGroup()`** in `src/services/livePreview.ts` — pure helpers extracted from `useNowData` for testable presence-toggle and crew-group resolution.
+- **`src/__tests__/fixtures/liveNowScenarios.ts`** — shared band/user/presence builders, `runLiveNowScenario()` pipeline, and `assertLiveNowExpectations()`.
+- **`src/__tests__/liveNowScenarios.test.ts`** — table-driven scenarios: 3 concurrent live bands + camping + lost + Metal Place snapshot; transition flows T1–T6 (camping/MP/lost/band); `derivePresenceValue` branch coverage.
+
+### Changed
+- **`resolveFocusUserLivePlan()`** in `livePreview.ts` — Metal Place (active window) overrides a concurrent live pick for the focus user's `myPlan` on `/now`; crew grouping already preferred MP via `groupCrewLivePlans`.
+- **`useNowData.ts`** — uses `resolveFocusUserLivePlan()` instead of `applyPresenceToLivePlan()` for `myPlan`.
+- **`PresenceToggle.tsx`** — `PresenceLocation` type re-exported from `livePreview.ts`.
+- **`livePreview.test.ts`** — extended with `applyPresenceToLivePlan`, `derivePresenceValue`, `resolveFocusUserLivePlan`, `groupCrewLivePlans`, and `findUserCrewGroup` cases.
+- **`liveNowScenarios.test.ts`** — T9 (MP overrides live band), T1b, T7, T8; T1/T3 updates for MP override on `myPlan`.
+- **`docs/ai-wiki/testing.md`** — Live Now scenario test section; test count updated.
+
+### Not implemented (deferred)
+- **Auto-mark missed when a picked band ends while user was at Metal Place** — estimated **medium–high** effort (~1 phase). Requires a `useNow` tick or resume hook, overlap rule (mark only if still at MP at `end_time`?), offline queue via `missedRepository`, idempotency, and tests for leave-MP-before-end / app-closed-during-set. Manual toggle in band detail after set ends remains the supported path.
+
+### Architectural Notes
+- Scenario tests run the same pure pipeline as `/now` without Supabase subscriptions or IndexedDB. `metalPlaceWindowActive` is passed explicitly in fixtures (defaults to `true`) to avoid importing `presenceRepository` in test helpers.
+- T1 documents current product behavior: leaving Metal Place (quit or event over) does **not** restore a prior camping flag — user lands in lost until they toggle camping again. While the event is over, a stale `is_at_metal_place` flag is ignored for grouping: user appears in **lost** or their **live band** group (T5/T7/T8); `validateAndAutoCheckout` clears the DB flag on the user's device.
+
+---
+
 ## 2026-05-24 (Phase 23 Part 2 — MoshSplit real API + BadgesDisplay two-phase loading)
 
 ### Added

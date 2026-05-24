@@ -1,8 +1,14 @@
 import { describe, it, expect } from 'vitest';
 import {
   applyLiveBandTestOverride,
+  applyPresenceToLivePlan,
+  derivePresenceValue,
   findLivePlan,
+  findUserCrewGroup,
+  groupCrewLivePlans,
   mapCrewLivePlans,
+  resolveFocusUserLivePlan,
+  type CrewLivePlan,
 } from '../services/livePreview';
 import type { Band, CrewUser, UserPick, UserPresence } from '../types';
 
@@ -109,5 +115,195 @@ describe('mapCrewLivePlans with liveTestBandId', () => {
     expect(picker.plan.status).toBe('current');
     expect(picker.plan.band?.id).toBe('b');
     expect(nonPicker.plan.status).toBe('lost');
+  });
+});
+
+describe('applyPresenceToLivePlan', () => {
+  const liveBand = band('live', '2026-07-29T18:00:00Z', '2026-07-29T21:00:00Z');
+  const nextBand = band('next', '2026-07-29T21:00:00Z', '2026-07-29T22:00:00Z');
+
+  it('keeps current plan unchanged even when camping', () => {
+    const plan = { status: 'current' as const, band: liveBand };
+    expect(applyPresenceToLivePlan(plan, true)).toEqual(plan);
+  });
+
+  it('maps camping without current band to lost with no nextBand', () => {
+    expect(applyPresenceToLivePlan({ status: 'empty', band: null }, true)).toEqual({
+      status: 'lost',
+      band: null,
+      nextBand: null,
+    });
+  });
+
+  it('maps next pick to lost with nextBand reference', () => {
+    expect(applyPresenceToLivePlan({ status: 'next', band: nextBand }, false)).toEqual({
+      status: 'lost',
+      band: null,
+      nextBand,
+    });
+  });
+
+  it('maps empty non-camping plan to lost without nextBand', () => {
+    expect(applyPresenceToLivePlan({ status: 'empty', band: null }, false)).toEqual({
+      status: 'lost',
+      band: null,
+      nextBand: null,
+    });
+  });
+});
+
+describe('derivePresenceValue', () => {
+  it('prioritises metal place when the window is active', () => {
+    expect(
+      derivePresenceValue(
+        { user_id: 'u1', is_camping: true, is_at_metal_place: true, updated_at: '' },
+        { status: 'empty', band: null },
+        true,
+      ),
+    ).toBe('metal_place');
+  });
+
+  it('returns camping when not at a current band', () => {
+    expect(
+      derivePresenceValue(
+        { user_id: 'u1', is_camping: true, is_at_metal_place: false, updated_at: '' },
+        { status: 'next', band: null },
+        true,
+      ),
+    ).toBe('camping');
+  });
+
+  it('returns auto when at a current band even if camping flag is set', () => {
+    expect(
+      derivePresenceValue(
+        { user_id: 'u1', is_camping: true, is_at_metal_place: false, updated_at: '' },
+        { status: 'current', band: null },
+        true,
+      ),
+    ).toBe('auto');
+  });
+});
+
+describe('groupCrewLivePlans', () => {
+  const NOW = new Date('2026-07-29T20:00:00.000Z');
+  const liveA = band('a', '2026-07-29T18:00:00Z', '2026-07-29T21:00:00Z', { name: 'A' });
+  const liveB = band('b', '2026-07-29T18:30:00Z', '2026-07-29T21:30:00Z', { name: 'B' });
+
+  function crewPlan(
+    id: string,
+    overrides: Partial<CrewLivePlan> & { plan: CrewLivePlan['plan'] },
+  ): CrewLivePlan {
+    return {
+      id,
+      display_name: id,
+      avatar_url: null,
+      is_friend: null,
+      label: id,
+      isCamping: false,
+      isAtMetalPlace: false,
+      isFriend: false,
+      ...overrides,
+    };
+  }
+
+  it('orders live bands before camping, metal place, and lost', () => {
+    const plans: CrewLivePlan[] = [
+      crewPlan('lost1', { plan: { status: 'lost', band: null } }),
+      crewPlan('camper', { isCamping: true, plan: { status: 'lost', band: null } }),
+      crewPlan('mp', { isAtMetalPlace: true, plan: { status: 'lost', band: null } }),
+      crewPlan('atB', { plan: { status: 'current', band: liveB } }),
+      crewPlan('atA', { plan: { status: 'current', band: liveA } }),
+    ];
+
+    const groups = groupCrewLivePlans(plans, { metalPlaceWindowActive: true });
+    expect(groups.map((group) => group.kind)).toEqual(['band', 'band', 'camping', 'metal_place', 'lost']);
+    expect(groups[0].kind === 'band' && groups[0].band.id).toBe('a');
+    expect(groups[1].kind === 'band' && groups[1].band.id).toBe('b');
+  });
+
+  it('hides metal place group when no members are checked in', () => {
+    const plans: CrewLivePlan[] = [
+      crewPlan('lost1', { plan: { status: 'lost', band: null } }),
+    ];
+    const groups = groupCrewLivePlans(plans);
+    expect(groups.map((group) => group.kind)).toEqual(['camping', 'lost']);
+  });
+
+  it('routes stale metal place members to band when the window is inactive', () => {
+    const plans: CrewLivePlan[] = [
+      crewPlan('mpPicker', {
+        isAtMetalPlace: true,
+        plan: { status: 'current', band: liveA },
+      }),
+    ];
+    const groups = groupCrewLivePlans(plans, { metalPlaceWindowActive: false });
+    expect(groups.map((group) => group.kind)).toEqual(['band', 'camping', 'lost']);
+    expect(groups[0].kind).toBe('band');
+    expect(groups[0].members[0].id).toBe('mpPicker');
+  });
+
+  it('keeps metal place members out of band groups while the window is active', () => {
+    const plans: CrewLivePlan[] = [
+      crewPlan('mpPicker', {
+        isAtMetalPlace: true,
+        plan: { status: 'current', band: liveA },
+      }),
+    ];
+    const groups = groupCrewLivePlans(plans, { metalPlaceWindowActive: true });
+    expect(groups.map((group) => group.kind)).toEqual(['camping', 'metal_place', 'lost']);
+    expect(groups.find((group) => group.kind === 'metal_place')?.members[0].id).toBe('mpPicker');
+  });
+});
+
+describe('resolveFocusUserLivePlan', () => {
+  const liveBand = band('live', '2026-07-29T18:00:00Z', '2026-07-29T21:00:00Z');
+
+  it('metal place overrides a concurrent live pick for the focus user', () => {
+    const raw = { status: 'current' as const, band: liveBand };
+    const presence = { user_id: 'me', is_camping: false, is_at_metal_place: true, updated_at: '' };
+
+    expect(resolveFocusUserLivePlan(raw, presence, true)).toEqual({
+      status: 'lost',
+      band: null,
+      nextBand: liveBand,
+    });
+  });
+
+  it('does not override when the metal place window is inactive', () => {
+    const raw = { status: 'current' as const, band: liveBand };
+    const presence = { user_id: 'me', is_camping: false, is_at_metal_place: true, updated_at: '' };
+
+    expect(resolveFocusUserLivePlan(raw, presence, false)).toEqual(raw);
+  });
+
+  it('camping override still applies when not at a live band', () => {
+    const raw = { status: 'empty' as const, band: null };
+    const presence = { user_id: 'me', is_camping: true, is_at_metal_place: false, updated_at: '' };
+
+    expect(resolveFocusUserLivePlan(raw, presence, true)).toEqual({
+      status: 'lost',
+      band: null,
+      nextBand: null,
+    });
+  });
+});
+
+describe('findUserCrewGroup', () => {
+  it('returns the group containing the user', () => {
+    const groups = groupCrewLivePlans([
+      {
+        id: 'u1',
+        display_name: 'U1',
+        avatar_url: null,
+        is_friend: null,
+        label: 'U1',
+        isCamping: true,
+        isAtMetalPlace: false,
+        isFriend: false,
+        plan: { status: 'lost', band: null },
+      },
+    ]);
+    expect(findUserCrewGroup('u1', groups)?.kind).toBe('camping');
+    expect(findUserCrewGroup('missing', groups)).toBeNull();
   });
 });
