@@ -264,6 +264,33 @@ export function groupCrewLivePlans(
   return result;
 }
 
+/** Crew counts aligned with /now location cards — used by badge evaluation. */
+export function computeCrewLocationCounts(
+  bands: Band[],
+  picks: UserPick[],
+  users: CrewUser[],
+  presence: UserPresence[],
+  now: Date,
+  options?: { metalPlaceWindowActive?: boolean; liveTestBandId?: string | null },
+): Record<'camping' | 'metal_place' | 'lost', number> {
+  const crewPlans = mapCrewLivePlans(
+    bands,
+    picks,
+    users,
+    presence,
+    now,
+    options?.liveTestBandId,
+  );
+  const groups = groupCrewLivePlans(crewPlans, {
+    metalPlaceWindowActive: options?.metalPlaceWindowActive ?? true,
+  });
+  return {
+    camping: groups.find((g) => g.kind === 'camping')?.members.length ?? 0,
+    metal_place: groups.find((g) => g.kind === 'metal_place')?.members.length ?? 0,
+    lost: groups.find((g) => g.kind === 'lost')?.members.length ?? 0,
+  };
+}
+
 export function formatFestivalTime(iso: string): string {
   return new Intl.DateTimeFormat('pt-BR', {
     hour: '2-digit',

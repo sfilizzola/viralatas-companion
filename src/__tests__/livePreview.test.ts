@@ -6,6 +6,7 @@ import {
   findLivePlan,
   findUserCrewGroup,
   groupCrewLivePlans,
+  computeCrewLocationCounts,
   mapCrewLivePlans,
   resolveFocusUserLivePlan,
   type CrewLivePlan,
@@ -252,6 +253,46 @@ describe('groupCrewLivePlans', () => {
     const groups = groupCrewLivePlans(plans, { metalPlaceWindowActive: true });
     expect(groups.map((group) => group.kind)).toEqual(['camping', 'metal_place', 'lost']);
     expect(groups.find((group) => group.kind === 'metal_place')?.members[0].id).toBe('mpPicker');
+  });
+});
+
+describe('computeCrewLocationCounts', () => {
+  const festivalNow = new Date('2026-07-29T19:00:00.000Z');
+  const liveBand = band('live', '2026-07-29T18:00:00Z', '2026-07-29T21:00:00Z');
+
+  function crewUser(id: string, overrides: Partial<CrewUser> = {}): CrewUser {
+    return { id, display_name: id, avatar_url: null, is_friend: false, ...overrides };
+  }
+
+  it('counts crew without presence rows as lost (matches /now Lost card)', () => {
+    const users = Array.from({ length: 15 }, (_, i) => crewUser(`u${i}`));
+    const counts = computeCrewLocationCounts([], [], users, [], festivalNow);
+    expect(counts.lost).toBe(15);
+    expect(counts.camping).toBe(0);
+  });
+
+  it('excludes friends and band watchers from the lost count', () => {
+    const users = [
+      crewUser('lost1'),
+      crewUser('lost2'),
+      crewUser('friend', { is_friend: true }),
+      crewUser('watcher'),
+    ];
+    const picks: UserPick[] = [
+      { user_id: 'watcher', band_id: 'live', created_at: festivalNow.toISOString() },
+    ];
+    const counts = computeCrewLocationCounts([liveBand], picks, users, [], festivalNow);
+    expect(counts.lost).toBe(2);
+  });
+
+  it('counts explicit campers separately from lost', () => {
+    const users = [crewUser('camper'), crewUser('lost1')];
+    const presence: UserPresence[] = [
+      { user_id: 'camper', is_camping: true, is_at_metal_place: false, updated_at: '' },
+    ];
+    const counts = computeCrewLocationCounts([], [], users, presence, festivalNow);
+    expect(counts.camping).toBe(1);
+    expect(counts.lost).toBe(1);
   });
 });
 

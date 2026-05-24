@@ -307,7 +307,7 @@ export const BADGES: BadgeConfig[] = [
     imagePath: '/badges/badge_lost_together.png',
     labelKey: 'badgeLostTogether',
     descriptionKey: 'badgeLostTogetherDescription',
-    condition: { type: 'crew_at_location_min', location: 'lost', count: 10 },
+    condition: { type: 'crew_at_location_min', location: 'lost', count: 15 },
     year: 2026,
     persist: true,
   },

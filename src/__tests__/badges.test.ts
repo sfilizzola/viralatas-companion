@@ -894,6 +894,68 @@ describe('evaluateBadge — crew_at_location_min', () => {
     const cfg = { ...badge({ type: 'crew_at_location_min', location: 'camping', count: 15 }), slug: 'bbq-crew' };
     expect(evaluateBadge(cfg, ctx)).toBe(false);
   });
+
+  it('returns true when user is lost AND lost crew count >= threshold', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      'lost',
+      { camping: 2, lost: 15 },
+      new Set(),
+    );
+    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'lost', count: 15 }), slug: 'lost-together' };
+    expect(evaluateBadge(cfg, ctx)).toBe(true);
+  });
+
+  it('returns false when lost crew count is below threshold', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      'lost',
+      { camping: 0, lost: 14 },
+      new Set(),
+    );
+    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'lost', count: 15 }), slug: 'lost-together' };
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+
+  it('returns true via persist when lost-together slug is in achievedBadgeSlugs after crew disperses', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      'camping',
+      { camping: 15, lost: 1 },
+      new Set(['lost-together']),
+    );
+    const cfg = { ...badge({ type: 'crew_at_location_min', location: 'lost', count: 15 }), slug: 'lost-together', persist: true };
+    expect(evaluateBadge(cfg, ctx)).toBe(true);
+  });
+});
+
+describe('registry — lost-together threshold', () => {
+  it('requires 15 lost crew (registry entry)', () => {
+    const cfg = findBadge('lost-together');
+    expect(cfg.condition).toEqual({ type: 'crew_at_location_min', location: 'lost', count: 15 });
+    expect(cfg.persist).toBe(true);
+  });
 });
 
 describe('persist flag — generic achievement recording', () => {

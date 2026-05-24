@@ -4,22 +4,29 @@ import {
   BADGES,
   buildBadgeContext,
   evaluateBadge,
+  mergedPersistedBadgeSlugs,
+  persistMetadataPatch,
   type BadgeBand,
   type BadgeContext,
 } from '../services/badges';
+import { computeCrewLocationCounts } from '../services/livePreview';
 import {
   loadUserPicks,
   loadAllUserPicks,
   loadBands,
   loadAllUserPresence,
   loadCrewUsers,
+  loadMetalPlaceConfig,
+  loadLiveBandTestConfig,
   PICKS_CHANGED_EVENT,
   PRESENCE_CHANGED_EVENT,
   CREW_USERS_CHANGED_EVENT,
 } from '../lib/db';
+import { presenceRepository } from '../repositories';
 import { useMissedBands } from './useMissedBands';
 import { now } from '../services/time';
 import { supabase } from '../lib/supabase';
+import type { Band, CrewUser, UserPick, UserPresence } from '../types';
 
 export const EMPTY_BADGE_CONTEXT: BadgeContext = {
   wacken_years: [],
@@ -45,23 +52,38 @@ function badgesEqual(a: string[], b: string[]): boolean {
 
 type IdbSnapshot = {
   userPicks: { band_id: string }[];
-  allPicks: { band_id: string }[];
-  bands: BadgeBand[];
+  allPicks: UserPick[];
+  bands: Band[];
   allMissed: { user_id: string; band_id: string }[];
-  presence: { user_id: string; is_camping: boolean; is_at_metal_place?: boolean }[];
-  crewUsers: { id: string; is_friend?: boolean | null }[];
+  presence: UserPresence[];
+  crewUsers: CrewUser[];
   assignedBadges: string[];
   isCurrentUserFriend: boolean;
+  metalPlaceWindowActive: boolean;
+  liveTestBandId?: string | null;
 };
 
 function buildCtxFromSnapshot(snap: IdbSnapshot, userId: string, authUser: AuthUser): BadgeContext {
-  const { userPicks, allPicks, bands, allMissed, assignedBadges, isCurrentUserFriend, presence, crewUsers } = snap;
+  const {
+    userPicks,
+    allPicks,
+    bands,
+    allMissed,
+    assignedBadges,
+    isCurrentUserFriend,
+    presence,
+    crewUsers,
+    metalPlaceWindowActive,
+    liveTestBandId,
+  } = snap;
   const userPickBandIds = userPicks.map((p) => p.band_id);
   const allPickCounts = new Map<string, number>();
   allPicks.forEach((p) =>
     allPickCounts.set(p.band_id, (allPickCounts.get(p.band_id) ?? 0) + 1),
   );
-  const bandsById = new Map<string, BadgeBand>(bands.map((b) => [b.id, b]));
+  const bandsById = new Map<string, BadgeBand>(
+    bands.map((b) => [b.id, b]),
+  );
   const userMissedIds = new Set(
     allMissed.filter((m) => m.user_id === userId).map((m) => m.band_id),
   );
@@ -72,7 +94,7 @@ function buildCtxFromSnapshot(snap: IdbSnapshot, userId: string, authUser: AuthU
   let currentLocation: string | null;
   if (isCurrentUserFriend) {
     currentLocation = null;
-  } else if (isAtMetalPlace) {
+  } else if (isAtMetalPlace && metalPlaceWindowActive) {
     currentLocation = 'metal_place';
   } else if (isAtCamping) {
     currentLocation = 'camping';
@@ -80,20 +102,17 @@ function buildCtxFromSnapshot(snap: IdbSnapshot, userId: string, authUser: AuthU
     currentLocation = 'lost';
   }
 
-  const friendUserIds = new Set(
-    crewUsers.filter((u) => u.is_friend === true).map((u) => u.id),
+  const crewLocationCounts = computeCrewLocationCounts(
+    bands,
+    allPicks,
+    crewUsers,
+    presence,
+    now(),
+    { metalPlaceWindowActive, liveTestBandId },
   );
-  const nonFriendPresence = presence.filter((p) => !friendUserIds.has(p.user_id));
-  const crewLocationCounts: Record<string, number> = {
-    camping: nonFriendPresence.filter((p) => p.is_camping).length,
-    metal_place: nonFriendPresence.filter((p) => p.is_at_metal_place).length,
-    lost: nonFriendPresence.filter((p) => !p.is_camping && !p.is_at_metal_place).length,
-  };
 
   const locationVisits = (authUser.user_metadata?.location_visits as Record<string, number>) ?? {};
-  const achievedBadgeSlugs = new Set<string>(
-    (authUser.user_metadata?.achieved_badge_slugs as string[]) ?? [],
-  );
+  const achievedBadgeSlugs = mergedPersistedBadgeSlugs(authUser.user_metadata);
 
   return buildBadgeContext(
     authUser,
@@ -128,14 +147,25 @@ export function useBadgeContext(user: AuthUser) {
       const sessionUser = session?.user;
       if (!sessionUser || sessionUser.id !== user.id) return;
 
-      const [userPicks, allPicks, bands, presence, crewUsers] = await Promise.all([
-        loadUserPicks(user.id),
-        loadAllUserPicks(),
-        loadBands(),
-        loadAllUserPresence(),
-        loadCrewUsers(),
-      ]);
+      const [userPicks, allPicks, bands, presence, crewUsers, metalPlaceConfig, liveBandTestConfig] =
+        await Promise.all([
+          loadUserPicks(user.id),
+          loadAllUserPicks(),
+          loadBands(),
+          loadAllUserPresence(),
+          loadCrewUsers(),
+          loadMetalPlaceConfig(),
+          loadLiveBandTestConfig(),
+        ]);
       if (!active) return;
+
+      const currentNow = now();
+      const metalPlaceWindowActive = presenceRepository.isTimeWithinMetalPlaceWindow(
+        metalPlaceConfig,
+        currentNow,
+      );
+      const liveTestBandId = liveBandTestConfig?.band_id ?? null;
+      const liveContext = { metalPlaceWindowActive, liveTestBandId };
 
       const assignedBadgesFromMeta: string[] =
         (sessionUser.user_metadata?.special_badges as string[]) ?? [];
@@ -152,6 +182,7 @@ export function useBadgeContext(user: AuthUser) {
           isCurrentUserFriend: isCurrentUserFriendFromIdb,
           presence,
           crewUsers,
+          ...liveContext,
         },
         user.id,
         sessionUser,
@@ -192,28 +223,21 @@ export function useBadgeContext(user: AuthUser) {
           isCurrentUserFriend,
           presence,
           crewUsers,
+          ...liveContext,
         },
         user.id,
         sessionUser,
       );
 
-      const achievedBadgeSlugs = new Set<string>(
-        (sessionUser.user_metadata?.achieved_badge_slugs as string[]) ?? [],
-      );
+      const achievedBadgeSlugs = mergedPersistedBadgeSlugs(sessionUser.user_metadata);
       const earnedBadges = BADGES.filter((b) => evaluateBadge(b, fullCtx));
-      const newlyAchieved = earnedBadges
-        .filter((b) => b.persist && !achievedBadgeSlugs.has(b.slug))
-        .map((b) => b.slug);
+      const newlyAchieved = earnedBadges.filter(
+        (b) => b.persist && !achievedBadgeSlugs.has(b.slug),
+      );
 
-      if (newlyAchieved.length > 0) {
-        supabase.auth.updateUser({
-          data: {
-            achieved_badge_slugs: [
-              ...(sessionUser.user_metadata?.achieved_badge_slugs ?? []),
-              ...newlyAchieved,
-            ],
-          },
-        }).catch(() => {
+      const persistPatch = persistMetadataPatch(sessionUser.user_metadata, newlyAchieved);
+      if (persistPatch) {
+        supabase.auth.updateUser({ data: persistPatch }).catch(() => {
           // badge earning is best-effort
         });
       }

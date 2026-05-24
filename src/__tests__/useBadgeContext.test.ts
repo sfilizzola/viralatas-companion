@@ -54,6 +54,7 @@ import {
   PICKS_CHANGED_EVENT,
 } from '../lib/db';
 import { supabase } from '../lib/supabase';
+import { evaluateBadge, BADGES } from '../services/badges';
 import { useBadgeContext } from '../hooks/useBadgeContext';
 import type { Band, CrewUser } from '../types';
 
@@ -174,5 +175,46 @@ describe('useBadgeContext', () => {
       expect(updateUser).toHaveBeenCalledWith({ data: { special_badges: ['mosh-pit'] } });
     });
     expect(result.current.ctx.assignedBadges).toEqual(['mosh-pit']);
+  });
+
+  it('counts crew without presence rows toward lost location badges', async () => {
+    const crew: CrewUser[] = Array.from({ length: 15 }, (_, i) => ({
+      id: i === 0 ? userId : `crew-${i}`,
+      display_name: `Crew ${i}`,
+      avatar_url: null,
+      wacken_arrival_day: null,
+      is_friend: false,
+    }));
+
+    await saveCrewUsers(crew);
+
+    const { result } = renderHook(() => useBadgeContext(authUser()));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    expect(result.current.ctx.crewLocationCounts.lost).toBe(15);
+    expect(result.current.ctx.currentLocation).toBe('lost');
+
+    const lostTogether = BADGES.find((b) => b.slug === 'lost-together')!;
+    expect(evaluateBadge(lostTogether, result.current.ctx)).toBe(true);
+  });
+
+  it('restores persist badges recorded only in crew_earned_badge_slugs', async () => {
+    vi.mocked(supabase.auth.getSession).mockResolvedValue({
+      data: {
+        session: {
+          user: authUser({ crew_earned_badge_slugs: ['lost-together'] }),
+        },
+      },
+      error: null,
+    } as never);
+
+    await saveCrewUsers([brCrewUser]);
+
+    const { result } = renderHook(() => useBadgeContext(authUser({ crew_earned_badge_slugs: ['lost-together'] })));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    const lostTogether = BADGES.find((b) => b.slug === 'lost-together')!;
+    expect(result.current.ctx.achievedBadgeSlugs.has('lost-together')).toBe(true);
+    expect(evaluateBadge(lostTogether, result.current.ctx)).toBe(true);
   });
 });
