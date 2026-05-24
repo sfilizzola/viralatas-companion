@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { UserMissedBand } from '../types';
 import { MISSED_CHANGED_EVENT } from '../lib/db';
-import { picksRepository, missedRepository } from '../repositories';
+import { missedRepository } from '../repositories';
 import { useBandConflicts } from '../hooks/useBandConflicts';
 import { useAuth } from '../hooks/useAuth';
 import { useBands } from '../hooks/useBands';
 import { useBandAttendees } from '../hooks/useBandAttendees';
-import { useMyPicks } from '../hooks/useMyPicks';
+import { usePickActions } from '../hooks/usePickActions';
 import { usePickCounts } from '../hooks/usePickCounts';
 import { useNow } from '../hooks/useNow';
 import { useI18n } from '../lib/i18n';
@@ -24,7 +24,7 @@ export default function PopularPage() {
   const [activeBandId, setActiveBandId] = useState<string | null>(null);
   const [allMissed, setAllMissed] = useState<UserMissedBand[]>([]);
   const { bands, loading } = useBands();
-  const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
+  const { pickedIds, togglePick } = usePickActions(userId);
   const attendeesByBand = useBandAttendees();
   const pickCounts = usePickCounts();
   const currentNow = useNow(60_000);
@@ -102,15 +102,6 @@ export default function PopularPage() {
     return map;
   }, [allMissed]);
 
-  const handleToggle = useCallback(
-    async (bandId: string) => {
-      if (!userId) return;
-      await picksRepository.toggle(userId, bandId, pickedIds.has(bandId));
-      await refreshPicks();
-    },
-    [userId, pickedIds, refreshPicks],
-  );
-
   const handleToggleMissed = useCallback(async () => {
     if (!userId || !activeBand) return;
     if (isMissed) {
@@ -166,7 +157,7 @@ export default function PopularPage() {
           band={activeBand}
           attendees={attendeesByBand[activeBand.id] ?? []}
           isPicked={pickedIds.has(activeBand.id)}
-          onTogglePick={() => handleToggle(activeBand.id)}
+          onTogglePick={() => togglePick(activeBand.id)}
           onClose={() => setActiveBandId(null)}
           isBandEnded={isBandEnded}
           hidePick={isBandEnded}

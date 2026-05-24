@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Band, UserMissedBand } from '../types';
 import { MISSED_CHANGED_EVENT } from '../lib/db';
-import { picksRepository, missedRepository } from '../repositories';
+import { missedRepository } from '../repositories';
 import { bandDay } from '../services/bandTime';
 import { useAuth } from '../hooks/useAuth';
 import { useBands } from '../hooks/useBands';
 import { useBandAttendees } from '../hooks/useBandAttendees';
-import { useMyPicks } from '../hooks/useMyPicks';
+import { usePickActions } from '../hooks/usePickActions';
 import { usePickCounts } from '../hooks/usePickCounts';
 import { useBandConflicts } from '../hooks/useBandConflicts';
 import { useI18n } from '../lib/i18n';
@@ -40,7 +40,7 @@ export default function MyPicksPage() {
     () => rawBands.slice().sort((a, b) => a.start_time.localeCompare(b.start_time)),
     [rawBands],
   );
-  const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
+  const { pickedIds, togglePick } = usePickActions(userId);
   const attendeesByBand = useBandAttendees();
   const pickCounts = usePickCounts();
   const currentNow = useNow(60_000);
@@ -182,15 +182,6 @@ export default function MyPicksPage() {
     [tSchedule],
   );
 
-  const handleToggle = useCallback(
-    async (bandId: string) => {
-      if (!userId) return;
-      await picksRepository.toggle(userId, bandId, pickedIds.has(bandId));
-      await refreshPicks();
-    },
-    [userId, pickedIds, refreshPicks],
-  );
-
   const handleToggleMissed = useCallback(async () => {
     if (!userId || !activeBand) return;
     if (isMissed) {
@@ -300,7 +291,7 @@ export default function MyPicksPage() {
                       band={band}
                       isPicked={pickedIds.has(band.id)}
                       count={pickCounts[band.id] ?? 0}
-                      onToggle={() => handleToggle(band.id)}
+                      onToggle={() => togglePick(band.id)}
                       onClick={() => setActiveBandId(band.id)}
                       variant="timeline"
                       pending={pendingBandIds.has(band.id)}
@@ -355,7 +346,7 @@ export default function MyPicksPage() {
                     band={band}
                     isPicked={pickedIds.has(band.id)}
                     count={pickCounts[band.id] ?? 0}
-                    onToggle={() => handleToggle(band.id)}
+                    onToggle={() => togglePick(band.id)}
                     onClick={() => setActiveBandId(band.id)}
                     variant="timeline"
                     pending={pendingBandIds.has(band.id)}
@@ -401,7 +392,7 @@ export default function MyPicksPage() {
                     band={band}
                     isPicked={pickedIds.has(band.id)}
                     count={pickCounts[band.id] ?? 0}
-                    onToggle={() => handleToggle(band.id)}
+                    onToggle={() => togglePick(band.id)}
                     onClick={() => setActiveBandId(band.id)}
                     variant="timeline"
                     pending={pendingBandIds.has(band.id)}
@@ -421,7 +412,7 @@ export default function MyPicksPage() {
           band={activeBand}
           attendees={attendeesByBand[activeBand.id] ?? []}
           isPicked={pickedIds.has(activeBand.id)}
-          onTogglePick={() => handleToggle(activeBand.id)}
+          onTogglePick={() => togglePick(activeBand.id)}
           onClose={() => setActiveBandId(null)}
           isBandEnded={isBandEnded}
           hidePick={isBandEnded}

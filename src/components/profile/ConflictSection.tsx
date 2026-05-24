@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { Band, UserPick } from '../../types';
 import { loadBands, loadUserPicks, PICKS_CHANGED_EVENT } from '../../lib/db';
-import { picksRepository } from '../../repositories';
+import { usePickActions } from '../../hooks/usePickActions';
 import { computeBandOverlaps } from '../../hooks/useBandConflicts';
 import { getFestivalDay } from '../../services/time';
 import { Button, Collapsible, Modal } from '../../ui';
@@ -57,6 +57,7 @@ type ConflictSectionProps = {
 };
 
 export default function ConflictSection({ userId, t }: ConflictSectionProps) {
+  const { unpickBand } = usePickActions(userId);
   const [bands, setBands] = useState<Band[]>([]);
   const [picks, setPicks] = useState<UserPick[]>([]);
   const [loading, setLoading] = useState(true);
@@ -98,10 +99,10 @@ export default function ConflictSection({ userId, t }: ConflictSectionProps) {
 
   const handleKeepBand = useCallback(
     async (_bandToKeep: Band, bandToRemove: Band) => {
-      await picksRepository.toggle(userId, bandToRemove.id, true);
+      await unpickBand(bandToRemove.id);
       setSelectedConflict(null);
     },
-    [userId],
+    [unpickBand],
   );
 
   if (loading || conflicts.length === 0) return null;

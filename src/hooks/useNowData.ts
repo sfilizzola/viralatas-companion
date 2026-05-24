@@ -28,7 +28,8 @@ import {
   type LivePlan,
   type PresenceLocation,
 } from '../services/livePreview';
-import { picksRepository, presenceRepository } from '../repositories';
+import { presenceRepository } from '../repositories';
+import { usePickActions } from './usePickActions';
 import { useDuckQuack } from './useDuckQuack';
 import { syncLiveBandTestConfig } from '../services/liveBandTest';
 import { supabase } from '../lib/supabase';
@@ -82,6 +83,7 @@ export function useNowData(): NowData {
     () => rawBands.slice().sort((a, b) => a.start_time.localeCompare(b.start_time)),
     [rawBands],
   );
+  const { unpickBand, pickBand } = usePickActions(userId);
   const [cacheLoading, setCacheLoading] = useState(true);
   const loading = bandsLoading || cacheLoading;
   const [undoState, setUndoState] = useState<{ bandId: string; bandName: string } | null>(null);
@@ -271,19 +273,19 @@ export function useNowData(): NowData {
     const bandId = myPlan.band.id;
     const bandName = myPlan.band.name;
     if (undoTimerId) clearTimeout(undoTimerId);
-    await picksRepository.toggle(userId, bandId, true);
+    await unpickBand(bandId);
     setUndoState({ bandId, bandName });
     const timerId = setTimeout(() => setUndoState(null), 5000);
     setUndoTimerId(timerId);
-  }, [myPlan, userId, undoTimerId]);
+  }, [myPlan, userId, undoTimerId, unpickBand]);
 
   const handleUndo = useCallback(async () => {
     if (!undoState || !userId) return;
     if (undoTimerId) clearTimeout(undoTimerId);
     setUndoTimerId(null);
-    await picksRepository.toggle(userId, undoState.bandId, false);
+    await pickBand(undoState.bandId);
     setUndoState(null);
-  }, [undoState, userId, undoTimerId]);
+  }, [undoState, userId, undoTimerId, pickBand]);
 
   // Duck quack for the user's current live band (if any and not a ceremony),
   // only during the first 15 minutes of the set.

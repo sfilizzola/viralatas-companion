@@ -4,6 +4,21 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.E — usePickActions hook)
+
+### Added
+- `src/hooks/usePickActions.ts` — `{ pickedIds, refresh, togglePick, pickBand, unpickBand }`; composes `useMyPicks` + `picksRepository.toggle`.
+- `src/__tests__/usePickActions.test.ts` — mount load, togglePick, pickBand, unpickBand (4 cases).
+
+### Changed
+- `SchedulePage`, `MyPicksPage`, `PopularPage`, `ConflictSection`, `useNowData` — pick toggle via `usePickActions()` instead of direct `picksRepository` imports.
+- `docs/ai-wiki/architecture.md` — hooks table documents `usePickActions`.
+
+### Architectural Notes
+- Pick writes remain optimistic via repository; hook adds refresh after toggle so UI stays in sync without pages duplicating toggle + refresh boilerplate.
+
+---
+
 ## 2026-05-24 (Phase 26.C — useBands catalog hook)
 
 ### Added

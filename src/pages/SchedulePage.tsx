@@ -1,12 +1,11 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import type { Band } from '../types';
-import { picksRepository } from '../repositories';
 import { bandDay } from '../services/bandTime';
 import { filterBands } from '../services/bandFilter';
 import { loadStoredFilters, saveStoredFilters } from '../services/scheduleFilterStorage';
 import { useAuth } from '../hooks/useAuth';
 import { useBands } from '../hooks/useBands';
-import { useMyPicks } from '../hooks/useMyPicks';
+import { usePickActions } from '../hooks/usePickActions';
 import { useNow } from '../hooks/useNow';
 import { usePickCounts } from '../hooks/usePickCounts';
 import { useDuckQuack } from '../hooks/useDuckQuack';
@@ -70,7 +69,7 @@ export default function SchedulePage() {
 
   const { bands, loading } = useBands();
   const hashRestoredRef = useRef(false);
-  const { pickedIds, refresh: refreshPicks } = useMyPicks(userId);
+  const { pickedIds, togglePick } = usePickActions(userId);
   const pickCounts = usePickCounts();
   const currentTime = useNow();
   const pendingBandIds = useOfflinePendingBandIds();
@@ -120,15 +119,6 @@ export default function SchedulePage() {
     [bands, filters, currentTime],
   );
 
-  const handleToggle = useCallback(
-    async (bandId: string) => {
-      if (!userId) return;
-      await picksRepository.toggle(userId, bandId, pickedIds.has(bandId));
-      await refreshPicks();
-    },
-    [userId, pickedIds, refreshPicks],
-  );
-
   return (
     <div className={styles.page}>
       <OfflineBanner />
@@ -169,8 +159,8 @@ export default function SchedulePage() {
               isLive={isLive}
               userId={userId}
               count={pickCounts[band.id] ?? 0}
-              onToggle={() => handleToggle(band.id)}
-              onClick={() => handleToggle(band.id)}
+              onToggle={() => togglePick(band.id)}
+              onClick={() => togglePick(band.id)}
               pending={pendingBandIds.has(band.id)}
               isBandEnded={new Date(band.end_time) < currentTime}
             />

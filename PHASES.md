@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 In progress (26.A, 26.B, 26.C complete)
+**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.E complete)
 
 **Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
 
@@ -71,6 +71,20 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
+### Stage 26.E — `usePickActions()` hook ✅
+
+**Scope:** New `src/hooks/usePickActions.ts` wrapping `picksRepository.toggle` + `useMyPicks` refresh; migrate `SchedulePage`, `MyPicksPage`, `PopularPage`, `ConflictSection`, `useNowData` skip/undo handlers.
+
+**Gets simpler:** Pages stop importing `picksRepository`; aligns with wiki "pages use hooks" pattern.
+
+**Risk:** Low | **Depth:** Shallow | **Depends on:** 26.A
+
+**Verification:** `rtk npm test` (`picksRepository.test.ts` unchanged); pick toggle online/offline on schedule and my-picks.
+
+**Done (2026-05-24):** `usePickActions()` with `togglePick`, `pickBand`, `unpickBand`; five consumers migrated; 4 hook tests.
+
+---
+
 ### Stage 26.D — `useMissedBands()` hook
 
 **Scope:** New `src/hooks/useMissedBands.ts`; dedupe logic from `MyPicksPage.tsx`, `PopularPage.tsx`; simplify `BadgesDisplay.tsx` missed slice.
@@ -80,18 +94,6 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Risk:** Low–medium | **Depth:** Moderate extract | **Depends on:** 26.A
 
 **Verification:** `rtk npm test` (`missedRepository.test.ts`, `missed.test.ts`); mark/unmark on ended band in My Picks and Popular modals.
-
----
-
-### Stage 26.E — `usePickActions()` hook
-
-**Scope:** New `src/hooks/usePickActions.ts` wrapping `picksRepository.toggle` + `useMyPicks` refresh; migrate `SchedulePage`, `MyPicksPage`, `PopularPage`, `ConflictSection`, `useNowData` skip/undo handlers.
-
-**Gets simpler:** Pages stop importing `picksRepository`; aligns with wiki "pages use hooks" pattern.
-
-**Risk:** Low | **Depth:** Shallow | **Depends on:** 26.A
-
-**Verification:** `rtk npm test` (`picksRepository.test.ts` unchanged); pick toggle online/offline on schedule and my-picks.
 
 ---
 
