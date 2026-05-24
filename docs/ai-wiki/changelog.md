@@ -4,6 +4,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.N.b — Extract db connection layer)
+
+### Added
+- `src/lib/db/connection.ts` — `DB_NAME`, `DB_VERSION`, `getDB()`, upgrade handler (15 object stores), `resetDbConnectionForTests()` (verbatim extract from `db.ts`).
+
+### Changed
+- `src/lib/db.ts` — imports `getDB` from `./db/connection`; re-exports `resetDbConnectionForTests` for tests (482 → 407 lines).
+
+### Architectural Notes
+- Verbatim move; zero schema/version change. Shared singleton connection; domain functions unchanged. Next: 26.N.c session + catalog.
+
+---
+
 ## 2026-05-24 (Phase 26.N.a — Extract db events and types)
 
 ### Added

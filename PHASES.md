@@ -329,6 +329,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test` (`db.test.ts`, any test using `resetDbConnectionForTests`); fresh IDB open + upgrade path unchanged.
 
+**Done (2026-05-24):** `src/lib/db/connection.ts` — `DB_NAME`, `DB_VERSION`, `getDB()`, upgrade handler (15 stores), `resetDbConnectionForTests()`; `db.ts` imports shared singleton + re-exports test helper (482 → 407 lines); zero schema/version change.
+
 #### Stage 26.N.c — Session + catalog
 
 **Scope:** New `src/lib/db/session.ts` (session CRUD), `src/lib/db/catalog.ts` (`bands`, `crew_users` stores); move verbatim helpers from `db.ts`.
