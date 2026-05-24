@@ -4,6 +4,16 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (CLAUDE.md agent navigation refresh)
+
+### Changed
+- **`CLAUDE.md`** — Phase 27 active (26 complete); project structure reflects `src/lib/db/`, `components/sync/`, `realtimeSync.ts`; new post–Phase 26 agent navigation table; badge data vs presentation split; expanded `offline-sync-auditor` trigger paths.
+
+### Architectural Notes
+- Keeps CLAUDE.md as rules + file routing; deep detail remains in AI Wiki and `.claude/context/`.
+
+---
+
 ## 2026-05-24 (Fix: lost location badge counting + lost-together threshold)
 
 ### Changed

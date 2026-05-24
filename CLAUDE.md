@@ -88,14 +88,17 @@ Update **all three**:
 /
 ├── src/
 │   ├── components/       # Shared UI components
+│   │   └── sync/         # SyncOrchestration + BandSync, PickSync, etc. (Phase 26.G)
 │   ├── pages/            # Route-level page components
 │   ├── ui/               # Lower-level UI primitives
-│   ├── hooks/            # Custom React hooks
+│   ├── hooks/            # Custom React hooks (useBadgeContext, useNowData composables, …)
 │   ├── repositories/     # Data access (picks, announcements, duck, ...)
-│   ├── services/         # Domain services (badges, time, stage colors, ...)
+│   ├── services/         # Domain services (badges, time, stage colors, livePreview, ...)
 │   ├── lib/
 │   │   ├── supabase.ts   # Supabase client
-│   │   ├── db.ts         # IndexedDB helpers (offline store)
+│   │   ├── db.ts         # Shim → re-exports src/lib/db/ (do not add logic here)
+│   │   ├── db/           # IndexedDB domain modules (connection, picks, presence, …)
+│   │   ├── realtimeSync.ts  # subscribePostgresChanges() helper (Phase 26.H)
 │   │   ├── sync.ts       # Sync engine entrypoint
 │   │   ├── pushSubscription.ts  # Web Push setup
 │   │   └── i18n.ts       # i18n bootstrap
@@ -135,6 +138,24 @@ Update **all three**:
 - `/profile` — Profile, preferences, godlike/manager UI, logout
 
 Unknown routes redirect to `/now`.
+
+---
+
+## Agent navigation (post–Phase 26)
+
+Compact map so agents open the right file first — details stay in `docs/ai-wiki/architecture.md`.
+
+| Area | Data / logic | Presentation |
+|------|----------------|----------------|
+| **Badges** | `useBadgeContext.ts`, `services/badges/` (`engine`, `persistMetadata`) | `BadgesDisplay.tsx`, `stackLayout.ts` |
+| **`/now` live view** | `useNowData.ts` composes `useNowCache`, `useNowPlans`, `usePresenceRealtime`, config hooks; plans in `livePreview.ts` | `RightNowPage.tsx` |
+| **Announcements mural** | `useAnnouncements.ts`, `announcementsRepository` | `AnnouncementsPage.tsx` |
+| **Picks / schedule** | `usePickActions`, `useBands`, `picksRepository` | Schedule / My Picks / Popular pages |
+| **Sync on reconnect** | `components/sync/SyncOrchestration.tsx` + domain sync components | `App.tsx` mounts orchestration only |
+| **Realtime subscriptions** | `lib/realtimeSync.ts` → `subscribePostgresChanges()` | Hook/repository call sites |
+| **IndexedDB** | `src/lib/db/*.ts` (12 modules + barrel) | Never read Supabase directly from UI |
+
+**Crew location counts for badges** use `computeCrewLocationCounts()` in `livePreview.ts` — same rules as `/now` Lost/Camping cards.
 
 ---
 
@@ -254,6 +275,8 @@ Full trigger contract and the four behaviors → `.claude/context/auth-trigger.m
 
 ## Badge system
 
+Fully client-side. **`useBadgeContext`** builds `BadgeContext` from IndexedDB + auth metadata; **`BadgesDisplay`** is presentation-only (vest stack, modal).
+
 Client-side `BadgeConfig` contract, supported conditions, and the add-a-badge procedure → `.claude/context/badges.md`.
 Full inventory and condition engine → `docs/ai-wiki/badges.md`.
 
@@ -261,7 +284,7 @@ Full inventory and condition engine → `docs/ai-wiki/badges.md`.
 
 ## Phases at a glance
 
-Phases 1–25 are complete. The next active phase is **Phase 26** (TBD — see `FUTURE_IDEAS.md`).
+Phases 1–26 are complete. The active phase is **Phase 27** (TBD — see `FUTURE_IDEAS.md` and `PHASES.md`).
 
 **Full phase history** → `docs/ai-wiki/phases-history.md`
 
@@ -278,7 +301,7 @@ Specialized agents live in `.claude/agents/`. Each reads CLAUDE.md plus its own 
 - **`migration-validator`** — On any change under `supabase/migrations/`: validate RLS, triggers, idempotency, realtime config, auth-trigger contract.
 - **`edge-function-reviewer`** — On changes under `supabase/functions/`: verify no leaked API key, AlertContext shape preserved, server-side cooldowns, prompt rules.
 - **`badge-author`** — On "add badge X" or `src/services/badges/` changes: asset + registry + all 4 locales + supported predicate.
-- **`offline-sync-auditor`** — On changes to `src/lib/db.ts`, sync engine, or repositories: enforce `UI → IndexedDB ↕ Supabase`; flag inversions as critical.
+- **`offline-sync-auditor`** — On changes to `src/lib/db/**`, `src/components/sync/`, sync engine, or repositories: enforce `UI → IndexedDB ↕ Supabase`; flag inversions as critical.
 - **`pwa-auditor`** — On changes to `src/workers/sw.ts`, manifest, or caching config: NetworkFirst for API, CacheFirst for assets, version-bump invalidation, first-load schedule cache.
 
 ---
