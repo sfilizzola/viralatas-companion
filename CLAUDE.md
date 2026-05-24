@@ -240,7 +240,7 @@ Full inventory and condition engine → `docs/ai-wiki/badges.md`.
 
 ## Phases at a glance
 
-Phases 1–20 are complete. The next active phase is **Phase 21**.
+Phases 1–22 are complete. The next active phase is **Phase 23**.
 
 **Full phase history** → `docs/ai-wiki/phases-history.md`
 

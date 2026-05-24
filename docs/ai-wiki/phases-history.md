@@ -376,6 +376,17 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 
 **Part 2 (integration, no code changes):** Deep-link confirmed working end-to-end — opens `setlist.viralatas.org` with correct `user_name`, all picked band names, and `lang`; track preview loads; "Generate" lands in Spotify with the user's personal playlist.
 
+**Acceptance criteria (all met):**
+- [x] Godlike and manager see the strip on `/my-picks` when `playlist_testing = true`
+- [x] Normal users hidden while `playlist_testing = true`
+- [x] Godlike flips flag to `false` → all users see strip on next load
+- [x] URL carries correct `user_name`, band list, and `lang`
+- [x] Strip hidden when user has 0 picks
+- [x] Build and tests green
+- [x] End-to-end: Setlist preview + Spotify playlist generation confirmed
+
+**Wiki:** `docs/ai-wiki/flows/playlist-launch.md` · App Pack section in `architecture.md`
+
 **Architectural notes:**
 - `PlaylistLaunchButton` reads `playlist_testing` directly from Supabase on mount (not cached in IndexedDB). This is intentional — the flag is low-frequency and the button is purely a convenience deep-link out of the app; offline-first treatment is unnecessary.
 - The flag graduation path (when `playlist_testing` is removed) requires only deleting the flag column, the role-check logic inside the component, and the admin toggle — the component itself stays permanently.

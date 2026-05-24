@@ -6,6 +6,9 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ## 2026-05-22
 
+### Changed
+- **Phase 22 closed** — Playlist Launch removed from `PHASES.md`; acceptance criteria marked complete in `phases-history.md`. Active phase is now Phase 23.
+
 ### Added
 - **`code-wizards` badge** — godlike-assigned badge "Magos do Código" / "Code Wizards". Registry entry, PNG asset, and i18n in all four locales.
 - **`flows/playlist-launch.md`** — Full flow doc for Setlist Vira-Latas deep-link from `/my-picks`.
