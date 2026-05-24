@@ -1,7 +1,4 @@
 import { getDB } from './db/connection';
-import type {
-  OfflineDuckQuackOp,
-} from './db/types';
 
 export {
   ANNOUNCEMENTS_CHANGED_EVENT,
@@ -64,6 +61,11 @@ export {
   saveLiveBandTestConfig,
   clearLiveBandTestConfig,
 } from './db/config';
+export {
+  enqueueOfflineDuckQuack,
+  loadOfflineDuckQuackQueue,
+  removeFromOfflineDuckQuackQueue,
+} from './db/duck';
 
 // --- Cache version invalidation ---
 
@@ -99,21 +101,4 @@ export async function loadCacheVersion(): Promise<string | null> {
   const db = await getDB();
   const meta = await db.get('meta', 'cache_version');
   return meta?.cache_version ?? null;
-}
-
-// --- Offline duck quacks ---
-
-export async function enqueueOfflineDuckQuack(op: OfflineDuckQuackOp) {
-  const db = await getDB();
-  await db.put('offline_duck_quacks', op);
-}
-
-export async function loadOfflineDuckQuackQueue(): Promise<OfflineDuckQuackOp[]> {
-  const db = await getDB();
-  return db.getAll('offline_duck_quacks');
-}
-
-export async function removeFromOfflineDuckQuackQueue(id: string) {
-  const db = await getDB();
-  await db.delete('offline_duck_quacks', id);
 }

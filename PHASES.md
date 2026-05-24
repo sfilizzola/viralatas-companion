@@ -413,6 +413,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test`; manual quack offline → reconnect.
 
+**Done (2026-05-24):** `src/lib/db/duck.ts` — `offline_duck_quacks` queue helpers (`enqueueOfflineDuckQuack`, `loadOfflineDuckQuackQueue`, `removeFromOfflineDuckQuackQueue`); `db.ts` re-exports unchanged public surface (119 → 104 lines); zero consumer import path changes.
+
 #### Stage 26.N.j — Meta + wipe (cross-store)
 
 **Scope:** New `src/lib/db/meta.ts` — cache version store + `wipeAllLocalData()` (exact store lists and transaction scope preserved verbatim).

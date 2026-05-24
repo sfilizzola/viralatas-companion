@@ -4,6 +4,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.N.i — Extract duck offline queue db module)
+
+### Added
+- `src/lib/db/duck.ts` — `enqueueOfflineDuckQuack`, `loadOfflineDuckQuackQueue`, `removeFromOfflineDuckQuackQueue` (verbatim extract).
+
+### Changed
+- `src/lib/db.ts` — imports and re-exports duck offline queue from `./db/duck` module (119 → 104 lines).
+
+### Architectural Notes
+- Verbatim move; zero consumer import path changes. Next: 26.N.j meta + wipe.
+
+---
+
 ## 2026-05-24 (Phase 26.N.h — Extract admin config db module)
 
 ### Added
