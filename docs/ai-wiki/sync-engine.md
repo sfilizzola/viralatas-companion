@@ -8,14 +8,16 @@ Document how data is synchronized between IndexedDB (primary), offline queues, a
 
 ## Relevant Source Files
 
-- `src/App.tsx` — Sync orchestration (BandSync, PickSync, AnnouncementSync, DuckSync, PushSetup, CacheVersionCheck)
+- `src/components/sync/` — Sync orchestration (`SyncOrchestration`, `CacheVersionCheck`, `BandSync`, `PickSync`, `AnnouncementSync`, `DuckSync`, `PushSetup`, `DuckNotificationsListener`) — extracted from `App.tsx` (Phase 26.G)
+- `src/App.tsx` — Mounts `<SyncOrchestration />` only (84 lines)
+- `src/lib/realtimeSync.ts` — `subscribePostgresChanges()` unified Realtime helper (Phase 26.H)
 - `src/repositories/picks.ts` — Pick sync, queue deduplication
 - `src/repositories/announcements.ts` — Announcement sync and pending queue
 - `src/repositories/presence.ts` — Presence sync
 - `src/repositories/users.ts` — Crew member sync
 - `src/repositories/missed.ts` — Missed band sync
 - `src/repositories/bands.ts` — Band sync and cache version checking
-- `src/lib/db.ts` — IndexedDB operations and event emission
+- `src/lib/db/` — IndexedDB domain modules (barrel `index.ts`; public shim `src/lib/db.ts`)
 - `src/lib/sync.ts` — Band sync helper
 
 ---
@@ -32,9 +34,9 @@ The sync engine ensures:
 
 ---
 
-## Sync Orchestration (App.tsx)
+## Sync Orchestration (`src/components/sync/`, Phase 26.G)
 
-The app shell coordinates four sync components:
+`App.tsx` mounts `<SyncOrchestration />`, which composes focused sync components:
 
 ### 1. CacheVersionCheck
 
@@ -543,4 +545,4 @@ console.log(`Local cache version: ${version}`);
 
 ---
 
-**Last updated:** 2026-05-18 — corrected the `checkAndApplyCacheVersion` snippet to read from `public.app_config` (was incorrectly documented as `public.meta`).
+**Last updated:** 2026-05-24 — Phase 26.G sync extract to `src/components/sync/`; 26.H `subscribePostgresChanges`; IDB module path.

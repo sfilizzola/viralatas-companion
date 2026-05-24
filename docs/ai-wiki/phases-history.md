@@ -520,12 +520,12 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 
 **Acceptance criteria (all met):**
 - [x] `rtk npm run build` green
-- [x] `rtk npm test` — 488 tests pass; coverage thresholds tightened (95% stmts/lines/funcs on `src/lib/db/**`)
+- [x] `rtk npm test` — 488 tests at phase close (502 after post-phase lost-badge fix); coverage thresholds tightened (95% stmts/lines/funcs on `src/lib/db/**`)
 - [x] No new direct Supabase reads from presentation components (admin boundaries preserved)
 - [x] Offline-first invariants preserved — IndexedDB primary, repositories emit events, hooks subscribe
-- [x] Wiki updated (`architecture.md`, flows, per-sub-stage `changelog.md` entries)
+- [x] Wiki updated (`architecture.md`, `flows/live-now.md`, `sync-engine.md`, `testing.md`, per-sub-stage `changelog.md` entries)
 
-**Wiki:** `docs/ai-wiki/architecture.md` · `docs/ai-wiki/changelog.md` (26.A–26.N.k entries)
+**Wiki:** `docs/ai-wiki/architecture.md` · `docs/ai-wiki/changelog.md` (26.A–26.N.k entries) · post-close gap pass (`testing.md`, `live-now.md`, `sync-engine.md`, lost-badge fix)
 
 **Architectural notes:**
 - Hooks + window events pattern unchanged (no Redux/Zustand). Pages consume hooks; repositories own IDB writes and event emission.

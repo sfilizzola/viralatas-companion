@@ -8,7 +8,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 
 ## Relevant Source Files
 
-- `src/__tests__/` — All test files (389 tests)
+- `src/__tests__/` — All test files (**37 files**, **502 tests** as of 2026-05-24)
 - `vitest.config.ts` — Test runner configuration
 - `package.json` — Test scripts (`test`, `test:coverage`) and seed scripts (`seed:bands`, `seed:bands:sync`, `seed:bands:backfill-slot-id`, `seed:bands:move`, `seed:test-users`, `seed:live-now`, `festival:reset`)
 - `supabase/seed/` — Seed scripts for test data and the destructive `festival-reset.ts` operator script (see `docs/ai-wiki/festival-reset.md`)
@@ -28,13 +28,24 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `registration.test.tsx` | `getRegistrationEnabled`, `RegisterPage` signup flow and form constraints |
 | `login.test.tsx` | `useAuth` hook, `LoginPage` sign-in and profile verification |
 | `auth-integration.test.ts` | IDB auth storage, trigger metadata contract, mocked signup → profile flow |
-| `db.test.ts` | IndexedDB layer: session, bands, picks, queues, presence, announcements, events |
+| `db.test.ts` | IndexedDB layer (Phase 26.N): session, catalog, picks, presence, announcements, missed, config, duck, meta, events, wipe |
+| `useBands.test.ts` | Catalog hook: IDB load + `BANDS_CHANGED_EVENT` refresh (26.C) |
+| `usePickActions.test.ts` | Pick toggle wrapper delegating to `picksRepository` (26.E) |
+| `useMissedBands.test.ts` | Deduped missed-band load/sync/realtime (26.D) |
+| `useBandDetailModal.test.ts` | Shared band detail modal state (26.F) |
+| `useAnnouncements.test.ts` | Announcements mural hook: IDB, events, moderation (26.K) |
+| `announcementsDisplay.test.ts` | Pure display helpers for announcements (26.K) |
+| `useBadgeContext.test.ts` | Badge context from IDB, location counts, persist metadata (26.I + lost-badge fix) |
+| `stackLayout.test.ts` | Vest collapsed scatter layout math (26.I) |
+| `persistMetadata.test.ts` | `mergedPersistedBadgeSlugs`, `persistMetadataPatch` dual-key persist |
+| `useNowData.test.ts` | `/now` composable hook: presence toggle, skip/undo, duck gating (26.M) |
+| `realtimeSync.test.ts` | `subscribePostgresChanges()` channel setup/cleanup (26.H) |
 | `schedule.test.ts` | Band filtering, sorting, time logic |
 | `time.test.ts` | Festival day calculation, time utilities, formatting |
 | `useBandConflicts.test.ts` | Conflict detection, overlap logic, severity |
-| `livePreview.test.ts` | Time travel logic, test mode, presence grouping, `derivePresenceValue` |
+| `livePreview.test.ts` | Live plan math, presence grouping, `derivePresenceValue`, `computeCrewLocationCounts` |
 | `liveNowScenarios.test.ts` | Table-driven Live Now scenarios: multi-band crew layout, camping/Metal Place/lost transitions |
-| `badges.test.ts` | Badge condition evaluation |
+| `badges.test.ts` | Badge condition evaluation + registry integration (incl. lost `crew_at_location_min`) |
 | `missed.test.ts` | Marking bands as seen/missed |
 | `BandCard.test.tsx` | Component rendering, user interactions |
 | `bandTime.test.ts` | Band overlap/conflict logic, current/next band calc (`bandTime.ts`) |
@@ -51,7 +62,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `bandsRepository.test.ts` | `checkAndApplyCacheVersion()` match/mismatch/no-data (3 tests) |
 | `missedRepository.test.ts` | Mark/unmark missed band online and offline (4 tests) |
 
-**Coverage**: 389 tests across all files
+**Coverage**: **502 tests** across **37** test files (Phase 26 safety nets + post-phase badge fix)
 
 **Run**:
 ```bash
@@ -492,4 +503,4 @@ it('should show band as live when now equals start_time', () => {
 
 ---
 
-**Last updated:** 2026-05-18 — added `festival:reset` to the seed-script catalog and pre-release manual-test list.
+**Last updated:** 2026-05-24 — Phase 26 test inventory (502 tests, 37 files); lost-badge regression tests noted.

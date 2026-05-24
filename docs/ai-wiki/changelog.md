@@ -4,6 +4,33 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Fix: lost location badge counting + lost-together threshold)
+
+### Changed
+- **`src/services/badges/registry.ts`** — `lost-together` threshold raised from 10 to 15 (`crew_at_location_min`, location `'lost'`).
+- **`src/services/livePreview.ts`** — new `computeCrewLocationCounts()` reuses `mapCrewLivePlans` + `groupCrewLivePlans` so badge crew counts match `/now` location cards (all non-friend crew, excludes current-band watchers, respects Metal Place window).
+- **`src/hooks/useBadgeContext.ts`** — uses `computeCrewLocationCounts`; loads metal place + live band test config; merges `crew_earned_badge_slugs` on read; writes crew location badges to both metadata keys on earn.
+- **`src/services/badges/persistMetadata.ts`** — `mergedPersistedBadgeSlugs`, `persistMetadataPatch` helpers.
+- **`src/i18n/Badges_{br,en,es,de}.json`** — `badgeLostTogetherDescription` updated from "10+" to "15+".
+- **`docs/ai-wiki/badges.md`** — lost-together threshold, crew-count semantics, persist dual-key behavior, key files.
+- **`.claude/context/badges.md`** — persist write contract for crew location badges.
+
+### Added
+- **`src/__tests__/persistMetadata.test.ts`**, **`src/__tests__/livePreview.test.ts`** (`computeCrewLocationCounts`), **`src/__tests__/badges.test.ts`** (lost `crew_at_location_min`), **`src/__tests__/useBadgeContext.test.ts`** (crew without presence rows, legacy `crew_earned_badge_slugs` restore).
+
+### Architectural Notes
+- Prior bug: `crewLocationCounts` iterated only `user_presence` rows, undercounting Lost vs the `/now` UI when vira-latas had never toggled presence. Counts now derive from the same live-preview grouping as `/now`.
+- Persist read merges `achieved_badge_slugs` ∪ `crew_earned_badge_slugs`; crew-at-location earns write both keys so legacy-only records still restore.
+
+### Changed (wiki gap closure)
+- **`docs/ai-wiki/testing.md`** — 502 tests / 37 files; Phase 26 hook + IDB test inventory.
+- **`docs/ai-wiki/flows/live-now.md`** — composable `useNowData` (26.M), `usePresenceRealtime`, `subscribePostgresChanges`.
+- **`docs/ai-wiki/sync-engine.md`** — `src/components/sync/` orchestration (26.G).
+- **`docs/ai-wiki/architecture.md`** — `useBadgeContext` in hooks table; `useMissedBands` consumer fix.
+- **`docs/ai-wiki/phases-history.md`** — post-phase test count note (502).
+
+---
+
 ## 2026-05-24 (Phase 26 closed — Complexity Reduction & Simplification)
 
 ### Changed

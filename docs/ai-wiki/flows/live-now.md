@@ -6,6 +6,23 @@ Document how the app displays the current/next band for each crew member, includ
 
 ---
 
+## Relevant Source Files
+
+| File | Role |
+|---|---|
+| `src/pages/RightNowPage.tsx` | `/now` route shell |
+| `src/hooks/useNowData.ts` | Thin composer — wires config, cache, plans, presence side effects (Phase 26.M) |
+| `src/hooks/useNowCache.ts` | IDB cache load + window event listeners for picks/crew/presence/announcements |
+| `src/hooks/useNowPlans.ts` | Live plan memos (`myPlan`, `crewPlans`, `crewGroups`, `duckBandId`, …) |
+| `src/hooks/useMetalPlaceConfig.ts` | Metal Place config IDB + Realtime |
+| `src/hooks/useLiveBandTestConfig.ts` | Live band test config IDB + Realtime |
+| `src/hooks/usePresenceRealtime.ts` | Mount presence sync + `user_presence` Realtime via `subscribePostgresChanges` |
+| `src/repositories/presence.ts` | `applyPresenceToggle`, `autoClearCampingOnCurrentBand`, `validateAndAutoCheckout` |
+| `src/services/livePreview.ts` | `findLivePlan`, `mapCrewLivePlans`, `groupCrewLivePlans`, `computeCrewLocationCounts` |
+| `src/lib/realtimeSync.ts` | `subscribePostgresChanges()` helper (Phase 26.H) |
+
+---
+
 ## Trigger
 
 1. **Page load** → `/now` route initializes
@@ -45,16 +62,13 @@ User taps /now route
         RightNowPage component mounts
                     │
                     ▼
-   useNowData() hook initializes:
-     - Loads bands from IndexedDB
-     - Loads user picks from IndexedDB
-     - Loads crew users from IndexedDB
-     - Loads user_presence from IndexedDB
-     - Loads metal_place_config from IndexedDB
-     - Loads live_band_test_config from IndexedDB
-     - Calls now() to get current time
-       (checks localStorage for override,
-        falls back to Date.now())
+   useNowData() composes (Phase 26.M):
+     - useBands() → bands from IndexedDB
+     - useNowCache() → picks, crewUsers, presence, latestAnnouncement
+     - useMetalPlaceConfig() / useLiveBandTestConfig()
+     - usePresenceRealtime() → user_presence Realtime → IDB
+     - useNowPlans() → myPlan, crewPlans, crewGroups, duckBandId
+     - useNow() → current time (localStorage override or Date.now())
                     │
                     ▼
    ┌─────────────────────────────────────┐
@@ -321,7 +335,7 @@ isTimeWithinMetalPlaceWindow(config, now):
 - If window closed → Auto-checkout: set `is_at_metal_place = false`
 - Group order: Bands → Camping → Metal Place (if active) → Lost
 
-**Auto-checkout Validation** (in `useNowData`):
+**Auto-checkout Validation** (`useNowData` effect → `presenceRepository.validateAndAutoCheckout`):
 ```typescript
 useEffect(() => {
   validateAndAutoCheckout(metalPlaceConfig, userId)
@@ -410,14 +424,12 @@ Alphabetical by `label = display_name || 'Vira-lata ' + id.slice(0,4).toUpperCas
 ```
 User opens /now
   ↓
-useNowData subscribes to user_presence realtime:
-  .channel('user_presence_live')
-  .on('postgres_changes', { table: 'user_presence' }, (payload) => {
-    saveUserPresence(payload.new || payload.old)
-  })
+usePresenceRealtime() (mounted by useNowData):
+  subscribePostgresChanges('user_presence_live', { table: 'user_presence' })
+  → saveUserPresence(payload.new || payload.old)
   ↓
 When Bob checks into Metal Place:
-  1. Bob's client: setMetalPlaceStatus(bob_id, true)
+  1. Bob's client: presenceRepository.setMetalPlaceStatus(bob_id, true)
   2. Supabase: user_presence row updated, is_at_metal_place = true
   3. Realtime event sent to all subscriptions
   ↓
@@ -425,8 +437,8 @@ Other users' clients:
   1. Receive payload: { new: { user_id: bob, is_at_metal_place: true, ... } }
   2. Save to IndexedDB
   3. Event emitted: window.dispatchEvent(viralatas:presence-changed)
-  4. useNowData hook: refreshFromCache()
-  5. Recalculate crew plans (Bob now in metalPlaceGroup)
+  4. useNowCache() effect re-runs → picks/crew/presence state updates
+  5. useNowPlans() recomputes crew groups (Bob now in metalPlaceGroup)
   6. UI updates within 3s (~1.5s median)
 ```
 
@@ -591,7 +603,9 @@ Transitions:
 
 ## Performance Optimization
 
-### Memoization in useNowData
+### Memoization in useNowPlans (via useNowData)
+
+Live plan derivations live in `useNowPlans.ts` (extracted Phase 26.M):
 
 ```typescript
 // Only recalculate when bands/picks/now change
@@ -609,10 +623,14 @@ const crewGroups = useMemo(
 
 ### Realtime Subscriptions Cleaned Up
 
+`usePresenceRealtime`, config hooks, and repository subscribers use `subscribePostgresChanges()` (Phase 26.H):
+
 ```typescript
 useEffect(() => {
-  const channel = supabase.channel(...).subscribe()
-  return () => supabase.removeChannel(channel)  // Cleanup on unmount
+  return subscribePostgresChanges('user_presence_live', {
+    filter: { event: '*', table: 'user_presence' },
+    handler: async (payload) => { /* save to IDB */ },
+  })
 }, [])
 ```
 
@@ -643,3 +661,7 @@ useEffect(() => {
 - Show conflict badges on /now band cards
 - Auto-mark bands as "seen" when user watches current band
 - Add "at band" duration timer before next band
+
+---
+
+**Last updated:** 2026-05-24 — Phase 26.M composable `/now` hooks; Realtime via `usePresenceRealtime` + `subscribePostgresChanges`.

@@ -8,9 +8,12 @@ Badges are fully client-side. Source files:
 |---|---|
 | `src/services/badges/types.ts` | `BadgeConfig`, `BadgeCondition`, `BadgeContext`, `BadgeBand` |
 | `src/services/badges/engine.ts` | `buildBadgeContext`, `evaluateBadge`, `getEarnedBadges` (pure) |
-| `src/services/badges/registry.ts` | `BADGES[]` array — 64 entries today |
+| `src/services/badges/persistMetadata.ts` | `mergedPersistedBadgeSlugs`, `persistMetadataPatch` |
+| `src/services/livePreview.ts` | `computeCrewLocationCounts` — badge counts match `/now` location cards |
+| `src/hooks/useBadgeContext.ts` | IDB-first context build + persist recording |
+| `src/services/badges/registry.ts` | `BADGES[]` array — 65 entries today |
 | `src/services/badges/index.ts` | Barrel re-export |
-| `src/__tests__/badges.test.ts` | ~50 tests covering all conditions |
+| `src/__tests__/badges.test.ts` | Condition engine + registry tests |
 | `public/badges/` | PNG assets, 96×96 px, transparent background |
 | `src/i18n/Badges_{br,en,es,de}.json` | Labels + descriptions in all 4 locales |
 
@@ -32,7 +35,7 @@ type BadgeConfig = {
 };
 ```
 
-`persist: true` semantics: when the badge is first earned, its slug is stored in `user.user_metadata.achieved_badge_slugs[]` (or `crew_earned_badge_slugs[]` for `crew_at_location_min`). On subsequent loads, the badge stays earned even if the underlying condition becomes false. Use for historic/milestone badges (visited Metal Place, dreamer, crew-at-location). Omit/`false` for state-reflecting badges (country, current picks).
+`persist: true` semantics: when the badge is first earned, its slug is stored in `user.user_metadata.achieved_badge_slugs[]`. **`crew_at_location_min` badges also write to `crew_earned_badge_slugs[]` on earn**; **`useBadgeContext` merges both keys on read** so either key restores the badge. On subsequent loads, the badge stays earned even if the underlying condition becomes false. Use for historic/milestone badges (visited Metal Place, dreamer, crew-at-location). Omit/`false` for state-reflecting badges (country, current picks).
 
 `condition.type === 'assigned'` semantics: godlike-only manual assignment via the assign-badge Edge Function; the slug is stored in the row `users.special_badges[]` and matched against `badge.slug` at evaluation time.
 
@@ -91,7 +94,7 @@ A band is **seen** when `now > band.end_time` AND its id is **not** in `missedBa
 | Type | Inputs | Meaning |
 |---|---|---|
 | `location_visit_count_min` | `location: 'camping' \| 'metal_place' \| 'lost', count` | `user_metadata.location_visits[location] >= count` |
-| `crew_at_location_min` | `location: 'camping' \| 'lost', count` | User is currently at `location` AND ≥ N crew are too. **`'metal_place'` is NOT a valid location for this predicate.** Pair with `persist: true` so the badge survives the crew dispersing. |
+| `crew_at_location_min` | `location: 'camping' \| 'lost', count` | User is currently at `location` AND ≥ N crew are too (count via `computeCrewLocationCounts`, same rules as `/now`). **`'metal_place'` is NOT a valid location for this predicate.** Pair with `persist: true` so the badge survives the crew dispersing. |
 
 ### Manual (1)
 | Type | Inputs | Meaning |
@@ -121,7 +124,7 @@ type BadgeContext = {
   missedBandIds: Set<string>;                  // user_missed_bands rows
   locationVisits: Record<string, number>;      // user_metadata.location_visits
   currentLocation: string | null;
-  crewLocationCounts: Record<string, number>;  // realtime crew per location
+  crewLocationCounts: Record<string, number>;  // computeCrewLocationCounts — aligned with /now
   achievedBadgeSlugs: Set<string>;             // persist:true slugs already recorded
 };
 ```

@@ -17,10 +17,13 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 | `src/services/badges/stackLayout.ts` | Vest collapsed scatter layout — `buildStackPoses`, `stackStyle`, anti-bury placement math |
 | `src/services/badges/registry.ts` | `BADGES[]` array — all badge definitions + condition-examples reference |
 | `src/services/badges/index.ts` | Barrel re-export — preserves all existing `from '…/services/badges'` import paths |
-| `src/hooks/useBadgeContext.ts` | IDB-first badge context loading + events + Supabase metadata drift sync |
-| `src/__tests__/badges.test.ts` | 50+ tests covering all condition types |
+| `src/services/badges/persistMetadata.ts` | `mergedPersistedBadgeSlugs`, `persistMetadataPatch` — dual-key persist for crew location badges |
+| `src/services/livePreview.ts` | `computeCrewLocationCounts` — badge crew counts aligned with `/now` location cards |
+| `src/hooks/useBadgeContext.ts` | IDB-first badge context loading + events + Supabase metadata drift sync + persist recording |
+| `src/__tests__/badges.test.ts` | Condition engine + registry integration tests |
+| `src/__tests__/persistMetadata.test.ts` | Persist metadata merge/write tests |
 | `src/__tests__/stackLayout.test.ts` | Vest scatter layout unit tests |
-| `src/__tests__/useBadgeContext.test.ts` | Hook tests for context build and refresh |
+| `src/__tests__/useBadgeContext.test.ts` | Hook tests for context build, location counts, and refresh |
 | `public/badges/` | Badge PNG images (96×96 px recommended) |
 | `src/i18n/Badges_br.json` | Brazilian Portuguese labels + descriptions |
 | `src/i18n/Badges_en.json` | English labels + descriptions |
@@ -506,12 +509,12 @@ Earned when user **is at a location AND N+ crew members are there** (permanent o
 **Use case**: Crew bonding badges ("15 of us were camping together!")
 **Example badges**:
 - `bbq-crew` (15+ crew in camping simultaneously)
-- `lost-together` (10+ lost souls at once)
+- `lost-together` (15+ lost souls at once)
 
 **How it works**:
-1. System calculates real-time crew count at each location
-2. If user's current location AND crew count ≥ N, badge is earned
-3. Slug recorded permanently (even if crew later disperses)
+1. `useBadgeContext` builds `crewLocationCounts` via `computeCrewLocationCounts()` in `livePreview.ts` — same grouping rules as `/now` (all non-friend crew; excludes users on a **current** band; friends invisible; Metal Place window respected).
+2. If user's `currentLocation` matches AND crew count ≥ N, badge is earned.
+3. Slug recorded permanently (even if crew later disperses). Crew-location badges write to **both** `achieved_badge_slugs` and `crew_earned_badge_slugs`; reads merge both keys.
 
 ---
 
@@ -534,9 +537,9 @@ Badge has **no automatic condition**; godlike assigns it manually.
 6. Supabase JS client updates its localStorage session cache on the next `refreshSession()` call
 7. Badge appears in user's profile immediately; on next offline visit, badge is readable from `user.user_metadata.special_badges`
 
-**Offline behavior**: `BadgesDisplay` reads `assignedBadges` from `user.user_metadata?.special_badges ?? []`. Because the Supabase JS client caches the session (including `user_metadata`) in localStorage, assigned badges load without any network call. If the user is offline, the last-known-good `user_metadata` is used.
+**Offline behavior**: `useBadgeContext` reads `assignedBadges` from IndexedDB-first snapshot (DB `special_badges` after background fetch; phase-1 uses `user_metadata.special_badges`). Because the Supabase JS client caches the session (including `user_metadata`) in localStorage, assigned badges load without any network call on first paint. If the user is offline, the last-known-good metadata is used.
 
-**Drift detection**: `BadgesDisplay` compares the DB `special_badges` value (from `crew_users` IDB store) against `user_metadata.special_badges` on render. If they differ, it fires a background `supabase.auth.refreshSession()` to sync the localStorage session cache for the next offline visit — no UI block, no spinner.
+**Drift detection**: `useBadgeContext` compares the DB `special_badges` value (from `users` via Supabase) against `user_metadata.special_badges` on refresh. If they differ, it fires a one-shot `supabase.auth.updateUser({ data: { special_badges } })` to sync the session cache — no UI block, no spinner.
 
 **Example badges**:
 - `mosh-pit` (hit the floor and came back)
@@ -637,7 +640,7 @@ Pre-collapse subgenre strings (Goregrind, Humppa, Horror Punk, Melodic Death Met
 ### Location Presence (5)
 - `metal-place-2026` — Visited Metal Place (persist: true)
 - `bbq-crew` — 15+ crew camping together (persist: true)
-- `lost-together` — 10+ crew lost together (persist: true)
+- `lost-together` — 15+ crew lost together (persist: true)
 - `full-pack` — All 21 vira-latas in camping at the same time (`crew_at_location_min`, location: camping, count: 21; persist: true). The "everyone showed up" miracle badge.
 - `mass-lost` — All 21 vira-latas lost in the infield at the same time (`crew_at_location_min`, location: lost, count: 21; persist: true). Counterpart to `full-pack`.
 
@@ -773,8 +776,8 @@ type BadgeContext = {
   missedBandIds: Set<string>;          // Opted-out via "didn't see" toggle
   locationVisits: Record<string, number>;  // { camping: 3, metal_place: 1 }
   currentLocation: string | null;      // 'camping', 'metal_place', 'lost'
-  crewLocationCounts: Record<string, number>;  // Real-time crew at each location
-  achievedBadgeSlugs: Set<string>;     // Persist:true badges already earned
+  crewLocationCounts: Record<string, number>;  // From computeCrewLocationCounts — matches /now location cards
+  achievedBadgeSlugs: Set<string>;     // Merge of achieved_badge_slugs + crew_earned_badge_slugs
 };
 ```
 
@@ -800,9 +803,9 @@ Reflect **current state** — re-evaluated on every profile load.
 **Examples**:
 - `metal-place-2026` — Visited Metal Place once; recorded forever
 - `bbq-crew` — 15 crew camping together once; recorded forever even if crew disperses
-- `lost-together` — 10 crew lost together once; recorded forever
+- `lost-together` — 15 crew lost together once; recorded forever
 
-**Storage**: Slug stored in `user.user_metadata.achieved_badge_slugs[]` (for standard persist) or `crew_earned_badge_slugs[]` (for location crew badges). The companion `location_visits` counter (used by `location_visit_count_min`) is also stored in `user_metadata`.
+**Storage**: Slug stored in `user.user_metadata.achieved_badge_slugs[]` for all persist badges. **`crew_at_location_min` badges also write to `crew_earned_badge_slugs[]`** on first earn; **`useBadgeContext` merges both keys on read** so legacy records in either key still restore the badge. The companion `location_visits` counter (used by `location_visit_count_min`) is also stored in `user_metadata`.
 
 **Why persistent**: Some achievements are historic — you visited Metal Place, the 15 of you were together, those are facts. No takebacks.
 
@@ -959,13 +962,13 @@ const arrivalDayOrder = ['sun-jul26', 'mon-jul27', 'tue-jul28', 'wed-jul29', 'th
 
 ### 6. Assigned Badges Work Offline
 
-`BadgesDisplay` reads `assignedBadges` from `user.user_metadata?.special_badges ?? []` — not from a live Supabase call. Because the Supabase JS client persists `user_metadata` in localStorage, assigned badges are always available offline after the first online visit.
+`useBadgeContext` loads `assignedBadges` from IndexedDB-first snapshot (then reconciles with `users.special_badges` from Supabase). Because the Supabase JS client persists `user_metadata` in localStorage, assigned badges are available offline after the first online visit.
 
 The Edge Function (`assign-badge`) mirrors `users.special_badges` into `auth.users.raw_user_meta_data` for both assign and revoke operations. This ensures the cached session stays in sync after an online assignment.
 
-**Drift scenario**: If an assignment is made while the target user is offline, their `user_metadata` cache will be stale. On next online visit, `BadgesDisplay` detects the mismatch and calls `supabase.auth.refreshSession()` in the background, silently updating the cache for future offline visits.
+**Drift scenario**: If an assignment is made while the target user is offline, their `user_metadata` cache will be stale. On next online visit, `useBadgeContext` detects the mismatch and calls `supabase.auth.updateUser({ data: { special_badges } })` once to sync the session cache.
 
-**`isCurrentUserFriend` also reads offline**: `BadgesDisplay` determines whether the profile owner is a friend of the current user from the already-loaded `crewUsers` IDB store (`crewUsers.find(u => u.id === user.id)?.is_friend === true`). No extra network call is made.
+**`isCurrentUserFriend` also reads offline**: `useBadgeContext` determines whether the profile owner is a friend from the already-loaded `crewUsers` IDB store (`crewUsers.find(u => u.id === user.id)?.is_friend === true`). No extra network call is made.
 
 ### 7. Assigned Badge Slug vs. Condition
 
@@ -1036,7 +1039,10 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 - **src/services/badges/engine.ts** — `buildBadgeContext`, `evaluateBadge`, `getEarnedBadges`
 - **src/services/badges/types.ts** — Type definitions
 - **src/services/badges/index.ts** — Barrel re-export
-- **src/__tests__/badges.test.ts** — 50+ test cases
+- **src/services/badges/persistMetadata.ts** — Persist slug merge + auth metadata patch
+- **src/services/livePreview.ts** — `computeCrewLocationCounts` (shared with `/now` grouping)
+- **src/hooks/useBadgeContext.ts** — IDB-first context + persist recording
+- **src/__tests__/badges.test.ts**, **persistMetadata.test.ts**, **useBadgeContext.test.ts** — Condition + hook tests
 - **src/components/BadgesDisplay.tsx** — Vest-stack patches (collapsed + expanded), detail modal, fullscreen zoom
 - **src/components/ProfilePage.tsx** — Patches section + godlike assign UI
 - **src/i18n/Badges_*.json** — All 4 language translations
@@ -1045,4 +1051,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-24 — Phase 26.I: `stackLayout.ts` + `useBadgeContext.ts` extract; `BadgesDisplay.tsx` presentation-only.
+**Last updated:** 2026-05-24 — Lost location badge fix: `computeCrewLocationCounts`, dual-key persist merge, `lost-together` threshold 15.

@@ -20,7 +20,8 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/components/` — Shared UI components, modals, sections
 - `src/components/PlaylistLaunchButton.tsx` — Setlist deep-link strip (Phase 22)
 - `src/components/profile/MoshSplitSection.tsx` — MoshSplit balance section (Phase 23 Part 2 — real API via Vercel proxy)
-- `src/components/BadgesDisplay.tsx` — Vest-stack patches UI + two-phase badge loader (IndexedDB-first + background Supabase fetch)
+- `src/components/BadgesDisplay.tsx` — Vest-stack patches UI (presentation)
+- `src/hooks/useBadgeContext.ts` — IDB-first badge context + persist recording + `computeCrewLocationCounts`
 - `vite.config.ts` — PWA configuration, caching strategy, and local dev proxy for MoshSplit API
 - `vercel.json` — Vercel rewrites including MoshSplit CORS proxy (`/api/moshsplit/:path*`)
 
@@ -439,7 +440,8 @@ INSERT into user_picks
 | `useBands()` | `{ bands, loading, refresh }` | `BANDS_CHANGED_EVENT` | SchedulePage, MyPicksPage, PopularPage, useNowData |
 | `useMyPicks()` | `{ pickedIds, refresh }` | `PICKS_CHANGED_EVENT` | Internal to `usePickActions` |
 | `usePickActions()` | `{ pickedIds, refresh, togglePick, pickBand, unpickBand }` | `PICKS_CHANGED_EVENT` | SchedulePage, MyPicksPage, PopularPage, ConflictSection, useNowData |
-| `useMissedBands()` | `{ allMissed, missedBandIds, missedCountsByBand, mark, unmark, toggleMissed, refresh }` | `MISSED_CHANGED_EVENT`, Realtime | MyPicksPage, PopularPage, BadgesDisplay |
+| `useMissedBands()` | `{ allMissed, missedBandIds, missedCountsByBand, mark, unmark, toggleMissed, refresh }` | `MISSED_CHANGED_EVENT`, Realtime | MyPicksPage, PopularPage, `useBadgeContext` |
+| `useBadgeContext(user)` | `{ ctx, loading }` | `PICKS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT`, auth `USER_UPDATED` | BadgesDisplay, ProfilePage |
 | `useBandDetailModal()` | `{ activeBand, openBand, closeBand, modalProps }` | None (local state + composed inputs) | MyPicksPage, PopularPage |
 | `useAnnouncements()` | `{ announcements, visibleAnnouncements, crewUsers, userRoles, blockedUserIds, pendingAnnouncementIds, loading, isBlocked, canModerate, loadMore, post, deleteAnnouncement, blockUser, pin, … }` | `ANNOUNCEMENTS_CHANGED_EVENT`, Realtime | AnnouncementsPage |
 | `usePickCounts()` | `Record<bandId, count>` | `PICKS_CHANGED_EVENT`, Realtime | RightNowPage, PopularPage — `countPicks` is an exported pure fn |
@@ -474,7 +476,7 @@ INSERT into user_picks
 | `badges.ts` | Badge condition evaluation | ✅ Yes |
 | `stageColors.ts` | Map stage → CSS color | ✅ Yes |
 | `alerts.ts` | Queue alerts for Edge Function | Calls Supabase Edge Function |
-| `livePreview.ts` | Test data for live band preview | Reads/writes test config in IDB |
+| `livePreview.ts` | Live plan grouping, `computeCrewLocationCounts` (badge counts aligned with `/now`) | Reads/writes test config in IDB |
 | `bandFilter.ts` | `filterBands(bands, filters, now)` — pure filter predicate extracted from `SchedulePage`; testable without mounting any component | ✅ Yes |
 | `scheduleFilterStorage.ts` | `loadStoredFilters()` / `saveStoredFilters()` — localStorage persistence for schedule filter state; extracted from `SchedulePage` | ✅ Yes |
 | `attendees.ts` | `computeAttendees(picks, crewUsers)` — maps raw picks to hydrated `BandAttendee[]` per band; exports `BandAttendee` and `AttendeeMap` types | ✅ Yes |
@@ -588,4 +590,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-05-24 — Phase 23 Part 2: MoshSplit real API via Vercel proxy; BadgesDisplay two-phase loading; App Pack proxy rule added
+**Last updated:** 2026-05-24 — Lost location badge fix: `useBadgeContext` + `computeCrewLocationCounts`; BadgesDisplay presentation-only.
