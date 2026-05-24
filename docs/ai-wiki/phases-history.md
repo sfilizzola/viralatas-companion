@@ -458,3 +458,41 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Agents must never run destructive seed/reset on prod without explicit operator confirmation (see `production-database.md`).
 
 ---
+
+### Phase 25 — Genre Collapse
+**Status:** ✅ Complete
+
+**Goal:** Collapse ~95 distinct genre strings to **13 canonical labels** by renaming band genres in-place. Schedule genre filter becomes usable on mobile via pills + inline genre guide.
+
+**Deliverables:**
+- `docs/superpowers/specs/2026-05-24-genre-collapse-design.md` — collapse spec + old→new mapping table
+- `src/services/genreGuide.ts` — `GENRE_COLLAPSE_MAP`, `GENRE_GUIDE`, `sortFilterGenres()`
+- `supabase/seed/bands.ts` + `docs/ai-wiki/lineup.md` — 93 genre strings → 13; `TBD_GENRE` → `Metal`; all `Metal Battle *` → `Metal Battle`
+- `scripts/apply-genre-collapse.ts` — one-shot rename helper for seed + lineup
+- `src/components/BandFilters.tsx` — genre filter uses single-select pills (replaces native `<select>`)
+- `src/components/GenreGuideCollapsible.tsx` — inline collapsible guide below pill row in filter drawer
+- `src/i18n/SchedulePage_{br,en,es,de}.json` — genre guide keys
+- `public/Design-System.html` — genre pills + GenreGuideCollapsible documented
+- Wiki: `domain-model.md`, `lineup.md`, `changelog.md`
+
+**Acceptance criteria (all met):**
+- [x] Distinct genre strings in seed ≤ 13 (verified: 13)
+- [x] Schedule genre filter uses pills (not native `<select>`); ≤ 13 options
+- [x] `party-metal` badge unchanged; Alestorm + Airbourne remain `Party Metal`
+- [x] Zero pick loss after `seed:bands:sync --apply` (prod: no changes needed — DB already aligned; 0 picks affected)
+- [x] Genre guide reachable in ≤1 tap from open filter drawer (inline collapsible)
+- [x] Guide shows all 13 canonical labels and absorbed subgenres; Party Metal exception copy visible
+- [x] Guide usable at 375px width with Apply button still reachable (`max-height: 28dvh` on list)
+- [x] Pattern documented in Design System
+- [x] `lineup.md` + `bands.ts` in sync with live DB
+- [x] Build + tests green; wiki + changelog updated
+
+**Wiki:** `docs/superpowers/specs/2026-05-24-genre-collapse-design.md` · `domain-model.md` · `lineup.md`
+
+**Architectural notes:**
+- No schema change — rename in-place only; deploy via `seed:bands:sync --apply`.
+- Guide data is static in `genreGuide.ts` (offline-safe), not computed from live band list.
+- `death-metal` / `power-metal` badge thresholds kept at 3; `party-metal` unchanged.
+- Doom Metal absorbs Gothic Metal and related tags (Gothic / Industrial, Sludge, Post-Metal, Stoner Rock, Occult Rock).
+
+---

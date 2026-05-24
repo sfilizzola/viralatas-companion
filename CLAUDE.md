@@ -261,7 +261,7 @@ Full inventory and condition engine → `docs/ai-wiki/badges.md`.
 
 ## Phases at a glance
 
-Phases 1–24 are complete. The next active phase is **Phase 25**.
+Phases 1–25 are complete. The next active phase is **Phase 26** (TBD — see `FUTURE_IDEAS.md`).
 
 **Full phase history** → `docs/ai-wiki/phases-history.md`
 

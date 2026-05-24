@@ -23,6 +23,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - No schema change — rename in-place only; deploy via `seed:bands:sync --apply`.
 - `death-metal` / `power-metal` badge thresholds stay at 3; `party-metal` unchanged.
 - Guide data is static (offline-safe), not computed from live band list.
+- **Phase 25 closed:** prod `seed:bands:sync --apply` confirmed DB already aligned (0 genre updates needed, 0 picks affected).
 
 ---
 
