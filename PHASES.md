@@ -341,6 +341,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test`; login → bands cached; `/schedule` offline browse.
 
+**Done (2026-05-24):** `src/lib/db/session.ts` (session CRUD), `src/lib/db/catalog.ts` (`bands` + `crew_users` stores + change events); `db.ts` re-exports unchanged public surface (407 → 353 lines); zero consumer import path changes.
+
 #### Stage 26.N.d — Picks domain
 
 **Scope:** New `src/lib/db/picks.ts` — `user_picks` + `offline_picks` stores and queue helpers; re-export from `db.ts`.

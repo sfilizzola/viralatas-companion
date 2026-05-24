@@ -4,6 +4,20 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.N.c — Extract session and catalog db modules)
+
+### Added
+- `src/lib/db/session.ts` — `saveSession`, `loadSession`, `clearSession` (verbatim extract from `db.ts`).
+- `src/lib/db/catalog.ts` — `saveBands`, `loadBands`, `saveCrewUsers`, `loadCrewUsers` + `BANDS_CHANGED_EVENT` / `CREW_USERS_CHANGED_EVENT` emits (verbatim extract).
+
+### Changed
+- `src/lib/db.ts` — imports and re-exports session + catalog from `./db/` modules (407 → 353 lines).
+
+### Architectural Notes
+- Verbatim move; zero consumer import path changes. Next: 26.N.d picks domain.
+
+---
+
 ## 2026-05-24 (Phase 26.N.b — Extract db connection layer)
 
 ### Added

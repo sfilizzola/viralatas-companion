@@ -1,9 +1,7 @@
-import type { Announcement, Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserMissedBand, UserPick, UserPresence } from '../types';
+import type { Announcement, LiveBandTestConfig, MetalPlaceConfig, UserMissedBand, UserPick, UserPresence } from '../types';
 import { getDB } from './db/connection';
 import {
   ANNOUNCEMENTS_CHANGED_EVENT,
-  BANDS_CHANGED_EVENT,
-  CREW_USERS_CHANGED_EVENT,
   LIVE_BAND_TEST_CONFIG_CHANGED_EVENT,
   METAL_PLACE_CONFIG_CHANGED_EVENT,
   MISSED_CHANGED_EVENT,
@@ -29,22 +27,12 @@ export {
 } from './db/events';
 export type { OfflineDuckQuackOp, OfflinePickOp } from './db/types';
 export { resetDbConnectionForTests } from './db/connection';
-
-function emitBandsChanged() {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event(BANDS_CHANGED_EVENT));
-  }
-}
+export { saveSession, loadSession, clearSession } from './db/session';
+export { saveBands, loadBands, saveCrewUsers, loadCrewUsers } from './db/catalog';
 
 function emitPicksChanged() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(PICKS_CHANGED_EVENT));
-  }
-}
-
-function emitCrewUsersChanged() {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event(CREW_USERS_CHANGED_EVENT));
   }
 }
 
@@ -76,48 +64,6 @@ function emitMissedChanged() {
   if (typeof window !== 'undefined') {
     window.dispatchEvent(new Event(MISSED_CHANGED_EVENT));
   }
-}
-
-export async function saveSession(session: unknown) {
-  const db = await getDB();
-  await db.put('session', session, 'current');
-}
-
-export async function loadSession(): Promise<unknown> {
-  const db = await getDB();
-  return db.get('session', 'current');
-}
-
-export async function clearSession() {
-  const db = await getDB();
-  await db.delete('session', 'current');
-}
-
-export async function saveBands(bands: Band[]) {
-  const db = await getDB();
-  const tx = db.transaction('bands', 'readwrite');
-  await Promise.all(bands.map((b) => tx.store.put(b)));
-  await tx.done;
-  emitBandsChanged();
-}
-
-export async function loadBands(): Promise<Band[]> {
-  const db = await getDB();
-  return db.getAll('bands');
-}
-
-export async function saveCrewUsers(users: CrewUser[]) {
-  const db = await getDB();
-  const tx = db.transaction('crew_users', 'readwrite');
-  await tx.store.clear();
-  await Promise.all(users.map((user) => tx.store.put(user)));
-  await tx.done;
-  emitCrewUsersChanged();
-}
-
-export async function loadCrewUsers(): Promise<CrewUser[]> {
-  const db = await getDB();
-  return db.getAll('crew_users');
 }
 
 export async function saveUserPick(pick: UserPick) {
