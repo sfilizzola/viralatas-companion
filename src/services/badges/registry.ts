@@ -521,6 +521,22 @@ export const BADGES: BadgeConfig[] = [
     condition: { type: 'assigned' },
     year: 2026,
   },
+  {
+    slug: 'sun-sacrifice',
+    imagePath: '/badges/badge_sun-sacrifice.png',
+    labelKey: 'badgeSunSacrifice',
+    descriptionKey: 'badgeSunSacrificeDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
+  {
+    slug: 'tactical-nap',
+    imagePath: '/badges/badge_tactical-nap.png',
+    labelKey: 'badgeTacticalNap',
+    descriptionKey: 'badgeTacticalNapDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
 ];
 
 // ─── CONDITION EXAMPLES ───────────────────────────────────────────────────────

@@ -489,7 +489,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 
 ---
 
-## Current Badges Inventory (62 Total)
+## Current Badges Inventory (64 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -553,7 +553,7 @@ After Phase 25, every band carries one of **13 canonical genre labels**. Eleven 
 
 Pre-collapse subgenre strings (Goregrind, Humppa, Horror Punk, Melodic Death Metal, …) were merged into these buckets and **no longer appear** on `Band.genre`. See `src/services/genreGuide.ts` for the full old→new map.
 
-### Merit / Assigned (14)
+### Merit / Assigned (16)
 - `mosh-pit` — Hit the floor, came back (godlike-assigned)
 - `crowdsurfer` — Flew over the crowd (godlike-assigned)
 - `girl-power` — Metal queen (godlike-assigned)
@@ -568,6 +568,8 @@ Pre-collapse subgenre strings (Goregrind, Humppa, Horror Punk, Melodic Death Met
 - `beer-master` — "Mestre da Cerveja". Liquid bread is a food group. You drank Wacken dry and asked for seconds (godlike-assigned).
 - `beer-hater` — "Inimigo da Cerveja". Surrounded by oceans of beer and said "no thanks." Wine, shots, caipirinha — anything but that (godlike-assigned).
 - `code-wizards` — "Magos do Código". **Honors the builders of the Viralatas app pack** — Companion (find), Setlist Vira-Latas (listen), MoshSplit (pay). Three wizards, three apps, one pack. Godlike-assigned via `users.special_badges[]`. See [Architecture: Viralatas App Pack](architecture.md#viralatas-app-pack-phase-22–23).
+- `sun-sacrifice` — "Sun Sacrifice". Forgot the sunscreen; glows like a tomato in a denim vest (godlike-assigned).
+- `tactical-nap` — "Tactical Nap". Fell asleep mid-pit, mid-set, or mid-conversation — strategic withdrawal (godlike-assigned).
 
 ### Location Presence (5)
 - `metal-place-2026` — Visited Metal Place (persist: true)

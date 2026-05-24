@@ -8,7 +8,7 @@ Badges are fully client-side. Source files:
 |---|---|
 | `src/services/badges/types.ts` | `BadgeConfig`, `BadgeCondition`, `BadgeContext`, `BadgeBand` |
 | `src/services/badges/engine.ts` | `buildBadgeContext`, `evaluateBadge`, `getEarnedBadges` (pure) |
-| `src/services/badges/registry.ts` | `BADGES[]` array — 62 entries today |
+| `src/services/badges/registry.ts` | `BADGES[]` array — 64 entries today |
 | `src/services/badges/index.ts` | Barrel re-export |
 | `src/__tests__/badges.test.ts` | ~50 tests covering all conditions |
 | `public/badges/` | PNG assets, 96×96 px, transparent background |

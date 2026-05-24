@@ -4,6 +4,18 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (joke assigned badges — sun sacrifice, tactical nap)
+
+### Added
+- Two godlike-assigned joke badges for Wacken 2026: `sun-sacrifice`, `tactical-nap` (`condition: assigned`, `year: 2026`).
+- Registry entries + label/description keys in all four locale files.
+
+### Changed
+- `docs/ai-wiki/badges.md` — inventory 62 → 64; Merit / Assigned section updated.
+- `.claude/context/badges.md` — registry entry count updated.
+
+---
+
 ## 2026-05-24 (genre-based badges — Phase 25 canonical)
 
 ### Added
