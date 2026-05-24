@@ -365,6 +365,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test` (`db.test.ts`, `presenceRepository.test.ts`); two-browser presence update ≤3s.
 
+**Done (2026-05-24):** `src/lib/db/presence.ts` — `user_presence` + `offline_presence` stores, queue helpers, and `PRESENCE_CHANGED_EVENT` emit; `db.ts` re-exports unchanged public surface (304 → 261 lines); zero consumer import path changes.
+
 #### Stage 26.N.f — Announcements domain
 
 **Scope:** New `src/lib/db/announcements.ts` — `announcements` + `pending_announcements` stores and queue helpers.

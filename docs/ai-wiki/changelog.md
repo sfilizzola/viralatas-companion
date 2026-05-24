@@ -4,6 +4,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.N.e — Extract presence db module)
+
+### Added
+- `src/lib/db/presence.ts` — `saveUserPresence`, `loadUserPresence`, `loadAllUserPresence`, `replaceUserPresence`, offline queue ops (`enqueueOfflinePresence`, `loadOfflinePresenceQueue`, `removeFromOfflinePresenceQueue`) + `PRESENCE_CHANGED_EVENT` emit (verbatim extract).
+
+### Changed
+- `src/lib/db.ts` — imports and re-exports presence from `./db/presence` module (304 → 261 lines).
+
+### Architectural Notes
+- Verbatim move; zero consumer import path changes. Next: 26.N.f announcements domain.
+
+---
+
 ## 2026-05-24 (Phase 26.N.d — Extract picks db module)
 
 ### Added
