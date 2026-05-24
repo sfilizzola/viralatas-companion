@@ -4,6 +4,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.N.j — Extract meta and wipe db module)
+
+### Added
+- `src/lib/db/meta.ts` — `saveCacheVersion`, `loadCacheVersion`, `wipeAllLocalData` (verbatim extract; 10 cleared stores, 5 preserved).
+
+### Changed
+- `src/lib/db.ts` — imports and re-exports meta + wipe from `./db/meta` module (104 → 68 lines).
+
+### Architectural Notes
+- Verbatim move; zero consumer import path changes; wipe store lists unchanged from N.0 characterization. Next: 26.N.k optional barrel finalize.
+
+---
+
 ## 2026-05-24 (Phase 26.N.i — Extract duck offline queue db module)
 
 ### Added

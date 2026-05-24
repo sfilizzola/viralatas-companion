@@ -425,6 +425,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test` (`db.test.ts` wipe characterization); manual godlike cache reset smoke.
 
+**Done (2026-05-24):** `src/lib/db/meta.ts` — `saveCacheVersion`, `loadCacheVersion`, `wipeAllLocalData` (verbatim extract; 10 cleared / 5 preserved stores unchanged); `db.ts` thin barrel re-export only (104 → 68 lines).
+
 #### Stage 26.N.k — Optional: finalize barrel
 
 **Scope:** New `src/lib/db/index.ts` barrel re-export; update vitest coverage glob for `src/lib/db/**`; retire monolithic `db.ts` body (thin re-export shim or delete after import audit).
