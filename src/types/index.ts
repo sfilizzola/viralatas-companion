@@ -23,6 +23,7 @@ export type BandCategory = 'band' | 'ceremony';
 
 export type Band = {
   id: string;
+  slot_id: string;
   name: string;
   stage: string;
   start_time: string;

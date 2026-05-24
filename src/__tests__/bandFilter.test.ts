@@ -7,6 +7,7 @@ import type { BandFilterValue } from '../components/bandFilterValue';
 function makeBand(id: string, overrides: Partial<Band> = {}): Band {
   return {
     id,
+    slot_id: overrides.slot_id ?? `TST-${id}`,
     name: 'Test Band',
     stage: 'Faster',
     start_time: '2026-07-29T12:00:00Z',

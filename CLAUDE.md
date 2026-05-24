@@ -205,6 +205,27 @@ Never invert this to: `UI → API → local cache`. IndexedDB is the source of t
 
 ---
 
+## Production database safety
+
+**This Supabase project has no point-in-time restore.** Destructive ops on prod are **irreversible** — deleting `public.bands` CASCADE-wipes all `user_picks`.
+
+**Agents must never run these against production without explicit user confirmation in the same turn:**
+
+| Command | Effect |
+|---------|--------|
+| `npm run seed:bands` / `seed:bands -- --force` | DELETE all bands + all picks |
+| `npm run festival:reset` | Wipes social state; `--with-bands` also nukes picks |
+
+**Do not infer consent** from migration failures or phase docs — explain options and ask.
+
+**Safe defaults:**
+
+- Lineup edits → `npm run seed:bands:sync` (dry-run first; `--apply` preserves picks on UPDATE)
+- `slot_id` bootstrap → `npm run seed:bands:backfill-slot-id -- --apply` (UPDATE only)
+- Verify without writes → dry-run sync + SQL counts (see `.claude/context/production-database.md` and `docs/ai-wiki/lineup-sync.md`)
+
+---
+
 ## Stage configuration
 
 8 stages × 4 days at Wacken 2026. Full table, colors, festival schedule, and lineup update procedure → `.claude/context/stages-and-lineup.md`.
@@ -240,7 +261,7 @@ Full inventory and condition engine → `docs/ai-wiki/badges.md`.
 
 ## Phases at a glance
 
-Phases 1–22 are complete. The next active phase is **Phase 23**.
+Phases 1–24 are complete. The next active phase is **Phase 25**.
 
 **Full phase history** → `docs/ai-wiki/phases-history.md`
 
@@ -309,7 +330,11 @@ Only when **both the build and all tests are green** may you proceed with the co
 - **Unit tests:** `src/__tests__/` — run with `npm test` or `npm test:coverage`. Coverage details and conventions → `docs/ai-wiki/testing.md`.
 
 - **Seed scripts:** `supabase/seed/` and `npm run seed:*`
-  - `npm run seed:bands` — Refresh band lineup (cascades to picks)
+  - **Production:** no PITR — see **Production database safety** above. Never run destructive seed/reset on prod without explicit user OK.
+  - `npm run seed:bands` — Destructive full lineup replace (festival reset only; wipes picks)
+  - `npm run seed:bands:backfill-slot-id -- --apply` — One-time slot_id bootstrap (preserves picks; run before lock migration)
+  - `npm run seed:bands:sync` — Non-destructive lineup sync (dry-run by default; `--apply` to write)
+  - `npm run seed:bands:move -- --from FAS1 --to LOU3 [--apply]` — Transfer picks when band relocates slot
   - `npm run seed:test-users` — Create disposable test vira-latas
   - `npm run seed:live-now` — Time-shift bands for live preview testing
 
@@ -324,7 +349,7 @@ Only when **both the build and all tests are green** may you proceed with the co
 
 - `PHASES.md` — Current phase: acceptance criteria, deliverables
 - `docs/ai-wiki/` — Architecture wiki
-- `.claude/context/` — On-demand context: rtk-reference, stages-and-lineup, llm-alerts, badges, auth-trigger, wiki-template, key-decisions
+- `.claude/context/` — On-demand context: rtk-reference, stages-and-lineup, **production-database**, llm-alerts, badges, auth-trigger, wiki-template, key-decisions
 - `.claude/agents/` — Specialized subagents (see Subagent locations above)
 - `README.md`, `supabase/migrations/`, `src/types/index.ts`
 

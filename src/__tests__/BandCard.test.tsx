@@ -14,6 +14,7 @@ function renderWithI18n(ui: React.ReactElement) {
 
 const sampleBand: Band = {
   id: 'b1',
+  slot_id: 'FAS1',
   name: 'Iron Maiden',
   stage: 'Faster',
   start_time: '2026-07-29T19:00:00Z',

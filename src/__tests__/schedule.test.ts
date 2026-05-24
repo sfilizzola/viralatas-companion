@@ -49,6 +49,7 @@ function createBand(
 
   return {
     id: `band-${Math.random()}`,
+    slot_id: `TST-${name.replace(/\s+/g, '-').toLowerCase()}`,
     name,
     stage,
     start_time: startStr,

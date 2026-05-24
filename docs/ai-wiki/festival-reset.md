@@ -4,6 +4,8 @@
 
 Document the `npm run festival:reset` operator script — a one-shot tool to clear pre-festival activity (badges, announcements, presence check-ins, moderation history) and optionally re-seed the bands table with the finalized lineup. Run once at festival start so live counts, badges, and the announcement mural reflect Wacken itself rather than two months of pre-game.
 
+**Warning:** This project's Supabase plan has **no point-in-time restore**. `--with-bands` CASCADE-wipes all `user_picks` with no undo. Agents must not run this on production without explicit operator confirmation. See `.claude/context/production-database.md`.
+
 ---
 
 ## Relevant Source Files
@@ -184,7 +186,8 @@ Connected clients
 - `docs/ai-wiki/supabase-schema.md` — Full table DDL and RLS policies for everything wiped/preserved (including the `public.app_config` row this script bumps).
 - `docs/ai-wiki/badges.md` — Explains what `achieved_badge_slugs` and `crew_earned_badge_slugs` mean, plus the `persist: true` semantics that this script intentionally undoes.
 - `docs/ai-wiki/sync-engine.md` — `CacheVersionCheck` mechanics; how clients react to the bump on next app load.
-- `docs/ai-wiki/testing.md` — Manual seed-script catalog; this script lives alongside `seed:bands` / `seed:test-users` / `seed:live-now`.
+- `docs/ai-wiki/lineup-sync.md` — Non-destructive lineup sync; daily-use sibling to this script.
+- `docs/ai-wiki/testing.md` — Manual seed-script catalog; this script lives alongside `seed:bands` / `seed:bands:sync` / `seed:test-users` / `seed:live-now`.
 - `docs/ai-wiki/glossary.md` — `Festival Reset` and `Cache Version` entries.
 - `docs/superpowers/specs/2026-05-18-festival-reset-design.md` — The full design doc (problem statement, alternatives considered, risk assessment).
 

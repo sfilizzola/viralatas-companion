@@ -15,6 +15,7 @@ import type { Band, CrewUser, UserPick, UserPresence } from '../types';
 function band(id: string, start: string, end: string, overrides: Partial<Band> = {}): Band {
   return {
     id,
+    slot_id: overrides.slot_id ?? `TST-${id}`,
     name: `Band ${id}`,
     stage: 'Faster',
     start_time: start,

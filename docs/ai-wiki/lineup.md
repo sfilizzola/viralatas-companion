@@ -6,9 +6,19 @@
 > To update the lineup:
 > 1. Edit this file
 > 2. Apply changes to `supabase/seed/bands.ts`
-> 3. Run `npm run seed:bands`
+> 3. Run `npm run seed:bands:sync` (dry-run), then `npm run seed:bands:sync -- --apply`
+>
+> Use destructive `npm run seed:bands` only for festival reset / full rebuild — see [lineup-sync.md](lineup-sync.md).
 
 **Summary:** 155 bands CONFIRMED · 31 `TDB MTB` Metal Battle placeholders · 12 TBD · 199 total · 1 ceremony (Farewell & Announcements, HAR13)
+
+---
+
+## Stable Identity (`slot_id`)
+
+Each row in `public.bands` carries a `slot_id` (e.g. `FAS1`, `WET12`, `HAR13`). This is the canonical, stable identity of a festival slot — it survives edits to `name`, `start_time`, `image_url`, `genre`, etc., so user picks stay attached across small lineup changes.
+
+Every row in `supabase/seed/bands.ts` declares `slot_id` explicitly (formerly end-of-line comments). For everyday edits, use [lineup-sync.md](lineup-sync.md) (`npm run seed:bands:sync`). Destructive `npm run seed:bands` is reserved for festival reset and catastrophic refresh.
 
 ---
 
@@ -538,8 +548,8 @@ The following bands were in the previous version of this file as fake/guessed pl
 ### How to add a new confirmed band image
 
 1. In the Band Assignments section above, change `TBD` → `CONFIRMED` and replace `PLACEHOLDER` with the full image URL from wacken.com
-2. In `supabase/seed/bands.ts`, find the matching entry by `name` + `stage` + `start_time` and update `image_url` with the same URL
-3. Run `npm run seed:bands` to apply the change to the database
+2. In `supabase/seed/bands.ts`, find the entry by `slot_id` and update `image_url` with the same URL
+3. Run `npm run seed:bands:sync` to preview, then `npm run seed:bands:sync -- --apply`
 
 ### How to move a band to a different stage or day
 
@@ -549,7 +559,7 @@ This file maps directly to `bands.ts`. See [stages.md](stages.md#how-stages-link
 1. Update the day section and stage section in this file
 2. Update the stage schedule in [stages.md](stages.md) if the slot time changes
 3. In `bands.ts`, update the `stage` constant and the date variable prefix in `start_time`/`end_time`
-4. Run `npm run seed:bands` (this cascades to `user_picks`, so picks for that band will be cleared)
+4. Run `npm run seed:bands:sync -- --apply`. If picks must follow a slot change, run `seed:bands:move` first — see [lineup-sync.md](lineup-sync.md).
 
 ### How to confirm a slot's official time
 

@@ -20,6 +20,7 @@ export function scenarioBand(
 ): Band {
   return {
     id,
+    slot_id: overrides.slot_id ?? `TST-${id}`,
     name: overrides.name ?? `Band ${id}`,
     stage: overrides.stage ?? 'Faster',
     start_time: start,

@@ -130,17 +130,18 @@ USING (true);  -- All authenticated users can read all profiles
 ```sql
 CREATE TABLE public.bands (
   id uuid PRIMARY KEY,
+  slot_id text NOT NULL UNIQUE,
   name text NOT NULL,
   stage text NOT NULL,
   start_time timestamptz NOT NULL,
   end_time timestamptz NOT NULL,
   image_url text,
   genre text,
-  created_at timestamptz DEFAULT now(),
-  
-  UNIQUE(stage, start_time, name)  -- No overlapping bands on same stage
+  category text,
+  created_at timestamptz DEFAULT now()
 );
 
+CREATE INDEX idx_bands_slot_id ON public.bands(slot_id);
 CREATE INDEX idx_bands_stage ON public.bands(stage);
 CREATE INDEX idx_bands_start_time ON public.bands(start_time);
 ```
@@ -166,10 +167,9 @@ USING (
 );
 ```
 
-**Seed Script** (`supabase/seed/bands.ts`):
-- Fetches official Wacken 2026 lineup (or mocked data for testing)
-- Inserts all bands with correct times/stages
-- Run: `npm run seed:bands`
+**Seed Scripts**:
+- **Non-destructive (default):** `npm run seed:bands:sync` — diff by `slot_id`; dry-run by default; `--apply` to write. See [lineup-sync.md](lineup-sync.md).
+- **Destructive:** `supabase/seed/bands.ts` — full table replace; wipes picks. Run: `npm run seed:bands`. Banner warns to use sync for small edits.
 
 ---
 

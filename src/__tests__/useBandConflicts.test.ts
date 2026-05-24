@@ -10,6 +10,7 @@ function band(
 ): Band {
   return {
     id,
+    slot_id: `TST-${id}`,
     name: id,
     stage,
     start_time: startIso,

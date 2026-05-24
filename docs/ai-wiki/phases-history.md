@@ -425,3 +425,36 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `BadgesDisplay` was refactored to two-phase loading during this phase: Phase 1 reads from IndexedDB immediately (fast, offline-safe); Phase 2 fetches `special_badges`/`is_friend` from Supabase in the background with a skeleton pulse animation.
 
 ---
+
+### Phase 24 — Non-Destructive Lineup Sync
+**Status:** ✅ Complete
+
+**Goal:** Replace destructive `seed:bands` as the default path for lineup edits. Stable `slot_id` identity on every band row; `seed:bands:sync` applies name/time/genre/image changes without wiping `user_picks`.
+
+**Deliverables:**
+- `supabase/migrations/20260524000000_bands_slot_id_add.sql` — NULLable `slot_id` + index
+- `supabase/migrations/20260524000001_bands_slot_id_lock.sql` — NOT NULL + UNIQUE; drops composite `UNIQUE(stage, start_time, name)`
+- `supabase/seed/bands.ts` — `slot_id` on all 187 rows; `assertSeedIntegrity()`; destructive banner points at sync
+- `supabase/seed/bands-sync.ts` + `npm run seed:bands:sync` — dry-run default; `--apply` UPDATE/INSERT/DELETE by `slot_id`; bumps `cache_version`; timestamptz-normalized diff
+- `supabase/seed/bands-move.ts` + `npm run seed:bands:move` — pick transfer when band relocates slot
+- `supabase/seed/bands-backfill-slot-id.ts` — non-destructive `slot_id` bootstrap (UPDATE only; picks preserved)
+- `supabase/seed/seed-shared.ts` — shared env loader, service client, cache bump
+- `src/types/index.ts` — `Band.slot_id: string` required
+- Wiki: `lineup-sync.md`, `lineup.md`, `supabase-schema.md`, `festival-reset.md`, `index.md`; `.claude/context/production-database.md`
+
+**Acceptance criteria (all met):**
+- [x] Every band row has unique `slot_id` in DB and `bands.ts` (187 / 187 verified on prod)
+- [x] `seed:bands:sync` dry-run exits 0 with empty plan on aligned DB
+- [x] One-field change → 1-row UPDATE; `--apply` preserves `user_picks` count (Lovebites FAS1 genre test on prod)
+- [x] `cache_version` bumps on `--apply`
+- [x] Destructive `seed:bands` banner warns to use sync for small edits
+- [x] Build + tests green; wiki + changelog updated
+
+**Wiki:** `docs/ai-wiki/lineup-sync.md` · design `docs/superpowers/specs/2026-05-20-non-destructive-lineup-sync-design.md`
+
+**Architectural notes:**
+- `slot_id` is canonical DB identity; UI keeps using `band.id` for FKs. Client unchanged except type field.
+- Bootstrap path: migration add → `seed:bands:backfill-slot-id -- --apply` → migration lock. **Not** destructive seed (no PITR on this Supabase plan).
+- Agents must never run destructive seed/reset on prod without explicit operator confirmation (see `production-database.md`).
+
+---

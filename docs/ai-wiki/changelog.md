@@ -4,7 +4,52 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
-## 2026-05-24 (MoshSplit API path fix)
+## 2026-05-24 (production database safety)
+
+### Added
+- `.claude/context/production-database.md` — no PITR on Supabase plan; agent must ask before destructive prod ops.
+- `docs/ai-wiki/lineup-sync.md` → **Verifying Phase 24 / lineup changes** — dry-run, SQL, app smoke checklist.
+
+### Changed
+- `CLAUDE.md` — **Production database safety** section; seed-script catalog references it.
+- `.claude/context/stages-and-lineup.md` — sync/backfill as default; explicit no-PITR + ask-first for destructive seed.
+
+### Architectural Notes
+- Destructive `seed:bands` on prod without backup is irreversible for `user_picks`. Non-destructive path: `backfill-slot-id` + `seed:bands:sync`.
+
+---
+
+## 2026-05-24 (Phase 24 closed)
+
+### Changed
+- `PHASES.md` — active phase advanced to 25; Phase 24 entry appended to `phases-history.md`.
+- Prod verified: sync dry-run empty plan, 1-row UPDATE `--apply` preserves `user_picks`, revert confirmed.
+
+---
+
+## 2026-05-24 (Phase 24 — non-destructive lineup sync)
+
+### Added
+- Non-destructive lineup sync: `npm run seed:bands:sync` (dry-run by default, `--apply` to write).
+- Band slot move tool: `npm run seed:bands:move -- --from <slot> --to <slot> [--apply]`.
+- `docs/ai-wiki/lineup-sync.md` — operator flow for sync and move tools.
+- Migrations `20260524000000_bands_slot_id_add.sql` and `20260524000001_bands_slot_id_lock.sql`.
+- `supabase/seed/seed-shared.ts` — shared env loader, service client, cache_version bump.
+
+### Changed
+- `public.bands` gains `slot_id text NOT NULL UNIQUE` as canonical stable identity.
+- `supabase/seed/bands.ts` — every row declares `slot_id`; pre-flight integrity check; destructive banner points at sync.
+- `Band` TypeScript type gains required `slot_id: string`.
+- `lineup.md` maintenance guide defaults to sync; destructive seed recharacterized as festival-reset only.
+- `supabase-schema.md` — updated bands DDL (slot_id, dropped composite UNIQUE).
+
+### Architectural Notes
+- One-time operator backfill still required: apply migration 1 → `npm run seed:bands -- --force` → apply migration 2. That single destructive run bootstraps `slot_id`; all subsequent edits use sync.
+- Old `UNIQUE(stage, start_time, name)` dropped — redundant with slot_id identity.
+- Client unchanged: UI reads IndexedDB by `id`; `cache_version` bump forces refresh after sync apply.
+
+---
+
 
 ### Fixed
 - **`MoshSplitSection` API path** — fetch URL updated from `/v1/balances/external-summary` to `/pitboss/v1/balances/external-summary`. The bare `/v1/…` path returns 404; the Pitboss prefix is required per MoshSplit API docs.

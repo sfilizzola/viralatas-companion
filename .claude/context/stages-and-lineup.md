@@ -88,7 +88,8 @@ Stage order convention within each day in the wiki: Harder · Faster · Louder �
 
 1. Edit `docs/ai-wiki/lineup.md` (the human-editable source of truth for assignments) and/or `docs/ai-wiki/stages.md` if a slot time changes.
 2. Mirror the change in `supabase/seed/bands.ts`.
-3. **Do NOT run `npm run seed:bands` autonomously.** It cascades to `user_picks` (destructive). Ask the user to run it.
-4. Add a migration under `supabase/migrations/` only if the schema itself changes (new column, new constraint). Adding/changing a band row does not need a migration.
+3. **Do NOT run `npm run seed:bands` or `festival:reset --with-bands` autonomously on production.** Both CASCADE-wipe `user_picks`. There is **no Supabase PITR** on this plan — destructive ops are irreversible. Ask the user first.
+4. For lineup edits use `npm run seed:bands:sync` (dry-run, then `--apply`). For `slot_id` bootstrap use `seed:bands:backfill-slot-id -- --apply`.
+5. Add a migration under `supabase/migrations/` only if the schema itself changes (new column, new constraint). Adding/changing a band row does not need a migration.
 
 When Wacken publishes an official running order, also flip the affected slot's `Confirmed` column in `stages.md` from `NO` to `YES` and update the slot's `start_time` / `end_time` in `bands.ts`.

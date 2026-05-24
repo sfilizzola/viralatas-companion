@@ -5,6 +5,7 @@ import type { Band } from '../types';
 function makeBand(overrides: Partial<Band> = {}): Band {
   return {
     id: 'b1',
+    slot_id: 'FAS1',
     name: 'Test Band',
     stage: 'Faster',
     start_time: '2026-07-29T12:00:00Z',

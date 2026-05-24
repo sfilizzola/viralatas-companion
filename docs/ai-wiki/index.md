@@ -1,6 +1,6 @@
 # Viralatas Companion — Architectural Wiki
 
-**Last Updated**: 2026-05-22
+**Last Updated**: 2026-05-24
 
 ## Purpose
 
@@ -77,6 +77,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[Changelog](changelog.md)** — All wiki modifications, discoveries, corrections
 
 ### Operational Tooling
+- **[Lineup Sync](lineup-sync.md)** — Non-destructive `seed:bands:sync` and `seed:bands:move`. Dry-run by default; preserves user picks across small lineup edits.
 - **[Festival Reset](festival-reset.md)** — `npm run festival:reset` one-shot script: state wipe (announcements, blocked_posters, user_presence, assigned + persistent badges, cache_version bump) with optional bands re-seed via `--with-bands`. Flag matrix, scope guard, edge cases.
 
 ---

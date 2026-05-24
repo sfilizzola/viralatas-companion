@@ -10,7 +10,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 
 - `src/__tests__/` — All test files (443 tests)
 - `vitest.config.ts` — Test runner configuration
-- `package.json` — Test scripts (`test`, `test:coverage`) and seed scripts (`seed:bands`, `seed:test-users`, `seed:live-now`, `festival:reset`)
+- `package.json` — Test scripts (`test`, `test:coverage`) and seed scripts (`seed:bands`, `seed:bands:sync`, `seed:bands:backfill-slot-id`, `seed:bands:move`, `seed:test-users`, `seed:live-now`, `festival:reset`)
 - `supabase/seed/` — Seed scripts for test data and the destructive `festival-reset.ts` operator script (see `docs/ai-wiki/festival-reset.md`)
 
 ---
