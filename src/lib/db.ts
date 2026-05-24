@@ -1,109 +1,37 @@
 import { openDB, type IDBPDatabase } from 'idb';
 import type { Announcement, Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserMissedBand, UserPick, UserPresence } from '../types';
+import {
+  ANNOUNCEMENTS_CHANGED_EVENT,
+  BANDS_CHANGED_EVENT,
+  CREW_USERS_CHANGED_EVENT,
+  LIVE_BAND_TEST_CONFIG_CHANGED_EVENT,
+  METAL_PLACE_CONFIG_CHANGED_EVENT,
+  MISSED_CHANGED_EVENT,
+  PICKS_CHANGED_EVENT,
+  PRESENCE_CHANGED_EVENT,
+} from './db/events';
+import type {
+  OfflineDuckQuackOp,
+  OfflineMissedOp,
+  OfflinePickOp,
+  OfflinePresenceOp,
+  ViralatasDB,
+} from './db/types';
+
+export {
+  ANNOUNCEMENTS_CHANGED_EVENT,
+  BANDS_CHANGED_EVENT,
+  CREW_USERS_CHANGED_EVENT,
+  LIVE_BAND_TEST_CONFIG_CHANGED_EVENT,
+  METAL_PLACE_CONFIG_CHANGED_EVENT,
+  MISSED_CHANGED_EVENT,
+  PICKS_CHANGED_EVENT,
+  PRESENCE_CHANGED_EVENT,
+} from './db/events';
+export type { OfflineDuckQuackOp, OfflinePickOp } from './db/types';
 
 const DB_NAME = 'viralatas-db';
 const DB_VERSION = 9;
-
-export const BANDS_CHANGED_EVENT = 'viralatas:bands-changed';
-export const PICKS_CHANGED_EVENT = 'viralatas:picks-changed';
-export const CREW_USERS_CHANGED_EVENT = 'viralatas:crew-users-changed';
-export const PRESENCE_CHANGED_EVENT = 'viralatas:presence-changed';
-export const ANNOUNCEMENTS_CHANGED_EVENT = 'viralatas:announcements-changed';
-export const METAL_PLACE_CONFIG_CHANGED_EVENT = 'viralatas:metal-place-config-changed';
-export const LIVE_BAND_TEST_CONFIG_CHANGED_EVENT = 'viralatas:live-band-test-config-changed';
-export const MISSED_CHANGED_EVENT = 'viralatas:missed-changed';
-
-export type OfflinePickOp = {
-  id: string;
-  user_id: string;
-  band_id: string;
-  action: 'add' | 'remove';
-  created_at: string;
-};
-
-type OfflineMissedOp = {
-  id: string; // `${user_id}|${band_id}`
-  user_id: string;
-  band_id: string;
-  action: 'add' | 'remove';
-  marked_at: string;
-};
-
-type OfflinePresenceOp = UserPresence & {
-  id: string;
-};
-
-export type OfflineDuckQuackOp = {
-  id: string;
-  user_id: string;
-  band_id: string;
-  quacked_at: string;
-};
-
-type ViralatasDB = {
-  session: {
-    key: string;
-    value: unknown;
-  };
-  bands: {
-    key: string;
-    value: Band;
-  };
-  crew_users: {
-    key: string;
-    value: CrewUser;
-  };
-  user_picks: {
-    key: [string, string];
-    value: UserPick;
-    indexes: { by_user: string };
-  };
-  offline_picks: {
-    key: string;
-    value: OfflinePickOp;
-  };
-  user_presence: {
-    key: string;
-    value: UserPresence;
-  };
-  offline_presence: {
-    key: string;
-    value: OfflinePresenceOp;
-  };
-  announcements: {
-    key: string;
-    value: Announcement;
-  };
-  pending_announcements: {
-    key: string;
-    value: Announcement;
-  };
-  metal_place_config: {
-    key: string;
-    value: MetalPlaceConfig;
-  };
-  live_band_test_config: {
-    key: string;
-    value: LiveBandTestConfig;
-  };
-  meta: {
-    key: string;
-    value: { cache_version: string };
-  };
-  user_missed_bands: {
-    key: [string, string];
-    value: UserMissedBand;
-    indexes: { by_user: string };
-  };
-  offline_missed_bands: {
-    key: string;
-    value: OfflineMissedOp;
-  };
-  offline_duck_quacks: {
-    key: string;
-    value: OfflineDuckQuackOp;
-  };
-};
 
 let dbPromise: Promise<IDBPDatabase<ViralatasDB>> | null = null;
 

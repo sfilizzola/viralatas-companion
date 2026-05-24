@@ -317,6 +317,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test` (`db.test.ts` event constant tests); no import path changes for consumers.
 
+**Done (2026-05-24):** `src/lib/db/events.ts` (8 event constants), `src/lib/db/types.ts` (`OfflinePickOp`, `OfflineDuckQuackOp`, internal row types + `ViralatasDB` schema); `db.ts` re-exports unchanged public surface (555 → 482 lines); zero consumer import path changes.
+
 #### Stage 26.N.b — Connection layer
 
 **Scope:** New `src/lib/db/connection.ts` — `DB_NAME`, `DB_VERSION`, `getDB()`, `upgrade()` (all 15 object store definitions), `resetDbConnectionForTests()`; `db.ts` delegates connection calls.

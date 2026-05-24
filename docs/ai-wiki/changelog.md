@@ -4,6 +4,20 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.N.a — Extract db events and types)
+
+### Added
+- `src/lib/db/events.ts` — 8 window `*-changed` event string constants (verbatim extract from `db.ts`).
+- `src/lib/db/types.ts` — `OfflinePickOp`, `OfflineDuckQuackOp`, internal offline row types (`OfflineMissedOp`, `OfflinePresenceOp`), and `ViralatasDB` schema interface.
+
+### Changed
+- `src/lib/db.ts` — imports and re-exports events + public types from `./db/` modules; monolith body unchanged (555 → 482 lines).
+
+### Architectural Notes
+- Verbatim move; zero consumer import path changes (all still `from '../lib/db'`). First safe file split before 26.N.b connection layer.
+
+---
+
 ## 2026-05-24 (Phase 26.N.0 — IDB safety net)
 
 ### Added
