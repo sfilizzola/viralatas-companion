@@ -4,6 +4,19 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.N.d — Extract picks db module)
+
+### Added
+- `src/lib/db/picks.ts` — `saveUserPick`, `removeUserPick`, `loadUserPicks`, `loadAllUserPicks`, `replaceUserPicks`, offline queue ops (`enqueueOfflinePick`, `loadOfflineQueue`, `removeFromOfflineQueue`) + `PICKS_CHANGED_EVENT` emit (verbatim extract).
+
+### Changed
+- `src/lib/db.ts` — imports and re-exports picks from `./db/picks` module (353 → 304 lines).
+
+### Architectural Notes
+- Verbatim move; zero consumer import path changes. Next: 26.N.e presence domain.
+
+---
+
 ## 2026-05-24 (Phase 26.N.c — Extract session and catalog db modules)
 
 ### Added

@@ -353,6 +353,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test` (`db.test.ts`, `picksRepository.test.ts`); offline pick → reconnect flush.
 
+**Done (2026-05-24):** `src/lib/db/picks.ts` — `user_picks` + `offline_picks` stores, queue helpers, and `PICKS_CHANGED_EVENT` emit; `db.ts` re-exports unchanged public surface (353 → 304 lines); zero consumer import path changes.
+
 #### Stage 26.N.e — Presence domain
 
 **Scope:** New `src/lib/db/presence.ts` — `user_presence` + `offline_presence` stores and queue helpers.

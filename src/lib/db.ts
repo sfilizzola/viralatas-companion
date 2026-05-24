@@ -1,17 +1,15 @@
-import type { Announcement, LiveBandTestConfig, MetalPlaceConfig, UserMissedBand, UserPick, UserPresence } from '../types';
+import type { Announcement, LiveBandTestConfig, MetalPlaceConfig, UserMissedBand, UserPresence } from '../types';
 import { getDB } from './db/connection';
 import {
   ANNOUNCEMENTS_CHANGED_EVENT,
   LIVE_BAND_TEST_CONFIG_CHANGED_EVENT,
   METAL_PLACE_CONFIG_CHANGED_EVENT,
   MISSED_CHANGED_EVENT,
-  PICKS_CHANGED_EVENT,
   PRESENCE_CHANGED_EVENT,
 } from './db/events';
 import type {
   OfflineDuckQuackOp,
   OfflineMissedOp,
-  OfflinePickOp,
   OfflinePresenceOp,
 } from './db/types';
 
@@ -29,12 +27,16 @@ export type { OfflineDuckQuackOp, OfflinePickOp } from './db/types';
 export { resetDbConnectionForTests } from './db/connection';
 export { saveSession, loadSession, clearSession } from './db/session';
 export { saveBands, loadBands, saveCrewUsers, loadCrewUsers } from './db/catalog';
-
-function emitPicksChanged() {
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event(PICKS_CHANGED_EVENT));
-  }
-}
+export {
+  saveUserPick,
+  removeUserPick,
+  loadUserPicks,
+  loadAllUserPicks,
+  replaceUserPicks,
+  enqueueOfflinePick,
+  loadOfflineQueue,
+  removeFromOfflineQueue,
+} from './db/picks';
 
 function emitPresenceChanged() {
   if (typeof window !== 'undefined') {
@@ -66,42 +68,6 @@ function emitMissedChanged() {
   }
 }
 
-export async function saveUserPick(pick: UserPick) {
-  const db = await getDB();
-  await db.put('user_picks', pick);
-  emitPicksChanged();
-}
-
-export async function removeUserPick(userId: string, bandId: string) {
-  const db = await getDB();
-  await db.delete('user_picks', [userId, bandId]);
-  emitPicksChanged();
-}
-
-export async function loadUserPicks(userId: string): Promise<UserPick[]> {
-  const db = await getDB();
-  return db.getAllFromIndex('user_picks', 'by_user', userId);
-}
-
-export async function loadAllUserPicks(): Promise<UserPick[]> {
-  const db = await getDB();
-  return db.getAll('user_picks');
-}
-
-export async function replaceUserPicks(picks: UserPick[], userId?: string) {
-  const db = await getDB();
-  const tx = db.transaction('user_picks', 'readwrite');
-  if (userId) {
-    const existing = await tx.store.index('by_user').getAll(userId);
-    await Promise.all(existing.map((pick) => tx.store.delete([pick.user_id, pick.band_id])));
-  } else {
-    await tx.store.clear();
-  }
-  await Promise.all(picks.map((pick) => tx.store.put(pick)));
-  await tx.done;
-  emitPicksChanged();
-}
-
 export async function saveUserPresence(presence: UserPresence) {
   const db = await getDB();
   await db.put('user_presence', presence);
@@ -129,21 +95,6 @@ export async function replaceUserPresence(presence: UserPresence[], userId?: str
   await Promise.all(presence.map((item) => tx.store.put(item)));
   await tx.done;
   emitPresenceChanged();
-}
-
-export async function enqueueOfflinePick(op: OfflinePickOp) {
-  const db = await getDB();
-  await db.put('offline_picks', op);
-}
-
-export async function loadOfflineQueue(): Promise<OfflinePickOp[]> {
-  const db = await getDB();
-  return db.getAll('offline_picks');
-}
-
-export async function removeFromOfflineQueue(id: string) {
-  const db = await getDB();
-  await db.delete('offline_picks', id);
 }
 
 export async function enqueueOfflinePresence(op: OfflinePresenceOp) {
