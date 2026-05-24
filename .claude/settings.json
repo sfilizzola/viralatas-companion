@@ -10,5 +10,8 @@
       "Bash(pkill -f \"npm run dev\")",
       "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")"
     ]
+  },
+  "enabledPlugins": {
+    "superpowers@superpowers-marketplace": true
   }
 }
