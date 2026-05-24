@@ -418,11 +418,6 @@ export default function MyPicksPage() {
             </section>
           );
         })()}
-        {isFestivalActive && (
-          <div className={styles.playlistBottom}>
-            <PlaylistLaunchButton bands={myBands} userName={displayName} />
-          </div>
-        )}
       </main>
 
       {activeBand && (
