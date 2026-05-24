@@ -4,6 +4,16 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.M.0 — useNowData hook safety net)
+
+### Added
+- `src/__tests__/useNowData.test.ts` — 12 hook tests covering `handlePresenceChange` branches, camping auto-clear effect, `validateAndAutoCheckout` on inactive MP window, skip/undo, `duckBandId` gating (ceremony / 15-min window), `PRESENCE_CHANGED_EVENT` cache refresh, and a characterization snapshot for key `NowData` fields.
+
+### Architectural Notes
+- Test-only stage: no production code changes; safety net before 26.M.a–d hook extractions.
+
+---
+
 ## 2026-05-24 (Phase 26.L — Decompose GodlikeAdminPanel)
 
 ### Added

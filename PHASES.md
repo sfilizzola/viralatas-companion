@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 In progress (26.A–26.L complete)
+**Status:** 🔜 In progress (26.A–26.L complete; 26.M.0 ✅)
 
 **Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
 
@@ -211,16 +211,69 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ### Stage 26.M — Slim `useNowData.ts`
 
-**Scope:** After 26.C/H/E:
-- Extract `usePresenceRealtime`, `useMetalPlaceConfig`, `useLiveBandTestConfig` hooks
-- Move side-effect chains (auto-checkout, camping clear) into `presenceRepository` or small service functions
-- Target: `useNowData` ~150 lines orchestration; `RightNowPage` unchanged externally
+**Depends on:** 26.C, 26.E, 26.H, 26.A
 
-**Gets simpler:** Live Now debugging localized; mirrors successful RightNowPage thinness at hook layer.
+**Target:** `useNowData.ts` ~120–150 lines orchestration; `RightNowPage.tsx` unchanged externally.
 
-**Risk:** High | **Depth:** Deep restructure | **Depends on:** 26.C, 26.E, 26.H, 26.A (`liveNowScenarios.test.ts` green)
+**Risk note:** High if done in one commit. Split into sub-stages below; one commit per sub-stage.
 
-**Verification:** `rtk npm test` (`liveNowScenarios.test.ts`, `livePreview.test.ts`, `presenceRepository.test.ts`); full `/now` manual scenario (camping, Metal Place, skip/undo, duck).
+#### Stage 26.M.0 — Hook safety net (tests only)
+
+**Scope:** `src/__tests__/useNowData.test.ts` — `handlePresenceChange` branches, camping auto-clear effect, skip/undo + timer, `duckBandId` gating, cache refresh on window events. Optionally characterization snapshots for `NowData` shape.
+
+**Gets simpler:** Confidence to refactor hook wiring; `liveNowScenarios` covers pure pipeline only, not orchestration.
+
+**Risk:** Low | **Depth:** Shallow (test-only) | **Depends on:** 26.A
+
+**Verification:** `rtk npm test`; no production code changes.
+
+**Done (2026-05-24):** `src/__tests__/useNowData.test.ts` — 12 tests (presence toggles, camping auto-clear, MP auto-checkout, skip/undo, duckBandId gating, cache refresh, characterization snapshot); no production code changes.
+
+#### Stage 26.M.a — Extract config hooks
+
+**Scope:** New `useMetalPlaceConfig()`, `useLiveBandTestConfig()` — verbatim extract from `useNowData` (IDB + sync + window event + realtime via `subscribePostgresChanges`).
+
+**Gets simpler:** MP window and live test config isolated; easier to debug godlike overrides.
+
+**Risk:** Low | **Depth:** Shallow extract | **Depends on:** 26.M.0 recommended
+
+**Verification:** `rtk npm test`; manual MP window toggle + live band test banner.
+
+#### Stage 26.M.b — Extract `usePresenceRealtime()`
+
+**Scope:** Presence realtime channel + mount `syncCrewFromRemote()` — verbatim extract.
+
+**Gets simpler:** Crew live updates localized.
+
+**Risk:** Medium | **Depth:** Moderate extract | **Depends on:** 26.M.0 recommended, 26.H
+
+**Verification:** `rtk npm test`; two-browser presence update ≤3s.
+
+#### Stage 26.M.c — Extract cache + plan derivations
+
+**Scope:** `refreshFromCache` + window event listeners → `useNowCache()` (or similar); plan memos → optional `useNowPlans()`. Preserve `undoTimerId` effect dependency behavior exactly.
+
+**Gets simpler:** IDB/event wiring separated from live plan math.
+
+**Risk:** Medium | **Depth:** Moderate extract | **Depends on:** 26.M.0, 26.M.a, 26.M.b
+
+**Verification:** `rtk npm test` (`liveNowScenarios.test.ts`, `useNowData.test.ts`); skip/undo manual smoke.
+
+#### Stage 26.M.d — Optional side-effect consolidation
+
+**Scope:** Move camping auto-clear + `handlePresenceChange` orchestration into `presenceRepository` helpers (e.g. `applyPresenceToggle`). Only after M.0–M.c green.
+
+**Gets simpler:** Side effects testable at repository layer; thinner hook.
+
+**Risk:** Medium–High | **Depth:** Moderate | **Depends on:** 26.M.0–26.M.c
+
+**Verification:** `rtk npm test`; full `/now` manual smoke (camping, Metal Place, skip/undo, duck).
+
+**Recommended 26.M execution order:**
+
+```
+26.M.0 → 26.M.a → 26.M.b → 26.M.c → 26.M.d (optional)
+```
 
 ---
 
@@ -251,7 +304,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 ### Recommended execution order
 
 ```
-26.A → 26.B → 26.C → 26.E → 26.D → 26.F → 26.G → 26.H → 26.J → 26.I → 26.K → 26.L → 26.M → (26.N if needed)
+26.A → 26.B → 26.C → 26.E → 26.D → 26.F → 26.G → 26.H → 26.J → 26.I → 26.K → 26.L → 26.M.0 → 26.M.a → 26.M.b → 26.M.c → 26.M.d (optional) → (26.N if needed)
 ```
 
 Close each sub-stage with wiki changelog entry; close whole phase with single commit per CLAUDE.md phase rules.
