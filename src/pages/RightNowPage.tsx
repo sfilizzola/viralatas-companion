@@ -99,7 +99,7 @@ export default function RightNowPage() {
               />
             )}
 
-            {user && <BadgesDisplay user={user} heading={t('patches')} />}
+            {user && <BadgesDisplay user={user} />}
 
             <h2 className={styles.sectionTitle}>{t('crewNow')}</h2>
             <CrewGroupsSection

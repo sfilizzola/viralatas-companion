@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import {
   BADGES,
@@ -45,6 +45,7 @@ const EMPTY_CTX: BadgeContext = {
 
 type BadgesDisplayProps = {
   user: AuthUser;
+  /** @deprecated Kicker is rendered internally */
   heading?: string;
 };
 
@@ -52,11 +53,136 @@ function yearSuffix(year: number): string {
   return String(year).slice(-2);
 }
 
-export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
+/** Deterministic hash — stable chaos per badge slug */
+function hashSlug(slug: string): number {
+  let h = 0;
+  for (let i = 0; i < slug.length; i++) {
+    h = (Math.imul(31, h) + slug.charCodeAt(i)) | 0;
+  }
+  return Math.abs(h);
+}
+
+type StackPose = {
+  left: number;
+  top: number;
+  rotate: number;
+  scale: number;
+  zIndex: number;
+};
+
+function stackGrid(total: number): { cols: number; rows: number } {
+  const cols = Math.max(3, Math.min(6, Math.ceil(Math.sqrt(total * 1.2))));
+  const rows = Math.ceil(total / cols);
+  return { cols, rows };
+}
+
+/** ~480×112 vest — distance in “physical” space for overlap checks */
+const VEST_ASPECT = 480 / 112;
+
+function stackCenterDist(
+  a: { left: number; top: number },
+  b: { left: number; top: number },
+): number {
+  const dx = (a.left - b.left) / 100;
+  const dy = ((a.top - b.top) / 100) * VEST_ASPECT;
+  return Math.hypot(dx, dy);
+}
+
+function clampStackPoint(left: number, top: number): { left: number; top: number } {
+  return {
+    left: Math.max(8, Math.min(92, left)),
+    top: Math.max(10, Math.min(90, top)),
+  };
+}
+
+function stackPoseDraft(
+  slug: string,
+  index: number,
+  total: number,
+  seed: number,
+  attempt: number,
+): Omit<StackPose, 'zIndex'> {
+  const h = hashSlug(`${seed}:${slug}:${index}:${attempt}`);
+
+  const { cols, rows } = stackGrid(total);
+  const row = Math.floor(index / cols);
+  const col = index % cols;
+  const colsInRow = row === rows - 1 ? total - row * cols : cols;
+
+  const cellW = 100 / cols;
+  const cellH = 100 / rows;
+  const baseLeft = colsInRow <= 1 ? 50 : (col + 0.5) * (100 / colsInRow);
+  const baseTop = rows <= 1 ? 50 : (row + 0.5) * cellH;
+
+  const clutter = Math.min(1.35, 0.55 + total * 0.04);
+  let jitterX = ((h % 19) - 9) * (cellW * 0.32 * clutter) + (((h >> 6) % 11) - 5) * 1.6 * clutter;
+  let jitterY = (((h >> 4) % 19) - 9) * (cellH * 0.32 * clutter) + (((h >> 10) % 11) - 5) * 1.4 * clutter;
+
+  if (attempt > 0) {
+    const angle = ((h >> 3) % 360) * (Math.PI / 180);
+    const push = 5 + attempt * 2.2;
+    jitterX += Math.cos(angle) * push;
+    jitterY += Math.sin(angle) * push * 0.55;
+  }
+
+  const { left, top } = clampStackPoint(baseLeft + jitterX, baseTop + jitterY);
+
+  return {
+    left,
+    top,
+    rotate: (h % 111) - 55 + index * 0.2,
+    scale: 0.88 + (h % 12) / 100,
+  };
+}
+
+/** Place all collapsed patches; nudge apart when centers would fully bury a prior one */
+function buildStackPoses(
+  badges: BadgeConfig[],
+  seed: number,
+  glowing: Set<string>,
+): Map<string, StackPose> {
+  const poses = new Map<string, StackPose>();
+  const placed: { left: number; top: number }[] = [];
+  const total = badges.length;
+  const minDist = Math.max(0.038, 0.072 - total * 0.0015);
+
+  badges.forEach((badge, index) => {
+    let chosen = stackPoseDraft(badge.slug, index, total, seed, 0);
+
+    for (let attempt = 0; attempt < 12; attempt++) {
+      const draft = stackPoseDraft(badge.slug, index, total, seed, attempt);
+      chosen = draft;
+      const buried = placed.some((p) => stackCenterDist(draft, p) < minDist);
+      if (!buried) break;
+    }
+
+    placed.push({ left: chosen.left, top: chosen.top });
+    poses.set(badge.slug, {
+      ...chosen,
+      zIndex: index + 1 + (glowing.has(badge.slug) ? 50 : 0),
+    });
+  });
+
+  return poses;
+}
+
+function stackStyle(pose: StackPose): CSSProperties {
+  return {
+    ['--stack-left' as string]: `${pose.left}%`,
+    ['--stack-top' as string]: `${pose.top}%`,
+    ['--stack-rot' as string]: `${pose.rotate}deg`,
+    ['--stack-scale' as string]: String(pose.scale),
+    zIndex: pose.zIndex,
+  };
+}
+
+export default function BadgesDisplay({ user }: BadgesDisplayProps) {
   const { t } = useI18n('Badges');
   const [ctx, setCtx] = useState<BadgeContext>(EMPTY_CTX);
   const [loading, setLoading] = useState(true);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
+  const [spread, setSpread] = useState(false);
+  const [scatterSeed, setScatterSeed] = useState(() => Math.random());
   const [bg, setBg] = useState<PatchesBackground>(() => loadPatchesBackground());
 
   useEffect(() => {
@@ -279,14 +405,82 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
     setSelectedSlug(slug);
   }
 
+  function renderPatchButton(
+    badge: BadgeConfig,
+    index: number,
+    mode: 'stack' | 'grid',
+    stackPose?: StackPose,
+  ) {
+    const isGlowing = glowingSlugs.has(badge.slug);
+    const btnClass = [
+      styles.patchBtn,
+      mode === 'stack' ? styles.patchStackItem : styles.patchGridItem,
+      isGlowing ? styles.glowing : '',
+    ].filter(Boolean).join(' ');
+
+    const imgClass = mode === 'stack' ? styles.stackPatchImg : styles.patchImg;
+    const chipClass = mode === 'stack' ? styles.stackYearChip : styles.yearChip;
+
+    const patchContent = (
+      <span className={styles.imgWrapper}>
+        <img src={badge.imagePath} alt="" className={imgClass} />
+        {badge.year && (
+          <span className={chipClass}>{yearSuffix(badge.year)}</span>
+        )}
+      </span>
+    );
+
+    if (mode === 'stack') {
+      if (!stackPose) return null;
+      return (
+        <div
+          key={badge.slug}
+          className={btnClass}
+          style={stackStyle(stackPose)}
+          aria-hidden="true"
+        >
+          {patchContent}
+        </div>
+      );
+    }
+
+    return (
+      <button
+        key={badge.slug}
+        className={btnClass}
+        style={{ ['--settle-i' as string]: index }}
+        onClick={() => handleBadgeClick(badge.slug)}
+        type="button"
+        aria-label={t(badge.labelKey)}
+      >
+        {patchContent}
+      </button>
+    );
+  }
+
   if (loading) {
     return (
       <>
-        {heading && <div className={styles.patchesHeading}>{heading}</div>}
-        <div className={`${styles.patchesGrid} ${styles.patchesGridSkeleton}`} data-bg={bg} aria-hidden="true">
-          {[0, 1, 2, 3].map((i) => (
-            <div key={i} className={styles.skeletonPatch} />
-          ))}
+        <div className={styles.patchesHeader}>
+          <div className={styles.patchesHeading}>{t('patchesKicker')}</div>
+        </div>
+        <div
+          className={`${styles.vestStack} ${styles.vestStackSkeleton}`}
+          data-bg={bg}
+          aria-hidden="true"
+        >
+          <div className={styles.vestStackMeadow}>
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <div
+                key={i}
+                className={styles.skeletonStackPatch}
+                style={{
+                  left: `${14 + i * 13}%`,
+                  top: `${22 + (i % 2) * 28}%`,
+                }}
+              />
+            ))}
+          </div>
         </div>
       </>
     );
@@ -294,32 +488,50 @@ export default function BadgesDisplay({ user, heading }: BadgesDisplayProps) {
 
   if (earned.length === 0) return null;
 
+  const sortedEarned = earned;
+  const collapsedPoses = spread
+    ? null
+    : buildStackPoses(sortedEarned, scatterSeed, glowingSlugs);
+
   return (
     <>
-      {heading && <div className={styles.patchesHeading}>{heading}</div>}
-      <div className={styles.patchesGrid} data-bg={bg}>
-        {earned.map((badge) => {
-          const isGlowing = glowingSlugs.has(badge.slug);
-          const btnClass = isGlowing
-            ? `${styles.patchBtn} ${styles.glowing}`
-            : styles.patchBtn;
-          return (
-          <button
-            key={badge.slug}
-            className={btnClass}
-            onClick={() => handleBadgeClick(badge.slug)}
-            type="button"
-            aria-label={t(badge.labelKey)}
-          >
-            <span className={styles.imgWrapper}>
-              <img src={badge.imagePath} alt="" className={styles.patchImg} />
-              {badge.year && (
-                <span className={styles.yearChip}>{yearSuffix(badge.year)}</span>
-              )}
-            </span>
-          </button>
-          );
-        })}
+      <div className={styles.patchesHeader}>
+        <div className={styles.patchesHeading}>
+          {t('patchesKicker')}
+          <span className={styles.patchesCount}>· {earned.length}</span>
+        </div>
+        <button
+          type="button"
+          className={styles.spreadBtn}
+          onClick={() => {
+            if (spread) setScatterSeed(Math.random());
+            setSpread((s) => !s);
+          }}
+          aria-expanded={spread}
+        >
+          {spread ? t('patchesCollapse') : t('patchesSpread')}
+        </button>
+      </div>
+
+      <div
+        className={
+          spread
+            ? `${styles.vestStack} ${styles.vestSpread} ${styles.patchesGrid}`
+            : styles.vestStack
+        }
+        data-bg={bg}
+      >
+        {spread ? (
+          sortedEarned.map((badge, index) =>
+            renderPatchButton(badge, index, 'grid'),
+          )
+        ) : (
+          <div className={styles.vestStackMeadow}>
+            {sortedEarned.map((badge, index) =>
+              renderPatchButton(badge, index, 'stack', collapsedPoses!.get(badge.slug)),
+            )}
+          </div>
+        )}
       </div>
 
       {selectedBadge && (

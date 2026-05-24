@@ -22,10 +22,37 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 | `src/i18n/Badges_en.json` | English labels + descriptions |
 | `src/i18n/Badges_es.json` | Spanish labels + descriptions (if available) |
 | `src/i18n/Badges_de.json` | German labels + descriptions (if available) |
-| `src/components/BadgesDisplay.tsx` | Patches grid, detail modal, and fullscreen zoom overlay |
-| `src/components/ProfilePage.tsx` | Badge grid (4/6/8 cols) + admin assign-badge UI |
+| `src/components/BadgesDisplay.tsx` | Vest-stack patches grid, detail modal, fullscreen zoom, spread/collapse |
+| `src/components/ProfilePage.tsx` | Patches section + admin assign-badge UI |
 | `src/lib/patchesBackground.ts` | Per-device patches grid background preference (localStorage) |
 | `src/components/profile/PatchesBackgroundPicker.tsx` | 4-swatch fabric selector in profile |
+
+---
+
+## Patches Vest Stack (Variant C)
+
+The patches UI uses a **collapsed kutte stack** by default (fixed **112 px** height) so large collections do not dominate `/now` or `/profile`.
+
+### Collapsed (default)
+
+- **Layout:** 48 px patches scattered on a fixed-height vest (`.vestStack`); overlap increases with badge count.
+- **Chaos:** meadow scatter with per-collapse `scatterSeed`; rotation ±55°, scale 0.88–0.99; anti-bury nudge so no patch is fully hidden under another.
+- **Glow:** only unacknowledged badges animate (`badgeGlow`); no idle motion otherwise.
+- **Interaction:** patches are non-interactive; header **Open vest** expands. User `data-bg` applies to collapsed vest.
+
+### Expanded
+
+- **Layout:** 4-column grid, 48 px patches, same `data-bg` battle-vest background.
+- **Animation:** `settlePatch` keyframe with stagger (`42 ms × index`).
+- **Collapse:** **Close vest** reshuffles scatter seed and returns to kutte stack; patches clickable → detail modal.
+
+### i18n keys (`Badges_*.json`)
+
+- `patchesKicker`, `patchesSpread` (Open vest), `patchesCollapse` (Close vest)
+
+### Accessibility
+
+- `aria-expanded` on vest toggle; `aria-label` per patch when expanded; collapsed patches `aria-hidden`; `prefers-reduced-motion` disables settle animation.
 
 ---
 
@@ -49,7 +76,7 @@ The patches grid background is a **per-device visual preference**, not a synced 
 
 **Mechanism:**
 1. `PatchesBackgroundPicker` writes `localStorage['viralatas:patches-bg']` and dispatches `viralatas:patches-bg-changed` (CustomEvent with the new value in `detail`).
-2. `BadgesDisplay` listens for the event and re-renders `.patchesGrid` with `data-bg={value}`.
+2. `BadgesDisplay` listens for the event and applies `data-bg={value}` on both collapsed `.vestStack` and expanded `.vestSpread.patchesGrid`.
 3. CSS in `BadgesDisplay.module.css` keys each variant off the `data-bg` attribute. Switching is instant; no re-mount.
 
 If `localStorage` is unavailable (private mode, SSR), `loadPatchesBackground()` falls back to `DEFAULT_PATCHES_BG = 'steel'` and `savePatchesBackground` silently no-ops while still firing the event so the in-memory state updates for the session.

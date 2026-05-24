@@ -96,7 +96,6 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
       />
 
       <section className={styles.pfSection}>
-        <div className={styles.pfSectionKicker}>{t('patches')}</div>
         <BadgesDisplay user={user} />
       </section>
 

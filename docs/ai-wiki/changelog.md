@@ -4,6 +4,22 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (compact patches — Variant C vest stack)
+
+### Changed
+- `BadgesDisplay` — **Variant C (Vest Stack):** fixed 112 px collapsed kutte with meadow scatter (±55° rotation, reseed on collapse, anti-bury overlap), glow-only animation when collapsed; **Open vest** / **Close vest** toggle; expanded 4-col grid with `settlePatch`; user `data-bg` on both states.
+- `BadgesDisplay.module.css` — stack/spread styles, reduced expanded patch size (48 px).
+- `ProfilePage` / `RightNowPage` — unified patches header inside `BadgesDisplay` (count + spread toggle).
+- `src/i18n/Badges_*.json` — `patchesKicker`, `patchesSpread`, `patchesCollapse`.
+- `public/Design System.html` — new BadgesDisplay section.
+- `docs/ai-wiki/badges.md` — Vest Stack layout documentation.
+
+### Architectural Notes
+- Pure presentation change; badge engine, modal, fullscreen zoom, offline evaluation unchanged.
+- Design comparison canvas preserved at `_temp/patches-layout-variants/index.html`.
+
+---
+
 ## 2026-05-24 (joke assigned badges — sun sacrifice, tactical nap)
 
 ### Added

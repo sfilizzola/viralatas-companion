@@ -1,15 +1,172 @@
 /* ============================================================
-   PATCHES GRID — 4 cols phone, 6 tablet, 8 desktop
+   PATCHES — Variant C: Vest Stack (chaotic kutte + animated spread)
+   Collapsed ~108 px · Expanded 4-col grid with staggered settle
    ============================================================ */
 
-.patchesHeading {
+.patchesHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
   margin: 0 0 var(--s-1);
+  width: 100%;
+  max-width: 480px;
+}
+
+.patchesHeading {
+  margin: 0;
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.patchesCount {
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  opacity: 0.85;
+}
+
+.spreadBtn {
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  padding: 4px 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.spreadBtn:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+/* Collapsed kutte — fixed footprint; patches pile on top as count grows */
+.vestStack:not(.vestSpread) {
+  height: 112px;
+}
+
+.vestStack {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: var(--s-1);
+  border-radius: var(--r-2);
+  overflow: hidden;
+  transition:
+    height 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.vestStackMeadow {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.vestSpread {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--s-2);
+  height: auto;
+  overflow: visible;
+  padding: var(--s-3);
+  transition: height 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stackPatchImg {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.65));
+}
+
+.stackYearChip {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 22px;
+  height: 22px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 7px;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(145deg, #d93025 0%, #b32020 60%, #7a1010 100%);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+  line-height: 1;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.stackYearChip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.08) 45%, rgba(255, 255, 255, 0) 70%);
+}
+
+/* Expanded grid — patches settle into formation */
+.patchGridItem {
+  position: relative;
+  left: auto;
+  top: auto;
+  z-index: auto;
+  animation: settlePatch 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation-delay: calc(var(--settle-i) * 42ms);
+}
+
+@keyframes settlePatch {
+  0% {
+    opacity: 0.35;
+    transform: rotate(calc(var(--settle-i) * 7deg - 14deg)) scale(0.72) translateY(-18px);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(2deg) scale(1.04) translateY(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(0deg) scale(1) translateY(0);
+  }
+}
+
+.vestStackSkeleton {
+  pointer-events: none;
+}
+
+.skeletonStackPatch {
+  position: absolute;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--border);
+  animation: skeletonPulse 1.4s ease-in-out infinite;
+  transform: translate(-50%, -50%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vestStack,
+  .vestSpread { transition: none; }
+  .spreadBtn { transition: none; }
+  .patchGridItem { animation: none; }
 }
 
 .patchesGrid {
@@ -24,20 +181,25 @@
 }
 
 /* ============================================================
-   PATCHES GRID — BACKGROUND VARIANTS
+   PATCHES — BACKGROUND VARIANTS (collapsed vest + expanded grid)
    Toggled via data-bg attribute, driven by user preference
    stored in localStorage. See src/lib/patchesBackground.ts.
    ============================================================ */
 
 /* none — transparent, no frame; patches sit directly on the page */
+.vestStack[data-bg='none'],
 .patchesGrid[data-bg='none'] {
-  padding: var(--s-2) 0;
   border: none;
   background: transparent;
   box-shadow: none;
 }
 
+.patchesGrid[data-bg='none'] {
+  padding: var(--s-2) 0;
+}
+
 /* grid — subtle crosshatch on sunken black; minimalist */
+.vestStack[data-bg='grid'],
 .patchesGrid[data-bg='grid'] {
   background-color: var(--bg-sunken);
   background-image:
@@ -55,6 +217,7 @@
 }
 
 /* steel — darker indigo battle-vest denim (default) */
+.vestStack[data-bg='steel'],
 .patchesGrid[data-bg='steel'] {
   background-color: #18293f;
   background-image:
@@ -81,6 +244,7 @@
 }
 
 /* indigo — brighter washed denim, more saturated */
+.vestStack[data-bg='indigo'],
 .patchesGrid[data-bg='indigo'] {
   background-color: #34527a;
   background-image:
@@ -107,6 +271,7 @@
 }
 
 /* leather — dark cordovan, pebbled grain, warm sheen */
+.vestStack[data-bg='leather'],
 .patchesGrid[data-bg='leather'] {
   background-color: #2b1813;
   background-image:
@@ -129,6 +294,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .vestStack,
   .patchesGrid { transition: none; }
 }
 
@@ -179,15 +345,27 @@
   transition: transform 0.15s;
 }
 
+/* Collapsed kutte — static scatter, no interaction; must follow .patchBtn */
+.patchBtn.patchStackItem {
+  position: absolute;
+  left: var(--stack-left);
+  top: var(--stack-top);
+  padding: 0;
+  pointer-events: none;
+  cursor: default;
+  transform: translate(-50%, -50%) rotate(var(--stack-rot)) scale(var(--stack-scale));
+  transform-origin: center center;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .patchBtn { transition: none; }
 }
 
-.patchBtn:hover {
+.vestSpread .patchBtn:hover {
   transform: scale(1.08);
 }
 
-.patchBtn:active {
+.vestSpread .patchBtn:active {
   transform: scale(0.95);
 }
 
@@ -209,8 +387,8 @@
 }
 
 .patchImg {
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   display: block;
   object-fit: contain;
