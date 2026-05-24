@@ -1,11 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { Band, UserMissedBand } from '../types';
-import { MISSED_CHANGED_EVENT } from '../lib/db';
-import { missedRepository } from '../repositories';
+import { useCallback, useMemo, useState } from 'react';
+import type { Band } from '../types';
 import { bandDay } from '../services/bandTime';
 import { useAuth } from '../hooks/useAuth';
 import { useBands } from '../hooks/useBands';
 import { useBandAttendees } from '../hooks/useBandAttendees';
+import { useMissedBands } from '../hooks/useMissedBands';
 import { usePickActions } from '../hooks/usePickActions';
 import { usePickCounts } from '../hooks/usePickCounts';
 import { useBandConflicts } from '../hooks/useBandConflicts';
@@ -33,9 +32,9 @@ export default function MyPicksPage() {
 
   const [highlightedConflict, setHighlightedConflict] = useState<string | null>(null);
   const [activeBandId, setActiveBandId] = useState<string | null>(null);
-  const [allMissed, setAllMissed] = useState<UserMissedBand[]>([]);
   const [collapsedDays, setCollapsedDays] = useState<Set<string>>(new Set());
   const { bands: rawBands, loading } = useBands();
+  const { allMissed, missedBandIds, missedCountsByBand, toggleMissed } = useMissedBands(userId);
   const bands = useMemo(
     () => rawBands.slice().sort((a, b) => a.start_time.localeCompare(b.start_time)),
     [rawBands],
@@ -45,22 +44,6 @@ export default function MyPicksPage() {
   const pickCounts = usePickCounts();
   const currentNow = useNow(60_000);
   const pendingBandIds = useOfflinePendingBandIds();
-
-  useEffect(() => {
-    async function refreshMissed() {
-      setAllMissed(await missedRepository.loadAll());
-    }
-
-    refreshMissed();
-    if (userId) missedRepository.sync(userId).catch(() => {});
-
-    const unsubscribeRealtime = missedRepository.subscribeToRealtime();
-    window.addEventListener(MISSED_CHANGED_EVENT, refreshMissed);
-    return () => {
-      window.removeEventListener(MISSED_CHANGED_EVENT, refreshMissed);
-      unsubscribeRealtime();
-    };
-  }, [userId]);
 
   const myBands = useMemo(
     () => bands.filter((band) => pickedIds.has(band.id)),
@@ -77,11 +60,6 @@ export default function MyPicksPage() {
     [myBands, currentNow],
   );
 
-  const missedBandIds = useMemo(
-    () => new Set(allMissed.filter((m) => m.user_id === userId).map((m) => m.band_id)),
-    [allMissed, userId],
-  );
-
   const sawBands = useMemo(
     () => endedBands.filter((band) => !missedBandIds.has(band.id)),
     [endedBands, missedBandIds],
@@ -91,14 +69,6 @@ export default function MyPicksPage() {
     () => endedBands.filter((band) => missedBandIds.has(band.id)),
     [endedBands, missedBandIds],
   );
-
-  const missedCountsByBand = useMemo(() => {
-    const map: Record<string, number> = {};
-    for (const m of allMissed) {
-      map[m.band_id] = (map[m.band_id] ?? 0) + 1;
-    }
-    return map;
-  }, [allMissed]);
 
   const festivalActive = isFestivalActive(currentNow);
   const conflicts = useBandConflicts(myBands);
@@ -116,13 +86,8 @@ export default function MyPicksPage() {
   }, [allMissed, activeBand]);
 
   const isMissed = useMemo(
-    () =>
-      !!(
-        userId &&
-        activeBand &&
-        allMissed.some((missed) => missed.user_id === userId && missed.band_id === activeBand.id)
-      ),
-    [allMissed, userId, activeBand],
+    () => !!(activeBand && missedBandIds.has(activeBand.id)),
+    [missedBandIds, activeBand],
   );
 
   const isBandEnded = useMemo(
@@ -183,13 +148,9 @@ export default function MyPicksPage() {
   );
 
   const handleToggleMissed = useCallback(async () => {
-    if (!userId || !activeBand) return;
-    if (isMissed) {
-      await missedRepository.unmark(userId, activeBand.id);
-    } else {
-      await missedRepository.mark(userId, activeBand.id);
-    }
-  }, [userId, activeBand, isMissed]);
+    if (!activeBand) return;
+    await toggleMissed(activeBand.id);
+  }, [activeBand, toggleMissed]);
 
   function toggleDayCollapse(day: string) {
     setCollapsedDays((prev) => {

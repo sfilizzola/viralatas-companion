@@ -4,6 +4,21 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.D — useMissedBands hook)
+
+### Added
+- `src/hooks/useMissedBands.ts` — `{ allMissed, missedBandIds, missedCountsByBand, mark, unmark, toggleMissed, refresh }`; composes `missedRepository` + `MISSED_CHANGED_EVENT` + Realtime subscription.
+- `src/__tests__/useMissedBands.test.ts` — mount load, user-scoped ids, mark, unmark, toggleMissed (5 cases).
+
+### Changed
+- `MyPicksPage`, `PopularPage` — missed-band state/effects via `useMissedBands()` instead of duplicated `useEffect` + memos + direct repository calls.
+- `BadgesDisplay` — reads `allMissed` from hook; removed inline `missedRepository.loadAll()` and `MISSED_CHANGED_EVENT` listener.
+
+### Architectural Notes
+- Missed-band reads stay offline-first (`UI → IndexedDB`); hook centralizes sync + Realtime so pages only consume derived state and actions.
+
+---
+
 ## 2026-05-24 (Phase 26.E — usePickActions hook)
 
 ### Added

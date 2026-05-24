@@ -8,8 +8,8 @@ import {
   type BadgeConfig,
   type BadgeContext,
 } from '../services/badges';
-import { loadUserPicks, loadAllUserPicks, loadBands, loadAllUserPresence, loadCrewUsers, PICKS_CHANGED_EVENT, MISSED_CHANGED_EVENT, PRESENCE_CHANGED_EVENT, CREW_USERS_CHANGED_EVENT } from '../lib/db';
-import { missedRepository } from '../repositories';
+import { loadUserPicks, loadAllUserPicks, loadBands, loadAllUserPresence, loadCrewUsers, PICKS_CHANGED_EVENT, PRESENCE_CHANGED_EVENT, CREW_USERS_CHANGED_EVENT } from '../lib/db';
+import { useMissedBands } from '../hooks/useMissedBands';
 import { now } from '../services/time';
 import { supabase } from '../lib/supabase';
 import { useI18n } from '../lib/i18n';
@@ -178,6 +178,7 @@ function stackStyle(pose: StackPose): CSSProperties {
 
 export default function BadgesDisplay({ user }: BadgesDisplayProps) {
   const { t } = useI18n('Badges');
+  const { allMissed } = useMissedBands(user.id);
   const [ctx, setCtx] = useState<BadgeContext>(EMPTY_CTX);
   const [loading, setLoading] = useState(true);
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
@@ -275,11 +276,10 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
       if (!sessionUser || sessionUser.id !== user.id) return;
 
       // Phase 1: IDB-only reads (fast, local) — render badges immediately
-      const [userPicks, allPicks, bands, allMissed, presence, crewUsers] = await Promise.all([
+      const [userPicks, allPicks, bands, presence, crewUsers] = await Promise.all([
         loadUserPicks(user.id),
         loadAllUserPicks(),
         loadBands(),
-        missedRepository.loadAll(),
         loadAllUserPresence(),
         loadCrewUsers(),
       ]);
@@ -371,7 +371,6 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
 
     refresh();
     window.addEventListener(PICKS_CHANGED_EVENT, refresh);
-    window.addEventListener(MISSED_CHANGED_EVENT, refresh);
     window.addEventListener(PRESENCE_CHANGED_EVENT, refresh);
     window.addEventListener(CREW_USERS_CHANGED_EVENT, refresh);
 
@@ -382,12 +381,11 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
     return () => {
       active = false;
       window.removeEventListener(PICKS_CHANGED_EVENT, refresh);
-      window.removeEventListener(MISSED_CHANGED_EVENT, refresh);
       window.removeEventListener(PRESENCE_CHANGED_EVENT, refresh);
       window.removeEventListener(CREW_USERS_CHANGED_EVENT, refresh);
       subscription.unsubscribe();
     };
-  }, [user.id]);
+  }, [user.id, allMissed]);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
 

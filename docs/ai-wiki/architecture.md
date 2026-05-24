@@ -119,6 +119,7 @@ Hooks encapsulate state logic and subscriptions. They:
 | `useBands()` | Band catalog | IDB + `BANDS_CHANGED_EVENT` |
 | `useMyPicks()` | User's picks | IDB + window events |
 | `usePickActions()` | Pick toggle actions | Composes `useMyPicks` + `picksRepository.toggle` |
+| `useMissedBands()` | Missed-band state + actions | IDB + `MISSED_CHANGED_EVENT` + Realtime |
 | `usePickCounts()` | Attendance per band | IDB + Realtime + window events |
 | `useBandAttendees(bandId)` | Users going to a band | IDB + Realtime |
 | `useNowData()` | Current/next band for user | IDB + `useNow()` (time) |
@@ -428,6 +429,7 @@ INSERT into user_picks
 | `useBands()` | `{ bands, loading, refresh }` | `BANDS_CHANGED_EVENT` | SchedulePage, MyPicksPage, PopularPage, useNowData |
 | `useMyPicks()` | `{ pickedIds, refresh }` | `PICKS_CHANGED_EVENT` | Internal to `usePickActions` |
 | `usePickActions()` | `{ pickedIds, refresh, togglePick, pickBand, unpickBand }` | `PICKS_CHANGED_EVENT` | SchedulePage, MyPicksPage, PopularPage, ConflictSection, useNowData |
+| `useMissedBands()` | `{ allMissed, missedBandIds, missedCountsByBand, mark, unmark, toggleMissed, refresh }` | `MISSED_CHANGED_EVENT`, Realtime | MyPicksPage, PopularPage, BadgesDisplay |
 | `usePickCounts()` | `Record<bandId, count>` | `PICKS_CHANGED_EVENT`, Realtime | RightNowPage, PopularPage — `countPicks` is an exported pure fn |
 | `useBandAttendees(bandId)` | `User[]` | Realtime | BandDetailModal |
 | `useNowData()` | `{ current, next }` | `useNow()`, `PICKS_CHANGED_EVENT` | RightNowPage |

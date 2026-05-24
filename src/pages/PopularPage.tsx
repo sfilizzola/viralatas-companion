@@ -1,11 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import type { UserMissedBand } from '../types';
-import { MISSED_CHANGED_EVENT } from '../lib/db';
-import { missedRepository } from '../repositories';
+import { useCallback, useMemo, useState } from 'react';
 import { useBandConflicts } from '../hooks/useBandConflicts';
 import { useAuth } from '../hooks/useAuth';
 import { useBands } from '../hooks/useBands';
 import { useBandAttendees } from '../hooks/useBandAttendees';
+import { useMissedBands } from '../hooks/useMissedBands';
 import { usePickActions } from '../hooks/usePickActions';
 import { usePickCounts } from '../hooks/usePickCounts';
 import { useNow } from '../hooks/useNow';
@@ -22,28 +20,12 @@ export default function PopularPage() {
   const userId = session?.user?.id ?? null;
 
   const [activeBandId, setActiveBandId] = useState<string | null>(null);
-  const [allMissed, setAllMissed] = useState<UserMissedBand[]>([]);
   const { bands, loading } = useBands();
+  const { allMissed, missedBandIds, missedCountsByBand, toggleMissed } = useMissedBands(userId);
   const { pickedIds, togglePick } = usePickActions(userId);
   const attendeesByBand = useBandAttendees();
   const pickCounts = usePickCounts();
   const currentNow = useNow(60_000);
-
-  useEffect(() => {
-    async function refreshMissed() {
-      setAllMissed(await missedRepository.loadAll());
-    }
-
-    refreshMissed();
-    if (userId) missedRepository.sync(userId).catch(() => {});
-
-    const unsubscribeRealtime = missedRepository.subscribeToRealtime();
-    window.addEventListener(MISSED_CHANGED_EVENT, refreshMissed);
-    return () => {
-      window.removeEventListener(MISSED_CHANGED_EVENT, refreshMissed);
-      unsubscribeRealtime();
-    };
-  }, [userId]);
 
   const popularBands = useMemo(
     () =>
@@ -85,8 +67,8 @@ export default function PopularPage() {
   }, [allMissed, activeBand]);
 
   const isMissed = useMemo(
-    () => !!(userId && activeBand && allMissed.some((m) => m.user_id === userId && m.band_id === activeBand.id)),
-    [allMissed, userId, activeBand],
+    () => !!(activeBand && missedBandIds.has(activeBand.id)),
+    [missedBandIds, activeBand],
   );
 
   const isBandEnded = useMemo(
@@ -94,22 +76,10 @@ export default function PopularPage() {
     [activeBand, currentNow],
   );
 
-  const missedCountsByBand = useMemo(() => {
-    const map: Record<string, number> = {};
-    for (const m of allMissed) {
-      map[m.band_id] = (map[m.band_id] ?? 0) + 1;
-    }
-    return map;
-  }, [allMissed]);
-
   const handleToggleMissed = useCallback(async () => {
-    if (!userId || !activeBand) return;
-    if (isMissed) {
-      await missedRepository.unmark(userId, activeBand.id);
-    } else {
-      await missedRepository.mark(userId, activeBand.id);
-    }
-  }, [userId, activeBand, isMissed]);
+    if (!activeBand) return;
+    await toggleMissed(activeBand.id);
+  }, [activeBand, toggleMissed]);
 
   return (
     <div className={styles.page}>
