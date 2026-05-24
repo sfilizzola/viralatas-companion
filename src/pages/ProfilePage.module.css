@@ -132,7 +132,7 @@
 
 /* ── Collapsible rows (edit profile, godlike, manager) ── */
 .pfCollapse {
-  width: 100%;
+  width: calc(100% - 2 * var(--s-4));
   max-width: 400px;
   align-self: center;
   border: 1px solid var(--border);
@@ -416,7 +416,7 @@
 
 /* Conflicts section */
 .conflictsSection {
-  width: 100%;
+  width: calc(100% - 2 * var(--s-4));
   max-width: 400px;
   align-self: center;
   border: 1px solid var(--border);
@@ -710,7 +710,7 @@
 
 /* Godlike section */
 .godlikeSection {
-  width: 100%;
+  width: calc(100% - 2 * var(--s-4));
   max-width: 400px;
   align-self: center;
   margin: var(--s-3) var(--s-4);
@@ -1623,7 +1623,7 @@
 
 /* Manager section */
 .managerSection {
-  width: 100%;
+  width: calc(100% - 2 * var(--s-4));
   max-width: 400px;
   align-self: center;
   margin: var(--s-3) var(--s-4);

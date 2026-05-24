@@ -177,6 +177,10 @@ html, body, #root {
   -webkit-font-smoothing: antialiased;
 }
 
+html, body {
+  overflow-x: clip;
+}
+
 a {
   color: var(--accent-hover);
   text-decoration: none;

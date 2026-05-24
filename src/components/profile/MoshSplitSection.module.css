@@ -2,7 +2,7 @@
    All tokens come from src/index.css — no new custom properties. */
 
 .wrap {
-  width: 100%;
+  width: calc(100% - 2 * var(--s-4));
   max-width: 400px;
   align-self: center;
   margin: var(--s-3) var(--s-4);

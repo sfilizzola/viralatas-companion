@@ -24,7 +24,7 @@
     0 0 0 1px rgba(255, 215, 0, 0.12);
 
   pointer-events: none;
-  max-width: calc(100vw - 48px);
+  max-width: calc(100dvw - 48px);
 }
 
 .duck {
