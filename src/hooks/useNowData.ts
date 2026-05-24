@@ -95,8 +95,10 @@ export function useNowData(): NowData {
   }, [metalPlaceConfig, userId, isMetalPlaceWindowActive]);
 
   useEffect(() => {
-    if (!userId || !isCamping || myRawPlan.status !== 'current') return;
-    presenceRepository.setCampingStatus(userId, false).catch(() => {});
+    if (!userId) return;
+    presenceRepository
+      .autoClearCampingOnCurrentBand(userId, isCamping, myRawPlan.status)
+      .catch(() => {});
   }, [userId, isCamping, myRawPlan.status]);
 
   const handleSkip = useCallback(async () => {
@@ -122,20 +124,11 @@ export function useNowData(): NowData {
 
   const handlePresenceChange = useCallback(async (nextValue: PresenceLocation) => {
     if (!userId) return;
-    if (nextValue === 'camping') {
-      if (myRawPlan.status === 'current') {
-        await presenceRepository.setCampingStatus(userId, false);
-        return;
-      }
-      await presenceRepository.setCampingStatus(userId, true);
-      return;
-    }
-    if (nextValue === 'metal_place') {
-      await presenceRepository.setMetalPlaceStatus(userId, true);
-      return;
-    }
-    if (isAtMetalPlace) await presenceRepository.setMetalPlaceStatus(userId, false);
-    if (isCamping) await presenceRepository.setCampingStatus(userId, false);
+    await presenceRepository.applyPresenceToggle(userId, nextValue, {
+      myRawPlanStatus: myRawPlan.status,
+      isAtMetalPlace,
+      isCamping,
+    });
   }, [userId, myRawPlan.status, isAtMetalPlace, isCamping]);
 
   return {

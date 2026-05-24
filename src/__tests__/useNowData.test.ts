@@ -18,15 +18,56 @@ const {
   userId,
   setCampingStatus,
   setMetalPlaceStatus,
+  applyPresenceToggle,
+  autoClearCampingOnCurrentBand,
   validateAndAutoCheckout,
   isTimeWithinMetalPlaceWindow,
-} = vi.hoisted(() => ({
-  userId: 'user-now-data',
-  setCampingStatus: vi.fn().mockResolvedValue(undefined),
-  setMetalPlaceStatus: vi.fn().mockResolvedValue(undefined),
-  validateAndAutoCheckout: vi.fn().mockResolvedValue(undefined),
-  isTimeWithinMetalPlaceWindow: vi.fn().mockReturnValue(true),
-}));
+} = vi.hoisted(() => {
+  const setCampingStatus = vi.fn().mockResolvedValue(undefined);
+  const setMetalPlaceStatus = vi.fn().mockResolvedValue(undefined);
+  const applyPresenceToggle = vi.fn(
+    async (
+      uid: string,
+      nextValue: 'auto' | 'camping' | 'metal_place',
+      ctx: {
+        myRawPlanStatus: string;
+        isAtMetalPlace: boolean;
+        isCamping: boolean;
+      },
+    ) => {
+      if (nextValue === 'camping') {
+        if (ctx.myRawPlanStatus === 'current') {
+          await setCampingStatus(uid, false);
+          return;
+        }
+        await setCampingStatus(uid, true);
+        return;
+      }
+      if (nextValue === 'metal_place') {
+        await setMetalPlaceStatus(uid, true);
+        return;
+      }
+      if (ctx.isAtMetalPlace) await setMetalPlaceStatus(uid, false);
+      if (ctx.isCamping) await setCampingStatus(uid, false);
+    },
+  );
+  const autoClearCampingOnCurrentBand = vi.fn(
+    async (uid: string, isCamping: boolean, myRawPlanStatus: string) => {
+      if (isCamping && myRawPlanStatus === 'current') {
+        await setCampingStatus(uid, false);
+      }
+    },
+  );
+  return {
+    userId: 'user-now-data',
+    setCampingStatus,
+    setMetalPlaceStatus,
+    applyPresenceToggle,
+    autoClearCampingOnCurrentBand,
+    validateAndAutoCheckout: vi.fn().mockResolvedValue(undefined),
+    isTimeWithinMetalPlaceWindow: vi.fn().mockReturnValue(true),
+  };
+});
 
 beforeAll(() => {
   Object.defineProperty(window, 'localStorage', {
@@ -99,6 +140,8 @@ vi.mock('../repositories', async (importOriginal) => {
       ...actual.presenceRepository,
       setCampingStatus,
       setMetalPlaceStatus,
+      applyPresenceToggle,
+      autoClearCampingOnCurrentBand,
       validateAndAutoCheckout,
       isTimeWithinMetalPlaceWindow,
       syncCrewFromRemote: vi.fn().mockResolvedValue(undefined),
@@ -167,6 +210,8 @@ beforeEach(async () => {
   isTimeWithinMetalPlaceWindow.mockReturnValue(true);
   setCampingStatus.mockClear();
   setMetalPlaceStatus.mockClear();
+  applyPresenceToggle.mockClear();
+  autoClearCampingOnCurrentBand.mockClear();
   validateAndAutoCheckout.mockClear();
   Object.defineProperty(navigator, 'onLine', { value: true, writable: true, configurable: true });
 });

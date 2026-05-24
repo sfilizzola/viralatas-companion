@@ -154,6 +154,104 @@ describe('presenceRepository.isTimeWithinMetalPlaceWindow', () => {
   });
 });
 
+describe('presenceRepository.applyPresenceToggle', () => {
+  const baseContext = {
+    myRawPlanStatus: 'empty' as const,
+    isAtMetalPlace: false,
+    isCamping: false,
+  };
+
+  it('blocks camping when myRawPlanStatus is current (sets false, never true)', async () => {
+    vi.mocked(db.loadUserPresence).mockResolvedValue(undefined);
+
+    await presenceRepository.applyPresenceToggle('user1', 'camping', {
+      ...baseContext,
+      myRawPlanStatus: 'current',
+    });
+
+    expect(db.saveUserPresence).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: 'user1', is_camping: false }),
+    );
+    expect(db.saveUserPresence).not.toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: 'user1', is_camping: true }),
+    );
+  });
+
+  it('sets camping true when not on a current band', async () => {
+    vi.mocked(db.loadUserPresence).mockResolvedValue(undefined);
+
+    await presenceRepository.applyPresenceToggle('user1', 'camping', baseContext);
+
+    expect(db.saveUserPresence).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: 'user1', is_camping: true }),
+    );
+  });
+
+  it('sets metal place true for metal_place toggle', async () => {
+    vi.mocked(db.loadUserPresence).mockResolvedValue(undefined);
+
+    await presenceRepository.applyPresenceToggle('user1', 'metal_place', baseContext);
+
+    expect(db.saveUserPresence).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: 'user1', is_at_metal_place: true }),
+    );
+  });
+
+  it('clears MP and camping flags on auto when both are active', async () => {
+    const mockUpsert = vi.fn().mockResolvedValue({ error: null });
+    vi.mocked(supabase.from).mockReturnValue({ upsert: mockUpsert } as any);
+    vi.mocked(db.loadUserPresence).mockResolvedValue({
+      user_id: 'user1',
+      is_camping: true,
+      is_at_metal_place: true,
+      updated_at: '2026-07-29T10:00:00Z',
+    });
+
+    await presenceRepository.applyPresenceToggle('user1', 'auto', {
+      ...baseContext,
+      isCamping: true,
+      isAtMetalPlace: true,
+    });
+
+    expect(db.saveUserPresence).toHaveBeenCalledTimes(2);
+    expect(db.saveUserPresence).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: 'user1', is_at_metal_place: false }),
+    );
+    expect(db.saveUserPresence).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: 'user1', is_camping: false }),
+    );
+  });
+});
+
+describe('presenceRepository.autoClearCampingOnCurrentBand', () => {
+  it('clears camping when is_camping and user has a current band', async () => {
+    vi.mocked(db.loadUserPresence).mockResolvedValue({
+      user_id: 'user1',
+      is_camping: true,
+      is_at_metal_place: false,
+      updated_at: '2026-07-29T10:00:00Z',
+    });
+
+    await presenceRepository.autoClearCampingOnCurrentBand('user1', true, 'current');
+
+    expect(db.saveUserPresence).toHaveBeenCalledWith(
+      expect.objectContaining({ user_id: 'user1', is_camping: false }),
+    );
+  });
+
+  it('does nothing when not camping', async () => {
+    await presenceRepository.autoClearCampingOnCurrentBand('user1', false, 'current');
+
+    expect(db.saveUserPresence).not.toHaveBeenCalled();
+  });
+
+  it('does nothing when plan status is not current', async () => {
+    await presenceRepository.autoClearCampingOnCurrentBand('user1', true, 'next');
+
+    expect(db.saveUserPresence).not.toHaveBeenCalled();
+  });
+});
+
 describe('presenceRepository.validateAndAutoCheckout', () => {
   it('sets is_at_metal_place to false and syncs when time is outside the metal-place window', async () => {
     const config: MetalPlaceConfig = {

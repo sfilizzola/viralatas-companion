@@ -1,3 +1,4 @@
+import type { LivePlanStatus, PresenceLocation } from '../services/livePreview';
 import type { MetalPlaceConfig, UserPresence } from '../types';
 import {
   enqueueOfflinePresence,
@@ -216,6 +217,42 @@ async function autoCheckoutAllUsers(): Promise<void> {
   }
 }
 
+export type PresenceToggleContext = {
+  myRawPlanStatus: LivePlanStatus;
+  isAtMetalPlace: boolean;
+  isCamping: boolean;
+};
+
+async function applyPresenceToggle(
+  userId: string,
+  nextValue: PresenceLocation,
+  context: PresenceToggleContext,
+): Promise<void> {
+  if (nextValue === 'camping') {
+    if (context.myRawPlanStatus === 'current') {
+      await setCampingStatus(userId, false);
+      return;
+    }
+    await setCampingStatus(userId, true);
+    return;
+  }
+  if (nextValue === 'metal_place') {
+    await setMetalPlaceStatus(userId, true);
+    return;
+  }
+  if (context.isAtMetalPlace) await setMetalPlaceStatus(userId, false);
+  if (context.isCamping) await setCampingStatus(userId, false);
+}
+
+async function autoClearCampingOnCurrentBand(
+  userId: string,
+  isCamping: boolean,
+  myRawPlanStatus: LivePlanStatus,
+): Promise<void> {
+  if (!isCamping || myRawPlanStatus !== 'current') return;
+  await setCampingStatus(userId, false);
+}
+
 async function validateAndAutoCheckout(
   config: MetalPlaceConfig | null,
   userId: string | null,
@@ -244,6 +281,8 @@ async function validateAndAutoCheckout(
 export const presenceRepository = {
   setCampingStatus,
   setMetalPlaceStatus,
+  applyPresenceToggle,
+  autoClearCampingOnCurrentBand,
   syncCrewFromRemote,
   flushOfflineQueue,
   saveMetalPlaceConfigRemote,

@@ -4,6 +4,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.M.d — Consolidate presence side effects)
+
+### Added
+- `presenceRepository.applyPresenceToggle(userId, nextValue, context)` — orchestrates camping / Metal Place / auto presence toggles from `/now` (verbatim logic from `useNowData.handlePresenceChange`).
+- `presenceRepository.autoClearCampingOnCurrentBand(userId, isCamping, myRawPlanStatus)` — clears camping when user has a current band (verbatim logic from camping auto-clear effect).
+- `PresenceToggleContext` type exported from `src/repositories/presence.ts`.
+- `src/__tests__/presenceRepository.test.ts` — 7 tests for `applyPresenceToggle` and `autoClearCampingOnCurrentBand`.
+
+### Changed
+- `src/hooks/useNowData.ts` — delegates presence side effects to repository helpers (169 → 162 lines).
+- `docs/ai-wiki/flows/live-now.md` — documents new repository presence APIs.
+
+### Architectural Notes
+- Presence orchestration testable at repository layer; hook remains thin composition wiring. Stage 26.M complete.
+
+---
+
 ## 2026-05-24 (Phase 26.M.c — Extract cache and plan derivations)
 
 ### Added

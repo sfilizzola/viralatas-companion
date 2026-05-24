@@ -275,6 +275,10 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Verification:** `rtk npm test`; full `/now` manual smoke (camping, Metal Place, skip/undo, duck).
 
+**Done (2026-05-24):** `applyPresenceToggle()` + `autoClearCampingOnCurrentBand()` in `presenceRepository`; `useNowData` delegates presence side effects (169 → 162 lines); 7 new repository unit tests.
+
+**Stage 26.M complete (2026-05-24):** M.0–M.d done; `useNowData.ts` 335 → 162 lines via config/realtime/cache/plan extracts + presence side-effect consolidation.
+
 **Recommended 26.M execution order:**
 
 ```

@@ -292,11 +292,11 @@ Else:
 
 **Auto-clear on current band**: When user starts watching (`status='current'`), app calls:
 ```typescript
-presenceRepository.setCampingStatus(userId, false)
+presenceRepository.autoClearCampingOnCurrentBand(userId, isCamping, myRawPlanStatus)
 ```
-to mark them as active, not camping.
+which clears camping when both `isCamping` and `myRawPlanStatus === 'current'`.
 
-**Manual toggle**: User can tap "Camping" button to opt back in.
+**Manual toggle**: User taps route through `handlePresenceChange` → `presenceRepository.applyPresenceToggle(userId, nextValue, context)` with plan/presence context (`myRawPlanStatus`, `isAtMetalPlace`, `isCamping`).
 
 ### Metal Place Check-In Window
 
