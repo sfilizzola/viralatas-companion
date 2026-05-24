@@ -70,10 +70,12 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[ADR: Supabase as Sync Target](decisions/supabase-as-sync-target.md)** — Why Supabase (auth + DB + realtime), alternatives (Firebase, custom Node)
 - **[ADR: Custom Hooks + Window Events](decisions/custom-hooks-events-no-redux.md)** — Why no Redux/Zustand; event-driven IDB state management
 - **[ADR: Workbox Caching Strategy](decisions/workbox-caching-strategy.md)** — NetworkFirst (Supabase), CacheFirst (images), precache (app shell)
+- **[ADR: Genre Collapse to 13 Canonical Labels](decisions/genre-collapse-canonical-labels.md)** — Why ~93 Wacken subgenre strings became 13 in-place labels (Phase 25)
 
 ### Quality, Testing & Reference
 - **[Testing Strategy](testing.md)** — Unit tests, integration tests, offline scenarios
 - **[Glossary](glossary.md)** — 140+ terms: architecture, auth, sync, flows, caching, roles, badges
+- **[Genre collapse mapping](genre-collapse-mapping.md)** — Old Wacken subgenre tag → canonical label (Phase 25 lookup table)
 - **[Changelog](changelog.md)** — All wiki modifications, discoveries, corrections
 
 ### Operational Tooling
@@ -362,6 +364,7 @@ Understanding the "why" behind key technical choices.
 3. [ADR: Custom Hooks + Window Events](decisions/custom-hooks-events-no-redux.md)
 4. [ADR: Workbox Caching Strategy](decisions/workbox-caching-strategy.md)
 5. [ADR: PWA Not Native](decisions/pwa-not-native.md)
+6. [ADR: Genre Collapse to 13 Canonical Labels](decisions/genre-collapse-canonical-labels.md)
 
 ---
 

@@ -4,6 +4,32 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (genre collapse mapping wiki page)
+
+### Added
+- `docs/ai-wiki/genre-collapse-mapping.md` — full old tag → canonical label lookup table inside ai-wiki.
+
+### Changed
+- `docs/ai-wiki/index.md`, `domain-model.md`, `lineup.md`, `phases-history.md`, ADR, superpowers spec — link to mapping page.
+
+---
+
+## 2026-05-24 (genre collapse ADR)
+
+### Added
+- `docs/ai-wiki/decisions/genre-collapse-canonical-labels.md` — ADR for Phase 25: why ~93 subgenre strings collapsed to 13 in-place labels, alternatives rejected, tradeoffs (Doom/Gothic, Metal catch-all, Party Metal lock).
+
+### Changed
+- `docs/ai-wiki/index.md` — ADR linked in decisions inventory + Path 6.
+- `docs/ai-wiki/domain-model.md` — Band entity links to genre-collapse ADR.
+- `docs/ai-wiki/badges.md` — genre condition docs link to ADR.
+- `docs/ai-wiki/lineup.md` — genre section links to ADR.
+- `docs/ai-wiki/phases-history.md` — Phase 25 wiki list includes ADR.
+- `docs/superpowers/specs/2026-05-24-genre-collapse-design.md` — links to ADR.
+- `.claude/context/key-decisions.md` — quick-reference row for canonical genres.
+
+---
+
 ## 2026-05-24 (Phase 25 — Genre Collapse)
 
 ### Added

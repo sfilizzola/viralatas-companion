@@ -95,7 +95,7 @@ type Band = {
 
 `Black Metal` · `Death Metal` · `Doom Metal` · `Folk Metal` · `Hard Rock` · `Heavy Metal` · `Metal` · `Metal Battle` · `Metalcore` · `Party Metal` · `Power Metal` · `Punk` · `Thrash Metal`
 
-Full old→new mapping: `src/services/genreGuide.ts` (`GENRE_COLLAPSE_MAP`) and `docs/superpowers/specs/2026-05-24-genre-collapse-design.md`.
+Full old→new mapping: **[genre-collapse-mapping.md](genre-collapse-mapping.md)** (wiki lookup table) · `src/services/genreGuide.ts` (`GENRE_COLLAPSE_MAP`). **Why collapse:** [ADR: Genre Collapse to 13 Canonical Labels](decisions/genre-collapse-canonical-labels.md).
 
 **Party Metal** is locked to Alestorm + Airbourne only (badge condition unchanged).
 

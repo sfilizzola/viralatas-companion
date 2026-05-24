@@ -248,7 +248,7 @@ User picked **N+** bands in a specific genre (exact match).
 ```
 **Use case**: Genre specialization badges
 **Example badge**: `death-metal` (picked 3+ Death Metal bands)
-**Genre values**: Must match `Band.genre` exactly. After Phase 25 collapse, only **13 canonical labels** exist on band rows (see [domain-model.md](domain-model.md#band) · `src/services/genreGuide.ts`). Pre-collapse subgenre strings (e.g. `Grindcore`, `Melodic Death Metal`) no longer appear on `Band.genre`.
+**Genre values**: Must match `Band.genre` exactly. After Phase 25 collapse, only **13 canonical labels** exist on band rows (see [domain-model.md](domain-model.md#band) · [ADR: Genre Collapse](decisions/genre-collapse-canonical-labels.md) · `src/services/genreGuide.ts`). Pre-collapse subgenre strings (e.g. `Grindcore`, `Melodic Death Metal`) no longer appear on `Band.genre`.
 
 #### `bands_picked_stage_min`
 User picked **N+** bands on a specific stage (exact match).

@@ -13,6 +13,7 @@
 | Claude context | Full vira-latas picks + full schedule every call | Vira-latas group is tiny, payload is negligible, and recency beats incremental context | — |
 | Alert language | Brazilian Portuguese, max 2 sentences, ends with 🤘 | Viralatas group is BR-first, not a global product | see `llm-alerts.md` |
 | Role hierarchy | `normal` / `manager` / `godlike` | 3-tier allows moderation (announcement deletes, block) without giving everyone admin powers; `godlike` is hard-coded to `sfilizzola@gmail.com` in `handle_new_user()` | — |
+| Band genres | 13 canonical labels (in-place rename) | ~93 Wacken subgenre strings made mobile genre filter unusable; no `genreGroup` column — rename `genre` only, deploy via `seed:bands:sync` | `genre-collapse-canonical-labels.md` |
 
 **Hard constraints derived from these decisions (do NOT break):**
 - No React Native / Capacitor / Expo — PWA only.

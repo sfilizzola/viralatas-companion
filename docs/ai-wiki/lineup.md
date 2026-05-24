@@ -12,7 +12,7 @@
 
 **Summary:** 155 bands CONFIRMED · 31 `TDB MTB` Metal Battle placeholders · 12 TBD · 199 total · 1 ceremony (Farewell & Announcements, HAR13)
 
-**Genres:** 13 canonical labels after Phase 25 collapse (`Metal`, `Heavy Metal`, `Black Metal`, … — see [domain-model.md](domain-model.md#band) and `src/services/genreGuide.ts`). Unknown/TBD tags in this file seed as `Metal`.
+**Genres:** 13 canonical labels after Phase 25 collapse — **[old → new mapping table](genre-collapse-mapping.md)** · [domain-model](domain-model.md#band) · [ADR](decisions/genre-collapse-canonical-labels.md). Unknown/TBD tags in this file seed as `Metal`.
 
 ---
 
@@ -30,16 +30,16 @@ Every row in `supabase/seed/bands.ts` declares `slot_id` explicitly (formerly en
 
 See [stages.md](stages.md) for full stage reference (colors, categories, pairing rules, physical layout). Quick abbreviation lookup:
 
-| Abbrev | Full Name |
-|--------|-----------|
-| `HAR` | Harder |
-| `FAS` | Faster |
-| `LOU` | Louder |
-| `WET` | W.E.T. |
-| `HBA` | Headbangers |
-| `WAS` | Wasteland |
-| `WAK` | Wackinger |
-| `JUN` | Welcome to the Jungle |
+| Abbrev | Full Name             |
+| ------ | --------------------- |
+| `HAR`  | Harder                |
+| `FAS`  | Faster                |
+| `LOU`  | Louder                |
+| `WET`  | W.E.T.                |
+| `HBA`  | Headbangers           |
+| `WAS`  | Wasteland             |
+| `WAK`  | Wackinger             |
+| `JUN`  | Welcome to the Jungle |
 
 ### Slot ID
 

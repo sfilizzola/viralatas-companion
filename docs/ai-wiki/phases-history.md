@@ -487,7 +487,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - [x] `lineup.md` + `bands.ts` in sync with live DB
 - [x] Build + tests green; wiki + changelog updated
 
-**Wiki:** `docs/superpowers/specs/2026-05-24-genre-collapse-design.md` · `domain-model.md` · `lineup.md`
+**Wiki:** `docs/ai-wiki/genre-collapse-mapping.md` · `docs/ai-wiki/decisions/genre-collapse-canonical-labels.md` · `docs/superpowers/specs/2026-05-24-genre-collapse-design.md` · `domain-model.md` · `lineup.md`
 
 **Architectural notes:**
 - No schema change — rename in-place only; deploy via `seed:bands:sync --apply`.

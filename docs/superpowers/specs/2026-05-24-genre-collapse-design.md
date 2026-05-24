@@ -12,6 +12,10 @@ Collapse ~95 distinct Wacken genre strings to **13 canonical filter labels** by 
 
 Heavy Metal · Black Metal · Death Metal · Thrash Metal · Power Metal · Folk Metal · Doom Metal · Metalcore · Hard Rock · Punk · Party Metal · Metal Battle · Metal
 
+## Decision record
+
+Full ADR (context, alternatives, tradeoffs): [`docs/ai-wiki/decisions/genre-collapse-canonical-labels.md`](../../ai-wiki/decisions/genre-collapse-canonical-labels.md).
+
 ## Constraints
 
 - No new `genreGroup` column — rename into existing-style canonical strings only
@@ -20,6 +24,8 @@ Heavy Metal · Black Metal · Death Metal · Thrash Metal · Power Metal · Folk
 - Edit `docs/ai-wiki/lineup.md` + `supabase/seed/bands.ts` first; then sync
 
 ## Old → new mapping
+
+**Wiki lookup (old tag → canonical):** [`docs/ai-wiki/genre-collapse-mapping.md`](../../ai-wiki/genre-collapse-mapping.md)
 
 Implementation: `src/services/genreGuide.ts` (`GENRE_COLLAPSE_MAP` + `collapseGenre()`).
 
