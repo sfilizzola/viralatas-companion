@@ -4,6 +4,18 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (genre-based badges — Phase 25 canonical)
+
+### Added
+- Eight festival 2026 genre badges using `bands_seen_genre_min`: `denim-and-leather` (Heavy Metal, 4), `kvlt` (Black Metal, 4), `wall-of-death` (Thrash Metal, 2), `viking-fur` (Folk Metal, 4), `slow-and-low` (Doom Metal, 3), `breakdown-believer` (Metalcore, 2), `dad-rock-respect` (Hard Rock, 3), `pit-pup` (Punk, 2).
+- Registry entries + label/description keys in all four locale files (`Badges_{br,en,es,de}.json`).
+
+### Changed
+- `docs/ai-wiki/badges.md` — inventory 54 → 62; Festival 2026 section lists all eleven genre badges; canonical-genre gap narrowed to `Metal` + `Metal Battle`.
+- `.claude/context/badges.md` — registry entry count updated.
+
+---
+
 ## 2026-05-24 (genre collapse mapping wiki page)
 
 ### Added

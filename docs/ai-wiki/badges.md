@@ -489,7 +489,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 
 ---
 
-## Current Badges Inventory (54 Total)
+## Current Badges Inventory (62 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -506,12 +506,20 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `5-wackens` — Attended 5+ editions
 - `10-wackens` — Attended 10+ editions
 
-### Festival 2026 (20)
+### Festival 2026 (28)
 - `early-bird` — Saw 5+ bands before 1 PM (CEST)
 - `dreamer` — "I'm Tripping" / 30+ picked bands (persist: true)
 - `death-metal` — Saw 3+ Death Metal bands
 - `power-metal` — Saw 3+ Power Metal bands
 - `party-metal` — Saw 2 Party Metal bands. **In the 2026 lineup the `Party Metal` genre is held by exactly 2 bands: `Airbourne` (FAS15, Day 4, 17:30–18:45 Faster) and `Alestorm` (FAS17, Day 4→5 after midnight, 01:00–02:00 Faster) — so this badge effectively requires seeing both. Both play Faster on Day 4 evening/night; no Harder-stage overlap.**
+- `denim-and-leather` — "Denim and Leather". Saw 4+ Heavy Metal bands (`bands_seen_genre_min`).
+- `kvlt` — "Kvlt". Saw 4+ Black Metal bands (`bands_seen_genre_min`).
+- `wall-of-death` — "Wall of Death". Saw 2+ Thrash Metal bands (`bands_seen_genre_min`).
+- `viking-fur` — "Viking Fur". Saw 4+ Folk Metal bands (`bands_seen_genre_min`).
+- `slow-and-low` — "Slow and Low". Saw 3+ Doom Metal bands (`bands_seen_genre_min`).
+- `breakdown-believer` — "Breakdown Believer". Saw 2+ Metalcore bands (`bands_seen_genre_min`).
+- `dad-rock-respect` — "Dad Rock Respect". Saw 3+ Hard Rock bands (`bands_seen_genre_min`).
+- `pit-pup` — "Pit Pup". Saw 2+ Punk bands (`bands_seen_genre_min`).
 - `alestorm` — Saw Alestorm live (band_seen_named) — distinct from the genre-based `party-metal` above.
 - `roots` — "Roots, Bloody Roots" — Saw Sepultura's farewell show (band_seen_named: `Sepultura`, HAR6 Day 3, 19:00–20:30).
 - `live-beast` — Saw 22+ bands
@@ -539,10 +547,9 @@ One badge per camping-open day; each user earns exactly one based on `user_metad
 
 ### Canonical genres with NO corresponding badge
 
-After Phase 25, every band carries one of **13 canonical genre labels**. Most have no dedicated badge — only `death-metal`, `power-metal`, and `party-metal` use `bands_seen_genre_min` in the 2026 registry. Examples of canonical labels without a genre badge:
+After Phase 25, every band carries one of **13 canonical genre labels**. Eleven genres now have a `bands_seen_genre_min` badge in the 2026 registry (`death-metal`, `power-metal`, `party-metal`, plus the eight Phase 25 genre badges above). Labels still without a genre badge:
 
-- `Folk Metal` — includes former niche tags like Pirate Metal (`Mr. Hurley und die Pulveraffen`, LOU13 Day 3). Single-band absorption is not a good fit for `bands_seen_genre_min`; prefer `band_seen_named` if a pirate badge is desired.
-- `Metal`, `Metal Battle`, `Hard Rock`, `Punk`, etc. — intentional curation; the badge inventory stays small.
+- `Metal`, `Metal Battle` — intentional curation; the badge inventory stays small.
 
 Pre-collapse subgenre strings (Goregrind, Humppa, Horror Punk, Melodic Death Metal, …) were merged into these buckets and **no longer appear** on `Band.genre`. See `src/services/genreGuide.ts` for the full old→new map.
 
