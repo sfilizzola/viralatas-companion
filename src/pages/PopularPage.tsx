@@ -1,6 +1,8 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useBandConflicts } from '../hooks/useBandConflicts';
 import { useAuth } from '../hooks/useAuth';
+import { useBandDetailModal } from '../hooks/useBandDetailModal';
+import { BandDetailModalHost } from '../components/BandDetailModalHost';
 import { useBands } from '../hooks/useBands';
 import { useBandAttendees } from '../hooks/useBandAttendees';
 import { useMissedBands } from '../hooks/useMissedBands';
@@ -10,7 +12,6 @@ import { useNow } from '../hooks/useNow';
 import { useI18n } from '../lib/i18n';
 import BottomNav from '../components/BottomNav';
 import BandCard from '../components/BandCard';
-import BandDetailModal from '../components/BandDetailModal';
 import Icon from '../components/icons/Icon';
 import styles from './SchedulePage.module.css';
 
@@ -19,7 +20,6 @@ export default function PopularPage() {
   const { session } = useAuth();
   const userId = session?.user?.id ?? null;
 
-  const [activeBandId, setActiveBandId] = useState<string | null>(null);
   const { bands, loading } = useBands();
   const { allMissed, missedBandIds, missedCountsByBand, toggleMissed } = useMissedBands(userId);
   const { pickedIds, togglePick } = usePickActions(userId);
@@ -47,39 +47,23 @@ export default function PopularPage() {
     return userIds.size;
   }, [attendeesByBand]);
 
-  const activeBand = useMemo(
-    () => (activeBandId ? bands.find((b) => b.id === activeBandId) ?? null : null),
-    [activeBandId, bands],
-  );
-
   const pickedBands = useMemo(
     () => bands.filter((b) => pickedIds.has(b.id)),
     [bands, pickedIds],
   );
 
   const bandConflicts = useBandConflicts(pickedBands);
-
-  const missedUserIds = useMemo<Set<string>>(() => {
-    if (!activeBand) return new Set();
-    return new Set(
-      allMissed.filter((m) => m.band_id === activeBand.id).map((m) => m.user_id),
-    );
-  }, [allMissed, activeBand]);
-
-  const isMissed = useMemo(
-    () => !!(activeBand && missedBandIds.has(activeBand.id)),
-    [missedBandIds, activeBand],
-  );
-
-  const isBandEnded = useMemo(
-    () => !!activeBand && new Date(activeBand.end_time) < currentNow,
-    [activeBand, currentNow],
-  );
-
-  const handleToggleMissed = useCallback(async () => {
-    if (!activeBand) return;
-    await toggleMissed(activeBand.id);
-  }, [activeBand, toggleMissed]);
+  const { openBand, modalProps } = useBandDetailModal({
+    bands,
+    pickedIds,
+    togglePick,
+    allMissed,
+    missedBandIds,
+    toggleMissed,
+    attendeesByBand,
+    currentNow,
+    conflicts: bandConflicts,
+  });
 
   return (
     <div className={styles.page}>
@@ -111,7 +95,7 @@ export default function PopularPage() {
               isPicked={pickedIds.has(band.id)}
               count={count}
               onToggle={() => {}}
-              onClick={() => setActiveBandId(band.id)}
+              onClick={() => openBand(band.id)}
               variant="ranked"
               rank={index + 1}
               attendeeCluster={count > 0 ? { attendees, max: 5 } : undefined}
@@ -122,32 +106,7 @@ export default function PopularPage() {
         })}
       </main>
 
-      {activeBand && (
-        <BandDetailModal
-          band={activeBand}
-          attendees={attendeesByBand[activeBand.id] ?? []}
-          isPicked={pickedIds.has(activeBand.id)}
-          onTogglePick={() => togglePick(activeBand.id)}
-          onClose={() => setActiveBandId(null)}
-          isBandEnded={isBandEnded}
-          hidePick={isBandEnded}
-          missedUserIds={missedUserIds}
-          isMissed={isMissed}
-          onToggleMissed={handleToggleMissed}
-          conflictBands={
-            bandConflicts
-              .get(activeBand.id)
-              ?.filter((e) => e.severity === 'hard')
-              .map((e) => e.band) ?? []
-          }
-          overlapBands={
-            bandConflicts
-              .get(activeBand.id)
-              ?.filter((e) => e.severity === 'soft')
-              .map((e) => e.band) ?? []
-          }
-        />
-      )}
+      <BandDetailModalHost modalProps={modalProps} />
 
       <div className={styles.navSpacer} />
       <BottomNav />

@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E complete)
+**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E, 26.F complete)
 
 **Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
 
@@ -99,7 +99,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-### Stage 26.F — `useBandDetailModal()` shared state
+### Stage 26.F — `useBandDetailModal()` shared state ✅
 
 **Scope:** New hook or small component `BandDetailHost.tsx`; consolidate modal state from `MyPicksPage.tsx` and `PopularPage.tsx` (`activeBand`, attendees, missed flags, ended state).
 
@@ -108,6 +108,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Risk:** Low–medium | **Depth:** Moderate extract | **Depends on:** 26.D, 26.E
 
 **Verification:** `rtk npm test`; open band modal on both pages; verify missed toggle and pick toggle.
+
+**Done (2026-05-24):** `useBandDetailModal()` + `BandDetailModalHost`; MyPicksPage and PopularPage migrated; 6 hook tests.
 
 ---
 

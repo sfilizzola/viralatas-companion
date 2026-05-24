@@ -125,6 +125,7 @@ Hooks encapsulate state logic and subscriptions. They:
 | `useNowData()` | Current/next band for user | IDB + `useNow()` (time) |
 | `useBandConflicts(bandIds)` | Overlapping bands | Computed, no DB |
 | `useNow()` | Current time (with override) | localStorage + hook state |
+| `useBandDetailModal()` | Band detail modal state | Composes pick/missed/attendee inputs |
 | `useOfflinePendingBandIds()` | Offline-queued picks | IDB queue stores + events |
 
 **Example: usePickCounts()**
@@ -430,6 +431,7 @@ INSERT into user_picks
 | `useMyPicks()` | `{ pickedIds, refresh }` | `PICKS_CHANGED_EVENT` | Internal to `usePickActions` |
 | `usePickActions()` | `{ pickedIds, refresh, togglePick, pickBand, unpickBand }` | `PICKS_CHANGED_EVENT` | SchedulePage, MyPicksPage, PopularPage, ConflictSection, useNowData |
 | `useMissedBands()` | `{ allMissed, missedBandIds, missedCountsByBand, mark, unmark, toggleMissed, refresh }` | `MISSED_CHANGED_EVENT`, Realtime | MyPicksPage, PopularPage, BadgesDisplay |
+| `useBandDetailModal()` | `{ activeBand, openBand, closeBand, modalProps }` | None (local state + composed inputs) | MyPicksPage, PopularPage |
 | `usePickCounts()` | `Record<bandId, count>` | `PICKS_CHANGED_EVENT`, Realtime | RightNowPage, PopularPage — `countPicks` is an exported pure fn |
 | `useBandAttendees(bandId)` | `User[]` | Realtime | BandDetailModal |
 | `useNowData()` | `{ current, next }` | `useNow()`, `PICKS_CHANGED_EVENT` | RightNowPage |

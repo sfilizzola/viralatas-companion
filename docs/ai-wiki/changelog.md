@@ -4,6 +4,21 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.F — useBandDetailModal shared state)
+
+### Added
+- `src/hooks/useBandDetailModal.ts` — `{ activeBand, openBand, closeBand, modalProps }`; composes pick/missed/attendee inputs into one band-detail modal contract.
+- `src/components/BandDetailModalHost.tsx` — thin render wrapper for `BandDetailModal`.
+- `src/__tests__/useBandDetailModal.test.ts` — open/close, ended/missed derivation, pick and missed toggle handlers (6 cases).
+
+### Changed
+- `MyPicksPage`, `PopularPage` — band detail modal state/handlers via `useBandDetailModal()` instead of duplicated `activeBandId` memos and inline `BandDetailModal` props.
+
+### Architectural Notes
+- Pages keep composing `useBands`, `usePickActions`, `useMissedBands`, `useBandAttendees`; hook owns modal open/close and derived ended/missed/conflict props only.
+
+---
+
 ## 2026-05-24 (Phase 26.D — useMissedBands hook)
 
 ### Added

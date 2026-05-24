@@ -2,6 +2,8 @@ import { useCallback, useMemo, useState } from 'react';
 import type { Band } from '../types';
 import { bandDay } from '../services/bandTime';
 import { useAuth } from '../hooks/useAuth';
+import { useBandDetailModal } from '../hooks/useBandDetailModal';
+import { BandDetailModalHost } from '../components/BandDetailModalHost';
 import { useBands } from '../hooks/useBands';
 import { useBandAttendees } from '../hooks/useBandAttendees';
 import { useMissedBands } from '../hooks/useMissedBands';
@@ -15,7 +17,6 @@ import { isFestivalActive } from '../services/time';
 import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BandCard from '../components/BandCard';
-import BandDetailModal from '../components/BandDetailModal';
 import Icon from '../components/icons/Icon';
 import PlaylistLaunchButton from '../components/PlaylistLaunchButton';
 import styles from './SchedulePage.module.css';
@@ -31,7 +32,6 @@ export default function MyPicksPage() {
     '';
 
   const [highlightedConflict, setHighlightedConflict] = useState<string | null>(null);
-  const [activeBandId, setActiveBandId] = useState<string | null>(null);
   const [collapsedDays, setCollapsedDays] = useState<Set<string>>(new Set());
   const { bands: rawBands, loading } = useBands();
   const { allMissed, missedBandIds, missedCountsByBand, toggleMissed } = useMissedBands(userId);
@@ -72,28 +72,17 @@ export default function MyPicksPage() {
 
   const festivalActive = isFestivalActive(currentNow);
   const conflicts = useBandConflicts(myBands);
-
-  const activeBand = useMemo(
-    () => (activeBandId ? bands.find((band) => band.id === activeBandId) ?? null : null),
-    [activeBandId, bands],
-  );
-
-  const missedUserIds = useMemo<Set<string>>(() => {
-    if (!activeBand) return new Set();
-    return new Set(
-      allMissed.filter((missed) => missed.band_id === activeBand.id).map((missed) => missed.user_id),
-    );
-  }, [allMissed, activeBand]);
-
-  const isMissed = useMemo(
-    () => !!(activeBand && missedBandIds.has(activeBand.id)),
-    [missedBandIds, activeBand],
-  );
-
-  const isBandEnded = useMemo(
-    () => !!activeBand && new Date(activeBand.end_time) < currentNow,
-    [activeBand, currentNow],
-  );
+  const { openBand, modalProps } = useBandDetailModal({
+    bands,
+    pickedIds,
+    togglePick,
+    allMissed,
+    missedBandIds,
+    toggleMissed,
+    attendeesByBand,
+    currentNow,
+    conflicts,
+  });
 
   const grouped = useMemo(() => {
     const map = new Map<string, Band[]>();
@@ -146,11 +135,6 @@ export default function MyPicksPage() {
     },
     [tSchedule],
   );
-
-  const handleToggleMissed = useCallback(async () => {
-    if (!activeBand) return;
-    await toggleMissed(activeBand.id);
-  }, [activeBand, toggleMissed]);
 
   function toggleDayCollapse(day: string) {
     setCollapsedDays((prev) => {
@@ -253,7 +237,7 @@ export default function MyPicksPage() {
                       isPicked={pickedIds.has(band.id)}
                       count={pickCounts[band.id] ?? 0}
                       onToggle={() => togglePick(band.id)}
-                      onClick={() => setActiveBandId(band.id)}
+                      onClick={() => openBand(band.id)}
                       variant="timeline"
                       pending={pendingBandIds.has(band.id)}
                       conflict={
@@ -308,7 +292,7 @@ export default function MyPicksPage() {
                     isPicked={pickedIds.has(band.id)}
                     count={pickCounts[band.id] ?? 0}
                     onToggle={() => togglePick(band.id)}
-                    onClick={() => setActiveBandId(band.id)}
+                    onClick={() => openBand(band.id)}
                     variant="timeline"
                     pending={pendingBandIds.has(band.id)}
                     hidePick
@@ -354,7 +338,7 @@ export default function MyPicksPage() {
                     isPicked={pickedIds.has(band.id)}
                     count={pickCounts[band.id] ?? 0}
                     onToggle={() => togglePick(band.id)}
-                    onClick={() => setActiveBandId(band.id)}
+                    onClick={() => openBand(band.id)}
                     variant="timeline"
                     pending={pendingBandIds.has(band.id)}
                     hidePick
@@ -368,32 +352,7 @@ export default function MyPicksPage() {
         })()}
       </main>
 
-      {activeBand && (
-        <BandDetailModal
-          band={activeBand}
-          attendees={attendeesByBand[activeBand.id] ?? []}
-          isPicked={pickedIds.has(activeBand.id)}
-          onTogglePick={() => togglePick(activeBand.id)}
-          onClose={() => setActiveBandId(null)}
-          isBandEnded={isBandEnded}
-          hidePick={isBandEnded}
-          missedUserIds={missedUserIds}
-          isMissed={isMissed}
-          onToggleMissed={handleToggleMissed}
-          conflictBands={
-            conflicts
-              .get(activeBand.id)
-              ?.filter((e) => e.severity === 'hard')
-              .map((e) => e.band) ?? []
-          }
-          overlapBands={
-            conflicts
-              .get(activeBand.id)
-              ?.filter((e) => e.severity === 'soft')
-              .map((e) => e.band) ?? []
-          }
-        />
-      )}
+      <BandDetailModalHost modalProps={modalProps} />
 
       <div className={styles.navSpacer} />
       <BottomNav />
