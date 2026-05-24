@@ -4,6 +4,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.K — useAnnouncements hook)
+
+### Added
+- `src/hooks/useAnnouncements.ts` — IDB cache read, Realtime (announcements + blocked_posters), pagination, role/block state, post/delete/pin/block actions.
+- `src/services/announcementsDisplay.ts` — pure `applyPinSort`, `relativeTime` helpers.
+- `src/__tests__/useAnnouncements.test.ts` — 4 hook tests (IDB load, crew users, event refresh, canModerate).
+- `src/__tests__/announcementsDisplay.test.ts` — 7 tests for pin sort + relative time formatting.
+
+### Changed
+- `AnnouncementsPage.tsx` — layout + form only; data/actions via `useAnnouncements()`; 437 → 299 lines.
+- `docs/ai-wiki/architecture.md`, `flows/announcements.md` — hook documented.
+
+### Architectural Notes
+- Offline-first preserved: hook reads IDB first, Realtime writes IDB (emitting `ANNOUNCEMENTS_CHANGED_EVENT`); page never calls Supabase directly.
+
+---
+
 ## 2026-05-24 (Phase 26.I — Split BadgesDisplay)
 
 ### Added

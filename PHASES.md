@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E, 26.F, 26.G, 26.H, 26.I, 26.J complete)
+**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E, 26.F, 26.G, 26.H, 26.I, 26.J, 26.K complete)
 
 **Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
 
@@ -175,7 +175,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-### Stage 26.K — `useAnnouncements()` + slim `AnnouncementsPage`
+### Stage 26.K — `useAnnouncements()` + slim `AnnouncementsPage` ✅
 
 **Scope:** New `src/hooks/useAnnouncements.ts` (cache read, Realtime, pagination, role/block state, post/delete/pin actions); reduce `AnnouncementsPage.tsx` to layout + form (~200 lines). Extract `applyPinSort`, `relativeTime` to `src/services/announcementsDisplay.ts`.
 
@@ -183,7 +183,9 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Risk:** Medium | **Depth:** Moderate | **Depends on:** 26.H, 26.J
 
-**Verification:** `rtk npm test` (`announcementsRepository.test.ts`); post offline → reconnect; pin/unpin; load more.
+**Verification:** `rtk npm test` (`announcementsRepository.test.ts`, `useAnnouncements.test.ts`, `announcementsDisplay.test.ts`); post offline → reconnect; pin/unpin; load more.
+
+**Done (2026-05-24):** `useAnnouncements()` hook; `announcementsDisplay.ts`; `AnnouncementsPage.tsx` 437 → 299 lines; 4 hook + 7 display tests.
 
 ---
 

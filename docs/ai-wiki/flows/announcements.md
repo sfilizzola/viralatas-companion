@@ -21,7 +21,7 @@ User at /announcements page, typed message
         User taps "Post" button
                     │
                     ▼
-   AnnouncementsPage.onPost(
+   AnnouncementsPage form → useAnnouncements().post(
      userId: 'alice-uuid',
      content: 'Metalheads, meet at the Faster stage! 🤘'
    )
@@ -641,3 +641,18 @@ Godlike views /announcements
 - Add UNIQUE constraint `(id, author_id)` to prevent double-inserts
 - Emit Realtime event on `blocked_posters` changes
 - Add "blocked status" indicator in Profile admin panel
+
+---
+
+## Relevant Source Files
+
+| File | Role |
+|------|------|
+| `src/hooks/useAnnouncements.ts` | IDB read, Realtime subscription, pagination, moderation state, mural actions |
+| `src/pages/AnnouncementsPage.tsx` | Layout, post form, feed rendering (consumes hook) |
+| `src/services/announcementsDisplay.ts` | `applyPinSort`, `relativeTime` pure helpers |
+| `src/repositories/announcements.ts` | Post, sync, delete, pin/unpin, flush pending |
+| `src/repositories/users.ts` | Role map, block list, `blockUser()` |
+| `src/lib/realtimeSync.ts` | `subscribePostgresChanges()` helper (26.H) |
+| `src/lib/db.ts` | `announcements` + `pending_announcements` stores, `ANNOUNCEMENTS_CHANGED_EVENT` |
+| `src/components/sync/AnnouncementSync.tsx` | App-level pending flush on reconnect |
