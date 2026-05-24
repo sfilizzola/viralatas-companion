@@ -4,6 +4,22 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-24 (Phase 26.J — Repository boundary cleanup)
+
+### Added
+- `usersRepository.fetchUserRolesMap()`, `fetchAllUsers()`, `setUserRole()`, `fetchBlockedPosters()`, `fetchBlockedPostersWithUserDetails()`, `blockUser()`, `unblockUser()` — admin/user moderation ops (network-dependent).
+- `src/__tests__/usersRepository.test.ts` — 10 tests for crew sync, role map, user list, block/unblock, set role.
+
+### Changed
+- `announcementsRepository` — mural CRUD + sync + pin/unpin + current-user role/block checks only; admin ops removed.
+- `AnnouncementsPage`, `GodlikeAdminPanel`, `ManagerAdminPanel` — import admin ops from `usersRepository`.
+- `docs/ai-wiki/architecture.md`, `flows/announcements.md`, `testing.md` — repository boundary docs.
+
+### Architectural Notes
+- Admin moderation (roles, block list) lives in `usersRepository` alongside `syncCrew()`; `announcementsRepository` is mural-only. Offline-first unchanged — admin ops remain network-dependent by design.
+
+---
+
 ## 2026-05-24 (Phase 26.H — Realtime subscription helper)
 
 ### Added

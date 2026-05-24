@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 26 — Complexity Reduction & Simplification
 
-**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E, 26.F, 26.G, 26.H complete)
+**Status:** 🔜 In progress (26.A, 26.B, 26.C, 26.D, 26.E, 26.F, 26.G, 26.H, 26.J complete)
 
 **Goal:** Reduce cognitive load and file size across the React app without changing user-visible behavior. Extract repeated patterns into hooks and services, split god files into focused modules, and strengthen tests so each sub-stage is safely reviewable. Preserve offline-first invariants (`UI → IndexedDB ↕ Supabase`).
 
@@ -156,7 +156,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-### Stage 26.J — Repository boundary cleanup (announcements vs admin)
+### Stage 26.J — Repository boundary cleanup (announcements vs admin) ✅
 
 **Scope:**
 - Move `fetchAllUsers`, `setUserRole`, `fetchBlockedPosters*`, `blockUser`, `unblockUser` from `announcementsRepository` → `usersRepository` (or new `adminRepository.ts`)
@@ -168,6 +168,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Risk:** Medium | **Depth:** Moderate | **Depends on:** 26.A
 
 **Verification:** `rtk npm test` (`announcementsRepository.test.ts` + update admin call sites); godlike role change + block user still works.
+
+**Done (2026-05-24):** Admin user ops moved to `usersRepository`; `fetchUserRolesMap()` replaces direct Supabase in `AnnouncementsPage`; `announcementsRepository` retains mural CRUD + `fetchCurrentUserRole`/`fetchIsBlocked` (26.K hook scope); 10 new `usersRepository.test.ts` cases.
 
 ---
 

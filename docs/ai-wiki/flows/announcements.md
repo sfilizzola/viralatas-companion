@@ -550,7 +550,7 @@ Godlike user opens Profile admin panel
    Selects user to block (e.g., "Bob")
                     │
                     ▼
-   Calls: announcementsRepository.blockUser(
+   Calls: usersRepository.blockUser(
      userId: 'bob-uuid',
      blockedBy: 'godlike-uuid'
    )

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { UserRole } from '../../types';
-import { announcementsRepository } from '../../repositories';
+import { announcementsRepository, usersRepository } from '../../repositories';
 import { Avatar, Collapsible } from '../../ui';
 import type { UserWithLoading } from './types';
 import styles from '../../pages/ProfilePage.module.css';
@@ -32,7 +32,7 @@ export default function ManagerAdminPanel({ userId, t }: ManagerAdminPanelProps)
     async function loadBlocked() {
       if (userRole === 'manager' || userRole === 'godlike') {
         try {
-          const blocked = await announcementsRepository.fetchBlockedPostersWithUserDetails();
+          const blocked = await usersRepository.fetchBlockedPostersWithUserDetails();
           setBlockedUsers(
             blocked.map((bp) => ({
               id: bp.user_id,
@@ -60,7 +60,7 @@ export default function ManagerAdminPanel({ userId, t }: ManagerAdminPanelProps)
         prev.map((u) => (u.id === blockedUserId ? { ...u, loading: true, error: undefined } : u)),
       );
       try {
-        await announcementsRepository.unblockUser(blockedUserId);
+        await usersRepository.unblockUser(blockedUserId);
         setBlockedUsers((prev) => prev.filter((u) => u.id !== blockedUserId));
       } catch (error) {
         console.error('Unblock failed:', error);

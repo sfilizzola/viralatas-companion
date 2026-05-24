@@ -47,6 +47,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `picksRepository.test.ts` | `toggle()` online/offline/error, `flushOfflineQueue()` dedup/routing, `syncCrewFromRemote()` (26 tests) |
 | `presenceRepository.test.ts` | `setCampingStatus()` online/offline, `isTimeWithinMetalPlaceWindow()` boundary, `validateAndAutoCheckout()` (11 tests) |
 | `announcementsRepository.test.ts` | Online post, offline queue, `flushPendingAnnouncements()` (7 tests) |
+| `usersRepository.test.ts` | Crew sync, role map, user list, block/unblock, set role (10 tests) |
 | `bandsRepository.test.ts` | `checkAndApplyCacheVersion()` match/mismatch/no-data (3 tests) |
 | `missedRepository.test.ts` | Mark/unmark missed band online and offline (4 tests) |
 

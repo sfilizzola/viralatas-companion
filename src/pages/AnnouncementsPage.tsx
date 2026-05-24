@@ -8,8 +8,7 @@ import {
   removeAnnouncementFromCache,
   saveAnnouncement,
 } from '../lib/db';
-import { announcementsRepository } from '../repositories';
-import { supabase } from '../lib/supabase';
+import { announcementsRepository, usersRepository } from '../repositories';
 import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { loadUsefulLinks } from '../services/usefulLinks';
 import { useAuth } from '../hooks/useAuth';
@@ -84,16 +83,7 @@ export default function AnnouncementsPage() {
     setCrewUsers(users);
     setPendingAnnouncementIds(new Set(pendingQueue.map((a) => a.id)));
 
-    // Load user roles
-    const { data: allUsers } = await supabase
-      .from('users')
-      .select('id, role');
-    if (allUsers) {
-      const rolesMap = Object.fromEntries(
-        allUsers.map(u => [u.id, u.role as UserRole])
-      );
-      setUserRoles(rolesMap);
-    }
+    setUserRoles(await usersRepository.fetchUserRolesMap());
 
     setLoading(false);
   }, []);
@@ -167,7 +157,7 @@ export default function AnnouncementsPage() {
     announcementsRepository.sync().catch(() => {});
 
     // Load blocked users
-    announcementsRepository.fetchBlockedPosters().then((blocked) => {
+    usersRepository.fetchBlockedPosters().then((blocked) => {
       setBlockedUserIds(new Set(blocked.map(b => b.user_id)));
     });
 
@@ -238,7 +228,7 @@ export default function AnnouncementsPage() {
     if (!userId) return;
     setBlocking(authorId);
     try {
-      await announcementsRepository.blockUser(authorId, userId);
+      await usersRepository.blockUser(authorId, userId);
       await announcementsRepository.sync();
     } catch (error) {
       console.error('Block failed:', error);

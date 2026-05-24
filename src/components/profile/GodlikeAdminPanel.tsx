@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Band, LiveBandTestConfig, UserRole } from '../../types';
 import { supabase } from '../../lib/supabase';
-import { announcementsRepository, bandsRepository, presenceRepository } from '../../repositories';
+import { announcementsRepository, bandsRepository, presenceRepository, usersRepository } from '../../repositories';
 import { loadBands, loadAllUserPicks, loadLiveBandTestConfig, loadMetalPlaceConfig } from '../../lib/db';
 import {
   getRegistrationEnabled,
@@ -89,8 +89,8 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
     async function loadUsers() {
       try {
         const [users, blocked] = await Promise.all([
-          announcementsRepository.fetchAllUsers(),
-          announcementsRepository.fetchBlockedPostersWithUserDetails(),
+          usersRepository.fetchAllUsers(),
+          usersRepository.fetchBlockedPostersWithUserDetails(),
         ]);
         setAllUsers(users.map((u) => ({ ...u, special_badges: u.special_badges ?? [] })) as UserWithLoading[]);
         setBlockedPosters(blocked.map((b) => ({ user_id: b.user_id })));
@@ -291,7 +291,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
         prev.map((u) => (u.id === targetUserId ? { ...u, role: newRole } : u)),
       );
       try {
-        await announcementsRepository.setUserRole(targetUserId, newRole as 'normal' | 'manager');
+        await usersRepository.setUserRole(targetUserId, newRole as 'normal' | 'manager');
       } catch (error) {
         console.error('Failed to update user role:', error);
         setAllUsers(originalUsers);
@@ -357,7 +357,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
         prev.map((u) => (u.id === targetUserId ? { ...u, loading: true, error: undefined } : u)),
       );
       try {
-        await announcementsRepository.unblockUser(targetUserId);
+        await usersRepository.unblockUser(targetUserId);
         setBlockedPosters((prev) => prev.filter((bp) => bp.user_id !== targetUserId));
       } catch (error) {
         console.error('Unblock failed:', error);

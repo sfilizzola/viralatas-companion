@@ -175,9 +175,9 @@ export function usePickCounts(): Record<string, number> {
 
 **Repositories** handle CRUD + sync logic:
 - `picksRepository` — Toggle picks, sync with Supabase, flush offline queue
-- `announcementsRepository` — Post, sync, delete (soft-delete on server)
+- `announcementsRepository` — Post, sync, delete, pin/unpin; current-user role/block checks for mural permissions
 - `presenceRepository` — Update camping/Metal Place status
-- `usersRepository` — Fetch crew members, sync crew data
+- `usersRepository` — Sync crew to IndexedDB; admin user ops (roles, block list, role map)
 - `missedRepository` — Mark bands as "didn't watch"
 - `bandsRepository` — Fetch bands, check cache version
 
@@ -449,9 +449,9 @@ INSERT into user_picks
 | Repository | Key Methods | Side Effects |
 |------------|-------------|--------------|
 | `picksRepository` | `toggle()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `deduplicatePickQueue(ops)` (exported pure fn) | Writes IndexedDB, enqueues offline, calls Supabase |
-| `announcementsRepository` | `post()`, `sync()`, `delete()`, `flushPending()` | Writes IndexedDB, enqueues pending |
+| `announcementsRepository` | `post()`, `sync()`, `delete()`, `flushPending()`, `pinAnnouncement()`, `unpinAnnouncement()` | Writes IndexedDB, enqueues pending |
 | `presenceRepository` | `update()`, `syncCrewFromRemote()`, `flushOfflineQueue()` | Writes IndexedDB, enqueues offline |
-| `usersRepository` | `syncCrew()` | Writes crew_users IndexedDB |
+| `usersRepository` | `syncCrew()`, `fetchUserRolesMap()`, `fetchAllUsers()`, `setUserRole()`, `fetchBlockedPosters*()`, `blockUser()`, `unblockUser()` | Writes crew_users IDB (syncCrew); admin ops network-only |
 | `missedRepository` | `toggle()`, `flushOfflineQueue()` | Writes IndexedDB, enqueues offline |
 | `bandsRepository` | `checkAndApplyCacheVersion()`, `loadBands()` | Wipes IDB if cache version changes |
 
