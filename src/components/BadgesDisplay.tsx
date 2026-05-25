@@ -10,6 +10,11 @@ import {
   stackStyle,
   type StackPose,
 } from '../services/badges/stackLayout';
+import {
+  buildNeatStackPoses,
+  neatStackStyle,
+  type NeatStackPose,
+} from '../services/badges/neatStackLayout';
 import { useBadgeContext } from '../hooks/useBadgeContext';
 import { useI18n } from '../lib/i18n';
 import {
@@ -17,6 +22,11 @@ import {
   PATCHES_BG_CHANGED_EVENT,
   type PatchesBackground,
 } from '../lib/patchesBackground';
+import {
+  loadPatchesLayout,
+  PATCHES_LAYOUT_CHANGED_EVENT,
+  type PatchesLayout,
+} from '../lib/patchesLayout';
 import { Modal } from '../ui';
 import styles from './BadgesDisplay.module.css';
 
@@ -35,6 +45,7 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
   const [spread, setSpread] = useState(false);
   const [scatterSeed, setScatterSeed] = useState(() => Math.random());
   const [bg, setBg] = useState<PatchesBackground>(() => loadPatchesBackground());
+  const [layout, setLayout] = useState<PatchesLayout>(() => loadPatchesLayout());
 
   useEffect(() => {
     function onBgChange(event: Event) {
@@ -43,6 +54,15 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
     }
     globalThis.addEventListener(PATCHES_BG_CHANGED_EVENT, onBgChange);
     return () => globalThis.removeEventListener(PATCHES_BG_CHANGED_EVENT, onBgChange);
+  }, []);
+
+  useEffect(() => {
+    function onLayoutChange(event: Event) {
+      const next = (event as CustomEvent<PatchesLayout>).detail;
+      if (next) setLayout(next);
+    }
+    globalThis.addEventListener(PATCHES_LAYOUT_CHANGED_EVENT, onLayoutChange);
+    return () => globalThis.removeEventListener(PATCHES_LAYOUT_CHANGED_EVENT, onLayoutChange);
   }, []);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -74,18 +94,31 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
   function renderPatchButton(
     badge: BadgeConfig,
     index: number,
-    mode: 'stack' | 'grid',
+    mode: 'stack' | 'grid' | 'neat',
     stackPose?: StackPose,
+    neatPose?: NeatStackPose,
   ) {
     const isGlowing = glowingSlugs.has(badge.slug);
     const btnClass = [
       styles.patchBtn,
-      mode === 'stack' ? styles.patchStackItem : styles.patchGridItem,
+      mode === 'stack' ? styles.patchStackItem : '',
+      mode === 'neat' ? styles.patchNeatItem : '',
+      mode === 'grid' ? styles.patchGridItem : '',
       isGlowing ? styles.glowing : '',
     ].filter(Boolean).join(' ');
 
-    const imgClass = mode === 'stack' ? styles.stackPatchImg : styles.patchImg;
-    const chipClass = mode === 'stack' ? styles.stackYearChip : styles.yearChip;
+    const imgClass =
+      mode === 'grid'
+        ? styles.patchImg
+        : mode === 'neat'
+          ? styles.neatPatchImg
+          : styles.stackPatchImg;
+    const chipClass =
+      mode === 'grid'
+        ? styles.yearChip
+        : mode === 'neat'
+          ? styles.neatYearChip
+          : styles.stackYearChip;
 
     const patchContent = (
       <span className={styles.imgWrapper}>
@@ -103,6 +136,20 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
           key={badge.slug}
           className={btnClass}
           style={stackStyle(stackPose)}
+          aria-hidden="true"
+        >
+          {patchContent}
+        </div>
+      );
+    }
+
+    if (mode === 'neat') {
+      if (!neatPose) return null;
+      return (
+        <div
+          key={badge.slug}
+          className={btnClass}
+          style={neatStackStyle(neatPose)}
           aria-hidden="true"
         >
           {patchContent}
@@ -155,9 +202,18 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
   if (earned.length === 0) return null;
 
   const sortedEarned = earned;
-  const collapsedPoses = spread
+  const collapsedPoses = spread || layout === 'neat'
     ? null
     : buildStackPoses(sortedEarned, scatterSeed, glowingSlugs);
+  const neatLayout = spread || layout !== 'neat'
+    ? null
+    : buildNeatStackPoses(sortedEarned, glowingSlugs);
+
+  const collapsedStackClass = spread
+    ? `${styles.vestStack} ${styles.vestSpread} ${styles.patchesGrid}`
+    : layout === 'neat'
+      ? `${styles.vestStack} ${styles.vestNeat}${neatLayout?.metrics.needsScroll ? ` ${styles.vestNeatScroll}` : ''}`
+      : styles.vestStack;
 
   return (
     <>
@@ -170,7 +226,7 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
           type="button"
           className={styles.spreadBtn}
           onClick={() => {
-            if (spread) setScatterSeed(Math.random());
+            if (spread && layout === 'chaotic') setScatterSeed(Math.random());
             setSpread((s) => !s);
           }}
           aria-expanded={spread}
@@ -179,18 +235,23 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
         </button>
       </div>
 
-      <div
-        className={
-          spread
-            ? `${styles.vestStack} ${styles.vestSpread} ${styles.patchesGrid}`
-            : styles.vestStack
-        }
-        data-bg={bg}
-      >
+      <div className={collapsedStackClass} data-bg={bg}>
         {spread ? (
           sortedEarned.map((badge, index) =>
             renderPatchButton(badge, index, 'grid'),
           )
+        ) : layout === 'neat' ? (
+          <div className={styles.vestNeatRow}>
+            {sortedEarned.map((badge, index) =>
+              renderPatchButton(
+                badge,
+                index,
+                'neat',
+                undefined,
+                neatLayout!.poses.get(badge.slug),
+              ),
+            )}
+          </div>
         ) : (
           <div className={styles.vestStackMeadow}>
             {sortedEarned.map((badge, index) =>

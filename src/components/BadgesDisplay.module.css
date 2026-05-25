@@ -76,6 +76,82 @@
   height: 100%;
 }
 
+/* Neat collapsed — horizontal chip stack, all badges visible */
+.vestNeat:not(.vestSpread) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.vestNeatScroll:not(.vestSpread) {
+  overflow-x: auto;
+  overflow-y: hidden;
+  justify-content: flex-start;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.vestNeatScroll:not(.vestSpread)::-webkit-scrollbar {
+  display: none;
+}
+
+.vestNeatRow {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 var(--s-2);
+  min-width: min-content;
+}
+
+.vestNeatScroll .vestNeatRow {
+  justify-content: flex-start;
+  padding: 0 var(--s-3);
+}
+
+.neatPatchImg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  display: block;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.65));
+}
+
+.neatYearChip {
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 46%;
+  height: 46%;
+  min-width: 14px;
+  min-height: 14px;
+  max-width: 22px;
+  max-height: 22px;
+  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: clamp(6px, 38%, 9px);
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(145deg, #d93025 0%, #b32020 60%, #7a1010 100%);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.9));
+  line-height: 1;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.neatYearChip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(150deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.08) 45%, rgba(255, 255, 255, 0) 70%);
+}
+
 .vestSpread {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -354,6 +430,15 @@
   pointer-events: none;
   cursor: default;
   transform: translate(-50%, -50%) rotate(var(--stack-rot)) scale(var(--stack-scale));
+  transform-origin: center center;
+}
+
+.patchBtn.patchNeatItem {
+  position: relative;
+  flex-shrink: 0;
+  padding: 0;
+  pointer-events: none;
+  cursor: default;
   transform-origin: center center;
 }
 

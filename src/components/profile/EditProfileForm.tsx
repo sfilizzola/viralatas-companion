@@ -5,6 +5,8 @@ import { CREW_USERS_CHANGED_EVENT, loadCrewUsers } from '../../lib/db';
 import { type Language } from '../../lib/i18n';
 import { Button, Collapsible, Input, Select, SegmentedControl } from '../../ui';
 import PatchesBackgroundPicker from './PatchesBackgroundPicker';
+import PatchesLayoutToggle from './PatchesLayoutToggle';
+import pickerStyles from './PatchesBackgroundPicker.module.css';
 import styles from '../../pages/ProfilePage.module.css';
 
 const DECADE_GROUPS: { label: string; years: number[] }[] = [
@@ -293,7 +295,10 @@ export default function EditProfileForm({
 
         <div className={styles.label}>
           {t('patchesBackground')}
-          <PatchesBackgroundPicker t={t} />
+          <div className={pickerStyles.vestPrefsRow}>
+            <PatchesBackgroundPicker t={t} />
+            <PatchesLayoutToggle t={t} />
+          </div>
         </div>
 
         <label className={styles.label}>

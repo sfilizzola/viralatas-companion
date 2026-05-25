@@ -1049,8 +1049,8 @@
 
       <div class="component-section">
         <h3>BadgesDisplay <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/BadgesDisplay.tsx</span></h3>
-        <p>Earned patches on <code>/now</code> and <code>/profile</code>. <strong>Variant C — Vest Stack:</strong> collapsed kutte (fixed <strong>112 px</strong> tall, max-width 480 px) with chaotic overlapping <strong>48 px</strong> patches; <em>Open vest</em> expands into a 4-column grid on the user&apos;s battle-vest background with staggered <code>settlePatch</code> animation. <em>Close vest</em> reshuffles the pile.</p>
-        <p><strong>Collapsed:</strong> meadow scatter via <code>buildStackPoses()</code> — per-collapse <code>scatterSeed</code>, rotation ±55°, scale 0.88–0.99, anti-bury center distance, glow-only on unacknowledged badges, patches non-clickable, user <code>data-bg</code> on <code>.vestStack</code>. <strong>Expanded:</strong> clickable patches → detail modal + fullscreen zoom; same <code>data-bg</code> variants.</p>
+        <p>Earned patches on <code>/now</code> and <code>/profile</code>. <strong>Variant C — Vest Stack:</strong> collapsed kutte (fixed <strong>112 px</strong> tall, max-width 480 px). Default <strong>chaotic</strong> mode: meadow scatter with <strong>48 px</strong> patches; opt-in <strong>neat</strong> mode: horizontal chip stack (all badges, scaled). <em>Open vest</em> expands into a 4-column grid; <em>Close vest</em> reshuffles chaotic pile only.</p>
+        <p><strong>Collapsed chaotic:</strong> <code>buildStackPoses()</code> — <code>scatterSeed</code>, rotation ±55°, anti-bury. <strong>Collapsed neat:</strong> <code>buildNeatStackPoses()</code> — scale-down row, 0°–5° rotation, no reseed. Layout toggle in Edit profile (<code>PatchesLayoutToggle</code>, icon-only) beside fabric swatches; preference in <code>patchesLayout.ts</code>.</p>
         <table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
           <thead>
             <tr style="border-bottom:1px solid #333; text-align:left;">
@@ -1060,7 +1060,8 @@
           </thead>
           <tbody style="color:#888;">
             <tr><td style="padding:6px 8px;"><code>user</code></td><td style="padding:6px 8px;">Supabase auth user — badge context built offline-first (two-phase load).</td></tr>
-            <tr><td style="padding:6px 8px;">Collapsed</td><td style="padding:6px 8px;"><code>.vestStack</code> 112 px · 48 px patches · <code>aria-hidden</code> divs · i18n <em>Open vest</em></td></tr>
+            <tr><td style="padding:6px 8px;">Collapsed chaotic</td><td style="padding:6px 8px;"><code>.vestStack</code> + <code>.vestStackMeadow</code> · 48 px · scatter · reseed on close</td></tr>
+            <tr><td style="padding:6px 8px;">Collapsed neat</td><td style="padding:6px 8px;"><code>.vestStack.vestNeat</code> · scaled px · horizontal row · <code>patchesLayout.ts</code></td></tr>
             <tr><td style="padding:6px 8px;">Expanded</td><td style="padding:6px 8px;"><code>.vestSpread.patchesGrid</code> 4 cols · 48 px · <code>settlePatch</code> stagger 42 ms · i18n <em>Close vest</em></td></tr>
             <tr><td style="padding:6px 8px;"><code>data-bg</code></td><td style="padding:6px 8px;"><code>none</code> · <code>grid</code> · <code>steel</code> (default) · <code>indigo</code> · <code>leather</code> — from <code>patchesBackground.ts</code></td></tr>
             <tr><td style="padding:6px 8px;">Glow</td><td style="padding:6px 8px;"><code>badgeGlow</code> on unacknowledged slugs; cleared via <code>localStorage badgeAcknowledged</code></td></tr>
@@ -1101,7 +1102,23 @@
             <div class="ds-bd-patch" style="left: 12%; top: 70%; transform: translate(-50%,-50%) rotate(52deg) scale(.88); z-index: 7;"></div>
             <div class="ds-bd-patch" style="left: 88%; top: 42%; transform: translate(-50%,-50%) rotate(-18deg) scale(.95); z-index: 8;"></div>
           </div>
-          <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:10px 0 0;">Collapsed demo — steel <code>data-bg</code>, 48 px patches, ±55° scatter, fixed 112 px height.</p>
+          <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:10px 0 0;">Collapsed chaotic demo — steel <code>data-bg</code>, 48 px patches, ±55° scatter.</p>
+          <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:6px 0 16px;">Edit profile: fabric swatches + I1 layout toggle (scatter dots / stacked circles, aria-label only).</p>
+          <div class="ds-bd-header">
+            <span class="ds-bd-kicker">PATCHES · 22 · NEAT</span>
+            <span class="ds-bd-btn">Open vest</span>
+          </div>
+          <div class="ds-bd-stack" style="display:flex;align-items:center;justify-content:center;">
+            <div style="display:inline-flex;align-items:center;padding:0 12px;">
+              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(2deg);margin:0;"></div>
+              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(4deg);margin:0 0 0 -11px;z-index:2;"></div>
+              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(1deg);margin:0 0 0 -11px;z-index:3;"></div>
+              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(3deg);margin:0 0 0 -11px;z-index:4;"></div>
+              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(0deg);margin:0 0 0 -11px;z-index:5;box-shadow:0 0 14px rgba(255,160,40,.55);"></div>
+              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(5deg);margin:0 0 0 -11px;z-index:6;"></div>
+            </div>
+          </div>
+          <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:10px 0 0;">Collapsed neat demo — scaled 32 px patches, ~35% overlap, 0°–5° rotation.</p>
         </div>
       </div>
 

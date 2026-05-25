@@ -570,3 +570,31 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Band sync is repository-owned; `src/lib/sync.ts` removed — all remote fetch logic in `src/repositories/*`.
 
 ---
+
+### Phase 28 — Badge Vest Layout Preference (Chaotic / Neat)
+**Status:** ✅ Complete
+
+**Goal:** Per-device collapsed-vest layout preference: **chaotic** (existing meadow scatter) or **neat** (horizontal chip stack showing every badge). Control in Edit profile beside fabric swatches; applies on `/profile` and `/now`.
+
+**Deliverables:**
+- **`patchesLayout.ts`** — `chaotic` | `neat` localStorage preference + change event (mirrors `patchesBackground.ts`)
+- **`neatStackLayout.ts`** — scale-down row math, 0°–5° rotation, scroll fallback at min patch size
+- **`PatchesLayoutToggle.tsx`** — I1 icon-only toggle (scatter dots / stacked circles) in Edit profile
+- **`BadgesDisplay`** — branches collapsed render; chaotic reseed on Close vest only
+- i18n aria keys (`patchesLayout`, `layoutChaotic`, `layoutNeat`) in all 4 ProfilePage locales
+- Wiki + Design System updated
+
+**Acceptance criteria (all met):**
+- [x] Edit profile: swatches + icon toggle on same row (Variant C)
+- [x] Default chaotic — no behavior change until opt-in
+- [x] Neat shows all badges with scale-down sizing
+- [x] Open vest grid unchanged; preference offline-safe on both routes
+- [x] `rtk npm run build` green · `rtk npm test` green — 542 tests (5 new neat-layout tests)
+
+**Wiki:** `docs/ai-wiki/badges.md` · `changelog.md` · `public/Design System.html`
+
+**Architectural notes:**
+- Cosmetic preference stays localStorage-only (same contract as vest color); no Supabase sync.
+- Neat layout is pure presentation in `neatStackLayout.ts`; chaotic math unchanged in `stackLayout.ts`.
+
+---

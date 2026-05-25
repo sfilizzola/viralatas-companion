@@ -14,7 +14,8 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 |---|---|
 | `src/services/badges/types.ts` | `BadgeBand`, `BadgeCondition`, `BadgeConfig`, `BadgeContext` type definitions |
 | `src/services/badges/engine.ts` | `buildBadgeContext`, `evaluateBadge`, `getEarnedBadges` — pure evaluation logic |
-| `src/services/badges/stackLayout.ts` | Vest collapsed scatter layout — `buildStackPoses`, `stackStyle`, anti-bury placement math |
+| `src/services/badges/stackLayout.ts` | Vest collapsed **chaotic** scatter — `buildStackPoses`, `stackStyle`, anti-bury placement math |
+| `src/services/badges/neatStackLayout.ts` | Vest collapsed **neat** row — `buildNeatStackPoses`, scale-down sizing, 0°–5° rotation |
 | `src/services/badges/registry.ts` | `BADGES[]` array — all badge definitions + condition-examples reference |
 | `src/services/badges/index.ts` | Barrel re-export — preserves all existing `from '…/services/badges'` import paths |
 | `src/services/badges/badgeContextBuilder.ts` | Pure `buildBadgeContextFromSnapshot()` — IDB snapshot → `BadgeContext` (crew location parity with `/now`) |
@@ -25,7 +26,8 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 | `src/hooks/useBadgeContext.ts` | Thin composer — `useBadgeCache` + `useBadgePersist` |
 | `src/__tests__/badges.test.ts` | Condition engine + registry integration tests |
 | `src/__tests__/persistMetadata.test.ts` | Persist metadata merge/write tests |
-| `src/__tests__/stackLayout.test.ts` | Vest scatter layout unit tests |
+| `src/__tests__/stackLayout.test.ts` | Vest chaotic scatter layout unit tests |
+| `src/__tests__/neatStackLayout.test.ts` | Vest neat row layout unit tests |
 | `src/__tests__/useBadgeContext.test.ts` | Hook tests for context build, location counts, and refresh |
 | `public/badges/` | Badge PNG images (96×96 px recommended) |
 | `src/i18n/Badges_br.json` | Brazilian Portuguese labels + descriptions |
@@ -35,7 +37,9 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 | `src/components/BadgesDisplay.tsx` | Vest-stack patches presentation (collapsed + expanded), detail modal, fullscreen zoom |
 | `src/components/ProfilePage.tsx` | Patches section + admin assign-badge UI |
 | `src/lib/patchesBackground.ts` | Per-device patches grid background preference (localStorage) |
-| `src/components/profile/PatchesBackgroundPicker.tsx` | 4-swatch fabric selector in profile |
+| `src/lib/patchesLayout.ts` | Per-device collapsed vest layout preference — `chaotic` \| `neat` (localStorage) |
+| `src/components/profile/PatchesBackgroundPicker.tsx` | Fabric swatch selector in Edit profile |
+| `src/components/profile/PatchesLayoutToggle.tsx` | I1 icon toggle (scatter vs stack) beside swatches in Edit profile |
 
 ---
 
@@ -50,7 +54,7 @@ The patches UI uses a **collapsed kutte stack** by default (fixed **112 px** hei
 | **Collapsed** | 48 px (`.stackPatchImg`) | `.vestStack` — fixed 112 px, `overflow: hidden` | Non-interactive `<div>` patches (`pointer-events: none`, `aria-hidden`) |
 | **Expanded** | 48 px (`.patchImg`) | `.vestStack.vestSpread.patchesGrid` — 4-col grid, auto height | Clickable `<button>` → detail modal + fullscreen zoom |
 
-### Collapsed (default)
+### Collapsed chaotic (default)
 
 - **Scatter:** `buildStackPoses()` in `stackLayout.ts` places badges sequentially on a virtual slot grid (`stackGrid`) with hash jitter; `clutter` factor grows with badge count so overlap intensifies inside the fixed box.
 - **Reseed:** `scatterSeed` is random on mount and regenerated on **Close vest** — each collapse produces a new pile layout.
@@ -59,12 +63,20 @@ The patches UI uses a **collapsed kutte stack** by default (fixed **112 px** hei
 - **Glow:** only unacknowledged badges animate (`badgeGlow` on `.glowing`); no idle wobble or hover motion when collapsed.
 - **Background:** user `data-bg` preference (`patchesBackground.ts`) applies to `.vestStack[data-bg=…]` — same variants as expanded (`none`, `grid`, `steel`, `indigo`, `leather`).
 
+### Collapsed neat (opt-in)
+
+- **Toggle:** `PatchesLayoutToggle` in Edit profile (icon-only I1 — scattered dots vs overlapping circles); preference in `patchesLayout.ts` (`viralatas:patches-layout`, default `chaotic`).
+- **Row stack:** `buildNeatStackPoses()` in `neatStackLayout.ts` — horizontal flex row, all badges visible (no AvatarCluster cap).
+- **Sizing:** patch px scales down as count grows (48 px → floor 28 px) with ~35% overlap; horizontal scroll fallback if still wider than 480 px at min size.
+- **Rotation:** deterministic **0°–5°** per slug (`hashSlug(slug) % 6`); no reseed on **Close vest**.
+- **Routes:** preference applies on `/profile` and `/now`; control UI profile-only.
+
 ### Expanded
 
 - **Layout:** 4-column grid, 48 px patches, same `data-bg` battle-vest background.
 - **Animation:** `settlePatch` keyframe with stagger (`42 ms × index` via `--settle-i`).
 - **Interaction:** tap patch → detail modal; magnifying glass → fullscreen overlay. Acknowledging a glowing badge clears glow via `localStorage['badgeAcknowledged']`.
-- **Collapse:** **Close vest** reshuffles `scatterSeed` and returns to kutte stack.
+- **Collapse:** **Close vest** reshuffles `scatterSeed` (chaotic only) and returns to kutte stack.
 
 ### Header & i18n
 
@@ -82,8 +94,10 @@ Count suffix: `· {earned.length}` inline in kicker. Toggle exposes `aria-expand
 |---|---|
 | `.patchesHeader` | Kicker + count + vest toggle row |
 | `.vestStack` | Collapsed/expanded shell; height fixed when not `.vestSpread` |
-| `.vestStackMeadow` | Absolute scatter canvas (collapsed) |
-| `.patchBtn.patchStackItem` | Collapsed patch — `position: absolute`, CSS vars `--stack-left/top/rot/scale` |
+| `.vestStackMeadow` | Absolute scatter canvas (collapsed chaotic) |
+| `.vestNeat` / `.vestNeatRow` | Horizontal neat stack (collapsed neat) |
+| `.patchBtn.patchStackItem` | Chaotic collapsed patch — absolute, CSS vars `--stack-left/top/rot/scale` |
+| `.patchBtn.patchNeatItem` | Neat collapsed patch — flex item, inline px size + rotation |
 | `.patchGridItem` | Expanded patch — `settlePatch` animation |
 | `.vestSpread` | Grid mode overrides on `.vestStack` |
 
@@ -122,6 +136,19 @@ The patches grid background is a **per-device visual preference**, not a synced 
 3. CSS in `BadgesDisplay.module.css` keys each variant off the `data-bg` attribute. Switching is instant; no re-mount.
 
 If `localStorage` is unavailable (private mode, SSR), `loadPatchesBackground()` falls back to `DEFAULT_PATCHES_BG = 'steel'` and `savePatchesBackground` silently no-ops while still firing the event so the in-memory state updates for the session.
+
+---
+
+## Patches Layout Preference (Phase 28)
+
+Collapsed vest layout is a **per-device visual preference** (`chaotic` | `neat`), stored in `localStorage['viralatas:patches-layout']` with event `viralatas:patches-layout-changed`. Same offline-first rationale as vest color.
+
+**Mechanism:**
+1. `PatchesLayoutToggle` (Edit profile, beside fabric swatches) writes preference and dispatches the event.
+2. `BadgesDisplay` listens and branches collapsed render: `buildStackPoses` vs `buildNeatStackPoses`.
+3. Expanded grid unchanged; chaotic reseed on collapse unchanged when mode is chaotic.
+
+**i18n (aria only):** `patchesLayout`, `layoutChaotic`, `layoutNeat` in `ProfilePage_*.json`.
 
 ---
 

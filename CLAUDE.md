@@ -284,7 +284,7 @@ Full inventory and condition engine → `docs/ai-wiki/badges.md`.
 
 ## Phases at a glance
 
-Phases 1–27 are complete. The active phase is **Phase 28 — TBD** — see `PHASES.md`.
+Phases 1–28 are complete. The active phase is **Phase 29 — TBD** — see `PHASES.md`.
 
 **Full phase history** → `docs/ai-wiki/phases-history.md`
 

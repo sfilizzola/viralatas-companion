@@ -4,6 +4,26 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-25 (Phase 28 — Badge vest layout preference)
+
+### Added
+- **`src/lib/patchesLayout.ts`** — per-device `chaotic` | `neat` preference (localStorage + change event).
+- **`src/services/badges/neatStackLayout.ts`** — scale-down horizontal stack for collapsed neat mode.
+- **`src/components/profile/PatchesLayoutToggle.tsx`** — I1 icon toggle beside fabric swatches in Edit profile.
+- **`src/__tests__/neatStackLayout.test.ts`** — neat sizing, rotation cap, pose map tests.
+
+### Changed
+- **`BadgesDisplay.tsx`** — reads layout preference; neat collapsed row shows all badges; chaotic reseed only in chaotic mode.
+- **`BadgesDisplay.module.css`** — `.vestNeat`, `.vestNeatRow`, `.patchNeatItem`, scaled year chip.
+- **`EditProfileForm.tsx`** — vest prefs row: swatches + layout toggle.
+- **`docs/ai-wiki/badges.md`**, **`public/Design System.html`** — chaotic/neat docs and demos.
+- i18n `patchesLayout`, `layoutChaotic`, `layoutNeat` in all 4 ProfilePage locales.
+
+### Architectural Notes
+- Cosmetic preference stays localStorage-only (same contract as `patchesBackground.ts`); applies on `/now` and `/profile`, control UI profile-only.
+
+---
+
 ## 2026-05-25 (Phase 27 close — Architecture Deepening)
 
 ### Changed

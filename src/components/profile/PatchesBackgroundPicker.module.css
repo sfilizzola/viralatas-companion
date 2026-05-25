@@ -2,10 +2,17 @@
    PATCHES BACKGROUND PICKER — fabric swatch selector
    ============================================================ */
 
+.vestPrefsRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-2) 0;
+}
+
 .row {
   display: flex;
   gap: var(--s-2);
-  padding: var(--s-2) 0;
   flex-wrap: wrap;
 }
 
