@@ -9,7 +9,13 @@ import {
   type BadgeBand,
   type BadgeContext,
 } from '../services/badges';
-import { computeCrewLocationCounts } from '../services/livePreview';
+import {
+  crewLocationCountsFromGroups,
+  deriveUserBadgeLocation,
+  groupCrewLivePlans,
+  mapCrewLivePlans,
+  resolveLiveTestBandId,
+} from '../services/livePreview';
 import {
   loadUserPicks,
   loadAllUserPicks,
@@ -88,28 +94,18 @@ function buildCtxFromSnapshot(snap: IdbSnapshot, userId: string, authUser: AuthU
     allMissed.filter((m) => m.user_id === userId).map((m) => m.band_id),
   );
 
-  const myPresence = presence.find((p) => p.user_id === userId);
-  const isAtCamping = myPresence?.is_camping ?? false;
-  const isAtMetalPlace = myPresence?.is_at_metal_place ?? false;
-  let currentLocation: string | null;
-  if (isCurrentUserFriend) {
-    currentLocation = null;
-  } else if (isAtMetalPlace && metalPlaceWindowActive) {
-    currentLocation = 'metal_place';
-  } else if (isAtCamping) {
-    currentLocation = 'camping';
-  } else {
-    currentLocation = 'lost';
-  }
-
-  const crewLocationCounts = computeCrewLocationCounts(
+  const currentNow = now();
+  const crewPlans = mapCrewLivePlans(
     bands,
     allPicks,
     crewUsers,
     presence,
-    now(),
-    { metalPlaceWindowActive, liveTestBandId },
+    currentNow,
+    liveTestBandId ?? null,
   );
+  const crewGroups = groupCrewLivePlans(crewPlans, { metalPlaceWindowActive });
+  const currentLocation = deriveUserBadgeLocation(userId, crewGroups, isCurrentUserFriend);
+  const crewLocationCounts = crewLocationCountsFromGroups(crewGroups);
 
   const locationVisits = (authUser.user_metadata?.location_visits as Record<string, number>) ?? {};
   const achievedBadgeSlugs = mergedPersistedBadgeSlugs(authUser.user_metadata);
@@ -120,7 +116,7 @@ function buildCtxFromSnapshot(snap: IdbSnapshot, userId: string, authUser: AuthU
     allPickCounts,
     bandsById,
     userMissedIds,
-    now(),
+    currentNow,
     assignedBadges,
     locationVisits,
     currentLocation,
@@ -164,7 +160,7 @@ export function useBadgeContext(user: AuthUser) {
         metalPlaceConfig,
         currentNow,
       );
-      const liveTestBandId = liveBandTestConfig?.band_id ?? null;
+      const liveTestBandId = resolveLiveTestBandId(liveBandTestConfig);
       const liveContext = { metalPlaceWindowActive, liveTestBandId };
 
       const assignedBadgesFromMeta: string[] =

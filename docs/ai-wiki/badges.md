@@ -18,7 +18,7 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 | `src/services/badges/registry.ts` | `BADGES[]` array — all badge definitions + condition-examples reference |
 | `src/services/badges/index.ts` | Barrel re-export — preserves all existing `from '…/services/badges'` import paths |
 | `src/services/badges/persistMetadata.ts` | `mergedPersistedBadgeSlugs`, `persistMetadataPatch` — dual-key persist for crew location badges |
-| `src/services/livePreview.ts` | `computeCrewLocationCounts` — badge crew counts aligned with `/now` location cards |
+| `src/services/livePreview.ts` | `deriveUserBadgeLocation`, `crewLocationCountsFromGroups`, `computeCrewLocationCounts`, `resolveLiveTestBandId` — badge presence aligned with `/now` grouping |
 | `src/hooks/useBadgeContext.ts` | IDB-first badge context loading + events + Supabase metadata drift sync + persist recording |
 | `src/__tests__/badges.test.ts` | Condition engine + registry integration tests |
 | `src/__tests__/persistMetadata.test.ts` | Persist metadata merge/write tests |
@@ -512,7 +512,7 @@ Earned when user **is at a location AND N+ crew members are there** (permanent o
 - `lost-together` (15+ lost souls at once)
 
 **How it works**:
-1. `useBadgeContext` builds `crewLocationCounts` via `computeCrewLocationCounts()` in `livePreview.ts` — same grouping rules as `/now` (all non-friend crew; excludes users on a **current** band; friends invisible; Metal Place window respected).
+1. `useBadgeContext` runs `mapCrewLivePlans` → `groupCrewLivePlans` (same as `/now`), then `deriveUserBadgeLocation()` for the focus user and `crewLocationCountsFromGroups()` for crew counts.
 2. If user's `currentLocation` matches AND crew count ≥ N, badge is earned.
 3. Slug recorded permanently (even if crew later disperses). Crew-location badges write to **both** `achieved_badge_slugs` and `crew_earned_badge_slugs`; reads merge both keys.
 
@@ -775,8 +775,8 @@ type BadgeContext = {
   seenBands: BadgeBand[];              // Seen = after end_time, not opted-out
   missedBandIds: Set<string>;          // Opted-out via "didn't see" toggle
   locationVisits: Record<string, number>;  // { camping: 3, metal_place: 1 }
-  currentLocation: string | null;      // 'camping', 'metal_place', 'lost'
-  crewLocationCounts: Record<string, number>;  // From computeCrewLocationCounts — matches /now location cards
+  currentLocation: string | null;      // 'camping', 'metal_place', 'lost', or null (live band / friend)
+  crewLocationCounts: Record<string, number>;  // From crewLocationCountsFromGroups — matches /now location cards
   achievedBadgeSlugs: Set<string>;     // Merge of achieved_badge_slugs + crew_earned_badge_slugs
 };
 ```
@@ -1051,4 +1051,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-24 — Lost location badge fix: `computeCrewLocationCounts`, dual-key persist merge, `lost-together` threshold 15.
+**Last updated:** 2026-05-25 — Phase 27.B: `deriveUserBadgeLocation` shared with `/now` grouping; `resolveLiveTestBandId` enabled gate.

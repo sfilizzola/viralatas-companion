@@ -6,6 +6,7 @@ import {
   groupCrewLivePlans,
   mapCrewLivePlans,
   resolveFocusUserLivePlan,
+  resolveLiveTestBandId,
   type CrewLiveGroup,
   type CrewLivePlan,
   type LivePlan,
@@ -60,10 +61,7 @@ export function useNowPlans({
   );
 
   const liveTestBandId = useMemo(
-    () =>
-      liveBandTestConfig?.enabled && liveBandTestConfig.band_id
-        ? liveBandTestConfig.band_id
-        : null,
+    () => resolveLiveTestBandId(liveBandTestConfig),
     [liveBandTestConfig],
   );
 

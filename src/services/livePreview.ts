@@ -1,4 +1,4 @@
-import type { Band, CrewUser, UserPick, UserPresence } from '../types';
+import type { Band, CrewUser, LiveBandTestConfig, UserPick, UserPresence } from '../types';
 
 export type LivePlanStatus = 'current' | 'next' | 'empty' | 'lost';
 
@@ -31,6 +31,15 @@ export type CrewLiveGroup =
 export type PresenceLocation = 'auto' | 'camping' | 'metal_place';
 
 export type CrewGroupKind = CrewLiveGroup['kind'];
+
+/** Badge engine location for the focus user — aligned with /now crew grouping. */
+export type BadgeUserLocation = 'camping' | 'lost' | 'metal_place' | null;
+
+export function resolveLiveTestBandId(
+  config: LiveBandTestConfig | null | undefined,
+): string | null {
+  return config?.enabled && config.band_id ? config.band_id : null;
+}
 
 /**
  * Godlike "Live Band Test": when active, splice a virtual copy of the test band
@@ -264,6 +273,41 @@ export function groupCrewLivePlans(
   return result;
 }
 
+/** Maps /now crew group membership to badge currentLocation. */
+export function deriveUserBadgeLocation(
+  userId: string,
+  crewGroups: CrewLiveGroup[],
+  isCurrentUserFriend: boolean,
+): BadgeUserLocation {
+  if (isCurrentUserFriend) return null;
+
+  const group = findUserCrewGroup(userId, crewGroups);
+  if (!group) return 'lost';
+
+  switch (group.kind) {
+    case 'camping':
+      return 'camping';
+    case 'lost':
+      return 'lost';
+    case 'metal_place':
+      return 'metal_place';
+    case 'band':
+      return null;
+    default:
+      return null;
+  }
+}
+
+export function crewLocationCountsFromGroups(
+  groups: CrewLiveGroup[],
+): Record<'camping' | 'metal_place' | 'lost', number> {
+  return {
+    camping: groups.find((g) => g.kind === 'camping')?.members.length ?? 0,
+    metal_place: groups.find((g) => g.kind === 'metal_place')?.members.length ?? 0,
+    lost: groups.find((g) => g.kind === 'lost')?.members.length ?? 0,
+  };
+}
+
 /** Crew counts aligned with /now location cards — used by badge evaluation. */
 export function computeCrewLocationCounts(
   bands: Band[],
@@ -284,11 +328,7 @@ export function computeCrewLocationCounts(
   const groups = groupCrewLivePlans(crewPlans, {
     metalPlaceWindowActive: options?.metalPlaceWindowActive ?? true,
   });
-  return {
-    camping: groups.find((g) => g.kind === 'camping')?.members.length ?? 0,
-    metal_place: groups.find((g) => g.kind === 'metal_place')?.members.length ?? 0,
-    lost: groups.find((g) => g.kind === 'lost')?.members.length ?? 0,
-  };
+  return crewLocationCountsFromGroups(groups);
 }
 
 export function formatFestivalTime(iso: string): string {

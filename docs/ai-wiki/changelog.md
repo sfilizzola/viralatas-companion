@@ -4,6 +4,20 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-25 (Phase 27.B — Badge presence alignment)
+
+### Changed
+- **`src/services/livePreview.ts`** — Added `deriveUserBadgeLocation()`, `resolveLiveTestBandId()`, `crewLocationCountsFromGroups()`; badge `currentLocation` now derives from the same `groupCrewLivePlans` output as `/now`.
+- **`src/hooks/useBadgeContext.ts`** — Uses shared presence derivation; `liveTestBandId` gated on `enabled` via `resolveLiveTestBandId()`.
+- **`src/hooks/useNowPlans.ts`** — Reuses `resolveLiveTestBandId()` (DRY with badges).
+- **`src/__tests__/badgePresence.test.ts`** — Cross-domain contract tests: `/now` group kind ↔ badge location, count parity, live test enabled gate.
+
+### Architectural Notes
+- Fixes semantic drift: a vira-lata watching a live band was `'lost'` in badges but in a band card on `/now`; camping flag no longer overrides band group membership for `crew_at_location_min`.
+- Single pipeline: `mapCrewLivePlans` → `groupCrewLivePlans` → `deriveUserBadgeLocation` + `crewLocationCountsFromGroups`.
+
+---
+
 ## 2026-05-24 (Release v1.2.0)
 
 ### Changed
