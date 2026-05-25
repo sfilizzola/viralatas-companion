@@ -4,6 +4,24 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-25 (Phase 27.G — Decompose useBadgeContext)
+
+### Added
+- **`src/services/badges/badgeContextBuilder.ts`** — Pure `buildBadgeContextFromSnapshot()` + `BadgeIdbSnapshot` type + `EMPTY_BADGE_CONTEXT`.
+- **`src/hooks/useBadgeCache.ts`** — IDB loads, session read, presence/crew window events (mirror `useNowCache`).
+- **`src/hooks/useBadgePersist.ts`** — `special_badges` drift sync + `persistMetadataPatch` writes.
+- **`src/__tests__/badgeContextBuilder.test.ts`**, **`src/__tests__/useBadgeCache.test.ts`** — Pure builder and cache hook tests.
+
+### Changed
+- **`src/hooks/useBadgeContext.ts`** — Thin composer: `useBadgeCache` → `useBadgePersist`.
+- **`docs/ai-wiki/badges.md`** — Key files table updated for 27.G split.
+
+### Architectural Notes
+- Badge evaluation pipeline unchanged; `/now` parity logic stays in pure `buildBadgeContextFromSnapshot()`.
+- Mirrors Phase 26.M `/now` split: cache (IDB + events) → pure builder → persist side-effects → composer hook.
+
+---
+
 ## 2026-05-25 (Phase 27.F — IDB subscription caches)
 
 ### Added

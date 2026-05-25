@@ -23,7 +23,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 - [x] **27.D — Realtime in repositories:** `subscribeToRealtime()` on picks, announcements, presence, config repos (mirror `src/repositories/missed.ts`); remove Supabase→IDB writes from hooks
 - [x] **27.E — Offline-queue primitive:** shared `OptimisticQueue` with configurable dedup; migrate five repositories; uniform `flushOfflineQueue()` for coordinator
 - [x] **27.F — IDB subscription caches:** `useIdbSubscription` or `useSyncExternalStore` domain caches; derived hooks (`usePickCounts`, `useBandAttendees`, `useNowCache`, `useBadgeContext`) consume cache
-- **27.G — Decompose `useBadgeContext`:** `useBadgeCache` + `buildBadgeContextFromSnapshot()` + `useBadgePersist` + thin composer (mirror 26.M `/now` split)
+- [x] **27.G — Decompose `useBadgeContext`:** `useBadgeCache` + `buildBadgeContextFromSnapshot()` + `useBadgePersist` + thin composer (mirror 26.M `/now` split)
 - **27.H — Bands repository sync:** fold `src/lib/sync.ts` into `src/repositories/bands.ts`; delete pass-through module
 
 **Deferred (not in 27 scope — track in FUTURE_IDEAS.md if desired):**
