@@ -1,11 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  PICKS_CHANGED_EVENT,
-  loadAllUserPicks,
-  removeUserPick,
-  saveUserPick,
-} from '../lib/db';
-import { subscribePostgresChanges } from '../lib/realtimeSync';
+import { PICKS_CHANGED_EVENT, loadAllUserPicks } from '../lib/db';
 import type { UserPick } from '../types';
 
 export function countPicks(picks: UserPick[]) {
@@ -28,34 +22,11 @@ export function usePickCounts(): Record<string, number> {
     }
 
     refreshFromCache();
-
-    function handleLocalChange() {
-      refreshFromCache();
-    }
-
-    window.addEventListener(PICKS_CHANGED_EVENT, handleLocalChange);
-
-    const unsubscribeRealtime = subscribePostgresChanges('pick_counts', [
-      {
-        filter: { event: 'INSERT', table: 'user_picks' },
-        handler: async (payload) => {
-          const pick = payload.new as UserPick;
-          await saveUserPick(pick);
-        },
-      },
-      {
-        filter: { event: 'DELETE', table: 'user_picks' },
-        handler: async (payload) => {
-          const pick = payload.old as UserPick;
-          await removeUserPick(pick.user_id, pick.band_id);
-        },
-      },
-    ]);
+    window.addEventListener(PICKS_CHANGED_EVENT, refreshFromCache);
 
     return () => {
       active = false;
-      window.removeEventListener(PICKS_CHANGED_EVENT, handleLocalChange);
-      unsubscribeRealtime();
+      window.removeEventListener(PICKS_CHANGED_EVENT, refreshFromCache);
     };
   }, []);
 

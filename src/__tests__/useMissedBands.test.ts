@@ -32,7 +32,6 @@ vi.mock('../repositories', async (importOriginal) => {
     missedRepository: {
       ...actual.missedRepository,
       sync: vi.fn().mockResolvedValue(undefined),
-      subscribeToRealtime: vi.fn().mockReturnValue(() => {}),
     },
   };
 });

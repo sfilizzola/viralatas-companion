@@ -4,6 +4,31 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-25 (Phase 27.D — Realtime in repositories)
+
+### Added
+- **`src/components/sync/RealtimeSync.tsx`** — Mounts all Supabase Realtime → IndexedDB subscriptions once at app level via repository `subscribeToRealtime()` methods.
+- **`src/repositories/picks.ts`**, **`announcements.ts`**, **`presence.ts`**, **`users.ts`** — `subscribeToRealtime()` (presence also exports `subscribeToMetalPlaceConfigRealtime()`).
+- **`src/services/liveBandTest.ts`** — `subscribeToLiveBandTestConfigRealtime()`.
+- **`src/lib/db/events.ts`** — `BLOCKED_POSTERS_CHANGED_EVENT` for blocked-poster Realtime → hook refresh.
+- **`src/__tests__/RealtimeSync.test.tsx`** — Subscription mount and cleanup tests.
+
+### Changed
+- **`src/components/sync/SyncOrchestration.tsx`** — Mounts `RealtimeSync` alongside `ReconnectSync`.
+- **`src/hooks/usePickCounts.ts`**, **`useAnnouncements.ts`**, **`useMetalPlaceConfig.ts`**, **`useLiveBandTestConfig.ts`**, **`useMissedBands.ts`** — IDB reads + window events only; no Supabase Realtime ownership.
+- **`src/hooks/useNowData.ts`** — Removed `usePresenceRealtime()` composition.
+- **`docs/ai-wiki/sync-engine.md`**, **`architecture.md`**, **`decisions/custom-hooks-events-no-redux.md`** — Realtime subscription site = sync layer via repositories.
+
+### Removed
+- **`src/hooks/usePresenceRealtime.ts`** — Presence Realtime moved to `presenceRepository.subscribeToRealtime()` + `RealtimeSync`.
+
+### Architectural Notes
+- Hooks remain read-only IDB subscribers reacting to `viralatas:*` window events for remote updates.
+- `blocked_posters` Realtime emits `BLOCKED_POSTERS_CHANGED_EVENT`; `useAnnouncements` refetches via `usersRepository.fetchBlockedPosters()`.
+- Duck Realtime remains in `useDuckNotifications` (out of 27.D scope).
+
+---
+
 ## 2026-05-25 (Phase 27.E — Offline-queue primitive)
 
 ### Added

@@ -123,10 +123,10 @@ Hooks encapsulate state logic and subscriptions. They:
 | `useBands()` | Band catalog | IDB + `BANDS_CHANGED_EVENT` |
 | `useMyPicks()` | User's picks | IDB + window events |
 | `usePickActions()` | Pick toggle actions | Composes `useMyPicks` + `picksRepository.toggle` |
-| `useMissedBands()` | Missed-band state + actions | IDB + `MISSED_CHANGED_EVENT` + Realtime |
-| `useAnnouncements()` | Announcements mural state + actions | IDB + `ANNOUNCEMENTS_CHANGED_EVENT` + Realtime |
-| `usePickCounts()` | Attendance per band | IDB + Realtime + window events |
-| `useBandAttendees(bandId)` | Users going to a band | IDB + Realtime |
+| `useMissedBands()` | Missed-band state + actions | IDB + `MISSED_CHANGED_EVENT` |
+| `useAnnouncements()` | Announcements mural state + actions | IDB + `ANNOUNCEMENTS_CHANGED_EVENT` + `BLOCKED_POSTERS_CHANGED_EVENT` |
+| `usePickCounts()` | Attendance per band | IDB + `PICKS_CHANGED_EVENT` |
+| `useBandAttendees(bandId)` | Users going to a band | IDB + `PICKS_CHANGED_EVENT` / `CREW_USERS_CHANGED_EVENT` |
 | `useNowData()` | Current/next band for user | IDB + `useNow()` (time) |
 | `useBandConflicts(bandIds)` | Overlapping bands | Computed, no DB |
 | `useNow()` | Current time (with override) | localStorage + hook state |
@@ -135,37 +135,19 @@ Hooks encapsulate state logic and subscriptions. They:
 
 **Example: usePickCounts()**
 ```typescript
-// src/hooks/usePickCounts.ts
+// src/hooks/usePickCounts.ts — IDB read + window event only; Realtime owned by RealtimeSync
 export function usePickCounts(): Record<string, number> {
   const [counts, setCounts] = useState({});
 
   useEffect(() => {
-    // 1. Load from IDB
-    const picks = await loadAllUserPicks();
-    setCounts(countPicks(picks));
+    async function refreshFromCache() {
+      const picks = await loadAllUserPicks();
+      setCounts(countPicks(picks));
+    }
 
-    // 2. Sync from Supabase
-    picksRepository.syncCrewFromRemote().catch(() => {});
-
-    // 3. Listen to local changes
-    window.addEventListener(PICKS_CHANGED_EVENT, () => {
-      refreshFromCache();
-    });
-
-    // 4. Subscribe to Realtime
-    return subscribePostgresChanges('pick_counts', [
-      {
-        filter: { event: 'INSERT', table: 'user_picks' },
-        handler: async (payload) => saveUserPick(payload.new as UserPick),
-      },
-      {
-        filter: { event: 'DELETE', table: 'user_picks' },
-        handler: async (payload) => {
-          const pick = payload.old as UserPick;
-          await removeUserPick(pick.user_id, pick.band_id);
-        },
-      },
-    ]);
+    refreshFromCache();
+    window.addEventListener(PICKS_CHANGED_EVENT, refreshFromCache);
+    return () => window.removeEventListener(PICKS_CHANGED_EVENT, refreshFromCache);
   }, []);
 
   return counts;
@@ -441,15 +423,14 @@ INSERT into user_picks
 | `useBands()` | `{ bands, loading, refresh }` | `BANDS_CHANGED_EVENT` | SchedulePage, MyPicksPage, PopularPage, useNowData |
 | `useMyPicks()` | `{ pickedIds, refresh }` | `PICKS_CHANGED_EVENT` | Internal to `usePickActions` |
 | `usePickActions()` | `{ pickedIds, refresh, togglePick, pickBand, unpickBand }` | `PICKS_CHANGED_EVENT` | SchedulePage, MyPicksPage, PopularPage, ConflictSection, useNowData |
-| `useMissedBands()` | `{ allMissed, missedBandIds, missedCountsByBand, mark, unmark, toggleMissed, refresh }` | `MISSED_CHANGED_EVENT`, Realtime | MyPicksPage, PopularPage, `useBadgeContext` |
+| `useMissedBands()` | `{ allMissed, missedBandIds, missedCountsByBand, mark, unmark, toggleMissed, refresh }` | `MISSED_CHANGED_EVENT` | MyPicksPage, PopularPage, `useBadgeContext` |
 | `useBadgeContext(user)` | `{ ctx, loading }` | `PICKS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT`, auth `USER_UPDATED` | BadgesDisplay, ProfilePage |
 | `useBandDetailModal()` | `{ activeBand, openBand, closeBand, modalProps }` | None (local state + composed inputs) | MyPicksPage, PopularPage |
-| `useAnnouncements()` | `{ announcements, visibleAnnouncements, crewUsers, userRoles, blockedUserIds, pendingAnnouncementIds, loading, isBlocked, canModerate, loadMore, post, deleteAnnouncement, blockUser, pin, … }` | `ANNOUNCEMENTS_CHANGED_EVENT`, Realtime | AnnouncementsPage |
-| `usePickCounts()` | `Record<bandId, count>` | `PICKS_CHANGED_EVENT`, Realtime | RightNowPage, PopularPage — `countPicks` is an exported pure fn |
-| `useBandAttendees(bandId)` | `User[]` | Realtime | BandDetailModal |
-| `useMetalPlaceConfig()` | `MetalPlaceConfig \| null` | `METAL_PLACE_CONFIG_CHANGED_EVENT`, Realtime | useNowData |
-| `useLiveBandTestConfig()` | `LiveBandTestConfig \| null` | `LIVE_BAND_TEST_CONFIG_CHANGED_EVENT`, Realtime | useNowData |
-| `usePresenceRealtime()` | `void` | Realtime (`user_presence`), mount sync | useNowData |
+| `useAnnouncements()` | `{ announcements, visibleAnnouncements, crewUsers, userRoles, blockedUserIds, pendingAnnouncementIds, loading, isBlocked, canModerate, loadMore, post, deleteAnnouncement, blockUser, pin, … }` | `ANNOUNCEMENTS_CHANGED_EVENT`, `BLOCKED_POSTERS_CHANGED_EVENT` | AnnouncementsPage |
+| `usePickCounts()` | `Record<bandId, count>` | `PICKS_CHANGED_EVENT` | RightNowPage, PopularPage — `countPicks` is an exported pure fn |
+| `useBandAttendees(bandId)` | `User[]` | `PICKS_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT` | BandDetailModal |
+| `useMetalPlaceConfig()` | `MetalPlaceConfig \| null` | `METAL_PLACE_CONFIG_CHANGED_EVENT` | useNowData |
+| `useLiveBandTestConfig()` | `LiveBandTestConfig \| null` | `LIVE_BAND_TEST_CONFIG_CHANGED_EVENT` | useNowData |
 | `useNowCache(undoTimerId)` | `{ picks, crewUsers, presence, latestAnnouncement, cacheLoading }` | `PICKS_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, `ANNOUNCEMENTS_CHANGED_EVENT` | useNowData |
 | `useNowPlans({…})` | `{ myPlan, crewPlans, crewGroups, presenceValue, duckBandId, … }` | None (computed from cache + config + time) | useNowData |
 | `useNowData()` | `{ current, next }` | composes hooks above + `useNow()` | RightNowPage |
@@ -461,11 +442,11 @@ INSERT into user_picks
 
 | Repository | Key Methods | Side Effects |
 |------------|-------------|--------------|
-| `picksRepository` | `toggle()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `deduplicatePickQueue(ops)` (exported pure fn) | Writes IndexedDB, enqueues offline, calls Supabase |
-| `announcementsRepository` | `post()`, `sync()`, `delete()`, `flushPending()`, `pinAnnouncement()`, `unpinAnnouncement()` | Writes IndexedDB, enqueues pending |
-| `presenceRepository` | `update()`, `syncCrewFromRemote()`, `flushOfflineQueue()` | Writes IndexedDB, enqueues offline |
-| `usersRepository` | `syncCrew()`, `fetchUserRolesMap()`, `fetchAllUsers()`, `setUserRole()`, `fetchBlockedPosters*()`, `blockUser()`, `unblockUser()` | Writes crew_users IDB (syncCrew); admin ops network-only |
-| `missedRepository` | `toggle()`, `flushOfflineQueue()` | Writes IndexedDB, enqueues offline |
+| `picksRepository` | `toggle()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues offline, calls Supabase |
+| `announcementsRepository` | `post()`, `sync()`, `delete()`, `flushPending()`, `pinAnnouncement()`, `unpinAnnouncement()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues pending |
+| `presenceRepository` | `update()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `subscribeToRealtime()`, `subscribeToMetalPlaceConfigRealtime()` | Writes IndexedDB, enqueues offline |
+| `usersRepository` | `syncCrew()`, `fetchUserRolesMap()`, `fetchAllUsers()`, `setUserRole()`, `fetchBlockedPosters*()`, `blockUser()`, `unblockUser()`, `subscribeToRealtime()` | Writes crew_users IDB (syncCrew); admin ops network-only |
+| `missedRepository` | `toggle()`, `flushOfflineQueue()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues offline |
 | `bandsRepository` | `checkAndApplyCacheVersion()`, `loadBands()` | Wipes IDB if cache version changes |
 
 ### Services (src/services/)

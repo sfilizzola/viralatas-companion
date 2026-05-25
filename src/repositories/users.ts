@@ -1,4 +1,6 @@
 import { saveCrewUsers } from '../lib/db';
+import { BLOCKED_POSTERS_CHANGED_EVENT } from '../lib/db';
+import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { supabase } from '../lib/supabase';
 import type { BlockedPoster, CrewUser, UserRole } from '../types';
 
@@ -92,6 +94,23 @@ async function unblockUser(userId: string): Promise<void> {
   await supabase.from('blocked_posters').delete().eq('user_id', userId);
 }
 
+function subscribeToRealtime(): () => void {
+  return subscribePostgresChanges('blocked_posters_live', [
+    {
+      filter: { event: 'INSERT', table: 'blocked_posters' },
+      handler: () => {
+        window.dispatchEvent(new Event(BLOCKED_POSTERS_CHANGED_EVENT));
+      },
+    },
+    {
+      filter: { event: 'DELETE', table: 'blocked_posters' },
+      handler: () => {
+        window.dispatchEvent(new Event(BLOCKED_POSTERS_CHANGED_EVENT));
+      },
+    },
+  ]);
+}
+
 export const usersRepository = {
   syncCrew,
   fetchUserRolesMap,
@@ -101,4 +120,5 @@ export const usersRepository = {
   fetchBlockedPostersWithUserDetails,
   blockUser,
   unblockUser,
+  subscribeToRealtime,
 };

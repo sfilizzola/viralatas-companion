@@ -8,7 +8,6 @@ import { useAuth } from './useAuth';
 import { useBands } from './useBands';
 import { useLiveBandTestConfig } from './useLiveBandTestConfig';
 import { useMetalPlaceConfig } from './useMetalPlaceConfig';
-import { usePresenceRealtime } from './usePresenceRealtime';
 import { useNowCache } from './useNowCache';
 import { useNowPlans } from './useNowPlans';
 import { useNow } from './useNow';
@@ -59,7 +58,6 @@ export function useNowData(): NowData {
   const [undoTimerId, setUndoTimerId] = useState<ReturnType<typeof setTimeout> | null>(null);
   const metalPlaceConfig = useMetalPlaceConfig();
   const liveBandTestConfig = useLiveBandTestConfig();
-  usePresenceRealtime();
 
   const { picks, crewUsers, presence, latestAnnouncement, cacheLoading } =
     useNowCache(undoTimerId);

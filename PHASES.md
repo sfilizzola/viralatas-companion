@@ -20,7 +20,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 - [x] **27.A — Complete `wipeAllLocalData`:** extend `src/lib/db/meta.ts` to clear `offline_duck_quacks`, `metal_place_config`, `live_band_test_config` (and any future non-session stores); test against `src/lib/db/connection.ts` store list
 - [x] **27.B — Badge presence alignment:** `deriveUserBadgeLocation()` shared with `/now` grouping; gate `liveTestBandId` on `enabled`; cross-domain contract tests via `src/__tests__/fixtures/liveNowScenarios.ts`
 - [x] **27.C — Sync coordinator:** deepen `src/components/sync/SyncOrchestration.tsx` — single reconnect contract (flush all queues → pull remote → `viralatas:sync-complete`); fix Duck mount-flush and missed-band online gap
-- **27.D — Realtime in repositories:** `subscribeToRealtime()` on picks, announcements, presence, config repos (mirror `src/repositories/missed.ts`); remove Supabase→IDB writes from hooks
+- [x] **27.D — Realtime in repositories:** `subscribeToRealtime()` on picks, announcements, presence, config repos (mirror `src/repositories/missed.ts`); remove Supabase→IDB writes from hooks
 - [x] **27.E — Offline-queue primitive:** shared `OptimisticQueue` with configurable dedup; migrate five repositories; uniform `flushOfflineQueue()` for coordinator
 - **27.F — IDB subscription caches:** `useIdbSubscription` or `useSyncExternalStore` domain caches; derived hooks (`usePickCounts`, `useBandAttendees`, `useNowCache`, `useBadgeContext`) consume cache
 - **27.G — Decompose `useBadgeContext`:** `useBadgeCache` + `buildBadgeContextFromSnapshot()` + `useBadgePersist` + thin composer (mirror 26.M `/now` split)
@@ -36,13 +36,13 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 - [x] 27.A shipped
 - [x] 27.B shipped (correctness fixes + contract tests green)
 - [x] 27.C shipped (sync coordinator reconnect contract)
-- [ ] 27.D shipped (hooks no longer own Realtime)
+- [x] 27.D shipped (hooks no longer own Realtime)
 - [x] 27.E shipped (shared OptimisticQueue; uniform flush API)
 - [ ] `rtk npm run build` green
 - [ ] `rtk npm test` green; new tests for wipe, badge presence parity, queue dedup, coordinator reconnect
 - [ ] Offline-first invariants preserved — no presentation-layer Supabase reads
 - [ ] Wiki updated: `architecture.md`, `sync-engine.md`, `offline-first.md`, `flows/live-now.md`, `badges.md`, `changelog.md`
-- [ ] ADR amendment: `docs/ai-wiki/decisions/custom-hooks-events-no-redux.md` — Realtime subscription site = sync layer
+- [x] ADR amendment: `docs/ai-wiki/decisions/custom-hooks-events-no-redux.md` — Realtime subscription site = sync layer
 - [ ] Phase entry appended to `docs/ai-wiki/phases-history.md`; PHASES.md bumped to Phase 28 TBD
 
 **Recommended execution order:** 27.A → 27.B → (27.C + 27.D + 27.E as a batch) → 27.F → 27.G → 27.H

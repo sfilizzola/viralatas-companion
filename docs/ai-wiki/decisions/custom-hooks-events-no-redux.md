@@ -118,6 +118,7 @@ export const ANNOUNCEMENTS_CHANGED_EVENT = 'viralatas:announcements-changed';
 export const METAL_PLACE_CONFIG_CHANGED_EVENT = 'viralatas:metal-place-config-changed';
 export const LIVE_BAND_TEST_CONFIG_CHANGED_EVENT = 'viralatas:live-band-test-config-changed';
 export const MISSED_CHANGED_EVENT     = 'viralatas:missed-changed';
+export const BLOCKED_POSTERS_CHANGED_EVENT = 'viralatas:blocked-posters-changed';
 ```
 
 ### Emission (Repository Layer)
@@ -181,7 +182,7 @@ This pattern is optimal for **IDB-synced data** with **multiple independent read
 ✅ Each hook is self-contained and independently testable
 ✅ Zero-boilerplate: new data type → new IDB store + event constant + hook → done
 ✅ Event-driven decoupling: repositories and hooks are completely independent
-✅ Realtime and window events use the same subscription pattern — hooks handle both uniformly
+✅ Realtime writes to IDB in repositories; hooks subscribe to window events only — same refresh path for local and remote updates
 ✅ Small bundle size: 0 extra state management dependencies
 
 ### Negative
@@ -215,7 +216,7 @@ This pattern is optimal for **IDB-synced data** with **multiple independent read
 
 ### Hook Lifecycle Pattern
 
-Every hook follows this pattern:
+Every data hook follows this pattern (Realtime is **not** mounted in hooks):
 
 ```typescript
 export function useX(params): X {
@@ -230,16 +231,8 @@ export function useX(params): X {
     refresh();                                       // Initial load
     window.addEventListener(X_CHANGED_EVENT, refresh); // IDB subscription
 
-    // Realtime subscription (optional, for live crew data)
-    const channel = supabase.channel('x')
-      .on('postgres_changes', {...}, async (payload) => {
-        await saveX(payload.new);  // Update IDB → emits X_CHANGED_EVENT
-      })
-      .subscribe();
-
     return () => {
       window.removeEventListener(X_CHANGED_EVENT, refresh);
-      supabase.removeChannel(channel);
     };
   }, [params]);
 
@@ -247,13 +240,30 @@ export function useX(params): X {
 }
 ```
 
+### Realtime Subscription Site (Phase 27.D)
+
+Supabase Realtime → IndexedDB writes live in **repository `subscribeToRealtime()` methods**, mounted once by **`RealtimeSync`** in the sync layer (`SyncOrchestration`). Hooks never call `subscribePostgresChanges` directly.
+
+```typescript
+// src/components/sync/RealtimeSync.tsx
+useEffect(() => {
+  const unsubscribers = [
+    picksRepository.subscribeToRealtime(),
+    announcementsRepository.subscribeToRealtime(),
+    presenceRepository.subscribeToRealtime(),
+    // ...
+  ];
+  return () => unsubscribers.forEach((u) => u());
+}, []);
+```
+
 ### Realtime + Window Event Integration
 
-Realtime subscriptions write to IDB, which emits a window event, which the hook handles. There is no special Realtime code path — Realtime just updates IDB like any other write.
+Realtime subscriptions write to IDB (via repositories), which emits a window event, which the hook handles. There is no special Realtime code path in hooks — Realtime just updates IDB like any other write.
 
 ```
 Realtime: postgres_changes INSERT
-  → saveUserPick(payload.new)  [IDB write]
+  → picksRepository handler → saveUserPick(payload.new)  [IDB write]
   → PICKS_CHANGED_EVENT        [window event]
   → usePickCounts.refresh()    [IDB read]
   → setState(newCounts)        [React update]
@@ -270,8 +280,9 @@ Realtime: postgres_changes INSERT
 
 ## Revision History
 
+- **2026-05-25**: Phase 27.D — Realtime subscription site moved from hooks to sync layer (`RealtimeSync` + repository `subscribeToRealtime()`)
 - **2026-05**: Initial decision, accepted based on project requirements
 
 ---
 
-**Last updated:** 2026-05-12
+**Last updated:** 2026-05-25

@@ -2,14 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { Announcement, CrewUser, UserRole } from '../types';
 import {
   ANNOUNCEMENTS_CHANGED_EVENT,
+  BLOCKED_POSTERS_CHANGED_EVENT,
   loadAnnouncementsFromCache,
   loadCrewUsers,
   loadOfflineAnnouncementsQueue,
-  removeAnnouncementFromCache,
-  saveAnnouncement,
 } from '../lib/db';
 import { announcementsRepository, usersRepository } from '../repositories';
-import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { applyPinSort } from '../services/announcementsDisplay';
 
 const PAGE_SIZE = 10;
@@ -144,52 +142,14 @@ export function useAnnouncements(userId: string | null) {
   }, [userId]);
 
   useEffect(() => {
-    usersRepository.fetchBlockedPosters().then((blocked) => {
+    async function refreshBlockedUserIds() {
+      const blocked = await usersRepository.fetchBlockedPosters();
       setBlockedUserIds(new Set(blocked.map((b) => b.user_id)));
-    });
+    }
 
-    const unsubscribeRealtime = subscribePostgresChanges('announcements_live', [
-      {
-        filter: { event: 'INSERT', table: 'announcements' },
-        handler: async (payload) => {
-          await saveAnnouncement(payload.new as Announcement);
-        },
-      },
-      {
-        filter: { event: 'UPDATE', table: 'announcements' },
-        handler: async (payload) => {
-          await saveAnnouncement(payload.new as Announcement);
-        },
-      },
-      {
-        filter: { event: 'DELETE', table: 'announcements' },
-        handler: async (payload) => {
-          await removeAnnouncementFromCache(payload.old.id as string);
-        },
-      },
-      {
-        filter: { event: 'INSERT', table: 'blocked_posters' },
-        handler: async (payload) => {
-          const blocked = payload.new as { user_id: string };
-          setBlockedUserIds((prev) => new Set([...prev, blocked.user_id]));
-        },
-      },
-      {
-        filter: { event: 'DELETE', table: 'blocked_posters' },
-        handler: async (payload) => {
-          const unblocked = payload.old as { user_id: string };
-          setBlockedUserIds((prev) => {
-            const next = new Set(prev);
-            next.delete(unblocked.user_id);
-            return next;
-          });
-        },
-      },
-    ]);
-
-    return () => {
-      unsubscribeRealtime();
-    };
+    refreshBlockedUserIds();
+    window.addEventListener(BLOCKED_POSTERS_CHANGED_EVENT, refreshBlockedUserIds);
+    return () => window.removeEventListener(BLOCKED_POSTERS_CHANGED_EVENT, refreshBlockedUserIds);
   }, []);
 
   return {

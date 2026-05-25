@@ -459,29 +459,30 @@ export const bandsRepository = {
 
 ## Realtime Subscriptions
 
-Each subscription is managed by a hook or repository and cleaned up on unmount via `subscribePostgresChanges` (`src/lib/realtimeSync.ts`).
+All Realtime → IndexedDB writes are mounted once in **`RealtimeSync`** (`src/components/sync/SyncOrchestration.tsx`) via repository `subscribeToRealtime()` methods. Hooks react to window events only — they do not own Supabase channels.
 
 | Consumer | Channel | Events | Action |
 |------|---------|--------|--------|
-| usePickCounts | pick_counts | INSERT, DELETE on user_picks | Saves to user_picks IDB |
-| useMetalPlaceConfig | metal_place_config_live | * on metal_place_config | Saves to metal_place_config IDB |
-| useLiveBandTestConfig | live_band_test_config_live | * on live_band_test_config | Saves to live_band_test_config IDB |
-| usePresenceRealtime | user_presence_live | * on user_presence | Saves to user_presence IDB |
-| AnnouncementsPage | announcements_live | INSERT/UPDATE/DELETE announcements; INSERT/DELETE blocked_posters | IDB + local block-set state |
+| picksRepository | pick_counts | INSERT, DELETE on user_picks | Saves to user_picks IDB |
+| presenceRepository | metal_place_config_live | * on metal_place_config | Saves to metal_place_config IDB |
+| liveBandTest service | live_band_test_config_live | * on live_band_test_config | Saves to live_band_test_config IDB |
+| presenceRepository | user_presence_live | * on user_presence | Saves to user_presence IDB |
+| announcementsRepository | announcements_live | INSERT/UPDATE/DELETE announcements | Saves to announcements IDB |
+| usersRepository | blocked_posters_live | INSERT/DELETE blocked_posters | Emits `BLOCKED_POSTERS_CHANGED_EVENT` |
 | useDuckNotifications | duck_quacks_realtime | INSERT on duck_quacks | Dispatches `viralatas:duck-quack` event |
 | missedRepository | missed_bands | INSERT, DELETE on user_missed_bands | Saves to user_missed_bands IDB |
 
-**Subscription lifecycle**:
+**Subscription lifecycle** (sync layer):
 ```typescript
-import { subscribePostgresChanges } from '../lib/realtimeSync';
-
+// src/components/sync/RealtimeSync.tsx
 useEffect(() => {
-  return subscribePostgresChanges('pick_counts', [
-    {
-      filter: { event: 'INSERT', table: 'user_picks' },
-      handler: async (payload) => saveUserPick(payload.new as UserPick),
-    },
-  ]);
+  const unsubscribers = [
+    picksRepository.subscribeToRealtime(),
+    announcementsRepository.subscribeToRealtime(),
+    presenceRepository.subscribeToRealtime(),
+    // ...
+  ];
+  return () => unsubscribers.forEach((u) => u());
 }, []);
 ```
 

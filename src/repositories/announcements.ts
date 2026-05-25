@@ -8,6 +8,7 @@ import {
   saveAnnouncements,
 } from '../lib/db';
 import { createOptimisticQueue } from '../lib/optimisticQueue';
+import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { supabase } from '../lib/supabase';
 
 const INITIAL_SYNC_LIMIT = 10;
@@ -156,6 +157,29 @@ async function unpinAnnouncement(id: string): Promise<void> {
     .eq('id', id);
 }
 
+function subscribeToRealtime(): () => void {
+  return subscribePostgresChanges('announcements_live', [
+    {
+      filter: { event: 'INSERT', table: 'announcements' },
+      handler: async (payload) => {
+        await saveAnnouncement(payload.new as Announcement);
+      },
+    },
+    {
+      filter: { event: 'UPDATE', table: 'announcements' },
+      handler: async (payload) => {
+        await saveAnnouncement(payload.new as Announcement);
+      },
+    },
+    {
+      filter: { event: 'DELETE', table: 'announcements' },
+      handler: async (payload) => {
+        await removeAnnouncementFromCache(payload.old.id as string);
+      },
+    },
+  ]);
+}
+
 export const announcementsRepository = {
   sync,
   fetchMore,
@@ -167,4 +191,5 @@ export const announcementsRepository = {
   fetchIsBlocked,
   pinAnnouncement,
   unpinAnnouncement,
+  subscribeToRealtime,
 };

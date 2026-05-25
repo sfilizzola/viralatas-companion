@@ -1,3 +1,4 @@
+import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { supabase } from '../lib/supabase';
 import {
   saveUserPick,
@@ -118,9 +119,28 @@ async function flushOfflineQueue(): Promise<number> {
   return pickOfflineQueue.flush();
 }
 
+function subscribeToRealtime(): () => void {
+  return subscribePostgresChanges('pick_counts', [
+    {
+      filter: { event: 'INSERT', table: 'user_picks' },
+      handler: async (payload) => {
+        await saveUserPick(payload.new as UserPick);
+      },
+    },
+    {
+      filter: { event: 'DELETE', table: 'user_picks' },
+      handler: async (payload) => {
+        const pick = payload.old as UserPick;
+        await removeUserPick(pick.user_id, pick.band_id);
+      },
+    },
+  ]);
+}
+
 export const picksRepository = {
   toggle,
   syncForUser,
   syncCrewFromRemote,
   flushOfflineQueue,
+  subscribeToRealtime,
 };

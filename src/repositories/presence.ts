@@ -11,6 +11,7 @@ import {
 } from '../lib/db';
 import { createOptimisticQueue } from '../lib/optimisticQueue';
 import type { OfflinePresenceOp } from '../lib/db';
+import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { supabase } from '../lib/supabase';
 import { getFestivalDay, now } from '../services/time';
 
@@ -273,6 +274,26 @@ async function validateAndAutoCheckout(
   }
 }
 
+function subscribeToRealtime(): () => void {
+  return subscribePostgresChanges('user_presence_live', {
+    filter: { event: '*', table: 'user_presence' },
+    handler: async (payload) => {
+      const nextPresence = (payload.new ?? payload.old) as UserPresence | undefined;
+      if (nextPresence) await saveUserPresence(nextPresence);
+    },
+  });
+}
+
+function subscribeToMetalPlaceConfigRealtime(): () => void {
+  return subscribePostgresChanges('metal_place_config_live', {
+    filter: { event: '*', table: 'metal_place_config' },
+    handler: async (payload) => {
+      const next = (payload.new ?? payload.old) as MetalPlaceConfig | undefined;
+      if (next) await saveMetalPlaceConfig(next);
+    },
+  });
+}
+
 export const presenceRepository = {
   setCampingStatus,
   setMetalPlaceStatus,
@@ -285,4 +306,6 @@ export const presenceRepository = {
   isTimeWithinMetalPlaceWindow,
   autoCheckoutAllUsers,
   validateAndAutoCheckout,
+  subscribeToRealtime,
+  subscribeToMetalPlaceConfigRealtime,
 };

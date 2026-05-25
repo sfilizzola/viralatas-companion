@@ -7,6 +7,7 @@ export {
   MISSED_CHANGED_EVENT,
   PICKS_CHANGED_EVENT,
   PRESENCE_CHANGED_EVENT,
+  BLOCKED_POSTERS_CHANGED_EVENT,
 } from './events';
 export type { OfflineDuckQuackOp, OfflineMissedOp, OfflinePickOp, OfflinePresenceOp } from './types';
 export {

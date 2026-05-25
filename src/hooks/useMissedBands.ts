@@ -24,13 +24,11 @@ export function useMissedBands(userId: string | null) {
 
     load();
 
-    const unsubscribeRealtime = missedRepository.subscribeToRealtime();
     window.addEventListener(MISSED_CHANGED_EVENT, handleChange);
 
     return () => {
       active = false;
       window.removeEventListener(MISSED_CHANGED_EVENT, handleChange);
-      unsubscribeRealtime();
     };
   }, [userId]);
 

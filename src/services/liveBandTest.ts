@@ -1,5 +1,6 @@
 import type { LiveBandTestConfig } from '../types';
 import { saveLiveBandTestConfig } from '../lib/db';
+import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { supabase } from '../lib/supabase';
 
 export async function syncLiveBandTestConfig(): Promise<void> {
@@ -22,4 +23,14 @@ export async function saveLiveBandTestConfigRemote(config: LiveBandTestConfig): 
   }
 
   await saveLiveBandTestConfig(config);
+}
+
+export function subscribeToLiveBandTestConfigRealtime(): () => void {
+  return subscribePostgresChanges('live_band_test_config_live', {
+    filter: { event: '*', table: 'live_band_test_config' },
+    handler: async (payload) => {
+      const next = (payload.new ?? payload.old) as LiveBandTestConfig | undefined;
+      if (next) await saveLiveBandTestConfig(next);
+    },
+  });
 }
