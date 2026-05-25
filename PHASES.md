@@ -21,7 +21,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 - [x] **27.B — Badge presence alignment:** `deriveUserBadgeLocation()` shared with `/now` grouping; gate `liveTestBandId` on `enabled`; cross-domain contract tests via `src/__tests__/fixtures/liveNowScenarios.ts`
 - [x] **27.C — Sync coordinator:** deepen `src/components/sync/SyncOrchestration.tsx` — single reconnect contract (flush all queues → pull remote → `viralatas:sync-complete`); fix Duck mount-flush and missed-band online gap
 - **27.D — Realtime in repositories:** `subscribeToRealtime()` on picks, announcements, presence, config repos (mirror `src/repositories/missed.ts`); remove Supabase→IDB writes from hooks
-- **27.E — Offline-queue primitive:** shared `OptimisticQueue` with configurable dedup; migrate five repositories; uniform `flushAll()` for coordinator
+- [x] **27.E — Offline-queue primitive:** shared `OptimisticQueue` with configurable dedup; migrate five repositories; uniform `flushOfflineQueue()` for coordinator
 - **27.F — IDB subscription caches:** `useIdbSubscription` or `useSyncExternalStore` domain caches; derived hooks (`usePickCounts`, `useBandAttendees`, `useNowCache`, `useBadgeContext`) consume cache
 - **27.G — Decompose `useBadgeContext`:** `useBadgeCache` + `buildBadgeContextFromSnapshot()` + `useBadgePersist` + thin composer (mirror 26.M `/now` split)
 - **27.H — Bands repository sync:** fold `src/lib/sync.ts` into `src/repositories/bands.ts`; delete pass-through module
@@ -36,7 +36,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 - [x] 27.A shipped
 - [x] 27.B shipped (correctness fixes + contract tests green)
 - [x] 27.C shipped (sync coordinator reconnect contract)
-- [ ] 27.D–27.E shipped (hooks no longer own Realtime; queue dedup documented)
+- [ ] 27.D shipped (hooks no longer own Realtime)
+- [x] 27.E shipped (shared OptimisticQueue; uniform flush API)
 - [ ] `rtk npm run build` green
 - [ ] `rtk npm test` green; new tests for wipe, badge presence parity, queue dedup, coordinator reconnect
 - [ ] Offline-first invariants preserved — no presentation-layer Supabase reads

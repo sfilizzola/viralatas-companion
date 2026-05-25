@@ -8,7 +8,7 @@ export {
   PICKS_CHANGED_EVENT,
   PRESENCE_CHANGED_EVENT,
 } from './events';
-export type { OfflineDuckQuackOp, OfflinePickOp } from './types';
+export type { OfflineDuckQuackOp, OfflineMissedOp, OfflinePickOp, OfflinePresenceOp } from './types';
 export {
   resetDbConnectionForTests,
   VIRALATAS_OBJECT_STORES,

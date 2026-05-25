@@ -15,8 +15,8 @@ export async function runReconnectSync(userId: string): Promise<number> {
   const [picksFlushed, presenceFlushed, announcementsFlushed, duckFlushed] = await Promise.all([
     picksRepository.flushOfflineQueue(),
     presenceRepository.flushOfflineQueue(),
-    announcementsRepository.flushPending(),
-    duckRepository.flushOfflineDucks(),
+    announcementsRepository.flushOfflineQueue(),
+    duckRepository.flushOfflineQueue(),
     missedRepository.flushOfflineQueue(),
   ]);
 

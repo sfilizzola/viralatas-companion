@@ -9,7 +9,34 @@ import {
   loadOfflineMissedQueue,
   removeFromOfflineMissedQueue,
 } from '../lib/db';
+import { createOptimisticQueue } from '../lib/optimisticQueue';
+import type { OfflineMissedOp } from '../lib/db';
 import type { UserMissedBand } from '../types';
+
+const missedOfflineQueue = createOptimisticQueue<OfflineMissedOp>(
+  {
+    load: loadOfflineMissedQueue,
+    remove: removeFromOfflineMissedQueue,
+  },
+  {
+    getId: (op) => op.id,
+    dedup: { strategy: 'byId' },
+    syncOne: async (op) => {
+      if (op.action === 'add') {
+        return supabase.from('user_missed_bands').upsert({
+          user_id: op.user_id,
+          band_id: op.band_id,
+          marked_at: op.marked_at,
+        });
+      }
+      return supabase
+        .from('user_missed_bands')
+        .delete()
+        .eq('user_id', op.user_id)
+        .eq('band_id', op.band_id);
+    },
+  },
+);
 
 async function loadAll(): Promise<UserMissedBand[]> {
   return loadAllMissedBands();
@@ -49,31 +76,8 @@ async function unmark(userId: string, bandId: string): Promise<void> {
   }
 }
 
-async function flushOfflineQueue(): Promise<void> {
-  const queue = await loadOfflineMissedQueue();
-  if (queue.length === 0) return;
-
-  const groups = new Map<string, (typeof queue)[0]>();
-  for (const op of queue) {
-    groups.set(op.id, op);
-  }
-
-  for (const op of groups.values()) {
-    const { error } =
-      op.action === 'add'
-        ? await supabase
-            .from('user_missed_bands')
-            .upsert({ user_id: op.user_id, band_id: op.band_id, marked_at: op.marked_at })
-        : await supabase
-            .from('user_missed_bands')
-            .delete()
-            .eq('user_id', op.user_id)
-            .eq('band_id', op.band_id);
-
-    if (!error) {
-      await removeFromOfflineMissedQueue(op.id);
-    }
-  }
+async function flushOfflineQueue(): Promise<number> {
+  return missedOfflineQueue.flush();
 }
 
 async function syncFromRemote(userId: string): Promise<void> {

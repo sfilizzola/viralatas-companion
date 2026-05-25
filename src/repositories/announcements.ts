@@ -7,9 +7,34 @@ import {
   saveAnnouncement,
   saveAnnouncements,
 } from '../lib/db';
+import { createOptimisticQueue } from '../lib/optimisticQueue';
 import { supabase } from '../lib/supabase';
 
 const INITIAL_SYNC_LIMIT = 10;
+
+const announcementOfflineQueue = createOptimisticQueue<Announcement>(
+  {
+    load: loadOfflineAnnouncementsQueue,
+    remove: removeFromOfflineAnnouncementsQueue,
+  },
+  {
+    getId: (item) => item.id,
+    dedup: { strategy: 'fifo' },
+    syncOne: async (item) => {
+      const { data, error } = await supabase
+        .from('announcements')
+        .insert({ author_id: item.author_id, content: item.content })
+        .select()
+        .single();
+      if (error) return { error };
+      if (data) await saveAnnouncement(data as Announcement);
+      return { error: null };
+    },
+    onBatchSynced: async (item) => {
+      await removeAnnouncementFromCache(item.id);
+    },
+  },
+);
 
 async function sync(): Promise<void> {
   const { data, error } = await supabase
@@ -85,26 +110,13 @@ async function deleteAnnouncement(id: string): Promise<void> {
   }
 }
 
+async function flushOfflineQueue(): Promise<number> {
+  return announcementOfflineQueue.flush();
+}
+
+/** @deprecated Use flushOfflineQueue — kept for callers not yet migrated. */
 async function flushPending(): Promise<number> {
-  const queue = await loadOfflineAnnouncementsQueue();
-  if (queue.length === 0) return 0;
-
-  let flushed = 0;
-  for (const item of queue) {
-    const { data, error } = await supabase
-      .from('announcements')
-      .insert({ author_id: item.author_id, content: item.content })
-      .select()
-      .single();
-
-    if (!error) {
-      await removeFromOfflineAnnouncementsQueue(item.id);
-      await removeAnnouncementFromCache(item.id);
-      if (data) await saveAnnouncement(data as Announcement);
-      flushed++;
-    }
-  }
-  return flushed;
+  return flushOfflineQueue();
 }
 
 async function fetchCurrentUserRole(userId: string): Promise<UserRole> {
@@ -126,7 +138,6 @@ async function fetchIsBlocked(userId: string): Promise<boolean> {
 }
 
 async function pinAnnouncement(id: string): Promise<void> {
-  // Unpin all, then pin the target
   await supabase
     .from('announcements')
     .update({ is_pinned: false })
@@ -150,6 +161,7 @@ export const announcementsRepository = {
   fetchMore,
   post,
   delete: deleteAnnouncement,
+  flushOfflineQueue,
   flushPending,
   fetchCurrentUserRole,
   fetchIsBlocked,

@@ -9,6 +9,8 @@ import {
   saveMetalPlaceConfig,
   saveUserPresence,
 } from '../lib/db';
+import { createOptimisticQueue } from '../lib/optimisticQueue';
+import type { OfflinePresenceOp } from '../lib/db';
 import { supabase } from '../lib/supabase';
 import { getFestivalDay, now } from '../services/time';
 
@@ -16,6 +18,30 @@ function presenceOpId(userId: string) {
   const unique = crypto.randomUUID?.() ?? `${Date.now()}:${Math.random()}`;
   return `${userId}:presence:${unique}`;
 }
+
+const presenceOfflineQueue = createOptimisticQueue<OfflinePresenceOp>(
+  {
+    load: loadOfflinePresenceQueue,
+    remove: removeFromOfflinePresenceQueue,
+  },
+  {
+    getId: (op) => op.id,
+    dedup: {
+      strategy: 'keepLast',
+      groupKey: (op) => op.user_id,
+      sortKey: (op) => op.updated_at,
+    },
+    syncOne: async (op) => {
+      const presence: UserPresence = {
+        user_id: op.user_id,
+        is_camping: op.is_camping,
+        is_at_metal_place: op.is_at_metal_place ?? false,
+        updated_at: op.updated_at,
+      };
+      return supabase.from('user_presence').upsert(presence);
+    },
+  },
+);
 
 async function incrementLocationVisit(location: 'camping' | 'metal_place'): Promise<void> {
   const { data } = await supabase.auth.getUser();
@@ -72,38 +98,7 @@ async function syncCrewFromRemote(): Promise<void> {
 }
 
 async function flushOfflineQueue(): Promise<number> {
-  const queue = (await loadOfflinePresenceQueue()).sort((a, b) =>
-    a.updated_at.localeCompare(b.updated_at),
-  );
-  if (queue.length === 0) return 0;
-
-  const latestByUser = new Map<string, { allIds: string[]; presence: UserPresence }>();
-  for (const item of queue) {
-    const existing = latestByUser.get(item.user_id);
-    const presence: UserPresence = {
-      user_id: item.user_id,
-      is_camping: item.is_camping,
-      is_at_metal_place: item.is_at_metal_place ?? false,
-      updated_at: item.updated_at,
-    };
-
-    if (existing) {
-      existing.allIds.push(item.id);
-      existing.presence = presence;
-    } else {
-      latestByUser.set(item.user_id, { allIds: [item.id], presence });
-    }
-  }
-
-  let flushed = 0;
-  for (const { allIds, presence } of latestByUser.values()) {
-    const { error } = await supabase.from('user_presence').upsert(presence);
-    if (!error) {
-      await Promise.all(allIds.map((id) => removeFromOfflinePresenceQueue(id)));
-      flushed += allIds.length;
-    }
-  }
-  return flushed;
+  return presenceOfflineQueue.flush();
 }
 
 async function saveMetalPlaceConfigRemote(config: MetalPlaceConfig): Promise<void> {

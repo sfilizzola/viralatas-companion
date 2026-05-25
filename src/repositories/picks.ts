@@ -6,8 +6,9 @@ import {
   enqueueOfflinePick,
   loadOfflineQueue,
   removeFromOfflineQueue,
-  type OfflinePickOp,
 } from '../lib/db';
+import { createOptimisticQueue } from '../lib/optimisticQueue';
+import type { OfflinePickOp } from '../lib/db';
 import type { UserPick } from '../types';
 
 function offlinePickId(userId: string, bandId: string) {
@@ -29,6 +30,35 @@ async function queuePick(
     created_at: createdAt,
   });
 }
+
+const pickOfflineQueue = createOptimisticQueue<OfflinePickOp>(
+  {
+    load: loadOfflineQueue,
+    remove: removeFromOfflineQueue,
+  },
+  {
+    getId: (op) => op.id,
+    dedup: {
+      strategy: 'keepLast',
+      groupKey: (op) => `${op.user_id}:${op.band_id}`,
+      sortKey: (op) => op.created_at,
+    },
+    syncOne: async (op) => {
+      if (op.action === 'add') {
+        return supabase.from('user_picks').upsert({
+          user_id: op.user_id,
+          band_id: op.band_id,
+          created_at: op.created_at,
+        });
+      }
+      return supabase
+        .from('user_picks')
+        .delete()
+        .eq('user_id', op.user_id)
+        .eq('band_id', op.band_id);
+    },
+  },
+);
 
 async function toggle(
   userId: string,
@@ -84,55 +114,8 @@ async function syncCrewFromRemote(): Promise<void> {
   await replaceUserPicks(data as UserPick[]);
 }
 
-export function deduplicatePickQueue(ops: OfflinePickOp[]): OfflinePickOp[] {
-  const sorted = [...ops].sort((a, b) => a.created_at.localeCompare(b.created_at));
-  const lastByKey = new Map<string, OfflinePickOp>();
-  for (const op of sorted) {
-    lastByKey.set(`${op.user_id}:${op.band_id}`, op);
-  }
-  return Array.from(lastByKey.values());
-}
-
 async function flushOfflineQueue(): Promise<number> {
-  const queue = await loadOfflineQueue();
-  if (queue.length === 0) return 0;
-
-  const deduped = deduplicatePickQueue(queue);
-  const keyToAll = new Map<string, OfflinePickOp[]>();
-  for (const op of queue) {
-    const key = `${op.user_id}:${op.band_id}`;
-    const list = keyToAll.get(key);
-    if (list) {
-      list.push(op);
-    } else {
-      keyToAll.set(key, [op]);
-    }
-  }
-
-  let flushed = 0;
-  for (const last of deduped) {
-    const key = `${last.user_id}:${last.band_id}`;
-    const all = keyToAll.get(key) ?? [last];
-
-    const { error } =
-      last.action === 'add'
-        ? await supabase.from('user_picks').upsert({
-            user_id: last.user_id,
-            band_id: last.band_id,
-            created_at: last.created_at,
-          })
-        : await supabase
-            .from('user_picks')
-            .delete()
-            .eq('user_id', last.user_id)
-            .eq('band_id', last.band_id);
-
-    if (!error) {
-      await Promise.all(all.map((op) => removeFromOfflineQueue(op.id)));
-      flushed += all.length;
-    }
-  }
-  return flushed;
+  return pickOfflineQueue.flush();
 }
 
 export const picksRepository = {

@@ -4,6 +4,8 @@ import {
   loadOfflineDuckQuackQueue,
   removeFromOfflineDuckQuackQueue,
 } from '../lib/db';
+import { createOptimisticQueue } from '../lib/optimisticQueue';
+import type { OfflineDuckQuackOp } from '../lib/db';
 
 type DuckQuackRow = {
   id: string;
@@ -11,6 +13,23 @@ type DuckQuackRow = {
   band_id: string;
   quacked_at: string;
 };
+
+const duckOfflineQueue = createOptimisticQueue<OfflineDuckQuackOp>(
+  {
+    load: loadOfflineDuckQuackQueue,
+    remove: removeFromOfflineDuckQuackQueue,
+  },
+  {
+    getId: (op) => op.id,
+    dedup: { strategy: 'fifo' },
+    syncOne: async (op) =>
+      supabase.from('duck_quacks').insert({
+        user_id: op.user_id,
+        band_id: op.band_id,
+        quacked_at: op.quacked_at,
+      }),
+  },
+);
 
 /**
  * Writes a quack to Supabase, or queues it offline.
@@ -51,32 +70,17 @@ async function quackBand(
   return data;
 }
 
-/**
- * Flushes all offline duck quacks queued during offline periods.
- * Returns the number of successfully flushed quacks.
- */
+async function flushOfflineQueue(): Promise<number> {
+  return duckOfflineQueue.flush();
+}
+
+/** @deprecated Use flushOfflineQueue — kept for callers not yet migrated. */
 async function flushOfflineDucks(): Promise<number> {
-  const queue = await loadOfflineDuckQuackQueue();
-  if (queue.length === 0) return 0;
-
-  let flushed = 0;
-  for (const op of queue) {
-    const { error } = await supabase.from('duck_quacks').insert({
-      user_id: op.user_id,
-      band_id: op.band_id,
-      quacked_at: op.quacked_at,
-    });
-
-    if (!error) {
-      await removeFromOfflineDuckQuackQueue(op.id);
-      flushed++;
-    }
-  }
-
-  return flushed;
+  return flushOfflineQueue();
 }
 
 export const duckRepository = {
   quackBand,
+  flushOfflineQueue,
   flushOfflineDucks,
 };

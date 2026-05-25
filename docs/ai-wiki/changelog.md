@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-25 (Phase 27.E — Offline-queue primitive)
+
+### Added
+- **`src/lib/optimisticQueue.ts`** — `createOptimisticQueue()`, `buildFlushBatches()`, dedup strategies: `keepLast`, `byId`, `fifo`.
+- **`src/__tests__/optimisticQueue.test.ts`** — Dedup strategy unit tests and flush behavior.
+
+### Changed
+- **`src/repositories/picks.ts`**, **`presence.ts`**, **`missed.ts`**, **`announcements.ts`**, **`duck.ts`** — Flush paths migrated to `OptimisticQueue`; removed inline dedup/flush loops.
+- **`src/lib/syncCoordinator.ts`** — Uniform `flushOfflineQueue()` on all five repositories (announcements/duck aliases `flushPending`/`flushOfflineDucks` retained).
+- **`docs/ai-wiki/sync-engine.md`** — OptimisticQueue section and dedup strategy table.
+
+### Removed
+- **`src/repositories/picks.ts`** — Exported `deduplicatePickQueue()` (logic lives in `optimisticQueue.ts`).
+- **`src/__tests__/deduplicatePickQueue.test.ts`** — Replaced by `optimisticQueue.test.ts`.
+
+### Architectural Notes
+- Preserves per-domain dedup semantics: picks/presence keepLast, missed byId, announcements/duck FIFO.
+- Single flush contract for coordinator; missed flush returns count but remains excluded from sync-toast total.
+
+---
+
 ## 2026-05-25 (Phase 27.C — Sync coordinator)
 
 ### Added

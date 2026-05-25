@@ -10,6 +10,7 @@ Document how data is synchronized between IndexedDB (primary), offline queues, a
 
 - `src/components/sync/` — Sync orchestration (`SyncOrchestration`, `CacheVersionCheck`, `BandSync`, `ReconnectSync`, `PushSetup`, `DuckNotificationsListener`) — extracted from `App.tsx` (Phase 26.G)
 - `src/lib/syncCoordinator.ts` — `runReconnectSync()` single reconnect contract (Phase 27.C)
+- `src/lib/optimisticQueue.ts` — shared `OptimisticQueue` with configurable dedup strategies (Phase 27.E)
 - `src/App.tsx` — Mounts `<SyncOrchestration />` only (84 lines)
 - `src/lib/realtimeSync.ts` — `subscribePostgresChanges()` unified Realtime helper (Phase 26.H)
 - `src/repositories/picks.ts` — Pick sync, queue deduplication
@@ -137,12 +138,12 @@ function ReconnectSync() {
 
 **Operations** (`runReconnectSync` in `src/lib/syncCoordinator.ts`):
 
-1. **Flush all offline queues** (parallel):
-   - `picksRepository.flushOfflineQueue()`
-   - `presenceRepository.flushOfflineQueue()`
-   - `announcementsRepository.flushPending()`
-   - `duckRepository.flushOfflineDucks()`
-   - `missedRepository.flushOfflineQueue()`
+1. **Flush all offline queues** (parallel) — all repos expose `flushOfflineQueue()` backed by `OptimisticQueue`:
+   - **picks** — `keepLast` by `(user_id, band_id)`, sorted by `created_at`
+   - **presence** — `keepLast` by `user_id`, sorted by `updated_at`
+   - **missed** — `byId` (`${user_id}|${band_id}`)
+   - **announcements** — `fifo` (no dedup)
+   - **duck** — `fifo` (no dedup)
 2. **Pull remote crew data** (parallel):
    - `picksRepository.syncCrewFromRemote()`
    - `usersRepository.syncCrew()`
@@ -523,4 +524,27 @@ console.log(`Local cache version: ${version}`);
 
 ---
 
-**Last updated:** 2026-05-25 — Phase 27.C sync coordinator (`runReconnectSync`, `ReconnectSync`); PickSync/AnnouncementSync/DuckSync removed.
+## OptimisticQueue (Phase 27.E)
+
+Shared primitive in `src/lib/optimisticQueue.ts`:
+
+```typescript
+createOptimisticQueue(storage, {
+  getId,
+  dedup: { strategy: 'keepLast' | 'byId' | 'fifo', ... },
+  syncOne: async (item) => supabase...,
+  onBatchSynced?: async (item) => { ... },
+});
+```
+
+| Domain | Dedup strategy | Group / sort key |
+|--------|----------------|------------------|
+| Picks | `keepLast` | `(user_id, band_id)` / `created_at` |
+| Presence | `keepLast` | `user_id` / `updated_at` |
+| Missed bands | `byId` | `${user_id}\|${band_id}` |
+| Announcements | `fifo` | — |
+| Duck quacks | `fifo` | — |
+
+On flush: load IDB queue → `buildFlushBatches()` → `syncOne()` per batch → remove all IDs in batch on success. Failed batches stay queued for next reconnect.
+
+**Last updated:** 2026-05-25 — Phase 27.E shared `OptimisticQueue`; uniform `flushOfflineQueue()` on all five repositories.
