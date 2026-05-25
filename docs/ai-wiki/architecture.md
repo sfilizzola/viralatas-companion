@@ -14,7 +14,7 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/lib/db/` — IndexedDB domain modules + barrel (`index.ts`); public entry `src/lib/db.ts` re-exports unchanged surface
 - `src/lib/realtimeSync.ts` — Unified Supabase Realtime `postgres_changes` subscription helper
 - `src/lib/supabase.ts` — Supabase client + custom auth storage
-- `src/lib/sync.ts` — Band sync (minimal; most sync logic in repositories)
+- `src/repositories/bands.ts` — Band sync (`sync()`), cache version check, godlike cache invalidation (Phase 27.H)
 - `src/repositories/` — Data access layer (picks, announcements, users, presence, missed, bands)
 - `src/hooks/` — Custom hooks for state management
 - `src/pages/` — Route-level page components
@@ -40,7 +40,7 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
    └─ src/hooks/use*.ts, window event listeners
 
 3. DATA ACCESS (Repositories & Services)
-   └─ src/repositories/*, src/services/*, src/lib/sync.ts
+   └─ src/repositories/*, src/services/*
 
 4. STORAGE (IndexedDB + Supabase)
    └─ src/lib/db.ts → src/lib/db/, src/lib/supabase.ts

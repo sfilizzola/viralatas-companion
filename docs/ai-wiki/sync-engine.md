@@ -18,9 +18,8 @@ Document how data is synchronized between IndexedDB (primary), offline queues, a
 - `src/repositories/presence.ts` — Presence sync
 - `src/repositories/users.ts` — Crew member sync
 - `src/repositories/missed.ts` — Missed band sync
-- `src/repositories/bands.ts` — Band sync and cache version checking
+- `src/repositories/bands.ts` — Band sync (`sync()`), cache version check, godlike cache invalidation (Phase 27.H)
 - `src/lib/db/` — IndexedDB domain modules (barrel `index.ts`; public shim `src/lib/db.ts`)
-- `src/lib/sync.ts` — Band sync helper
 
 ---
 
@@ -77,7 +76,7 @@ function BandSync() {
 
   useEffect(() => {
     if (userId) {
-      syncBands().catch(() => {});  // Swallow offline errors
+      bandsRepository.sync().catch(() => {});  // Swallow offline errors
     }
   }, [userId]);
 
@@ -87,10 +86,9 @@ function BandSync() {
 
 **Trigger**: On login
 
-**Operation**:
+**Operation** (`bandsRepository.sync()` in `src/repositories/bands.ts`):
 ```typescript
-// src/lib/sync.ts
-export async function syncBands(): Promise<void> {
+async sync(): Promise<void> {
   const { data, error } = await supabase
     .from('bands')
     .select('*')
@@ -322,7 +320,7 @@ useAuth() detects session
      │  │  ├─ Compare with local
      │  │  └─ If mismatch: wipeAllLocalData()
      │  │
-     │  └─ syncBands()
+     │  └─ bandsRepository.sync()
      │     ├─ Fetch bands from Supabase
      │     └─ Save to IndexedDB
      │
@@ -548,4 +546,4 @@ createOptimisticQueue(storage, {
 
 On flush: load IDB queue → `buildFlushBatches()` → `syncOne()` per batch → remove all IDs in batch on success. Failed batches stay queued for next reconnect.
 
-**Last updated:** 2026-05-25 — Phase 27.E shared `OptimisticQueue`; uniform `flushOfflineQueue()` on all five repositories.
+**Last updated:** 2026-05-25 — Phase 27.H: band sync folded into `bandsRepository.sync()`; `src/lib/sync.ts` removed.

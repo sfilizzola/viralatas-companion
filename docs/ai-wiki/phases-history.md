@@ -534,3 +534,39 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Sub-stages landed as 29 individual commits on `dev` (26.A through 26.N.k); phase closed with docs commit.
 
 ---
+
+### Phase 27 — Architecture Deepening (Seam Restoration)
+**Status:** ✅ Complete
+
+**Goal:** Restore the intended offline-first seam (`UI → IndexedDB ← repositories → Supabase`). Deepen shallow modules from the May 2026 architecture review: fix correctness gaps first, then consolidate sync orchestration, Realtime ownership, and offline-queue semantics. Preserve Phase 26 hook + window-event model; extend ADRs where subscription site moves to sync layer.
+
+**Deliverables:**
+- **27.A — Complete `wipeAllLocalData`:** extend `src/lib/db/meta.ts` to clear all non-session stores; test against `connection.ts` store list
+- **27.B — Badge presence alignment:** `deriveUserBadgeLocation()` shared with `/now` grouping; gate `liveTestBandId` on `enabled`; cross-domain contract tests via `liveNowScenarios.ts`
+- **27.C — Sync coordinator:** `runReconnectSync()` in `syncCoordinator.ts` — flush all queues → pull remote → `viralatas:sync-complete`; `ReconnectSync` replaces PickSync/AnnouncementSync/DuckSync
+- **27.D — Realtime in repositories:** `subscribeToRealtime()` on picks, announcements, presence, users, live band test; `RealtimeSync` mount; hooks IDB + window events only
+- **27.E — Offline-queue primitive:** shared `OptimisticQueue` with configurable dedup; five repositories migrated; uniform `flushOfflineQueue()` for coordinator
+- **27.F — IDB subscription caches:** `useIdbSubscription` / `useSyncExternalStore`; `useAllPicks` shared cache; `usePickCounts`, `useBandAttendees`, `useNowCache`, `useBadgeContext` consume cache
+- **27.G — Decompose `useBadgeContext`:** `useBadgeCache` + `buildBadgeContextFromSnapshot()` + `useBadgePersist` + thin composer (mirror 26.M `/now` split)
+- **27.H — Bands repository sync:** fold `src/lib/sync.ts` into `bandsRepository.sync()`; delete pass-through module
+
+**Acceptance criteria (all met):**
+- [x] 27.A–27.H shipped (8 sub-stages on `dev`)
+- [x] `rtk npm run build` green
+- [x] `rtk npm test` green — 537 tests; wipe, badge presence parity, queue dedup, coordinator reconnect, bands sync covered
+- [x] Offline-first invariants preserved — no new presentation-layer Supabase reads (auth/admin boundaries unchanged)
+- [x] Wiki updated: `architecture.md`, `sync-engine.md`, `offline-first.md`, `flows/live-now.md`, `badges.md`, `changelog.md`
+- [x] ADR amended: `docs/ai-wiki/decisions/custom-hooks-events-no-redux.md` — Realtime subscription site = sync layer; IDB subscription caches (27.F)
+- [x] Phase entry appended; PHASES.md bumped to Phase 28 TBD
+
+**Wiki:** `docs/ai-wiki/architecture.md` · `sync-engine.md` · `offline-first.md` · `flows/live-now.md` · `badges.md` · `decisions/custom-hooks-events-no-redux.md` · `changelog.md` (27.A–27.H + close entries)
+
+**Architectural notes:**
+- Reconnect contract centralized: one `runReconnectSync()` flush-before-pull path; missed-band online gap closed.
+- Realtime writes land in repositories → IDB → window events → hooks; no Supabase subscriptions in presentation hooks.
+- `OptimisticQueue` unifies dedup semantics (keepLast / byId / fifo) across five offline-write domains.
+- `useIdbSubscription` deduplicates IDB reads without introducing a global store (ADR-compliant).
+- Badge pipeline mirrors `/now`: cache → pure builder → persist side-effects → composer hook.
+- Band sync is repository-owned; `src/lib/sync.ts` removed — all remote fetch logic in `src/repositories/*`.
+
+---

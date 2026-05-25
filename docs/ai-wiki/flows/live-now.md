@@ -14,9 +14,9 @@ Document how the app displays the current/next band for each crew member, includ
 | `src/hooks/useNowData.ts` | Thin composer — wires config, cache, plans, presence side effects (Phase 26.M) |
 | `src/hooks/useNowCache.ts` | IDB cache load + window event listeners for picks/crew/presence/announcements |
 | `src/hooks/useNowPlans.ts` | Live plan memos (`myPlan`, `crewPlans`, `crewGroups`, `duckBandId`, …) |
-| `src/hooks/useMetalPlaceConfig.ts` | Metal Place config IDB + Realtime |
-| `src/hooks/useLiveBandTestConfig.ts` | Live band test config IDB + Realtime |
-| `src/hooks/usePresenceRealtime.ts` | Mount presence sync + `user_presence` Realtime via `subscribePostgresChanges` |
+| `src/hooks/useMetalPlaceConfig.ts` | Metal Place config IDB + window events (Realtime via `RealtimeSync`) |
+| `src/hooks/useLiveBandTestConfig.ts` | Live band test config IDB + window events (Realtime via `RealtimeSync`) |
+| `src/components/sync/RealtimeSync.tsx` | Mounts repository Realtime subscriptions (Phase 27.D) |
 | `src/repositories/presence.ts` | `applyPresenceToggle`, `autoClearCampingOnCurrentBand`, `validateAndAutoCheckout` |
 | `src/services/livePreview.ts` | `findLivePlan`, `mapCrewLivePlans`, `groupCrewLivePlans`, `computeCrewLocationCounts` |
 | `src/lib/realtimeSync.ts` | `subscribePostgresChanges()` helper (Phase 26.H) |

@@ -9,8 +9,10 @@ Document the guarantees, tradeoffs, and mechanics of the offline-first architect
 ## Relevant Source Files
 
 - `src/lib/db/` — IndexedDB domain modules (barrel at `index.ts`; public shim `src/lib/db.ts`), stores, event emission
-- `src/repositories/picks.ts`, `announcements.ts`, `presence.ts`, `missed.ts` — Offline queue logic
-- `src/App.tsx` — Sync orchestration (BandSync, PickSync, AnnouncementSync)
+- `src/repositories/bands.ts` — Band fetch on login (`sync()`), cache version wipe + full re-sync (Phase 27.H)
+- `src/repositories/picks.ts`, `announcements.ts`, `presence.ts`, `missed.ts`, `duck.ts` — Offline queue logic + `flushOfflineQueue()`
+- `src/lib/syncCoordinator.ts` — Single reconnect contract (Phase 27.C)
+- `src/components/sync/` — `BandSync`, `ReconnectSync`, `RealtimeSync`, `CacheVersionCheck` (Phase 26.G + 27.C/D/H)
 - `vite.config.ts` — PWA / Service Worker caching strategy
 - `src/components/OfflineBanner.tsx` — Offline status UI
 - `src/components/SyncToast.tsx` — Sync completion feedback
@@ -500,4 +502,4 @@ Appears when:
 
 ---
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-25 — Phase 27 seam restoration: coordinator reconnect, repository-owned band sync, OptimisticQueue, Realtime in sync layer.

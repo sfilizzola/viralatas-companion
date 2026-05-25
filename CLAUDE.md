@@ -284,7 +284,7 @@ Full inventory and condition engine → `docs/ai-wiki/badges.md`.
 
 ## Phases at a glance
 
-Phases 1–26 are complete. The active phase is **Phase 27 — Architecture Deepening (Seam Restoration)** — see `PHASES.md`.
+Phases 1–27 are complete. The active phase is **Phase 28 — TBD** — see `PHASES.md`.
 
 **Full phase history** → `docs/ai-wiki/phases-history.md`
 

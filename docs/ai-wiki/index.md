@@ -213,7 +213,7 @@ window.addEventListener('viralatas:picks-changed', () => {
 | Concern | Files |
 |---------|-------|
 | **Offline Store** | `src/lib/db.ts`, `src/__tests__/` |
-| **Sync Engine** | `src/repositories/picks.ts`, `src/repositories/announcements.ts`, `src/lib/sync.ts` |
+| **Sync Engine** | `src/repositories/bands.ts`, `src/repositories/picks.ts`, `src/repositories/announcements.ts`, `src/lib/syncCoordinator.ts` |
 | **Realtime** | `src/lib/realtimeSync.ts`, `src/hooks/usePickCounts.ts`, `src/hooks/useBandAttendees.ts` |
 | **Auth** | `src/lib/supabase.ts`, `src/hooks/useAuth.ts`, `src/pages/LoginPage.tsx` |
 | **Time System** | `src/hooks/useNow.ts`, `src/services/time.ts`, `src/services/bandTime.ts` |

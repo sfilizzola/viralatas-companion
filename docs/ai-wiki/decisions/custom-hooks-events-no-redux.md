@@ -305,6 +305,7 @@ Realtime: postgres_changes INSERT
 
 ## Revision History
 
+- **2026-05-25**: Phase 27.H — Band sync folded into `bandsRepository.sync()`; removed `src/lib/sync.ts` pass-through
 - **2026-05-25**: Phase 27.F — IDB subscription caches (`useIdbSubscription`, `useAllPicks`) deduplicate IDB reads across derived hooks
 - **2026-05-25**: Phase 27.D — Realtime subscription site moved from hooks to sync layer (`RealtimeSync` + repository `subscribeToRealtime()`)
 - **2026-05**: Initial decision, accepted based on project requirements

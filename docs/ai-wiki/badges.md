@@ -1057,4 +1057,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-25 — Phase 27.G: `useBadgeContext` split into `useBadgeCache`, `buildBadgeContextFromSnapshot()`, `useBadgePersist`.
+**Last updated:** 2026-05-25 — Phase 27.H: band sync in `bandsRepository`; Phase 27.D Realtime ownership in sync layer.

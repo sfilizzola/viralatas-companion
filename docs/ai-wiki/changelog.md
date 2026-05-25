@@ -4,6 +4,35 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-25 (Phase 27 close — Architecture Deepening)
+
+### Changed
+- **`PHASES.md`** — Phase 27 complete; active phase → Phase 28 TBD.
+- **`docs/ai-wiki/phases-history.md`** — Full Phase 27 entry (27.A–27.H).
+- **`docs/ai-wiki/architecture.md`**, **`sync-engine.md`**, **`offline-first.md`**, **`flows/live-now.md`**, **`badges.md`**, **`index.md`** — Seam restoration docs aligned; `src/lib/sync.ts` references removed.
+
+### Architectural Notes
+- Offline-first seam restored: `UI → IndexedDB ← repositories → Supabase`; hooks are IDB subscribers only.
+- All sync orchestration lives in `src/components/sync/` + repository modules; no standalone `sync.ts` pass-through.
+- 537 tests green at phase close.
+
+---
+
+## 2026-05-25 (Phase 27.H — Bands repository sync)
+
+### Changed
+- **`src/repositories/bands.ts`** — `bandsRepository.sync()` owns Supabase band fetch → `saveBands`; cache invalidation calls `bandsRepository.sync()`.
+- **`src/components/sync/BandSync.tsx`** — Calls `bandsRepository.sync()` instead of `syncBands()`.
+- **`src/__tests__/bandsRepository.test.ts`** — `sync()` unit tests + cache-version spy on repository method.
+
+### Removed
+- **`src/lib/sync.ts`** — Pass-through module deleted.
+
+### Architectural Notes
+- Final 27 sub-stage: all remote fetch/sync logic now lives in repository modules.
+
+---
+
 ## 2026-05-25 (Phase 27.G — Decompose useBadgeContext)
 
 ### Added
