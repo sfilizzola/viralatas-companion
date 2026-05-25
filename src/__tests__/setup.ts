@@ -1,5 +1,6 @@
 import { vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
+import { resetIdbSubscriptionsForTests } from '../hooks/useIdbSubscription';
 
 // Mock IndexedDB
 const mockIndexedDB = {
@@ -17,4 +18,8 @@ Object.defineProperty(window, 'indexedDB', {
 Object.assign(import.meta.env, {
   VITE_SUPABASE_URL: 'https://test.supabase.co',
   VITE_SUPABASE_ANON_KEY: 'test-anon-key',
+});
+
+beforeEach(() => {
+  resetIdbSubscriptionsForTests();
 });

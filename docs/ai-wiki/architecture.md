@@ -125,32 +125,28 @@ Hooks encapsulate state logic and subscriptions. They:
 | `usePickActions()` | Pick toggle actions | Composes `useMyPicks` + `picksRepository.toggle` |
 | `useMissedBands()` | Missed-band state + actions | IDB + `MISSED_CHANGED_EVENT` |
 | `useAnnouncements()` | Announcements mural state + actions | IDB + `ANNOUNCEMENTS_CHANGED_EVENT` + `BLOCKED_POSTERS_CHANGED_EVENT` |
-| `usePickCounts()` | Attendance per band | IDB + `PICKS_CHANGED_EVENT` |
-| `useBandAttendees(bandId)` | Users going to a band | IDB + `PICKS_CHANGED_EVENT` / `CREW_USERS_CHANGED_EVENT` |
+| `usePickCounts()` | Attendance per band | `useAllPicks()` shared cache → `countPicks()` |
+| `useBandAttendees(bandId)` | Users going to a band | `useAllPicks()` + `CREW_USERS_CHANGED_EVENT` |
 | `useNowData()` | Current/next band for user | IDB + `useNow()` (time) |
 | `useBandConflicts(bandIds)` | Overlapping bands | Computed, no DB |
 | `useNow()` | Current time (with override) | localStorage + hook state |
 | `useBandDetailModal()` | Band detail modal state | Composes pick/missed/attendee inputs |
 | `useOfflinePendingBandIds()` | Offline-queued picks | IDB queue stores + events |
 
+**IDB subscription caches (Phase 27.F)**
+
+Multiple hooks read the same IDB store on the same window event. `useIdbSubscription` + `useSyncExternalStore` deduplicate: one listener and one IDB read per cache key, shared across all subscribers.
+
+| Cache hook | Key | Events | Consumers |
+|------------|-----|--------|-----------|
+| `useAllPicks()` | `all-user-picks` | `PICKS_CHANGED_EVENT` | `usePickCounts`, `useBandAttendees`, `useNowCache`, `useBadgeContext` |
+
 **Example: usePickCounts()**
 ```typescript
-// src/hooks/usePickCounts.ts — IDB read + window event only; Realtime owned by RealtimeSync
+// src/hooks/usePickCounts.ts — derives from shared useAllPicks cache
 export function usePickCounts(): Record<string, number> {
-  const [counts, setCounts] = useState({});
-
-  useEffect(() => {
-    async function refreshFromCache() {
-      const picks = await loadAllUserPicks();
-      setCounts(countPicks(picks));
-    }
-
-    refreshFromCache();
-    window.addEventListener(PICKS_CHANGED_EVENT, refreshFromCache);
-    return () => window.removeEventListener(PICKS_CHANGED_EVENT, refreshFromCache);
-  }, []);
-
-  return counts;
+  const allPicks = useAllPicks();
+  return useMemo(() => countPicks(allPicks ?? []), [allPicks]);
 }
 ```
 

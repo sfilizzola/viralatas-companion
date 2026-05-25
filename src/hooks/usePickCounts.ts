@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { PICKS_CHANGED_EVENT, loadAllUserPicks } from '../lib/db';
+import { useMemo } from 'react';
+import { useAllPicks } from './useAllPicks';
 import type { UserPick } from '../types';
 
 export function countPicks(picks: UserPick[]) {
@@ -11,24 +11,6 @@ export function countPicks(picks: UserPick[]) {
 }
 
 export function usePickCounts(): Record<string, number> {
-  const [counts, setCounts] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    let active = true;
-
-    async function refreshFromCache() {
-      const picks = await loadAllUserPicks();
-      if (active) setCounts(countPicks(picks));
-    }
-
-    refreshFromCache();
-    window.addEventListener(PICKS_CHANGED_EVENT, refreshFromCache);
-
-    return () => {
-      active = false;
-      window.removeEventListener(PICKS_CHANGED_EVENT, refreshFromCache);
-    };
-  }, []);
-
-  return counts;
+  const allPicks = useAllPicks();
+  return useMemo(() => countPicks(allPicks ?? []), [allPicks]);
 }

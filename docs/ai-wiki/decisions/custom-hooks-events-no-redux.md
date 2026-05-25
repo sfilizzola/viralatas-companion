@@ -240,6 +240,31 @@ export function useX(params): X {
 }
 ```
 
+### IDB Subscription Caches (Phase 27.F)
+
+When multiple hooks read the same IDB store on the same window event, each hook previously re-fetched independently. **`useIdbSubscription`** (backed by `useSyncExternalStore`) maintains a module-level cache per key: one event listener, one IDB read, many React subscribers.
+
+```typescript
+// src/hooks/useAllPicks.ts
+export function useAllPicks(): UserPick[] | undefined {
+  return useIdbSubscription({
+    key: ALL_PICKS_CACHE_KEY,
+    events: [PICKS_CHANGED_EVENT],
+    loader: loadAllUserPicks,
+  });
+}
+
+// Derived hooks consume cache — no duplicate listeners
+export function usePickCounts(): Record<string, number> {
+  const allPicks = useAllPicks();
+  return useMemo(() => countPicks(allPicks ?? []), [allPicks]);
+}
+```
+
+Window events remain the cross-component signal; the cache layer only deduplicates IDB reads within a tab.
+
+---
+
 ### Realtime Subscription Site (Phase 27.D)
 
 Supabase Realtime → IndexedDB writes live in **repository `subscribeToRealtime()` methods**, mounted once by **`RealtimeSync`** in the sync layer (`SyncOrchestration`). Hooks never call `subscribePostgresChanges` directly.
@@ -280,6 +305,7 @@ Realtime: postgres_changes INSERT
 
 ## Revision History
 
+- **2026-05-25**: Phase 27.F — IDB subscription caches (`useIdbSubscription`, `useAllPicks`) deduplicate IDB reads across derived hooks
 - **2026-05-25**: Phase 27.D — Realtime subscription site moved from hooks to sync layer (`RealtimeSync` + repository `subscribeToRealtime()`)
 - **2026-05**: Initial decision, accepted based on project requirements
 

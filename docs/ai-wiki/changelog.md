@@ -4,6 +4,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-25 (Phase 27.F — IDB subscription caches)
+
+### Added
+- **`src/hooks/useIdbSubscription.ts`** — Module-level `useSyncExternalStore` cache: one window-event listener + one IDB read per key, shared across subscribers.
+- **`src/hooks/useAllPicks.ts`** — Shared picks cache keyed on `PICKS_CHANGED_EVENT`.
+- **`src/__tests__/useIdbSubscription.test.ts`** — One event → one IDB read; multi-subscriber cache sharing.
+
+### Changed
+- **`src/hooks/usePickCounts.ts`**, **`useBandAttendees.ts`**, **`useNowCache.ts`**, **`useBadgeContext.ts`** — Consume `useAllPicks()` instead of independent `loadAllUserPicks()` subscriptions.
+- **`docs/ai-wiki/architecture.md`**, **`decisions/custom-hooks-events-no-redux.md`** — IDB subscription cache pattern documented.
+
+### Architectural Notes
+- Window event model preserved (ADR-compliant); cache deduplicates IDB reads only.
+- Full `useBadgeContext` decomposition deferred to Phase 27.G; picks domain wired to shared cache in 27.F.
+
+---
+
 ## 2026-05-25 (Phase 27.D — Realtime in repositories)
 
 ### Added

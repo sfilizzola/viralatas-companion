@@ -18,17 +18,16 @@ import {
 } from '../services/livePreview';
 import {
   loadUserPicks,
-  loadAllUserPicks,
   loadBands,
   loadAllUserPresence,
   loadCrewUsers,
   loadMetalPlaceConfig,
   loadLiveBandTestConfig,
-  PICKS_CHANGED_EVENT,
   PRESENCE_CHANGED_EVENT,
   CREW_USERS_CHANGED_EVENT,
 } from '../lib/db';
 import { presenceRepository } from '../repositories';
+import { useAllPicks } from './useAllPicks';
 import { useMissedBands } from './useMissedBands';
 import { now } from '../services/time';
 import { supabase } from '../lib/supabase';
@@ -127,6 +126,7 @@ function buildCtxFromSnapshot(snap: IdbSnapshot, userId: string, authUser: AuthU
 
 export function useBadgeContext(user: AuthUser) {
   const { allMissed } = useMissedBands(user.id);
+  const allPicks = useAllPicks();
   const [ctx, setCtx] = useState<BadgeContext>(EMPTY_BADGE_CONTEXT);
   const [loading, setLoading] = useState(true);
 
@@ -138,15 +138,16 @@ export function useBadgeContext(user: AuthUser) {
     dbAssignedRef.current = null;
     metadataSyncedRef.current = false;
 
+    if (allPicks === undefined) return;
+
     async function refresh() {
       const { data: { session } } = await supabase.auth.getSession();
       const sessionUser = session?.user;
       if (!sessionUser || sessionUser.id !== user.id) return;
 
-      const [userPicks, allPicks, bands, presence, crewUsers, metalPlaceConfig, liveBandTestConfig] =
+      const [userPicks, bands, presence, crewUsers, metalPlaceConfig, liveBandTestConfig] =
         await Promise.all([
           loadUserPicks(user.id),
-          loadAllUserPicks(),
           loadBands(),
           loadAllUserPresence(),
           loadCrewUsers(),
@@ -171,7 +172,7 @@ export function useBadgeContext(user: AuthUser) {
       const idbCtx = buildCtxFromSnapshot(
         {
           userPicks,
-          allPicks,
+          allPicks: allPicks!,
           bands,
           allMissed,
           assignedBadges: assignedForPhase1,
@@ -212,7 +213,7 @@ export function useBadgeContext(user: AuthUser) {
       const fullCtx = buildCtxFromSnapshot(
         {
           userPicks,
-          allPicks,
+          allPicks: allPicks!,
           bands,
           allMissed,
           assignedBadges,
@@ -242,7 +243,6 @@ export function useBadgeContext(user: AuthUser) {
     }
 
     refresh();
-    window.addEventListener(PICKS_CHANGED_EVENT, refresh);
     window.addEventListener(PRESENCE_CHANGED_EVENT, refresh);
     window.addEventListener(CREW_USERS_CHANGED_EVENT, refresh);
 
@@ -252,12 +252,11 @@ export function useBadgeContext(user: AuthUser) {
 
     return () => {
       active = false;
-      window.removeEventListener(PICKS_CHANGED_EVENT, refresh);
       window.removeEventListener(PRESENCE_CHANGED_EVENT, refresh);
       window.removeEventListener(CREW_USERS_CHANGED_EVENT, refresh);
       subscription.unsubscribe();
     };
-  }, [user.id, allMissed]);
+  }, [user.id, allMissed, allPicks]);
 
   return { ctx, loading };
 }
