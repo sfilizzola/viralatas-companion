@@ -4,6 +4,18 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-25 (Phase 27.A — Complete wipeAllLocalData)
+
+### Changed
+- **`src/lib/db/connection.ts`** — `VIRALATAS_OBJECT_STORES`, `WIPE_PRESERVED_OBJECT_STORES`, `wipeTargetObjectStores()` — canonical store list derived from schema.
+- **`src/lib/db/meta.ts`** — `wipeAllLocalData()` clears all 13 non-session/meta stores (adds `offline_duck_quacks`, `metal_place_config`, `live_band_test_config`).
+- **`src/__tests__/db.test.ts`** — Wipe characterization updated; parity test ensures new stores auto-enroll.
+
+### Architectural Notes
+- Cache-version invalidation now matches ADR/glossary contract: every store cleared except `session` and `meta` (local `cache_version` marker preserved).
+
+---
+
 ## 2026-05-25 (Phase 27.B — Badge presence alignment)
 
 ### Changed

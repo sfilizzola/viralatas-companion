@@ -9,7 +9,12 @@ export {
   PRESENCE_CHANGED_EVENT,
 } from './events';
 export type { OfflineDuckQuackOp, OfflinePickOp } from './types';
-export { resetDbConnectionForTests } from './connection';
+export {
+  resetDbConnectionForTests,
+  VIRALATAS_OBJECT_STORES,
+  WIPE_PRESERVED_OBJECT_STORES,
+  wipeTargetObjectStores,
+} from './connection';
 export { saveSession, loadSession, clearSession } from './session';
 export { saveBands, loadBands, saveCrewUsers, loadCrewUsers } from './catalog';
 export {

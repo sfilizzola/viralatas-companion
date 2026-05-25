@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 27 — Architecture Deepening (Seam Restoration)
 
-**Status:** 🚧 In progress (27.B complete)
+**Status:** 🚧 In progress (27.A–27.B complete)
 
 **Goal:** Restore the intended offline-first seam (`UI → IndexedDB ← repositories → Supabase`). Deepen shallow modules identified in the May 2026 architecture review: fix correctness gaps first, then consolidate sync orchestration, Realtime ownership, and offline-queue semantics. Preserve Phase 26 hook + window-event model; extend ADRs where subscription site moves to sync layer.
 
@@ -17,7 +17,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Deliverables (ordered — each sub-stage is one reviewable commit):**
 
-- [ ] **27.A — Complete `wipeAllLocalData`:** extend `src/lib/db/meta.ts` to clear `offline_duck_quacks`, `metal_place_config`, `live_band_test_config` (and any future non-session stores); test against `src/lib/db/connection.ts` store list
+- [x] **27.A — Complete `wipeAllLocalData`:** extend `src/lib/db/meta.ts` to clear `offline_duck_quacks`, `metal_place_config`, `live_band_test_config` (and any future non-session stores); test against `src/lib/db/connection.ts` store list
 - [x] **27.B — Badge presence alignment:** `deriveUserBadgeLocation()` shared with `/now` grouping; gate `liveTestBandId` on `enabled`; cross-domain contract tests via `src/__tests__/fixtures/liveNowScenarios.ts`
 - **27.C — Sync coordinator:** deepen `src/components/sync/SyncOrchestration.tsx` — single reconnect contract (flush all queues → pull remote → `viralatas:sync-complete`); fix Duck mount-flush and missed-band online gap
 - **27.D — Realtime in repositories:** `subscribeToRealtime()` on picks, announcements, presence, config repos (mirror `src/repositories/missed.ts`); remove Supabase→IDB writes from hooks
@@ -33,7 +33,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 - `/now` badge pipeline dedup (depends on 27.B + 27.F)
 
 **Acceptance criteria (phase close):**
-- [ ] 27.A shipped
+- [x] 27.A shipped
 - [x] 27.B shipped (correctness fixes + contract tests green)
 - [ ] 27.C–27.E shipped (single coordinator; hooks no longer own Realtime; queue dedup documented)
 - [ ] `rtk npm run build` green

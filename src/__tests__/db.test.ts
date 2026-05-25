@@ -62,7 +62,10 @@ import {
   saveSession,
   saveUserPick,
   saveUserPresence,
+  VIRALATAS_OBJECT_STORES,
+  WIPE_PRESERVED_OBJECT_STORES,
   wipeAllLocalData,
+  wipeTargetObjectStores,
 } from '../lib/db';
 import type {
   Announcement,
@@ -75,44 +78,9 @@ import type {
   UserPresence,
 } from '../types';
 
-const EXPECTED_OBJECT_STORES = [
-  'session',
-  'bands',
-  'crew_users',
-  'user_picks',
-  'offline_picks',
-  'user_presence',
-  'offline_presence',
-  'announcements',
-  'pending_announcements',
-  'metal_place_config',
-  'live_band_test_config',
-  'meta',
-  'user_missed_bands',
-  'offline_missed_bands',
-  'offline_duck_quacks',
-] as const;
-
-const WIPE_CLEARED_STORES = [
-  'bands',
-  'crew_users',
-  'user_picks',
-  'offline_picks',
-  'user_presence',
-  'offline_presence',
-  'announcements',
-  'pending_announcements',
-  'user_missed_bands',
-  'offline_missed_bands',
-] as const;
-
-const WIPE_PRESERVED_STORES = [
-  'session',
-  'meta',
-  'metal_place_config',
-  'live_band_test_config',
-  'offline_duck_quacks',
-] as const;
+const EXPECTED_OBJECT_STORES = VIRALATAS_OBJECT_STORES;
+const WIPE_CLEARED_STORES = wipeTargetObjectStores();
+const WIPE_PRESERVED_STORES = WIPE_PRESERVED_OBJECT_STORES;
 
 const sampleBand: Band = {
   id: 'band-1',
@@ -603,7 +571,7 @@ describe('IndexedDB layer (lib/db.ts)', () => {
       expect(await loadCacheVersion()).toBe('v1');
     });
 
-    it('wipeAllLocalData clears all 10 targeted stores and preserves 5 others', async () => {
+    it('wipeAllLocalData clears all non-session/meta stores and preserves cache_version', async () => {
       await saveBands([sampleBand]);
       await saveCrewUsers([
         { id: 'u1', display_name: 'Alice', avatar_url: null, wacken_arrival_day: null },
@@ -679,24 +647,34 @@ describe('IndexedDB layer (lib/db.ts)', () => {
           case 'offline_missed_bands':
             expect(await loadOfflineMissedQueue(), `${store} should be cleared`).toEqual([]);
             break;
+          case 'metal_place_config':
+            expect(await loadMetalPlaceConfig(), `${store} should be cleared`).toBeNull();
+            break;
+          case 'live_band_test_config':
+            expect(await loadLiveBandTestConfig(), `${store} should be cleared`).toBeNull();
+            break;
+          case 'offline_duck_quacks':
+            expect(await loadOfflineDuckQuackQueue(), `${store} should be cleared`).toEqual([]);
+            break;
         }
       }
 
       expect(await loadSession()).toEqual({ token: 'keep' });
       expect(await loadCacheVersion()).toBe('v1');
-      expect(await loadMetalPlaceConfig()).toEqual(sampleMetalPlaceConfig());
-      expect(await loadLiveBandTestConfig()).toEqual(sampleLiveBandTestConfig());
-      expect(await loadOfflineDuckQuackQueue()).toEqual([
-        {
-          id: 'quack-1',
-          user_id: 'user-1',
-          band_id: 'band-1',
-          quacked_at: '2026-05-01T12:00:00Z',
-        },
-      ]);
 
-      expect(WIPE_CLEARED_STORES).toHaveLength(10);
-      expect(WIPE_PRESERVED_STORES).toHaveLength(5);
+      expect(WIPE_CLEARED_STORES).toHaveLength(13);
+      expect(WIPE_PRESERVED_STORES).toHaveLength(2);
+      expect(WIPE_CLEARED_STORES.length + WIPE_PRESERVED_STORES.length).toBe(
+        EXPECTED_OBJECT_STORES.length,
+      );
+    });
+
+    it('wipeTargetObjectStores covers every schema store except session and meta', () => {
+      expect([...WIPE_CLEARED_STORES].sort()).toEqual(
+        [...EXPECTED_OBJECT_STORES]
+          .filter((name) => !WIPE_PRESERVED_STORES.includes(name as (typeof WIPE_PRESERVED_STORES)[number]))
+          .sort(),
+      );
     });
   });
 });
