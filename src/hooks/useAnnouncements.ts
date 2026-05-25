@@ -144,8 +144,6 @@ export function useAnnouncements(userId: string | null) {
   }, [userId]);
 
   useEffect(() => {
-    announcementsRepository.sync().catch(() => {});
-
     usersRepository.fetchBlockedPosters().then((blocked) => {
       setBlockedUserIds(new Set(blocked.map((b) => b.user_id)));
     });

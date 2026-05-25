@@ -1,25 +1,28 @@
 import { useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { announcementsRepository } from '../../repositories';
+import { runReconnectSync } from '../../lib/syncCoordinator';
 import { emitSyncComplete } from './emitSyncComplete';
 
-export function AnnouncementSync() {
+export function ReconnectSync() {
   const { session } = useAuth();
   const userId = session?.user?.id;
 
   useEffect(() => {
     if (!userId) return;
 
-    async function syncNow() {
-      const flushed = await announcementsRepository.flushPending();
-      if (flushed > 0) emitSyncComplete();
-      await announcementsRepository.sync();
+    async function reconnect() {
+      try {
+        const flushed = await runReconnectSync(userId);
+        if (flushed > 0) emitSyncComplete();
+      } catch {
+        // Swallow offline / transient errors; queues retry on next reconnect.
+      }
     }
 
-    syncNow().catch(() => {});
+    reconnect();
 
     function handleOnline() {
-      syncNow().catch(() => {});
+      reconnect();
     }
 
     window.addEventListener('online', handleOnline);

@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-25 (Phase 27.C — Sync coordinator)
+
+### Added
+- **`src/lib/syncCoordinator.ts`** — `runReconnectSync(userId)`: flush picks, presence, announcements, duck, missed queues → pull crew remote → return flushed count.
+- **`src/components/sync/ReconnectSync.tsx`** — Single mount + `online` handler; emits `viralatas:sync-complete` once when items flushed.
+- **`src/__tests__/syncCoordinator.test.ts`**, **`src/__tests__/ReconnectSync.test.tsx`** — Coordinator flush-before-pull ordering and reconnect component behavior.
+
+### Changed
+- **`src/components/sync/SyncOrchestration.tsx`** — Replaces `PickSync`, `AnnouncementSync`, `DuckSync` with `ReconnectSync`.
+- **`src/repositories/missed.ts`** — Extracted `syncFromRemote(userId)` for coordinator pull phase.
+- **`src/hooks/usePickCounts.ts`**, **`usePresenceRealtime.ts`**, **`useAnnouncements.ts`**, **`useBandAttendees.ts`**, **`useMissedBands.ts`** — Removed redundant mount-time remote sync (coordinator owns reconnect).
+
+### Removed
+- **`src/components/sync/PickSync.tsx`**, **`AnnouncementSync.tsx`**, **`DuckSync.tsx`** — Consolidated into coordinator.
+
+### Architectural Notes
+- Fixes Duck mount-flush gap (was online-only) and missed-band online gap (was hook-mount-only).
+- Single reconnect contract: all five offline queues flush before any remote pull; one sync toast event per reconnect cycle.
+
+---
+
 ## 2026-05-25 (Phase 27.A — Complete wipeAllLocalData)
 
 ### Changed

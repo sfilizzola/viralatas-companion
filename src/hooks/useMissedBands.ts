@@ -23,7 +23,6 @@ export function useMissedBands(userId: string | null) {
     }
 
     load();
-    if (userId) missedRepository.sync(userId).catch(() => {});
 
     const unsubscribeRealtime = missedRepository.subscribeToRealtime();
     window.addEventListener(MISSED_CHANGED_EVENT, handleChange);

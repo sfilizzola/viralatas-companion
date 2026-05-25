@@ -8,7 +8,8 @@ Document how data is synchronized between IndexedDB (primary), offline queues, a
 
 ## Relevant Source Files
 
-- `src/components/sync/` — Sync orchestration (`SyncOrchestration`, `CacheVersionCheck`, `BandSync`, `PickSync`, `AnnouncementSync`, `DuckSync`, `PushSetup`, `DuckNotificationsListener`) — extracted from `App.tsx` (Phase 26.G)
+- `src/components/sync/` — Sync orchestration (`SyncOrchestration`, `CacheVersionCheck`, `BandSync`, `ReconnectSync`, `PushSetup`, `DuckNotificationsListener`) — extracted from `App.tsx` (Phase 26.G)
+- `src/lib/syncCoordinator.ts` — `runReconnectSync()` single reconnect contract (Phase 27.C)
 - `src/App.tsx` — Mounts `<SyncOrchestration />` only (84 lines)
 - `src/lib/realtimeSync.ts` — `subscribePostgresChanges()` unified Realtime helper (Phase 26.H)
 - `src/repositories/picks.ts` — Pick sync, queue deduplication
@@ -106,7 +107,58 @@ export async function syncBands(): Promise<void> {
 
 ---
 
-### 3. PickSync
+### 3. ReconnectSync (Phase 27.C — replaces PickSync, AnnouncementSync, DuckSync)
+
+```typescript
+function ReconnectSync() {
+  const { session } = useAuth();
+  const userId = session?.user?.id;
+
+  useEffect(() => {
+    if (!userId) return;
+
+    async function reconnect() {
+      const flushed = await runReconnectSync(userId);
+      if (flushed > 0) emitSyncComplete();
+    }
+
+    reconnect().catch(() => {});
+    window.addEventListener('online', () => reconnect().catch(() => {}));
+    return () => window.removeEventListener('online', reconnect);
+  }, [userId]);
+
+  return null;
+}
+```
+
+**Triggers**:
+1. On login (userId changes)
+2. On `'online'` event (window event)
+
+**Operations** (`runReconnectSync` in `src/lib/syncCoordinator.ts`):
+
+1. **Flush all offline queues** (parallel):
+   - `picksRepository.flushOfflineQueue()`
+   - `presenceRepository.flushOfflineQueue()`
+   - `announcementsRepository.flushPending()`
+   - `duckRepository.flushOfflineDucks()`
+   - `missedRepository.flushOfflineQueue()`
+2. **Pull remote crew data** (parallel):
+   - `picksRepository.syncCrewFromRemote()`
+   - `usersRepository.syncCrew()`
+   - `presenceRepository.syncCrewFromRemote()`
+   - `announcementsRepository.sync()`
+   - `missedRepository.syncFromRemote(userId)`
+3. **Emit SyncToast** → `viralatas:sync-complete` once if any queue items flushed
+
+**Why one coordinator?** Previously PickSync, AnnouncementSync, and DuckSync each registered separate `online` handlers; DuckSync skipped mount flush; missed-band flush only ran when `useMissedBands` mounted. Hooks (`usePickCounts`, `usePresenceRealtime`, etc.) duplicated remote pulls on mount.
+
+---
+
+### 4. PickSync (removed in 27.C)
+
+<details>
+<summary>Historical — replaced by ReconnectSync</summary>
 
 ```typescript
 function PickSync() {
@@ -147,66 +199,7 @@ function PickSync() {
 }
 ```
 
-**Triggers**:
-1. On login (userId changes)
-2. On 'online' event (window event)
-
-**Operations**:
-1. **Flush offline picks** → Process all queued pick changes
-2. **Flush offline presence** → Process all queued presence changes
-3. **Emit SyncToast** → Tell user "N items synced" (if any flushed)
-4. **Sync crew picks** → Fetch all crew picks from Supabase, overwrite IndexedDB
-5. **Sync crew users** → Fetch all crew profiles, overwrite IndexedDB
-6. **Sync crew presence** → Fetch all crew presence, overwrite IndexedDB
-
-**Realtime subscriptions** (inside hooks like usePickCounts):
-- Auto-subscribe to postgres_changes
-- On INSERT/DELETE/UPDATE, update IndexedDB immediately
-- Components re-render via window events
-
----
-
-### 4. AnnouncementSync
-
-```typescript
-function AnnouncementSync() {
-  const { session } = useAuth();
-  const userId = session?.user?.id;
-
-  useEffect(() => {
-    if (!userId) return;
-
-    async function syncNow() {
-      // 1. Flush pending announcements
-      const flushed = await announcementsRepository.flushPending();
-      if (flushed > 0) emitSyncComplete();
-
-      // 2. Fetch all announcements
-      await announcementsRepository.sync();
-    }
-
-    syncNow().catch(() => {});
-
-    function handleOnline() {
-      syncNow().catch(() => {});
-    }
-
-    window.addEventListener('online', handleOnline);
-    return () => window.removeEventListener('online', handleOnline);
-  }, [userId]);
-
-  return null;
-}
-```
-
-**Triggers**: On login and 'online' event
-
-**Operations**:
-1. Flush pending announcements → Push offline posts to Supabase
-2. Sync all announcements → Fetch from Supabase, overwrite IndexedDB
-3. Subscribe to Realtime → New announcements appear in ~3s
-
----
+</details>
 
 ## Sync Flows in Detail
 
@@ -332,25 +325,10 @@ useAuth() detects session
      │     ├─ Fetch bands from Supabase
      │     └─ Save to IndexedDB
      │
-     ├─ PickSync
-     │  ├─ flushOfflineQueue()
-     │  │  └─ (empty if first login)
-     │  ├─ syncCrewFromRemote()
-     │  │  ├─ Fetch all user_picks from Supabase
-     │  │  └─ Overwrite IndexedDB
-     │  ├─ usersRepository.syncCrew()
-     │  └─ presenceRepository.syncCrewFromRemote()
-     │
-     ├─ AnnouncementSync
-     │  ├─ flushPending()
-     │  │  └─ (empty if first login)
-     │  ├─ announcementsRepository.sync()
-     │
-     ├─ DuckSync
-     │  └─ (listens to 'online'; flushes offline_duck_quacks via duckRepository.flushOfflineDucks())
-     │  │  ├─ Fetch all announcements from Supabase
-     │  │  └─ Overwrite IndexedDB
-     │  └─ [Subscribe to Realtime]
+     ├─ ReconnectSync (runReconnectSync)
+     │  ├─ flushOfflineQueue() × picks, presence, announcements, duck, missed
+     │  ├─ syncCrewFromRemote() + syncCrew() + announcements.sync() + missed.syncFromRemote()
+     │  └─ emit viralatas:sync-complete (if flushed > 0)
      │
      └─ User sees populated app with band schedule + crew attendance
 ```
@@ -523,7 +501,7 @@ console.log(`${queue.length} picks pending sync`);
 ```typescript
 // In browser console
 window.dispatchEvent(new Event('online'));
-// Triggers PickSync and AnnouncementSync
+// Triggers ReconnectSync → runReconnectSync()
 ```
 
 ### View Cache Version
@@ -545,4 +523,4 @@ console.log(`Local cache version: ${version}`);
 
 ---
 
-**Last updated:** 2026-05-24 — Phase 26.G sync extract to `src/components/sync/`; 26.H `subscribePostgresChanges`; IDB module path.
+**Last updated:** 2026-05-25 — Phase 27.C sync coordinator (`runReconnectSync`, `ReconnectSync`); PickSync/AnnouncementSync/DuckSync removed.

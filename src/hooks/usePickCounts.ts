@@ -6,7 +6,6 @@ import {
   saveUserPick,
 } from '../lib/db';
 import { subscribePostgresChanges } from '../lib/realtimeSync';
-import { picksRepository } from '../repositories';
 import type { UserPick } from '../types';
 
 export function countPicks(picks: UserPick[]) {
@@ -29,7 +28,6 @@ export function usePickCounts(): Record<string, number> {
     }
 
     refreshFromCache();
-    picksRepository.syncCrewFromRemote().catch(() => {});
 
     function handleLocalChange() {
       refreshFromCache();

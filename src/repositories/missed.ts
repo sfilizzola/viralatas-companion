@@ -76,9 +76,7 @@ async function flushOfflineQueue(): Promise<void> {
   }
 }
 
-async function sync(userId: string): Promise<void> {
-  await flushOfflineQueue();
-
+async function syncFromRemote(userId: string): Promise<void> {
   const { data, error } = await supabase
     .from('user_missed_bands')
     .select('*')
@@ -86,6 +84,11 @@ async function sync(userId: string): Promise<void> {
   if (error || !data) return;
 
   await replaceUserMissedBands(data as UserMissedBand[], userId);
+}
+
+async function sync(userId: string): Promise<void> {
+  await flushOfflineQueue();
+  await syncFromRemote(userId);
 }
 
 function subscribeToRealtime(): () => void {
@@ -113,6 +116,7 @@ export const missedRepository = {
   mark,
   unmark,
   sync,
+  syncFromRemote,
   flushOfflineQueue,
   subscribeToRealtime,
 };

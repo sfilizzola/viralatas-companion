@@ -5,7 +5,6 @@ import {
   loadAllUserPicks,
   loadCrewUsers,
 } from '../lib/db';
-import { usersRepository } from '../repositories';
 import { computeAttendees } from '../services/attendees';
 import type { AttendeeMap, BandAttendee } from '../services/attendees';
 
@@ -23,7 +22,6 @@ export function useBandAttendees(): AttendeeMap {
     }
 
     refreshFromCache();
-    usersRepository.syncCrew().catch(() => {});
 
     window.addEventListener(PICKS_CHANGED_EVENT, refreshFromCache);
     window.addEventListener(CREW_USERS_CHANGED_EVENT, refreshFromCache);

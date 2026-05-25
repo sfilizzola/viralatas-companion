@@ -9,7 +9,8 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 ## Relevant Source Files
 
 - `src/App.tsx` — App shell, route setup, providers
-- `src/components/sync/` — Sync orchestration (`CacheVersionCheck`, `BandSync`, `PickSync`, `AnnouncementSync`, `DuckSync`, `PushSetup`, `DuckNotificationsListener`)
+- `src/components/sync/` — Sync orchestration (`CacheVersionCheck`, `BandSync`, `ReconnectSync`, `PushSetup`, `DuckNotificationsListener`)
+- `src/lib/syncCoordinator.ts` — `runReconnectSync()` reconnect contract (Phase 27.C)
 - `src/lib/db/` — IndexedDB domain modules + barrel (`index.ts`); public entry `src/lib/db.ts` re-exports unchanged surface
 - `src/lib/realtimeSync.ts` — Unified Supabase Realtime `postgres_changes` subscription helper
 - `src/lib/supabase.ts` — Supabase client + custom auth storage
@@ -510,20 +511,16 @@ INSERT into user_picks
 2. Fetches bands from Supabase (if online), overwrites IndexedDB
 3. `CacheVersionCheck` — compares local cache version with server
    - If mismatch: `wipeAllLocalData()` (forces fresh sync)
-4. `PickSync` — flushes offline queues if online
-5. `AnnouncementSync` — flushes pending announcements if online
+4. `ReconnectSync` — `runReconnectSync()`: flush all offline queues, pull remote crew data, emit `viralatas:sync-complete` if items flushed
 
 ### On `'online'` Event
 
 ```typescript
-// src/components/sync/PickSync.tsx
-window.addEventListener('online', () => {
-  picksRepository.flushOfflineQueue();        // Flush picks
-  presenceRepository.flushOfflineQueue();     // Flush presence
-  picksRepository.syncCrewFromRemote();       // Fetch crew picks
-  usersRepository.syncCrew();                 // Fetch crew profiles
-  presenceRepository.syncCrewFromRemote();    // Fetch crew presence
-});
+// src/lib/syncCoordinator.ts — invoked by ReconnectSync on mount + online
+await runReconnectSync(userId);
+// 1. Flush: picks, presence, announcements, duck, missed queues
+// 2. Pull: crew picks, users, presence, announcements, user missed bands
+// 3. emitSyncComplete() if any queue items flushed
 ```
 
 ### Queue Deduplication Logic

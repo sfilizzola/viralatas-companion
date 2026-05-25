@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 27 — Architecture Deepening (Seam Restoration)
 
-**Status:** 🚧 In progress (27.A–27.B complete)
+**Status:** 🚧 In progress (27.A–27.C complete)
 
 **Goal:** Restore the intended offline-first seam (`UI → IndexedDB ← repositories → Supabase`). Deepen shallow modules identified in the May 2026 architecture review: fix correctness gaps first, then consolidate sync orchestration, Realtime ownership, and offline-queue semantics. Preserve Phase 26 hook + window-event model; extend ADRs where subscription site moves to sync layer.
 
@@ -19,7 +19,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 - [x] **27.A — Complete `wipeAllLocalData`:** extend `src/lib/db/meta.ts` to clear `offline_duck_quacks`, `metal_place_config`, `live_band_test_config` (and any future non-session stores); test against `src/lib/db/connection.ts` store list
 - [x] **27.B — Badge presence alignment:** `deriveUserBadgeLocation()` shared with `/now` grouping; gate `liveTestBandId` on `enabled`; cross-domain contract tests via `src/__tests__/fixtures/liveNowScenarios.ts`
-- **27.C — Sync coordinator:** deepen `src/components/sync/SyncOrchestration.tsx` — single reconnect contract (flush all queues → pull remote → `viralatas:sync-complete`); fix Duck mount-flush and missed-band online gap
+- [x] **27.C — Sync coordinator:** deepen `src/components/sync/SyncOrchestration.tsx` — single reconnect contract (flush all queues → pull remote → `viralatas:sync-complete`); fix Duck mount-flush and missed-band online gap
 - **27.D — Realtime in repositories:** `subscribeToRealtime()` on picks, announcements, presence, config repos (mirror `src/repositories/missed.ts`); remove Supabase→IDB writes from hooks
 - **27.E — Offline-queue primitive:** shared `OptimisticQueue` with configurable dedup; migrate five repositories; uniform `flushAll()` for coordinator
 - **27.F — IDB subscription caches:** `useIdbSubscription` or `useSyncExternalStore` domain caches; derived hooks (`usePickCounts`, `useBandAttendees`, `useNowCache`, `useBadgeContext`) consume cache
@@ -35,7 +35,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Acceptance criteria (phase close):**
 - [x] 27.A shipped
 - [x] 27.B shipped (correctness fixes + contract tests green)
-- [ ] 27.C–27.E shipped (single coordinator; hooks no longer own Realtime; queue dedup documented)
+- [x] 27.C shipped (sync coordinator reconnect contract)
+- [ ] 27.D–27.E shipped (hooks no longer own Realtime; queue dedup documented)
 - [ ] `rtk npm run build` green
 - [ ] `rtk npm test` green; new tests for wipe, badge presence parity, queue dedup, coordinator reconnect
 - [ ] Offline-first invariants preserved — no presentation-layer Supabase reads
