@@ -53,6 +53,8 @@ export function useBadgePersist(userId: string, cache: BadgeCacheData): BadgeCon
     );
     setCtx(idbCtx);
 
+    const snap = snapshot;
+
     async function enrich() {
       const userRow = await supabase
         .from('users')
@@ -66,7 +68,7 @@ export function useBadgePersist(userId: string, cache: BadgeCacheData): BadgeCon
       dbAssignedRef.current = assignedBadges;
       const isCurrentUserFriend = rowData?.is_friend === true;
 
-      const metaBadges = snapshot.assignedBadgesFromMeta;
+      const metaBadges = snap.assignedBadgesFromMeta;
       const hasDrift = !badgesEqual(assignedBadges, metaBadges);
       if (hasDrift && !metadataSyncedRef.current) {
         metadataSyncedRef.current = true;
@@ -79,16 +81,16 @@ export function useBadgePersist(userId: string, cache: BadgeCacheData): BadgeCon
 
       const fullCtx = buildBadgeContextFromSnapshot(
         {
-          userPicks: snapshot.userPicks,
-          allPicks: snapshot.allPicks,
-          bands: snapshot.bands,
-          allMissed: snapshot.allMissed,
+          userPicks: snap.userPicks,
+          allPicks: snap.allPicks,
+          bands: snap.bands,
+          allMissed: snap.allMissed,
           assignedBadges,
           isCurrentUserFriend,
-          presence: snapshot.presence,
-          crewUsers: snapshot.crewUsers,
-          metalPlaceWindowActive: snapshot.metalPlaceWindowActive,
-          liveTestBandId: snapshot.liveTestBandId,
+          presence: snap.presence,
+          crewUsers: snap.crewUsers,
+          metalPlaceWindowActive: snap.metalPlaceWindowActive,
+          liveTestBandId: snap.liveTestBandId,
         },
         userId,
         sessionUser,

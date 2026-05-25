@@ -1,4 +1,4 @@
-import { vi } from 'vitest';
+import { vi, beforeEach } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 import { resetIdbSubscriptionsForTests } from '../hooks/useIdbSubscription';
 

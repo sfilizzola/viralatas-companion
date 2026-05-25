@@ -4,16 +4,13 @@ vi.mock('../lib/db', () => ({
   loadCacheVersion: vi.fn(),
   saveCacheVersion: vi.fn(),
   wipeAllLocalData: vi.fn(),
+  saveBands: vi.fn(),
 }));
 
 vi.mock('../lib/supabase', () => ({
   supabase: {
     from: vi.fn(),
   },
-}));
-
-vi.mock('../lib/sync', () => ({
-  syncBands: vi.fn(),
 }));
 
 vi.mock('../repositories/picks', () => ({
@@ -33,9 +30,8 @@ vi.mock('../repositories/announcements', () => ({
 }));
 
 import { bandsRepository } from '../repositories/bands';
-import { loadCacheVersion, saveCacheVersion, wipeAllLocalData } from '../lib/db';
+import { loadCacheVersion, saveCacheVersion, wipeAllLocalData, saveBands } from '../lib/db';
 import { supabase } from '../lib/supabase';
-import { syncBands } from '../lib/sync';
 import { picksRepository } from '../repositories/picks';
 import { usersRepository } from '../repositories/users';
 import { presenceRepository } from '../repositories/presence';
@@ -48,12 +44,50 @@ function mockAppConfigResponse(version: string | null) {
   vi.mocked(supabase.from).mockReturnValue({ select } as ReturnType<typeof supabase.from>);
 }
 
+function mockBandsResponse(bands: unknown[] | null, error: Error | null = null) {
+  const order = vi.fn().mockResolvedValue({ data: bands, error });
+  const select = vi.fn().mockReturnValue({ order });
+  vi.mocked(supabase.from).mockReturnValue({ select } as ReturnType<typeof supabase.from>);
+}
+
+describe('bandsRepository.sync', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(saveBands).mockResolvedValue(undefined);
+  });
+
+  it('fetches bands from Supabase and saves to IndexedDB', async () => {
+    const bands = [{ id: '1', name: 'Test Band' }];
+    mockBandsResponse(bands);
+
+    await bandsRepository.sync();
+
+    expect(supabase.from).toHaveBeenCalledWith('bands');
+    expect(saveBands).toHaveBeenCalledWith(bands);
+  });
+
+  it('throws when Supabase returns an error', async () => {
+    mockBandsResponse(null, new Error('network error'));
+
+    await expect(bandsRepository.sync()).rejects.toThrow('network error');
+    expect(saveBands).not.toHaveBeenCalled();
+  });
+
+  it('does not call saveBands when response is empty', async () => {
+    mockBandsResponse([]);
+
+    await bandsRepository.sync();
+
+    expect(saveBands).not.toHaveBeenCalled();
+  });
+});
+
 describe('bandsRepository.checkAndApplyCacheVersion', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(wipeAllLocalData).mockResolvedValue(undefined);
     vi.mocked(saveCacheVersion).mockResolvedValue(undefined);
-    vi.mocked(syncBands).mockResolvedValue(undefined);
+    vi.spyOn(bandsRepository, 'sync').mockResolvedValue(undefined);
     vi.mocked(picksRepository.syncCrewFromRemote).mockResolvedValue(undefined);
     vi.mocked(usersRepository.syncCrew).mockResolvedValue(undefined);
     vi.mocked(presenceRepository.syncCrewFromRemote).mockResolvedValue(undefined);
@@ -68,7 +102,7 @@ describe('bandsRepository.checkAndApplyCacheVersion', () => {
 
     expect(wipeAllLocalData).not.toHaveBeenCalled();
     expect(saveCacheVersion).not.toHaveBeenCalled();
-    expect(syncBands).not.toHaveBeenCalled();
+    expect(bandsRepository.sync).not.toHaveBeenCalled();
     expect(picksRepository.syncCrewFromRemote).not.toHaveBeenCalled();
     expect(usersRepository.syncCrew).not.toHaveBeenCalled();
     expect(presenceRepository.syncCrewFromRemote).not.toHaveBeenCalled();
@@ -83,7 +117,7 @@ describe('bandsRepository.checkAndApplyCacheVersion', () => {
 
     expect(wipeAllLocalData).toHaveBeenCalledOnce();
     expect(saveCacheVersion).toHaveBeenCalledWith('v99');
-    expect(syncBands).toHaveBeenCalledOnce();
+    expect(bandsRepository.sync).toHaveBeenCalledOnce();
     expect(picksRepository.syncCrewFromRemote).toHaveBeenCalledOnce();
     expect(usersRepository.syncCrew).toHaveBeenCalledOnce();
     expect(presenceRepository.syncCrewFromRemote).toHaveBeenCalledOnce();

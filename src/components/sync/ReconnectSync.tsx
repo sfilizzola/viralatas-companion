@@ -9,10 +9,11 @@ export function ReconnectSync() {
 
   useEffect(() => {
     if (!userId) return;
+    const uid = userId;
 
     async function reconnect() {
       try {
-        const flushed = await runReconnectSync(userId);
+        const flushed = await runReconnectSync(uid);
         if (flushed > 0) emitSyncComplete();
       } catch {
         // Swallow offline / transient errors; queues retry on next reconnect.

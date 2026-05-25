@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { syncBands } from '../../lib/sync';
+import { bandsRepository } from '../../repositories';
 
 export function BandSync() {
   const { session } = useAuth();
@@ -8,7 +8,7 @@ export function BandSync() {
 
   useEffect(() => {
     if (userId) {
-      syncBands().catch(() => {}); // swallow offline errors; bands stay in IndexedDB
+      bandsRepository.sync().catch(() => {}); // swallow offline errors; bands stay in IndexedDB
     }
   }, [userId]);
 

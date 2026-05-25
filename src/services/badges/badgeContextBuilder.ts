@@ -7,7 +7,8 @@ import {
   mapCrewLivePlans,
 } from '../livePreview';
 import { now } from '../time';
-import { buildBadgeContext, type BadgeBand, type BadgeContext } from './engine';
+import { buildBadgeContext } from './engine';
+import type { BadgeBand, BadgeContext } from './types';
 import { mergedPersistedBadgeSlugs } from './persistMetadata';
 
 export const EMPTY_BADGE_CONTEXT: BadgeContext = {
