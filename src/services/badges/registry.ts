@@ -444,6 +444,23 @@ export const BADGES: BadgeConfig[] = [
     year: 2026,
     persist: true,
   },
+  // Festival 2026 — committed weak skips on /now ("I am weak"; no persist — live on weak_skips_2026)
+  {
+    slug: 'weak',
+    imagePath: '/badges/badge_weak.png',
+    labelKey: 'badgeWeak',
+    descriptionKey: 'badgeWeakDescription',
+    condition: { type: 'weak_skips_min', count: 3 },
+    year: 2026,
+  },
+  {
+    slug: 'weakling-supreme',
+    imagePath: '/badges/badge_weakling-supreme.png',
+    labelKey: 'badgeWeaklingSupreme',
+    descriptionKey: 'badgeWeaklingSupremeDescription',
+    condition: { type: 'weak_skips_min', count: 10 },
+    year: 2026,
+  },
   // Joke badges — assigned manually by godlike via the assign-badge Edge Function
   {
     slug: 'medic',
@@ -534,6 +551,14 @@ export const BADGES: BadgeConfig[] = [
     imagePath: '/badges/badge_tactical-nap.png',
     labelKey: 'badgeTacticalNap',
     descriptionKey: 'badgeTacticalNapDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
+  {
+    slug: 'patient-zero',
+    imagePath: '/badges/badge_patient-zero.png',
+    labelKey: 'badgePatientZero',
+    descriptionKey: 'badgePatientZeroDescription',
     condition: { type: 'assigned' },
     year: 2026,
   },
@@ -704,7 +729,7 @@ export const BADGES: BadgeConfig[] = [
 //   Counter in user_metadata.weak_skips_2026 via recordCommittedSkip(); generic card unpicks do not count.
 //   Choose persist:true or false per badge at author time.
 //   Example: committed 3+ weak skips
-//   { slug: 'serial-skipper', condition: { type: 'weak_skips_min', count: 3 }, year: 2026 }
+//   { slug: 'weak', condition: { type: 'weak_skips_min', count: 3 }, year: 2026 }
 //
 // crew_at_location_min
 //   Earned when user is at a location AND N+ crew members are there at the same time.

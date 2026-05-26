@@ -1372,3 +1372,60 @@ describe('ceremony entry — badge regression (Phase 19)', () => {
     expect(evaluateBadge(badge({ type: 'bands_picked_min', count: 2 }), ctx)).toBe(false); // ceremony excluded
   });
 });
+
+describe('registry — weak skip badges', () => {
+  const weakCtx = (count: number) =>
+    buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      null,
+      {},
+      new Set(),
+      count,
+    );
+
+  it('weak earns at 3+ committed skips', () => {
+    const cfg = findBadge('weak');
+    expect(evaluateBadge(cfg, weakCtx(3))).toBe(true);
+    expect(evaluateBadge(cfg, weakCtx(2))).toBe(false);
+    expect(cfg.year).toBe(2026);
+    expect(cfg.persist).toBeUndefined();
+  });
+
+  it('weakling-supreme earns at 10+ committed skips', () => {
+    const cfg = findBadge('weakling-supreme');
+    expect(evaluateBadge(cfg, weakCtx(10))).toBe(true);
+    expect(evaluateBadge(cfg, weakCtx(9))).toBe(false);
+    expect(cfg.year).toBe(2026);
+    expect(cfg.persist).toBeUndefined();
+  });
+});
+
+describe('registry — patient-zero (assigned)', () => {
+  it('earns when slug is in assignedBadges', () => {
+    const cfg = findBadge('patient-zero');
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      ['patient-zero'],
+    );
+    expect(evaluateBadge(cfg, ctx)).toBe(true);
+    expect(cfg.year).toBe(2026);
+  });
+
+  it('not earned without godlike assignment', () => {
+    const cfg = findBadge('patient-zero');
+    const ctx = buildBadgeContext(authUser(), [], new Map(), new Map());
+    expect(evaluateBadge(cfg, ctx)).toBe(false);
+  });
+});

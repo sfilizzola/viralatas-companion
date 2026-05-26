@@ -4,6 +4,22 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-26 (Weak skip + Patient Zero badges)
+
+### Added
+- **`weak`** — `weak_skips_min` count 3, `year: 2026`, no persist. Committed "I am weak" milestone.
+- **`weakling-supreme`** — `weak_skips_min` count 10, `year: 2026`, no persist.
+- **`patient-zero`** — `assigned`, `year: 2026`. Godlike-only overdose joke badge.
+- i18n keys in all four locale files; registry tests in `badges.test.ts`.
+
+### Changed
+- **`docs/ai-wiki/badges.md`** — inventory 64 → 67; weak-skip + assigned entries documented.
+
+### Architectural Notes
+- Weak badges live on `user_metadata.weak_skips_2026` without `persist: true` — festival reset can strip them when counter clears.
+
+---
+
 ## 2026-05-26 (Weak skip badge engine plumbing)
 
 ### Added

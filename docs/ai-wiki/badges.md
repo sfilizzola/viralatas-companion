@@ -598,7 +598,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 
 ---
 
-## Current Badges Inventory (64 Total)
+## Current Badges Inventory (67 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -645,6 +645,13 @@ Badge has **no automatic condition**; godlike assigns it manually.
 - `stage-hopper` — "Nômade dos Palcos". Saw bands on 4+ distinct stages (`stage_diversity_min`, count: 4). Four stages, four vibes, zero loyalty.
 - `octopus` — "Polvo". Saw bands on all 8 distinct stages (`stage_diversity_min`, count: 8; persist: true). All 8 stages conquered — you have no favorites, only victims.
 
+### Weak Skip 2026 (2) — `weak_skips_min`, no persist
+
+Committed `/now` "I am weak" skips only (`user_metadata.weak_skips_2026`). Generic schedule unpicks do not count.
+
+- `weak` — "Fraco" / "Weak". 3+ committed weak skips.
+- `weakling-supreme` — "Fraco Supremo" / "Weakling Supreme". 10+ committed weak skips.
+
 ### Arrival Day 2026 (4) — `wacken_arrived_on`, mutually exclusive
 
 One badge per camping-open day; each user earns exactly one based on `user_metadata.wacken_arrival_day`. Not persistent — reflects the current self-reported arrival.
@@ -662,7 +669,7 @@ After Phase 25, every band carries one of **13 canonical genre labels**. Eleven 
 
 Pre-collapse subgenre strings (Goregrind, Humppa, Horror Punk, Melodic Death Metal, …) were merged into these buckets and **no longer appear** on `Band.genre`. See `src/services/genreGuide.ts` for the full old→new map.
 
-### Merit / Assigned (16)
+### Merit / Assigned (17)
 - `mosh-pit` — Hit the floor, came back (godlike-assigned)
 - `crowdsurfer` — Flew over the crowd (godlike-assigned)
 - `girl-power` — Metal queen (godlike-assigned)
@@ -679,6 +686,7 @@ Pre-collapse subgenre strings (Goregrind, Humppa, Horror Punk, Melodic Death Met
 - `code-wizards` — "Magos do Código". **Honors the builders of the Viralatas app pack** — Companion (find), Setlist Vira-Latas (listen), MoshSplit (pay). Three wizards, three apps, one pack. Godlike-assigned via `users.special_badges[]`. See [Architecture: Viralatas App Pack](architecture.md#viralatas-app-pack-phase-22–23).
 - `sun-sacrifice` — "Sun Sacrifice". Forgot the sunscreen; glows like a tomato in a denim vest (godlike-assigned).
 - `tactical-nap` — "Tactical Nap". Fell asleep mid-pit, mid-set, or mid-conversation — strategic withdrawal (godlike-assigned).
+- `patient-zero` — "Paciente Zero" / "Patient Zero". One minute dancing, next minute pupil check — time is a flat circle (godlike-assigned).
 
 ### Location Presence (5)
 - `metal-place-2026` — Visited Metal Place (persist: true)
