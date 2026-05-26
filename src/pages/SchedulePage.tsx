@@ -41,6 +41,7 @@ function DuckableBandCard({
   onClick: () => void;
   pending: boolean;
   isBandEnded: boolean;
+  showDayLabel?: boolean;
 }) {
   const duckEnabled = useDuckEnabled();
   const canDuck = duckEnabled && isLive && isPicked && band.category !== 'ceremony';
@@ -163,6 +164,7 @@ export default function SchedulePage() {
               onClick={() => togglePick(band.id)}
               pending={pendingBandIds.has(band.id)}
               isBandEnded={new Date(band.end_time) < currentTime}
+              showDayLabel={filters.day === null}
             />
           );
         })}

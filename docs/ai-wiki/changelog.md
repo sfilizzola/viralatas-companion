@@ -4,6 +4,25 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-26 (BandCard corner day label)
+
+### Added
+- **`bandWeekdayKey()`** in `src/services/bandTime.ts` — weekday i18n key from a band's CEST festival day (same rollover rules as `bandDay()`).
+- **`.dayGhost` / `.bodyWithDayGhost`** in `BandCard.module.css` — V1 corner ghost: 9px mono weekday abbr, `--text-faint`, top-right of body.
+- **`showDayLabel?: boolean`** prop on `BandCard` — renders ghost on `schedule` and `ranked` variants only.
+
+### Changed
+- **`SchedulePage`** — passes `showDayLabel={filters.day === null}` (visible during search / all-days browse; hidden when a day tab is active).
+- **`PopularPage`** — always passes `showDayLabel` (cross-day popularity list).
+- **`public/Design System.html`** — BandCard section documents day label visibility rules + static demo.
+- **`docs/ai-wiki/glossary.md`** — BandCard entry mentions corner day ghost.
+- Tests in `BandCard.test.tsx` and `bandTime.test.ts`.
+
+### Architectural Notes
+- Presentation-only; no sync or IndexedDB changes. Weekday strings reuse existing SchedulePage i18n keys (`wednesday`, etc.).
+
+---
+
 ## 2026-05-25 (Phase 28 — Badge vest layout preference)
 
 ### Added

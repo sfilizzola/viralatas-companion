@@ -101,6 +101,7 @@ export default function PopularPage() {
               attendeeCluster={count > 0 ? { attendees, max: 5 } : undefined}
               isBandEnded={ended}
               missedCount={ended ? (missedCountsByBand[band.id] ?? 0) : undefined}
+              showDayLabel
             />
           );
         })}

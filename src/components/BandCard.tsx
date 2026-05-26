@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 
 import type { Band } from '../types';
 import type { BandAttendee } from '../hooks/useBandAttendees';
 import { stageColorVar } from '../services/stageColors';
-import { formatTime } from '../services/bandTime';
+import { bandWeekdayKey, formatTime } from '../services/bandTime';
 import { useI18n } from '../lib/i18n';
 import { Avatar, Chip } from '../ui';
 import StarIcon from './icons/StarIcon';
@@ -31,6 +31,8 @@ type BandCardProps = {
   /** When provided, renders the duck button (only for live + picked non-ceremony bands) */
   onDuck?: () => void;
   duckCooldownUntil?: number;
+  /** Corner weekday label — schedule/ranked when day context is mixed */
+  showDayLabel?: boolean;
 };
 
 function getVariantClass(variant: BandCardVariant, hasDuck: boolean): string {
@@ -70,6 +72,7 @@ export default function BandCard({
   children,
   onDuck,
   duckCooldownUntil,
+  showDayLabel = false,
 }: Readonly<BandCardProps>) {
   const { t } = useI18n('SchedulePage');
   const initial = band.name.charAt(0).toUpperCase();
@@ -101,6 +104,8 @@ export default function BandCard({
   const thumbFallback = isCeremony ? '✦' : initial;
   const showDuck = Boolean(onDuck) && !isCeremony;
   const hasDuckSlot = showDuck && Boolean(onDuck);
+  const showDayGhost =
+    showDayLabel && (variant === 'schedule' || variant === 'ranked');
 
   const cardClasses = [
     styles.card,
@@ -137,7 +142,20 @@ export default function BandCard({
 
       {variant === 'ranked' && <RankBadge rank={rank} />}
 
-      <div className={`${styles.body} ${variant === 'ranked' ? styles.bodyRanked : ''}`}>
+      <div
+        className={[
+          styles.body,
+          variant === 'ranked' ? styles.bodyRanked : '',
+          showDayGhost ? styles.bodyWithDayGhost : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        {showDayGhost && (
+          <span className={styles.dayGhost} aria-hidden>
+            {t(bandWeekdayKey(band))}
+          </span>
+        )}
         <h2 className={styles.bandName}>{band.name}</h2>
         <div className={styles.meta}>
           {isCeremony ? (

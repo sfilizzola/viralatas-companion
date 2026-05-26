@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { bandDay, formatTime } from '../services/bandTime';
+import { bandDay, bandWeekdayKey, formatTime } from '../services/bandTime';
 import type { Band } from '../types';
 
 function makeBand(overrides: Partial<Band> = {}): Band {
@@ -60,6 +60,17 @@ describe('bandDay', () => {
   it('handles a time outside the festival range (still returns a valid CEST date)', () => {
     // bandDay does not validate the festival window; it always returns the adjusted CEST date
     expect(bandDay(makeBand({ start_time: '2026-06-01T10:00:00Z' }))).toBe('2026-06-01');
+  });
+});
+
+describe('bandWeekdayKey', () => {
+  it('returns wednesday for Day 1 (2026-07-29)', () => {
+    expect(bandWeekdayKey(makeBand({ start_time: '2026-07-29T12:00:00Z' }))).toBe('wednesday');
+  });
+
+  it('follows bandDay rollover for after-midnight slots', () => {
+    // 00:00 UTC July 30 → CEST rolls to July 29 → wednesday
+    expect(bandWeekdayKey(makeBand({ start_time: '2026-07-30T00:00:00Z' }))).toBe('wednesday');
   });
 });
 

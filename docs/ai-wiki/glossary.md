@@ -229,7 +229,7 @@ Notification appearing after sync completes. Example: "✓ Synced 3 items".
 6-tab navigation bar (Now, Schedule, My Picks, Popular, Mural, Profile).
 
 ### BandCard
-Reusable component showing band info: name, stage, time, attendance, pick status.
+Reusable component showing band info: name, stage, time, attendance, pick status. Optional corner weekday ghost (`showDayLabel`) on schedule/ranked variants when day context is mixed.
 
 ### BandDetailModal
 Full-screen or overlay modal with detailed band info, conflict warnings, attendance breakdown.

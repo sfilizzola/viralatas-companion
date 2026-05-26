@@ -110,4 +110,44 @@ describe('BandCard', () => {
 
     expect(onClick).toHaveBeenCalledTimes(1);
   });
+
+  it('shows corner day label on schedule variant when showDayLabel is true', () => {
+    const { container } = renderWithI18n(
+      <BandCard
+        band={sampleBand}
+        isPicked={false}
+        count={3}
+        onToggle={vi.fn()}
+        showDayLabel
+      />,
+    );
+
+    const dayGhost = container.querySelector('span[class*="dayGhost"]');
+    expect(dayGhost).not.toBeNull();
+    expect(dayGhost?.textContent).toBe('Wed');
+  });
+
+  it('hides corner day label when showDayLabel is false', () => {
+    const { container } = renderWithI18n(
+      <BandCard band={sampleBand} isPicked={false} count={3} onToggle={vi.fn()} />,
+    );
+
+    expect(container.querySelector('span[class*="dayGhost"]')).toBeNull();
+  });
+
+  it('shows corner day label on ranked variant when showDayLabel is true', () => {
+    const { container } = renderWithI18n(
+      <BandCard
+        band={sampleBand}
+        isPicked={false}
+        count={3}
+        onToggle={vi.fn()}
+        variant="ranked"
+        rank={1}
+        showDayLabel
+      />,
+    );
+
+    expect(container.querySelector('span[class*="dayGhost"]')?.textContent).toBe('Wed');
+  });
 });

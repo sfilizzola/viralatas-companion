@@ -942,8 +942,38 @@
         <h3>BandCard</h3>
         <p>Displays band information with pick toggles and attendance counts.</p>
         <p><strong>Variants:</strong> schedule, timeline, ranked, ceremony</p>
-        <p><strong>Features:</strong> duck button, conflict indicators, stage badge, attendee avatars</p>
+        <p><strong>Features:</strong> duck button, conflict indicators, stage badge, attendee avatars, corner weekday label (V1 ghost)</p>
+        <p><strong>Day label (<code>showDayLabel</code>):</strong> optional corner ghost — mono 9px weekday abbr in <code>--text-faint</code>, top-right of the body column (<code>.dayGhost</code>). Only on <code>schedule</code> and <code>ranked</code> variants. Weekday comes from <code>bandWeekdayKey()</code> in <code>bandTime.ts</code> (CEST, same rules as <code>bandDay()</code>) via existing SchedulePage i18n keys. <strong>Schedule:</strong> shown when no day tab is active (<code>filters.day === null</code> — search, all-days browse). Hidden when a single day filter is selected. <strong>Popular:</strong> always shown (cross-day list). <strong>My Picks:</strong> not used (timeline variant + day section headers).</p>
         <p><strong>Duck button visibility:</strong> only when band is currently live, the user has picked it, <code>band.category !== 'ceremony'</code>, AND the global <code>duck_enabled</code> killswitch (Phase 21) is on. The killswitch is a single boolean on <code>app_settings</code>, fetched once at app boot via <code>DuckEnabledProvider</code> and toggled from Godlike Powers → Duck feature. When off, the duck button is not rendered anywhere; offline-queued ducks still flush on reconnect.</p>
+        <div class="component-demo" style="background: #0a0a0a; padding: 20px; max-width: 420px;">
+          <style>
+            .ds-bc-card { display: grid; grid-template-columns: 4px 56px 1fr 64px; background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; --stage-color: #2980b9; }
+            .ds-bc-stripe { background: var(--stage-color); }
+            .ds-bc-thumb { width: 56px; height: 56px; margin: 12px 0 12px 12px; background: var(--stage-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; color: #fff; }
+            .ds-bc-body { padding: 12px 44px 12px 16px; position: relative; min-width: 0; }
+            .ds-bc-day { position: absolute; top: 10px; right: 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #555; }
+            .ds-bc-name { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 19px; text-transform: uppercase; color: #e8e8e8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .ds-bc-meta { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; align-items: center; }
+            .ds-bc-stage { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #fff; background: var(--stage-color); padding: 4px 8px; border-radius: 0; }
+            .ds-bc-time { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8e8e8; }
+            .ds-bc-pick { width: 64px; border-left: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: center; color: #888; font-size: 22px; }
+            .ds-bc-caption { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
+          </style>
+          <div class="ds-bc-caption">Schedule · showDayLabel=true</div>
+          <div class="ds-bc-card">
+            <div class="ds-bc-stripe"></div>
+            <div class="ds-bc-thumb">J</div>
+            <div class="ds-bc-body">
+              <span class="ds-bc-day">Wed</span>
+              <div class="ds-bc-name">Judas Priest</div>
+              <div class="ds-bc-meta">
+                <span class="ds-bc-stage">Faster</span>
+                <span class="ds-bc-time">19:00 – 22:00</span>
+              </div>
+            </div>
+            <div class="ds-bc-pick">☆</div>
+          </div>
+        </div>
         <p><strong>Status:</strong> <span class="status-warn">⚠ Hardcoded colors in component—needs refactor</span></p>
       </div>
 
