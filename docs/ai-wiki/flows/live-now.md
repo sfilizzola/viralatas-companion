@@ -11,7 +11,8 @@ Document how the app displays the current/next band for each crew member, includ
 | File | Role |
 |---|---|
 | `src/pages/RightNowPage.tsx` | `/now` route shell |
-| `src/hooks/useNowData.ts` | Thin composer — wires config, cache, plans, presence side effects (Phase 26.M) |
+| `src/hooks/useNowData.ts` | Thin composer — wires config, cache, plans, presence side effects, weak-skip commit timer (Phase 26.M) |
+| `src/services/weakSkips.ts` | Committed “I am weak” counter in `user_metadata.weak_skips_2026` |
 | `src/hooks/useNowCache.ts` | IDB cache load + window event listeners for picks/crew/presence/announcements |
 | `src/hooks/useNowPlans.ts` | Live plan memos (`myPlan`, `crewPlans`, `crewGroups`, `duckBandId`, …) |
 | `src/hooks/useMetalPlaceConfig.ts` | Metal Place config IDB + window events (Realtime via `RealtimeSync`) |
@@ -218,6 +219,37 @@ User taps /now route
 - T=150ms: UI renders crew groups
 - T=30000ms: useNow() updates, recalculates
 - T=30100ms: Components re-render with new band/plan
+
+---
+
+## Weak skip (“I am weak”)
+
+When the user is on their **current live picked band**, `CrewGroupsSection` shows **souFraco** (“I am weak”). This is separate from the duck button and from generic unpicks on schedule cards.
+
+```
+User taps "I am weak"
+        │
+        ▼
+handleSkip (useNowData)
+  ├─ commit previous pending weak skip (if re-skip before timer)
+  ├─ unpickBand → picksRepository → IndexedDB (existing path)
+  ├─ undo toast (5s) + undo timer
+  └─ commit timer (5s)
+
+commit timer fires:
+  ├─ loadUserPicks(userId) from IndexedDB
+  ├─ if band still unpicked → recordCommittedSkip(userId, bandId)
+  └─ else → no count (e.g. user re-picked via schedule card)
+
+handleUndo (within 5s):
+  ├─ cancel commit timer
+  ├─ pickBand → picksRepository
+  └─ no counter increment
+```
+
+**Isolation:** `togglePick`, `BandDetailModal`, and `ConflictSection` never call `recordCommittedSkip()`.
+
+**Storage:** `user_metadata.weak_skips_2026` via best-effort `auth.updateUser` — same family as `location_visits`. No badge registry entries yet; festival reset strip deferred. See `docs/superpowers/specs/2026-05-26-weak-skip-counter-design.md`.
 
 ---
 

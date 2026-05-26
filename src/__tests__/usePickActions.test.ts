@@ -18,6 +18,12 @@ vi.mock('../lib/supabase', () => ({
   },
 }));
 
+const recordCommittedSkip = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+
+vi.mock('../services/weakSkips', () => ({
+  recordCommittedSkip,
+}));
+
 import { resetDbConnectionForTests, saveUserPick } from '../lib/db';
 import { usePickActions } from '../hooks/usePickActions';
 
@@ -27,6 +33,7 @@ const bandId = 'band-test';
 beforeEach(async () => {
   await resetDbConnectionForTests();
   await deleteViralatasDatabase();
+  recordCommittedSkip.mockClear();
   Object.defineProperty(navigator, 'onLine', { value: true, writable: true, configurable: true });
 });
 
@@ -61,5 +68,16 @@ describe('usePickActions', () => {
 
     await result.current.unpickBand(bandId);
     await waitFor(() => expect(result.current.pickedIds.has(bandId)).toBe(false));
+  });
+
+  it('does not record weak skips when toggling picks off a card', async () => {
+    await saveUserPick({ user_id: userId, band_id: bandId, created_at: new Date().toISOString() });
+    const { result } = renderHook(() => usePickActions(userId));
+    await waitFor(() => expect(result.current.pickedIds.has(bandId)).toBe(true));
+
+    await result.current.togglePick(bandId);
+    await waitFor(() => expect(result.current.pickedIds.has(bandId)).toBe(false));
+
+    expect(recordCommittedSkip).not.toHaveBeenCalled();
   });
 });

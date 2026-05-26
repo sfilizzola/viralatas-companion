@@ -429,7 +429,7 @@ INSERT into user_picks
 | `useLiveBandTestConfig()` | `LiveBandTestConfig \| null` | `LIVE_BAND_TEST_CONFIG_CHANGED_EVENT` | useNowData |
 | `useNowCache(undoTimerId)` | `{ picks, crewUsers, presence, latestAnnouncement, cacheLoading }` | `PICKS_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, `ANNOUNCEMENTS_CHANGED_EVENT` | useNowData |
 | `useNowPlans({…})` | `{ myPlan, crewPlans, crewGroups, presenceValue, duckBandId, … }` | None (computed from cache + config + time) | useNowData |
-| `useNowData()` | `{ current, next }` | composes hooks above + `useNow()` | RightNowPage |
+| `useNowData()` | `{ myPlan, crewGroups, handleSkip, handleUndo, duckQuack, … }` | composes hooks above + `useNow()`; weak-skip commit timer → `recordCommittedSkip()` | RightNowPage |
 | `useBandConflicts(bandIds)` | `Conflict[]` | None (computed) | MyPicksPage |
 | `useNow()` | `{ now, override }` | localStorage, window events | Time-based views |
 | `useOfflinePendingBandIds()` | `Set<bandId>` | `PICKS_CHANGED_EVENT` | BandCard (show pending chip) |
@@ -458,6 +458,7 @@ INSERT into user_picks
 | `bandFilter.ts` | `filterBands(bands, filters, now)` — pure filter predicate extracted from `SchedulePage`; testable without mounting any component | ✅ Yes |
 | `scheduleFilterStorage.ts` | `loadStoredFilters()` / `saveStoredFilters()` — localStorage persistence for schedule filter state; extracted from `SchedulePage` | ✅ Yes |
 | `attendees.ts` | `computeAttendees(picks, crewUsers)` — maps raw picks to hydrated `BandAttendee[]` per band; exports `BandAttendee` and `AttendeeMap` types | ✅ Yes |
+| `weakSkips.ts` | `getWeakSkipCount()`, `recordCommittedSkip()` — committed “I am weak” skips in `user_metadata.weak_skips_2026` via best-effort `auth.updateUser` (same pattern as `location_visits` in `presenceRepository`) | Auth metadata only |
 
 ---
 
@@ -468,6 +469,7 @@ INSERT into user_picks
 - Announcement post: Queued to `pending_announcements`
 - Presence update: Queued to `offline_presence`
 - Missed band mark: Queued to `offline_missed_bands`
+- Weak skip counter / location visit counts: Best-effort `auth.updateUser` on commit (no IDB queue; session cache is read source for badges)
 
 **Reads:**
 - Always from IndexedDB (stale if offline)

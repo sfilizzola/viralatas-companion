@@ -4,6 +4,29 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-26 (Weak skip counter)
+
+### Added
+- **`src/services/weakSkips.ts`** — `getWeakSkipCount()`, `recordCommittedSkip()`, `WEAK_SKIPS_2026_KEY`, `WEAK_SKIP_UNDO_MS`; persists committed “I am weak” skips in `user_metadata.weak_skips_2026` via best-effort `auth.updateUser` (same pattern as `location_visits`).
+- **`src/__tests__/weakSkips.test.ts`** — unit tests for read/increment helpers.
+- **`useNowData` commit timer** — increments counter only after the 5s undo window when the unpick still holds; cancels on undo; commits previous pending skip when a second weak skip starts before the first timer fires.
+
+### Changed
+- **`src/hooks/useNowData.ts`** — weak-skip commit path is the sole caller of `recordCommittedSkip()` (generic unpicks unchanged).
+- **`src/__tests__/useNowData.test.ts`**, **`src/__tests__/usePickActions.test.ts`** — integration/isolation tests for commit, undo, re-skip, and card-toggle unpick.
+- **`docs/ai-wiki/glossary.md`** — weak skip vs generic unpick terminology.
+- **`docs/ai-wiki/architecture.md`** — `weakSkips.ts` in Services table; offline writes note for metadata counters.
+- **`docs/ai-wiki/flows/live-now.md`** — weak skip commit flow and isolation rules.
+- **`docs/superpowers/specs/2026-05-26-weak-skip-counter-design.md`** — approved spec.
+
+### Fixed
+- **`recordCommittedSkip`** — ignores increment when `auth.getUser().id` does not match the passed `userId`.
+
+### Architectural Notes
+- Badge registry unchanged — counter is stored now for future `weak_skips_min` conditions. Festival reset strip for `weak_skips_2026` deferred until festival-close script. Future Supabase event log documented in spec, not built.
+
+---
+
 ## 2026-05-26 (BandCard corner day label)
 
 ### Added

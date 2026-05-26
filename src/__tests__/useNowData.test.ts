@@ -120,6 +120,13 @@ vi.mock('../services/liveBandTest', () => ({
   syncLiveBandTestConfig: vi.fn().mockResolvedValue(undefined),
 }));
 
+const recordCommittedSkip = vi.hoisted(() => vi.fn().mockResolvedValue(undefined));
+
+vi.mock('../services/weakSkips', () => ({
+  WEAK_SKIP_UNDO_MS: 10,
+  recordCommittedSkip,
+}));
+
 vi.mock('../hooks/useAuth', () => ({
   useAuth: () => ({
     session: { user: { id: userId } },
@@ -213,6 +220,7 @@ beforeEach(async () => {
   applyPresenceToggle.mockClear();
   autoClearCampingOnCurrentBand.mockClear();
   validateAndAutoCheckout.mockClear();
+  recordCommittedSkip.mockClear();
   Object.defineProperty(navigator, 'onLine', { value: true, writable: true, configurable: true });
 });
 
@@ -342,6 +350,86 @@ describe('useNowData — skip and undo', () => {
     await waitFor(() => {
       expect(result.current.picks.some((pick) => pick.band_id === currentBand.id)).toBe(true);
     });
+  });
+});
+
+describe('useNowData — weak skip counter', () => {
+  it('records a committed skip after the undo window expires', async () => {
+    await seedBaseScenario();
+    await saveUserPick(scenarioPick(userId, currentBand.id));
+    await saveUserPresence(scenarioPresence(userId, {}));
+
+    const { result } = await waitForNowDataReady();
+
+    await act(async () => {
+      await result.current.handleSkip();
+    });
+
+    expect(recordCommittedSkip).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 15));
+    });
+
+    await waitFor(() => {
+      expect(recordCommittedSkip).toHaveBeenCalledTimes(1);
+    });
+    expect(recordCommittedSkip).toHaveBeenCalledWith(userId, currentBand.id);
+  });
+
+  it('does not record a skip when undo happens before the commit timer', async () => {
+    await seedBaseScenario();
+    await saveUserPick(scenarioPick(userId, currentBand.id));
+    await saveUserPresence(scenarioPresence(userId, {}));
+
+    const { result } = await waitForNowDataReady();
+
+    await act(async () => {
+      await result.current.handleSkip();
+    });
+
+    await act(async () => {
+      await result.current.handleUndo();
+    });
+
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 15));
+    });
+
+    expect(recordCommittedSkip).not.toHaveBeenCalled();
+  });
+
+  it('commits the previous skip immediately when a second weak skip starts', async () => {
+    const bandA = scenarioBand(
+      'band-a',
+      '2026-07-29T18:00:00Z',
+      '2026-07-29T21:00:00Z',
+      { name: 'Grand Magus' },
+    );
+    const bandB = scenarioBand(
+      'band-b',
+      '2026-07-29T18:30:00Z',
+      '2026-07-29T21:30:00Z',
+      { name: 'Airbourne' },
+    );
+    await seedBaseScenario([bandA, bandB]);
+    await saveUserPick(scenarioPick(userId, bandA.id));
+    await saveUserPick(scenarioPick(userId, bandB.id));
+    await saveUserPresence(scenarioPresence(userId, {}));
+
+    const { result } = await waitForNowDataReady();
+    expect(result.current.myPlan.band?.id).toBe(bandB.id);
+
+    await act(async () => {
+      await result.current.handleSkip();
+    });
+
+    await act(async () => {
+      await result.current.handleSkip();
+    });
+
+    expect(recordCommittedSkip).toHaveBeenCalledTimes(1);
+    expect(recordCommittedSkip).toHaveBeenCalledWith(userId, bandB.id);
   });
 });
 

@@ -243,6 +243,12 @@ Visual indicator on band card showing it overlaps with another pick.
 ### Conflict Banner
 Large warning banner on /my-picks if user has 3+ conflicts.
 
+### Weak skip (“I am weak”)
+User taps **souFraco** on `/now` to unpick their current live band with a 5s undo toast. A **committed weak skip** is counted only when the unpick sticks after undo expires — stored in `user_metadata.weak_skips_2026`. Generic unpicks (schedule card, detail modal, conflict resolver) never increment this counter.
+
+### Generic unpick
+Removing a pick through any path other than the `/now` weak-skip button (card toggle, band detail, conflict resolver).
+
 ### Stage Color
 CSS custom property mapped to each stage. Example: Faster (`var(--stage-faster)` / `#2980b9` blue), Harder (`var(--stage-harder)` / `#e67e22` orange). Defined in `src/index.css`; resolved to token strings by `stageColors.ts`. Full color table in `docs/ai-wiki/stages.md`.
 
