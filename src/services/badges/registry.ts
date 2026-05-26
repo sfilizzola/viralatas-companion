@@ -699,6 +699,13 @@ export const BADGES: BadgeConfig[] = [
 //   Example: camped at least 3 separate times during the festival
 //   { slug: 'tent-rat', condition: { type: 'location_visit_count_min', location: 'camping', count: 3 } }
 //
+// weak_skips_min
+//   Badge earned when user has committed N+ "I am weak" skips on /now (unpick sticks after undo window).
+//   Counter in user_metadata.weak_skips_2026 via recordCommittedSkip(); generic card unpicks do not count.
+//   Choose persist:true or false per badge at author time.
+//   Example: committed 3+ weak skips
+//   { slug: 'serial-skipper', condition: { type: 'weak_skips_min', count: 3 }, year: 2026 }
+//
 // crew_at_location_min
 //   Earned when user is at a location AND N+ crew members are there at the same time.
 //   Permanent once earned (slug stored in user_metadata.crew_earned_badge_slugs).

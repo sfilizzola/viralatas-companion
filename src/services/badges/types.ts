@@ -40,6 +40,8 @@ export type BadgeCondition =
   | { type: 'wacken_arrived_on'; day: string }
   // Location visit count: earned when user has toggled into a location N+ times
   | { type: 'location_visit_count_min'; location: 'camping' | 'metal_place' | 'lost'; count: number }
+  // Committed weak skips on /now ("I am weak"): count from user_metadata.weak_skips_2026
+  | { type: 'weak_skips_min'; count: number }
   // Crew at location: earned when user is at a location AND N+ crew are there; permanent once earned
   | { type: 'crew_at_location_min'; location: 'camping' | 'lost'; count: number }
   // Time-based: count bands whose CEST start_time >= hour (symmetric to `before` variants)
@@ -75,6 +77,7 @@ export type BadgeContext = {
   seenBands: BadgeBand[];
   missedBandIds: Set<string>;
   locationVisits: Record<string, number>;
+  weakSkipCount: number;
   currentLocation: string | null;
   crewLocationCounts: Record<string, number>;
   achievedBadgeSlugs: Set<string>; // persist:true badges already recorded in user_metadata

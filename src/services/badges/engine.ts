@@ -23,6 +23,7 @@ export function buildBadgeContext(
   currentLocation: string | null = null,
   crewLocationCounts: Record<string, number> = {},
   achievedBadgeSlugs: Set<string> = new Set(),
+  weakSkipCount: number = 0,
 ): BadgeContext {
   const meta = user.user_metadata;
   const maxAttendance = userPickBandIds.reduce(
@@ -46,6 +47,7 @@ export function buildBadgeContext(
     seenBands,
     missedBandIds,
     locationVisits,
+    weakSkipCount,
     currentLocation,
     crewLocationCounts,
     achievedBadgeSlugs,
@@ -131,6 +133,8 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
       return ctx.wacken_arrival_day === condition.day;
     case 'location_visit_count_min':
       return (ctx.locationVisits[condition.location] ?? 0) >= condition.count;
+    case 'weak_skips_min':
+      return ctx.weakSkipCount >= condition.count;
     case 'crew_at_location_min':
       return (
         ctx.currentLocation === condition.location &&

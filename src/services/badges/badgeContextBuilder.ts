@@ -7,6 +7,7 @@ import {
   mapCrewLivePlans,
 } from '../livePreview';
 import { now } from '../time';
+import { getWeakSkipCount } from '../weakSkipMetadata';
 import { buildBadgeContext } from './engine';
 import type { BadgeBand, BadgeContext } from './types';
 import { mergedPersistedBadgeSlugs } from './persistMetadata';
@@ -22,6 +23,7 @@ export const EMPTY_BADGE_CONTEXT: BadgeContext = {
   seenBands: [],
   missedBandIds: new Set(),
   locationVisits: {},
+  weakSkipCount: 0,
   currentLocation: null,
   crewLocationCounts: {},
   achievedBadgeSlugs: new Set(),
@@ -83,6 +85,7 @@ export function buildBadgeContextFromSnapshot(
   const crewLocationCounts = crewLocationCountsFromGroups(crewGroups);
 
   const locationVisits = (authUser.user_metadata?.location_visits as Record<string, number>) ?? {};
+  const weakSkipCount = getWeakSkipCount(authUser.user_metadata);
   const achievedBadgeSlugs = mergedPersistedBadgeSlugs(authUser.user_metadata);
 
   return buildBadgeContext(
@@ -97,5 +100,6 @@ export function buildBadgeContextFromSnapshot(
     currentLocation,
     crewLocationCounts,
     achievedBadgeSlugs,
+    weakSkipCount,
   );
 }

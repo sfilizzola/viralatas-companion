@@ -822,6 +822,32 @@ describe('evaluateBadge — location_visit_count_min', () => {
   });
 });
 
+describe('evaluateBadge — weak_skips_min', () => {
+  it('returns true when weakSkipCount >= count', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      [],
+      new Map(),
+      new Map(),
+      new Set(),
+      new Date(),
+      [],
+      {},
+      null,
+      {},
+      new Set(),
+      3,
+    );
+    expect(evaluateBadge(badge({ type: 'weak_skips_min', count: 3 }), ctx)).toBe(true);
+    expect(evaluateBadge(badge({ type: 'weak_skips_min', count: 4 }), ctx)).toBe(false);
+  });
+
+  it('defaults weakSkipCount to 0', () => {
+    const ctx = buildBadgeContext(authUser(), [], new Map(), new Map());
+    expect(evaluateBadge(badge({ type: 'weak_skips_min', count: 1 }), ctx)).toBe(false);
+  });
+});
+
 describe('evaluateBadge — crew_at_location_min', () => {
   it('returns true when user is at location AND crew count >= threshold', () => {
     const ctx = buildBadgeContext(

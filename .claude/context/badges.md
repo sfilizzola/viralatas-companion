@@ -96,6 +96,11 @@ A band is **seen** when `now > band.end_time` AND its id is **not** in `missedBa
 | `location_visit_count_min` | `location: 'camping' \| 'metal_place' \| 'lost', count` | `user_metadata.location_visits[location] >= count` |
 | `crew_at_location_min` | `location: 'camping' \| 'lost', count` | User is currently at `location` AND ≥ N crew are too (count via `computeCrewLocationCounts`, same rules as `/now`). **`'metal_place'` is NOT a valid location for this predicate.** Pair with `persist: true` so the badge survives the crew dispersing. |
 
+### Weak skip (1)
+| Type | Inputs | Meaning |
+|---|---|---|
+| `weak_skips_min` | `count: number` | `user_metadata.weak_skips_2026 >= count` (committed `/now` "I am weak" only; see `weakSkips.ts`) |
+
 ### Manual (1)
 | Type | Inputs | Meaning |
 |---|---|---|
@@ -123,6 +128,7 @@ type BadgeContext = {
   seenBands: BadgeBand[];                      // pickedBands ∧ end_time < now ∧ ¬missed
   missedBandIds: Set<string>;                  // user_missed_bands rows
   locationVisits: Record<string, number>;      // user_metadata.location_visits
+  weakSkipCount: number;                         // user_metadata.weak_skips_2026
   currentLocation: string | null;
   crewLocationCounts: Record<string, number>;  // computeCrewLocationCounts — aligned with /now
   achievedBadgeSlugs: Set<string>;             // persist:true slugs already recorded

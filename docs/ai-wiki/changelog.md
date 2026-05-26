@@ -4,6 +4,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-26 (Weak skip badge engine plumbing)
+
+### Added
+- **`weak_skips_min`** badge condition + `BadgeContext.weakSkipCount` — engine ready for future weak-skip badges; no registry entries yet.
+- **`evaluateBadge`** branch and **`buildBadgeContextFromSnapshot`** wiring via `getWeakSkipCount()`.
+- Tests in `badges.test.ts` and `badgeContextBuilder.test.ts`.
+
+### Changed
+- **`docs/ai-wiki/badges.md`**, **`.claude/context/badges.md`**, **`registry.ts`** author comments — document `weak_skips_min`.
+- **`docs/superpowers/specs/2026-05-26-weak-skip-counter-design.md`** — badge context section marked implemented.
+
+### Architectural Notes
+- `getWeakSkipCount()` lives in `weakSkipMetadata.ts` (no Supabase import) so `badgeContextBuilder` stays testable without pulling auth client. `weakSkips.ts` re-exports for write path.
+- `BadgesDisplay` unchanged until a badge is authored. Refresh path: `recordCommittedSkip` → `USER_UPDATED` → `useBadgeCache` (same as `location_visits`).
+
+---
+
 ## 2026-05-26 (Weak skip counter)
 
 ### Added

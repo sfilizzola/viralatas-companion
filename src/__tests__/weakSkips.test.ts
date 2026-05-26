@@ -14,34 +14,12 @@ vi.mock('../lib/supabase', () => ({
   },
 }));
 
-import {
-  WEAK_SKIPS_2026_KEY,
-  getWeakSkipCount,
-  recordCommittedSkip,
-} from '../services/weakSkips';
+import { WEAK_SKIPS_2026_KEY, recordCommittedSkip } from '../services/weakSkips';
 
 beforeEach(() => {
   getUser.mockReset();
   updateUser.mockReset();
   updateUser.mockReturnValue({ catch: vi.fn() });
-});
-
-describe('getWeakSkipCount', () => {
-  it('returns 0 when key is missing', () => {
-    expect(getWeakSkipCount(undefined)).toBe(0);
-    expect(getWeakSkipCount({})).toBe(0);
-  });
-
-  it('returns 0 for invalid values', () => {
-    expect(getWeakSkipCount({ [WEAK_SKIPS_2026_KEY]: '3' })).toBe(0);
-    expect(getWeakSkipCount({ [WEAK_SKIPS_2026_KEY]: -1 })).toBe(0);
-    expect(getWeakSkipCount({ [WEAK_SKIPS_2026_KEY]: NaN })).toBe(0);
-  });
-
-  it('reads an existing non-negative integer count', () => {
-    expect(getWeakSkipCount({ [WEAK_SKIPS_2026_KEY]: 4 })).toBe(4);
-    expect(getWeakSkipCount({ [WEAK_SKIPS_2026_KEY]: 2.9 })).toBe(2);
-  });
 });
 
 describe('recordCommittedSkip', () => {

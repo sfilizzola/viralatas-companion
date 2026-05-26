@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import { buildBadgeContextFromSnapshot } from '../services/badges/badgeContextBuilder';
-import { evaluateBadge, BADGES } from '../services/badges';
+import { evaluateBadge, BADGES, type BadgeConfig } from '../services/badges';
 import { SCENARIO_NOW } from './fixtures/liveNowScenarios';
 import type { Band, CrewUser } from '../types';
 
@@ -38,6 +38,16 @@ const brCrewUser: CrewUser = {
   wacken_arrival_day: null,
   is_friend: false,
 };
+
+function badge(condition: BadgeConfig['condition']): BadgeConfig {
+  return {
+    slug: 'test',
+    imagePath: '/badges/test.png',
+    labelKey: 'test',
+    descriptionKey: 'test',
+    condition,
+  };
+}
 
 describe('buildBadgeContextFromSnapshot', () => {
   it('builds pick counts and metadata from snapshot inputs', () => {
@@ -116,5 +126,28 @@ describe('buildBadgeContextFromSnapshot', () => {
     );
 
     expect(ctx.achievedBadgeSlugs.has('lost-together')).toBe(true);
+  });
+
+  it('reads weak_skips_2026 from auth metadata into weakSkipCount', () => {
+    const ctx = buildBadgeContextFromSnapshot(
+      {
+        userPicks: [],
+        allPicks: [],
+        bands: [],
+        allMissed: [],
+        assignedBadges: [],
+        isCurrentUserFriend: false,
+        presence: [],
+        crewUsers: [brCrewUser],
+        metalPlaceWindowActive: false,
+        liveTestBandId: null,
+      },
+      'user-badge-ctx',
+      authUser({ weak_skips_2026: 2 }),
+    );
+
+    expect(ctx.weakSkipCount).toBe(2);
+    expect(evaluateBadge(badge({ type: 'weak_skips_min', count: 2 }), ctx)).toBe(true);
+    expect(evaluateBadge(badge({ type: 'weak_skips_min', count: 3 }), ctx)).toBe(false);
   });
 });

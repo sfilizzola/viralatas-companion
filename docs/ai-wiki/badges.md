@@ -526,6 +526,19 @@ Badge earned when user has **checked into a location at least N times** (persist
 2. Each location change increments the counter for that location
 3. Badge persists even if user later changes location away
 
+#### `weak_skips_min`
+Badge earned when user has **committed N+ "I am weak" skips** on `/now` (unpick sticks after the 5s undo window).
+
+```typescript
+{ type: 'weak_skips_min', count: 3 }
+```
+
+**Counter**: `user_metadata.weak_skips_2026` via `recordCommittedSkip()` — generic schedule-card unpicks do not increment.
+
+**Registry**: Condition and evaluator shipped; **no badge entries yet**. Choose `persist: true` or `false` per badge at author time.
+
+**Refresh**: `auth.updateUser` after commit → `USER_UPDATED` → `useBadgeCache.refresh()` → `BadgesDisplay` re-evaluates.
+
 #### `crew_at_location_min`
 Earned when user **is at a location AND N+ crew members are there** (permanent once earned).
 
@@ -805,6 +818,7 @@ type BadgeContext = {
   seenBands: BadgeBand[];              // Seen = after end_time, not opted-out
   missedBandIds: Set<string>;          // Opted-out via "didn't see" toggle
   locationVisits: Record<string, number>;  // { camping: 3, metal_place: 1 }
+  weakSkipCount: number;               // user_metadata.weak_skips_2026 (committed /now skips)
   currentLocation: string | null;      // 'camping', 'metal_place', 'lost', or null (live band / friend)
   crewLocationCounts: Record<string, number>;  // From crewLocationCountsFromGroups — matches /now location cards
   achievedBadgeSlugs: Set<string>;     // Merge of achieved_badge_slugs + crew_earned_badge_slugs
@@ -1058,6 +1072,7 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 | `bands_seen_after_hour_min` | `hour, count` | `23, 2` → saw 2+ after 11 PM |
 | `band_seen_named` | `name: string` | `'Alestorm'` → saw Alestorm |
 | `location_visit_count_min` | `location, count` | `'metal_place', 1` → visited Metal Place |
+| `weak_skips_min` | `count` | `3` → committed 3+ "I am weak" skips |
 | `crew_at_location_min` | `location, count` | `'camping', 15` → 15+ crew camping |
 | `assigned` | (none) | Godlike manual assignment |
 

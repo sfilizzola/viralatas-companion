@@ -149,15 +149,15 @@ export function recordCommittedSkip(
 - On `handleSkip`: schedule commit; on `handleUndo`: cancel commit.
 - On commit fire: call `recordCommittedSkip` only if pick is absent.
 
-### Future badge context (not implemented now)
+### Future badge context (implemented)
 
-When badges ship, extend `BadgeContext` with `weakSkipCount: number` and read via `getWeakSkipCount(authUser.user_metadata)` in `badgeContextBuilder.ts`. New condition type candidate:
+`BadgeContext.weakSkipCount` is populated from `getWeakSkipCount(authUser.user_metadata)` in `badgeContextBuilder.ts` and passed to `buildBadgeContext()`. Condition type:
 
 ```ts
 { type: 'weak_skips_min'; count: number }
 ```
 
-Registry entries and `evaluateBadge` branch deferred.
+Evaluated in `evaluateBadge` as `ctx.weakSkipCount >= count`. **No registry entries yet** — add badge PNG + i18n + `BADGES[]` row when ready. Choose `persist: true` or `false` per badge at author time. Live refresh relies on existing `USER_UPDATED` → `useBadgeCache.refresh()` after `recordCommittedSkip()` updates auth metadata.
 
 ### Future Supabase sync (not implemented now)
 
