@@ -36,3 +36,6 @@ coverage/
 
 # Visual brainstorm sessions
 .superpowers/
+
+# Local design demos and scratch work
+_temp/
