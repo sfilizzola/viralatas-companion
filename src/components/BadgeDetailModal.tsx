@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import type { BadgeConfig } from '../services/badges/types';
 import { useI18n } from '../lib/i18n';
 import { Modal } from '../ui';
@@ -8,9 +8,10 @@ import styles from './BadgesDisplay.module.css';
 type BadgeDetailModalProps = {
   badge: BadgeConfig;
   onClose: () => void;
+  footer?: ReactNode;
 };
 
-export default function BadgeDetailModal({ badge, onClose }: BadgeDetailModalProps) {
+export default function BadgeDetailModal({ badge, onClose, footer }: BadgeDetailModalProps) {
   const { t } = useI18n('Badges');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const label = t(badge.labelKey);
@@ -46,6 +47,7 @@ export default function BadgeDetailModal({ badge, onClose }: BadgeDetailModalPro
         </div>
         <h3 className={styles.modalName}>{label}</h3>
         <p className={styles.modalDesc}>{t(badge.descriptionKey)}</p>
+        {footer}
       </Modal>
 
       {isFullscreen && (
