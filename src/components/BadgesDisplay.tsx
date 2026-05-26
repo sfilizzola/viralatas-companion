@@ -27,7 +27,7 @@ import {
   PATCHES_LAYOUT_CHANGED_EVENT,
   type PatchesLayout,
 } from '../lib/patchesLayout';
-import { Modal } from '../ui';
+import BadgeDetailModal from './BadgeDetailModal';
 import styles from './BadgesDisplay.module.css';
 
 type BadgesDisplayProps = Readonly<{
@@ -64,8 +64,6 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
     globalThis.addEventListener(PATCHES_LAYOUT_CHANGED_EVENT, onLayoutChange);
     return () => globalThis.removeEventListener(PATCHES_LAYOUT_CHANGED_EVENT, onLayoutChange);
   }, []);
-
-  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const earned = BADGES.filter((b) => evaluateBadge(b, ctx));
   const selectedBadge: BadgeConfig | null = selectedSlug
@@ -262,55 +260,7 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
       </div>
 
       {selectedBadge && (
-        <Modal onClose={() => { setSelectedSlug(null); setIsFullscreen(false); }} contentClassName={styles.modalContent}>
-          <div className={styles.modalPatch}>
-            <img
-              src={selectedBadge.imagePath}
-              alt={t(selectedBadge.labelKey)}
-              className={styles.modalImg}
-            />
-            {selectedBadge.year && (
-              <span className={styles.modalYearChip}>{yearSuffix(selectedBadge.year)}</span>
-            )}
-            <button
-              type="button"
-              className={styles.zoomBtn}
-              onClick={() => setIsFullscreen(true)}
-              aria-label="View badge fullscreen"
-            >
-              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.8"/>
-                <line x1="10.5" y1="10.5" x2="14.5" y2="14.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </button>
-          </div>
-          <h3 className={styles.modalName}>{t(selectedBadge.labelKey)}</h3>
-          <p className={styles.modalDesc}>{t(selectedBadge.descriptionKey)}</p>
-        </Modal>
-      )}
-
-      {isFullscreen && selectedBadge && (
-        <button
-          type="button"
-          className={styles.fullscreenOverlay}
-          onClick={() => setIsFullscreen(false)}
-          aria-label={`Close fullscreen view of ${t(selectedBadge.labelKey)}`}
-        >
-          <img
-            src={selectedBadge.imagePath}
-            alt={t(selectedBadge.labelKey)}
-            className={styles.fullscreenImg}
-          />
-          {selectedBadge.year && (
-            <span className={styles.fullscreenYearChip}>{yearSuffix(selectedBadge.year)}</span>
-          )}
-          <span className={styles.fullscreenClose} aria-hidden="true">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-              <line x1="2" y1="2" x2="16" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="16" y1="2" x2="2" y2="16" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </span>
-        </button>
+        <BadgeDetailModal badge={selectedBadge} onClose={() => setSelectedSlug(null)} />
       )}
     </>
   );

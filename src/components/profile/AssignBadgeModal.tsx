@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useI18n } from '../../lib/i18n';
 import { BADGES } from '../../services/badges';
+import PatchTile from '../badges/PatchTile';
+import badgeStyles from '../BadgesDisplay.module.css';
+import { Modal } from '../../ui';
 import type { UserWithLoading } from './types';
 import styles from '../../pages/ProfilePage.module.css';
 
@@ -12,10 +15,6 @@ type AssignBadgeModalProps = {
   onClose: () => void;
   t: (key: string, values?: Record<string, string | number>) => string;
 };
-
-function yearSuffix(year: number): string {
-  return String(year).slice(-2);
-}
 
 export default function AssignBadgeModal({ targetUser, onAssign, onClose, t }: AssignBadgeModalProps) {
   const [busy, setBusy] = useState(false);
@@ -40,86 +39,70 @@ export default function AssignBadgeModal({ targetUser, onAssign, onClose, t }: A
   }
 
   return (
-    <div className={styles.conflictModal} onClick={onClose} role="dialog" aria-modal="true">
-      <div className={styles.conflictModalContent} onClick={(e) => e.stopPropagation()}>
-        <div className={styles.abmHeader}>
-          <div className={styles.abmKicker}>{t('assignBadgeKicker')}</div>
-          <h3 className={styles.abmTitle}>{name}</h3>
-        </div>
+    <Modal onClose={onClose} contentClassName={styles.assignBadgeModal}>
+      <div className={styles.abmHeader}>
+        <div className={badgeStyles.patchesHeading}>{t('assignBadgeKicker')}</div>
+        <h3 className={styles.abmTitle}>{name}</h3>
+      </div>
 
-        {error && <p className={styles.userRowError}>{error}</p>}
+      {error && <p className={styles.userRowError}>{error}</p>}
 
-        {/* Assigned section */}
-        <div className={styles.abmSection}>
-          <div className={styles.abmSectionLabel}>
-            {t('assignedPatches')}
-            {assigned.length > 0 && (
-              <span className={styles.abmCount}>{assigned.length}</span>
-            )}
-          </div>
-
-          {assigned.length === 0 ? (
-            <div className={styles.abmEmpty}>{t('noPatchesAssigned')}</div>
-          ) : (
-            <div className={styles.abmAssignedStrip}>
-              {assigned.map((badge) => (
-                <button
-                  key={badge.slug}
-                  className={`${styles.abmPatch} ${styles.abmPatchAssigned}`}
-                  onClick={() => doAction(badge.slug, 'revoke')}
-                  disabled={busy}
-                  type="button"
-                  title={`${tBadges(badge.labelKey)} — ${t('clickToRevoke')}`}
-                >
-                  <div className={styles.abmPatchImgWrap}>
-                    <img src={badge.imagePath} alt="" className={styles.abmPatchImg} />
-                    {badge.year && (
-                      <span className={styles.abmYearChip}>{yearSuffix(badge.year)}</span>
-                    )}
-                    <span className={styles.abmRevokeOverlay}>✕</span>
-                  </div>
-                  <span className={styles.abmPatchName}>{tBadges(badge.labelKey)}</span>
-                </button>
-              ))}
-            </div>
+      <div className={styles.abmSection}>
+        <div className={badgeStyles.patchesHeading}>
+          {t('assignedPatches')}
+          {assigned.length > 0 && (
+            <span className={styles.abmCount}>{assigned.length}</span>
           )}
         </div>
 
-        {/* Available section */}
-        {available.length > 0 && (
-          <div className={styles.abmSection}>
-            <div className={styles.abmSectionLabel}>{t('availablePatches')}</div>
-            <div className={styles.abmAvailableGrid}>
-              {available.map((badge) => (
-                <button
-                  key={badge.slug}
-                  className={styles.abmPatch}
-                  onClick={() => doAction(badge.slug, 'assign')}
-                  disabled={busy}
-                  type="button"
-                  title={`${tBadges(badge.labelKey)} — ${tBadges(badge.descriptionKey)}`}
-                >
-                  <div className={styles.abmPatchImgWrap}>
-                    <img src={badge.imagePath} alt="" className={styles.abmPatchImg} />
-                    {badge.year && (
-                      <span className={styles.abmYearChip}>{yearSuffix(badge.year)}</span>
-                    )}
-                  </div>
-                  <span className={styles.abmPatchName}>{tBadges(badge.labelKey)}</span>
-                </button>
-              ))}
-            </div>
+        {assigned.length === 0 ? (
+          <div className={styles.abmEmpty}>{t('noPatchesAssigned')}</div>
+        ) : (
+          <div className={`${badgeStyles.patchesGrid} ${styles.abmAssignedGrid}`} data-bg="steel">
+            {assigned.map((badge, index) => (
+              <PatchTile
+                key={badge.slug}
+                badge={badge}
+                gridIndex={index}
+                animate={false}
+                className={styles.abmAssignedTile}
+                disabled={busy}
+                onClick={() => doAction(badge.slug, 'revoke')}
+                ariaLabel={`${tBadges(badge.labelKey)} — ${t('clickToRevoke')}`}
+                title={`${tBadges(badge.labelKey)} — ${t('clickToRevoke')}`}
+                overlay={<span className={styles.abmRevokeOverlay}>✕</span>}
+              />
+            ))}
           </div>
         )}
-
-        <button
-          className={`${styles.conflictButton} ${styles.conflictCloseButton}`}
-          onClick={onClose}
-          type="button"
-        >
-          {t('close')}
-        </button>
       </div>
-    </div>
+
+      {available.length > 0 && (
+        <div className={styles.abmSection}>
+          <div className={badgeStyles.patchesHeading}>{t('availablePatches')}</div>
+          <div className={`${badgeStyles.patchesGrid} ${styles.abmAvailableGrid}`} data-bg="steel">
+            {available.map((badge, index) => (
+              <PatchTile
+                key={badge.slug}
+                badge={badge}
+                gridIndex={index}
+                disabled={busy}
+                onClick={() => doAction(badge.slug, 'assign')}
+                ariaLabel={tBadges(badge.labelKey)}
+                title={`${tBadges(badge.labelKey)} — ${tBadges(badge.descriptionKey)}`}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      <button
+        className={badgeStyles.spreadBtn}
+        onClick={onClose}
+        type="button"
+      >
+        {t('close')}
+      </button>
+    </Modal>
   );
 }
