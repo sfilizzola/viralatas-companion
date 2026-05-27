@@ -4,6 +4,30 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-27 (Phase 29 closed)
+
+### Added
+- **`user_badge_history`** — Supabase table + RLS; IndexedDB v10 store; frozen year-badge archive survives `festival:reset`.
+- **`consolidate-year-badges`** Edge Function — godlike year snapshot (Deno badge engine/registry copies); idempotent; test users excluded.
+- **Client archive stack** — `badgeHistoryRepository`, `useUserBadgeHistory`, `BadgeHistorySection` (U2 layout), godlike `ConsolidateBadgesSection`.
+- **`getCurrentFestivalYear()`**, **`isLiveVestBadge()`**, **`isFestivalEnded()`** — live vest filters to evergreen + current festival year only.
+- **Godlike archive preview** — `TestBadgeSection` seeds local IDB rows without Supabase (`seedLocalPreview` / `clearLocalPreview`).
+
+### Changed
+- **Vest terminology** — kutte → vest (and locale equivalents) across UI, wiki, and design docs.
+- **`BadgeDetailModal`** — optional `showDescription` / `showZoom` for archive taps (M2).
+- **`BadgeHistorySection` U2 polish** — flat 4×48 px grid, Oswald year headings, red enamel diamond year chips (24 px @ 48 px patch).
+- **Wiki sync** — `index.md`, `architecture.md`, `domain-model.md`, `routes.md`, `offline-first.md`, `badges.md`, `festival-reset.md`, `supabase-schema.md`, `phases-history.md`.
+- **`public/Design System.html`** — Previously Achieved + consolidation anatomy with diamond chip demo.
+
+### Architectural Notes
+- Badge history follows golden rule: UI → IndexedDB; Supabase is sync target on profile mount / `'online'`. No offline queue for consolidate (network-only godlike op).
+- Frozen rows store `image_path` + `label_key` at consolidate time (P1 asset immutability).
+- After consolidation + `festival:reset`, year-badges appear only in **Previously Achieved** — not on the live vest.
+- **581 tests passing** at phase close.
+
+---
+
 ## 2026-05-27 (Terminology: kutte → vest)
 
 ### Changed

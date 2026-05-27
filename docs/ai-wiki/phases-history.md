@@ -609,15 +609,16 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Edge Function `consolidate-year-badges` (engine/registry/types copies + `contextBuilder.ts`)
 - IDB v10 `user_badge_history` store; `badgeHistoryRepository`; `useUserBadgeHistory`
 - `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()`
-- `BadgeHistorySection`, godlike `ConsolidateBadgesSection`; archive modal M2 (no description/zoom)
-- Tests: `time.test.ts`, `currentFestivalYear.test.ts`, `badgeHistoryRepository.test.ts`, `db.test.ts` wipe coverage
+- `BadgeHistorySection` (U2 flat grid, diamond year chips), godlike `ConsolidateBadgesSection`; archive modal M2 (no description/zoom)
+- Godlike archive preview seed (`TestBadgeSection`); kutte → vest terminology
+- Tests: `time.test.ts`, `currentFestivalYear.test.ts`, `badgeHistoryRepository.test.ts`, `archivePreviewSeed.test.ts`, `db.test.ts` wipe coverage
 
 **Acceptance criteria (all met):**
 - [x] Idempotent consolidation; godlike-only; test users excluded; evergreen excluded
 - [x] Live vest filters current year; archive offline after first profile sync
-- [x] `rtk npm run build` green · `rtk npm test` green — 577 tests
+- [x] `rtk npm run build` green · `rtk npm test` green — 581 tests
 
-**Wiki:** `badges.md` · `festival-reset.md` · `supabase-schema.md` · `changelog.md` · `Design System.html`
+**Wiki:** `badges.md` · `festival-reset.md` · `supabase-schema.md` · `architecture.md` · `domain-model.md` · `index.md` · `routes.md` · `offline-first.md` · `changelog.md` · `Design System.html`
 
 **Architectural notes:**
 - UI → IndexedDB for badge history; Supabase sync on profile load / reconnect.

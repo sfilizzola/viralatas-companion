@@ -11,6 +11,7 @@ Document the guarantees, tradeoffs, and mechanics of the offline-first architect
 - `src/lib/db/` — IndexedDB domain modules (barrel at `index.ts`; public shim `src/lib/db.ts`), stores, event emission
 - `src/repositories/bands.ts` — Band fetch on login (`sync()`), cache version wipe + full re-sync (Phase 27.H)
 - `src/repositories/picks.ts`, `announcements.ts`, `presence.ts`, `missed.ts`, `duck.ts` — Offline queue logic + `flushOfflineQueue()`
+- `src/repositories/badgeHistoryRepository.ts` — Badge archive IDB read + Supabase pull (no offline queue; Phase 29)
 - `src/lib/syncCoordinator.ts` — Single reconnect contract (Phase 27.C)
 - `src/components/sync/` — `BandSync`, `ReconnectSync`, `RealtimeSync`, `CacheVersionCheck` (Phase 26.G + 27.C/D/H)
 - `vite.config.ts` — PWA / Service Worker caching strategy
@@ -56,6 +57,8 @@ The app **must** remain fully functional offline:
 - ✅ Post announcements (queued for sync)
 - ✅ Update presence (queued for sync)
 - ✅ Mark bands as seen (queued for sync)
+- ✅ View badge archive on `/profile` (cached after first sync; no Realtime)
+- ❌ Run badge year consolidation (godlike; requires network)
 - ❌ Receive LLM alerts (requires network call)
 - ❌ See brand-new announcements (requires Realtime)
 
@@ -378,6 +381,15 @@ Delete from offline queue:
 |----------|-----------|
 | Check in offline | Queued, synced on reconnect ✓ |
 | Check in, toggle, reconnect | Last toggle synced ✓ |
+
+### Badge history (Phase 29)
+
+| Scenario | Guarantee |
+|----------|-----------|
+| View archive offline | Served from IndexedDB after first profile sync ✓ |
+| Consolidate year offline | Not available — Edge Function requires network ✓ |
+| `festival:reset` | Archive rows untouched in Supabase and IDB ✓ |
+| Re-consolidate same year | Idempotent upsert (`UNIQUE user_id, festival_year, slug`) ✓ |
 
 ---
 

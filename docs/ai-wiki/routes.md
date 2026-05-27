@@ -272,12 +272,17 @@ export default function PrivateRoute({ children }: Props) {
 - Years at Wacken (multi-select)
 - Arrival day picker
 
-#### Badges (All-Badges Patches Grid)
-- Grid of badge icons (4/6/8 cols responsive)
-- Locked badges shown as grayscale
-- Unlocked badges shown in color
-- Tooltip on hover with badge name + description
-- Modal on click with details
+#### Patches (Live Vest)
+- **`BadgesDisplay`** — collapsed vest stack (chaotic scatter or neat row) + expanded 4-col grid
+- Live badges only: evergreen + current festival year (`isLiveVestBadge()`)
+- Tap expanded patch → detail modal + fullscreen zoom
+- Per-device vest color + layout preferences (localStorage)
+
+#### Previously Achieved (Phase 29)
+- **`BadgeHistorySection`** — collapsible archive below live vest; hidden when IDB history empty
+- U2 layout: flat `repeat(4, 48px)` grid per year, Oswald `Wacken {year}` headings, red enamel diamond year chips (24 px)
+- Tap archive patch → `BadgeDetailModal` (label + year chip only; no description/zoom)
+- Offline after first profile sync (`useUserBadgeHistory` → IDB first)
 
 #### Conflicts (Collapsible)
 - List of band conflicts in user's picks
@@ -315,6 +320,10 @@ export default function PrivateRoute({ children }: Props) {
 - **Cache management**:
   - Button to "Clear local cache" (wipeAllLocalData)
   - Button to bump cache version (forces refresh)
+- **Badge consolidation** (Phase 29):
+  - **`ConsolidateBadgesSection`** — year selector, force checkbox, gate until `isFestivalEnded()`
+  - Confirm modal → `consolidate-year-badges` Edge Function
+- **Test badges** — assign badges + **Archive preview (local)** (seeds IDB without Supabase)
 - **Announce** — Post announcement as godlike (future)
 
 #### Manager Admin Panel (Manager+ only, Collapsible)
@@ -448,4 +457,4 @@ AnnouncementsPage (offline)
 
 ---
 
-**Last updated:** 2026-05-22 — added PlaylistLaunchButton on `/my-picks`, MoshSplitSection on `/profile`, playlist admin toggle
+**Last updated:** 2026-05-27 — Phase 29 Previously Achieved archive + godlike consolidate on `/profile`

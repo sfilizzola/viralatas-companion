@@ -27,6 +27,7 @@ Viralatas Metaleiros is a small group (~20 people) attending Wacken Open Air 202
 7. **PushSubscription** — A device-level Web Push subscription for background notifications (Phase 20)
 8. **Announcement** — A mural post from any vira-lata
 9. **BlockedPoster** — Manager blocking moderation rules
+10. **UserBadgeHistory** — Frozen year-badge row after godlike consolidation (Phase 29)
 
 ---
 
@@ -393,6 +394,52 @@ type LiveBandTestConfig = {
 
 ---
 
+### UserBadgeHistory
+
+**Essence**: A frozen snapshot of one earned year-badge, written when godlike consolidates a festival year. Survives `festival:reset` and outlives live vest metadata.
+
+```typescript
+type UserBadgeHistoryRow = {
+  id: string;                  // uuid
+  user_id: string;             // uuid FK → users
+  festival_year: number;       // e.g. 2026
+  slug: string;                // badge registry slug
+  image_path: string;          // frozen at consolidate time (P1 asset immutability)
+  label_key: string;           // frozen i18n key at consolidate time
+  consolidated_at: string;     // ISO 8601
+};
+```
+
+**Invariants:**
+- `UNIQUE (user_id, festival_year, slug)` — idempotent re-consolidation
+- Test users (`is_test_user = true`) excluded from consolidation
+- Evergreen badges (`!year` on `BadgeConfig`) never archived
+- `festival:reset` never deletes or modifies rows
+
+**Business Rules:**
+- Godlike-only consolidation via `consolidate-year-badges` Edge Function
+- Run after `isFestivalEnded()` and before next `festival:reset` (force bypass available)
+- Live vest shows only evergreen + `year === getCurrentFestivalYear()`; archived years appear in **Previously Achieved** on `/profile`
+- Client reads IDB first; Supabase pull on profile mount / reconnect (no offline queue)
+
+**Lifecycle:**
+1. Vira-lata earns year-badges during festival (live vest)
+2. After festival ends, godlike runs **Consolidar badges YYYY**
+3. Edge Function evaluates badge engine per non-test user; upserts frozen rows to Supabase
+4. Client `useUserBadgeHistory` syncs rows into IndexedDB `user_badge_history` store
+5. `BadgeHistorySection` renders U2 flat grid grouped by `festival_year` desc
+6. After `festival:reset`, year-badges visible only in archive — not on live vest
+
+**Relevant source files:**
+- `supabase/migrations/20260527000001_user_badge_history.sql`
+- `supabase/functions/consolidate-year-badges/`
+- `src/repositories/badgeHistoryRepository.ts`
+- `src/hooks/useUserBadgeHistory.ts`
+- `src/components/BadgeHistorySection.tsx`
+- `src/lib/db/badgeHistory.ts`
+
+---
+
 ## Relationships
 
 ```
@@ -404,7 +451,9 @@ User (1) ──┬─→ (∞) UserPick ←─ (∞) Band
            │
            ├─→ (∞) BlockedPoster [via user_id or blocked_by]
            │
-           └─→ (∞) UserMissedBand ←─ (∞) Band
+           ├─→ (∞) UserMissedBand ←─ (∞) Band
+           │
+           └─→ (∞) UserBadgeHistory
 
 
 Announcement
@@ -482,6 +531,7 @@ Computed in `useNowData()` using current time + user picks.
 - Control Metal Place check-in window
 - Time travel (test mode)
 - Assign special joke badges
+- Consolidate year-badges into archive (`ConsolidateBadgesSection`)
 - Configure live band test override
 - Edit test user flag
 - Modify other users' profiles (future)
@@ -498,6 +548,8 @@ Computed in `useNowData()` using current time + user picks.
 | Author exists for announcement | Foreign key | Low (soft moderation) |
 | Band exists for pick | Foreign key (optional enforcement) | Low (orphaned picks OK) |
 | Godlike role limited to 1 email | Trigger on signup | High |
+| Badge history unique per user/year/slug | DB unique constraint | Medium |
+| Archive survives festival reset | `festival:reset` scope guard | High |
 
 ---
 
@@ -529,4 +581,4 @@ Computed in `useNowData()` using current time + user picks.
 
 ---
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-27 — Phase 29 `UserBadgeHistory` entity, consolidation lifecycle, live vest vs archive split.

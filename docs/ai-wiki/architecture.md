@@ -22,7 +22,14 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/components/PlaylistLaunchButton.tsx` — Setlist deep-link strip (Phase 22)
 - `src/components/profile/MoshSplitSection.tsx` — MoshSplit balance section (Phase 23 Part 2 — real API via Vercel proxy)
 - `src/components/BadgesDisplay.tsx` — Vest-stack patches UI (presentation)
+- `src/components/BadgeHistorySection.tsx` — Previously Achieved archive (U2 layout)
+- `src/components/profile/ConsolidateBadgesSection.tsx` — Godlike year consolidation panel
 - `src/hooks/useBadgeContext.ts` — IDB-first badge context + persist recording + `computeCrewLocationCounts`
+- `src/hooks/useUserBadgeHistory.ts` — IDB-first badge history; sync on profile mount / reconnect
+- `src/repositories/badgeHistoryRepository.ts` — IDB read + Supabase pull; `consolidateYear()` Edge Function invoke
+- `src/lib/db/badgeHistory.ts` — IndexedDB replace-all for current user on sync
+- `src/services/badges/currentFestivalYear.ts` — `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()`
+- `supabase/functions/consolidate-year-badges/` — Server-side year-badge snapshot (Deno badge engine copies)
 - `vite.config.ts` — PWA configuration, caching strategy, and local dev proxy for MoshSplit API
 - `vercel.json` — Vercel rewrites including MoshSplit CORS proxy (`/api/moshsplit/:path*`)
 
@@ -197,9 +204,9 @@ emitPicksChanged();               // Components re-render
 
 #### IndexedDB (`src/lib/db/`)
 
-Public import path remains `src/lib/db.ts` (thin re-export shim). Domain modules live under `src/lib/db/` (`connection`, `session`, `catalog`, `picks`, `presence`, `announcements`, `missed`, `config`, `duck`, `meta`, `events`, `types`).
+Public import path remains `src/lib/db.ts` (thin re-export shim). Domain modules live under `src/lib/db/` (`connection`, `session`, `catalog`, `picks`, `presence`, `announcements`, `missed`, `config`, `duck`, `badgeHistory`, `meta`, `events`, `types`).
 
-**Version**: 8 (incremented on schema changes)
+**Version**: 10 (incremented on schema changes — Phase 29 adds `user_badge_history`)
 
 **Object Stores** (collections):
 
@@ -216,6 +223,7 @@ Public import path remains `src/lib/db.ts` (thin re-export shim). Domain modules
 | `pending_announcements` | announcement.id | Announcements posted offline |
 | `user_missed_bands` | [user_id, band_id] | Bands user marked as "didn't watch" |
 | `offline_missed_bands` | uuid | Missed marks made offline |
+| `user_badge_history` | id (uuid) | Frozen year-badge archive per user (Phase 29) |
 | `metal_place_config` | string `'current'` | Festival day/time for Metal Place |
 | `live_band_test_config` | string `'current'` | Test override for live band (godlike) |
 | `meta` | string `'cache_version'` | Cache version for invalidation |
@@ -421,6 +429,7 @@ INSERT into user_picks
 | `usePickActions()` | `{ pickedIds, refresh, togglePick, pickBand, unpickBand }` | `PICKS_CHANGED_EVENT` | SchedulePage, MyPicksPage, PopularPage, ConflictSection, useNowData |
 | `useMissedBands()` | `{ allMissed, missedBandIds, missedCountsByBand, mark, unmark, toggleMissed, refresh }` | `MISSED_CHANGED_EVENT` | MyPicksPage, PopularPage, `useBadgeContext` |
 | `useBadgeContext(user)` | `{ ctx, loading }` | `PICKS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT`, auth `USER_UPDATED` | BadgesDisplay, ProfilePage |
+| `useUserBadgeHistory(userId)` | `{ rows, loading }` | `BADGE_HISTORY_CHANGED_EVENT`, `online` | BadgeHistorySection |
 | `useBandDetailModal()` | `{ activeBand, openBand, closeBand, modalProps }` | None (local state + composed inputs) | MyPicksPage, PopularPage |
 | `useAnnouncements()` | `{ announcements, visibleAnnouncements, crewUsers, userRoles, blockedUserIds, pendingAnnouncementIds, loading, isBlocked, canModerate, loadMore, post, deleteAnnouncement, blockUser, pin, … }` | `ANNOUNCEMENTS_CHANGED_EVENT`, `BLOCKED_POSTERS_CHANGED_EVENT` | AnnouncementsPage |
 | `usePickCounts()` | `Record<bandId, count>` | `PICKS_CHANGED_EVENT` | RightNowPage, PopularPage — `countPicks` is an exported pure fn |
@@ -444,6 +453,7 @@ INSERT into user_picks
 | `usersRepository` | `syncCrew()`, `fetchUserRolesMap()`, `fetchAllUsers()`, `setUserRole()`, `fetchBlockedPosters*()`, `blockUser()`, `unblockUser()`, `subscribeToRealtime()` | Writes crew_users IDB (syncCrew); admin ops network-only |
 | `missedRepository` | `toggle()`, `flushOfflineQueue()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues offline |
 | `bandsRepository` | `checkAndApplyCacheVersion()`, `loadBands()` | Wipes IDB if cache version changes |
+| `badgeHistoryRepository` | `loadLocal()`, `syncFromRemote()`, `consolidateYear()`, `seedLocalPreview()`, `clearLocalPreview()` | Writes `user_badge_history` IDB; pull from Supabase; godlike consolidate via Edge Function |
 
 ### Services (src/services/)
 
@@ -459,6 +469,26 @@ INSERT into user_picks
 | `scheduleFilterStorage.ts` | `loadStoredFilters()` / `saveStoredFilters()` — localStorage persistence for schedule filter state; extracted from `SchedulePage` | ✅ Yes |
 | `attendees.ts` | `computeAttendees(picks, crewUsers)` — maps raw picks to hydrated `BandAttendee[]` per band; exports `BandAttendee` and `AttendeeMap` types | ✅ Yes |
 | `weakSkips.ts` | `getWeakSkipCount()`, `recordCommittedSkip()` — committed “I am weak” skips in `user_metadata.weak_skips_2026` via best-effort `auth.updateUser` (same pattern as `location_visits` in `presenceRepository`) | Auth metadata only |
+| `badges/currentFestivalYear.ts` | `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()` — live vest year filter + consolidation gate | ✅ Yes |
+
+### Badge archive flow (Phase 29)
+
+After Wacken ends, godlike runs **Consolidar badges YYYY** → `consolidate-year-badges` Edge Function evaluates each non-test user's earned year-badges and upserts frozen rows into `public.user_badge_history` (`image_path`, `label_key` snapshotted at consolidate time).
+
+```
+/profile mount
+    │
+    ▼
+useUserBadgeHistory ──► badgeHistoryRepository.loadLocal()  [IDB first]
+    │
+    └─ if online ──► syncFromRemote() ──► replaceUserBadgeHistory() ──► BADGE_HISTORY_CHANGED_EVENT
+                              │
+BadgeHistorySection ◄─────────┘  (hidden when empty; U2 flat grid by festival_year desc)
+
+Live vest (BadgesDisplay): isLiveVestBadge() → evergreen + current festival year only
+```
+
+Consolidation is **network-only** (no offline queue). Archive reads are fully offline after first profile sync. `festival:reset` never touches `user_badge_history`. See [Badge System — Year-Badge Archive](badges.md#year-badge-archive--consolidation-phase-29).
 
 ---
 
@@ -470,6 +500,7 @@ INSERT into user_picks
 - Presence update: Queued to `offline_presence`
 - Missed band mark: Queued to `offline_missed_bands`
 - Weak skip counter / location visit counts: Best-effort `auth.updateUser` on commit (no IDB queue; session cache is read source for badges)
+- Badge history: Read from IDB; pull from Supabase on profile mount and `'online'` (no offline queue — godlike consolidate requires network)
 
 **Reads:**
 - Always from IndexedDB (stale if offline)
@@ -566,4 +597,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-05-24 — Lost location badge fix: `useBadgeContext` + `computeCrewLocationCounts`; BadgesDisplay presentation-only.
+**Last updated:** 2026-05-27 — Phase 29 badge archive (IDB v10, `useUserBadgeHistory`, consolidate Edge Function); live vest year filter.

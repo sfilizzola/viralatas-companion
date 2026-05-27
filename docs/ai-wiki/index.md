@@ -1,6 +1,6 @@
 # Viralatas Companion — Architectural Wiki
 
-**Last Updated**: 2026-05-24 (Phase 25 closed)
+**Last Updated**: 2026-05-27 (Phase 29 closed)
 
 ## Purpose
 
@@ -52,7 +52,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[Band Lineup](lineup.md)** — Band assignments by day and stage; cross-references stages.md via Slot IDs
 
 ### Features & Mechanics
-- **[Badge System](badges.md)** — 22+ condition types, current badges, how to add new badges, localization, testing
+- **[Badge System](badges.md)** — 22+ condition types, live vest + Previously Achieved archive, year consolidation, how to add badges
 
 ### Flows & Behaviors
 - **[Flow: Picking a Band](flows/pick-band.md)** — Optimistic write, realtime update, offline fallback
@@ -180,18 +180,19 @@ window.addEventListener('viralatas:picks-changed', () => {
        │ immediate writes + event emit            │
        ▼                                          │
 ┌──────────────────────┐                  ┌──────▼──────────┐
-│  IndexedDB (v8)      │                  │ Window Events   │
+│  IndexedDB (v10)     │                  │ Window Events   │
 │                      │                  │                 │
 │  stores:             │                  │ 'picks-changed' │
 │  - user_picks        │◄─────────────────│ 'crew-users-...'│
 │  - offline_picks     │                  │ 'presence-...'  │
 │  - announcements     │                  │ 'announce-...'  │
-│  - offline_ann.      │                  │                 │
+│  - offline_ann.      │                  │ 'badge-history' │
 │  - bands (cache)     │                  └─────────────────┘
 │  - crew_users (cache)│
 │  - user_presence     │
 │  - offline_presence  │
 │  - user_missed_bands │
+│  - user_badge_history│
 │  - offline_missed    │
 └──────────┬───────────┘
            │ async sync (reconnect, 'online' event)
@@ -212,7 +213,8 @@ window.addEventListener('viralatas:picks-changed', () => {
 
 | Concern | Files |
 |---------|-------|
-| **Offline Store** | `src/lib/db.ts`, `src/lib/db/badgeHistory.ts`, `src/__tests__/` |
+| **Offline Store** | `src/lib/db.ts`, `src/lib/db/badgeHistory.ts`, `src/repositories/badgeHistoryRepository.ts`, `src/__tests__/` |
+| **Badge archive** | `src/hooks/useUserBadgeHistory.ts`, `src/components/BadgeHistorySection.tsx`, `src/components/profile/ConsolidateBadgesSection.tsx`, `supabase/functions/consolidate-year-badges/` |
 | **Sync Engine** | `src/repositories/bands.ts`, `src/repositories/picks.ts`, `src/repositories/announcements.ts`, `src/lib/syncCoordinator.ts` |
 | **Realtime** | `src/lib/realtimeSync.ts`, `src/hooks/usePickCounts.ts`, `src/hooks/useBandAttendees.ts` |
 | **Auth** | `src/lib/supabase.ts`, `src/hooks/useAuth.ts`, `src/pages/LoginPage.tsx` |
@@ -235,6 +237,7 @@ window.addEventListener('viralatas:picks-changed', () => {
 - **Announcement**: Text posts with author, creation time, soft-delete support
 - **UserPresence**: Camping status, Metal Place check-in status
 - **UserMissedBand**: Bands user marked as "didn't watch" (for badges)
+- **UserBadgeHistory**: Frozen year-badge rows after godlike consolidation (Phase 29); survives `festival:reset`
 
 > **Stage is not a DB entity.** Each `Band` record stores `stage: string`. Stage metadata (colors, schedules, pairing rules) lives in `docs/ai-wiki/stages.md` and in source constants (`stageColors.ts`, `SchedulePage.tsx`). Band assignments per slot live in `docs/ai-wiki/lineup.md`.
 
@@ -243,7 +246,8 @@ window.addEventListener('viralatas:picks-changed', () => {
 User (1) ──┬─→ (∞) UserPick ←─ (∞) Band
            ├─→ (∞) Announcement
            ├─→ (1) UserPresence
-           └─→ (∞) UserMissedBand
+           ├─→ (∞) UserMissedBand
+           └─→ (∞) UserBadgeHistory
 ```
 
 ---
@@ -475,4 +479,4 @@ Window events dispatched by hooks/components (not from db.ts):
 
 ---
 
-**Last edited**: 2026-05-22 — App Pack flows, reading path 9
+**Last edited**: 2026-05-27 — Phase 29 badge archive, IDB v10, vest terminology
