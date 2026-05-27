@@ -7,6 +7,7 @@ import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';
 import { announcementsRepository } from '../repositories';
 import { VERSION } from '../version';
+import BadgeHistorySection from '../components/BadgeHistorySection';
 import BottomNav from '../components/BottomNav';
 import BadgesDisplay from '../components/BadgesDisplay';
 import ProfileHeader from '../components/profile/ProfileHeader';
@@ -98,6 +99,8 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
       <section className={styles.pfSection}>
         <BadgesDisplay user={user} />
       </section>
+
+      <BadgeHistorySection userId={user.id} />
 
       <ConflictSection userId={user.id} t={t} />
       <MoshSplitSection userEmail={user.email ?? ''} />

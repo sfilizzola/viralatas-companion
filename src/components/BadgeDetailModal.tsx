@@ -9,9 +9,18 @@ type BadgeDetailModalProps = {
   badge: BadgeConfig;
   onClose: () => void;
   footer?: ReactNode;
+  /** History archive (M2): label + year chip only. */
+  showDescription?: boolean;
+  showZoom?: boolean;
 };
 
-export default function BadgeDetailModal({ badge, onClose, footer }: BadgeDetailModalProps) {
+export default function BadgeDetailModal({
+  badge,
+  onClose,
+  footer,
+  showDescription = true,
+  showZoom = true,
+}: BadgeDetailModalProps) {
   const { t } = useI18n('Badges');
   const [isFullscreen, setIsFullscreen] = useState(false);
   const label = t(badge.labelKey);
@@ -33,24 +42,28 @@ export default function BadgeDetailModal({ badge, onClose, footer }: BadgeDetail
           {badge.year && (
             <span className={styles.modalYearChip}>{badgeYearSuffix(badge.year)}</span>
           )}
-          <button
-            type="button"
-            className={styles.zoomBtn}
-            onClick={() => setIsFullscreen(true)}
-            aria-label="View badge fullscreen"
-          >
-            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-              <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.8" />
-              <line x1="10.5" y1="10.5" x2="14.5" y2="14.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-            </svg>
-          </button>
+          {showZoom && (
+            <button
+              type="button"
+              className={styles.zoomBtn}
+              onClick={() => setIsFullscreen(true)}
+              aria-label="View badge fullscreen"
+            >
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+                <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" strokeWidth="1.8" />
+                <line x1="10.5" y1="10.5" x2="14.5" y2="14.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
         </div>
         <h3 className={styles.modalName}>{label}</h3>
-        <p className={styles.modalDesc}>{t(badge.descriptionKey)}</p>
+        {showDescription && (
+          <p className={styles.modalDesc}>{t(badge.descriptionKey)}</p>
+        )}
         {footer}
       </Modal>
 
-      {isFullscreen && (
+      {showZoom && isFullscreen && (
         <button
           type="button"
           className={styles.fullscreenOverlay}

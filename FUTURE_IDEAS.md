@@ -481,7 +481,7 @@ No new backend work is needed — `user_presence` is already synced via Supabase
 
 **When:** Available once the last non-ceremony band's `end_time` has passed. Discovery via a teaser banner on `/now` and/or `/profile` (dismissible per device). Route remains reachable for godlike time-travel testing before festival end.
 
-**Layout decision (locked in design exploration):** **A2 · Kutte Chronicle** — extends the patches vest language from `BadgesDisplay` (stage color top bar, surface cards, chaos meters, denim kutte finale with chaotic patch pile). HTML prototypes live in `_temp/wrap-proposals/` (`variant-a2-kutte-chronicle.html`, comparison gallery `index.html`).
+**Layout decision (locked in design exploration):** **A2 · Vest Chronicle** — extends the patches vest language from `BadgesDisplay` (stage color top bar, surface cards, chaos meters, denim vest finale with chaotic patch pile). HTML prototypes live in `_temp/wrap-proposals/` (`variant-a2-vest-chronicle.html`, comparison gallery `index.html`).
 
 ---
 
@@ -495,7 +495,7 @@ One private route `/wrap`. Five full-viewport sections with optional `scroll-sna
 | 2 | Personality | Top genre + top stage copy; stage-colored pill (`Harder stage · N visited`) |
 | 3 | Chaos | Horizontal meters: weak skips, hard schedule conflicts, patches earned |
 | 4 | Crew | Pick twin (name + overlap %); crew favorite band (name + pick count / active vira-latas) |
-| 5 | Patches | Chaotic scattered earned badge thumbnails on denim kutte texture; CTA **Open vest on profile** → `/profile` |
+| 5 | Patches | Chaotic scattered earned badge thumbnails on denim vest texture; CTA **Open vest on profile** → `/profile` |
 
 **Visual system (from Design System):**
 - Tokens: `--bg`, `--bg-surface`, `--text`, `--text-muted`, `--accent` (#c0392b CTA)
@@ -591,8 +591,8 @@ Discovery
 | `src/services/festivalWrap.ts` | Pure stats builder + types |
 | `src/services/time.ts` | Add `isFestivalEnded()` |
 | `src/hooks/useFestivalWrapStats.ts` | IDB + auth compose hook |
-| `src/pages/WrapPage.tsx` | A2 Kutte layout |
-| `src/pages/WrapPage.module.css` | Stage bar, meters, kutte finale |
+| `src/pages/WrapPage.tsx` | A2 Vest layout |
+| `src/pages/WrapPage.module.css` | Stage bar, meters, vest finale |
 | `src/i18n/WrapPage_*.json` | br, en, es, de |
 | `src/App.tsx` | Private route `/wrap` |
 | `src/pages/RightNowPage.tsx` / `ProfilePage.tsx` | Post-festival teaser banner |
@@ -611,7 +611,7 @@ Discovery
 
 ### Acceptance criteria
 
-- [ ] `/wrap` renders five scroll sections with A2 Kutte visual language (stage bar, meters, patch pile, progress dots).
+- [ ] `/wrap` renders five scroll sections with A2 Vest visual language (stage bar, meters, patch pile, progress dots).
 - [ ] All displayed stats match badge engine semantics for seen/picked/skipped/conflicts.
 - [ ] Page works fully offline after first load (stats from IndexedDB only).
 - [ ] Teaser banner appears only after `isFestivalEnded()` and respects dismiss localStorage key.

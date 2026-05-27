@@ -2,7 +2,7 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { ViralatasDB } from './types';
 
 export const DB_NAME = 'viralatas-db';
-export const DB_VERSION = 9;
+export const DB_VERSION = 10;
 
 /** Canonical object store list — keep in sync with the upgrade() block below. */
 export const VIRALATAS_OBJECT_STORES = [
@@ -21,6 +21,7 @@ export const VIRALATAS_OBJECT_STORES = [
   'user_missed_bands',
   'offline_missed_bands',
   'offline_duck_quacks',
+  'user_badge_history',
 ] as const satisfies readonly (keyof ViralatasDB)[];
 
 /** Preserved on cache-version invalidation (session + local cache_version marker). */
@@ -99,6 +100,12 @@ export function getDB() {
         }
         if (!db.objectStoreNames.contains('offline_duck_quacks')) {
           db.createObjectStore('offline_duck_quacks', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('user_badge_history')) {
+          const historyStore = db.createObjectStore('user_badge_history', {
+            keyPath: ['user_id', 'festival_year', 'slug'],
+          });
+          historyStore.createIndex('by_user', 'user_id');
         }
       },
     });

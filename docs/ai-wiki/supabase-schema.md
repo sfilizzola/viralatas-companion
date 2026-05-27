@@ -363,6 +363,33 @@ CREATE INDEX idx_user_missed_bands_user_id ON public.user_missed_bands(user_id);
 
 ---
 
+### `public.user_badge_history`
+
+**Purpose**: Frozen year-badge archive after godlike consolidation (Phase 29). Survives `festival:reset`.
+
+```sql
+CREATE TABLE public.user_badge_history (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  festival_year integer NOT NULL,
+  slug text NOT NULL,
+  image_path text NOT NULL,
+  label_key text NOT NULL,
+  consolidated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE (user_id, festival_year, slug)
+);
+```
+
+**Semantics**: One row per earned year-badge at consolidate time. `image_path` and `label_key` are frozen from `BadgeConfig` (P1 — PNGs never overwritten).
+
+**Realtime**: Disabled (pull on profile load).
+
+**RLS Policies**:
+- Users: SELECT own rows
+- Godlike: ALL (via Edge Function service role for bulk upsert)
+
+---
+
 ### `public.metal_place_config`
 
 **Purpose**: Godlike settings for Metal Place check-in window.

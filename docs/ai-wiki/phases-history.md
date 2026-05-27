@@ -598,3 +598,29 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Neat layout is pure presentation in `neatStackLayout.ts`; chaotic math unchanged in `stackLayout.ts`.
 
 ---
+
+### Phase 29 — Badge Consolidation (Year Archive)
+**Status:** ✅ Complete
+
+**Goal:** Snapshot year-badges into `user_badge_history` after Wacken ends so 2026 wins survive `festival:reset`. Live vest shows evergreen + current-festival badges; past years in **Conquistas Anteriores** on `/profile`.
+
+**Deliverables:**
+- Migration `20260527000001_user_badge_history.sql` + RLS
+- Edge Function `consolidate-year-badges` (engine/registry/types copies + `contextBuilder.ts`)
+- IDB v10 `user_badge_history` store; `badgeHistoryRepository`; `useUserBadgeHistory`
+- `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()`
+- `BadgeHistorySection`, godlike `ConsolidateBadgesSection`; archive modal M2 (no description/zoom)
+- Tests: `time.test.ts`, `currentFestivalYear.test.ts`, `badgeHistoryRepository.test.ts`, `db.test.ts` wipe coverage
+
+**Acceptance criteria (all met):**
+- [x] Idempotent consolidation; godlike-only; test users excluded; evergreen excluded
+- [x] Live vest filters current year; archive offline after first profile sync
+- [x] `rtk npm run build` green · `rtk npm test` green — 577 tests
+
+**Wiki:** `badges.md` · `festival-reset.md` · `supabase-schema.md` · `changelog.md` · `Design System.html`
+
+**Architectural notes:**
+- UI → IndexedDB for badge history; Supabase sync on profile load / reconnect.
+- `festival:reset` strip list unchanged — archive lives in dedicated table, not `achieved_badge_slugs`.
+
+---

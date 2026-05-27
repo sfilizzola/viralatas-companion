@@ -45,6 +45,16 @@ export type UserMissedBand = {
   marked_at: string;
 };
 
+export type UserBadgeHistory = {
+  id?: string;
+  user_id: string;
+  festival_year: number;
+  slug: string;
+  image_path: string;
+  label_key: string;
+  consolidated_at?: string;
+};
+
 export type UserPresence = {
   user_id: string;
   is_camping: boolean;

@@ -59,6 +59,7 @@ Flags are commutative. `--dry-run` always overrides write semantics: it shows th
 | `public.bands` (only with `--with-bands`) | Replaced via `bands.ts --force` |
 | `public.user_picks` (only with `--with-bands`) | CASCADE from bands wipe |
 | `public.user_missed_bands` (only with `--with-bands`) | CASCADE from bands wipe |
+| `public.user_badge_history` | **Never touched** — year archive survives reset |
 
 ### Preserved (never touched)
 
@@ -75,6 +76,7 @@ Flags are commutative. `--dry-run` always overrides write semantics: it shows th
 | `public.live_band_test_config` | Godlike sets fresh values before festival |
 | `public.bands` (without `--with-bands`) | Untouched |
 | `public.user_picks` (without `--with-bands`) | Untouched |
+| `public.user_badge_history` | **Never touched** — consolidated year badges are permanent archive |
 
 ---
 

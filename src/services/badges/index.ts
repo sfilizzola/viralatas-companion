@@ -3,3 +3,4 @@ export * from './engine';
 export * from './registry';
 export * from './persistMetadata';
 export * from './badgeContextBuilder';
+export * from './currentFestivalYear';

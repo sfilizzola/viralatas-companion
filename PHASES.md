@@ -10,11 +10,11 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 29 — Badge consolidation (year archive)
 
-**Status:** 📋 Not started
+**Status:** ✅ Complete
 
 **Source:** FUTURE_IDEAS.md · Idea 2 — Badge consolidation
 
-**Goal:** After Wacken ends, godlike operators snapshot each vira-lata's earned **year-badges** into `user_badge_history` so 2026 wins survive `festival:reset` and registry rollover. Live kutte shows evergreen + current-festival badges only; past years live in **Conquistas Anteriores** on `/profile`.
+**Goal:** After Wacken ends, godlike operators snapshot each vira-lata's earned **year-badges** into `user_badge_history` so 2026 wins survive `festival:reset` and registry rollover. Live vest shows evergreen + current-festival badges only; past years live in **Conquistas Anteriores** on `/profile`.
 
 **When to run (operator):** Inside the **consolidation window** — after `isFestivalEnded()`, before the next `npm run festival:reset`. Idempotent; safe to re-run. Exclude test vira-latas (`is_test_user = true`).
 
@@ -24,13 +24,13 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 | Topic | Decision |
 |-------|----------|
-| Post-reset display | **Archive only** — year-badges not on live kutte after reset |
+| Post-reset display | **Archive only** — year-badges not on live vest after reset |
 | Registry rollover | **In-place year bump** — same slugs; `getCurrentFestivalYear()` = max `BadgeConfig.year` in registry |
 | Badge images | **P1** — never overwrite PNGs; new art → new file (e.g. `badge_medic-27.png`); frozen `image_path` at consolidate |
 | Client reads | **O1** — IndexedDB-primary badge history cache; sync from Supabase on `/profile` load when online |
 | Consolidation gate | **T1** — disabled until `isFestivalEnded()`; **F3/B3** godlike bypass via time override **or** confirm-modal `force: true` (server validates godlike) |
-| Transition (pre-reset) | **D1** — duplicate kutte + archive OK; no dedup logic |
-| Previously Achieved UI | **U2 + M2** — read-only grid by year; tap → same overlay patch modal as live kutte (label + year chip only; no description; no zoom) |
+| Transition (pre-reset) | **D1** — duplicate vest + archive OK; no dedup logic |
+| Previously Achieved UI | **U2 + M2** — read-only grid by year; tap → same overlay patch modal as live vest (label + year chip only; no description; no zoom) |
 | Test users | **X1** — excluded from consolidation |
 
 ---
@@ -71,7 +71,7 @@ Edge function contract: `POST { year: number, force?: boolean }` → `{ processe
 | `src/services/time.ts` | `isFestivalEnded(at?, bands?)` — past max non-ceremony `end_time` |
 | `src/components/BadgeHistorySection.tsx` | Collapsible Previously Achieved; grid by `festival_year` desc |
 | `src/components/badges/` (modal share) | History tap → live patch overlay modal (M2); no `descriptionKey`, no zoom |
-| `src/pages/ProfilePage.tsx` | Mount `BadgeHistorySection` below live kutte; godlike consolidate panel |
+| `src/pages/ProfilePage.tsx` | Mount `BadgeHistorySection` below live vest; godlike consolidate panel |
 | `src/i18n/ProfilePage_*.json` | br, en, es, de — section title, year heading, confirm modal, force checkbox, result summary |
 | `public/Design System.html` | Previously Achieved + godlike consolidate anatomy |
 
@@ -101,8 +101,8 @@ Edge function contract: `POST { year: number, force?: boolean }` → `{ processe
 - [ ] Frozen rows store `image_path` and `label_key` from registry at consolidate time
 
 **Live vest**
-- [ ] Kutte evaluates/displays only evergreen + `year === getCurrentFestivalYear()` badges
-- [ ] After consolidation + reset, year-badges visible **only** in Previously Achieved (not kutte)
+- [ ] Vest evaluates/displays only evergreen + `year === getCurrentFestivalYear()` badges
+- [ ] After consolidation + reset, year-badges visible **only** in Previously Achieved (not vest)
 
 **Previously Achieved (U2 + M2)**
 - [ ] Section hidden when IDB history empty
@@ -140,8 +140,6 @@ Edge function contract: `POST { year: number, force?: boolean }` → `{ processe
 - **`festival:reset` strip list unchanged** — archive lives in `user_badge_history`, not `achieved_badge_slugs`.
 - **`isFestivalEnded()`** shared utility — `/wrap` (Idea 7) reuses later; no wrap UI in this phase.
 - **Transition overlap (D1)** intentional until reset; no cross-store dedup.
-
----
 
 ## Phase 30 — TBD
 

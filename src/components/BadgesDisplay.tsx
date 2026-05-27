@@ -3,6 +3,7 @@ import type { User as AuthUser } from '@supabase/supabase-js';
 import {
   BADGES,
   evaluateBadge,
+  isLiveVestBadge,
   type BadgeConfig,
 } from '../services/badges';
 import {
@@ -65,7 +66,7 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
     return () => globalThis.removeEventListener(PATCHES_LAYOUT_CHANGED_EVENT, onLayoutChange);
   }, []);
 
-  const earned = BADGES.filter((b) => evaluateBadge(b, ctx));
+  const earned = BADGES.filter((b) => isLiveVestBadge(b) && evaluateBadge(b, ctx));
   const selectedBadge: BadgeConfig | null = selectedSlug
     ? (earned.find((b) => b.slug === selectedSlug) ?? null)
     : null;
@@ -76,7 +77,7 @@ export default function BadgesDisplay({ user }: BadgesDisplayProps) {
   const [glowingSlugs, setGlowingSlugs] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    const earnedNow = BADGES.filter((b) => evaluateBadge(b, ctx));
+    const earnedNow = BADGES.filter((b) => isLiveVestBadge(b) && evaluateBadge(b, ctx));
     const ack = acknowledgedRef.current;
     const unacked = earnedNow.filter((b) => !ack.has(b.slug)).map((b) => b.slug);
     setGlowingSlugs(new Set(unacked));

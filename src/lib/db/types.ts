@@ -1,4 +1,14 @@
-import type { Announcement, Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserMissedBand, UserPick, UserPresence } from '../../types';
+import type {
+  Announcement,
+  Band,
+  CrewUser,
+  LiveBandTestConfig,
+  MetalPlaceConfig,
+  UserBadgeHistory,
+  UserMissedBand,
+  UserPick,
+  UserPresence,
+} from '../../types';
 
 export type OfflinePickOp = {
   id: string;
@@ -89,5 +99,10 @@ export type ViralatasDB = {
   offline_duck_quacks: {
     key: string;
     value: OfflineDuckQuackOp;
+  };
+  user_badge_history: {
+    key: [string, number, string];
+    value: UserBadgeHistory;
+    indexes: { by_user: string };
   };
 };

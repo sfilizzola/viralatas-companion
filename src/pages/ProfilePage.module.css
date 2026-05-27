@@ -1835,3 +1835,51 @@
 .arrivalDayTabActive .arrivalDayTabDow {
   color: var(--text-muted);
 }
+
+/* Badge consolidation (Phase 29) */
+.consolidateField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 12px 0;
+  font-size: 0.875rem;
+  color: var(--text);
+}
+
+.consolidateSelect {
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.consolidateForceRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: var(--text);
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.consolidateForceRow input {
+  cursor: pointer;
+}
+
+.consolidateModalTitle {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.consolidateModalActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}

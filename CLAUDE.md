@@ -161,12 +161,12 @@ Compact map so agents open the right file first — details stay in `docs/ai-wik
 
 ## Database schema
 
-**9 tables + 1 view:**
+**10 tables + 1 view:**
 
 ```sql
 users, bands, user_picks, announcements, blocked_posters,
 user_presence, user_missed_bands, metal_place_config,
-live_band_test_config, band_attendance (view)
+live_band_test_config, user_badge_history, band_attendance (view)
 ```
 
 **Realtime enabled on:** `user_picks`, `announcements`, `user_presence`, `metal_place_config`, `live_band_test_config`

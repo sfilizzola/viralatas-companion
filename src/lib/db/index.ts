@@ -8,6 +8,7 @@ export {
   PICKS_CHANGED_EVENT,
   PRESENCE_CHANGED_EVENT,
   BLOCKED_POSTERS_CHANGED_EVENT,
+  BADGE_HISTORY_CHANGED_EVENT,
 } from './events';
 export type { OfflineDuckQuackOp, OfflineMissedOp, OfflinePickOp, OfflinePresenceOp } from './types';
 export {
@@ -71,3 +72,4 @@ export {
   removeFromOfflineDuckQuackQueue,
 } from './duck';
 export { wipeAllLocalData, saveCacheVersion, loadCacheVersion } from './meta';
+export { loadUserBadgeHistory, replaceUserBadgeHistory } from './badgeHistory';

@@ -7,3 +7,4 @@ export const METAL_PLACE_CONFIG_CHANGED_EVENT = 'viralatas:metal-place-config-ch
 export const LIVE_BAND_TEST_CONFIG_CHANGED_EVENT = 'viralatas:live-band-test-config-changed';
 export const MISSED_CHANGED_EVENT = 'viralatas:missed-changed';
 export const BLOCKED_POSTERS_CHANGED_EVENT = 'viralatas:blocked-posters-changed';
+export const BADGE_HISTORY_CHANGED_EVENT = 'viralatas:badge-history-changed';

@@ -25,7 +25,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
 | Frontend | React 18 + Vite | Component UI, hot reload |
-| Offline Store | IndexedDB v8 (`idb` lib) | Primary source of truth for reads |
+| Offline Store | IndexedDB v10 (`idb` lib) | Primary source of truth for reads |
 | Sync Target | Supabase PostgreSQL + Realtime | Source of truth for auth, persistence, live updates |
 | Auth | Supabase Auth | Email/password login; persisted to IndexedDB |
 | PWA | Vite PWA Plugin + Workbox | Service Worker, manifest, auto-update, caching |
@@ -212,7 +212,7 @@ window.addEventListener('viralatas:picks-changed', () => {
 
 | Concern | Files |
 |---------|-------|
-| **Offline Store** | `src/lib/db.ts`, `src/__tests__/` |
+| **Offline Store** | `src/lib/db.ts`, `src/lib/db/badgeHistory.ts`, `src/__tests__/` |
 | **Sync Engine** | `src/repositories/bands.ts`, `src/repositories/picks.ts`, `src/repositories/announcements.ts`, `src/lib/syncCoordinator.ts` |
 | **Realtime** | `src/lib/realtimeSync.ts`, `src/hooks/usePickCounts.ts`, `src/hooks/useBandAttendees.ts` |
 | **Auth** | `src/lib/supabase.ts`, `src/hooks/useAuth.ts`, `src/pages/LoginPage.tsx` |
@@ -467,6 +467,7 @@ Window events emitted from `src/lib/db.ts`:
 - `'viralatas:metal-place-config-changed'` — metal_place_config updated
 - `'viralatas:live-band-test-config-changed'` — live_band_test_config updated
 - `'viralatas:missed-changed'` — user_missed_bands or offline_missed_bands updated
+- `'viralatas:badge-history-changed'` — user_badge_history cache updated
 
 Window events dispatched by hooks/components (not from db.ts):
 - `'viralatas:duck-quack'` (CustomEvent `{ detail: { bandId: string } }`) — emitted by `useDuckNotifications` when a Realtime INSERT arrives on `duck_quacks`; consumed by `DuckToast`

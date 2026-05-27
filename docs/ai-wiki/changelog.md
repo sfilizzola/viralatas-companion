@@ -4,6 +4,50 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-27 (Terminology: kutte → vest)
+
+### Changed
+- Replaced **kutte** with **vest** (and locale equivalents: colete, chaleco, Weste) across UI strings, code comments, wiki, and design docs — aligned with existing *Open vest* / `isLiveVestBadge` language.
+
+---
+
+## 2026-05-27 (Previously Achieved U2 polish)
+
+### Changed
+- `BadgeHistorySection` — U2 flat grid (4×48 px, gap 10), Oswald year headings, lighter collapsible header; removed live-vest denim grid shell.
+- Archive patch year chip — red enamel **diamond** (24 px @ 48 px patch), same `.yearChip` language as live vest (clip-path, gloss, hover glow); not the gray pill from early U2 mock.
+- `public/Design System.html` — multi-year archive anatomy + demo aligned with `_temp/badge-history-proposals`; diamond chip spec in patch row.
+- `docs/ai-wiki/badges.md` — U2 layout documents diamond chip sizing.
+
+---
+
+## 2026-05-27 (Godlike archive preview seed)
+
+### Added
+- Godlike **Archive preview (local)** in `TestBadgeSection` — seeds `user_badge_history` IDB rows without Supabase or consolidate; `archivePreviewMode` pauses sync on that device.
+
+### Changed
+- `badgeHistoryRepository.seedLocalPreview` / `clearLocalPreview`; `docs/ai-wiki/badges.md`.
+
+---
+
+## 2026-05-27 (Phase 29 — Badge consolidation)
+
+### Added
+- `user_badge_history` table + RLS; `consolidate-year-badges` Edge Function (Deno copies of badge engine/registry).
+- IndexedDB `user_badge_history` store (v10); `badgeHistoryRepository`, `useUserBadgeHistory`, `BadgeHistorySection`, godlike `ConsolidateBadgesSection`.
+- `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()`; live vest filters to evergreen + current festival year only.
+
+### Changed
+- `BadgeDetailModal` — optional `showDescription` / `showZoom` for archive taps (M2).
+- `docs/ai-wiki/badges.md`, `festival-reset.md`, `supabase-schema.md`; `public/Design System.html` — Previously Achieved + consolidate anatomy.
+
+### Architectural Notes
+- Badge history is IndexedDB-primary on `/profile`; Supabase is sync target. `festival:reset` never touches `user_badge_history`.
+- Frozen rows store `image_path` + `label_key` at consolidate time (P1 asset immutability).
+
+---
+
 ## 2026-05-27 (Alemão Mode badge)
 
 ### Added
@@ -752,7 +796,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ## 2026-05-24 (compact patches — Variant C vest stack)
 
 ### Changed
-- `BadgesDisplay` — **Variant C (Vest Stack):** fixed 112 px collapsed kutte with meadow scatter (±55° rotation, reseed on collapse, anti-bury overlap), glow-only animation when collapsed; **Open vest** / **Close vest** toggle; expanded 4-col grid with `settlePatch`; user `data-bg` on both states.
+- `BadgesDisplay` — **Variant C (Vest Stack):** fixed 112 px collapsed vest with meadow scatter (±55° rotation, reseed on collapse, anti-bury overlap), glow-only animation when collapsed; **Open vest** / **Close vest** toggle; expanded 4-col grid with `settlePatch`; user `data-bg` on both states.
 - `BadgesDisplay.module.css` — stack/spread styles; 48 px patches in both states; `.vestStack[data-bg=…]` shares background variants with `.patchesGrid`.
 - `ProfilePage` / `RightNowPage` — unified patches header inside `BadgesDisplay` (count + vest toggle); removed external `PATCHES` kicker.
 - `src/i18n/Badges_*.json` — `patchesKicker`, `patchesSpread` (Open vest), `patchesCollapse` (Close vest).

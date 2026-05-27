@@ -35,6 +35,12 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 | `src/i18n/Badges_es.json` | Spanish labels + descriptions (if available) |
 | `src/i18n/Badges_de.json` | German labels + descriptions (if available) |
 | `src/components/BadgesDisplay.tsx` | Vest-stack patches presentation (collapsed + expanded), detail modal, fullscreen zoom |
+| `src/components/BadgeHistorySection.tsx` | Collapsible Previously Achieved archive (U2), grouped by `festival_year` |
+| `src/components/profile/ConsolidateBadgesSection.tsx` | Godlike year consolidation panel + confirm modal |
+| `src/services/badges/currentFestivalYear.ts` | `getCurrentFestivalYear()`, `isLiveVestBadge()` — live vest year filter |
+| `src/repositories/badgeHistoryRepository.ts` | IDB read + Supabase pull; `consolidateYear()` Edge Function invoke |
+| `src/hooks/useUserBadgeHistory.ts` | IDB-first badge history; sync on profile mount / reconnect |
+| `src/lib/db/badgeHistory.ts` | IndexedDB replace-all for current user on sync |
 | `src/components/ProfilePage.tsx` | Patches section + admin assign-badge UI |
 | `src/lib/patchesBackground.ts` | Per-device patches grid background preference (localStorage) |
 | `src/lib/patchesLayout.ts` | Per-device collapsed vest layout preference — `chaotic` \| `neat` (localStorage) |
@@ -45,7 +51,7 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 
 ## Patches Vest Stack (Variant C)
 
-The patches UI uses a **collapsed kutte stack** by default (fixed **112 px** height, max-width **480 px**) so large collections (15–22+ badges) do not dominate `/now` or `/profile`. Unified on both routes via `<BadgesDisplay user={user} />`; the deprecated `heading` prop is ignored — kicker + count render internally.
+The patches UI uses a **collapsed vest stack** by default (fixed **112 px** height, max-width **480 px**) so large collections (15–22+ badges) do not dominate `/now` or `/profile`. Unified on both routes via `<BadgesDisplay user={user} />`; the deprecated `heading` prop is ignored — kicker + count render internally.
 
 ### Layout constants
 
@@ -76,7 +82,7 @@ The patches UI uses a **collapsed kutte stack** by default (fixed **112 px** hei
 - **Layout:** 4-column grid, 48 px patches, same `data-bg` battle-vest background.
 - **Animation:** `settlePatch` keyframe with stagger (`42 ms × index` via `--settle-i`).
 - **Interaction:** tap patch → detail modal; magnifying glass → fullscreen overlay. Acknowledging a glowing badge clears glow via `localStorage['badgeAcknowledged']`.
-- **Collapse:** **Close vest** reshuffles `scatterSeed` (chaotic only) and returns to kutte stack.
+- **Collapse:** **Close vest** reshuffles `scatterSeed` (chaotic only) and returns to vest stack.
 
 ### Header & i18n
 
@@ -149,6 +155,33 @@ Collapsed vest layout is a **per-device visual preference** (`chaotic` | `neat`)
 3. Expanded grid unchanged; chaotic reseed on collapse unchanged when mode is chaotic.
 
 **i18n (aria only):** `patchesLayout`, `layoutChaotic`, `layoutNeat` in `ProfilePage_*.json`.
+
+---
+
+## Year-Badge Archive & Consolidation (Phase 29)
+
+After Wacken ends, godlike operators run **Consolidar badges YYYY** (Profile → Godlike Powers) to snapshot each vira-lata's earned **year-badges** into `user_badge_history`. Test vira-latas (`is_test_user = true`) are excluded. Re-runs are idempotent (`UNIQUE (user_id, festival_year, slug)`).
+
+### Live vest vs archive
+
+| Surface | Badges shown |
+|---|---|
+| Live vest (`BadgesDisplay`) | Evergreen (`!year`) + `year === getCurrentFestivalYear()` |
+| Previously Achieved (`BadgeHistorySection`) | Frozen rows from `user_badge_history` by year desc |
+
+After consolidation + `festival:reset`, year-badges appear **only** in Previously Achieved — not on the live vest.
+
+### Consolidation window
+
+Run after `isFestivalEnded()` and before the next `npm run festival:reset`. Godlike bypass: time override past last band end **or** confirm-modal `force: true`.
+
+### Client data flow
+
+`/profile` → `useUserBadgeHistory` → IDB first → Supabase pull when online → `BadgeHistorySection` (hidden when empty). Tap archive patch → `BadgeDetailModal` with `showDescription={false}` `showZoom={false}`.
+
+**U2 layout (locked):** Flat `repeat(4, 48px)` grid per year — no denim vest shell. Mono collapsible header + Oswald `Wacken {year}` headings. Patches at 88% opacity (trophy shelf, not live vest). Year chip: red enamel diamond (24 px @ 48 px patch), same language as live `.yearChip`. Reference: `_temp/badge-history-proposals/index.html` scenario U2.
+
+**Godlike archive preview (dev):** Godlike Powers → Test Badges → *Archive preview (local)*. Seeds IndexedDB only; per-device flag pauses history sync until *Clear preview*.
 
 ---
 

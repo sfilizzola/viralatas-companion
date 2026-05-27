@@ -5,3 +5,4 @@ export { announcementsRepository } from './announcements';
 export { usersRepository } from './users';
 export { bandsRepository } from './bands';
 export { duckRepository } from './duck';
+export { badgeHistoryRepository } from './badgeHistoryRepository';

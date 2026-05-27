@@ -1,5 +1,5 @@
 /* ============================================================
-   PATCHES — Variant C: Vest Stack (chaotic kutte + animated spread)
+   PATCHES — Variant C: Vest Stack (chaotic vest + animated spread)
    Collapsed 112 px fixed · Expanded 4-col grid with staggered settle
    ============================================================ */
 
@@ -52,7 +52,7 @@
   color: var(--text);
 }
 
-/* Collapsed kutte — fixed footprint; patches pile on top as count grows */
+/* Collapsed vest — fixed footprint; patches pile on top as count grows */
 .vestStack:not(.vestSpread) {
   height: 112px;
 }
@@ -421,7 +421,7 @@
   transition: transform 0.15s;
 }
 
-/* Collapsed kutte — static scatter, no interaction; must follow .patchBtn */
+/* Collapsed vest — static scatter, no interaction; must follow .patchBtn */
 .patchBtn.patchStackItem {
   position: absolute;
   left: var(--stack-left);

@@ -37,6 +37,7 @@ import {
   loadOfflinePresenceQueue,
   loadOfflineQueue,
   loadSession,
+  loadUserBadgeHistory,
   loadUserPicks,
   loadUserPresence,
   removeAnnouncementFromCache,
@@ -48,6 +49,7 @@ import {
   removeMissedBand,
   removeUserPick,
   replaceUserMissedBands,
+  replaceUserBadgeHistory,
   replaceUserPicks,
   replaceUserPresence,
   resetDbConnectionForTests,
@@ -612,6 +614,16 @@ describe('IndexedDB layer (lib/db.ts)', () => {
         band_id: 'band-1',
         quacked_at: '2026-05-01T12:00:00Z',
       });
+      await replaceUserBadgeHistory(
+        [{
+          user_id: 'user-1',
+          festival_year: 2026,
+          slug: 'puppy',
+          image_path: '/badges/badge_new-puppy.png',
+          label_key: 'badgePuppy',
+        }],
+        'user-1',
+      );
 
       await wipeAllLocalData();
 
@@ -656,13 +668,16 @@ describe('IndexedDB layer (lib/db.ts)', () => {
           case 'offline_duck_quacks':
             expect(await loadOfflineDuckQuackQueue(), `${store} should be cleared`).toEqual([]);
             break;
+          case 'user_badge_history':
+            expect(await loadUserBadgeHistory('user-1'), `${store} should be cleared`).toEqual([]);
+            break;
         }
       }
 
       expect(await loadSession()).toEqual({ token: 'keep' });
       expect(await loadCacheVersion()).toBe('v1');
 
-      expect(WIPE_CLEARED_STORES).toHaveLength(13);
+      expect(WIPE_CLEARED_STORES).toHaveLength(14);
       expect(WIPE_PRESERVED_STORES).toHaveLength(2);
       expect(WIPE_CLEARED_STORES.length + WIPE_PRESERVED_STORES.length).toBe(
         EXPECTED_OBJECT_STORES.length,

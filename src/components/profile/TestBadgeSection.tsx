@@ -1,6 +1,15 @@
-import { useState } from 'react';
-import { BADGES } from '../../services/badges';
+import { useMemo, useState } from 'react';
+import type { User as AuthUser } from '@supabase/supabase-js';
+import { BADGES, evaluateBadge, isLiveVestBadge } from '../../services/badges';
 import type { BadgeConfig } from '../../services/badges/types';
+import {
+  buildEarnedYearPreviewRows,
+  buildSamplePreviewRows,
+} from '../../services/badges/archivePreviewSeed';
+import { getCurrentFestivalYear } from '../../services/badges/currentFestivalYear';
+import { isArchivePreviewActive } from '../../lib/archivePreviewMode';
+import { useBadgeContext } from '../../hooks/useBadgeContext';
+import { badgeHistoryRepository } from '../../repositories/badgeHistoryRepository';
 import { I18nContext, useI18n, type Language } from '../../lib/i18n';
 import BadgeDetailModal from '../BadgeDetailModal';
 import PatchTile from '../badges/PatchTile';
@@ -18,17 +27,60 @@ const PREVIEW_LANG_OPTIONS = [
 
 type TestBadgeSectionProps = {
   t: (key: string, values?: Record<string, string | number>) => string;
+  user: AuthUser;
 };
 
-export default function TestBadgeSection({ t: _t }: TestBadgeSectionProps) {
-  const { t } = useI18n('Badges');
+export default function TestBadgeSection({ t, user }: TestBadgeSectionProps) {
+  const { t: tBadges } = useI18n('Badges');
+  const { ctx } = useBadgeContext(user);
   const [selectedBadge, setSelectedBadge] = useState<BadgeConfig | null>(null);
   const [previewLanguage, setPreviewLanguage] = useState<Language>('br');
+  const [archiveBusy, setArchiveBusy] = useState(false);
+  const [archiveMessage, setArchiveMessage] = useState<string | null>(null);
+
+  const festivalYear = getCurrentFestivalYear();
+  const earnedYearBadges = useMemo(
+    () => BADGES.filter((badge) => isLiveVestBadge(badge) && evaluateBadge(badge, ctx)),
+    [ctx],
+  );
+  const earnedYearCount = earnedYearBadges.filter((badge) => badge.year === festivalYear).length;
+  const previewActive = isArchivePreviewActive(user.id);
 
   const trigger = <h4 className={profileStyles.liveBandTestSectionTitle}>🎖️ Test Badges</h4>;
 
   function openBadge(badge: BadgeConfig) {
     setSelectedBadge(badge);
+  }
+
+  async function seedArchive(buildRows: () => ReturnType<typeof buildSamplePreviewRows>) {
+    setArchiveBusy(true);
+    setArchiveMessage(null);
+    try {
+      const rows = buildRows();
+      if (rows.length === 0) {
+        setArchiveMessage(t('archivePreviewEmpty'));
+        return;
+      }
+      await badgeHistoryRepository.seedLocalPreview(user.id, rows);
+      setArchiveMessage(t('archivePreviewSeeded', { count: rows.length, year: festivalYear }));
+    } catch {
+      setArchiveMessage(t('archivePreviewError'));
+    } finally {
+      setArchiveBusy(false);
+    }
+  }
+
+  async function clearArchivePreview() {
+    setArchiveBusy(true);
+    setArchiveMessage(null);
+    try {
+      await badgeHistoryRepository.clearLocalPreview(user.id);
+      setArchiveMessage(t('archivePreviewCleared'));
+    } catch {
+      setArchiveMessage(t('archivePreviewError'));
+    } finally {
+      setArchiveBusy(false);
+    }
   }
 
   return (
@@ -38,7 +90,7 @@ export default function TestBadgeSection({ t: _t }: TestBadgeSectionProps) {
           <div className={panelStyles.testBadgePanel}>
             <div className={badgeStyles.patchesHeader}>
               <div className={badgeStyles.patchesHeading}>
-                {t('patchesKicker')}
+                {tBadges('patchesKicker')}
                 <span className={badgeStyles.patchesCount}>· {BADGES.length}</span>
               </div>
             </div>
@@ -49,10 +101,51 @@ export default function TestBadgeSection({ t: _t }: TestBadgeSectionProps) {
                   badge={badge}
                   gridIndex={index}
                   onClick={() => openBadge(badge)}
-                  ariaLabel={t(badge.labelKey)}
-                  title={`${t(badge.labelKey)} (${badge.slug})`}
+                  ariaLabel={tBadges(badge.labelKey)}
+                  title={`${tBadges(badge.labelKey)} (${badge.slug})`}
                 />
               ))}
+            </div>
+
+            <div className={panelStyles.archivePreviewBlock}>
+              <h5 className={panelStyles.archivePreviewTitle}>{t('archivePreviewTitle')}</h5>
+              <p className={profileStyles.liveBandTestDescription}>{t('archivePreviewDescription')}</p>
+              {previewActive && (
+                <p className={profileStyles.testModeHint}>{t('archivePreviewActiveHint')}</p>
+              )}
+              {archiveMessage && (
+                <p className={profileStyles.resetMessage}>{archiveMessage}</p>
+              )}
+              <div className={panelStyles.archivePreviewActions}>
+                <button
+                  type="button"
+                  className={profileStyles.saveButton}
+                  disabled={archiveBusy || earnedYearCount === 0}
+                  onClick={() => void seedArchive(() =>
+                    buildEarnedYearPreviewRows(user.id, earnedYearBadges, festivalYear),
+                  )}
+                >
+                  {t('archivePreviewFromVest', { count: earnedYearCount, year: festivalYear })}
+                </button>
+                <button
+                  type="button"
+                  className={profileStyles.saveButton}
+                  disabled={archiveBusy}
+                  onClick={() => void seedArchive(() =>
+                    buildSamplePreviewRows(user.id, festivalYear),
+                  )}
+                >
+                  {t('archivePreviewSample', { year: festivalYear })}
+                </button>
+                <button
+                  type="button"
+                  className={profileStyles.pfSignOutBtn}
+                  disabled={archiveBusy || !previewActive}
+                  onClick={() => void clearArchivePreview()}
+                >
+                  {t('archivePreviewClear')}
+                </button>
+              </div>
             </div>
           </div>
         </Collapsible>

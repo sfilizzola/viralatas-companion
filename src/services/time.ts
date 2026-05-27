@@ -1,3 +1,5 @@
+import type { Band } from '../types';
+
 export const TIME_OVERRIDE_STORAGE_KEY = 'viralatas-time-override';
 export const TIME_OVERRIDE_CHANGED_EVENT = 'viralatas:time-override-changed';
 
@@ -56,4 +58,24 @@ export function isFestivalActive(at: Date = now()): boolean {
 export function getFestivalDay(at: Date): number {
   const dayOffset = Math.floor((at.getTime() - FESTIVAL_DAY_1_START.getTime()) / FESTIVAL_DAY_MS);
   return dayOffset + 1;
+}
+
+type FestivalEndBand = Pick<Band, 'end_time' | 'category'>;
+
+/** True when `at` is past the latest non-ceremony band end_time. */
+export function isFestivalEnded(
+  at: Date = now(),
+  bands?: FestivalEndBand[],
+): boolean {
+  if (!bands || bands.length === 0) return false;
+
+  const nonCeremony = bands.filter((band) => band.category !== 'ceremony');
+  if (nonCeremony.length === 0) return false;
+
+  const maxEndMs = nonCeremony.reduce((max, band) => {
+    const endMs = new Date(band.end_time).getTime();
+    return endMs > max ? endMs : max;
+  }, Number.NEGATIVE_INFINITY);
+
+  return at.getTime() > maxEndMs;
 }

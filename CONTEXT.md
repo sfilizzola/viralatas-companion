@@ -9,11 +9,11 @@ A one-time, godlike-triggered snapshot that copies each vira-lata's earned year-
 _Avoid_: Year freeze, badge freeze, historical badge migration
 
 **Live vest**:
-The kutte patch display on `/profile` and `/now` — badges earned or persisted for the **current festival cycle** plus evergreen identity badges.
+The vest patch display on `/profile` and `/now` — badges earned or persisted for the **current festival cycle** plus evergreen identity badges.
 _Avoid_: Active badges, current badges
 
 **Previously Achieved** (`Conquistas Anteriores`):
-A profile section showing frozen badges from past festival years, read from `user_badge_history`. The sole home for year-specific wins after consolidation and festival reset. Archived badges render in a read-only grid grouped by year; tap opens the same overlay patch modal as the live kutte (label + year chip only — no description, no fullscreen zoom).
+A profile section showing frozen badges from past festival years, read from `user_badge_history`. The sole home for year-specific wins after consolidation and festival reset. Archived badges render in a read-only grid grouped by year; tap opens the same overlay patch modal as the live vest (label + year chip only — no description, no fullscreen zoom).
 _Avoid_: Historical badges, archived vest, badge history section
 
 **Evergreen badge**:

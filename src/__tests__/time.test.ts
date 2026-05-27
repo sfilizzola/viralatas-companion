@@ -8,6 +8,7 @@ import {
   getFestivalDay,
   getTimeOverride,
   isFestivalActive,
+  isFestivalEnded,
   isTimeOverrideActive,
   now,
   setTimeOverride,
@@ -135,5 +136,35 @@ describe('festival constants', () => {
     expect(getFestivalDay(new Date('2026-07-29T21:59:59.999Z'))).toBe(1);
     expect(getFestivalDay(new Date('2026-07-29T22:00:00.000Z'))).toBe(2);
     expect(getFestivalDay(new Date('2026-07-30T13:00:00.000Z'))).toBe(2);
+  });
+});
+
+describe('isFestivalEnded', () => {
+  const bands = [
+    { end_time: '2026-08-01T20:00:00+02:00', category: 'band' as const },
+    { end_time: '2026-08-01T23:00:00+02:00', category: 'ceremony' as const },
+    { end_time: '2026-08-01T22:00:00+02:00', category: 'band' as const },
+  ];
+
+  it('is false before the latest non-ceremony band ends', () => {
+    expect(isFestivalEnded(new Date('2026-08-01T21:59:59+02:00'), bands)).toBe(false);
+  });
+
+  it('is true after the latest non-ceremony band ends (ignores ceremony end)', () => {
+    expect(isFestivalEnded(new Date('2026-08-01T22:00:01+02:00'), bands)).toBe(true);
+    expect(isFestivalEnded(new Date('2026-08-01T23:30:00+02:00'), bands)).toBe(true);
+  });
+
+  it('returns false when bands list is empty or missing', () => {
+    expect(isFestivalEnded(new Date(), [])).toBe(false);
+    expect(isFestivalEnded(new Date(), undefined)).toBe(false);
+  });
+
+  it('returns false when only ceremony bands exist', () => {
+    expect(
+      isFestivalEnded(new Date('2026-08-02T00:00:00+02:00'), [
+        { end_time: '2026-08-01T23:00:00+02:00', category: 'ceremony' },
+      ]),
+    ).toBe(false);
   });
 });

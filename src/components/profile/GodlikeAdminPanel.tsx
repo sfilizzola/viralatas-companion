@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { UserRole } from '../../types';
 import { supabase } from '../../lib/supabase';
+import { useAuth } from '../../hooks/useAuth';
 import { announcementsRepository } from '../../repositories';
 import { useCooldown } from '../../hooks/useCooldown';
 import { Collapsible } from '../../ui';
@@ -8,6 +9,7 @@ import DuckButton from '../DuckButton';
 import { DUCK_QUACK_EVENT } from '../../hooks/useDuckNotifications';
 import TimeTravelSection from './TimeTravelSection';
 import TestBadgeSection from './TestBadgeSection';
+import ConsolidateBadgesSection from './ConsolidateBadgesSection';
 import CacheResetSection from './CacheResetSection';
 import FeatureFlagsSection from './FeatureFlagsSection';
 import MetalPlaceAdminSection, { type MetalPlaceBridge } from './MetalPlaceAdminSection';
@@ -21,6 +23,7 @@ type GodlikeAdminPanelProps = {
 };
 
 export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps) {
+  const { user } = useAuth();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
   const [duckFeatureEnabled, setDuckFeatureEnabled] = useState(true);
@@ -190,7 +193,8 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
             </div>
 
             <TimeTravelSection />
-            <TestBadgeSection t={t} />
+            <ConsolidateBadgesSection t={t} />
+            <TestBadgeSection t={t} user={user!} />
           </div>
         </div>
       </Collapsible>
