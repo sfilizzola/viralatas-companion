@@ -4,7 +4,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Completed phase history** → `docs/ai-wiki/phases-history.md`
 **Upcoming ideas** → `FUTURE_IDEAS.md`
-**Implementation plan (Phase 30)** → `docs/superpowers/plans/2026-05-27-festival-wrap-plan.md` (execution: **subagent-driven**, § Subagent execution strategy)
+**Implementation plan (Phase 30)** → `docs/superpowers/plans/2026-05-27-festival-wrap-plan.md` (execution: **subagent-driven**, § Subagent execution strategy)  
+**Godlike QA spec** → `docs/superpowers/specs/2026-05-27-festival-wrap-godlike-qa-design.md`
 **Domain glossary (badge consolidation)** → `CONTEXT.md`
 
 ---
@@ -27,7 +28,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 | **30.B** | `useFestivalWrapStats` + `wrapDismiss.ts` localStorage helper |
 | **30.C** | `/wrap` route + page shell (loading / empty / five section scaffold) |
 | **30.D** | A2 UI — scroll-snap, progress dots, all five sections + i18n |
-| **30.E** | Teaser banners on `/now` + `/profile`, Design System, wiki flow page |
+| **30.E** | Teaser banners on `/now` + `/profile`, Time Travel wrap disclaimer (godlike), Design System, wiki flow page |
 
 **Deliverables:**
 
@@ -36,7 +37,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 - `src/pages/WrapPage.tsx` + CSS module — five full-viewport sections, `IntersectionObserver` progress bar
 - `src/components/wrap/WrapProgress.tsx`, `WrapTeaserBanner.tsx`
 - Private route `/wrap` in `App.tsx`
-- Post-festival teaser on `RightNowPage` + `ProfilePage` (gated by `isFestivalEnded()` ✅ Phase 29, dismiss `viralatas:wrap-dismissed-2026`)
+- Post-festival teaser on `RightNowPage` + `ProfilePage` (gated by `isFestivalEnded(now(), bands)` ✅ Phase 29, dismiss `viralatas:wrap-dismissed-2026`; reacts to `viralatas:time-override-changed`)
+- Godlike Time Travel disclaimer (`timeTravelWrapDisclaimer`) — D+1 previews teaser only; `/wrap` route stays open anytime (see `docs/superpowers/specs/2026-05-27-festival-wrap-godlike-qa-design.md`)
 - i18n `WrapPage_*` (br, en, es, de) — **vira-latas** in user-facing copy
 - Tests: `festivalWrap.test.ts`, `wrapDismiss.test.ts`
 - Docs: `docs/ai-wiki/flows/festival-wrap.md`, Design System section, changelog on completion
@@ -46,7 +48,9 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 - [ ] `/wrap` renders five scroll sections with A2 Vest visual language (stage bar, meters, patch pile, progress dots)
 - [ ] All displayed stats match badge engine semantics for seen/picked/skipped/conflicts
 - [ ] Page works fully offline after first load (stats from IndexedDB only)
-- [ ] Teaser banner appears only after `isFestivalEnded()` and respects dismiss localStorage key
+- [ ] Teaser banner appears only after `isFestivalEnded(now(), bands)` and respects dismiss localStorage key
+- [ ] Godlike: D+1 time travel shows wrap teaser on `/now` and `/profile` without reload; Time Travel always shows wrap-only QA disclaimer (4 locales)
+- [ ] `/wrap` route has no festival-ended gate (teaser is the discovery surface)
 - [ ] Copy uses **vira-latas** (not "crew") in all four locales
 - [ ] Friend users never see location-toggle stats on the wrap page
 - [ ] Empty-picks users see a friendly empty state, not broken layout

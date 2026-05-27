@@ -8,7 +8,7 @@
 
 **Tech stack:** React + Vite, IndexedDB (`src/lib/db/`), existing badge services, `isFestivalEnded()` from `src/services/time.ts`, CSS modules, i18n (br/en/es/de).
 
-**Spec source:** `FUTURE_IDEAS.md` § Idea 7 · Visual reference: `_temp/wrap-proposals/variant-a2-vest-chronicle.html` (design-only; not shipped)
+**Spec source:** `FUTURE_IDEAS.md` § Idea 7 · Godlike QA: `docs/superpowers/specs/2026-05-27-festival-wrap-godlike-qa-design.md` · Visual reference: `_temp/wrap-proposals/variant-a2-vest-chronicle.html` (design-only; not shipped)
 
 **Phase:** 30 — Festival Wrap (sub-phases 30.A–30.E below)
 
@@ -23,6 +23,8 @@
 5. `src/services/badges/engine.ts` — `seenBands`, `getEarnedBadges`
 6. `src/hooks/useBandConflicts.ts` — `computeBandOverlaps`
 7. `src/pages/PopularPage.tsx` — crew #1 band sort + `totalViraLatas` pattern
+8. `docs/superpowers/specs/2026-05-27-festival-wrap-godlike-qa-design.md` — teaser vs `/wrap` route, D+1, Time Travel disclaimer
+9. `src/components/profile/TimeTravelSection.tsx` + `ConsolidateBadgesSection.tsx` — time-override reactivity pattern
 
 **Verification gates (every sub-phase):** `rtk npm run build` · `rtk npm test`
 
@@ -41,8 +43,10 @@
 | `src/components/wrap/WrapTeaserBanner.tsx` | Dismissible CTA → `/wrap` |
 | `src/i18n/WrapPage_br.json` (+ en, es, de) | All copy; **vira-latas** not crew |
 | `src/App.tsx` | Private route `/wrap` |
-| `src/pages/RightNowPage.tsx` | Mount teaser when gated |
-| `src/pages/ProfilePage.tsx` | Mount teaser when gated |
+| `src/pages/RightNowPage.tsx` | Mount teaser when gated; listen `viralatas:time-override-changed` |
+| `src/pages/ProfilePage.tsx` | Mount teaser when gated; listen `viralatas:time-override-changed` |
+| `src/components/profile/TimeTravelSection.tsx` | Always-visible wrap QA disclaimer (godlike) |
+| `src/i18n/ProfilePage_*.json` | `timeTravelWrapDisclaimer` (br, en, es, de) |
 | `src/__tests__/festivalWrap.test.ts` | Stats edge cases |
 | `src/__tests__/wrapDismiss.test.ts` | Dismiss key round-trip |
 | `public/Design System.html` | Wrap section anatomy |
@@ -342,11 +346,33 @@ const show =
   !loadingBands;
 ```
 
+Use `now()` from `time.ts` — never raw `new Date()` for the gate.
+
+- [ ] **Subscribe to `viralatas:time-override-changed`** — recompute `show` when godlike changes Time Travel (mirror `ConsolidateBadgesSection.tsx` lines 37–45)
+
 - [ ] **Link to `/wrap`**, dismiss button calls `dismissWrapTeaser()`
 
-- [ ] **Route `/wrap` always reachable when logged in** — no gate on the page itself (godlike time-travel QA)
+- [ ] **Route `/wrap` always reachable when logged in** — no `isFestivalEnded` guard on the page (teaser is the discovery surface; godlike uses D+1 to preview teaser only — see godlike QA spec)
 
 - [ ] **Commit** `Phase 30.E: wrap teaser banner`
+
+---
+
+### Task 12b: Time Travel wrap disclaimer (godlike QA)
+
+**Spec:** `docs/superpowers/specs/2026-05-27-festival-wrap-godlike-qa-design.md`
+
+**Files:**
+- Modify: `src/components/profile/TimeTravelSection.tsx`
+- Modify: `src/i18n/ProfilePage_br.json`, `ProfilePage_en.json`, `ProfilePage_es.json`, `ProfilePage_de.json`
+
+- [ ] **Add key `timeTravelWrapDisclaimer`** in all four locales (wrap teaser only; mention D+1; `/wrap` always testable; do **not** mention consolidate)
+
+- [ ] **Render** second `<p>` under `timeTravelDescription` with same muted description styling
+
+- [ ] **Manual QA:** godlike → Profile → Time Travel → read disclaimer → D+1 → teaser on `/now` without reload → Clear → teaser hides if real time is pre-festival
+
+- [ ] **Commit** `Phase 30.E: time travel wrap QA disclaimer`
 
 ---
 
@@ -380,7 +406,9 @@ const show =
 - [ ] `/wrap` renders five scroll sections with A2 Vest visual language (stage bar, meters, patch pile, progress dots)
 - [ ] All displayed stats match badge engine semantics for seen/picked/skipped/conflicts
 - [ ] Page works fully offline after first load (stats from IndexedDB only)
-- [ ] Teaser banner appears only after `isFestivalEnded()` and respects `viralatas:wrap-dismissed-2026`
+- [ ] Teaser banner appears only after `isFestivalEnded(now(), bands)` and respects `viralatas:wrap-dismissed-2026`
+- [ ] Godlike D+1 time travel shows teaser on `/now` and `/profile` without reload; Time Travel shows wrap-only disclaimer (4 locales)
+- [ ] `/wrap` has no festival-ended route gate
 - [ ] Copy uses **vira-latas** (not "crew") in all four locales
 - [ ] Friend users never see location-toggle stats on the wrap page
 - [ ] Empty-picks users see a friendly empty state, not broken layout
@@ -408,7 +436,8 @@ const show =
 | Five sections A2 | Tasks 9–11 |
 | Badge semantics | Tasks 2–4 |
 | Offline IDB | Tasks 6, 14 |
-| `isFestivalEnded` gate | Task 12 |
+| `isFestivalEnded` gate + godlike D+1 | Tasks 12, 12b |
+| `/wrap` open anytime | Task 12 (no route gate) |
 | Friend privacy | Tasks 2, 11 |
 | Empty picks | Task 1, 8 |
 | Open vest CTA | Task 11 |
@@ -424,7 +453,7 @@ const show =
 
 **Controller (parent agent) responsibilities:**
 
-1. Read this plan once; extract Tasks 1–14 with full step text into a TodoWrite checklist.
+1. Read this plan once; extract Tasks 1–14 and **12b** with full step text into a TodoWrite checklist.
 2. Confirm branch/worktree on a feature branch (not `main` unless user explicitly approved).
 3. For each task: paste **Dispatch packet** (below) into a new `generalPurpose` implementer subagent — never ask the subagent to re-read this file.
 4. After implementer reports **DONE** or **DONE_WITH_CONCERNS**: run spec reviewer → fix loop → code quality reviewer → fix loop.
@@ -454,7 +483,7 @@ Product copy: **vira-latas** (never "crew" in user-facing strings).
 - No Supabase reads for wrap stats; reuse `buildBadgeContextFromSnapshot` semantics.
 - `seenBands` / skipped / conflicts must match `engine.ts` + `computeBandOverlaps`.
 - Friend users: `locationVisitsTotal` null — never render location stats.
-- `/wrap` route always reachable when logged in; teaser gated by `isFestivalEnded()` only.
+- `/wrap` route always reachable when logged in; teaser gated by `isFestivalEnded(now(), bands)` only. Godlike D+1 previews teaser, not route lock (Task 12b: wrap-only Time Travel disclaimer).
 - No schema migrations; no Edge Functions; no client API keys.
 - Prefix shell commands with `rtk` (e.g. `rtk npm test -- src/__tests__/festivalWrap.test.ts`).
 - One commit per task with message from plan (or `Phase 30.X: …`).
@@ -486,7 +515,8 @@ DONE | DONE_WITH_CONCERNS | NEEDS_CONTEXT | BLOCKED
 | 9 | 30.D | standard | Scroll-snap + `IntersectionObserver` |
 | 10 | 30.D | standard | Sections 1–3 + 4 locale files |
 | 11 | 30.D | standard | Crew + patch pile; reuses `stackLayout.ts` |
-| 12 | 30.E | standard | Banner + two page mounts |
+| 12 | 30.E | standard | Banner + two page mounts + `time-override-changed` |
+| 12b | 30.E | fast | Time Travel disclaimer + ProfilePage i18n only |
 | 13 | 30.E | fast | Docs/HTML only — invoke **wiki-curator** subagent instead of generic implementer |
 | 14 | 30.E | standard | Phase metadata — invoke **phase-closer** subagent |
 
@@ -510,7 +540,8 @@ Implementer (Task N)
 - Compare git diff to **Task N** text only.
 - Flag missing behavior, extra features, wrong file paths.
 - For Tasks 2–4: require stat parity with `BadgeContext` / `PopularPage` sort.
-- For Task 12: teaser must not gate `/wrap` page itself.
+- For Task 12: teaser must not gate `/wrap` page itself; must use `now()` and listen for `viralatas:time-override-changed`.
+- For Task 12b: disclaimer always visible; wrap-only copy per godlike QA spec.
 
 **Code quality reviewer prompt (short):**
 
@@ -609,6 +640,6 @@ Use `superpowers:executing-plans` only when the human explicitly requests same-s
 
 ## Execution handoff
 
-**Default:** Start Phase 30 with subagent-driven-development using this section. Controller announces: *"Using subagent-driven development for Phase 30 Festival Wrap — Task 1."*
+**Default:** Start Phase 30 with subagent-driven-development using this section. Controller announces: *"Using subagent-driven development for Phase 30 Festival Wrap — Task 1."* Run **Task 12b** after Task 12 (same sub-phase 30.E).
 
 **Human opt-in required for:** inline execution, commits to `main`, or skipping specialist audits at G1/G2/G5.

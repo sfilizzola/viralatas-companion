@@ -313,8 +313,9 @@ Optional v2: percentile rank ("You saw more bands than X% of vira-latas") — tr
 
 `isFestivalEnded(at, bands)` in `time.ts` — **implemented in Phase 29** (shared with badge consolidation gate). True when `at` is past the max non-ceremony band `end_time`.
 
-- Teaser banner only when `isFestivalEnded()`
-- `/wrap` always reachable when logged in (godlike time override for QA)
+- Teaser banner only when `isFestivalEnded(now(), bands)` — uses `now()` so godlike **D+1** Time Travel previews the teaser on `/now` and `/profile` (see `docs/superpowers/specs/2026-05-27-festival-wrap-godlike-qa-design.md`)
+- `/wrap` always reachable when logged in — **no** festival-ended gate on the route (direct QA URL)
+- Godlike Time Travel: always-visible disclaimer that recap teaser follows post-festival simulated time; wrap-only copy (not consolidate)
 - Banner dismiss: `localStorage['viralatas:wrap-dismissed-2026']`
 
 ---
