@@ -15,6 +15,8 @@ import EditProfileForm from '../components/profile/EditProfileForm';
 import ConflictSection from '../components/profile/ConflictSection';
 import MoshSplitSection from '../components/profile/MoshSplitSection';
 import GodlikeAdminPanel from '../components/profile/GodlikeAdminPanel';
+import WrapTeaserBanner from '../components/wrap/WrapTeaserBanner';
+import { useWrapTeaserVisible } from '../hooks/useWrapTeaserVisible';
 import ManagerAdminPanel from '../components/profile/ManagerAdminPanel';
 import styles from './ProfilePage.module.css';
 
@@ -83,6 +85,8 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
     announcementsRepository.fetchCurrentUserRole(user.id).then(setUserRole);
   }, [user.id]);
 
+  const showWrapTeaser = useWrapTeaserVisible();
+
   return (
     <main className={styles.main}>
       <ProfileHeader
@@ -95,6 +99,8 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
         savedWackenYears={savedWackenYears}
         t={t}
       />
+
+      {showWrapTeaser && <WrapTeaserBanner />}
 
       <section className={styles.pfSection}>
         <BadgesDisplay user={user} />

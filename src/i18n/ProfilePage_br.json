@@ -91,6 +91,7 @@
   "liveBandTestConflictWithMetalPlace": "Live Band Test e o modo teste do Metal Place não podem ficar ativos juntos. O outro vai ser desativado. Continuar?",
   "timeTravelTitle": "🕒 Time Travel",
   "timeTravelDescription": "Sobrescreve o \"agora\" do app para testar bandas que já passaram, contagens e estados do /agora. Fica salvo apenas neste dispositivo.",
+  "timeTravelWrapDisclaimer": "Depois que o festival acaba, o teaser do recap no Agora e no Perfil aparece para todo mundo. Pule para D+1 (ou qualquer horário simulado depois da última banda) para ver esse teaser neste dispositivo. A página /wrap fica sempre disponível para teste direto.",
   "timeTravelQuickDay": "Pulo rápido (22:00 em Wacken por padrão; mantém a hora informada se já estiver preenchida)",
   "timeTravelInputLabel": "Hora simulada (fuso horário do dispositivo)",
   "timeTravelSet": "Aplicar",

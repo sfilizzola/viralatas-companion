@@ -96,6 +96,7 @@ export default function TimeTravelSection() {
     <div className={styles.liveBandTestSection}>
       <h4 className={styles.liveBandTestSectionTitle}>{t('timeTravelTitle')}</h4>
       <p className={styles.liveBandTestDescription}>{t('timeTravelDescription')}</p>
+      <p className={styles.liveBandTestDescription}>{t('timeTravelWrapDisclaimer')}</p>
       {override && (
         <p className={styles.liveBandTestActive}>
           {t('timeTravelActive', { time: formatWackenLocal(override, language) })}

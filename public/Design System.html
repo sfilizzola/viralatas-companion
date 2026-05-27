@@ -1078,6 +1078,28 @@
       </div>
 
       <div class="component-section">
+        <h3>Festival Wrap — `/wrap` + Teaser <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">WrapPage · WrapTeaserBanner</span></h3>
+        <p><strong>A2 Vest Chronicle</strong> (<code>WrapPage.tsx</code>): five full-viewport scroll sections with <code>scroll-snap-type: y mandatory</code>; fixed <strong>5-dot</strong> progress bar (<code>WrapProgress</code>) driven by <code>IntersectionObserver</code>. Document root sets dynamic <code>--stage</code> from user's top stage (<code>stageColorVar</code>).</p>
+        <table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
+          <thead>
+            <tr style="border-bottom:1px solid #333; text-align:left;">
+              <th style="padding:6px 8px; color:#aaa;">Section</th>
+              <th style="padding:6px 8px; color:#aaa;">Content</th>
+            </tr>
+          </thead>
+          <tbody style="color:#888;">
+            <tr><td style="padding:6px 8px;">1 Hero</td><td style="padding:6px 8px;">Giant bands seen; row: picked · skipped · stages</td></tr>
+            <tr><td style="padding:6px 8px;">2 Personality</td><td style="padding:6px 8px;">Top genre + stage; stage pill with visit count</td></tr>
+            <tr><td style="padding:6px 8px;">3 Chaos</td><td style="padding:6px 8px;">Horizontal meters: weak skips, hard conflicts, badges</td></tr>
+            <tr><td style="padding:6px 8px;">4 Crew</td><td style="padding:6px 8px;">Pick twin + vira-latas #1 band</td></tr>
+            <tr><td style="padding:6px 8px;">5 Patches</td><td style="padding:6px 8px;">Decorative <code>buildStackPoses</code> pile; CTA Open vest → /profile</td></tr>
+          </tbody>
+        </table>
+        <p>Each section card: <strong>4px</strong> top bar <code>background: var(--stage)</code> (fallback <code>var(--accent)</code>). Typography: Oswald display, IBM Plex body, JetBrains Mono kickers.</p>
+        <p><strong>WrapTeaserBanner Variant B</strong> (<code>/now</code>, <code>/profile</code>): full-width bar on <code>--bg-surface</code>; <strong>4px</strong> solid <code>var(--accent)</code> top strip; decorative 3-patch pile (18×18 stage colors); Oswald headline + mono CTA; dismiss column 44px touch target. Gated post-festival only; not in bottom nav.</p>
+      </div>
+
+      <div class="component-section">
         <h3>BadgesDisplay <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/BadgesDisplay.tsx</span></h3>
         <p>Earned patches on <code>/now</code> and <code>/profile</code>. <strong>Variant C — Vest Stack:</strong> collapsed vest (fixed <strong>112 px</strong> tall, max-width 480 px). Default <strong>chaotic</strong> mode: meadow scatter with <strong>48 px</strong> patches; opt-in <strong>neat</strong> mode: horizontal chip stack (all badges, scaled). <em>Open vest</em> expands into a 4-column grid; <em>Close vest</em> reshuffles chaotic pile only.</p>
         <p><strong>Collapsed chaotic:</strong> <code>buildStackPoses()</code> — <code>scatterSeed</code>, rotation ±55°, anti-bury. <strong>Collapsed neat:</strong> <code>buildNeatStackPoses()</code> — scale-down row, 0°–5° rotation, no reseed. Layout toggle in Edit profile (<code>PatchesLayoutToggle</code>, icon-only) beside fabric swatches; preference in <code>patchesLayout.ts</code>.</p>

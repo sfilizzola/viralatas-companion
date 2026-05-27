@@ -91,6 +91,7 @@
   "liveBandTestConflictWithMetalPlace": "Live Band Test and Metal Place test mode can't both be on. The other will be disabled. Continue?",
   "timeTravelTitle": "🕒 Time Travel",
   "timeTravelDescription": "Override the app's \"now\" to test past bands, counts, and /now states. Saved only on this device.",
+  "timeTravelWrapDisclaimer": "After the festival ends, the recap teaser on Agora and Profile appears for everyone. Jump to D+1 (or any simulated time after the last band) to preview that teaser on this device. The /wrap page is always available for direct testing.",
   "timeTravelQuickDay": "Quick jump (22:00 Wacken default; keeps input time if already set)",
   "timeTravelInputLabel": "Simulated time (device time zone)",
   "timeTravelSet": "Apply",

@@ -1,0 +1,120 @@
+.bar {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+  margin: 0 0 8px;
+}
+
+.topAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--accent);
+}
+
+.linkArea {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 8px 12px 14px;
+  min-height: 44px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.linkArea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.patches {
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  height: 28px;
+}
+
+.patch {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.patch[data-stage='faster'] {
+  background: var(--stage-faster);
+  top: 0;
+  left: 0;
+  transform: rotate(-8deg);
+}
+
+.patch[data-stage='harder'] {
+  background: var(--stage-harder);
+  top: 6px;
+  left: 10px;
+  transform: rotate(6deg);
+  z-index: 1;
+}
+
+.patch[data-stage='louder'] {
+  background: var(--stage-louder);
+  top: 2px;
+  left: 18px;
+  transform: rotate(-4deg);
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.headline {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent-hover);
+}
+
+.dismiss {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.dismiss:hover {
+  color: var(--text);
+}

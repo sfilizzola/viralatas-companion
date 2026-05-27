@@ -625,3 +625,29 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `festival:reset` strip list unchanged — archive lives in dedicated table, not `achieved_badge_slugs`.
 
 ---
+
+### Phase 30 — Festival Wrap (`/wrap`)
+**Status:** ✅ Complete
+
+**Goal:** Private offline-first `/wrap` recap (A2 Vest Chronicle) with five scroll sections, client-side stats from IndexedDB, and post-festival discovery banners on `/now` and `/profile`.
+
+**Deliverables:**
+- `src/services/festivalWrap.ts` — `buildFestivalWrapStats()` with badge-engine parity
+- `src/hooks/useFestivalWrapStats.ts`, `useWrapTeaserVisible.ts`, `src/lib/wrapDismiss.ts`
+- `src/pages/WrapPage.tsx` + CSS; `WrapProgress`, `WrapTeaserBanner` (Variant B)
+- Private route `/wrap`; teaser on `/now` + `/profile`; godlike Time Travel disclaimer
+- i18n `WrapPage_*` (br, en, es, de); tests `festivalWrap.test.ts`, `wrapDismiss.test.ts`
+- Wiki `flows/festival-wrap.md`; Design System wrap section
+
+**Acceptance criteria (all met):**
+- [x] Five A2 scroll sections; Variant B teaser; IDB-only stats; offline after first load
+- [x] Teaser gated; `/wrap` open anytime; godlike D+1; vira-latas copy; friend privacy; empty state
+- [x] `rtk npm run build` green · `rtk npm test` green — 591 tests
+
+**Wiki:** `flows/festival-wrap.md` · `routes.md` · `index.md` · `changelog.md` · `Design System.html`
+
+**Architectural notes:**
+- No Supabase reads for wrap stats; reuses `buildBadgeContextFromSnapshot` semantics.
+- Teaser discovery only — route never gated on `isFestivalEnded()`.
+
+---

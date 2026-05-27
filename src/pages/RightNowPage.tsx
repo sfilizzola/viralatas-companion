@@ -8,6 +8,8 @@ import OfflineBanner from '../components/OfflineBanner';
 import BadgesDisplay from '../components/BadgesDisplay';
 import PresenceToggle from '../components/PresenceToggle';
 import LatestAnnouncementBanner from '../components/now/LatestAnnouncementBanner';
+import WrapTeaserBanner from '../components/wrap/WrapTeaserBanner';
+import { useWrapTeaserVisible } from '../hooks/useWrapTeaserVisible';
 import CrewGroupsSection from '../components/now/CrewGroupsSection';
 import LiveCardSheet from '../components/now/LiveCardSheet';
 import styles from './RightNowPage.module.css';
@@ -55,6 +57,7 @@ export default function RightNowPage() {
     duckQuack,
     duckCooldownUntil,
   } = useNowData();
+  const showWrapTeaser = useWrapTeaserVisible();
 
   return (
     <div className={styles.page}>
@@ -72,6 +75,8 @@ export default function RightNowPage() {
           {t('liveTestBanner', { band: liveTestBand.name })}
         </div>
       )}
+
+      {showWrapTeaser && <WrapTeaserBanner />}
 
       <main className={styles.main}>
         {userId && !isFriend && (

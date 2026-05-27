@@ -51,6 +51,10 @@ import duckButtonBr from '../i18n/DuckButton_br.json';
 import duckButtonDe from '../i18n/DuckButton_de.json';
 import duckButtonEn from '../i18n/DuckButton_en.json';
 import duckButtonEs from '../i18n/DuckButton_es.json';
+import wrapBr from '../i18n/WrapPage_br.json';
+import wrapDe from '../i18n/WrapPage_de.json';
+import wrapEn from '../i18n/WrapPage_en.json';
+import wrapEs from '../i18n/WrapPage_es.json';
 
 export type Language = 'br' | 'en' | 'es' | 'de';
 
@@ -67,7 +71,8 @@ type TranslationFile =
   | 'Badges'
   | 'OfflineBanner'
   | 'SyncToast'
-  | 'DuckButton';
+  | 'DuckButton'
+  | 'WrapPage';
 
 type Translations = Record<Language, Record<TranslationFile, Record<string, string>>>;
 
@@ -88,6 +93,7 @@ const translations: Translations = {
     OfflineBanner: offlineBannerBr,
     SyncToast: syncToastBr,
     DuckButton: duckButtonBr,
+    WrapPage: wrapBr,
   },
   en: {
     App: appEn,
@@ -103,6 +109,7 @@ const translations: Translations = {
     OfflineBanner: offlineBannerEn,
     SyncToast: syncToastEn,
     DuckButton: duckButtonEn,
+    WrapPage: wrapEn,
   },
   es: {
     App: appEs,
@@ -118,6 +125,7 @@ const translations: Translations = {
     OfflineBanner: offlineBannerEs,
     SyncToast: syncToastEs,
     DuckButton: duckButtonEs,
+    WrapPage: wrapEs,
   },
   de: {
     App: appDe,
@@ -133,6 +141,7 @@ const translations: Translations = {
     OfflineBanner: offlineBannerDe,
     SyncToast: syncToastDe,
     DuckButton: duckButtonDe,
+    WrapPage: wrapDe,
   },
 };
 

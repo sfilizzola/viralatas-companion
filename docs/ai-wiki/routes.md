@@ -11,7 +11,7 @@ Document all app routes, their purpose, access control, and key components.
 - `src/App.tsx` — Route definitions (React Router setup)
 - `src/components/PrivateRoute.tsx` — Auth guard component
 - `src/components/BottomNav.tsx` — Navigation tabs
-- `src/pages/*.tsx` — Page components (6 routes)
+- `src/pages/*.tsx` — Page components (8 routes incl. `/wrap`)
 
 ---
 
@@ -26,6 +26,7 @@ Document all app routes, their purpose, access control, and key components.
 /popular             → PopularPage (protected)
 /announcements       → AnnouncementsPage (protected)
 /profile             → ProfilePage (protected)
+/wrap                → WrapPage (protected) — festival recap; no festival-ended route gate
 /*                   → Redirect to /now
 ```
 
@@ -244,6 +245,22 @@ export default function PrivateRoute({ children }: Props) {
 **Offline**:
 - Fully functional
 - Pending posts visible locally until synced
+
+---
+
+### /wrap (WrapPage)
+
+**Component**: `src/pages/WrapPage.tsx`
+
+**Purpose**: Post-festival personal recap — five scroll sections (A2 Vest Chronicle)
+
+**Access**: Protected (`PrivateRoute`). **No** `isFestivalEnded()` route gate — always reachable when logged in.
+
+**Data**: `useFestivalWrapStats` → IndexedDB only (same snapshot as badges).
+
+**Discovery**: `WrapTeaserBanner` on `/now` and `/profile` after festival ends.
+
+**Flow wiki**: `docs/ai-wiki/flows/festival-wrap.md`
 
 ---
 

@@ -1,6 +1,6 @@
 # Viralatas Companion — Architectural Wiki
 
-**Last Updated**: 2026-05-27 (Phase 29 closed)
+**Last Updated**: 2026-05-27 (Phase 30 closed)
 
 ## Purpose
 
@@ -63,6 +63,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[Flow: Duck Quack](flows/duck.md)** — Duck button → cooldown → quack → Realtime in-app DuckToast + Web Push system notification; offline queuing; admin test flows
 - **[Flow: Playlist Launch](flows/playlist-launch.md)** — `/my-picks` strip → Setlist Vira-Latas deep-link; `playlist_testing` feature flag; godlike admin toggle
 - **[Flow: MoshSplit Balance](flows/moshsplit.md)** — `/profile` balance section → MoshSplit deep-link; Part 1 mock (hidden), Part 2 API (blocked)
+- **[Flow: Festival Wrap](flows/festival-wrap.md)** — Post-festival `/wrap` recap; IDB-only stats; teaser banner + godlike D+1 QA
 
 ### Architectural Decisions (ADRs)
 - **[ADR: IndexedDB as Primary Store](decisions/indexeddb-primary-store.md)** — Why IDB, not Supabase-primary

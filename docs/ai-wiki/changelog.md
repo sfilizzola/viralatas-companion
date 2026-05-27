@@ -4,6 +4,28 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-27 (Phase 30 — Festival Wrap)
+
+### Added
+- **`/wrap` recap page** — A2 Vest Chronicle: five scroll-snap sections, 5-dot progress, client-side stats from IndexedDB.
+- **`buildFestivalWrapStats()`** — reuses `buildBadgeContextFromSnapshot`, `getEarnedBadges`, `computeBandOverlaps`, crew Jaccard + PopularPage sort.
+- **`useFestivalWrapStats`**, **`useWrapTeaserVisible`**, **`wrapDismiss.ts`** — IDB-first hook; teaser gate; `viralatas:wrap-dismissed-2026`.
+- **`WrapTeaserBanner` Variant B** — 4px accent bar, patch pile, on `/now` and `/profile` after festival end.
+- **Godlike QA** — `timeTravelWrapDisclaimer` in Time Travel (4 locales); D+1 previews teaser without reload.
+- **Tests** — `festivalWrap.test.ts`, `wrapDismiss.test.ts`.
+- **Wiki** — `flows/festival-wrap.md`; Design System wrap section.
+
+### Changed
+- **`App.tsx`** — private route `/wrap`.
+- **`routes.md`**, **`index.md`**, **`PHASES.md`**, **`FUTURE_IDEAS.md`**, **`phases-history.md`**.
+
+### Architectural Notes
+- Golden rule preserved: wrap stats path is UI → IndexedDB only; no Supabase reads for recap numbers.
+- Teaser gated by `isFestivalEnded(now(), bands)`; `/wrap` route always open when logged in.
+- **591 tests passing** at phase close.
+
+---
+
 ## 2026-05-27 (Phase 29 closed)
 
 ### Added

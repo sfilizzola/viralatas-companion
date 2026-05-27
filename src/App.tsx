@@ -9,6 +9,7 @@ import MyPicksPage from './pages/MyPicksPage';
 import PopularPage from './pages/PopularPage';
 import RightNowPage from './pages/RightNowPage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
+import WrapPage from './pages/WrapPage';
 import PrivateRoute from './components/PrivateRoute';
 import SyncToast from './components/SyncToast';
 import DuckToast from './components/DuckToast';
@@ -72,6 +73,14 @@ export default function App() {
             element={
               <PrivateRoute>
                 <ProfilePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/wrap"
+            element={
+              <PrivateRoute>
+                <WrapPage />
               </PrivateRoute>
             }
           />
