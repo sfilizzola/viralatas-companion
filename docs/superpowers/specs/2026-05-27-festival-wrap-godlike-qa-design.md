@@ -3,7 +3,8 @@
 **Date:** 2026-05-27  
 **Status:** Approved (brainstorming)  
 **Parent:** Phase 30 / `FUTURE_IDEAS.md` Idea 7  
-**Implementation plan:** `docs/superpowers/plans/2026-05-27-festival-wrap-plan.md`
+**Implementation plan:** `docs/superpowers/plans/2026-05-27-festival-wrap-plan.md`  
+**Teaser UI (locked):** `docs/superpowers/specs/2026-05-27-festival-wrap-banner-design.md` — **Variant B** (not B+D / not D gold wash)
 
 ---
 

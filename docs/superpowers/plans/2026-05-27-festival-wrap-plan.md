@@ -8,9 +8,23 @@
 
 **Tech stack:** React + Vite, IndexedDB (`src/lib/db/`), existing badge services, `isFestivalEnded()` from `src/services/time.ts`, CSS modules, i18n (br/en/es/de).
 
-**Spec source:** `FUTURE_IDEAS.md` § Idea 7 · Godlike QA: `docs/superpowers/specs/2026-05-27-festival-wrap-godlike-qa-design.md` · Visual reference: `_temp/wrap-proposals/variant-a2-vest-chronicle.html` (design-only; not shipped)
+**Spec source:** `FUTURE_IDEAS.md` § Idea 7
 
 **Phase:** 30 — Festival Wrap (sub-phases 30.A–30.E below)
+
+---
+
+## Locked design decisions (approved — do not re-open)
+
+| Surface | Locked variant | Spec |
+|---------|----------------|------|
+| **`/wrap` page** | **A2 · Vest Chronicle** — 5 scroll sections, 5-dot progress, stage bar, meters, patch finale | `docs/superpowers/specs/2026-05-27-festival-wrap-page-design.md` |
+| **Teaser banner** (`/now`, `/profile`) | **B · Vest Chronicle bar** — 4px `--accent` top bar, patch pile, Oswald + mono (not playlist strip, not gold D, not B+D) | `docs/superpowers/specs/2026-05-27-festival-wrap-banner-design.md` |
+| **Godlike QA** | D+1 time travel previews **teaser only**; `/wrap` always reachable | `docs/superpowers/specs/2026-05-27-festival-wrap-godlike-qa-design.md` |
+
+**HTML prototypes (local, gitignored):** `_temp/wrap-proposals/variant-a2-vest-chronicle.html` · `_temp/wrap-banner-proposals/index.html` (variant B)
+
+Implementers must match these specs; new banner/page layout explorations are out of scope for Phase 30.
 
 ---
 
@@ -18,13 +32,14 @@
 
 1. `docs/ai-wiki/index.md` → offline-first + badges sections
 2. `docs/ai-wiki/badges.md` — `BadgeContext`, seen/picked semantics, vest stack
-3. `FUTURE_IDEAS.md` — Idea 7 acceptance criteria (locked UX)
-4. `src/services/badges/badgeContextBuilder.ts` — `BadgeIdbSnapshot` / `buildBadgeContextFromSnapshot`
-5. `src/services/badges/engine.ts` — `seenBands`, `getEarnedBadges`
-6. `src/hooks/useBandConflicts.ts` — `computeBandOverlaps`
-7. `src/pages/PopularPage.tsx` — crew #1 band sort + `totalViraLatas` pattern
-8. `docs/superpowers/specs/2026-05-27-festival-wrap-godlike-qa-design.md` — teaser vs `/wrap` route, D+1, Time Travel disclaimer
-9. `src/components/profile/TimeTravelSection.tsx` + `ConsolidateBadgesSection.tsx` — time-override reactivity pattern
+3. `docs/superpowers/specs/2026-05-27-festival-wrap-page-design.md` + `docs/superpowers/specs/2026-05-27-festival-wrap-banner-design.md` — **locked UI** (read before any UI task)
+4. `FUTURE_IDEAS.md` — Idea 7 stats + acceptance criteria
+5. `src/services/badges/badgeContextBuilder.ts` — `BadgeIdbSnapshot` / `buildBadgeContextFromSnapshot`
+6. `src/services/badges/engine.ts` — `seenBands`, `getEarnedBadges`
+7. `src/hooks/useBandConflicts.ts` — `computeBandOverlaps`
+8. `src/pages/PopularPage.tsx` — crew #1 band sort + `totalViraLatas` pattern
+9. `docs/superpowers/specs/2026-05-27-festival-wrap-godlike-qa-design.md` — teaser vs `/wrap` route, D+1, Time Travel disclaimer
+10. `src/components/profile/TimeTravelSection.tsx` + `ConsolidateBadgesSection.tsx` — time-override reactivity pattern
 
 **Verification gates (every sub-phase):** `rtk npm run build` · `rtk npm test`
 
@@ -40,7 +55,7 @@
 | `src/pages/WrapPage.tsx` | Five sections, scroll-snap, `IntersectionObserver` progress |
 | `src/pages/WrapPage.module.css` | A2 vest: stage bar, meters, denim finale |
 | `src/components/wrap/WrapProgress.tsx` | Fixed 5-dot bar |
-| `src/components/wrap/WrapTeaserBanner.tsx` | Dismissible CTA → `/wrap` |
+| `src/components/wrap/WrapTeaserBanner.tsx` + `.module.css` | **Variant B** dismissible bar → `/wrap` |
 | `src/i18n/WrapPage_br.json` (+ en, es, de) | All copy; **vira-latas** not crew |
 | `src/App.tsx` | Private route `/wrap` |
 | `src/pages/RightNowPage.tsx` | Mount teaser when gated; listen `viralatas:time-override-changed` |
@@ -277,6 +292,8 @@ it('activeViraLatas counts unique pickers', () => { /* dedupe user_id in allPick
 
 ## Sub-phase 30.D — A2 Vest UI (five sections)
 
+**Design spec (locked):** `docs/superpowers/specs/2026-05-27-festival-wrap-page-design.md` — do not change section count, scroll model, or A2 visual rules without a new design approval.
+
 ### Task 9: `WrapProgress` + scroll-snap
 
 **Files:**
@@ -332,10 +349,13 @@ it('activeViraLatas counts unique pickers', () => { /* dedupe user_id in allPick
 
 ## Sub-phase 30.E — Discovery, docs, wiki
 
-### Task 12: `WrapTeaserBanner`
+### Task 12: `WrapTeaserBanner` (Variant B — locked)
+
+**Design spec:** `docs/superpowers/specs/2026-05-27-festival-wrap-banner-design.md`
 
 **Files:**
-- Create: `src/components/wrap/WrapTeaserBanner.tsx`
+- Create: `src/components/wrap/WrapTeaserBanner.tsx`, `WrapTeaserBanner.module.css`
+- Create: `src/i18n/WrapTeaserBanner_br.json` (+ en, es, de) — or keys under `WrapPage_*` if barrel prefers one namespace
 - Modify: `RightNowPage.tsx`, `ProfilePage.tsx`
 
 **Gate (all required):**
@@ -350,11 +370,15 @@ Use `now()` from `time.ts` — never raw `new Date()` for the gate.
 
 - [ ] **Subscribe to `viralatas:time-override-changed`** — recompute `show` when godlike changes Time Travel (mirror `ConsolidateBadgesSection.tsx` lines 37–45)
 
+- [ ] **Implement Variant B layout** — `--bg-surface` bar; `::before` or child **4px** `var(--accent)` top bar; decorative 3-patch pile; mono kicker + Oswald headline + mono CTA; dismiss column (not gold wash, not ’26 circle, not playlist strip)
+
+- [ ] **Placement** — `/now` below header; `/profile` below `ProfileHeader` (per banner spec)
+
 - [ ] **Link to `/wrap`**, dismiss button calls `dismissWrapTeaser()`
 
-- [ ] **Route `/wrap` always reachable when logged in** — no `isFestivalEnded` guard on the page (teaser is the discovery surface; godlike uses D+1 to preview teaser only — see godlike QA spec)
+- [ ] **Route `/wrap` always reachable when logged in** — no `isFestivalEnded` guard on the page (see godlike QA spec)
 
-- [ ] **Commit** `Phase 30.E: wrap teaser banner`
+- [ ] **Commit** `Phase 30.E: wrap teaser banner (variant B)`
 
 ---
 
@@ -383,7 +407,7 @@ Use `now()` from `time.ts` — never raw `new Date()` for the gate.
 - Create: `docs/ai-wiki/flows/festival-wrap.md` (8-section wiki template)
 - Modify: `docs/ai-wiki/routes.md`, `docs/ai-wiki/changelog.md`, `docs/ai-wiki/index.md` (link flow)
 
-- [ ] **Design System:** document tokens, section anatomy, `--stage` dynamic color, progress bar
+- [ ] **Design System:** `WrapTeaserBanner` Variant B anatomy + `/wrap` A2 page section table, tokens, `--stage` dynamic color, progress bar (per page + banner specs)
 
 - [ ] **Wiki flow:** IDB-only reads, gating table, files list, acceptance criteria mirrored from PHASES.md
 
@@ -406,7 +430,7 @@ Use `now()` from `time.ts` — never raw `new Date()` for the gate.
 - [ ] `/wrap` renders five scroll sections with A2 Vest visual language (stage bar, meters, patch pile, progress dots)
 - [ ] All displayed stats match badge engine semantics for seen/picked/skipped/conflicts
 - [ ] Page works fully offline after first load (stats from IndexedDB only)
-- [ ] Teaser banner appears only after `isFestivalEnded(now(), bands)` and respects `viralatas:wrap-dismissed-2026`
+- [ ] Teaser banner **Variant B** on `/now` and `/profile`; gated by `isFestivalEnded(now(), bands)`; respects `viralatas:wrap-dismissed-2026`
 - [ ] Godlike D+1 time travel shows teaser on `/now` and `/profile` without reload; Time Travel shows wrap-only disclaimer (4 locales)
 - [ ] `/wrap` has no festival-ended route gate
 - [ ] Copy uses **vira-latas** (not "crew") in all four locales
@@ -436,6 +460,7 @@ Use `now()` from `time.ts` — never raw `new Date()` for the gate.
 | Five sections A2 | Tasks 9–11 |
 | Badge semantics | Tasks 2–4 |
 | Offline IDB | Tasks 6, 14 |
+| Teaser banner Variant B | Task 12 |
 | `isFestivalEnded` gate + godlike D+1 | Tasks 12, 12b |
 | `/wrap` open anytime | Task 12 (no route gate) |
 | Friend privacy | Tasks 2, 11 |
@@ -515,7 +540,7 @@ DONE | DONE_WITH_CONCERNS | NEEDS_CONTEXT | BLOCKED
 | 9 | 30.D | standard | Scroll-snap + `IntersectionObserver` |
 | 10 | 30.D | standard | Sections 1–3 + 4 locale files |
 | 11 | 30.D | standard | Crew + patch pile; reuses `stackLayout.ts` |
-| 12 | 30.E | standard | Banner + two page mounts + `time-override-changed` |
+| 12 | 30.E | standard | **Variant B** `WrapTeaserBanner` + two page mounts + `time-override-changed` |
 | 12b | 30.E | fast | Time Travel disclaimer + ProfilePage i18n only |
 | 13 | 30.E | fast | Docs/HTML only — invoke **wiki-curator** subagent instead of generic implementer |
 | 14 | 30.E | standard | Phase metadata — invoke **phase-closer** subagent |
@@ -541,7 +566,9 @@ Implementer (Task N)
 - Flag missing behavior, extra features, wrong file paths.
 - For Tasks 2–4: require stat parity with `BadgeContext` / `PopularPage` sort.
 - For Task 12: teaser must not gate `/wrap` page itself; must use `now()` and listen for `viralatas:time-override-changed`.
+- For Task 12: must match `festival-wrap-banner-design.md` Variant B (reject gold D / B+D / playlist A).
 - For Task 12b: disclaimer always visible; wrap-only copy per godlike QA spec.
+- For Tasks 9–11: must match `festival-wrap-page-design.md` A2 (five sections, no carousel).
 
 **Code quality reviewer prompt (short):**
 

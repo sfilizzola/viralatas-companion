@@ -239,7 +239,9 @@ No new backend work is needed — `user_presence` is already synced via Supabase
 
 **When:** Available once the last non-ceremony band's `end_time` has passed. Discovery via a teaser banner on `/now` and/or `/profile` (dismissible per device). Route remains reachable for godlike time-travel testing before festival end.
 
-**Layout decision (locked in design exploration):** **A2 · Vest Chronicle** — extends the patches vest language from `BadgesDisplay` (stage color top bar, surface cards, chaos meters, denim vest finale with chaotic patch pile). HTML prototypes live in `_temp/wrap-proposals/` (`variant-a2-vest-chronicle.html`, comparison gallery `index.html`).
+**Layout decisions (locked — see specs before implementation):**
+- **`/wrap` page:** **A2 · Vest Chronicle** → `docs/superpowers/specs/2026-05-27-festival-wrap-page-design.md` (prototype `_temp/wrap-proposals/variant-a2-vest-chronicle.html`)
+- **Teaser banner** on `/now` + `/profile`: **B · Vest Chronicle bar** → `docs/superpowers/specs/2026-05-27-festival-wrap-banner-design.md` (prototype `_temp/wrap-banner-proposals/index.html` § B; variants A/C/D/B+D rejected)
 
 ---
 
