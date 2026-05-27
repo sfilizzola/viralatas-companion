@@ -4,6 +4,13 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-27 (Phase 30 closed)
+
+### Changed
+- **Phase 30 marked complete** — full wrap polish shipped (welcome/finale gates, epigraphs, assigned patches, twin spotlight, approved copy); `PHASES.md` now shows no active phased work; phases-history entry updated; **594 tests** green.
+
+---
+
 ## 2026-05-27 (Wrap — closing thanks section)
 
 ### Added

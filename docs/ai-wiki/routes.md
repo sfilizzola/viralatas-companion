@@ -252,13 +252,15 @@ export default function PrivateRoute({ children }: Props) {
 
 **Component**: `src/pages/WrapPage.tsx`
 
-**Purpose**: Post-festival personal recap — five scroll sections (A2 Vest Chronicle)
+**Purpose**: Post-festival personal recap — A2 Vest Chronicle (welcome + stat sections + optional assigned patches + vest pile + thanks finale; 7–8 scroll sections)
 
 **Access**: Protected (`PrivateRoute`). **No** `isFestivalEnded()` route gate — always reachable when logged in.
 
 **Data**: `useFestivalWrapStats` → IndexedDB only (same snapshot as badges).
 
 **Discovery**: `WrapTeaserBanner` on `/now` and `/profile` after festival ends.
+
+**Exit**: Finale section CTA **Back to the App** → `/now`; patches section **Open vest** → `/profile?vest=open#vest`.
 
 **Flow wiki**: `docs/ai-wiki/flows/festival-wrap.md`
 

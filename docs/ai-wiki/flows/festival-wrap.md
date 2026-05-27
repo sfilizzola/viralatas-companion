@@ -123,14 +123,14 @@ Teaser path:
 
 ## Acceptance Criteria (Phase 30)
 
-- [x] Five scroll sections (A2): stage bar, meters, patch pile, progress dots
+- [x] A2 scroll-snap recap: welcome gate + stat sections (epigraphs) + optional assigned patches + patches vest + finale thanks (7–8 sections, 7–9 progress dots)
 - [x] Teaser Variant B on `/now` and `/profile`
 - [x] Stats match badge engine semantics
 - [x] Offline after first IDB load
 - [x] Teaser gated; `/wrap` route open anytime
 - [x] Godlike D+1 + Time Travel disclaimer (4 locales)
-- [x] **vira-latas** copy in all locales
+- [x] **vira-latas** copy in all locales (user-approved section phrases)
 - [x] Friend users hide location stats
 - [x] Empty picks friendly state
-- [x] Open vest → `/profile`
+- [x] Open vest → `/profile?vest=open#vest`; finale CTA → `/now`
 - [x] Design System documents wrap anatomy

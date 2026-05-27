@@ -629,20 +629,24 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 ### Phase 30 — Festival Wrap (`/wrap`)
 **Status:** ✅ Complete
 
-**Goal:** Private offline-first `/wrap` recap (A2 Vest Chronicle) with five scroll sections, client-side stats from IndexedDB, and post-festival discovery banners on `/now` and `/profile`.
+**Goal:** Private offline-first `/wrap` recap (A2 Vest Chronicle) with scroll-snap sections, client-side stats from IndexedDB, post-festival discovery banners, and approved vira-latas copy in four locales.
 
 **Deliverables:**
-- `src/services/festivalWrap.ts` — `buildFestivalWrapStats()` with badge-engine parity
+- `src/services/festivalWrap.ts` — `buildFestivalWrapStats()` with badge-engine parity; `assignedBadgeSlugs`; pick-twin + current-user avatar URLs
 - `src/hooks/useFestivalWrapStats.ts`, `useWrapTeaserVisible.ts`, `src/lib/wrapDismiss.ts`
-- `src/pages/WrapPage.tsx` + CSS; `WrapProgress`, `WrapTeaserBanner` (Variant B)
-- Private route `/wrap`; teaser on `/now` + `/profile`; godlike Time Travel disclaimer
-- i18n `WrapPage_*` (br, en, es, de); tests `festivalWrap.test.ts`, `wrapDismiss.test.ts`
-- Wiki `flows/festival-wrap.md`; Design System wrap section
+- `src/pages/WrapPage.tsx` + CSS — welcome gate; hero / personality / chaos / crew stat sections with **epigraphs above cards**; optional godlike **assigned patches** grid; pick-twin spotlight portrait; patches vest pile; **finale thanks** gate (Wacken 2027 · Rain or Shine) + CTA to `/now`
+- Celebration layer — ambient orbs, film grain, scroll reveal animations; `prefers-reduced-motion` respected
+- `WrapProgress` (7–9 dots), `WrapTeaserBanner` Variant B on `/now` + `/profile`
+- Private route `/wrap`; godlike Time Travel disclaimer; vest deep-link `/profile?vest=open#vest` + `#vest` anchor on profile
+- i18n `WrapPage_*` (br, en, es, de) — user-approved section phrases; **vira-latas** in user-facing copy
+- Tests `festivalWrap.test.ts`, `wrapDismiss.test.ts`
+- Wiki `flows/festival-wrap.md`; Design System wrap section table
 
 **Acceptance criteria (all met):**
-- [x] Five A2 scroll sections; Variant B teaser; IDB-only stats; offline after first load
+- [x] A2 scroll-snap recap (7–8 sections: welcome + stats + optional assigned + patches + thanks); Variant B teaser; IDB-only stats; offline after first load
 - [x] Teaser gated; `/wrap` open anytime; godlike D+1; vira-latas copy; friend privacy; empty state
-- [x] `rtk npm run build` green · `rtk npm test` green — 591 tests
+- [x] Open vest → profile vest; finale → `/now`
+- [x] `rtk npm run build` green · `rtk npm test` green — **594 tests**
 
 **Wiki:** `flows/festival-wrap.md` · `routes.md` · `index.md` · `changelog.md` · `Design System.html`
 
