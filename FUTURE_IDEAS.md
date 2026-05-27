@@ -3,13 +3,15 @@
 Ideas and features that would enhance the app but are not yet scheduled for implementation. Numbered independently of phase numbering.
 
 > **Rule:** When adding a new idea, evaluate its complexity and risk and add a row to the table below before writing the full spec.
+>
+> **Status values:** `pending` · `✅ Phase N` (shipped — spec collapsed; see `docs/ai-wiki/phases-history.md`)
 
 ## Ideas at a glance
 
 | # | Title | Complexity | Risk | Status |
 |---|---|---|---|---|
 | 1 | LLM proactive alerts | High | Medium — API key handling, alert spam, offline edge cases | pending |
-| 2 | Year freeze for historical badges | Medium | Low — godlike-only, idempotent, additive schema change | pending |
+| 2 | Year freeze for historical badges | Medium | Low — godlike-only, idempotent, additive schema change | ✅ Phase 29 |
 | 3 | Unit tests: IDB layer (`lib/db.ts`) | Medium | Low — requires `fake-indexeddb` dev dependency; isolated from app runtime | pending |
 | 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — `renderHook` + mocked IDB and Supabase; no network | pending |
 | 5 | Unit tests: Component and page integration | High | Low — replaces misleading stub tests; mounts pages with RTL + mocked hooks | pending |
@@ -115,147 +117,11 @@ Regras:
 
 ## Idea 2 — Badge consolidation
 
-**Goal:** After a festival ends, snapshot every user's earned year-specific badges into a permanent DB table so 2026 wins are still visible in 2027 alongside fresh badge content — and in future years as the history grows.
+**Status:** ✅ **Implemented — Phase 29** (2026-05-27). Full deliverables, acceptance criteria, and operator runbook → `docs/ai-wiki/phases-history.md` (Phase 29) · `docs/ai-wiki/badges.md` · `docs/ai-wiki/festival-reset.md`.
 
-**When:** Deploy and run ~late July 2026, once the crew is home and festival state is still live in the DB. Must run before any future seed that would wipe picks.
+**Shipped summary:** Godlike `consolidate-year-badges` snapshots earned year-badges into `user_badge_history` (frozen `image_path` + `label_key`). Live vest shows evergreen + current festival year only; past years in **Previously Achieved** on `/profile` (U2 flat grid, diamond year chips, M2 modal). IndexedDB-primary client cache; survives `festival:reset`. Godlike archive preview seed for local UI testing.
 
----
-
-### Which badges are consolidated
-
-Only badges where `BadgeConfig.year === festivalYear` (e.g., `year: 2026`) are captured. This field already exists on `BadgeConfig` as the year chip display value — no type change needed.
-
-All badge types qualify:
-- Conditional (live-evaluated, e.g. pick-based, seen-based, location)
-- `persist: true` (already stored in `user_metadata.achieved_badge_slugs`)
-- `assigned` (stored in `users.special_badges`)
-
-Evergreen badges ( `pais-tropical`, `belga`, etc.) have no `year` field and are intentionally excluded — they remain live and re-earnable each Wacken.
-
----
-
-### Schema — dedicated table
-
-> Supersedes the `users.historical_badges jsonb` column approach sketched earlier. A proper relational table is easier to query per-year, has RLS per-row, and extends cleanly without schema churn.
-
-```sql
-create table public.user_badge_history (
-  id uuid primary key default gen_random_uuid(),
-  user_id uuid not null references auth.users(id) on delete cascade,
-  festival_year integer not null,
-  slug text not null,
-  image_path text not null,   -- frozen from BadgeConfig.imagePath at consolidation time
-  label_key text not null,    -- frozen from BadgeConfig.labelKey at consolidation time
-  consolidated_at timestamptz not null default now(),
-  constraint user_badge_history_unique unique (user_id, festival_year, slug)
-);
-
-alter table public.user_badge_history enable row level security;
-
--- Users can read only their own rows
-create policy "Users can read own badge history"
-  on public.user_badge_history for select using (auth.uid() = user_id);
-
--- Godlike can read/insert/update/delete all rows
-create policy "Godlike can manage badge history"
-  on public.user_badge_history for all
-  using (exists (select 1 from public.users where id = auth.uid() and role = 'godlike'));
-```
-
----
-
-### Badge images — store path, not binary
-
-Both approaches were evaluated: (a) store `image_path` as a relative path, (b) upload to Supabase Storage for absolute URLs.
-
-**Decision: store `image_path` (the `BadgeConfig.imagePath` value, e.g. `/badges/badge_veteran.png`) frozen at consolidation time.**
-
-Rationale:
-- Badge images are stable and shared across years — `badge_puppy.png` will serve Wacken 2027 first-timers just as it served 2026
-- The PWA will keep serving future Wackens, so relative paths remain valid
-- No image upload step, no Supabase Storage bucket setup, no edge-function file I/O complexity
-- Future escape hatch: if the app is ever decommissioned, a single migration adds an `image_url` column backed by Supabase Storage — the path data is already there to drive the upload
-
----
-
-### Edge Function: `consolidate-year-badges`
-
-```
-POST /functions/v1/consolidate-year-badges
-Body: { year: 2026 }
-Auth: Bearer token — must belong to a godlike user (403 otherwise)
-```
-
-**Steps:**
-
-1. Verify caller has `role = 'godlike'` in `public.users`.
-2. Fetch all active users: exclude `is_test_user = true`.
-3. For each user, assemble a server-side `BadgeContext` by reading:
-   - `public.user_picks` + `public.bands` → `pickedBands`, `bandsPicked`, `maxAttendanceInPicks`, `seenBands`
-   - `public.user_missed_bands` → `missedBandIds`
-   - `auth.users.raw_user_meta_data` → `wacken_years`, `country`, `wacken_arrival_day`, `location_visits`, `achieved_badge_slugs`, `crew_earned_badge_slugs`
-   - `public.users.special_badges` → `assignedBadges`
-4. Run `getEarnedBadges(context, BADGES)` using copies of `engine.ts` and `registry.ts` inside the function folder (pure TS, no DOM dependencies — ports cleanly to Deno).
-5. Filter results to `badge.year === year`.
-6. Upsert each earned badge into `user_badge_history` — idempotent due to the `UNIQUE (user_id, festival_year, slug)` constraint.
-7. Return `{ processedUsers, savedBadges, skipped, errors }`.
-
-**Function layout:**
-```
-supabase/functions/consolidate-year-badges/
-  index.ts       ← HTTP handler, auth check, orchestration
-  engine.ts      ← copy of src/services/badges/engine.ts
-  registry.ts    ← copy of src/services/badges/registry.ts
-  types.ts       ← copy of src/services/badges/types.ts
-```
-
-> Note: keeping copies (not imports) avoids Deno/Node module boundary issues and keeps the function self-contained. When the registry changes for a new year, update both the src copy and the function copy before consolidation runs.
-
----
-
-### UI — Previously Achieved section
-
-**Location:** `/profile` page, below the current active badge grid.
-
-**For all users:**
-- Collapsible section titled "Conquistas Anteriores" / "Previously Achieved" (all 4 locales)
-- Groups badges by `festival_year` descending (e.g. "Wacken 2026", then "Wacken 2027" next year)
-- Each badge: `<img src={image_path}>` + localized label via `label_key` + year chip (`'26`)
-- Section hidden entirely when `user_badge_history` is empty (first-year users)
-- Data loaded by new `useUserBadgeHistory()` hook → SELECT from `user_badge_history` where `user_id = auth.uid()`
-
-**For godlike only (Profile admin panel):**
-- "Consolidar badges do ano YYYY" button with year selector (defaults to current festival year)
-- Confirmation modal: "Isso vai salvar os badges do Wacken YYYY para todos os vira-latas. A ação é idempotente e segura de re-executar."
-- After completion: inline result summary ("X vira-latas processados, Y badges salvos, Z erros")
-
----
-
-### Files
-
-| File | Action |
-|------|--------|
-| `supabase/migrations/<date>_idea2_user_badge_history.sql` | New table + RLS |
-| `supabase/functions/consolidate-year-badges/index.ts` | Edge Function handler |
-| `supabase/functions/consolidate-year-badges/engine.ts` | Badge engine copy for Deno |
-| `supabase/functions/consolidate-year-badges/registry.ts` | Badge registry copy for Deno |
-| `supabase/functions/consolidate-year-badges/types.ts` | Badge types copy for Deno |
-| `src/hooks/useUserBadgeHistory.ts` | Fetches `user_badge_history` for current user |
-| `src/components/BadgeHistorySection.tsx` | Previously Achieved UI, grouped by year |
-| `src/pages/ProfilePage.tsx` | Mount section + godlike consolidation button/modal |
-| `src/i18n/ProfilePage_*.json` | 4 locale strings: section title, button label, modal text, result summary |
-
----
-
-### Acceptance criteria
-
-- [ ] `user_badge_history` migration applies cleanly on a live Supabase project.
-- [ ] Consolidation is idempotent: re-running for the same year adds no duplicate rows.
-- [ ] Non-godlike callers receive 403 from the edge function.
-- [ ] Frozen badges remain visible in "Previously Achieved" even after their underlying live condition no longer holds (e.g. user removes picks, location count drops).
-- [ ] Evergreen badges (no `year` field on `BadgeConfig`) are excluded from the snapshot.
-- [ ] Previously Achieved section is hidden when `user_badge_history` is empty.
-- [ ] Badge images resolve correctly from `image_path` in the Previously Achieved view.
+**Key paths:** `supabase/migrations/20260527000001_user_badge_history.sql` · `supabase/functions/consolidate-year-badges/` · `src/components/BadgeHistorySection.tsx` · `src/components/profile/ConsolidateBadgesSection.tsx` · `src/repositories/badgeHistoryRepository.ts`.
 
 ---
 
@@ -553,12 +419,7 @@ Optional v2: percentile rank ("You saw more bands than X% of vira-latas") — tr
 
 ### Festival-ended gate
 
-`isFestivalActive()` in `time.ts` is true forever after Day 1 — **not** suitable for wrap discovery. Add:
-
-```typescript
-isFestivalEnded(at, bands): boolean
-// true when at > max(end_time) for bands where category !== 'ceremony'
-```
+`isFestivalEnded(at, bands)` in `time.ts` — **implemented in Phase 29** (shared with badge consolidation gate). True when `at` is past the max non-ceremony band `end_time`.
 
 - Teaser banner only when `isFestivalEnded()`
 - `/wrap` always reachable when logged in (godlike time override for QA)
@@ -589,7 +450,7 @@ Discovery
 | File | Action |
 |------|--------|
 | `src/services/festivalWrap.ts` | Pure stats builder + types |
-| `src/services/time.ts` | Add `isFestivalEnded()` |
+| `src/services/time.ts` | `isFestivalEnded()` ✅ Phase 29 |
 | `src/hooks/useFestivalWrapStats.ts` | IDB + auth compose hook |
 | `src/pages/WrapPage.tsx` | A2 Vest layout |
 | `src/pages/WrapPage.module.css` | Stage bar, meters, vest finale |
@@ -605,7 +466,7 @@ Discovery
 ### Relationship to other ideas
 
 - **Idea 1 (day recap alert):** LLM push notification per festival day — complementary, not a substitute; wrap is a static on-demand page.
-- **Idea 2 (badge consolidation):** Persists year badges to DB after festival — wrap shows live earned badges from current engine; consolidation is a separate post-festival operator action.
+- **Idea 2 (badge consolidation):** ✅ Phase 29 — wrap shows live earned badges from the current engine; **Previously Achieved** shows consolidated year badges after the godlike operator runs consolidate (and after reset, year-badges live only in archive).
 
 ---
 
