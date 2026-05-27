@@ -687,6 +687,7 @@ Pre-collapse subgenre strings (Goregrind, Humppa, Horror Punk, Melodic Death Met
 - `sun-sacrifice` — "Sun Sacrifice". Forgot the sunscreen; glows like a tomato in a denim vest (godlike-assigned).
 - `tactical-nap` — "Tactical Nap". Fell asleep mid-pit, mid-set, or mid-conversation — strategic withdrawal (godlike-assigned).
 - `patient-zero` — "Paciente Zero" / "Patient Zero". One minute dancing, next minute pupil check — time is a flat circle (godlike-assigned).
+- `alemao-mode` — "Alemão Mode". One song, one announcement, one trembling lip — Alemão would be proud (godlike-assigned).
 
 ### Location Presence (5)
 - `metal-place-2026` — Visited Metal Place (persist: true)

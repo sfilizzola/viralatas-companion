@@ -562,6 +562,14 @@ export const BADGES: BadgeConfig[] = [
     condition: { type: 'assigned' },
     year: 2026,
   },
+  {
+    slug: 'alemao-mode',
+    imagePath: '/badges/badge_alemao-mode.png',
+    labelKey: 'badgeAlemaoMode',
+    descriptionKey: 'badgeAlemaoModeDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
 ];
 
 // ─── CONDITION EXAMPLES ───────────────────────────────────────────────────────

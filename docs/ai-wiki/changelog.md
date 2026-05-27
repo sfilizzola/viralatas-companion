@@ -4,6 +4,17 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-27 (Alemão Mode badge)
+
+### Added
+- **`alemao-mode`** — `assigned`, `year: 2026`. Godlike-only emotional-moment badge; asset at `public/badges/badge_alemao-mode.png`.
+- i18n keys (`badgeAlemaoMode`, `badgeAlemaoModeDescription`) in all four locale files.
+
+### Changed
+- **`docs/ai-wiki/badges.md`** — inventory 67 → 68; assigned badge entry documented.
+
+---
+
 ## 2026-05-26 (Weak skip + Patient Zero badges)
 
 ### Added
