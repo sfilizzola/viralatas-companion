@@ -6,9 +6,9 @@
   z-index: 20;
   display: flex;
   justify-content: center;
-  gap: 8px;
-  padding: 12px 16px 8px;
-  background: linear-gradient(to bottom, var(--bg) 60%, transparent);
+  gap: 10px;
+  padding: 14px 16px 10px;
+  background: linear-gradient(to bottom, var(--bg) 55%, transparent);
   pointer-events: none;
 }
 
@@ -17,10 +17,23 @@
   height: 8px;
   border-radius: 50%;
   background: var(--border);
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.35s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease;
 }
 
 .dotActive {
-  background: var(--accent);
-  transform: scale(1.15);
+  background: var(--stage, var(--accent));
+  transform: scale(1.35);
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--stage, var(--accent)) 22%, transparent),
+    0 0 14px color-mix(in srgb, var(--stage, var(--accent)) 55%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot,
+  .dotActive {
+    transition: none;
+  }
 }

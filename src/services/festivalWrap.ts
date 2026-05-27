@@ -6,7 +6,16 @@ import {
   type BadgeIdbSnapshot,
 } from './badges/badgeContextBuilder';
 import { getEarnedBadges } from './badges/engine';
+import { BADGES } from './badges/registry';
 import type { BadgeBand } from './badges/types';
+
+const ASSIGNABLE_BADGE_SLUGS = new Set(
+  BADGES.filter((b) => b.condition.type === 'assigned').map((b) => b.slug),
+);
+
+function assignedBadgeSlugsFromMeta(assignedBadges: string[]): string[] {
+  return assignedBadges.filter((slug) => ASSIGNABLE_BADGE_SLUGS.has(slug));
+}
 import { getWeakSkipCount } from './weakSkipMetadata';
 import { now } from './time';
 
@@ -23,6 +32,7 @@ export type FestivalWrapPersonal = {
   weakSkips: number;
   badgesEarnedCount: number;
   earnedBadgeSlugs: string[];
+  assignedBadgeSlugs: string[];
   maxCrewAtPick: number;
   locationVisitsTotal: number | null;
 };
@@ -33,7 +43,10 @@ export type FestivalWrapCrew = {
   activeViraLatas: number;
   pickTwinUserId: string | null;
   pickTwinDisplayName: string | null;
+  pickTwinAvatarUrl: string | null;
   pickTwinOverlapPct: number | null;
+  currentUserDisplayName: string | null;
+  currentUserAvatarUrl: string | null;
 };
 
 export type FestivalWrapStats = {
@@ -57,6 +70,7 @@ export const EMPTY_WRAP_STATS: FestivalWrapStats = {
     weakSkips: 0,
     badgesEarnedCount: 0,
     earnedBadgeSlugs: [],
+    assignedBadgeSlugs: [],
     maxCrewAtPick: 0,
     locationVisitsTotal: null,
   },
@@ -66,7 +80,10 @@ export const EMPTY_WRAP_STATS: FestivalWrapStats = {
     activeViraLatas: 0,
     pickTwinUserId: null,
     pickTwinDisplayName: null,
+    pickTwinAvatarUrl: null,
     pickTwinOverlapPct: null,
+    currentUserDisplayName: null,
+    currentUserAvatarUrl: null,
   },
 };
 
@@ -115,6 +132,7 @@ function countConflictPairs(pickedBands: Band[]): { hard: number; soft: number }
 function computeCrewWrapStats(
   snap: BadgeIdbSnapshot,
   userId: string,
+  authUser: AuthUser,
 ): FestivalWrapCrew {
   const { allPicks, bands, crewUsers } = snap;
   const allPickCounts = new Map<string, number>();
@@ -145,6 +163,16 @@ function computeCrewWrapStats(
   const displayNameById = new Map(
     crewUsers.map((u) => [u.id, u.display_name ?? u.id]),
   );
+  const avatarById = new Map(crewUsers.map((u) => [u.id, u.avatar_url]));
+
+  const metaDisplayName = authUser.user_metadata?.display_name;
+  const metaAvatar = authUser.user_metadata?.avatar_url;
+  const currentUserDisplayName =
+    displayNameById.get(userId) ??
+    (typeof metaDisplayName === 'string' ? metaDisplayName : null);
+  const currentUserAvatarUrl =
+    avatarById.get(userId) ??
+    (typeof metaAvatar === 'string' ? metaAvatar : null);
 
   let pickTwinUserId: string | null = null;
   let pickTwinOverlapPct: number | null = null;
@@ -179,7 +207,10 @@ function computeCrewWrapStats(
     pickTwinDisplayName: pickTwinUserId
       ? (displayNameById.get(pickTwinUserId) ?? pickTwinUserId)
       : null,
+    pickTwinAvatarUrl: pickTwinUserId ? (avatarById.get(pickTwinUserId) ?? null) : null,
     pickTwinOverlapPct,
+    currentUserDisplayName,
+    currentUserAvatarUrl,
   };
 }
 
@@ -193,7 +224,7 @@ export function buildFestivalWrapStats(
   if (ctx.bandsPicked === 0) {
     return {
       ...EMPTY_WRAP_STATS,
-      crew: computeCrewWrapStats(snap, userId),
+      crew: computeCrewWrapStats(snap, userId, authUser),
     };
   }
 
@@ -230,9 +261,10 @@ export function buildFestivalWrapStats(
       weakSkips,
       badgesEarnedCount: earned.length,
       earnedBadgeSlugs: earned.map((b) => b.slug),
+      assignedBadgeSlugs: assignedBadgeSlugsFromMeta(ctx.assignedBadges),
       maxCrewAtPick: ctx.maxAttendanceInPicks,
       locationVisitsTotal,
     },
-    crew: computeCrewWrapStats(snap, userId),
+    crew: computeCrewWrapStats(snap, userId, authUser),
   };
 }

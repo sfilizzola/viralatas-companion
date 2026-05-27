@@ -158,6 +158,39 @@ describe('buildFestivalWrapStats', () => {
     expect(stats.crew.pickTwinDisplayName).toBe('Bob');
   });
 
+  it('surfaces avatar urls for current user and pick twin from crewUsers', () => {
+    const bands = [band({ id: 'a' }), band({ id: 'b' })];
+    const crewWithAvatars = defaultCrew.map((u) => ({
+      ...u,
+      avatar_url:
+        u.id === 'u1'
+          ? 'https://example.com/alice.jpg'
+          : u.id === 'u2'
+            ? 'https://example.com/bob.jpg'
+            : null,
+    }));
+    const snap = minimalSnapshot({
+      userPicks: [{ band_id: 'a' }, { band_id: 'b' }],
+      allPicks: [
+        { user_id: 'u1', band_id: 'a', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'b', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'a', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'b', created_at: '2026-07-01T00:00:00Z' },
+      ],
+      bands,
+      crewUsers: crewWithAvatars,
+    });
+
+    const stats = buildFestivalWrapStats(
+      snap,
+      'u1',
+      authUser({ avatar_url: 'https://example.com/meta-alice.jpg', display_name: 'Alice' }),
+    );
+    expect(stats.crew.currentUserDisplayName).toBe('Alice');
+    expect(stats.crew.currentUserAvatarUrl).toBe('https://example.com/alice.jpg');
+    expect(stats.crew.pickTwinAvatarUrl).toBe('https://example.com/bob.jpg');
+  });
+
   it('activeViraLatas counts unique pickers', () => {
     const b = band({ id: 'a' });
     const snap = minimalSnapshot({
@@ -203,5 +236,31 @@ describe('buildFestivalWrapStats', () => {
     const stats = buildFestivalWrapStats(snap, 'u1', authUser());
     expect(stats.hasPicks).toBe(true);
     expect(stats.personal.bandsSkipped).toBe(0);
+  });
+
+  it('surfaces assignable badge slugs from snapshot assignedBadges', () => {
+    const b = band({ id: 'a' });
+    const snap = minimalSnapshot({
+      userPicks: [{ band_id: 'a' }],
+      allPicks: [{ user_id: 'u1', band_id: 'a', created_at: '2026-07-01T00:00:00Z' }],
+      bands: [b],
+      assignedBadges: ['mosh-pit', 'not-a-real-badge', 'crowdsurfer'],
+    });
+
+    const stats = buildFestivalWrapStats(snap, 'u1', authUser());
+    expect(stats.personal.assignedBadgeSlugs).toEqual(['mosh-pit', 'crowdsurfer']);
+  });
+
+  it('returns empty assignedBadgeSlugs when none assigned', () => {
+    const b = band({ id: 'a' });
+    const snap = minimalSnapshot({
+      userPicks: [{ band_id: 'a' }],
+      allPicks: [{ user_id: 'u1', band_id: 'a', created_at: '2026-07-01T00:00:00Z' }],
+      bands: [b],
+      assignedBadges: [],
+    });
+
+    const stats = buildFestivalWrapStats(snap, 'u1', authUser());
+    expect(stats.personal.assignedBadgeSlugs).toEqual([]);
   });
 });

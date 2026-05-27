@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import {
   BADGES,
@@ -42,11 +43,16 @@ function yearSuffix(year: number): string {
 export default function BadgesDisplay({ user }: BadgesDisplayProps) {
   const { t } = useI18n('Badges');
   const { ctx, loading } = useBadgeContext(user);
+  const [searchParams] = useSearchParams();
   const [selectedSlug, setSelectedSlug] = useState<string | null>(null);
-  const [spread, setSpread] = useState(false);
+  const [spread, setSpread] = useState(() => searchParams.get('vest') === 'open');
   const [scatterSeed, setScatterSeed] = useState(() => Math.random());
   const [bg, setBg] = useState<PatchesBackground>(() => loadPatchesBackground());
   const [layout, setLayout] = useState<PatchesLayout>(() => loadPatchesLayout());
+
+  useEffect(() => {
+    if (searchParams.get('vest') === 'open') setSpread(true);
+  }, [searchParams]);
 
   useEffect(() => {
     function onBgChange(event: Event) {

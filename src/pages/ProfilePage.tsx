@@ -102,7 +102,7 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
 
       {showWrapTeaser && <WrapTeaserBanner />}
 
-      <section className={styles.pfSection}>
+      <section id="vest" className={styles.pfSection}>
         <BadgesDisplay user={user} />
       </section>
 

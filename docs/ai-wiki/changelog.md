@@ -4,6 +4,36 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-27 (Wrap — closing thanks section)
+
+### Added
+- **Finale thanks section** — scroll-snap closing gate with vira-lata thank-you, Wacken 2027 sign-off, and CTA to `/now`.
+
+---
+
+## 2026-05-27 (Wrap — welcome gate)
+
+### Added
+- **Welcome section** — first scroll-snap screen on `/wrap` (poster title, phrase, scroll hint); progress bar now 6–7 dots.
+
+### Changed
+- Stat sections shifted +1 index; hero count-up triggers on hero section reveal.
+
+---
+
+## 2026-05-27 (Wrap — assigned patches + section phrases)
+
+### Added
+- **Conditional assigned-badges section** on `/wrap` — appears when user has godlike-assigned patches (`assignedBadgeSlugs` from `buildFestivalWrapStats`); 6th scroll section + progress dot.
+- **Section phrases** — playful vira-latas copy per section (`heroPhrase`, `personalityPhrase`, etc.) in all 4 locales.
+
+### Changed
+- **`WrapPage.tsx`** — dynamic section count; assigned patch grid with staggered drop-in animation.
+- **`festivalWrap.ts`** — `personal.assignedBadgeSlugs` filtered to registry `assigned` condition type.
+- **Design System** — wrap section table + phrase note.
+
+---
+
 ## 2026-05-27 (Phase 30 — Festival Wrap)
 
 ### Added
