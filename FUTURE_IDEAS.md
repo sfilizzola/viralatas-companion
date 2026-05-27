@@ -16,7 +16,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 | 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — pure services + scenario tests; no network | ✅ Phase 26 |
 | 5 | Unit tests: Component and page integration | High | Low — auth pages + repository/hook coverage; SchedulePage logic tested at lower layers | ✅ Phase 26 |
 | 6 | Festival minimap with live user positions | Medium | Medium — requires maintained image asset, presence data accuracy, mobile layout fit | pending |
-| 7 | Festival wrap (`/wrap` recap page) | Medium | Low — client-side stats from existing IDB; no schema change; additive route | pending |
+| 7 | Festival wrap (`/wrap` recap page) | Medium | Low — client-side stats from existing IDB; no schema change; additive route | 📋 Phase 30 |
 
 ---
 
@@ -230,6 +230,8 @@ No new backend work is needed — `user_presence` is already synced via Supabase
 ---
 
 ## Idea 7 — Festival wrap (`/wrap` recap page)
+
+**Status:** 📋 **Phase 30** — implementation plan: `docs/superpowers/plans/2026-05-27-festival-wrap-plan.md` (no code yet)
 
 **Goal:** After Wacken ends, give each vira-lata a single scrollable recap page — Spotify Wrapped energy, but one route instead of a carousel or modal. Lead with **personal** stats; close with **1–2 crew highlights**. No LLM prose; all numbers computed offline from IndexedDB.
 

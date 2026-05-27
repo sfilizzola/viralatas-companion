@@ -284,7 +284,7 @@ Full inventory and condition engine → `docs/ai-wiki/badges.md`.
 
 ## Phases at a glance
 
-Phases 1–29 are complete. The active phase is **Phase 30 — TBD** — see `PHASES.md`.
+Phases 1–29 are complete. The active phase is **Phase 30 — Festival Wrap (`/wrap`)** — see `PHASES.md` and `docs/superpowers/plans/2026-05-27-festival-wrap-plan.md`.
 
 **Full phase history** → `docs/ai-wiki/phases-history.md`
 
