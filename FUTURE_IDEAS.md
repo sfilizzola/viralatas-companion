@@ -12,9 +12,9 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 |---|---|---|---|---|
 | 1 | LLM proactive alerts | High | Medium — API key handling, alert spam, offline edge cases | pending |
 | 2 | Year freeze for historical badges | Medium | Low — godlike-only, idempotent, additive schema change | ✅ Phase 29 |
-| 3 | Unit tests: IDB layer (`lib/db.ts`) | Medium | Low — requires `fake-indexeddb` dev dependency; isolated from app runtime | pending |
-| 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — `renderHook` + mocked IDB and Supabase; no network | pending |
-| 5 | Unit tests: Component and page integration | High | Low — replaces misleading stub tests; mounts pages with RTL + mocked hooks | pending |
+| 3 | Unit tests: IDB layer (`src/lib/db/`) | Medium | Low — `fake-indexeddb` dev dependency; isolated from app runtime | ✅ Phase 26 |
+| 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — pure services + scenario tests; no network | ✅ Phase 26 |
+| 5 | Unit tests: Component and page integration | High | Low — auth pages + repository/hook coverage; SchedulePage logic tested at lower layers | ✅ Phase 26 |
 | 6 | Festival minimap with live user positions | Medium | Medium — requires maintained image asset, presence data accuracy, mobile layout fit | pending |
 | 7 | Festival wrap (`/wrap` recap page) | Medium | Low — client-side stats from existing IDB; no schema change; additive route | pending |
 
@@ -125,143 +125,33 @@ Regras:
 
 ---
 
-## Idea 3 — Unit tests: IDB layer (`lib/db.ts`)
+## Idea 3 — Unit tests: IDB layer
 
-**Goal:** Achieve ~80% branch coverage on `lib/db.ts` (506 lines), the entire offline IndexedDB abstraction, using a real in-memory IDB implementation so tests exercise the actual schema and version migrations.
+**Status:** ✅ **Implemented — Phase 26** (26.A safety net + 26.N domain split). Full inventory → `docs/ai-wiki/testing.md` · `docs/ai-wiki/phases-history.md` (Phase 26).
 
-**Prerequisite:** Install `fake-indexeddb` as a dev dependency (`npm install --save-dev fake-indexeddb`). Scope it to `db.test.ts` only — keep the existing minimal `window.indexedDB` stub in `setup.ts` for all other test files.
+**Shipped summary:** `fake-indexeddb` scoped via `helpers/fakeIdb.ts`; monolithic `lib/db.ts` split into 12 modules under `src/lib/db/` (barrel import unchanged). `db.test.ts` covers session, catalog, picks, offline queues (picks/presence/announcements/missed/duck), presence, announcements, missed, config, duck, meta, badge history, wipe, and all `*-changed` window events. Coverage thresholds in `vitest.config.ts` gate `src/lib/db/**` (95% lines/funcs/stmts, 55% branches).
 
-**New dev dependency:**
-```bash
-npm install --save-dev fake-indexeddb
-```
-
-### Test file: `src/__tests__/db.test.ts`
-
-| Test group | Cases |
-|---|---|
-| Bands | `saveBand` / `loadBands` round-trip |
-| Picks | `saveUserPick` / `removeUserPick` / `replaceUserPicks` (per-user replace leaves other users' picks intact) |
-| Offline queue | `enqueueOfflinePick` / `loadOfflineQueue` / `removeFromOfflineQueue` |
-| Presence | `saveUserPresence` / `loadUserPresence` / `replaceUserPresence` |
-| Announcements | `loadLatestAnnouncement` returns entry with most recent `created_at` |
-| Window events | `PICKS_CHANGED_EVENT` fires after save/remove pick; `PRESENCE_CHANGED_EVENT` fires after presence write |
-
-### Vitest config additions
-
-Add coverage thresholds to `vitest.config.ts` once this stage ships:
-
-```ts
-coverage: {
-  provider: 'v8',
-  reporter: ['text', 'html'],
-  thresholds: {
-    lines: 90,
-    functions: 90,
-    branches: 85,
-    statements: 90,
-  },
-  exclude: [
-    'src/supabase.types.ts',
-    'src/vite-env.d.ts',
-    'src/version.ts',
-    'src/i18n/**',
-    '**/*.module.css',
-  ],
-},
-```
-
-**Files:** `src/__tests__/db.test.ts`, `vitest.config.ts`, `package.json` (new dev dep).
-
-**Acceptance criteria:**
-- [ ] `fake-indexeddb` is a dev-only dependency; production bundle unchanged.
-- [ ] All IDB round-trip tests pass without touching the real browser IDB.
-- [ ] Window events (`PICKS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, etc.) are asserted in tests.
-- [ ] Coverage thresholds gate is applied in `vitest.config.ts` and CI passes.
+**Key paths:** `src/__tests__/db.test.ts` · `src/__tests__/helpers/fakeIdb.ts` · `src/lib/db/` · `vitest.config.ts`.
 
 ---
 
 ## Idea 4 — Unit tests: Hook logic (pure memoized computations)
 
-**Goal:** Cover the deterministic derivation logic inside key hooks using `renderHook` from RTL. Mocks target Supabase channels and IDB. Side effects (realtime subscriptions, flush loops) are not in scope — focus is on the pure computed outputs.
+**Status:** ✅ **Implemented — Phase 26/27** (26.M `/now` composable split + 27.F IDB subscription caches). Full inventory → `docs/ai-wiki/testing.md` · `docs/ai-wiki/phases-history.md` (Phases 26–27).
 
-**Prerequisite:** Stages 1–3 from the test plan must be complete (pure function extractions already done). Relies on the extracted `computeAttendees` from `services/attendees.ts` and `countPicks` from `hooks/usePickCounts.ts`.
+**Shipped summary:** Original plan targeted separate `useNowData.logic`, `usePickCounts`, and `useBandAttendees` test files. Delivered instead via pure-service and scenario tests aligned with the refactored architecture: `/now` derivation in `livePreview.test.ts` + table-driven `liveNowScenarios.test.ts`; composable hook wiring in `useNowData.test.ts`; `computeAttendees()` in `attendees.test.ts`; shared pick cache in `useIdbSubscription.test.ts`. No Supabase subscriptions in these tests.
 
-### Test files
-
-#### `src/__tests__/useNowData.logic.test.ts`
-
-| Case | Description |
-|---|---|
-| `presenceValue` — camping | `is_camping = true`, plan not currently active → `'camping'` |
-| `presenceValue` — metal_place | `is_at_metal_place = true`, within metal-place window → `'metal_place'` |
-| `presenceValue` — default | No special flags set → `'auto'` |
-| `isMetalPlaceWindowActive` | Outside time window gates the metal_place presence value |
-| `crewPlans` completeness | Always includes the current user even when absent from `crewUsers` |
-
-#### `src/__tests__/usePickCounts.test.ts`
-
-| Case | Description |
-|---|---|
-| Basic count | `countPicks()` returns correct `{ [band_id]: number }` map from a `UserPick[]` array |
-
-#### `src/__tests__/useBandAttendees.test.ts`
-
-| Case | Description |
-|---|---|
-| Grouping | `computeAttendees()` groups picks by `band_id` |
-| Hydration | Matches each entry with `CrewUser` display names |
-
-**Files:** `src/__tests__/useNowData.logic.test.ts`, `src/__tests__/usePickCounts.test.ts`, `src/__tests__/useBandAttendees.test.ts`.
-
-**Acceptance criteria:**
-- [ ] All derivation tests pass without mounting real Supabase subscriptions.
-- [ ] `useNowData.logic.test.ts` covers the three `presenceValue` branches and the `crewPlans` completeness invariant.
-- [ ] `countPicks` and `computeAttendees` are tested as pure functions (no `renderHook` overhead needed).
+**Key paths:** `src/__tests__/livePreview.test.ts` · `src/__tests__/liveNowScenarios.test.ts` · `src/__tests__/useNowData.test.ts` · `src/__tests__/attendees.test.ts` · `src/__tests__/useIdbSubscription.test.ts` · `src/services/livePreview.ts` · `src/services/attendees.ts`.
 
 ---
 
 ## Idea 5 — Unit tests: Component and page integration
 
-**Goal:** Mount real page and component trees with RTL + `I18nProvider`, mock out hooks and repositories, and assert rendered output. These tests replace the three misleading stub files (`registration.test.ts`, `login.test.ts`, `auth-integration.test.ts`) that do not import any app code.
+**Status:** ✅ **Implemented — Phase 26** (26.A auth safety net). Full inventory → `docs/ai-wiki/testing.md` · `docs/ai-wiki/phases-history.md` (Phase 26).
 
-**Prerequisite:** Stages 1–4 complete. All pure function extractions in place. Misleading stub tests removed as part of this work.
+**Shipped summary:** Auth pages mount real components with RTL + mocked Supabase: `login.test.tsx` (LoginPage + `useAuth`), `registration.test.tsx` (RegisterPage validation + signup shape), `auth-integration.test.ts` (IDB session + trigger metadata contract). Original plan also called for `SchedulePage.test.tsx`; filter/toggle behavior is covered at lower layers instead — `bandFilter.test.ts`, `schedule.test.ts`, `usePickActions.test.ts`, `picksRepository.test.ts` — which matches the post–Phase 26 hook/repository architecture. No dedicated SchedulePage mount test; accepted trade-off.
 
-### Test files
-
-#### `src/__tests__/SchedulePage.test.tsx`
-
-| Case | Description |
-|---|---|
-| Initial render | Band list loaded from mocked IDB renders correctly |
-| Day filter | Selecting a day hides bands from other days |
-| Stage filter | Multi-select stage filter shows only matching bands |
-| Pick toggle | Clicking pick button calls `picksRepository.toggle` with correct arguments |
-
-#### `src/__tests__/LoginPage.test.tsx` _(replaces `login.test.ts`)_
-
-| Case | Description |
-|---|---|
-| Empty email | Shows validation error without calling Supabase |
-| Empty password | Shows validation error without calling Supabase |
-| Valid submit | Calls `supabase.auth.signInWithPassword` with correct credentials |
-| Supabase error | Error response renders error message to user |
-
-#### `src/__tests__/RegisterPage.test.tsx` _(replaces `registration.test.ts`)_
-
-| Case | Description |
-|---|---|
-| Short password | Shows validation error |
-| Missing display name | Shows validation error |
-| Valid submit | Calls `supabase.auth.signUp` with correct metadata shape (`display_name`, `preferred_language`, `is_test_user: false`) |
-
-**Files:** `src/__tests__/SchedulePage.test.tsx`, `src/__tests__/LoginPage.test.tsx`, `src/__tests__/RegisterPage.test.tsx`; delete `src/__tests__/registration.test.ts`, `src/__tests__/login.test.ts`, `src/__tests__/auth-integration.test.ts`.
-
-**Acceptance criteria:**
-- [ ] Misleading stub tests deleted; replaced by tests that actually import and exercise app code.
-- [ ] `SchedulePage` filter and toggle behavior tested end-to-end through the component tree.
-- [ ] Auth page tests assert on real form validation logic and correct Supabase call shapes.
-- [ ] All new tests pass with `npm test`.
+**Key paths:** `src/__tests__/login.test.tsx` · `src/__tests__/registration.test.tsx` · `src/__tests__/auth-integration.test.ts` · `src/__tests__/bandFilter.test.ts` · `src/__tests__/usePickActions.test.ts` · `src/__tests__/picksRepository.test.ts`.
 
 ---
 

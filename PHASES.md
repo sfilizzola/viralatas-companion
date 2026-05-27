@@ -12,7 +12,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Status:** 📋 Not started
 
-**Goal:** TBD — see `FUTURE_IDEAS.md` (Idea 7 `/wrap`, test coverage ideas, minimap, etc.).
+**Goal:** TBD — see `FUTURE_IDEAS.md` (Idea 7 `/wrap`, minimap, LLM alerts, etc.).
 
 **Deliverables:** TBD
 
