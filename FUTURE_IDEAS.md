@@ -14,6 +14,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 | 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — `renderHook` + mocked IDB and Supabase; no network | pending |
 | 5 | Unit tests: Component and page integration | High | Low — replaces misleading stub tests; mounts pages with RTL + mocked hooks | pending |
 | 6 | Festival minimap with live user positions | Medium | Medium — requires maintained image asset, presence data accuracy, mobile layout fit | pending |
+| 7 | Festival wrap (`/wrap` recap page) | Medium | Low — client-side stats from existing IDB; no schema change; additive route | pending |
 
 ---
 
@@ -469,3 +470,153 @@ No new backend work is needed — `user_presence` is already synced via Supabase
 - [ ] "Unknown" users appear in the non-zone region of the image, not on top of a stage or camping zone.
 - [ ] Privacy consideration addressed (opt-in/out mechanism or explicit decision documented).
 - [ ] Works on mobile at 375 px width — image scales, dot positions scale proportionally.
+
+---
+
+## Idea 7 — Festival wrap (`/wrap` recap page)
+
+**Goal:** After Wacken ends, give each vira-lata a single scrollable recap page — Spotify Wrapped energy, but one route instead of a carousel or modal. Lead with **personal** stats; close with **1–2 crew highlights**. No LLM prose; all numbers computed offline from IndexedDB.
+
+**Inspiration:** Spotify Wrapped, but scoped to what the app already knows (picks, seen bands, badges, schedule chaos, crew overlap).
+
+**When:** Available once the last non-ceremony band's `end_time` has passed. Discovery via a teaser banner on `/now` and/or `/profile` (dismissible per device). Route remains reachable for godlike time-travel testing before festival end.
+
+**Layout decision (locked in design exploration):** **A2 · Kutte Chronicle** — extends the patches vest language from `BadgesDisplay` (stage color top bar, surface cards, chaos meters, denim kutte finale with chaotic patch pile). HTML prototypes live in `_temp/wrap-proposals/` (`variant-a2-kutte-chronicle.html`, comparison gallery `index.html`).
+
+---
+
+### UX — scroll story (Approach A)
+
+One private route `/wrap`. Five full-viewport sections with optional `scroll-snap`. Fixed **5-dot progress bar** at top (updates via `IntersectionObserver` as user scrolls).
+
+| # | Section | Content |
+|---|---------|---------|
+| 1 | Hero | Giant **bands seen** count; secondary row: picked · skipped · stages visited |
+| 2 | Personality | Top genre + top stage copy; stage-colored pill (`Harder stage · N visited`) |
+| 3 | Chaos | Horizontal meters: weak skips, hard schedule conflicts, patches earned |
+| 4 | Crew | Pick twin (name + overlap %); crew favorite band (name + pick count / active vira-latas) |
+| 5 | Patches | Chaotic scattered earned badge thumbnails on denim kutte texture; CTA **Open vest on profile** → `/profile` |
+
+**Visual system (from Design System):**
+- Tokens: `--bg`, `--bg-surface`, `--text`, `--text-muted`, `--accent` (#c0392b CTA)
+- Typography: Oswald display, IBM Plex Sans body, JetBrains Mono kickers
+- **Dynamic `--stage` color** from user's top stage (same map as `SchedulePage` stage colors)
+- 4px stage-color bar at top of each section card
+
+**Edge cases:**
+- `is_friend` users: hide location-toggle stats if ever surfaced; crew comparisons still valid
+- Zero picks: friendly empty state — survived Wacken without the app knowing your schedule
+- Sparse `user_missed_bands` adoption: prefer pick-based stats over skip-based when missed data is thin
+
+---
+
+### Stats — personal (from IndexedDB + auth metadata)
+
+All computed client-side; reuse patterns from `badgeContextBuilder.ts`, `engine.ts`, `usePickCounts.ts`, `useBandConflicts.ts`.
+
+| Stat | Source |
+|------|--------|
+| Bands picked | `user_picks` |
+| Bands seen | picks where `end_time < now`, minus `user_missed_bands` (same as badge `seenBands`) |
+| Bands skipped | picked + ended + in missed set |
+| Top genre / stage | aggregate `seenBands` |
+| Stage diversity | distinct stages in `seenBands` |
+| Hard / soft conflicts | `computeBandOverlaps()` on picked bands |
+| Weak skips | `user_metadata.weak_skips_2026` |
+| Badges earned | `getEarnedBadges(ctx)` |
+| Location toggles | `user_metadata.location_visits` (optional; hide for friends) |
+| Max crew at a pick | `maxAttendanceInPicks` in `BadgeContext` |
+
+### Stats — crew closing beats
+
+| Stat | Source |
+|------|--------|
+| Crew's #1 band | highest pick count across vira-latas (`PopularPage` logic) |
+| Pick twin | vira-lata with highest pick-set overlap (Jaccard) |
+| Active vira-latas | unique user IDs in all picks |
+| Shared seen moment | band you saw that N crew members also picked (optional copy variant) |
+
+### Not in v1 (documented gaps)
+
+| Stat | Gap |
+|------|-----|
+| Duck quacks sent/received | `duck_quacks` in Supabase only — not cached in IndexedDB |
+| Historical presence trail | only toggle counters in metadata |
+| True attendance proof | "seen" = didn't opt out of missed mark |
+| MoshSplit balance | external API on Profile — out of scope |
+| LLM day recap | separate future alert type (`day_recap` in Idea 1) |
+| Public shareable URL | no server-side persistence of wrap snapshot |
+
+Optional v2: percentile rank ("You saw more bands than X% of vira-latas") — trivial client-side when crew is ~20 people; copy needs care.
+
+---
+
+### Festival-ended gate
+
+`isFestivalActive()` in `time.ts` is true forever after Day 1 — **not** suitable for wrap discovery. Add:
+
+```typescript
+isFestivalEnded(at, bands): boolean
+// true when at > max(end_time) for bands where category !== 'ceremony'
+```
+
+- Teaser banner only when `isFestivalEnded()`
+- `/wrap` always reachable when logged in (godlike time override for QA)
+- Banner dismiss: `localStorage['viralatas:wrap-dismissed-2026']`
+
+---
+
+### Architecture sketch
+
+```
+WrapPage (scroll-snap sections × 5)
+  ├── useFestivalWrapStats()  ← IDB snapshot + auth metadata
+  │     └── festivalWrap.ts   ← pure stats builder
+  ├── WrapProgress            ← 5-dot bar (A2+)
+  ├── WrapHero / Personality / Chaos / Crew / Patches
+  └── Link → /profile (Open vest)
+
+Discovery
+  └── Banner on RightNowPage + ProfilePage when isFestivalEnded && !dismissed
+```
+
+**Offline-first:** Same as rest of app — reads IndexedDB first; no Supabase reads for stats.
+
+---
+
+### Files (when implemented)
+
+| File | Action |
+|------|--------|
+| `src/services/festivalWrap.ts` | Pure stats builder + types |
+| `src/services/time.ts` | Add `isFestivalEnded()` |
+| `src/hooks/useFestivalWrapStats.ts` | IDB + auth compose hook |
+| `src/pages/WrapPage.tsx` | A2 Kutte layout |
+| `src/pages/WrapPage.module.css` | Stage bar, meters, kutte finale |
+| `src/i18n/WrapPage_*.json` | br, en, es, de |
+| `src/App.tsx` | Private route `/wrap` |
+| `src/pages/RightNowPage.tsx` / `ProfilePage.tsx` | Post-festival teaser banner |
+| `public/Design System.html` | Wrap section |
+| `src/__tests__/festivalWrap.test.ts` | Edge cases: 0 picks, friend user, sparse missed |
+| `_temp/wrap-proposals/` | Design-only HTML (already drafted) |
+
+---
+
+### Relationship to other ideas
+
+- **Idea 1 (day recap alert):** LLM push notification per festival day — complementary, not a substitute; wrap is a static on-demand page.
+- **Idea 2 (badge consolidation):** Persists year badges to DB after festival — wrap shows live earned badges from current engine; consolidation is a separate post-festival operator action.
+
+---
+
+### Acceptance criteria
+
+- [ ] `/wrap` renders five scroll sections with A2 Kutte visual language (stage bar, meters, patch pile, progress dots).
+- [ ] All displayed stats match badge engine semantics for seen/picked/skipped/conflicts.
+- [ ] Page works fully offline after first load (stats from IndexedDB only).
+- [ ] Teaser banner appears only after `isFestivalEnded()` and respects dismiss localStorage key.
+- [ ] Copy uses **vira-latas** (not "crew") in all four locales.
+- [ ] Friend users never see location-toggle stats on the wrap page.
+- [ ] Empty-picks users see a friendly empty state, not broken layout.
+- [ ] "Open vest" navigates to `/profile` where `BadgesDisplay` shows full patch collection.
+- [ ] Design System documents Wrap page tokens and section anatomy.
