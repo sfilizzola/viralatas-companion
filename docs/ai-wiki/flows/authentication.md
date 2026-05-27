@@ -387,7 +387,7 @@ function PrivateRoute({ children }) {
 }
 ```
 
-All app routes (`/now`, `/schedule`, `/my-picks`, `/popular`, `/announcements`, `/profile`) are wrapped in `PrivateRoute`.
+All app routes (`/now`, `/schedule`, `/my-picks`, `/popular`, `/announcements`, `/profile`, `/wrap`) are wrapped in `PrivateRoute`.
 
 **Public routes** (no `PrivateRoute`): `/login`, `/register`, `/reset-password`. The reset page must be public because the user arrives unauthenticated from an email link.
 

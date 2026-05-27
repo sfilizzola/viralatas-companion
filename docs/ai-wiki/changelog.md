@@ -4,6 +4,15 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-27 (Wiki audit — Phase 30 doc sync)
+
+### Changed
+- **Design System** — wrap section counts corrected (7–8 sections/dots); epigraph scope clarified (stat sections only).
+- **`testing.md`** — 594 tests / 52 files; added `festivalWrap.test.ts`, `wrapDismiss.test.ts`.
+- **`architecture.md`**, **`authentication.md`** — `/wrap` route documented.
+
+---
+
 ## 2026-05-27 (Phase 30 closed)
 
 ### Changed

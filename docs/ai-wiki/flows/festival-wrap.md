@@ -49,7 +49,7 @@ After Wacken ends, each vira-lata gets a private scrollable recap at `/wrap` —
 | `src/hooks/useWrapTeaserVisible.ts` | Teaser gate: `isFestivalEnded(now(), bands)` + dismiss |
 | `src/lib/wrapDismiss.ts` | `viralatas:wrap-dismissed-2026` helpers |
 | `src/pages/WrapPage.tsx` | Welcome + stat sections + patches + finale thanks; scroll-snap; IntersectionObserver progress |
-| `src/components/wrap/WrapProgress.tsx` | Fixed progress dots (7–9 depending on assigned patches) |
+| `src/components/wrap/WrapProgress.tsx` | Fixed progress dots (7–8 depending on assigned patches) |
 | `src/components/wrap/WrapTeaserBanner.tsx` | Variant B discovery bar |
 | `src/pages/RightNowPage.tsx` / `ProfilePage.tsx` | Teaser mount + time-override reactivity |
 | `src/components/profile/TimeTravelSection.tsx` | Godlike wrap QA disclaimer |
@@ -87,7 +87,7 @@ Teaser path:
 
 | Case | Behavior |
 |------|----------|
-| Zero picks | Friendly empty state — not five broken sections |
+| Zero picks | Friendly empty state — not a broken multi-section layout |
 | Friend user (`is_friend`) | `locationVisitsTotal === null` — location stats never rendered |
 | Sparse missed data | Skip count may be 0; page still shows picks/seen |
 | Godlike D+1 time travel | Teaser appears without reload; `/wrap` always open |

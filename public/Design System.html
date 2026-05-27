@@ -1079,7 +1079,7 @@
 
       <div class="component-section">
         <h3>Festival Wrap — `/wrap` + Teaser <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">WrapPage · WrapTeaserBanner</span></h3>
-        <p><strong>A2 Vest Chronicle</strong> (<code>WrapPage.tsx</code>): welcome gate + stat sections + closing thanks gate with CTA to <code>/now</code> (6–8 scroll sections depending on assigned patches) with <code>scroll-snap-type: y mandatory</code>; fixed progress bar (<code>WrapProgress</code>, 7–9 dots) driven by <code>IntersectionObserver</code>. Document root sets dynamic <code>--stage</code> from user's top stage (<code>stageColorVar</code>).</p>
+        <p><strong>A2 Vest Chronicle</strong> (<code>WrapPage.tsx</code>): welcome gate + stat sections + closing thanks gate with CTA to <code>/now</code> (<strong>7–8</strong> scroll sections depending on assigned patches) with <code>scroll-snap-type: y mandatory</code>; fixed progress bar (<code>WrapProgress</code>, <strong>7–8</strong> dots) driven by <code>IntersectionObserver</code>. Document root sets dynamic <code>--stage</code> from user's top stage (<code>stageColorVar</code>).</p>
         <table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
           <thead>
             <tr style="border-bottom:1px solid #333; text-align:left;">
@@ -1098,7 +1098,7 @@
             <tr><td style="padding:6px 8px;">7/8 Thanks</td><td style="padding:6px 8px;">Closing gate — thanks + Wacken 2027 (Rain or Shine); CTA Back to the App → /now</td></tr>
           </tbody>
         </table>
-        <p>Each section card: <strong>4px</strong> top bar <code>background: var(--stage)</code> (fallback <code>var(--accent)</code>); shimmer + glow on reveal. Typography: Oswald display, IBM Plex body, JetBrains Mono kickers. Per-section <strong>epigraph</strong> (<code>.sectionEpigraph</code>) sits <em>above</em> the card in <code>.sectionFrame</code> — editorial voice against ambient orbs; card holds stats only.</p>
+        <p>Stat sections (hero → patches, plus optional assigned): <strong>4px</strong> top bar <code>background: var(--stage)</code> (fallback <code>var(--accent)</code>); shimmer + glow on reveal. Typography: Oswald display, IBM Plex body, JetBrains Mono kickers. Per-section <strong>epigraph</strong> (<code>.sectionEpigraph</code>) sits <em>above</em> the card in <code>.sectionFrame</code> — editorial voice against ambient orbs; card holds stats only. Welcome and thanks finale are poster gates (no card).</p>
         <p><strong>Celebration layer (Phase 30 polish):</strong> fixed ambient stage/accent orbs + film grain; cards fade/slide in on scroll (<code>IntersectionObserver</code> → <code>.sectionRevealed</code>); hero count-up; staggered meter fills; patch pile drop-in; pill CTA for Open vest. Respects <code>prefers-reduced-motion</code>.</p>
         <p><strong>WrapTeaserBanner Variant B</strong> (<code>/now</code>, <code>/profile</code>): full-width bar on <code>--bg-surface</code>; <strong>4px</strong> solid <code>var(--accent)</code> top strip; decorative 3-patch pile (18×18 stage colors); Oswald headline + mono CTA; dismiss column 44px touch target. Gated post-festival only; not in bottom nav.</p>
       </div>

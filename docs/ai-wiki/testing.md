@@ -8,7 +8,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 
 ## Relevant Source Files
 
-- `src/__tests__/` — All test files (**37 files**, **502 tests** as of 2026-05-24)
+- `src/__tests__/` — All test files (**52 files**, **594 tests** as of Phase 30 close)
 - `vitest.config.ts` — Test runner configuration
 - `package.json` — Test scripts (`test`, `test:coverage`) and seed scripts (`seed:bands`, `seed:bands:sync`, `seed:bands:backfill-slot-id`, `seed:bands:move`, `seed:test-users`, `seed:live-now`, `festival:reset`)
 - `supabase/seed/` — Seed scripts for test data and the destructive `festival-reset.ts` operator script (see `docs/ai-wiki/festival-reset.md`)
@@ -61,8 +61,10 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `usersRepository.test.ts` | Crew sync, role map, user list, block/unblock, set role (10 tests) |
 | `bandsRepository.test.ts` | `checkAndApplyCacheVersion()` match/mismatch/no-data (3 tests) |
 | `missedRepository.test.ts` | Mark/unmark missed band online and offline (4 tests) |
+| `festivalWrap.test.ts` | `buildFestivalWrapStats()` badge parity, crew Jaccard, assigned slugs, avatar URLs (Phase 30) |
+| `wrapDismiss.test.ts` | `viralatas:wrap-dismissed-2026` dismiss key round-trip (Phase 30) |
 
-**Coverage**: **502 tests** across **37** test files (Phase 26 safety nets + post-phase badge fix)
+**Coverage**: **594 tests** across **52** test files (Phase 30 wrap + Phase 29 archive)
 
 **Run**:
 ```bash

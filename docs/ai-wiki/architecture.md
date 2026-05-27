@@ -59,7 +59,7 @@ Components are organized by concern:
 
 | Folder | Purpose |
 |--------|---------|
-| `src/pages/` | Route-level containers (6 pages) |
+| `src/pages/` | Route-level containers (8 routes incl. `/wrap`) |
 | `src/components/` | Shared UI building blocks |
 | `src/ui/` | Design system (Button, Modal, Input, etc.) |
 
@@ -70,6 +70,7 @@ Components are organized by concern:
 - `/popular` (PopularPage) — Bands sorted by total pick count, avatar clusters
 - `/announcements` (AnnouncementsPage) — Mural-style announcements board
 - `/profile` (ProfilePage) — User info, role controls, godlike admin
+- `/wrap` (WrapPage) — Post-festival recap; IDB-only stats; scroll-snap A2 Vest Chronicle (see `flows/festival-wrap.md`)
 
 **Pattern**: All pages read from custom hooks, never call repositories directly.
 

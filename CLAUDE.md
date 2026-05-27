@@ -136,6 +136,7 @@ Update **all three**:
 - `/popular` — Vira-latas popularity: bands sorted by total picks
 - `/announcements` — Mural-style announcements board
 - `/profile` — Profile, preferences, godlike/manager UI, logout
+- `/wrap` — Festival recap (post-festival; always reachable when logged in)
 
 Unknown routes redirect to `/now`.
 
