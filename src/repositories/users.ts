@@ -24,12 +24,15 @@ export type BlockedPosterWithUserDetails = BlockedPoster & {
 async function syncCrew(): Promise<void> {
   const { data, error } = await supabase
     .from('users')
-    .select('id, display_name, avatar_url, wacken_arrival_day, is_friend')
+    .select('id, display_name, avatar_url, wacken_arrival_day, is_friend, special_badges')
     .order('display_name', { ascending: true, nullsFirst: false });
 
   if (error || !data) return;
 
-  await saveCrewUsers(data as CrewUser[]);
+  const crew: CrewUser[] = (data as Array<CrewUser & { special_badges?: string[] | null }>).map(
+    (u) => ({ ...u, special_badges: u.special_badges ?? [] }),
+  );
+  await saveCrewUsers(crew);
 }
 
 async function fetchUserRolesMap(): Promise<Record<string, UserRole>> {

@@ -21,7 +21,7 @@ beforeEach(() => {
 
 describe('usersRepository.syncCrew', () => {
   it('fetches crew profiles and saves to IndexedDB', async () => {
-    const crew = [{ id: 'u1', display_name: 'Alice', avatar_url: null, wacken_arrival_day: 1, is_friend: true }];
+    const crew = [{ id: 'u1', display_name: 'Alice', avatar_url: null, wacken_arrival_day: 1, is_friend: true, special_badges: null }];
     const mockOrder = vi.fn().mockResolvedValue({ data: crew, error: null });
     const mockSelect = vi.fn().mockReturnValue({ order: mockOrder });
     vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
@@ -29,7 +29,23 @@ describe('usersRepository.syncCrew', () => {
     await usersRepository.syncCrew();
 
     expect(supabase.from).toHaveBeenCalledWith('users');
-    expect(db.saveCrewUsers).toHaveBeenCalledWith(crew);
+    expect(mockSelect).toHaveBeenCalledWith(
+      'id, display_name, avatar_url, wacken_arrival_day, is_friend, special_badges',
+    );
+    expect(db.saveCrewUsers).toHaveBeenCalledWith([
+      expect.objectContaining({ id: 'u1', special_badges: [] }),
+    ]);
+  });
+
+  it('persists special_badges on crew_users IDB rows', async () => {
+    const crew = [{ id: 'u1', display_name: 'Alice', avatar_url: null, wacken_arrival_day: 1, is_friend: false, special_badges: ['code-wizards'] }];
+    const mockOrder = vi.fn().mockResolvedValue({ data: crew, error: null });
+    const mockSelect = vi.fn().mockReturnValue({ order: mockOrder });
+    vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
+    await usersRepository.syncCrew();
+    expect(db.saveCrewUsers).toHaveBeenCalledWith([
+      expect.objectContaining({ id: 'u1', special_badges: ['code-wizards'] }),
+    ]);
   });
 });
 

@@ -17,7 +17,12 @@ export type User = {
   wacken_arrival_day?: string | null;
 };
 
-export type CrewUser = Pick<User, 'id' | 'display_name' | 'avatar_url' | 'wacken_arrival_day' | 'is_friend'>;
+export type CrewUser = Pick<
+  User,
+  'id' | 'display_name' | 'avatar_url' | 'wacken_arrival_day' | 'is_friend'
+> & {
+  special_badges?: string[];
+};
 
 export type BandCategory = 'band' | 'ceremony';
 
