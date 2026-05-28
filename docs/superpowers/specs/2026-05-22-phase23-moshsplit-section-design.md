@@ -107,7 +107,7 @@ A brief `setTimeout(200ms)` simulates network latency so the loading state is vi
 | `src/components/profile/MoshSplitSection.tsx` | Create | Full component, mock data, all 4 states |
 | `src/components/profile/MoshSplitSection.module.css` | Create | Uses existing CSS tokens only |
 | `src/pages/ProfilePage.tsx` | Edit | Insert `<MoshSplitSection userEmail={...} />` |
-| `public/Design System.html` | Edit | Document component in profile section |
+| `public/vira-lata-ds.html` | Edit | Document component in profile section |
 
 No migrations, no edge functions, no API calls in Part 1.
 

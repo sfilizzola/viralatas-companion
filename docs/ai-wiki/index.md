@@ -37,6 +37,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 ## Quick Navigation
 
 ### Architecture & Design
+- **[Design System](../../public/vira-lata-ds.html)** — Living UI spec: tokens, components, layouts, motion (`public/vira-lata-ds.html`)
 - **[Architecture Overview](architecture.md)** — Frontend, offline-first, sync, realtime, PWA
 - **[Domain Model](domain-model.md)** — Users, bands, picks, announcements, presence
 - **[Offline-First Pattern](offline-first.md)** — IndexedDB primary, sync secondary, queue mechanics

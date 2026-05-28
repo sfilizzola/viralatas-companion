@@ -64,7 +64,7 @@ Implementers must match these specs; new banner/page layout explorations are out
 | `src/i18n/ProfilePage_*.json` | `timeTravelWrapDisclaimer` (br, en, es, de) |
 | `src/__tests__/festivalWrap.test.ts` | Stats edge cases |
 | `src/__tests__/wrapDismiss.test.ts` | Dismiss key round-trip |
-| `public/Design System.html` | Wrap section anatomy |
+| `public/vira-lata-ds.html` | Wrap section anatomy |
 | `docs/ai-wiki/flows/festival-wrap.md` | New flow page (wiki-curator after ship) |
 | `docs/ai-wiki/routes.md` | Add `/wrap` |
 | `docs/ai-wiki/changelog.md` | Dated entry on completion |
@@ -403,7 +403,7 @@ Use `now()` from `time.ts` — never raw `new Date()` for the gate.
 ### Task 13: Design System + wiki
 
 **Files:**
-- Modify: `public/Design System.html`
+- Modify: `public/vira-lata-ds.html`
 - Create: `docs/ai-wiki/flows/festival-wrap.md` (8-section wiki template)
 - Modify: `docs/ai-wiki/routes.md`, `docs/ai-wiki/changelog.md`, `docs/ai-wiki/index.md` (link flow)
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Viralatas Metaleiros — Design System</title>
+<title>Viralatas Metaleiros — Vira-Lata Design System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -2143,6 +2143,23 @@
   .duck-toast--animated {
     animation: duck-toast-in 240ms cubic-bezier(0.34,1.56,0.64,1) both;
   }
+
+  /* Governance tables (merged audit) */
+  .status-ok { color: var(--signal-ok); }
+  .status-warn { color: var(--signal-warn); }
+  .status-error { color: var(--accent); }
+  .priority { font-family: var(--font-mono); font-size: 10px; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 2px; }
+  .priority-high { background: rgba(192,57,43,0.15); color: var(--accent-hover); }
+  .priority-medium { background: rgba(243,156,18,0.12); color: var(--signal-warn); }
+  .priority-low { background: var(--bg-elevated); color: var(--text-muted); }
+  .issue-list { list-style: none; counter-reset: issue-counter; padding: 0; }
+  .issue-list li { counter-increment: issue-counter; margin-bottom: var(--s-3); padding: var(--s-3); background: var(--accent-soft); border-left: 4px solid var(--accent); border-radius: var(--r-1); font-size: 14px; color: var(--text-muted); }
+  .issue-list li::before { content: counter(issue-counter); display: inline-block; width: 22px; height: 22px; background: var(--accent); color: #fff; border-radius: 50%; text-align: center; line-height: 22px; font-weight: 700; margin-right: var(--s-2); font-size: 12px; }
+  .action-item { padding: var(--s-4); background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--r-2); margin-bottom: var(--s-4); font-size: 14px; color: var(--text-muted); }
+  #governance table { width: 100%; border-collapse: collapse; margin-bottom: var(--s-6); font-size: 13px; }
+  #governance th { text-align: left; padding: var(--s-3); border-bottom: 2px solid var(--border-strong); font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; color: var(--text-muted); background: var(--bg-surface); }
+  #governance td { padding: var(--s-3); border-bottom: 1px solid var(--border); color: var(--text-muted); vertical-align: top; }
+  #governance ul { color: var(--text-muted); font-size: 14px; line-height: 1.6; margin: 0 0 var(--s-4) var(--s-6); max-width: 70ch; }
 </style>
 </head>
 <body>
@@ -2155,7 +2172,10 @@
   <a href="#icons">06 Icons</a>
   <a href="#motion">07 Motion</a>
   <a href="#additional">08 Additional</a>
+  <a href="#empty-states">10 Empty</a>
   <a href="#duck">11 Duck 🦆</a>
+  <a href="#governance">12 Governance</a>
+  <a href="#changelog">Log</a>
 </nav>
 <div class="page">
 
@@ -2164,9 +2184,9 @@
        ============================================================ -->
   <header class="masthead">
     <div>
-      <div class="eyebrow">Design System &middot; v2.2 &middot; Wacken Open Air 2026</div>
+      <div class="eyebrow">Vira-Lata DS &middot; v3.0 &middot; Wacken Open Air 2026 &middot; canonical</div>
       <h1>Viralatas<br />Metaleiros<span class="horns"> 🤘</span></h1>
-      <p class="lede">A festival companion PWA for ~20 metalheads. Dark-first, offline-first. Feels like a backstage wristband, not a corporate app.</p>
+      <p class="lede">A festival companion PWA for ~20 metal vira-latas. Dark-first, offline-first. Feels like a backstage wristband, not a corporate app. <strong style="color:var(--text-muted)">Canonical design system</strong> — edit only this file (<code>public/vira-lata-ds.html</code>).</p>
       <p class="lede" style="margin-top:var(--s-3);font-size:13px;color:var(--text-faint);max-width:52ch"><strong style="color:var(--text-muted)">Visual relationship to Wacken Open Air:</strong> We reference the festival by using its 8 canonical stage colors as the only saturated palette in the app. We do not recreate, copy, or approximate Wacken's own graphic identity (logotype, mascot, stage graphics). Stage color assignments are fixed and must not be changed — they are the festival's identity, not ours to reinterpret.</p>
     </div>
     <div class="specs">
@@ -2390,7 +2410,7 @@
       <div class="num">04</div>
       <div>
         <h2>Components</h2>
-        <p class="desc">Dark mode is the only mode that matters. Everything has high contrast, hard edges, and lives in tight density. The pick toggle is a star — a single saved gesture, instantly visible across the schedule.</p>
+        <p class="desc">Dark mode is the only mode that matters. Everything has high contrast, hard edges, and lives in tight density. The pick toggle is a paw — a single saved gesture, instantly visible across the schedule.</p>
       </div>
     </div>
 
@@ -2453,8 +2473,10 @@
           <li><b>Stage chip</b> Mono 10, hard radius</li>
           <li><b>Time</b> Mono tabular, en-dash</li>
           <li><b>Going count</b> red number = social proof</li>
-          <li><b>Pick</b> 64px hit area, rest of card opens detail</li>
-          <li><i>No conflict chip on this variant</i> — surfaced only on /my-picks</li>
+          <li><b>Pick</b> 64px hit area — <code>PawIcon</code> 28px; rest of card opens detail</li>
+          <li><b>Day ghost</b> (<code>showDayLabel</code>) — mono 9px weekday top-right when no day tab filter (Lineup) or always (Popular)</li>
+          <li><b>Duck</b> — only when band is live + picked + not ceremony + <code>duck_enabled</code> killswitch on (Godlike Powers)</li>
+          <li><i>No conflict chip on this variant</i> — surfaced only on /my-picks upcoming rows</li>
         </ul>
       </div>
     </div>
@@ -2495,13 +2517,15 @@
         </div>
       </div>
       <div class="demo-notes">
-        <h4>Use</h4>
+        <h4>Use · My Wacken (<code>/my-picks</code>)</h4>
         <ul>
-          <li>Sorted by start time, grouped by day</li>
+          <li>Sorted by start time, grouped by collapsible festival day (<code>myWackenGrouping.ts</code>)</li>
           <li><b>Time block</b> on the left replaces thumb</li>
-          <li><b>Conflict chip</b> single "Conflito" label — overlap details intentionally not computed</li>
-          <li>Star pick toggle on every card to unpick directly from this list</li>
-          <li>Day grouping uses a 2px accent rule (see /my-picks layout)</li>
+          <li><b>Conflict chip</b> on upcoming rows only — overlap details intentionally not computed</li>
+          <li><b>Ended rows</b> (Phase 33): inline <code>attended</code> / <code>missed</code> chips in <code>.meta</code>; pick column hidden; status = <b>4px left stripe</b> (<code>--signal-ok</code> / <code>--signal-warn</code>) + card opacity 72% / 62%</li>
+          <li><b>Paw pick</b> toggle on upcoming rows only — <code>PawIcon</code> 28px in 64px column</li>
+          <li>Within each day: upcoming ASC → optional <code>already played today</code> divider → ended ASC. Footer Saw / Didn't See buckets removed.</li>
+          <li>Day header: localized weekday + pick count; 2px accent rule. See <b>My Wacken page</b> subhead below.</li>
         </ul>
       </div>
     </div>
@@ -2556,9 +2580,11 @@
         <h4>Anatomy</h4>
         <ul>
           <li><b>Rank</b> Oswald 36, top-3 in red</li>
-          <li><b>Avatar cluster</b> up to 5 visible, +N overflow</li>
+          <li><b>Picks mode</b> — avatar cluster up to 5 visible, +N overflow</li>
+          <li><b>Rating mode</b> (Phase 32) — footer strip with count, optional <code>You · N</code>, paw + avg hero; avatars hidden</li>
+          <li>Header: title + inset segmented pill (<code>Picks</code> / <code>Rating</code>) on one row</li>
           <li>Tap → opens band detail modal</li>
-          <li>Day chip uses <code>D1</code>–<code>D4</code> shorthand</li>
+          <li>Day ghost uses weekday abbr (<code>Wed</code> etc.) via <code>showDayLabel</code></li>
         </ul>
       </div>
     </div>
@@ -2898,8 +2924,9 @@
     </div>
 
     <!-- BADGE -->
-    <div class="subhead">Badge collection &middot; circular patches, vest-style</div>
-    <p class="t-small" style="margin:-6px 0 var(--s-3)">Badges live as <b>patches on a metal vest</b>, not entries in a settings list. The default state is image-only — no captions visible. Tap any patch to open the detail modal with name, description, and (if historical) the Wacken year chip.</p>
+    <div class="subhead">BadgesDisplay &middot; vest stack · <code>src/components/BadgesDisplay.tsx</code></div>
+        <p class="t-small" style="margin:-6px 0 var(--s-3)">Earned patches on <code>/now</code> and <code>/profile</code>. Collapsed vest: fixed <b>112px</b> tall. Default <b>chaotic</b> scatter (48px patches, ±55° rotation, reseed on close) or opt-in <b>neat</b> horizontal chip row (<code>PatchesLayoutToggle</code> in Edit profile). Expanded = 4-column grid with 42ms stagger. Background textures via <code>data-bg</code>: none · grid · steel · indigo · leather.</p>
+    <p class="t-small" style="margin:-6px 0 var(--s-3);color:var(--text-faint)">Grid demo below (expanded spread). Live vest uses <b>patches on a metal vest</b>, not entries in a settings list. The default state is image-only — no captions visible. Tap any patch to open the detail modal with name, description, and (if historical) the Wacken year chip.</p>
 
     <div class="demo">
       <div class="demo-stage">
@@ -3085,7 +3112,7 @@
     </div>
 
     <!-- PICK TOGGLE -->
-    <div class="subhead">Pick toggle &middot; standalone</div>
+    <div class="subhead">Pick toggle &middot; standalone · <code>PawIcon</code></div>
     <div class="demo">
       <div class="demo-stage">
         <div class="row">
@@ -3273,6 +3300,1045 @@
         </ul>
       </div>
     </div>
+
+    <div class="subhead">Switch <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/ui/Switch.tsx</span></div>
+        <p>Accessible toggle for binary admin states. Used in godlike <strong>Servants of Metal</strong> user rows for manager access and vira-lata friend (<code>is_friend</code>) flags. Renders as a <code>button[role="switch"]</code> — not a checkbox — with tone-specific ON colors.</p>
+        <p><strong>Tones:</strong> <code>manager</code> (blue) · <code>friend</code> (amber). OFF = muted thumb on <code>--bg-elevated</code>; ON = filled track + colored thumb using role tokens.</p>
+        <div class="component-demo" style="background:#0a0a0a;padding:24px;display:flex;gap:28px;flex-wrap:wrap;align-items:center;">
+          <style>
+            .ds-sw { position:relative;width:44px;height:26px;border-radius:999px;border:1px solid #2a2a2a;background:#1e1e1e;flex-shrink:0; }
+            .ds-sw::after { content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#888; }
+            .ds-sw.on.manager { background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.45); }
+            .ds-sw.on.manager::after { transform:translateX(18px);background:#3b82f6; }
+            .ds-sw.on.friend { background:rgba(217,119,6,.15);border-color:rgba(217,119,6,.4); }
+            .ds-sw.on.friend::after { transform:translateX(18px);background:#f59e0b; }
+            .ds-sw-row { display:flex;align-items:center;gap:10px; }
+            .ds-sw-lbl { font-family:'JetBrains Mono',monospace;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.06em; }
+          </style>
+          <div class="ds-sw-row"><span class="ds-sw-lbl">Manager OFF</span><span class="ds-sw" aria-hidden="true"></span></div>
+          <div class="ds-sw-row"><span class="ds-sw-lbl">Manager ON</span><span class="ds-sw on manager" aria-hidden="true"></span></div>
+          <div class="ds-sw-row"><span class="ds-sw-lbl">Friend OFF</span><span class="ds-sw" aria-hidden="true"></span></div>
+          <div class="ds-sw-row"><span class="ds-sw-lbl">Friend ON</span><span class="ds-sw on friend" aria-hidden="true"></span></div>
+        </div>
+        <table>
+          <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>checked</td><td>boolean</td><td>Current ON/OFF state.</td></tr>
+            <tr><td>onChange</td><td>(checked: boolean) =&gt; void</td><td>Called when user toggles.</td></tr>
+            <tr><td>tone</td><td>'manager' | 'friend'</td><td>ON-state color palette.</td></tr>
+            <tr><td>disabled</td><td>boolean</td><td>Loading / blocked interaction.</td></tr>
+            <tr><td>ariaLabel</td><td>string</td><td>Accessible name (required).</td></tr>
+          </tbody>
+        </table>
+
+      <div class="subhead">BandCard</div>
+        <p>Displays band information with pick toggles and attendance counts.</p>
+        <p><strong>Variants:</strong> schedule, timeline, ranked, ceremony</p>
+        <p><strong>Features:</strong> duck button, conflict indicators, stage badge, attendee avatars, corner weekday label (V1 ghost)</p>
+        <p><strong>Day label (<code>showDayLabel</code>):</strong> optional corner ghost — mono 9px weekday abbr in <code>--text-faint</code>, top-right of the body column (<code>.dayGhost</code>). Only on <code>schedule</code> and <code>ranked</code> variants. Weekday comes from <code>bandWeekdayKey()</code> in <code>bandTime.ts</code> (CEST, same rules as <code>bandDay()</code>) via SchedulePage i18n keys. <strong>Lineup (<code>/schedule</code>):</strong> shown when no day tab is active (<code>filters.day === null</code>). Hidden when a single day filter is selected. <strong>Popular:</strong> always shown. <strong>My Wacken:</strong> not used — festival day comes from section headers (<code>.dayHeader</code>).</p>
+        <p><strong>Attendance chip (<code>attendanceChip</code>, Phase 33):</strong> <code>timeline</code> variant on <code>/my-picks</code> <strong>ended rows only</strong>. Values <code>attended</code> | <code>missed</code> (not “Saw”). Mono pill <code>.attendanceChipAttended</code> / <code>.attendanceChipMissed</code> in <code>.meta</code>; <code>hidePick</code> on ended rows. Card background + time column = same as upcoming; status = <strong>4px left stripe only</strong> (<code>.stripeAttended</code> → <code>--signal-ok</code>, <code>.stripeMissed</code> → <code>--signal-warn</code>). Stage color on <code>.stageBadge</code> only. Opacity: <code>.cardAttended</code> 72% · <code>.cardMissed</code> 62%. No conflict outline on ended rows. See <strong>My Wacken Page</strong> section for page-level layout.</p>
+        <p><strong>Duck button visibility:</strong> only when band is currently live, the user has picked it, <code>band.category !== 'ceremony'</code>, AND the global <code>duck_enabled</code> killswitch (Phase 21) is on. The killswitch is a single boolean on <code>app_settings</code>, fetched once at app boot via <code>DuckEnabledProvider</code> and toggled from Godlike Powers → Duck feature. When off, the duck button is not rendered anywhere; offline-queued ducks still flush on reconnect.</p>
+        <p><strong>Pick toggle:</strong> <code>StarIcon</code> → <code>PawIcon</code> (canine + heel, −14°) in the 64px column at <strong>28px</strong>; outline when unpicked, filled accent when picked. Bottom nav My Wacken tab stays 18px.</p>
+        <p><strong>Popular rating mode (<code>ratingStats</code>, Phase 32):</strong> when sort mode is <code>rating</code>, ranked cards pass <code>ratingStats</code> instead of <code>attendeeCluster</code>. Footer strip (border-top): left column = count + optional <code>You · {score}</code> + optional missed skip; right column = paw + large avg (<code>.ratingHero</code>). Pick avatars hidden.</p>
+        <div class="component-demo" style="background: #0a0a0a; padding: 20px; max-width: 420px;">
+          <style>
+            .ds-bc-card { display: grid; grid-template-columns: 4px 56px 1fr 64px; background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; --stage-color: #2980b9; }
+            .ds-bc-stripe { background: var(--stage-color); }
+            .ds-bc-thumb { width: 56px; height: 56px; margin: 12px 0 12px 12px; background: var(--stage-color); border-radius: 4px; display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; color: #fff; }
+            .ds-bc-body { padding: 12px 44px 12px 16px; position: relative; min-width: 0; }
+            .ds-bc-day { position: absolute; top: 10px; right: 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #555; }
+            .ds-bc-name { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 19px; text-transform: uppercase; color: #e8e8e8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+            .ds-bc-meta { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; align-items: center; }
+            .ds-bc-stage { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #fff; background: var(--stage-color); padding: 4px 8px; border-radius: 0; }
+            .ds-bc-time { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8e8e8; }
+            .ds-bc-pick { width: 64px; border-left: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: center; color: #888; }
+            .ds-bc-caption { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
+          </style>
+          <div class="ds-bc-caption">Schedule · showDayLabel=true</div>
+          <div class="ds-bc-card">
+            <div class="ds-bc-stripe"></div>
+            <div class="ds-bc-thumb">J</div>
+            <div class="ds-bc-body">
+              <span class="ds-bc-day">Wed</span>
+              <div class="ds-bc-name">Judas Priest</div>
+              <div class="ds-bc-meta">
+                <span class="ds-bc-stage">Faster</span>
+                <span class="ds-bc-time">19:00 – 22:00</span>
+              </div>
+            </div>
+            <div class="ds-bc-pick">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.35" aria-hidden="true">
+                <g transform="rotate(-14 12 12)">
+                  <ellipse cx="6.5" cy="8.8" rx="1.95" ry="2.45"/>
+                  <ellipse cx="9.8" cy="5.5" rx="2.1" ry="2.7"/>
+                  <ellipse cx="14.2" cy="5.5" rx="2.1" ry="2.7"/>
+                  <ellipse cx="17.5" cy="8.8" rx="1.95" ry="2.45"/>
+                  <ellipse cx="12" cy="15.8" rx="5.8" ry="4.2"/>
+                  <ellipse cx="12" cy="19.2" rx="2.8" ry="1.6"/>
+                </g>
+              </svg>
+            </div>
+          </div>
+
+          <div class="ds-bc-caption" style="margin-top: 20px;">My Wacken · timeline · ended attended</div>
+          <div class="ds-bc-card ds-mw-ended" style="grid-template-columns: 4px 1fr; opacity: 0.72;">
+            <div class="ds-bc-stripe" style="background: #27ae60;"></div>
+            <div style="display: grid; grid-template-columns: 56px 1fr; min-width: 0;">
+              <div style="padding: 12px 0 12px 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8e8e8; display: grid; align-content: center; gap: 2px;">
+                <span>16:00</span><span style="font-size: 10px; color: #888;">16:45</span>
+              </div>
+              <div class="ds-bc-body" style="padding-right: 12px;">
+                <div class="ds-bc-name">Blind Guardian</div>
+                <div class="ds-bc-meta">
+                  <span class="ds-bc-stage">Faster</span>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; background: rgba(39,174,96,.22); color: #7dcea0; border: 1px solid rgba(39,174,96,.4);">Attended</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ds-bc-caption">My Wacken · timeline · ended missed</div>
+          <div class="ds-bc-card ds-mw-ended" style="grid-template-columns: 4px 1fr; opacity: 0.62;">
+            <div class="ds-bc-stripe" style="background: #f39c12;"></div>
+            <div style="display: grid; grid-template-columns: 56px 1fr; min-width: 0;">
+              <div style="padding: 12px 0 12px 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8e8e8; display: grid; align-content: center; gap: 2px;">
+                <span>18:00</span><span style="font-size: 10px; color: #888;">18:45</span>
+              </div>
+              <div class="ds-bc-body" style="padding-right: 12px;">
+                <div class="ds-bc-name">Angel Witch</div>
+                <div class="ds-bc-meta">
+                  <span class="ds-bc-stage">Louder</span>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; background: rgba(243,156,18,.22); color: #f5b041; border: 1px solid rgba(243,156,18,.4);">Missed</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p><strong>Status:</strong> <span class="status-warn">⚠ Hardcoded colors in component—needs refactor</span></p>
+
+      <div class="subhead">My Wacken Page <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">Phase 33 · MyWackenPage.tsx · route /my-picks</span></div>
+        <p>Personal festival schedule — all picks stay on their <strong>festival day</strong> (CEST <code>bandDay()</code>). Ended and upcoming bands share one day section; footer <strong>Saw / Didn't See</strong> buckets removed. Shares <code>SchedulePage.module.css</code> with Lineup and Popular; i18n namespace stays <code>MyPicksPage</code>.</p>
+
+        <table>
+          <thead><tr><th>Surface</th><th>EN</th><th>BR (locked)</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Bottom nav tab</td><td>Lineup · My Wacken</td><td>Line-up · Meu Wacken</td><td>Routes unchanged: <code>/schedule</code>, <code>/my-picks</code></td></tr>
+            <tr><td>Page title</td><td>My Wacken</td><td>Meu Wacken</td><td><code>MyPicksPage.title</code></td></tr>
+            <tr><td>Lineup page title</td><td>Lineup</td><td>Line-up</td><td><code>LineupPage.tsx</code> · namespace <code>SchedulePage</code></td></tr>
+            <tr><td>Empty state CTA</td><td>Head to the Line-up</td><td>…Line-up</td><td>Paw icon 24px</td></tr>
+            <tr><td>Divider</td><td>already played today</td><td>já passaram hoje</td><td>Only when day has ≥1 ended and ≥1 upcoming</td></tr>
+            <tr><td>Header highlight</td><td>{n} left today</td><td>{count} por vir hoje</td><td><code>--signal-ok</code> · hidden when n = 0</td></tr>
+            <tr><td>Ended chips</td><td>Attended · Missed</td><td>Assistida · Perdi</td><td>Opt-out via modal — unchanged</td></tr>
+          </tbody>
+        </table>
+
+        <p><strong>Page stack (top → bottom):</strong></p>
+        <ol style="color: #888; margin: 0 0 16px 20px; max-width: 80ch;">
+          <li><code>.header</code> — Oswald 24px title + right-aligned mono summary grid</li>
+          <li><code>.conflictBanner</code> — red tint when ≥3 <strong>upcoming</strong> hard conflicts (links to profile)</li>
+          <li><code>PlaylistLaunchButton</code> — only when <code>!isFestivalActive</code> (pre-festival)</li>
+          <li><code>MyWackenCoachBanner</code> — teal coach when ≥1 ended pick (see below)</li>
+          <li><code>.list</code> — collapsible <code>.daySection</code> blocks</li>
+        </ol>
+
+        <p><strong>Header summary lines</strong> (<code>.summary</code> · mono 10px · uppercase · right-aligned):</p>
+        <ul style="color: #888; margin: 0 0 16px 20px; max-width: 80ch;">
+          <li><code>headerBandsDays</code> — total picks / distinct festival days with picks (includes past ended-only days)</li>
+          <li><code>headerLeftToday</code> — upcoming count on today's <code>bandDay()</code>; only while festival ongoing (<code>collapsePastDays</code>) and n ≥ 1; <code>.summaryHighlight</code></li>
+          <li><code>headerConflicts</code> / <code>headerOverlaps</code> — derived from <strong>upcoming picks only</strong></li>
+        </ul>
+
+        <p><strong>Day sections</strong> (<code>myWackenGrouping.ts</code>): Within each day: upcoming ASC → optional <code>.dayDivider</code> → ended ASC. Day header shows localized weekday + <code>dayPickCount</code> (total picks that day). Chevron toggles <code>.dayBands</code> / <code>.dayBandsOpen</code> (max-height 0 ↔ 4000px).</p>
+
+        <p><strong>Collapse rules (implemented):</strong></p>
+        <ul style="color: #888; margin: 0 0 16px 20px; max-width: 80ch;">
+          <li><strong>Mid-festival:</strong> auto-collapse every festival day with <code>dayKey &lt; todayKey</code> (calendar past days). Today + future days start expanded.</li>
+          <li><strong>Post-festival:</strong> all days expanded when <code>isFestivalEnded(now, bands)</code> — review mode.</li>
+          <li><strong>Gate:</strong> waits for <code>picksReady</code> from IDB before applying collapse (fixes remount flash).</li>
+          <li><strong>Time travel:</strong> changing godlike override day re-seeds collapse via <code>todayKey|collapsePastDays</code> context; manual chevron toggles reset on context change only.</li>
+          <li>Not persisted to <code>localStorage</code> (session-only overrides).</li>
+        </ul>
+
+        <div class="component-demo" style="background: #0a0a0a; padding: 0; max-width: 420px; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden;">
+          <style>
+            .ds-mw-hdr { padding: 16px 16px 12px; border-bottom: 1px solid #2a2a2a; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+            .ds-mw-title { font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700; text-transform: uppercase; color: #e8e8e8; line-height: 1; margin: 0; }
+            .ds-mw-sum { display: grid; gap: 2px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #888; text-transform: uppercase; line-height: 1.25; }
+            .ds-mw-sum-hi { color: #27ae60; }
+            .ds-mw-coach { position: relative; padding: 12px 16px; background: rgba(22,160,133,.1); border-bottom: 1px solid rgba(22,160,133,.25); font-size: 11px; color: #8fdcc8; line-height: 1.4; }
+            .ds-mw-coach-k { display: block; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: #27ae60; margin-bottom: 4px; }
+            .ds-mw-coach-x { position: absolute; top: 8px; right: 12px; color: #555; font-size: 14px; }
+            .ds-mw-day { margin: 12px 16px; padding-top: 6px; border-top: 2px solid #c0392b; display: flex; align-items: center; justify-content: space-between; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; color: #e8e8e8; }
+            .ds-mw-day-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 400; color: #888; display: flex; align-items: center; gap: 8px; }
+            .ds-mw-div { height: 1px; background: #2a2a2a; margin: 16px 0 16px; padding-top: 8px; position: relative; }
+            .ds-mw-div span { position: absolute; left: 0; top: 0; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #555; text-transform: uppercase; letter-spacing: .04em; background: #0a0a0a; padding-right: 8px; }
+            .ds-mw-collapsed .ds-mw-day-body { display: none; }
+          </style>
+          <div class="ds-mw-hdr">
+            <h4 class="ds-mw-title">My Wacken</h4>
+            <div class="ds-mw-sum">
+              <span>8 picks / 3 days</span>
+              <span class="ds-mw-sum-hi">2 left today</span>
+              <span>1 conflicts</span>
+            </div>
+          </div>
+          <div class="ds-mw-coach">
+            <span class="ds-mw-coach-x" aria-hidden="true">×</span>
+            <strong class="ds-mw-coach-k">First time</strong>
+            Shows that already ended stay on the same day. We count them as attended — didn't go? Open the band and tap "I didn't see this band".
+          </div>
+          <div class="ds-mw-day ds-mw-collapsed">
+            <div><span>Wed 29/07</span><span class="ds-mw-day-meta">3 picks ▾</span></div>
+          </div>
+          <div class="ds-mw-day">
+            <div><span>Thu 30/07</span><span class="ds-mw-day-meta">4 picks ▴</span></div>
+            <div class="ds-mw-day-body" style="margin-top: 8px; color: #555; font-family: 'JetBrains Mono', monospace; font-size: 9px;">…upcoming BandCards…</div>
+            <div class="ds-mw-div"><span>already played today</span></div>
+            <div class="ds-mw-day-body" style="color: #555; font-family: 'JetBrains Mono', monospace; font-size: 9px;">…ended rows + Attended/Missed chips…</div>
+          </div>
+        </div>
+
+        <p style="margin-top: 12px;"><strong>Removed (Phase 33):</strong> footer <code>sectionSaw</code> / <code>sectionDidntSee</code> blocks — keys remain in JSON but are not rendered. <code>.dayHeaderSaw</code> / <code>.dayHeaderDidntSee</code> border accents unused on My Wacken.</p>
+
+      <div class="subhead">MyWackenCoachBanner <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/MyWackenCoachBanner.tsx</span></div>
+        <p>One-time education strip — not conflict styling. Explains opt-out attendance after the user's first ended pick.</p>
+        <table>
+          <thead><tr><th>Rule</th><th>Behavior</th></tr></thead>
+          <tbody>
+            <tr><td>Show</td><td>≥1 ended pick on page and <code>!isMyWackenCoachDismissed()</code></td></tr>
+            <tr><td>Dismiss</td><td>× button → <code>viralatas:my-wacken-ended-coach-dismissed</code> in <code>localStorage</code> (per device, no Supabase sync)</td></tr>
+            <tr><td>Placement</td><td>After header / conflict / playlist strip; before <code>&lt;main class="list"&gt;</code></td></tr>
+            <tr><td>i18n</td><td><code>coachBannerTitle</code>, <code>coachBannerBody</code>, <code>coachBannerDismiss</code> (4 locales)</td></tr>
+          </tbody>
+        </table>
+        <p><strong>CSS module:</strong> teal wash <code>rgba(22,160,133,0.1)</code>, border-bottom <code>rgba(22,160,133,0.25)</code>, kicker 9px mono <code>--signal-ok</code>, body 11px <code>color-mix(--signal-ok 55%, --text-muted)</code>, dismiss absolute top-right with <code>focus-visible</code> teal outline.</p>
+
+      <div class="subhead">Godlike Time Travel <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">TimeTravelSection · services/time.ts</span></div>
+        <p>Profile-only clock override for testing Live Now, My Wacken grouping, badges, and wrap gates. <strong>Datetime-local input is interpreted as Europe/Berlin (Wacken CEST)</strong> via <code>parseWackenDatetimeLocal()</code> / <code>formatWackenDatetimeLocal()</code> — not the browser's local timezone. Quick day chips (D-1…D+1) keep the current wall-clock time when switching festival days.</p>
+        <p>Changing override dispatches <code>viralatas:time-override-changed</code>; <code>useNow()</code> consumers (including My Wacken) recompute <code>todayKey</code>, upcoming vs ended split, collapse context, and coach visibility.</p>
+
+      <div class="subhead">BandRatingInput</div>
+        <p>Five-paw 1–5 rating control for ended concerts. Renders in <code>BandDetailModal</code> <strong>below</strong> the missed toggle when <code>canRate</code> is true (picked + ended + not missed + not ceremony). No crew average in modal — aggregates live on Popular only.</p>
+        <p><strong>Icon:</strong> <code>PawIcon</code> — canine paw + heel, rotated −14° (<code>IconPawFinal</code>, Phase 32 locked). 20px in buttons; outline stroke when inactive, filled <code>currentColor</code> when score ≥ index.</p>
+        <p><strong>Interaction:</strong> tap paw sets score (cumulative highlight 1…N); tap exact paw again clears; uppercase mono <strong>Clear</strong> link when score set. Both clear paths delete the row.</p>
+        <p><strong>Modal placement:</strong> compact box after “didn’t see” toggle; mono kicker <code>ratingSectionTitle</code> (“How awesome was this band?” EN); hint <code>ratingClearHint</code>.</p>
+        <p><strong>CSS module:</strong> <code>BandRatingInput.module.css</code> — section on <code>--bg-elevated</code>; buttons 36×36 on <code>--bg-sunken</code>; active <code>rgba(192, 57, 43, 0.1)</code>; exact border <code>--accent</code>.</p>
+        <div class="component-demo" style="background: #0a0a0a; padding: 20px; max-width: 440px;">
+          <style>
+            .ds-paw { display: block; }
+            .ds-ri-section { display: grid; gap: 8px; padding: 12px; background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 4px; }
+            .ds-ri-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+            .ds-ri-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #888; }
+            .ds-ri-clear { border: none; background: none; color: #555; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; padding: 2px 0; }
+            .ds-ri-clear:hover { color: #888; }
+            .ds-ri-row { display: flex; gap: 4px; flex-wrap: wrap; }
+            .ds-ri-btn { width: 36px; height: 36px; border: 1px solid #2a2a2a; border-radius: 4px; background: #050505; color: #888; display: grid; place-items: center; cursor: default; transition: border-color .12s, background .12s, color .12s; }
+            .ds-ri-btn.active { background: rgba(192, 57, 43, 0.1); border-color: rgba(192, 57, 43, 0.28); color: #c0392b; }
+            .ds-ri-btn.exact { border-color: #c0392b; }
+            .ds-ri-hint { margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: .05em; color: #555; }
+            .ds-sp-pill { display: inline-flex; flex-shrink: 0; padding: 3px; background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 999px; }
+            .ds-sp-btn { min-width: 52px; padding: 6px 12px; border: none; border-radius: 999px; background: transparent; color: #888; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; cursor: default; }
+            .ds-sp-btn.on { background: #c0392b; color: #fff; box-shadow: 0 1px 6px rgba(192, 57, 43, 0.35); }
+            .ds-sp-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 20px; }
+            .ds-sp-title { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; text-transform: uppercase; color: #e8e8e8; }
+            .ds-sp-meta { margin: 8px 0 0; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: .06em; }
+            .ds-sp-caption { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: .1em; margin: 20px 0 8px; }
+            .ds-rc-card { display: grid; grid-template-columns: 44px 1fr; background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; margin-top: 8px; --stage-color: #2980b9; }
+            .ds-rc-rank { display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; color: #c0392b; background: #1e1e1e; border-right: 1px solid #2a2a2a; }
+            .ds-rc-body { padding: 12px 16px; position: relative; }
+            .ds-rc-day { position: absolute; top: 10px; right: 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #555; }
+            .ds-rc-name { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 17px; text-transform: uppercase; color: #e8e8e8; }
+            .ds-rc-meta { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; align-items: center; }
+            .ds-rc-stage { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #fff; background: var(--stage-color); padding: 4px 8px; }
+            .ds-rc-time { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8e8e8; }
+            .ds-rc-rating { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #2a2a2a; }
+            .ds-rc-details { display: grid; gap: 3px; min-width: 0; }
+            .ds-rc-meta-line { margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: .06em; }
+            .ds-rc-you { margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #c0392b; text-transform: uppercase; letter-spacing: .06em; }
+            .ds-rc-hero { flex-shrink: 0; display: flex; align-items: center; gap: 4px; color: #c0392b; }
+            .ds-rc-avg { font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+          </style>
+          <!-- Paw SVG inline (matches PawIcon.tsx IconPawFinal) -->
+          <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+            <defs>
+              <symbol id="ds-paw" viewBox="0 0 24 24">
+                <g transform="rotate(-14 12 12)">
+                  <ellipse cx="6.5" cy="8.8" rx="1.95" ry="2.45"/>
+                  <ellipse cx="9.8" cy="5.5" rx="2.1" ry="2.7"/>
+                  <ellipse cx="14.2" cy="5.5" rx="2.1" ry="2.7"/>
+                  <ellipse cx="17.5" cy="8.8" rx="1.95" ry="2.45"/>
+                  <ellipse cx="12" cy="15.8" rx="5.8" ry="4.2"/>
+                  <ellipse cx="12" cy="19.2" rx="2.8" ry="1.6" opacity="0.85"/>
+                </g>
+              </symbol>
+            </defs>
+          </svg>
+          <div class="ds-ri-section">
+            <div class="ds-ri-header">
+              <span class="ds-ri-title">How awesome was this band?</span>
+              <button type="button" class="ds-ri-clear">Clear</button>
+            </div>
+            <div class="ds-ri-row" role="group" aria-label="Your score">
+              <span class="ds-ri-btn"><svg class="ds-paw" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.35"><use href="#ds-paw"/></svg></span>
+              <span class="ds-ri-btn"><svg class="ds-paw" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.35"><use href="#ds-paw"/></svg></span>
+              <span class="ds-ri-btn active"><svg class="ds-paw" width="20" height="20" fill="currentColor" stroke="none"><use href="#ds-paw"/></svg></span>
+              <span class="ds-ri-btn active"><svg class="ds-paw" width="20" height="20" fill="currentColor" stroke="none"><use href="#ds-paw"/></svg></span>
+              <span class="ds-ri-btn active exact"><svg class="ds-paw" width="20" height="20" fill="currentColor" stroke="none"><use href="#ds-paw"/></svg></span>
+            </div>
+            <p class="ds-ri-hint">Tap same paw again to clear</p>
+          </div>
+
+          <div class="ds-sp-caption">PopularPage · header + sort track</div>
+          <div class="ds-sp-header">
+            <span class="ds-sp-title">Popular</span>
+            <div class="ds-sp-pill" role="group" aria-label="Sort mode">
+              <span class="ds-sp-btn">Picks</span>
+              <span class="ds-sp-btn on">Rating</span>
+            </div>
+          </div>
+          <p class="ds-sp-meta">20 vira-latas · sorted by rating</p>
+          <p style="color: #888; font-size: 11px; margin-top: 10px; line-height: 1.45;">Title + inset segmented track on one row; meta line below (<code>.popularHeaderTop</code> / <code>.popularHeaderMeta</code>). Track uses 3px inset padding — active segment is floating pill, not divider split.</p>
+
+          <div class="ds-sp-caption">BandCard ranked · rating mode</div>
+          <div class="ds-rc-card">
+            <div class="ds-rc-rank">01</div>
+            <div class="ds-rc-body">
+              <span class="ds-rc-day">Tue</span>
+              <div class="ds-rc-name">Blind Guardian</div>
+              <div class="ds-rc-meta">
+                <span class="ds-rc-stage">Faster</span>
+                <span class="ds-rc-time">18:30 – 19:15</span>
+              </div>
+              <div class="ds-rc-rating">
+                <div class="ds-rc-details">
+                  <p class="ds-rc-meta-line">7 vira-latas</p>
+                  <p class="ds-rc-you">You · 5</p>
+                </div>
+                <div class="ds-rc-hero">
+                  <svg width="16" height="16" fill="#c0392b" aria-hidden="true"><use href="#ds-paw"/></svg>
+                  <span class="ds-rc-avg">4.2</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Prop / token</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>value</code></td>
+              <td>1–5 | null</td>
+              <td>Current user score</td>
+            </tr>
+            <tr>
+              <td><code>onChange</code></td>
+              <td>(score | null) =&gt; void</td>
+              <td>Score set or cleared</td>
+            </tr>
+            <tr>
+              <td><code>sectionTitle</code></td>
+              <td>string</td>
+              <td>Mono kicker — i18n <code>ratingSectionTitle</code></td>
+            </tr>
+            <tr>
+              <td><code>clearLabel</code> / <code>clearHint</code></td>
+              <td>string</td>
+              <td>Clear link + tap-again hint</td>
+            </tr>
+            <tr>
+              <td><code>ratingStats</code> (BandCard)</td>
+              <td>object</td>
+              <td>Popular rating mode card lines</td>
+            </tr>
+            <tr>
+              <td><code>.sortPill*</code></td>
+              <td>CSS</td>
+              <td>Popular header segmented control</td>
+            </tr>
+            <tr>
+              <td><code>.ratingCluster*</code></td>
+              <td>CSS</td>
+              <td>Rated card footer: <code>.ratingDetails</code> left, <code>.ratingHero</code> right</td>
+            </tr>
+          </tbody>
+        </table>
+
+      <div class="subhead">Avatar</div>
+        <p>User profile picture or monogram fallback.</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Property</th>
+              <th>Type</th>
+              <th>Default</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>src</td>
+              <td>string</td>
+              <td>—</td>
+              <td>Image URL</td>
+            </tr>
+            <tr>
+              <td>name</td>
+              <td>string</td>
+              <td>—</td>
+              <td>Display name for monogram</td>
+            </tr>
+            <tr>
+              <td>size</td>
+              <td>'sm' | 'md' | 'lg'</td>
+              <td>'md'</td>
+              <td>Avatar size</td>
+            </tr>
+          </tbody>
+        </table>
+
+      <div class="subhead">ProfileHeader <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/profile/ProfileHeader.tsx</span></div>
+        <p>Top of <code>/profile</code>. Stacks avatar → name → email → metadata row (<code>.pfMeta</code>). The metadata row shows, in order: <strong>role chip</strong>, <strong>country flag emoji</strong> (no chrome — just the glyph), and the <strong>Wackens chip</strong>. Wackens chip only renders when the user has at least one Wacken year saved; tapping the count reveals the year list via the native tooltip.</p>
+        <p><strong>Wackens chip rules:</strong></p>
+        <ul style="margin: 0 0 12px 18px; color: #888; font-size: 14px;">
+          <li>Reuses the shared <code>Chip</code> primitive with the <em>default</em> (muted gray) variant — same palette as a normal vira-lata role chip. Discreet on purpose: it's ambient metadata, not a CTA. No accent dot, no colored fill.</li>
+          <li>Label is plural-aware: <code>{count} Wacken</code> when count = 1, <code>{count} Wackens</code> otherwise. German collapses to <code>{count}× Wacken</code> for both cases. Strings live in <code>ProfilePage_*.json</code> under <code>wackenCountSingular</code> / <code>wackenCountPlural</code>.</li>
+          <li>Tooltip exposes the sorted list of years (<code>wackenCountTooltip</code>) — useful for inspecting veterans on the team.</li>
+          <li>Always sits to the <em>right</em> of the country flag and wraps on narrow widths via <code>.pfMeta { flex-wrap: wrap }</code>.</li>
+          <li>Replaces the earlier diamond-shaped <code>.pfYearDiamond</code> badge — kept the badge in pill form because users could not read the year count from a clipped diamond. An earlier red-accented version was reverted to the default gray Chip for visual quietness.</li>
+        </ul>
+        <div class="component-demo" style="background: #0a0a0a; padding: 24px; display: flex; flex-direction: column; gap: 18px; align-items: center;">
+          <style>
+            .ds-pf-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
+            .ds-pf-chip { display: inline-flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 3px 8px; border-radius: 999px; border: 1px solid #2a2a2a; background: #141414; color: #888; white-space: nowrap; line-height: 1; }
+            .ds-pf-chip-godlike { color: #d97706; border-color: rgba(217,119,6,.45); background: rgba(217,119,6,.08); }
+            .ds-pf-chip-manager { color: #3b82f6; border-color: rgba(59,130,246,.45); background: rgba(59,130,246,.08); }
+            .ds-pf-flag { font-size: 1.25rem; line-height: 1; }
+            .ds-pf-stack { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+            .ds-pf-stack-label { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: .1em; }
+          </style>
+
+          <div class="ds-pf-stack">
+            <span class="ds-pf-stack-label">Godlike · BR · 5 Wackens (default)</span>
+            <div class="ds-pf-meta">
+              <span class="ds-pf-chip ds-pf-chip-godlike">Godlike</span>
+              <span class="ds-pf-flag">🇧🇷</span>
+              <span class="ds-pf-chip">5 Wackens</span>
+            </div>
+          </div>
+
+          <div class="ds-pf-stack">
+            <span class="ds-pf-stack-label">Manager · DE · 1 Wacken (singular)</span>
+            <div class="ds-pf-meta">
+              <span class="ds-pf-chip ds-pf-chip-manager">Manager</span>
+              <span class="ds-pf-flag">🇩🇪</span>
+              <span class="ds-pf-chip">1× Wacken</span>
+            </div>
+          </div>
+
+          <div class="ds-pf-stack">
+            <span class="ds-pf-stack-label">Vira-lata · ES · no Wackens yet (chip hidden)</span>
+            <div class="ds-pf-meta">
+              <span class="ds-pf-chip">Vira-lata</span>
+              <span class="ds-pf-flag">🇪🇸</span>
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>displayName</td><td>string</td><td>Vira-latas name shown under the avatar.</td></tr>
+            <tr><td>initial</td><td>string</td><td>Single-letter monogram fallback for the avatar.</td></tr>
+            <tr><td>avatarUrl</td><td>string | null</td><td>Profile picture URL.</td></tr>
+            <tr><td>email</td><td>string</td><td>Account email (mono caption).</td></tr>
+            <tr><td>userRole</td><td>'normal' | 'manager' | 'godlike' | null</td><td>Drives the leading role chip variant.</td></tr>
+            <tr><td>savedCountry</td><td>string | null</td><td>ISO2 country code → flag emoji (<code>br</code>, <code>de</code>, <code>us</code>, <code>be</code>, <code>co</code>, <code>es</code>).</td></tr>
+            <tr><td>savedWackenYears</td><td>number[]</td><td>Years attended. <code>length</code> drives chip label; values feed the tooltip. Chip hidden when empty.</td></tr>
+            <tr><td>t</td><td>TFn</td><td>i18n function — must resolve <code>wackenCountSingular</code>, <code>wackenCountPlural</code>, and <code>wackenCountTooltip</code>.</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:12px;font-size:14px;color:#888;"><strong>Role label copy:</strong> <code>roleLabel()</code> returns <code>Godlike</code>, <code>Manager</code>, or <code>Vira-lata</code> (singular) for normal users — never «Vira-latas» on a single-user chip.</p>
+
+      <div class="subhead">UserManagementSection · Servants of Metal <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/profile/UserManagementSection.tsx</span></div>
+        <p>Godlike-only collapsible (<code>GodlikeAdminPanel</code> → «Servants of Metal»). Lists all registered vira-latas with a <strong>hybrid A</strong> layout: scan pills → toggle switches → one-shot action buttons. Copy lives in lazy-loaded <code>GodlikeAdmin_*.json</code>.</p>
+        <p><strong>Three tiers per row (non-godlike users):</strong></p>
+        <ul style="margin:0 0 12px 18px;color:#888;font-size:14px;">
+          <li><strong>Status strip</strong> — pills for Manager / Friend / Blocked. Lit dot + fill = ON; dimmed = OFF.</li>
+          <li><strong>Switches</strong> — <code>Switch</code> toggles for manager access and vira-lata friend. Helper text flips between hint and «ON — tap to revoke».</li>
+          <li><strong>One-shot actions</strong> — mono section label + toolbar: purple <code>.actionBadge</code> assign patch (shows <code>· N</code> when patches assigned); orange <code>.actionUnblock</code> when user is blocked.</li>
+        </ul>
+        <p>Godlike rows skip pills/switches; they only show the action toolbar (assign patch). CSS: <code>ProfilePage.module.css</code> — <code>.userStatusStrip</code>, <code>.userSwitchRow</code>, <code>.userActionToolbar</code>.</p>
+        <div class="component-demo" style="background:#060606;padding:24px;display:flex;justify-content:center;">
+          <style>
+            .ds-um-phone { width:min(100%,360px);border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;background:#0a0a0a; }
+            .ds-um-head { padding:12px 14px;border-bottom:1px solid #2a2a2a;background:linear-gradient(180deg,rgba(217,119,6,.08),transparent);font-family:'Oswald',sans-serif;font-size:12px;text-transform:uppercase;color:#d97706; }
+            .ds-um-row { padding:12px 14px;border-bottom:1px solid #2a2a2a;background:#141414; }
+            .ds-um-id { display:flex;align-items:center;gap:10px;margin-bottom:10px; }
+            .ds-um-av { width:36px;height:36px;border-radius:50%;background:#c0392b;display:grid;place-items:center;font-family:'Oswald',sans-serif;font-weight:700;font-size:14px; }
+            .ds-um-name { font-family:'Oswald',sans-serif;font-size:14px;text-transform:uppercase;line-height:1; }
+            .ds-um-email { font-family:'JetBrains Mono',monospace;font-size:9px;color:#888;margin-top:2px; }
+            .ds-um-role { margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;text-transform:uppercase;padding:2px 6px;border-radius:2px;border:1px solid rgba(59,130,246,.45);background:rgba(59,130,246,.08);color:#3b82f6; }
+            .ds-um-pills { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px; }
+            .ds-um-pill { display:inline-flex;align-items:center;gap:4px;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;text-transform:uppercase;padding:3px 7px;border-radius:999px;border:1px solid #2a2a2a;color:#888;opacity:.45; }
+            .ds-um-pill.on { opacity:1; }
+            .ds-um-pill.mgr.on { background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.45);color:#3b82f6; }
+            .ds-um-pill.fr.on { background:rgba(217,119,6,.15);border-color:rgba(217,119,6,.4);color:#f59e0b; }
+            .ds-um-dot { width:5px;height:5px;border-radius:50%;background:currentColor; }
+            .ds-um-pill.on .ds-um-dot { box-shadow:0 0 5px currentColor; }
+            .ds-um-swrow { display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding-top:8px;border-top:1px solid #2a2a2a;font-family:'JetBrains Mono',monospace;font-size:9px;color:#888; }
+            .ds-um-swrow strong { display:block;color:#e8e8e8;font-size:10px;text-transform:uppercase;margin-bottom:1px; }
+            .ds-um-act-lbl { font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:10px 0 6px; }
+            .ds-um-toolbar { display:flex;gap:6px;padding-top:8px;border-top:1px solid #2a2a2a; }
+            .ds-um-btn { flex:1;padding:5px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border:1px solid; }
+            .ds-um-btn.badge { background:rgba(142,68,173,.1);border-color:rgba(142,68,173,.4);color:#bb8fce; }
+          </style>
+          <div class="ds-um-phone">
+            <div class="ds-um-head">⚡ Servants of Metal</div>
+            <div class="ds-um-row">
+              <div class="ds-um-id">
+                <div class="ds-um-av">M</div>
+                <div><div class="ds-um-name">Marina Stage</div><div class="ds-um-email">marina@example.com</div></div>
+                <span class="ds-um-role">Manager</span>
+              </div>
+              <div class="ds-um-pills">
+                <span class="ds-um-pill mgr on"><span class="ds-um-dot"></span>Manager</span>
+                <span class="ds-um-pill fr on"><span class="ds-um-dot"></span>Friend</span>
+              </div>
+              <div class="ds-um-swrow"><div><strong>Manager access</strong>ON — tap to revoke</div><span class="ds-sw on manager"></span></div>
+              <div class="ds-um-swrow" style="border-top:none;padding-top:6px;"><div><strong>Vira-lata friend</strong>ON — tap to revoke</div><span class="ds-sw on friend"></span></div>
+              <div class="ds-um-act-lbl">One-shot actions</div>
+              <div class="ds-um-toolbar"><span class="ds-um-btn badge">Assign patch · 2</span></div>
+            </div>
+          </div>
+        </div>
+
+      <div class="subhead">Festival Wrap — `/wrap` + Teaser <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">WrapPage · WrapTeaserBanner</span></div>
+        <p><strong>A2 Vest Chronicle</strong> (<code>WrapPage.tsx</code>): welcome gate + stat sections + closing thanks gate with CTA to <code>/now</code> (<strong>7–8</strong> scroll sections depending on assigned patches) with <code>scroll-snap-type: y mandatory</code>; fixed progress bar (<code>WrapProgress</code>, <strong>7–8</strong> dots) driven by <code>IntersectionObserver</code>. Document root sets dynamic <code>--stage</code> from user's top stage (<code>stageColorVar</code>).</p>
+        <table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
+          <thead>
+            <tr style="border-bottom:1px solid #333; text-align:left;">
+              <th style="padding:6px 8px; color:#aaa;">Section</th>
+              <th style="padding:6px 8px; color:#aaa;">Content</th>
+            </tr>
+          </thead>
+          <tbody style="color:#888;">
+            <tr><td style="padding:6px 8px;">0 Welcome</td><td style="padding:6px 8px;">Poster gate — title, phrase, scroll hint (no card)</td></tr>
+            <tr><td style="padding:6px 8px;">1 Hero</td><td style="padding:6px 8px;">Giant bands seen; row: picked · skipped · stages</td></tr>
+            <tr><td style="padding:6px 8px;">2 Personality</td><td style="padding:6px 8px;">Top genre + stage; stage pill with visit count</td></tr>
+            <tr><td style="padding:6px 8px;">3 Chaos</td><td style="padding:6px 8px;">Horizontal meters: weak skips, hard conflicts, badges</td></tr>
+            <tr><td style="padding:6px 8px;">4 Vira-latas</td><td style="padding:6px 8px;">Pick-twin spotlight portrait (twin only, name below); stats in card</td></tr>
+            <tr><td style="padding:6px 8px;">5 Assigned (conditional)</td><td style="padding:6px 8px;">Godlike hand-picked patches grid; only when <code>assignedBadgeSlugs.length &gt; 0</code></td></tr>
+            <tr><td style="padding:6px 8px;">6/7 Patches</td><td style="padding:6px 8px;">Decorative <code>buildStackPoses</code> pile; CTA Open vest → /profile?vest=open#vest</td></tr>
+            <tr><td style="padding:6px 8px;">7/8 Thanks</td><td style="padding:6px 8px;">Closing gate — thanks + Wacken 2027 (Rain or Shine); CTA Back to the App → /now</td></tr>
+          </tbody>
+        </table>
+        <p>Stat sections (hero → patches, plus optional assigned): <strong>4px</strong> top bar <code>background: var(--stage)</code> (fallback <code>var(--accent)</code>); shimmer + glow on reveal. Typography: Oswald display, IBM Plex body, JetBrains Mono kickers. Per-section <strong>epigraph</strong> (<code>.sectionEpigraph</code>) sits <em>above</em> the card in <code>.sectionFrame</code> — editorial voice against ambient orbs; card holds stats only. Welcome and thanks finale are poster gates (no card).</p>
+        <p><strong>Celebration layer (Phase 30 polish):</strong> fixed ambient stage/accent orbs + film grain; cards fade/slide in on scroll (<code>IntersectionObserver</code> → <code>.sectionRevealed</code>); hero count-up; staggered meter fills; patch pile drop-in; pill CTA for Open vest. Respects <code>prefers-reduced-motion</code>.</p>
+        <p><strong>WrapTeaserBanner Variant B</strong> (<code>/now</code>, <code>/profile</code>): full-width bar on <code>--bg-surface</code>; <strong>4px</strong> solid <code>var(--accent)</code> top strip; decorative 3-patch pile (18×18 stage colors); Oswald headline + mono CTA; dismiss column 44px touch target. Gated post-festival only; not in bottom nav.</p>
+
+      <div class="subhead">BadgesDisplay <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/BadgesDisplay.tsx</span></div>
+        <p>Earned patches on <code>/now</code> and <code>/profile</code>. <strong>Variant C — Vest Stack:</strong> collapsed vest (fixed <strong>112 px</strong> tall, max-width 480 px). Default <strong>chaotic</strong> mode: meadow scatter with <strong>48 px</strong> patches; opt-in <strong>neat</strong> mode: horizontal chip stack (all badges, scaled). <em>Open vest</em> expands into a 4-column grid; <em>Close vest</em> reshuffles chaotic pile only.</p>
+        <p><strong>Collapsed chaotic:</strong> <code>buildStackPoses()</code> — center-out golden spiral, <code>scatterSeed</code>, rotation ±55°, max 50% overlap. <strong>Collapsed neat:</strong> <code>buildNeatStackPoses()</code> — scale-down row, 0°–5° rotation, no reseed. Layout toggle in Edit profile (<code>PatchesLayoutToggle</code>, icon-only) beside fabric swatches; preference in <code>patchesLayout.ts</code>.</p>
+        <table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
+          <thead>
+            <tr style="border-bottom:1px solid #333; text-align:left;">
+              <th style="padding:6px 8px; color:#aaa;">Prop / state</th>
+              <th style="padding:6px 8px; color:#aaa;">Detail</th>
+            </tr>
+          </thead>
+          <tbody style="color:#888;">
+            <tr><td style="padding:6px 8px;"><code>user</code></td><td style="padding:6px 8px;">Supabase auth user — badge context built offline-first (two-phase load).</td></tr>
+            <tr><td style="padding:6px 8px;">Collapsed chaotic</td><td style="padding:6px 8px;"><code>.vestStack</code> + <code>.vestStackMeadow</code> · 48 px · scatter · reseed on close</td></tr>
+            <tr><td style="padding:6px 8px;">Collapsed neat</td><td style="padding:6px 8px;"><code>.vestStack.vestNeat</code> · scaled px · horizontal row · <code>patchesLayout.ts</code></td></tr>
+            <tr><td style="padding:6px 8px;">Expanded</td><td style="padding:6px 8px;"><code>.vestSpread.patchesGrid</code> 4 cols · 48 px · <code>settlePatch</code> stagger 42 ms · i18n <em>Close vest</em></td></tr>
+            <tr><td style="padding:6px 8px;"><code>data-bg</code></td><td style="padding:6px 8px;"><code>none</code> · <code>grid</code> · <code>steel</code> (default) · <code>indigo</code> · <code>leather</code> — from <code>patchesBackground.ts</code></td></tr>
+            <tr><td style="padding:6px 8px;">Glow</td><td style="padding:6px 8px;"><code>badgeGlow</code> on unacknowledged slugs; cleared via <code>localStorage badgeAcknowledged</code></td></tr>
+          </tbody>
+        </table>
+        <div class="component-demo" style="background: #0a0a0a; padding: 24px; max-width: 360px;">
+          <style>
+            .ds-bd-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+            .ds-bd-kicker { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #666; }
+            .ds-bd-btn { font-family: 'JetBrains Mono', monospace; font-size: 9px; padding: 4px 10px; border-radius: 999px; border: 1px solid #333; background: none; color: #888; }
+            .ds-bd-stack {
+              position: relative; height: 112px; border-radius: 8px; overflow: hidden;
+              background-color: #18293f;
+              background-image:
+                radial-gradient(ellipse 130% 110% at 50% 50%, transparent 50%, rgba(0,0,0,.38) 100%),
+                repeating-linear-gradient(-52deg, rgba(255,255,255,.035) 0 2px, transparent 2px 8px);
+              border: 1px solid #0e1e30;
+              box-shadow: inset 0 1px 0 rgba(255,255,255,.07);
+            }
+            .ds-bd-patch {
+              position: absolute; width: 48px; height: 48px; border-radius: 50%;
+              background: radial-gradient(circle at 35% 30%, #444, #1a1a1a);
+              border: 1px solid #333; box-shadow: 0 2px 6px rgba(0,0,0,.65);
+              transform: translate(-50%, -50%);
+            }
+          </style>
+          <div class="ds-bd-header">
+            <span class="ds-bd-kicker">PATCHES · 22</span>
+            <span class="ds-bd-btn">Open vest</span>
+          </div>
+          <div class="ds-bd-stack">
+            <div class="ds-bd-patch" style="left: 18%; top: 38%; transform: translate(-50%,-50%) rotate(-48deg) scale(.94); z-index: 2;"></div>
+            <div class="ds-bd-patch" style="left: 42%; top: 62%; transform: translate(-50%,-50%) rotate(35deg) scale(.91); z-index: 5;"></div>
+            <div class="ds-bd-patch" style="left: 68%; top: 30%; transform: translate(-50%,-50%) rotate(-55deg) scale(.97); z-index: 3;"></div>
+            <div class="ds-bd-patch" style="left: 31%; top: 78%; transform: translate(-50%,-50%) rotate(22deg) scale(.89); z-index: 4;"></div>
+            <div class="ds-bd-patch" style="left: 55%; top: 44%; transform: translate(-50%,-50%) rotate(41deg) scale(.96); z-index: 9; box-shadow: 0 0 14px rgba(255,160,40,.55);"></div>
+            <div class="ds-bd-patch" style="left: 80%; top: 58%; transform: translate(-50%,-50%) rotate(-31deg) scale(.92); z-index: 6;"></div>
+            <div class="ds-bd-patch" style="left: 12%; top: 70%; transform: translate(-50%,-50%) rotate(52deg) scale(.88); z-index: 7;"></div>
+            <div class="ds-bd-patch" style="left: 88%; top: 42%; transform: translate(-50%,-50%) rotate(-18deg) scale(.95); z-index: 8;"></div>
+          </div>
+          <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:10px 0 0;">Collapsed chaotic demo — steel <code>data-bg</code>, 48 px patches, ±55° scatter.</p>
+          <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:6px 0 16px;">Edit profile: fabric swatches + I1 layout toggle (scatter dots / stacked circles, aria-label only).</p>
+          <div class="ds-bd-header">
+            <span class="ds-bd-kicker">PATCHES · 22 · NEAT</span>
+            <span class="ds-bd-btn">Open vest</span>
+          </div>
+          <div class="ds-bd-stack" style="display:flex;align-items:center;justify-content:center;">
+            <div style="display:inline-flex;align-items:center;padding:0 12px;">
+              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(2deg);margin:0;"></div>
+              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(4deg);margin:0 0 0 -11px;z-index:2;"></div>
+              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(1deg);margin:0 0 0 -11px;z-index:3;"></div>
+              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(3deg);margin:0 0 0 -11px;z-index:4;"></div>
+              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(0deg);margin:0 0 0 -11px;z-index:5;box-shadow:0 0 14px rgba(255,160,40,.55);"></div>
+              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(5deg);margin:0 0 0 -11px;z-index:6;"></div>
+            </div>
+          </div>
+          <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:10px 0 0;">Collapsed neat demo — scaled 32 px patches, ~35% overlap, 0°–5° rotation.</p>
+        </div>
+
+      <div class="subhead">Previously Achieved + Consolidation <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">Phase 29 · U2</span></div>
+        <p><strong>Previously Achieved</strong> (<code>BadgeHistorySection.tsx</code>) — collapsible archive below live vest on <code>/profile</code>. Hidden when IndexedDB history empty. Locked layout: <strong>U2</strong> from <code>_temp/badge-history-proposals/index.html</code> — flat 4×48 px grid per year (no denim vest shell), Oswald year headings, mono section title, muted patch opacity. Tap → overlay <code>BadgeDetailModal</code> (M2: label + year chip only; no description; no zoom).</p>
+        <p><strong>Live vest filter</strong> — <code>isLiveVestBadge()</code>: evergreen + <code>year === getCurrentFestivalYear()</code> only. After reset, year-badges live in archive only.</p>
+        <p><strong>Godlike consolidate</strong> (<code>ConsolidateBadgesSection</code>) — year selector, force checkbox, gate until <code>isFestivalEnded()</code>, confirm modal, inline result. <strong>Archive preview (dev)</strong> — Test Badges panel seeds local IDB without Supabase.</p>
+        <table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
+          <thead>
+            <tr style="border-bottom:1px solid #333; text-align:left;">
+              <th style="padding:6px 8px; color:#aaa;">Element</th>
+              <th style="padding:6px 8px; color:#aaa;">Spec</th>
+            </tr>
+          </thead>
+          <tbody style="color:#888;">
+            <tr><td style="padding:6px 8px;">Section shell</td><td style="padding:6px 8px;">max-width 400 px · centered · opacity ~0.94 · no bordered collapsible card</td></tr>
+            <tr><td style="padding:6px 8px;">Header</td><td style="padding:6px 8px;">Mono 10 px title + count · chevron + expand/collapse hint</td></tr>
+            <tr><td style="padding:6px 8px;">Year heading</td><td style="padding:6px 8px;">Oswald 14 px uppercase · <em>Wacken {year}</em></td></tr>
+            <tr><td style="padding:6px 8px;">Grid</td><td style="padding:6px 8px;"><code>repeat(4, 48px)</code> · gap 10 px · frozen <code>image_path</code></td></tr>
+            <tr><td style="padding:6px 8px;">Patch</td><td style="padding:6px 8px;">48 px · opacity 0.88 → 1 hover · red enamel diamond year chip (24 px, same as live vest · scaled from 29 px @ 58 px)</td></tr>
+          </tbody>
+        </table>
+        <div class="component-demo" style="background:#0a0a0a;padding:24px;display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start;justify-content:center;">
+          <style>
+            .ds-bh-section { width:100%; max-width:360px; opacity:.94; }
+            .ds-bh-header { display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:10px; }
+            .ds-bh-title { font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:#e8e8e8; }
+            .ds-bh-count { font-weight:400; color:#888; margin-left:6px; }
+            .ds-bh-hint { font-family:'JetBrains Mono',monospace; font-size:9px; color:#555; text-transform:lowercase; margin-right:8px; }
+            .ds-bh-year { font-family:Oswald,sans-serif; font-size:14px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:#888; margin:12px 0 8px; }
+            .ds-bh-year:first-of-type { margin-top:0; }
+            .ds-bh-grid { display:grid; grid-template-columns:repeat(4,48px); gap:10px; padding:4px 0 12px; }
+            .ds-bh-patch { position:relative; width:48px; height:48px; border-radius:6px; opacity:.88; }
+            .ds-bh-patch-wrap { position:relative; display:inline-flex; line-height:0; }
+            .ds-bh-patch img, .ds-bh-patch .ds-bd-patch { width:48px; height:48px; border-radius:50%; }
+            .ds-bh-chip {
+              position:absolute; bottom:-2px; right:-2px; width:24px; height:24px;
+              clip-path:polygon(50% 0%,100% 50%,50% 100%,0% 50%);
+              display:flex; align-items:center; justify-content:center;
+              font-family:'JetBrains Mono',monospace; font-size:9px; font-weight:700; color:#fff; line-height:1;
+              background:linear-gradient(145deg,#d93025 0%,#b32020 60%,#7a1010 100%);
+              filter:drop-shadow(0 2px 4px rgba(0,0,0,.9)); z-index:1;
+            }
+            .ds-bh-chip::after {
+              content:''; position:absolute; inset:0;
+              background:linear-gradient(150deg,rgba(255,255,255,.5) 0%,rgba(255,255,255,.08) 45%,rgba(255,255,255,0) 70%);
+            }
+          </style>
+          <div class="ds-bh-section">
+            <div class="ds-bh-header">
+              <span class="ds-bh-title">Conquistas Anteriores<span class="ds-bh-count">· 11</span></span>
+              <span><span class="ds-bh-hint">recolher</span><span style="color:#888;">▾</span></span>
+            </div>
+            <div class="ds-bh-year">Wacken 2027</div>
+            <div class="ds-bh-grid">
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'27</span></span></div>
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'27</span></span></div>
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'27</span></span></div>
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'27</span></span></div>
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'27</span></span></div>
+            </div>
+            <div class="ds-bh-year">Wacken 2026</div>
+            <div class="ds-bh-grid">
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'26</span></span></div>
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'26</span></span></div>
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'26</span></span></div>
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'26</span></span></div>
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'26</span></span></div>
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'26</span></span></div>
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'26</span></span></div>
+              <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'26</span></span></div>
+            </div>
+            <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:4px 0 0;">U2 multi-year demo — flat grid scales linearly; no mini-vest per year (U3 rejected).</p>
+          </div>
+          <div style="max-width:280px;font-size:12px;color:#666;line-height:1.5;">
+            <strong style="color:#888;display:block;margin-bottom:6px;font-size:11px;">vs live vest</strong>
+            Live patches use <code>.vestStack</code> denim shell + chaotic scatter or neat row. Archive deliberately skips <code>data-bg</code> — quieter trophy shelf so the live vest above stays the hero.
+          </div>
+        </div>
+
+      <div class="subhead">MoshSplitSection <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/profile/MoshSplitSection.tsx</span></div>
+        <p>Collapsible profile section showing the current user's net balance from <strong>MoshSplit</strong> (<code>split.viralatas.org</code>) — the festival finance app used by the vira-latas at Wacken. Placed after <code>&lt;ConflictSection&gt;</code>, before <code>&lt;EditProfileForm&gt;</code>. Accepts only <code>userEmail: string</code>; fetches live data via <code>POST /api/moshsplit/pitboss/v1/balances/external-summary</code> (Vercel proxy → <code>split.viralatas.org</code>, bearer token from <code>VITE_MOSHSPLIT_TOKEN</code>).</p>
+        <p><strong>Five render states:</strong></p>
+        <ul style="margin: 0 0 12px 18px; color: #888; font-size: 14px;">
+          <li><strong>loading</strong> — spinner chip in header, pulse-skeleton in body.</li>
+          <li><strong>not_found</strong> — API 404; <code>return null</code>, component fully invisible.</li>
+          <li><strong>error</strong> — non-OK response or network failure; orange <code>!</code> chip in header; <code>⚠ Could not load MoshSplit data</code> + CTA in body.</li>
+          <li><strong>settled</strong> (balance = 0) — teal chip + "All settled 🤘" message + CTA.</li>
+          <li><strong>active</strong> (balance ≠ 0) — red chip if owes, teal chip if owed + expense list + festival/total row + CTA.</li>
+        </ul>
+        <p><strong>Collapsible trigger layout:</strong> logo (22×22, border-radius 5px, remote SVG with wallet fallback) → label group (Oswald 14px + mono sub-label) → balance chip (right-aligned). Uses <code>&lt;Collapsible&gt;</code> from <code>src/ui</code> with <code>defaultOpen={false}</code>. Wrapper: <code>margin: var(--s-3) var(--s-4)</code>, max-width 400px.</p>
+        <p><strong>Chip palette:</strong> owes = <code>rgba(--accent, 0.20)</code> bg / <code>--accent-hover</code> text; owed = <code>rgba(--signal-ok, 0.20)</code> bg / teal text; settled = attenuated teal; error = <code>rgba(255,165,0,0.20)</code> bg / orange text. Font mono 11px tabular-nums.</p>
+        <p><strong>CTA:</strong> full-width <code>&lt;a&gt;</code> element, "Open MoshSplit →", <code>rgba(--accent, 0.08)</code> bg, opens <code>https://split.viralatas.org</code> in new tab. Visible in settled, active, and error states.</p>
+        <div class="component-demo" style="background: #060606; padding: 24px; display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; justify-content: center;">
+          <style>
+            .ds-ms-wrap { border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; width: 280px; }
+            .ds-ms-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #1e1e1e; }
+            .ds-ms-left { display: flex; align-items: center; gap: 10px; }
+            .ds-ms-logo { width: 22px; height: 22px; border-radius: 5px; background: #1a1a1a; border: 1px solid #3a3a3a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+            .ds-ms-lg { display: flex; flex-direction: column; gap: 1px; }
+            .ds-ms-lbl { font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: .02em; color: #e8e8e8; line-height: 1; }
+            .ds-ms-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; letter-spacing: .04em; }
+            .ds-ms-chip { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; letter-spacing: .02em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+            .ds-ms-chip-owes { background: rgba(192,57,43,.20); color: #e74c3c; border: 1px solid rgba(192,57,43,.40); }
+            .ds-ms-chip-owed { background: rgba(22,160,133,.20); color: #1abc9c; border: 1px solid rgba(22,160,133,.40); }
+            .ds-ms-chip-settled { background: rgba(22,160,133,.10); color: #16a085; border: 1px solid rgba(22,160,133,.25); }
+            .ds-ms-inner { border-top: 1px solid #2a2a2a; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 10px; }
+            .ds-ms-settled-msg { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: rgba(22,160,133,.08); border: 1px solid rgba(22,160,133,.20); border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: #1abc9c; letter-spacing: .02em; }
+            .ds-ms-row { display: flex; align-items: center; justify-content: space-between; }
+            .ds-ms-festival { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #888; }
+            .ds-ms-amount { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+            .ds-ms-amount-owes { color: #e74c3c; }
+            .ds-ms-amount-owed { color: #1abc9c; }
+            .ds-ms-divider { height: 1px; background: #2a2a2a; margin: 2px 0; }
+            .ds-ms-cta { display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; background: rgba(192,57,43,.08); border: 1px solid rgba(192,57,43,.25); border-radius: 4px; color: #e74c3c; font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .03em; text-decoration: none; }
+            .ds-ms-stack { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+            .ds-ms-stack-lbl { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: .1em; }
+            .ds-ms-chevron { width: 20px; height: 20px; color: #888; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+          </style>
+
+          <!-- Owes state -->
+          <div class="ds-ms-stack">
+            <span class="ds-ms-stack-lbl">Active — owes (expanded)</span>
+            <div class="ds-ms-wrap">
+              <div class="ds-ms-trigger">
+                <div class="ds-ms-left">
+                  <div class="ds-ms-logo">
+                    <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="#555" stroke-width="1.3"/><path d="M4 3V2.5a3 3 0 0 1 6 0V3" stroke="#555" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="7.5" r="1" fill="#555"/></svg>
+                  </div>
+                  <div class="ds-ms-lg">
+                    <span class="ds-ms-lbl">MoshSplit</span>
+                    <span class="ds-ms-sub">split.viralatas.org</span>
+                  </div>
+                  <span class="ds-ms-chip ds-ms-chip-owes">- R$42,50</span>
+                </div>
+                <span class="ds-ms-chevron">▲</span>
+              </div>
+              <div class="ds-ms-inner">
+                <div class="ds-ms-row">
+                  <span class="ds-ms-festival">Wacken 2026</span>
+                  <span class="ds-ms-amount ds-ms-amount-owes">- R$42,50</span>
+                </div>
+                <div class="ds-ms-divider"></div>
+                <a href="#" class="ds-ms-cta"><span>Abrir MoshSplit</span><span>→</span></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Owed state -->
+          <div class="ds-ms-stack">
+            <span class="ds-ms-stack-lbl">Active — owed (expanded)</span>
+            <div class="ds-ms-wrap">
+              <div class="ds-ms-trigger">
+                <div class="ds-ms-left">
+                  <div class="ds-ms-logo">
+                    <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="#555" stroke-width="1.3"/><path d="M4 3V2.5a3 3 0 0 1 6 0V3" stroke="#555" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="7.5" r="1" fill="#555"/></svg>
+                  </div>
+                  <div class="ds-ms-lg">
+                    <span class="ds-ms-lbl">MoshSplit</span>
+                    <span class="ds-ms-sub">split.viralatas.org</span>
+                  </div>
+                  <span class="ds-ms-chip ds-ms-chip-owed">+ R$15,00</span>
+                </div>
+                <span class="ds-ms-chevron">▲</span>
+              </div>
+              <div class="ds-ms-inner">
+                <div class="ds-ms-row">
+                  <span class="ds-ms-festival">Wacken 2026</span>
+                  <span class="ds-ms-amount ds-ms-amount-owed">+ R$15,00</span>
+                </div>
+                <div class="ds-ms-divider"></div>
+                <a href="#" class="ds-ms-cta"><span>Abrir MoshSplit</span><span>→</span></a>
+              </div>
+            </div>
+          </div>
+
+          <!-- Settled state -->
+          <div class="ds-ms-stack">
+            <span class="ds-ms-stack-lbl">Settled (expanded)</span>
+            <div class="ds-ms-wrap">
+              <div class="ds-ms-trigger">
+                <div class="ds-ms-left">
+                  <div class="ds-ms-logo">
+                    <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" width="14" height="14"><rect x="1" y="3" width="12" height="9" rx="1.5" stroke="#555" stroke-width="1.3"/><path d="M4 3V2.5a3 3 0 0 1 6 0V3" stroke="#555" stroke-width="1.3" stroke-linecap="round"/><circle cx="7" cy="7.5" r="1" fill="#555"/></svg>
+                  </div>
+                  <div class="ds-ms-lg">
+                    <span class="ds-ms-lbl">MoshSplit</span>
+                    <span class="ds-ms-sub">split.viralatas.org</span>
+                  </div>
+                  <span class="ds-ms-chip ds-ms-chip-settled">Quitado</span>
+                </div>
+                <span class="ds-ms-chevron">▲</span>
+              </div>
+              <div class="ds-ms-inner">
+                <div class="ds-ms-settled-msg"><span>🤘</span><span>Tudo acertado</span></div>
+                <a href="#" class="ds-ms-cta"><span>Abrir MoshSplit</span><span>→</span></a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>userEmail</td><td>string</td><td>Current user's email. Sent as <code>{ email }</code> in the POST body to the MoshSplit balance API. Empty string causes <code>useEffect</code> to bail early (component stays in loading state).</td></tr>
+          </tbody>
+        </table>
+
+      <div class="subhead">PlaylistLaunchButton <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/PlaylistLaunchButton.tsx</span></div>
+        <p>Full-width action strip shown on <code>/picks</code> (below conflict banner, above band list) that deep-links the user to <strong>Setlist Vira-Latas</strong> (<code>setlist.viralatas.org</code>) with their picked bands pre-filled. Ships behind a feature flag (<code>playlist_testing</code> on <code>app_settings</code>).</p>
+        <p><strong>Visibility rules:</strong> hidden when user has 0 picks; hidden to <code>normal</code> role while <code>playlist_testing = true</code>; visible to all when <code>playlist_testing = false</code>. Godlike toggles the flag in the admin panel.</p>
+        <p><strong>URL construction:</strong> <code>GET /launch</code> on Setlist Vira-Latas with repeated <code>bands</code> params, <code>user_name</code> trimmed to 20 chars, <code>lang</code> mapped (<code>br → pt-BR</code>, else <code>en</code>). Renders as <code>&lt;a target="_blank"&gt;</code> — no loading state, instant redirect.</p>
+        <p><strong>Layout:</strong> left side = 22×22 inline SVG icon (playlist motif, teal, border-radius 5px) + two-line text stack (Oswald 13px 700 uppercase label + JetBrains Mono 10px sub-label with band count); right side = <code>→</code> arrow in mono.</p>
+        <p><strong>Tokens used:</strong> <code>--signal-ok</code>, <code>--font-display</code>, <code>--font-mono</code>, <code>--s-3</code>, <code>--s-4</code>. No new custom properties.</p>
+        <div class="component-demo" style="background: #0a0a0a; padding: 0; overflow: hidden;">
+          <style>
+            .ds-plb { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(22,160,133,0.06); border-bottom: 1px solid rgba(22,160,133,0.18); text-decoration: none; cursor: pointer; }
+            .ds-plb-left { display: flex; align-items: center; gap: 10px; }
+            .ds-plb-icon { flex-shrink: 0; width: 22px; height: 22px; border-radius: 5px; overflow: hidden; }
+            .ds-plb-stack { display: flex; flex-direction: column; gap: 2px; }
+            .ds-plb-label { font-family: 'Oswald', sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: #16a085; line-height: 1; }
+            .ds-plb-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(22,160,133,0.65); line-height: 1; }
+            .ds-plb-arrow { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: rgba(22,160,133,0.65); margin-left: 12px; }
+          </style>
+          <div class="ds-plb">
+            <div class="ds-plb-left">
+              <div class="ds-plb-icon">
+                <svg viewBox="0 0 22 22" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect width="22" height="22" rx="5" fill="rgba(22,160,133,0.18)" />
+                  <line x1="6" y1="7" x2="16" y2="7" stroke="#16a085" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="6" y1="11" x2="16" y2="11" stroke="#16a085" stroke-width="1.6" stroke-linecap="round" />
+                  <line x1="6" y1="15" x2="12" y2="15" stroke="#16a085" stroke-width="1.6" stroke-linecap="round" />
+                  <circle cx="16" cy="15" r="2" stroke="#16a085" stroke-width="1.4" />
+                  <line x1="18" y1="13.5" x2="18" y2="11" stroke="#16a085" stroke-width="1.4" stroke-linecap="round" />
+                </svg>
+              </div>
+              <div class="ds-plb-stack">
+                <span class="ds-plb-label">GENERATE SETLIST</span>
+                <span class="ds-plb-sub">Setlist Vira-Latas · 18 bands</span>
+              </div>
+            </div>
+            <span class="ds-plb-arrow">→</span>
+          </div>
+        </div>
+        <table class="prop-table" style="margin-top: 16px;">
+          <thead><tr><th>Prop</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>bands</td><td>Band[]</td><td>User's picked bands. Component is hidden when empty.</td></tr>
+            <tr><td>userName</td><td>string</td><td>User display name. Trimmed to 20 chars before inclusion in the deep-link URL.</td></tr>
+          </tbody>
+        </table>
+
+      <div class="subhead">ClusterRow <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/now/CrewGroupsSection.tsx</span></div>
+        <p>Collapsed stacked-avatar row used on all 4 live page card types. Replaces the always-visible member pill list. Max 5 avatars shown; overflow shown as +N. Tapping the parent card opens the LiveCardSheet.</p>
+        <div class="component-demo" style="background: #0a0a0a; padding: 20px; display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+          <!-- Band cluster -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .08em;">band card</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="display: flex;">
+                <div style="width:24px;height:24px;border-radius:50%;background:#2980b9;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">S</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:#333;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ccc;margin-left:-8px;">R</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:#333;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ccc;margin-left:-8px;">M</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:#333;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ccc;margin-left:-8px;">A</div>
+              </div>
+              <span style="font-size:12px;color:#888;">4 vira-latas</span>
+            </div>
+          </div>
+          <!-- Metal Place cluster -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .08em;">metal place</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="display: flex;">
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(217,119,6,.55);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">C</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(217,119,6,.55);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">P</div>
+              </div>
+              <span style="font-size:12px;color:#888;">2 here</span>
+            </div>
+          </div>
+          <!-- Camping cluster with overflow -->
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .08em;">camping (overflow)</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="display: flex; align-items: center;">
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">T</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">V</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">L</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">N</div>
+                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">B</div>
+                <span style="font-size:11px;color:#888;margin-left:4px;">+3</span>
+              </div>
+              <span style="font-size:12px;color:#888;">8 resting</span>
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>members</td><td>CrewLivePlan[]</td><td>Vira-latas in this group</td></tr>
+            <tr><td>kind</td><td>'band' | 'metal_place' | 'camping' | 'lost'</td><td>Card type — drives count label text</td></tr>
+            <tr><td>t</td><td>TFn</td><td>i18n function for count labels</td></tr>
+          </tbody>
+        </table>
+        <p><strong>Count labels by kind:</strong> band → <em>"N vira-latas"</em> · metal_place → <em>"N here"</em> · camping → <em>"N resting"</em> · lost → <em>"N wandering"</em></p>
+
+      <div class="subhead">LiveCardSheet <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/now/LiveCardSheet.tsx</span></div>
+        <p>Themed bottom sheet opened by tapping any live page group card. Slide-up entrance (280ms iOS spring). Tapping the backdrop dismisses. State lives at <code>RightNowPage</code> level — only one sheet open at a time.</p>
+        <p><strong>Sections:</strong> Members with no next band → "Here now" (pulsing live dot). Members with <code>plan.nextBand</code> → "Heading next" (stage-coloured pill). Sections omitted when empty. Divider only shown when both sections non-empty.</p>
+
+        <!-- Live preview of all 4 sheet types -->
+        <div class="component-demo" style="background: #050505; padding: 20px; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end;">
+          <style>
+            .ds-sheet { border-radius: 14px; overflow: hidden; width: 180px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; color: #f0f0f0; border-top: 2px solid var(--ds-accent); background: var(--ds-bg); }
+            .ds-sheet-handle { width: 28px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.15); margin: 8px auto 10px; }
+            .ds-sheet-header { padding: 0 12px 10px; border-bottom: 1px solid rgba(255,255,255,.07); }
+            .ds-stage-row { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
+            .ds-stage-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ds-accent); }
+            .ds-stage-name { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--ds-accent); }
+            .ds-stage-time { font-size: 9px; color: rgba(255,255,255,.3); }
+            .ds-title { font-size: 14px; font-weight: 800; letter-spacing: -.02em; color: var(--ds-title, #fff); }
+            .ds-count { font-size: 10px; color: rgba(255,255,255,.3); margin-top: 2px; }
+            .ds-members { padding: 8px 12px 12px; }
+            .ds-section-label { font-family: 'JetBrains Mono', monospace; font-size: 8px; text-transform: uppercase; letter-spacing: .1em; color: rgba(255,255,255,.2); margin-bottom: 5px; margin-top: 8px; }
+            .ds-section-label:first-child { margin-top: 0; }
+            .ds-divider { height: 1px; background: rgba(255,255,255,.06); margin: 6px 0; }
+            .ds-row { display: flex; align-items: center; gap: 7px; padding: 3px 0; }
+            .ds-av { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; color: #fff; flex-shrink: 0; background: var(--ds-avatar-bg); }
+            .ds-av.you { background: var(--ds-accent); }
+            .ds-name { font-size: 11px; font-weight: 600; color: rgba(255,255,255,.85); flex: 1; }
+            .ds-you-tag { font-size: 8px; background: rgba(255,255,255,.08); color: var(--ds-accent); border-radius: 3px; padding: 1px 4px; }
+            .ds-live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ds-accent); animation: ds-pulse 2.2s ease-in-out infinite; flex-shrink: 0; }
+            @keyframes ds-pulse { 0%,100%{box-shadow:0 0 0 0 var(--ds-accent)}50%{box-shadow:0 0 0 4px transparent} }
+            .ds-next-pill { display: flex; align-items: center; gap: 3px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.09); border-radius: 20px; padding: 2px 5px 2px 4px; flex-shrink: 0; }
+            .ds-next-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
+            .ds-next-name { font-size: 9px; color: rgba(255,255,255,.5); white-space: nowrap; }
+          </style>
+
+          <!-- Band (blue) -->
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#2980b9;text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px;">Band</div>
+            <div class="ds-sheet" style="--ds-accent:#2980b9;--ds-bg:#0a1929;--ds-avatar-bg:rgba(41,128,185,.3);">
+              <div class="ds-sheet-handle"></div>
+              <div class="ds-sheet-header">
+                <div class="ds-stage-row"><div class="ds-stage-dot"></div><span class="ds-stage-name">Faster</span><span class="ds-stage-time">20:30–22:00</span></div>
+                <div class="ds-title">Judas Priest</div>
+                <div class="ds-count">3 vira-latas</div>
+              </div>
+              <div class="ds-members">
+                <div class="ds-section-label">Here now</div>
+                <div class="ds-row"><div class="ds-av you">S</div><span class="ds-name">sfilizzola <span class="ds-you-tag">you</span></span><div class="ds-live-dot"></div></div>
+                <div class="ds-row"><div class="ds-av">R</div><span class="ds-name">rodrigo</span><div class="ds-live-dot"></div></div>
+                <div class="ds-divider"></div>
+                <div class="ds-section-label">Heading next</div>
+                <div class="ds-row"><div class="ds-av">M</div><span class="ds-name">marcos</span><div class="ds-next-pill"><div class="ds-next-dot" style="background:#e67e22;"></div><span class="ds-next-name">Slipknot</span></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Metal Place (amber) -->
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(217,119,6,1);text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px;">Metal Place</div>
+            <div class="ds-sheet" style="--ds-accent:rgba(217,119,6,1);--ds-bg:rgba(217,119,6,.09);--ds-avatar-bg:rgba(217,119,6,.4);--ds-title:rgba(253,224,71,.95);">
+              <div class="ds-sheet-handle"></div>
+              <div class="ds-sheet-header">
+                <div class="ds-stage-row"><div class="ds-stage-dot"></div><span class="ds-stage-name" style="color:rgba(217,119,6,1);">Special zone</span><span class="ds-stage-time">14:00–22:00</span></div>
+                <div class="ds-title">Metal Place ⚡</div>
+                <div class="ds-count">2 here</div>
+              </div>
+              <div class="ds-members">
+                <div class="ds-row"><div class="ds-av">A</div><span class="ds-name">ana</span><div class="ds-next-pill"><div class="ds-next-dot" style="background:#2980b9;"></div><span class="ds-next-name">Judas P.</span></div></div>
+                <div class="ds-row"><div class="ds-av">C</div><span class="ds-name">carlos</span><div class="ds-live-dot"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Camping (teal) -->
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#16a085;text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px;">Camping</div>
+            <div class="ds-sheet" style="--ds-accent:#16a085;--ds-bg:rgba(22,160,133,.09);--ds-avatar-bg:rgba(22,160,133,.35);">
+              <div class="ds-sheet-handle"></div>
+              <div class="ds-sheet-header">
+                <div class="ds-title">Vira-Latas HQ 🏕</div>
+                <div class="ds-count">2 resting</div>
+              </div>
+              <div class="ds-members">
+                <div class="ds-row"><div class="ds-av">T</div><span class="ds-name">tiago</span><div class="ds-next-pill"><div class="ds-next-dot" style="background:#2980b9;"></div><span class="ds-next-name">Judas P.</span></div></div>
+                <div class="ds-row"><div class="ds-av">V</div><span class="ds-name">vitor</span><span style="font-size:9px;color:rgba(255,255,255,.2);font-style:italic;">no picks</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lost (purple) -->
+          <div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#a855f7;text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px;">Lost</div>
+            <div class="ds-sheet" style="--ds-accent:rgba(168,85,247,.9);--ds-bg:rgba(88,28,135,.3);--ds-avatar-bg:rgba(88,28,135,.5);">
+              <div class="ds-sheet-handle"></div>
+              <div class="ds-sheet-header">
+                <div class="ds-title" style="color:rgba(233,213,255,.95);text-shadow:0 0 12px rgba(168,85,247,.4);">Lost in the pit 🤘</div>
+                <div class="ds-count">2 wandering</div>
+              </div>
+              <div class="ds-members">
+                <div class="ds-row"><div class="ds-av">L</div><span class="ds-name">lucas</span><div class="ds-next-pill"><div class="ds-next-dot" style="background:#e67e22;"></div><span class="ds-next-name">Slipknot</span></div></div>
+                <div class="ds-row"><div class="ds-av">N</div><span class="ds-name">nanda</span><span style="font-size:9px;color:rgba(255,255,255,.2);font-style:italic;">no picks</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p style="margin-top: 12px;"><strong>Colour system:</strong> All 4 sheet types use a <code>--sheet-*</code> CSS variable bundle injected inline by a <code>groupAccentColor()</code> helper. Band cards derive accent from <code>stageColor(stage)</code>; presence cards use fixed values: metal_place <code>rgba(217,119,6,1)</code> · camping <code>var(--signal-ok)</code> · lost <code>var(--signal-lost)</code>.</p>
+        <p><strong>Animation:</strong> Sheet entrance: <code>translateY(100%) → 0</code> over 280ms <code>cubic-bezier(0.32, 0.72, 0, 1)</code>. Backdrop: opacity 0→0.55 over 200ms. Live dot pulses with CSS <code>box-shadow</code> animation every 2.2s.</p>
+        <table>
+          <thead>
+            <tr><th>Property</th><th>Type</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>group</td><td>CrewLiveGroup</td><td>The card group that was tapped</td></tr>
+            <tr><td>crewPlans</td><td>CrewLivePlan[]</td><td>Full vira-lata live plans from useNowData (already in scope)</td></tr>
+            <tr><td>userId</td><td>string | null</td><td>Current user — drives "you" tag</td></tr>
+            <tr><td>metalPlaceConfig</td><td>MetalPlaceConfig | null</td><td>W.E.T. time window for Metal Place header</td></tr>
+            <tr><td>onClose</td><td>() => void</td><td>Called on backdrop tap</td></tr>
+            <tr><td>t</td><td>TFn</td><td>i18n function</td></tr>
+          </tbody>
+        </table>
   </section>
 
   <!-- ============================================================
@@ -4013,7 +5079,7 @@
         <li><b>Collapsed view strip</b> — `border-left: 4px solid var(--signal-ok)` (teal) when the user has marked arrival</li>
         <li>Avatar chips inside each row follow the standard `.av` sizing (22px)</li>
         <li><b>Friend filtering</b> — users with <code>is_friend === true</code> are excluded from every row, every avatar cluster, and the collapsed-view totals. The crew does not coordinate camping logistics with friends, so friend arrivals stay private. The matching <i>"When do you arrive?"</i> picker inside <code>EditProfileForm</code> on <b>/profile</b> is also hidden for friend users (and <code>wacken_arrival_day</code> is no longer persisted on save), so the data is suppressed at the source as well as the surface.</li>
-        <li>No DS section — fully undocumented; see <code>src/components/ArrivalMap.tsx</code></li>
+        <li>Documented in unified DS §08; see <code>src/components/ArrivalMap.tsx</code></li>
       </ul>
     </div>
 
@@ -4089,7 +5155,7 @@
         <div style="padding:var(--s-3) var(--s-4);border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase">/my-picks — zero picks</div>
         <div class="empty-state">
           <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          <p class="empty-msg">No bands saved yet. Head to Schedule. 🤘</p>
+          <p class="empty-msg">No bands saved yet. Head to the Line-up. 🤘</p>
         </div>
       </div>
 
@@ -4525,6 +5591,308 @@
     </div>
   </section>
 
+
+  <!-- ============================================================
+       12. GOVERNANCE · audit & engineering checklist
+       ============================================================ -->
+  <section class="section" id="governance">
+    <div class="section-head">
+      <div class="num">12</div>
+      <div>
+        <h2>Governance</h2>
+        <p class="desc">Engineering audit trail from the May 2026 token review. Use alongside live demos above — score reflects CSS-module hygiene, not product polish.</p>
+      </div>
+    </div>
+
+    <div class="subhead">Audit summary</div>
+    <div class="demo-notes" style="border-left:0;padding-left:0;margin-bottom:var(--s-6)">
+      <ul>
+        <li><b>Components reviewed:</b> 24+ UI and feature components</li>
+        <li><b>Audit score:</b> 72/100 — solid token foundation; primary gap = hardcoded hex in CSS modules</li>
+        <li><b>Priority:</b> migrate hardcoded colors/spacing to <code>--*</code> tokens; keep this file updated on every UI change</li>
+      </ul>
+    </div>
+
+    <div class="action-item">
+        <strong>Current Audit Score: 72/100</strong><br>
+        Priority: Resolve hardcoded colors and document component variants for full compliance.
+      </div>
+
+      <div class="subhead">Naming Consistency</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Issue</th>
+            <th>Components</th>
+            <th>Recommendation</th>
+            <th>Priority</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Hardcoded hex colors in CSS modules</td>
+            <td>BandCard, Button, Chip</td>
+            <td>Replace all hardcoded hex values (#fff, #dc2626, #d97706, #3b82f6, #e74c3c, #f9c66b, #1a0d00) with existing CSS tokens or new semantic tokens</td>
+            <td><span class="priority priority-high">High</span></td>
+          </tr>
+          <tr>
+            <td>Mixed spacing units (px vs. var)</td>
+            <td>BandCard, Modal</td>
+            <td>Standardize all spacing to use --s-N variables. Replace hardcoded 2px, 4px, 6px, 8px with appropriate tokens</td>
+            <td><span class="priority priority-high">High</span></td>
+          </tr>
+          <tr>
+            <td>Inline styles on components</td>
+            <td>BandCard, ArrivalMap, BandFilters</td>
+            <td>Move stage-color styling to data attributes or CSS classes; reduce inline style {} objects</td>
+            <td><span class="priority priority-medium">Medium</span></td>
+          </tr>
+          <tr>
+            <td>Modal positioning CSS not using tokens</td>
+            <td>Modal</td>
+            <td>Replace hardcoded border-radius (1rem) with var(--r-2) for consistency</td>
+            <td><span class="priority priority-low">Low</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="subhead">Token Coverage</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Defined</th>
+            <th>Hardcoded Values Found</th>
+            <th>Recommendation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Colors</td>
+            <td class="status-ok">✓ Complete</td>
+            <td>15+ instances across CSS modules</td>
+            <td>Migrate hardcoded hex to CSS variables</td>
+          </tr>
+          <tr>
+            <td>Spacing</td>
+            <td class="status-ok">✓ Complete (--s-1 to --s-12)</td>
+            <td>~8 hardcoded pixel values</td>
+            <td>Standardize to spacing scale</td>
+          </tr>
+          <tr>
+            <td>Typography</td>
+            <td class="status-ok">✓ Complete (9 classes)</td>
+            <td>0 hardcoded (using classes)</td>
+            <td>No action needed</td>
+          </tr>
+          <tr>
+            <td>Border Radius</td>
+            <td class="status-ok">✓ Complete (5 tokens)</td>
+            <td>1 hardcoded (1rem in Modal)</td>
+            <td>Use --r-2 instead</td>
+          </tr>
+          <tr>
+            <td>Shadows</td>
+            <td class="status-warn">⚠ Not defined</td>
+            <td>0 (no shadows used)</td>
+            <td>Consider adding elevation tokens if shadows are added in future</td>
+          </tr>
+          <tr>
+            <td>Motion / Animation</td>
+            <td class="status-warn">⚠ Inline values</td>
+            <td>0.15s, 0.3s, 0.32s, 0.2s scattered</td>
+            <td>Define --duration-fast, --duration-normal, --duration-slow</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="subhead">Component Completeness</div>
+      <table>
+        <thead>
+          <tr>
+            <th>Component</th>
+            <th>States</th>
+            <th>Variants</th>
+            <th>Docs</th>
+            <th>Issues</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Button</td>
+            <td>✅</td>
+            <td>✅ 4 variants</td>
+            <td>⚠️ Partial</td>
+            <td>Hardcoded destructive color (#dc2626)</td>
+            <td>8/10</td>
+          </tr>
+          <tr>
+            <td>Input</td>
+            <td>✅</td>
+            <td>✅ Error state</td>
+            <td>⚠️ Partial</td>
+            <td>Password visibility button styling could be more consistent</td>
+            <td>8/10</td>
+          </tr>
+          <tr>
+            <td>Chip / Badge</td>
+            <td>✅</td>
+            <td>✅ 4 variants (role-based)</td>
+            <td>⚠️ Partial</td>
+            <td>Hardcoded role colors (#d97706, #3b82f6)</td>
+            <td>7/10</td>
+          </tr>
+          <tr>
+            <td>Modal</td>
+            <td>✅</td>
+            <td>✅ 2 positions</td>
+            <td>⚠️ Minimal</td>
+            <td>Hardcoded border-radius (1rem)</td>
+            <td>7/10</td>
+          </tr>
+          <tr>
+            <td>BandCard</td>
+            <td>✅</td>
+            <td>✅ 4 variants + attendanceChip (Phase 33)</td>
+            <td>⚠️ Partial</td>
+            <td>Hardcoded colors; timeline attended/missed documented</td>
+            <td>6/10</td>
+          </tr>
+          <tr>
+            <td>My Wacken Page</td>
+            <td>✅</td>
+            <td>✅ Day inline A2 + collapse + coach</td>
+            <td>✅ Phase 33</td>
+            <td>Shares SchedulePage.module.css; picksReady collapse gate</td>
+            <td>9/10</td>
+          </tr>
+          <tr>
+            <td>Avatar</td>
+            <td>✅</td>
+            <td>✅ Size variants</td>
+            <td>⚠️ Minimal</td>
+            <td>None</td>
+            <td>8/10</td>
+          </tr>
+          <tr>
+            <td>SegmentedControl</td>
+            <td>✅</td>
+            <td>✅ Default/active</td>
+            <td>⚠️ Minimal</td>
+            <td>None</td>
+            <td>8/10</td>
+          </tr>
+          <tr>
+            <td>Select</td>
+            <td>✅</td>
+            <td>❌ Single variant</td>
+            <td>⚠️ Minimal</td>
+            <td>Limited variant coverage</td>
+            <td>6/10</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="subhead">Priority Actions</div>
+      <ol class="issue-list">
+        <li>
+          <strong>Eliminate hardcoded colors in CSS.</strong> Search and replace all hardcoded hex values in .module.css files with existing --color-* or --signal-* tokens. Files: BandCard.module.css, Button.module.css, Chip.module.css. Timeline: 1–2 hours.
+        </li>
+        <li>
+          <strong>Standardize spacing to CSS scale.</strong> Replace hardcoded pixel margins/padding (2px, 4px, 6px, 6px) with --s-N tokens. Focus on BandCard (high volume). Timeline: 1 hour.
+        </li>
+        <li>
+          <strong>Add component variant documentation.</strong> Document all variants, props, and states for BandCard, Input, Modal, and Chip in this Design System. Timeline: 2 hours.
+        </li>
+        <li>
+          <strong>Define motion tokens.</strong> Create --duration-fast, --duration-normal, --duration-slow variables for transitions (0.15s, 0.3s, 0.5s). Timeline: 30 min.
+        </li>
+        <li>
+          <strong>Refactor BandCard inline styles.</strong> Move stage-color inline styles to data attributes or utility classes; reduce style={} object count. Timeline: 1.5 hours.
+        </li>
+        <li>
+          <strong>Add accessibility states to components.</strong> Document focus-visible, disabled, and aria-* attributes for all interactive components. Timeline: 1 hour.
+        </li>
+        <li>
+          <strong>Create component showcase page.</strong> Build an interactive page (like this file) showing live component examples with code snippets. Timeline: 3 hours (ongoing).
+        </li>
+      </ol>
+    </div>
+
+    <div class="section">
+      <h2>Implementation Checklist</h2>
+      <p>Use this checklist to track progress on design system improvements:</p>
+      <div class="note">
+        <strong>Before merging to main:</strong> Ensure build (rtk npm run build) and tests (rtk npm test) both pass. Update docs/ai-wiki/changelog.md with all changes. Keep <code>public/vira-lata-ds.html</code> in sync with code changes.
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Status</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Remove hardcoded colors from BandCard.module.css</td>
+            <td>⬜ To Do</td>
+            <td>Replace #fff, #f9c66b, #1a0d00 with tokens</td>
+          </tr>
+          <tr>
+            <td>Remove hardcoded colors from Button.module.css</td>
+            <td>⬜ To Do</td>
+            <td>Replace #dc2626, #b91c1c, #fff with tokens</td>
+          </tr>
+          <tr>
+            <td>Remove hardcoded colors from Chip.module.css</td>
+            <td>⬜ To Do</td>
+            <td>Replace #d97706, #3b82f6 with tokens</td>
+          </tr>
+          <tr>
+            <td>Standardize spacing in BandCard.module.css</td>
+            <td>⬜ To Do</td>
+            <td>Replace 2px, 4px, 6px hardcoded with --s-N</td>
+          </tr>
+          <tr>
+            <td>Define motion duration tokens</td>
+            <td>⬜ To Do</td>
+            <td>Add --duration-* to :root in index.css</td>
+          </tr>
+          <tr>
+            <td>Refactor BandCard inline styles</td>
+            <td>⬜ To Do</td>
+            <td>Move stage color styling to classes or data attributes</td>
+          </tr>
+          <tr>
+            <td>Audit component focus states</td>
+            <td>⬜ To Do</td>
+            <td>Ensure all buttons/inputs have focus-visible</td>
+          </tr>
+          <tr>
+            <td>Publish updated <code>public/vira-lata-ds.html</code></td>
+            <td>⬜ To Do</td>
+            <td>After each batch of changes</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="section">
+      <h2>Best Practices</h2>
+      <ul>
+        <li><strong>Always use CSS variables for design tokens.</strong> Never hardcode colors, spacing, or typography values in components or CSS modules.</li>
+        <li><strong>Keep inline styles minimal.</strong> Prefer CSS modules and utility classes for consistent styling.</li>
+        <li><strong>Document variants and props.</strong> Every component should have clear documentation of its props, variants, and expected behavior.</li>
+        <li><strong>Test contrast ratios.</strong> Ensure all text meets WCAG AA standards (4.5:1 for normal text).</li>
+        <li><strong>Use semantic colors.</strong> Use --signal-* tokens for state indicators (live, warn, ok, lost) rather than arbitrary colors.</li>
+        <li><strong>Scale consistently.</strong> All spacing, sizes, and font sizes should reference the defined scales.</li>
+        <li><strong>Update <code>public/vira-lata-ds.html</code> with every change.</strong> The design system is a living document — keep it in sync with the codebase.</li>
+      </ul>
+    </div>
+  </section>
+
   <!-- ============================================================
        CHANGELOG
        ============================================================ -->
@@ -4538,6 +5906,19 @@
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.0 — Unified canonical DS · May 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li>Created <code>public/vira-lata-ds.html</code> as the single canonical design system — unified former <code>Design-System.html</code> (demos, layouts, motion) and <code>Design System.html</code> (audit, Phase 29–33 specs); superseded files removed from the repo</li>
+          <li>Added §12 Governance (audit score, token coverage, implementation checklist, best practices)</li>
+          <li>Merged: Switch, My Wacken page, coach banner, godlike time travel, BandRatingInput, ProfileHeader, UserManagementSection, Festival Wrap, BadgesDisplay vest modes, Previously Achieved archive, MoshSplit, PlaylistLaunchButton, ClusterRow, LiveCardSheet</li>
+          <li>Updated BandCard docs: paw pick, day ghost, attendance chips, duck killswitch, Popular rating mode</li>
+          <li>Sidenav now links §10 Empty, §12 Governance, and Changelog</li>
+          <li>Removed legacy <code>Design-System.html</code> and <code>Design System.html</code> from the repository; all docs point here only</li>
+        </ul>
+      </div>
+
+
 
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-faint);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v2.3 — Phase 21 · May 2026</div>
@@ -4650,5 +6031,5 @@
   });
 })();
 </script>
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</body>
 </html>

@@ -355,7 +355,7 @@ Discovery
 | `src/i18n/WrapPage_*.json` | br, en, es, de |
 | `src/App.tsx` | Private route `/wrap` |
 | `src/pages/RightNowPage.tsx` / `ProfilePage.tsx` | Post-festival teaser banner |
-| `public/Design System.html` | Wrap section |
+| `public/vira-lata-ds.html` | Wrap section |
 | `src/__tests__/festivalWrap.test.ts` | Edge cases: 0 picks, friend user, sparse missed |
 | `_temp/wrap-proposals/` | Design-only HTML (already drafted) |
 

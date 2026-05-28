@@ -21,7 +21,7 @@ Run `rtk npm test`.
 
 ### 3. Documentation sync
 
-Delegate to the `wiki-curator` subagent to update affected wiki pages, append a changelog entry, and sync `public/Design System.html` if UI changed. Wait for it to finish and confirm exit criteria are met.
+Delegate to the `wiki-curator` subagent to update affected wiki pages, append a changelog entry, and sync `public/vira-lata-ds.html` if UI changed. Wait for it to finish and confirm exit criteria are met.
 
 ### 4. Append to phase history
 

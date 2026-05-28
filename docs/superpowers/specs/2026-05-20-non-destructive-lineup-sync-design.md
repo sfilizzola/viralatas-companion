@@ -383,7 +383,7 @@ Three-step rollout. The middle step is a one-time intentional pick loss (the sam
 - **New `docs/ai-wiki/lineup-sync.md`** — Full flow doc (purpose, when to run, flags, plan output, worked examples for each scope case, edge cases). Follows the 8-section flow template.
 - **`docs/ai-wiki/changelog.md`** — Dated entry: Added (new scripts, new flow page), Changed (bands schema, lineup.md instructions), Architectural Notes (slot_id as stable identity).
 - **`docs/ai-wiki/index.md`** — Link the new page; add to a new "Operational Tooling" subsection alongside the festival-reset link.
-- **`public/Design System.html`** — No UI changes; no DS edit.
+- **`public/vira-lata-ds.html`** — No UI changes; no DS edit.
 - **`CLAUDE.md`** — Update the Testing section's seed-script catalog to include `seed:bands:sync` and `seed:bands:move`. No principle changes.
 
 ---

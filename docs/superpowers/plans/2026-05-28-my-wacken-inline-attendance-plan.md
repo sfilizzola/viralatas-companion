@@ -72,7 +72,7 @@ Includes original spec locks + grill session (2026-05-28). Full rationale → sp
 | `src/i18n/SchedulePage_*.json` | Modify ×4 | `title` → Lineup if page header uses this namespace |
 | `src/pages/SchedulePage.module.css` | Modify | Optional: `.dayDivider` label; deprecate `.dayHeaderSaw` / `.dayHeaderDidntSee` docs |
 | `src/__tests__/myWackenGrouping.test.ts` | **Create** | Grouping + chip derivation |
-| `public/Design System.html` | Modify | My Wacken / attendance chips / remove Saw footer |
+| `public/vira-lata-ds.html` | Modify | My Wacken / attendance chips / remove Saw footer |
 | `docs/ai-wiki/routes.md` | Modify | Component filenames vs paths |
 | `docs/ai-wiki/architecture.md` | Modify | `/my-picks` description |
 | `docs/ai-wiki/changelog.md` | Modify | Dated entry on 33.3 complete |
@@ -178,7 +178,7 @@ Includes original spec locks + grill session (2026-05-28). Full rationale → sp
 
 ### Task 7: Design System
 
-- [ ] `public/Design System.html` — document attendance chips on timeline variant; update My Wacken page description; mark Saw/Didn't See footer sections as removed
+- [ ] `public/vira-lata-ds.html` — document attendance chips on timeline variant; update My Wacken page description; mark Saw/Didn't See footer sections as removed
 
 **Gate:** `rtk npm run build` · `rtk npm test`
 

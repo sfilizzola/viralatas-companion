@@ -50,7 +50,7 @@ Each page follows the 8-section template in `.claude/context/wiki-template.md`.
 Update **all three**:
 - Relevant wiki pages (architecture.md, domain-model.md, etc.)
 - `docs/ai-wiki/changelog.md` with your changes
-- `public/Design System.html` — if any UI element is added, changed, or removed, update the relevant DS section. Treat the design system as a living spec: it must stay in sync with the code.
+- `public/vira-lata-ds.html` — if any UI element is added, changed, or removed, update the relevant DS section. Treat the design system as a living spec: it must stay in sync with the code.
 
 ### Changelog format
 
@@ -113,7 +113,7 @@ Update **all three**:
 │   └── seed/             # Seed scripts (bands, test users, live-now)
 ├── public/
 │   ├── badges/           # Badge PNG assets
-│   └── Design System.html  # Living UI spec
+│   └── vira-lata-ds.html   # Living UI spec (design system)
 ├── docs/
 │   └── ai-wiki/          # Architecture wiki (core/, flows/, decisions/)
 ├── .claude/
@@ -311,7 +311,7 @@ Phases 1–30 are complete. See `PHASES.md` and `FUTURE_IDEAS.md` for upcoming w
 | Close phase / branch wrap-up | `finishing-a-development-branch` |
 | Bug, failing tests, regression | `diagnose` or `systematic-debugging` |
 
-**UI pipeline:** `huashu-design` (creativity + `public/Design System.html`) → user locks variant → `frontend-design` (implement in `src/`).
+**UI pipeline:** `huashu-design` (creativity + `public/vira-lata-ds.html`) → user locks variant → `frontend-design` (implement in `src/`).
 
 **User-direct (never auto-suggest; `/skill` only):** `grill-me`, `grill-with-docs`, `handoff`, `humanize-writing`, `prototype`, `tdd`.
 
@@ -323,7 +323,7 @@ Skills define *how* the main agent works; **subagents** below define *who* revie
 
 Specialized agents live in `.claude/agents/`. Each reads CLAUDE.md plus its own system prompt. Delegate when the trigger matches:
 
-- **`wiki-curator`** — After any meaningful code change and before phase close: sync wiki pages, append changelog, update Design System.
+- **`wiki-curator`** — After any meaningful code change and before phase close: sync wiki pages, append changelog, update `public/vira-lata-ds.html`.
 - **`phase-closer`** — On "close phase N": run build + tests, delegate to wiki-curator, append phases-history, single commit, push, version bump if main.
 - **`migration-validator`** — On any change under `supabase/migrations/`: validate RLS, triggers, idempotency, realtime config, auth-trigger contract.
 - **`edge-function-reviewer`** — On changes under `supabase/functions/`: verify no leaked API key, AlertContext shape preserved, server-side cooldowns, prompt rules.

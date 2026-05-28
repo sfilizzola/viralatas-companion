@@ -129,7 +129,7 @@ Without (3), godlike applies D+1 but the teaser does not appear until navigation
 | `src/components/wrap/WrapTeaserBanner.tsx` | Gate + optional internal override listener |
 | `src/pages/RightNowPage.tsx` | Mount teaser; listen for time override |
 | `src/pages/ProfilePage.tsx` | Mount teaser; listen for time override |
-| `public/Design System.html` | Optional one line under godlike Time Travel (Task 13) |
+| `public/vira-lata-ds.html` | Optional one line under godlike Time Travel (Task 13) |
 
 ---
 

@@ -4,6 +4,30 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-28 (Design system — single canonical file)
+
+### Changed
+- **All project docs** — `public/vira-lata-ds.html` is the only design system path in CLAUDE.md, agents, wiki, plans, and specs.
+- **Removed** superseded `public/Design-System.html`, `public/Design System.html`, and `scripts/merge-vira-lata-ds.py`.
+
+### Architectural Notes
+- UI changes must update **`public/vira-lata-ds.html`** only.
+
+---
+
+## 2026-05-28 (Design system unification)
+
+### Added
+- **`public/vira-lata-ds.html`** — single canonical design system (v3.0): unified the former two HTML files (tokens, live demos, layouts, motion, duck, audit, Phase 29–33 component specs). New §12 Governance (audit score, checklist, best practices).
+
+### Changed
+- BandCard (paw pick, day ghost, attendance chips, rating mode), My Wacken page anatomy, BadgesDisplay vest modes, sidenav (§10 Empty, §12 Governance, Changelog).
+
+### Architectural Notes
+- Agents and wiki treat **`public/vira-lata-ds.html`** as the living UI spec.
+
+---
+
 ## 2026-05-28 (Phase 33 — My Wacken inline attendance)
 
 ### Added
@@ -17,7 +41,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - Bottom nav + page titles: **Lineup** / **My Wacken** (BR **Line-up** / **Meu Wacken**); empty state points to Line-up.
 - Header stats: `{days}` = all days with picks; conflicts/overlaps from upcoming picks only; **{n} left today** during festival when n ≥ 1.
 - Mid-festival collapse: calendar days before `todayKey` collapsed; today + future expanded; post-festival all expanded; `picksReady` + CEST time-travel parsing.
-- **`docs/ai-wiki/routes.md`**, **`architecture.md`**, **`public/Design System.html`** — My Wacken page section, coach banner, godlike CEST time travel, timeline chip demos.
+- **`docs/ai-wiki/routes.md`**, **`architecture.md`**, **`public/vira-lata-ds.html`** — My Wacken page section, coach banner, godlike CEST time travel, timeline chip demos.
 
 ### Architectural Notes
 - No schema or sync changes; attendance opt-out unchanged in `BandDetailModal`.
@@ -183,7 +207,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - **`BadgeDetailModal`** — optional `showDescription` / `showZoom` for archive taps (M2).
 - **`BadgeHistorySection` U2 polish** — flat 4×48 px grid, Oswald year headings, red enamel diamond year chips (24 px @ 48 px patch).
 - **Wiki sync** — `index.md`, `architecture.md`, `domain-model.md`, `routes.md`, `offline-first.md`, `badges.md`, `festival-reset.md`, `supabase-schema.md`, `phases-history.md`.
-- **`public/Design System.html`** — Previously Achieved + consolidation anatomy with diamond chip demo.
+- **`public/vira-lata-ds.html`** — Previously Achieved + consolidation anatomy with diamond chip demo.
 
 ### Architectural Notes
 - Badge history follows golden rule: UI → IndexedDB; Supabase is sync target on profile mount / `'online'`. No offline queue for consolidate (network-only godlike op).
@@ -205,7 +229,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ### Changed
 - `BadgeHistorySection` — U2 flat grid (4×48 px, gap 10), Oswald year headings, lighter collapsible header; removed live-vest denim grid shell.
 - Archive patch year chip — red enamel **diamond** (24 px @ 48 px patch), same `.yearChip` language as live vest (clip-path, gloss, hover glow); not the gray pill from early U2 mock.
-- `public/Design System.html` — multi-year archive anatomy + demo aligned with `_temp/badge-history-proposals`; diamond chip spec in patch row.
+- `public/vira-lata-ds.html` — multi-year archive anatomy + demo aligned with `_temp/badge-history-proposals`; diamond chip spec in patch row.
 - `docs/ai-wiki/badges.md` — U2 layout documents diamond chip sizing.
 
 ---
@@ -229,7 +253,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ### Changed
 - `BadgeDetailModal` — optional `showDescription` / `showZoom` for archive taps (M2).
-- `docs/ai-wiki/badges.md`, `festival-reset.md`, `supabase-schema.md`; `public/Design System.html` — Previously Achieved + consolidate anatomy.
+- `docs/ai-wiki/badges.md`, `festival-reset.md`, `supabase-schema.md`; `public/vira-lata-ds.html` — Previously Achieved + consolidate anatomy.
 
 ### Architectural Notes
 - Badge history is IndexedDB-primary on `/profile`; Supabase is sync target. `festival:reset` never touches `user_badge_history`.
@@ -314,7 +338,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ### Changed
 - **`SchedulePage`** — passes `showDayLabel={filters.day === null}` (visible during search / all-days browse; hidden when a day tab is active).
 - **`PopularPage`** — always passes `showDayLabel` (cross-day popularity list).
-- **`public/Design System.html`** — BandCard section documents day label visibility rules + static demo.
+- **`public/vira-lata-ds.html`** — BandCard section documents day label visibility rules + static demo.
 - **`docs/ai-wiki/glossary.md`** — BandCard entry mentions corner day ghost.
 - Tests in `BandCard.test.tsx` and `bandTime.test.ts`.
 
@@ -335,7 +359,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - **`BadgesDisplay.tsx`** — reads layout preference; neat collapsed row shows all badges; chaotic reseed only in chaotic mode.
 - **`BadgesDisplay.module.css`** — `.vestNeat`, `.vestNeatRow`, `.patchNeatItem`, scaled year chip.
 - **`EditProfileForm.tsx`** — vest prefs row: swatches + layout toggle.
-- **`docs/ai-wiki/badges.md`**, **`public/Design System.html`** — chaotic/neat docs and demos.
+- **`docs/ai-wiki/badges.md`**, **`public/vira-lata-ds.html`** — chaotic/neat docs and demos.
 - i18n `patchesLayout`, `layoutChaotic`, `layoutNeat` in all 4 ProfilePage locales.
 
 ### Architectural Notes
@@ -989,7 +1013,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - `BadgesDisplay.module.css` — stack/spread styles; 48 px patches in both states; `.vestStack[data-bg=…]` shares background variants with `.patchesGrid`.
 - `ProfilePage` / `RightNowPage` — unified patches header inside `BadgesDisplay` (count + vest toggle); removed external `PATCHES` kicker.
 - `src/i18n/Badges_*.json` — `patchesKicker`, `patchesSpread` (Open vest), `patchesCollapse` (Close vest).
-- `public/Design System.html` — BadgesDisplay section with collapsed/expanded spec table and demo.
+- `public/vira-lata-ds.html` — BadgesDisplay section with collapsed/expanded spec table and demo.
 - `docs/ai-wiki/badges.md` — Vest Stack layout, constants, CSS class map, scatter algorithm notes.
 - `docs/ai-wiki/architecture.md` — BadgesDisplay entry notes vest-stack UI.
 
@@ -1062,7 +1086,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - `supabase/seed/bands.ts` + `docs/ai-wiki/lineup.md` — ~93 genre strings collapsed to 13 canonical labels; `TBD_GENRE` → `Metal`; all `Metal Battle *` → `Metal Battle`.
 - `src/components/BandFilters.tsx` — genre filter uses single-select pills (not native `<select>`); GenreGuide collapsible below pill row.
 - `src/i18n/SchedulePage_{br,en,es,de}.json` — genre guide keys (`genreGuideTrigger`, `genreGuideIntro`, …).
-- `public/Design-System.html` — genre pills + GenreGuideCollapsible documented.
+- `public/vira-lata-ds.html` — genre pills + GenreGuideCollapsible documented.
 - `docs/ai-wiki/domain-model.md` — canonical 13-genre list on Band entity.
 
 ### Changed (doc audit)
@@ -1130,7 +1154,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - **`MoshSplitSection` API path** — fetch URL updated from `/v1/balances/external-summary` to `/pitboss/v1/balances/external-summary`. The bare `/v1/…` path returns 404; the Pitboss prefix is required per MoshSplit API docs.
 
 ### Changed
-- **`README.md`**, **`flows/moshsplit.md`**, **`architecture.md`**, **`Design System.html`** — endpoint paths updated to include `/pitboss`.
+- **`README.md`**, **`flows/moshsplit.md`**, **`architecture.md`**, **`vira-lata-ds.html`** — endpoint paths updated to include `/pitboss`.
 
 ---
 
@@ -1422,7 +1446,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - `src/components/ArrivalMap.tsx` — added a `visibleUsers` derivation (`crewUsers.filter((u) => u.is_friend !== true)`) and routed the per-day grouping, totals, and empty-state checks through it. Users flagged as `is_friend` no longer surface in any of the three `ArrivalMap` view states (collapsed summary, day cluster, full details), and they no longer contribute to the "X arrived · Y to arrive" counters on `/announcements`.
 - `src/components/profile/EditProfileForm.tsx` — added an `isFriend` state hydrated from the IDB-cached `crew_users` store via `loadCrewUsers()` and refreshed on `CREW_USERS_CHANGED_EVENT`. When `isFriend === true` the `ArrivalDayPicker` is not rendered on `/profile`, and `handleSave` writes `wacken_arrival_day: null` to both the auth metadata and the `users` row so a previously-set value cannot be re-published while the picker is hidden.
 - `docs/ai-wiki/domain-model.md` — extended the `User` invariants list to capture the friend-privacy rule for arrival data (ArrivalMap exclusion + EditProfileForm picker hidden + null-on-save).
-- `public/Design System.html` (canonical: `public/Design-System.html`) — extended the `ArrivalMap` subhead in §9 with a "Friend filtering" bullet that describes the dual-surface suppression (map + picker) and the null-on-save behavior.
+- `public/vira-lata-ds.html` (canonical: `public/vira-lata-ds.html`) — extended the `ArrivalMap` subhead in §9 with a "Friend filtering" bullet that describes the dual-surface suppression (map + picker) and the null-on-save behavior.
 
 ### Architectural Notes
 - This change is purely **read/write filtering on top of the existing `is_friend` flag** — no schema migration, no new IDB store, no new RLS policy. The flag remains godlike-toggle-only via the admin panel.
@@ -1448,7 +1472,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - `src/pages/RightNowPage.tsx` — `onDuck` is passed to `CrewGroupsSection` only when `duckEnabled && duckBandId`.
 - `src/pages/SchedulePage.tsx` — `DuckableBandCard.canDuck` short-circuits to `false` when `duckEnabled` is `false`.
 - `src/i18n/ProfilePage_{br,en,es,de}.json` — added 7 new keys: `duckToggle`, `duckToggleDescription`, `duckEnabled`, `duckDisabled`, `duckLoading`, `duckToggleError`, `testQuackDisabledHint`.
-- `public/Design System.html` — BandCard component-section now documents the killswitch visibility rule and where the toggle lives.
+- `public/vira-lata-ds.html` — BandCard component-section now documents the killswitch visibility rule and where the toggle lives.
 - `PHASES.md` — Phase 20 details removed (already preserved in `phases-history.md`); Phase 21 written out as the active phase.
 
 ### Architectural Notes
@@ -1502,7 +1526,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - `src/pages/ProfilePage.tsx` — passes the `t` function down to `ProfileHeader` so the chip can resolve `wackenCountSingular` / `wackenCountPlural` / `wackenCountTooltip`.
 - `src/pages/ProfilePage.module.css` — dropped `.pfYearDiamond` and the (already orphan) `.pfYearsPill`; introduced a thin `.pfWackenChip` override (cursor + intent doc) that lets the chip inherit the default Chip palette.
 - `src/i18n/ProfilePage_{br,en,es,de}.json` — added `wackenCountSingular`, `wackenCountPlural`, and `wackenCountTooltip` (German collapses singular/plural to `{count}× Wacken`).
-- `public/Design System.html` — added a `ProfileHeader` component section documenting the metadata row (role chip · flag · Wackens chip) with three live variants (godlike default, manager singular, vira-lata empty-state) and a prop table; rationale notes why the diamond was retired and why the chip stays in the default gray palette.
+- `public/vira-lata-ds.html` — added a `ProfileHeader` component section documenting the metadata row (role chip · flag · Wackens chip) with three live variants (godlike default, manager singular, vira-lata empty-state) and a prop table; rationale notes why the diamond was retired and why the chip stays in the default gray palette.
 
 ### Architectural Notes
 - The Wackens chip is intentionally rendered through the shared `Chip` primitive (default variant) rather than a bespoke `<span>`, so the role chip and the Wackens chip stay visually consistent if Chip ever evolves (border-radius, mono font, padding tokens). It deliberately stays in the muted gray palette: it's ambient metadata, not a CTA — coloured fills would compete with the role chip for attention.
@@ -1514,7 +1538,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ### Added
 - `supabase/functions/send-test-push/index.ts` — new `send-test-push` Edge Function; authenticates caller via JWT, queries their `push_subscriptions`, sends a real VAPID Web Push directly to them; provides inline diagnostic feedback (`no_subscription`, `sent`, `failed`)
 - `docs/ai-wiki/flows/duck.md` — new flow document covering the full duck quack lifecycle: button press → cooldown → online/offline quack → Realtime in-app DuckToast → Database Webhook → `send-duck-push` → Web Push → SW push handler; also documents admin test flows (Test Quack vs Test Push)
-- `public/Design System.html` — comprehensive design system audit & reference: token inventory (colors, spacing, radii, typography, motion), component docs (Button, Input, Chip, Modal, BandCard, Avatar), audit score 72/100, implementation checklist with 7 priority issues.
+- `public/vira-lata-ds.html` — comprehensive design system audit & reference: token inventory (colors, spacing, radii, typography, motion), component docs (Button, Input, Chip, Modal, BandCard, Avatar), audit score 72/100, implementation checklist with 7 priority issues.
 - `src/index.css` — new CSS tokens: `--role-godlike`, `--role-godlike-bg/border`, `--role-manager`, `--role-manager-bg/border`, `--btn-destructive`, `--btn-destructive-hover`, `--signal-warn-light`, `--text-on-warn`, `--text-white`; motion tokens: `--duration-fast`, `--duration-normal`, `--duration-slow`, `--easing-ease-out`, `--easing-ease-in`.
 
 ### Changed
@@ -1566,8 +1590,8 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - `.skipButton` ("I am weak 🤘") redesigned as a **ghost mono-caps micro-link**: transparent background, no border, `--font-mono` 10 px / 600 / uppercase / 0.16 em letter-spacing, `--text-faint` at rest. Hover lifts to `--text-muted`, draws a `--border-strong` bottom rule, and eases letter-spacing to 0.18 em. Active snaps to `--accent-hover` bottom rule. The intent: the duck is the unambiguous hero CTA on a live picked band; the skip button is a tertiary escape hatch and must visually recede.
 - `src/components/DuckButton.tsx` — added optional `tile?: boolean` prop. When true, renders a 64×64 rounded-square button (`.buttonTile`) with transparent background, soft border, 46 px duck image, and square-cornered cooldown drain (`.drainOverlayTile`). Default circular variant is unchanged for `BandCard` usage.
 - `src/components/DuckButton.module.css` — added `.wrapperTile`, `.buttonTile`, `.duckImgTile`, `.drainOverlayTile` styles; the tile variant pulls `border-radius` from `var(--r-1)` to match the count tile.
-- `public/Design System.html` §11 — replaced the live card simulation with six new examples covering the full Monument grammar (band you-here ready · band you-here cooldown · band others-only · metal_place you-here · camping empty · lost with members) and rewrote the Element Inventory + Component Ownership notes to match.
-- `public/Design System.html` changelog — added v2.3 entry documenting the Phase 21 Monument redesign.
+- `public/vira-lata-ds.html` §11 — replaced the live card simulation with six new examples covering the full Monument grammar (band you-here ready · band you-here cooldown · band others-only · metal_place you-here · camping empty · lost with members) and rewrote the Element Inventory + Component Ownership notes to match.
+- `public/vira-lata-ds.html` changelog — added v2.3 entry documenting the Phase 21 Monument redesign.
 
 ### Architectural Notes
 - **One grammar, four kinds.** The same body grid handles every `/now` card (band, metal_place, camping, lost). Variants only override the rail color, kicker color, count tile palette, pill palette, and gradient backdrop. This keeps future card kinds cheap to add.
@@ -1631,7 +1655,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ### Changed
 - `BandSeed.genre` type widened to `string | null`; `BandSeed.category` optional field added
 - `band()` test helper in `badges.test.ts` now includes `category: 'band'` default; new `ceremonyBand()` helper added
-- `public/Design System.html` — ceremony card demos updated to "Farewell & Announcements" / 22:30–23:00 / `FA` monogram; notes corrected to reflect stage chip is hidden (not absent)
+- `public/vira-lata-ds.html` — ceremony card demos updated to "Farewell & Announcements" / 22:30–23:00 / `FA` monogram; notes corrected to reflect stage chip is hidden (not absent)
 
 ### Architectural Notes
 - `category` column uses a DB-level check constraint — invalid values are rejected at the Postgres layer, not just TypeScript.
@@ -1696,14 +1720,14 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ### Added
 - `src/components/ErrorState.tsx` + `ErrorState.module.css` — reusable error state component; props: `variant: 'network' | 'sync' | 'auth'`, `onRetry?: () => void`, `message?: string`; each variant shows an appropriate SVG icon and Portuguese copy; retry button only rendered when `onRetry` is provided
-- `public/Design System.html` §10 Empty & Error States — new section documenting 5 canonical empty states (`/now`, `/schedule`, `/my-picks`, `/popular`, `/announcements`) and 3 error state variants (`network`, `sync`, `auth`); visual pattern: centered layout, single muted line of copy, optional 24px stroke icon
-- `public/Design System.html` Changelog section — revision history for v1.0–v2.0 at the bottom of the document
+- `public/vira-lata-ds.html` §10 Empty & Error States — new section documenting 5 canonical empty states (`/now`, `/schedule`, `/my-picks`, `/popular`, `/announcements`) and 3 error state variants (`network`, `sync`, `auth`); visual pattern: centered layout, single muted line of copy, optional 24px stroke icon
+- `public/vira-lata-ds.html` Changelog section — revision history for v1.0–v2.0 at the bottom of the document
 
 ### Changed
 - `src/components/BadgesDisplay.tsx` — badge unlock animation fires once per session per slug; uses `sessionStorage` key `badgeAnimated` to track already-played slugs; applies `.unlocking` CSS class for 380 ms then clears it
 - `src/components/BadgesDisplay.module.css` — added `@keyframes badgeUnlock` (scale 0.85 → 1.12 → 1.0) and `.unlocking` class (380 ms, `cubic-bezier(0.34, 1.56, 0.64, 1)`); respects `prefers-reduced-motion`
-- `public/Design System.html` masthead — added Wacken identity relationship statement after lede; eyebrow version bumped from v1.0 to v2.0; footer updated to v2.0
-- `CLAUDE.md` — "After every meaningful change" rule expanded to include `public/Design System.html` as a required update target alongside the wiki pages
+- `public/vira-lata-ds.html` masthead — added Wacken identity relationship statement after lede; eyebrow version bumped from v1.0 to v2.0; footer updated to v2.0
+- `CLAUDE.md` — "After every meaningful change" rule expanded to include `public/vira-lata-ds.html` as a required update target alongside the wiki pages
 - Deleted `docs/DESIGN_IMPROVEMENT_PLAN.md` — all 4 sprints complete; no longer needed
 
 ### Architectural Notes
@@ -2177,7 +2201,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - **GodlikeAdminPanel** — wired new semantic button classes; role chip moved inside the user info block for better layout; avatar size reduced to 36px
 - **ManagerAdminPanel** — wired `.actionUnblock` class on the unblock button
 - **badges.md** — corrected `BadgeModal.tsx` reference to `BadgesDisplay.tsx`; added "Badge Detail Modal & Fullscreen Zoom" section documenting the new interaction; updated manual testing checklist
-- **Design System.html** — added zoom button to badge detail modal demo; added fullscreen overlay section with live preview
+- **vira-lata-ds.html** — added zoom button to badge detail modal demo; added fullscreen overlay section with live preview
 
 ---
 
@@ -2195,7 +2219,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ### Added
 - `src/components/now/LiveCardSheet.tsx` — new bottom sheet component opened when any live page group card is tapped; receives `group: CrewLiveGroup` and renders an atmospheric header (colour-matched to card type), a "Here now" section (pulsing live dot per member), and a "Heading next" section (stage-coloured next-band pill per member with `plan.nextBand`); state lives at `RightNowPage` level so only one sheet is open at a time
 - `src/components/now/LiveCardSheet.module.css` — full CSS module for the sheet; all 4 card-type colour variants driven by `--sheet-*` CSS variables injected inline; slide-up entrance (280ms `cubic-bezier(0.32, 0.72, 0, 1)`); backdrop fade-in (200ms); pulsing `@keyframes livePulse` on the live dot
-- `public/Design System.html` — added `ClusterRow` and `LiveCardSheet` component sections with live interactive previews of all 4 card types (band/metal_place/camping/lost); component count updated 18 → 20
+- `public/vira-lata-ds.html` — added `ClusterRow` and `LiveCardSheet` component sections with live interactive previews of all 4 card types (band/metal_place/camping/lost); component count updated 18 → 20
 
 ### Changed
 - `src/components/now/CrewGroupsSection.tsx` — replaced always-visible `memberList` / `CrewMember` pills with new `ClusterRow` sub-component (stacked `Avatar` circles, max 5 + overflow count + per-kind count label); all 4 `groupCard` article elements are now tappable (`onClick`, `cursor: pointer`) and receive a new `onGroupSelect` prop; `skipButton` `onClick` uses `e.stopPropagation()` to prevent card tap propagation; removed unused `truncateDisplayName` and `CrewMember` helpers

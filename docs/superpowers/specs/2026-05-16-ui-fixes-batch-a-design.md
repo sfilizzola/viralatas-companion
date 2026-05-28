@@ -123,4 +123,4 @@ A new section added **before** the `<TimeTravelSection />` call (to keep test ut
 - All 4 fixes are independent; they share no code or state and can be implemented in parallel subagents.
 - No database migrations. No Edge Function changes. No Service Worker changes.
 - Offline behaviour is unaffected.
-- After every change, update `docs/ai-wiki/changelog.md` and `public/Design System.html` per CLAUDE.md rules.
+- After every change, update `docs/ai-wiki/changelog.md` and `public/vira-lata-ds.html` per CLAUDE.md rules.

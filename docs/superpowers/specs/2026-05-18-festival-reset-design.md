@@ -207,7 +207,7 @@ After implementation:
   - Flag matrix
   - Pointer to this design doc
   - Linked from `docs/ai-wiki/index.md` under operational tooling
-- **No `Design System.html` update** — zero UI surface area.
+- **No `vira-lata-ds.html` update** — zero UI surface area.
 - **No migration files.**
 - **No PHASES.md change** unless the operator decides to bundle this as Phase 22's first deliverable.
 

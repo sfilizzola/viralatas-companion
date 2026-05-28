@@ -148,7 +148,7 @@ Full table → `GENRE_COLLAPSE_MAP` in `src/services/genreGuide.ts`.
 - Guide: **inline `Collapsible`** below pill row — not nested modal on drawer (z-index / mobile stacking)
 - **Out of scope:** per-band “formerly tagged as …”, push notification, blocking banner, guide search
 
-See `public/Design-System.html` (genre pills + `GenreGuideCollapsible`) and `docs/ai-wiki/routes.md` (/schedule filters).
+See `public/vira-lata-ds.html` (genre pills + `GenreGuideCollapsible`) and `docs/ai-wiki/routes.md` (/schedule filters).
 
 ---
 

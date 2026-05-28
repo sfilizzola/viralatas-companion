@@ -318,7 +318,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `src/pages/SchedulePage.tsx` — `DuckableBandCard` wrapper (hook per band, null when not applicable)
 - `src/App.tsx` — mounts `DuckSync`, `PushSetup`, `DuckNotificationsListener`, `DuckToast`
 - `supabase/functions/send-duck-push/index.ts` — Edge Function for Web Push via `npm:web-push`; triggered by Supabase Database Webhook on `duck_quacks` INSERT
-- `public/Design System.html` §11 — pre-authored DuckButton states (ready/cooldown drain at 10/50/85%), DuckToast entrance/exit, live card simulation with 8 crew + "I am weak" + duck button
+- `public/vira-lata-ds.html` §11 — pre-authored DuckButton states (ready/cooldown drain at 10/50/85%), DuckToast entrance/exit, live card simulation with 8 crew + "I am weak" + duck button
 
 **Post-phase additions (2026-05-16):**
 - `supabase/functions/send-test-push/index.ts` — diagnostic Edge Function for godlike admins; authenticates caller, looks up their `push_subscriptions`, sends a real VAPID push directly to their own device; allows end-to-end push stack verification without needing a second user
@@ -344,7 +344,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `src/pages/SchedulePage.tsx` — `DuckableBandCard.canDuck` short-circuits when `duckEnabled` is `false`
 - `src/components/profile/GodlikeAdminPanel.tsx` — new "Duck feature 🦆" toggle section mirroring the existing "Control registration" UI (button + 🟢/🔴 status dot, identical styling); calls `useRefreshDuckEnabled()` after a successful toggle so the admin's own session reflects the change immediately; existing Test Quack tile now shows a `testQuackDisabledHint` line above the `DuckButton` when the feature is OFF
 - `src/i18n/ProfilePage_{br,en,es,de}.json` — 7 new keys: `duckToggle`, `duckToggleDescription`, `duckEnabled`, `duckDisabled`, `duckLoading`, `duckToggleError`, `testQuackDisabledHint`
-- `public/Design System.html` — BandCard component-section now documents the killswitch visibility rule and where the toggle lives
+- `public/vira-lata-ds.html` — BandCard component-section now documents the killswitch visibility rule and where the toggle lives
 - `docs/ai-wiki/flows/duck.md` — new "Killswitch (Phase 21)" section; "Relevant Source Files" table extended with `DuckEnabledContext.tsx` and `appSettings.ts`
 - `docs/ai-wiki/supabase-schema.md` — new `public.app_settings` table section documenting both `registration_enabled` and `duck_enabled` (this filled a pre-existing gap — `app_settings` had been missing from the schema doc since the registration killswitch shipped)
 - `src/__tests__/duckKillswitch.test.tsx` — 12 new tests covering `getDuckEnabled` (true/false/error/throws/null defaults), `setDuckEnabled` (happy path, row-lookup failure, update failure), and `DuckEnabledProvider` (initial true, initial false, network failure stays true, `refresh()` picks up a toggle within the same session)
@@ -372,7 +372,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `src/components/profile/GodlikeAdminPanel.tsx` — new "Playlist feature" toggle section in Godlike Powers, mirroring the duck toggle pattern
 - `src/i18n/MyPicksPage_{br,en,es,de}.json` — `generateSetlist` + `generateSetlistSub` keys
 - `src/i18n/ProfilePage_{br,en,es,de}.json` — `playlistToggle`, `playlistTesting`, `playlistLive`, `playlistToggleError` keys
-- `public/Design System.html` — `PlaylistLaunchButton` documented in a new component section
+- `public/vira-lata-ds.html` — `PlaylistLaunchButton` documented in a new component section
 
 **Part 2 (integration, no code changes):** Deep-link confirmed working end-to-end — opens `setlist.viralatas.org` with correct `user_name`, all picked band names, and `lang`; track preview loads; "Generate" lands in Spotify with the user's personal playlist.
 
@@ -405,7 +405,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `vercel.json` — `/api/moshsplit/:path*` → `https://split.viralatas.org/:path*` rewrite added before SPA catch-all; solves CORS (browser never contacts `split.viralatas.org` directly)
 - `vite.config.ts` — `server.proxy` mirrors the Vercel rewrite for local development
 - `README.md` — `VITE_MOSHSPLIT_TOKEN` documented in Environment Setup section
-- `public/Design System.html` — `MoshSplitSection` documented in the profile components section
+- `public/vira-lata-ds.html` — `MoshSplitSection` documented in the profile components section
 - `docs/ai-wiki/flows/moshsplit.md` — new wiki page covering component states, API contract, proxy architecture, and data flow
 - `docs/ai-wiki/architecture.md` — App Pack section extended with MoshSplit integration
 - **Hotfixes shipped during phase:** fix horizontal scroll on iOS mobile (`SchedulePage.module.css`), fix offline gap for godlike-assigned badges (`BadgesDisplay.tsx` two-phase loading with skeleton), hide `PlaylistLaunchButton` once the festival starts
@@ -472,7 +472,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `src/components/BandFilters.tsx` — genre filter uses single-select pills (replaces native `<select>`)
 - `src/components/GenreGuideCollapsible.tsx` — inline collapsible guide below pill row in filter drawer
 - `src/i18n/SchedulePage_{br,en,es,de}.json` — genre guide keys
-- `public/Design-System.html` — genre pills + GenreGuideCollapsible documented
+- `public/vira-lata-ds.html` — genre pills + GenreGuideCollapsible documented
 - Wiki: `domain-model.md`, `lineup.md`, `changelog.md`
 
 **Acceptance criteria (all met):**
@@ -591,7 +591,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - [x] Open vest grid unchanged; preference offline-safe on both routes
 - [x] `rtk npm run build` green · `rtk npm test` green — 542 tests (5 new neat-layout tests)
 
-**Wiki:** `docs/ai-wiki/badges.md` · `changelog.md` · `public/Design System.html`
+**Wiki:** `docs/ai-wiki/badges.md` · `changelog.md` · `public/vira-lata-ds.html`
 
 **Architectural notes:**
 - Cosmetic preference stays localStorage-only (same contract as vest color); no Supabase sync.
@@ -618,7 +618,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - [x] Live vest filters current year; archive offline after first profile sync
 - [x] `rtk npm run build` green · `rtk npm test` green — 581 tests
 
-**Wiki:** `badges.md` · `festival-reset.md` · `supabase-schema.md` · `architecture.md` · `domain-model.md` · `index.md` · `routes.md` · `offline-first.md` · `changelog.md` · `Design System.html`
+**Wiki:** `badges.md` · `festival-reset.md` · `supabase-schema.md` · `architecture.md` · `domain-model.md` · `index.md` · `routes.md` · `offline-first.md` · `changelog.md` · `vira-lata-ds.html`
 
 **Architectural notes:**
 - UI → IndexedDB for badge history; Supabase sync on profile load / reconnect.
@@ -648,7 +648,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - [x] Open vest → profile vest; finale → `/now`
 - [x] `rtk npm run build` green · `rtk npm test` green — **594 tests**
 
-**Wiki:** `flows/festival-wrap.md` · `routes.md` · `index.md` · `changelog.md` · `Design System.html`
+**Wiki:** `flows/festival-wrap.md` · `routes.md` · `index.md` · `changelog.md` · `vira-lata-ds.html`
 
 **Architectural notes:**
 - No Supabase reads for wrap stats; reuses `buildBadgeContextFromSnapshot` semantics.
@@ -715,7 +715,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - [x] All four locales updated; Design System documents rating control
 - [x] `rtk npm run build` and `rtk npm test` green
 
-**Wiki:** `domain-model.md` · `supabase-schema.md` · `changelog.md` · `Design System.html` · `PHASES.md`
+**Wiki:** `domain-model.md` · `supabase-schema.md` · `changelog.md` · `vira-lata-ds.html` · `PHASES.md`
 
 **Architectural notes:**
 - No server-side aggregate; Popular sort reads full crew snapshot from IDB.

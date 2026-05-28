@@ -91,7 +91,7 @@ Decisions from `/grill-me` session — **do not re-open** without explicit produ
 | `src/pages/PopularPage.tsx` | Dual sort mode |
 | `src/i18n/PopularPage_*.json` | 4 locales |
 | `src/i18n/SchedulePage_*.json` | Modal rating strings |
-| `public/Design System.html` | Rating control section |
+| `public/vira-lata-ds.html` | Rating control section |
 | `src/__tests__/bandRatings.test.ts` | **Create** |
 | `src/__tests__/ratingsRepository.test.ts` | **Create** |
 | `src/__tests__/useBandRatings.test.ts` | **Create** |
@@ -506,7 +506,7 @@ Run: `rtk npm test -- src/__tests__/syncCoordinator.test.ts`
 
 - [x] **Step 2b: Popular sort pill** — grill locked: segmented `Picks` · `Rating`; visibility rules in grill table.
 
-- [ ] **Step 3: Design System** — document rating control in `public/Design System.html` during Task 8/9 (after React implementation matches prototype).
+- [ ] **Step 3: Design System** — document rating control in `public/vira-lata-ds.html` during Task 8/9 (after React implementation matches prototype).
 
 ---
 
@@ -585,7 +585,7 @@ Run: `rtk npm test -- src/__tests__/useBandRatings.test.ts` · `rtk npm run buil
 - Modify: `src/pages/PopularPage.tsx`
 - Modify: `src/components/BandCard.tsx` (+ module CSS if needed)
 - Modify: `src/i18n/PopularPage_*.json` (4 files)
-- Modify: `public/Design System.html`
+- Modify: `public/vira-lata-ds.html`
 
 - [ ] **Step 1: Sort mode state + persistence**
 

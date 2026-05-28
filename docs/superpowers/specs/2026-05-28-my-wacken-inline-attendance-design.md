@@ -161,7 +161,7 @@ From wireframe Scenario 01:
 - `docs/ai-wiki/routes.md` — component file names vs URLs  
 - `docs/ai-wiki/architecture.md` — `/my-picks` behavior description  
 - `docs/ai-wiki/changelog.md` — dated entry  
-- `public/Design System.html` — My Wacken section, attendance chips, remove Saw footer docs  
+- `public/vira-lata-ds.html` — My Wacken section, attendance chips, remove Saw footer docs  
 - `docs/ai-wiki/phases-history.md` — on completion only  
 
 ---

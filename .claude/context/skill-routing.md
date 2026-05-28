@@ -43,7 +43,7 @@ Use these in sequence for feature and UI work. Do not skip upstream steps when t
 |------|--------|---------|
 | 1 | `brainstorming` | New feature, “what if…”, scope unclear, user invokes `/brainstorming` |
 | 2 | `writing-plans` | Spec approved and need an implementation plan; **adding or editing `PHASES.md` or `FUTURE_IDEAS.md`**; promoting an idea to a phase |
-| 3 | `huashu-design` | Design exploration, challenge/improve existing UI, HTML prototypes, **creativity and updates to `public/Design System.html`** |
+| 3 | `huashu-design` | Design exploration, challenge/improve existing UI, HTML prototypes, **creativity and updates to `public/vira-lata-ds.html`** |
 | 4 | `frontend-design` | Ship **locked** design into production React (`src/pages/`, `src/components/`, `src/ui/`) after huashu + DS are settled |
 | 5 | `executing-plans` | Plan file under `docs/superpowers/plans/` exists; **implementing current phase acceptance criteria from `PHASES.md`** |
 | 6 | `finishing-a-development-branch` | “Close phase N”, branch wrap-up, all tasks done — verify tests/build and present merge options |
@@ -53,7 +53,7 @@ Use these in sequence for feature and UI work. Do not skip upstream steps when t
 ```text
 brainstorming (optional)
     ↓
-huashu-design  — explore, challenge, HTML in _temp/, update Design System.html
+huashu-design  — explore, challenge, HTML in _temp/, update vira-lata-ds.html
     ↓  [user approves locked variant]
 frontend-design  — implement in src/ from DS + spec/HTML reference
     ↓

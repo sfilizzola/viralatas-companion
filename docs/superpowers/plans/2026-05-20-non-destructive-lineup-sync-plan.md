@@ -492,7 +492,7 @@ The `slot_id` column itself stays populated. It costs nothing to leave it in pla
 - [ ] `rtk npm run build` green
 - [ ] `rtk npm test` green
 - [ ] All wiki pages updated, changelog has dated entry, CLAUDE.md catalog updated
-- [ ] No edits to `public/Design System.html` (no UI changes)
+- [ ] No edits to `public/vira-lata-ds.html` (no UI changes)
 
 ---
 
