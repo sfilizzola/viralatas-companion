@@ -2,7 +2,7 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { ViralatasDB } from './types';
 
 export const DB_NAME = 'viralatas-db';
-export const DB_VERSION = 10;
+export const DB_VERSION = 11;
 
 /** Canonical object store list — keep in sync with the upgrade() block below. */
 export const VIRALATAS_OBJECT_STORES = [
@@ -20,6 +20,8 @@ export const VIRALATAS_OBJECT_STORES = [
   'meta',
   'user_missed_bands',
   'offline_missed_bands',
+  'user_band_ratings',
+  'offline_band_ratings',
   'offline_duck_quacks',
   'user_badge_history',
 ] as const satisfies readonly (keyof ViralatasDB)[];
@@ -97,6 +99,15 @@ export function getDB() {
         }
         if (!db.objectStoreNames.contains('offline_missed_bands')) {
           db.createObjectStore('offline_missed_bands', { keyPath: 'id' });
+        }
+        if (!db.objectStoreNames.contains('user_band_ratings')) {
+          const ratingsStore = db.createObjectStore('user_band_ratings', {
+            keyPath: ['user_id', 'band_id'],
+          });
+          ratingsStore.createIndex('by_user', 'user_id');
+        }
+        if (!db.objectStoreNames.contains('offline_band_ratings')) {
+          db.createObjectStore('offline_band_ratings', { keyPath: 'id' });
         }
         if (!db.objectStoreNames.contains('offline_duck_quacks')) {
           db.createObjectStore('offline_duck_quacks', { keyPath: 'id' });

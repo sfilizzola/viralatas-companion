@@ -5,12 +5,13 @@ export {
   LIVE_BAND_TEST_CONFIG_CHANGED_EVENT,
   METAL_PLACE_CONFIG_CHANGED_EVENT,
   MISSED_CHANGED_EVENT,
+  RATINGS_CHANGED_EVENT,
   PICKS_CHANGED_EVENT,
   PRESENCE_CHANGED_EVENT,
   BLOCKED_POSTERS_CHANGED_EVENT,
   BADGE_HISTORY_CHANGED_EVENT,
 } from './events';
-export type { OfflineDuckQuackOp, OfflineMissedOp, OfflinePickOp, OfflinePresenceOp } from './types';
+export type { OfflineBandRatingOp, OfflineDuckQuackOp, OfflineMissedOp, OfflinePickOp, OfflinePresenceOp } from './types';
 export {
   resetDbConnectionForTests,
   VIRALATAS_OBJECT_STORES,
@@ -58,6 +59,16 @@ export {
   loadOfflineMissedQueue,
   removeFromOfflineMissedQueue,
 } from './missed';
+export {
+  saveBandRating,
+  removeBandRating,
+  loadBandRatings,
+  loadAllBandRatings,
+  replaceAllBandRatings,
+  enqueueOfflineBandRating,
+  loadOfflineBandRatingsQueue,
+  removeFromOfflineBandRatingsQueue,
+} from './ratings';
 export {
   loadMetalPlaceConfig,
   saveMetalPlaceConfig,

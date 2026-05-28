@@ -1,11 +1,13 @@
 import type {
   Announcement,
   Band,
+  BandRatingScore,
   CrewUser,
   LiveBandTestConfig,
   MetalPlaceConfig,
   UserBadgeHistory,
   UserMissedBand,
+  UserBandRating,
   UserPick,
   UserPresence,
 } from '../../types';
@@ -25,6 +27,10 @@ export type OfflineMissedOp = {
   action: 'add' | 'remove';
   marked_at: string;
 };
+
+export type OfflineBandRatingOp =
+  | { id: string; user_id: string; band_id: string; action: 'upsert'; score: BandRatingScore; rated_at: string }
+  | { id: string; user_id: string; band_id: string; action: 'remove'; rated_at: string };
 
 export type OfflinePresenceOp = UserPresence & {
   id: string;
@@ -95,6 +101,15 @@ export type ViralatasDB = {
   offline_missed_bands: {
     key: string;
     value: OfflineMissedOp;
+  };
+  user_band_ratings: {
+    key: [string, string];
+    value: UserBandRating;
+    indexes: { by_user: string };
+  };
+  offline_band_ratings: {
+    key: string;
+    value: OfflineBandRatingOp;
   };
   offline_duck_quacks: {
     key: string;

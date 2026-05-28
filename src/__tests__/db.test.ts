@@ -677,7 +677,7 @@ describe('IndexedDB layer (lib/db.ts)', () => {
       expect(await loadSession()).toEqual({ token: 'keep' });
       expect(await loadCacheVersion()).toBe('v1');
 
-      expect(WIPE_CLEARED_STORES).toHaveLength(14);
+      expect(WIPE_CLEARED_STORES).toHaveLength(16);
       expect(WIPE_PRESERVED_STORES).toHaveLength(2);
       expect(WIPE_CLEARED_STORES.length + WIPE_PRESERVED_STORES.length).toBe(
         EXPECTED_OBJECT_STORES.length,

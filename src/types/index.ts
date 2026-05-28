@@ -50,6 +50,15 @@ export type UserMissedBand = {
   marked_at: string;
 };
 
+export type BandRatingScore = 1 | 2 | 3 | 4 | 5;
+
+export type UserBandRating = {
+  user_id: string;
+  band_id: string;
+  score: BandRatingScore;
+  rated_at: string;
+};
+
 export type UserBadgeHistory = {
   id?: string;
   user_id: string;
