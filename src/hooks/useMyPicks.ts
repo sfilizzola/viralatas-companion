@@ -3,14 +3,18 @@ import { PICKS_CHANGED_EVENT, loadUserPicks } from '../lib/db';
 
 export function useMyPicks(userId: string | null) {
   const [pickedIds, setPickedIds] = useState<Set<string>>(new Set());
+  /** False until the first IDB read for this `userId` finishes (avoids empty-picks flash on remount). */
+  const [picksReady, setPicksReady] = useState(() => userId === null);
 
   const refresh = useCallback(async () => {
     if (!userId) {
       setPickedIds(new Set());
+      setPicksReady(true);
       return;
     }
     const picks = await loadUserPicks(userId);
     setPickedIds(new Set(picks.map((p) => p.band_id)));
+    setPicksReady(true);
   }, [userId]);
 
   useEffect(() => {
@@ -18,11 +22,18 @@ export function useMyPicks(userId: string | null) {
 
     async function load() {
       if (!userId) {
-        if (active) setPickedIds(new Set());
+        if (active) {
+          setPickedIds(new Set());
+          setPicksReady(true);
+        }
         return;
       }
+      if (active) setPicksReady(false);
       const picks = await loadUserPicks(userId);
-      if (active) setPickedIds(new Set(picks.map((p) => p.band_id)));
+      if (active) {
+        setPickedIds(new Set(picks.map((p) => p.band_id)));
+        setPicksReady(true);
+      }
     }
 
     function handleLocalChange() {
@@ -38,5 +49,5 @@ export function useMyPicks(userId: string | null) {
     };
   }, [userId]);
 
-  return { pickedIds, refresh };
+  return { pickedIds, picksReady, refresh };
 }

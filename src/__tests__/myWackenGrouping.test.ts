@@ -122,21 +122,46 @@ describe('computeInitialCollapsedDays', () => {
       new Date('2026-07-29T14:00:00Z'),
     );
     const collapsed = computeInitialCollapsedDays(groups, {
-      festivalActive: true,
+      collapsePastDays: true,
       todayKey: '2026-07-29',
     });
     expect(collapsed.has('2026-07-28')).toBe(true);
     expect(collapsed.has('2026-07-29')).toBe(false);
   });
 
-  it('expands all days post-festival', () => {
+  it('collapses all calendar days before today, not future days', () => {
+    const groups = groupMyWackenByDay(
+      [
+        makeBand({
+          id: 'past',
+          start_time: '2026-07-28T10:00:00Z',
+          end_time: '2026-07-28T11:00:00Z',
+        }),
+        makeBand({
+          id: 'future',
+          start_time: '2026-07-30T12:00:00Z',
+          end_time: '2026-07-30T13:00:00Z',
+        }),
+      ],
+      new Set(['past', 'future']),
+      new Date('2026-07-29T14:00:00Z'),
+    );
+    const collapsed = computeInitialCollapsedDays(groups, {
+      collapsePastDays: true,
+      todayKey: '2026-07-29',
+    });
+    expect(collapsed.has('2026-07-28')).toBe(true);
+    expect(collapsed.has('2026-07-30')).toBe(false);
+  });
+
+  it('expands all days when collapsePastDays is false (post-festival)', () => {
     const groups = groupMyWackenByDay(
       [makeBand({ id: 'past', end_time: '2026-07-28T11:00:00Z', start_time: '2026-07-28T10:00:00Z' })],
       new Set(['past']),
       new Date('2026-08-05T12:00:00Z'),
     );
     expect(
-      computeInitialCollapsedDays(groups, { festivalActive: false, todayKey: '2026-08-05' }).size,
+      computeInitialCollapsedDays(groups, { collapsePastDays: false, todayKey: '2026-08-05' }).size,
     ).toBe(0);
   });
 });

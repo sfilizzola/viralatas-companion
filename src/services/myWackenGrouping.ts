@@ -59,16 +59,18 @@ export function groupMyWackenByDay(
     });
 }
 
-/** Mid-festival: collapse past ended-only days; keep today expanded. Post-festival: none collapsed. */
+/**
+ * Mid-festival: collapse every day before `todayKey`; keep today + future days expanded.
+ * Post-festival / pre-festival: none collapsed.
+ */
 export function computeInitialCollapsedDays(
   groups: MyWackenDayGroup[],
-  options: { festivalActive: boolean; todayKey: string },
+  options: { collapsePastDays: boolean; todayKey: string },
 ): Set<string> {
-  if (!options.festivalActive) return new Set();
+  if (!options.collapsePastDays) return new Set();
   const collapsed = new Set<string>();
   for (const group of groups) {
-    const endedOnly = group.upcoming.length === 0 && group.ended.length > 0;
-    if (endedOnly && group.dayKey !== options.todayKey) {
+    if (group.dayKey < options.todayKey) {
       collapsed.add(group.dayKey);
     }
   }

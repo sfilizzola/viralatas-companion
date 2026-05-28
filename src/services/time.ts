@@ -50,6 +50,36 @@ export function wackenLocalMidnight(isoDate: string): Date {
   return new Date(`${isoDate}T00:00:00${WACKEN_CEST_OFFSET}`);
 }
 
+/** `datetime-local` value (YYYY-MM-DDTHH:mm) interpreted as Wacken CEST, not browser TZ. */
+export function parseWackenDatetimeLocal(value: string): string {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) {
+    throw new Error(`Invalid Wacken datetime-local: ${value}`);
+  }
+  const instant = new Date(`${value}:00${WACKEN_CEST_OFFSET}`);
+  if (isNaN(instant.getTime())) {
+    throw new Error(`Invalid Wacken datetime-local: ${value}`);
+  }
+  return instant.toISOString();
+}
+
+/** Format an ISO instant for a `datetime-local` input in Europe/Berlin (festival field time). */
+export function formatWackenDatetimeLocal(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Europe/Berlin',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).formatToParts(d);
+  const get = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((p) => p.type === type)?.value ?? '';
+  return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}`;
+}
+
 export function isFestivalActive(at: Date = now()): boolean {
   return at >= FESTIVAL_DAY_1_START;
 }

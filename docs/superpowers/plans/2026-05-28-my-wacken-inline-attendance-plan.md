@@ -188,12 +188,12 @@ Includes original spec locks + grill session (2026-05-28). Full rationale → sp
 
 ### Task 8: Coach banner component
 
-- [ ] Add `MyWackenCoachBanner` (or inline block in `MyWackenPage`)
-- [ ] i18n keys: `coachBannerTitle`, `coachBannerBody` (4 locales) — match spec copy
-- [ ] Visibility: at least one ended pick in `myBands` AND not dismissed in `localStorage`
-- [ ] Dismiss × sets flag; banner never returns on that device
-- [ ] Visual: teal tint per wireframe Scenario 02 (not red conflict styling)
-- [ ] Placement: after header/conflict banner, before day sections
+- [x] Add `MyWackenCoachBanner` (or inline block in `MyWackenPage`)
+- [x] i18n keys: `coachBannerTitle`, `coachBannerBody` (4 locales) — match spec copy
+- [x] Visibility: at least one ended pick in `myBands` AND not dismissed in `localStorage`
+- [x] Dismiss × sets flag; banner never returns on that device
+- [x] Visual: teal tint per wireframe Scenario 02 (not red conflict styling)
+- [x] Placement: after header/conflict banner, before day sections
 
 **Acceptance:** First ended pick shows banner; dismiss hides permanently; refresh respects flag.
 
@@ -201,10 +201,10 @@ Includes original spec locks + grill session (2026-05-28). Full rationale → sp
 
 ### Task 9: Phase documentation
 
-- [ ] `docs/ai-wiki/changelog.md` — dated Phase 33 entry
-- [ ] `docs/ai-wiki/architecture.md` — `/my-picks` bullet updated
-- [ ] `PHASES.md` — mark complete / hand off to "no active phased work"
-- [ ] `docs/ai-wiki/phases-history.md` — full Phase 33 entry (on phase close, not mid-work)
+- [x] `docs/ai-wiki/changelog.md` — dated Phase 33 entry
+- [x] `docs/ai-wiki/architecture.md` — `/my-picks` bullet updated
+- [x] `PHASES.md` — mark complete / hand off to "no active phased work"
+- [x] `docs/ai-wiki/phases-history.md` — full Phase 33 entry (on phase close, not mid-work)
 
 **Final gate:** `rtk npm run build` · `rtk npm test`
 

@@ -723,3 +723,33 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Out of scope deferred to `FUTURE_IDEAS.md` #8–#10: My Picks display, `/wrap` stats, rating badges.
 
 ---
+
+### Phase 33 — My Wacken inline attendance
+**Status:** ✅ Complete
+
+**Goal:** Ended picks stay on their festival day with inline Attended/Missed chips; nav **Lineup** + **My Wacken**; one-time coach banner on first ended pick.
+
+**Deliverables:**
+- `LineupPage.tsx` / `MyWackenPage.tsx` renames; routes `/schedule`, `/my-picks` unchanged
+- Bottom nav + i18n: Lineup / My Wacken (4 locales)
+- `src/services/myWackenGrouping.ts` + tests — A2 grouping, divider, collapse, left-today stat
+- `MyWackenPage` — inline ended rows; removed Saw / Didn't See footer; upcoming-only conflicts
+- `BandCard` `attendanceChip` — stripe + mono chip on ended timeline rows
+- `MyWackenCoachBanner` + `myWackenCoachDismiss.ts` — teal dismiss-once banner
+- Design System + wiki (`routes.md`, `architecture.md`, `changelog.md`)
+
+**Acceptance criteria (all met):**
+- [x] Nav **Lineup** / **My Wacken**; files renamed; build green
+- [x] Ended picks on festival day; divider; no footer buckets
+- [x] Attended/Missed chips; no timing chips on ended rows
+- [x] Header days/conflicts/left-today; collapse rules
+- [x] Coach banner + `localStorage` dismiss
+- [x] No schema/sync changes; `rtk npm run build` + `rtk npm test` green
+
+**Wiki:** `changelog.md` · `architecture.md` · `routes.md` · `PHASES.md` · Design System
+
+**Architectural notes:**
+- Grouping and chips are client-only from IndexedDB + `useNow`; same offline-first path as before.
+- Coach flag not synced — intentional per-device UX.
+
+---

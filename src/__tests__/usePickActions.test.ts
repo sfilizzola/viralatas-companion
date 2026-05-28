@@ -44,6 +44,13 @@ describe('usePickActions', () => {
     await waitFor(() => expect(result.current.pickedIds.has(bandId)).toBe(true));
   });
 
+  it('picksReady is false until IDB hydrate, then true', async () => {
+    await saveUserPick({ user_id: userId, band_id: bandId, created_at: new Date().toISOString() });
+    const { result } = renderHook(() => usePickActions(userId));
+    expect(result.current.picksReady).toBe(false);
+    await waitFor(() => expect(result.current.picksReady).toBe(true));
+  });
+
   it('togglePick removes a picked band', async () => {
     await saveUserPick({ user_id: userId, band_id: bandId, created_at: new Date().toISOString() });
     const { result } = renderHook(() => usePickActions(userId));

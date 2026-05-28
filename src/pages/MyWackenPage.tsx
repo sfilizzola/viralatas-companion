@@ -13,7 +13,7 @@ import { useBandRatings } from '../hooks/useBandRatings';
 import { useI18n } from '../lib/i18n';
 import { useNow } from '../hooks/useNow';
 import { useOfflinePendingBandIds } from '../hooks/useOfflinePendingBandIds';
-import { isFestivalActive } from '../services/time';
+import { isFestivalActive, isFestivalEnded } from '../services/time';
 import {
   computeInitialCollapsedDays,
   countUpcomingLeftToday,
@@ -24,6 +24,7 @@ import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BandCard from '../components/BandCard';
 import Icon from '../components/icons/Icon';
+import MyWackenCoachBanner from '../components/MyWackenCoachBanner';
 import PlaylistLaunchButton from '../components/PlaylistLaunchButton';
 import styles from './SchedulePage.module.css';
 
@@ -38,15 +39,16 @@ export default function MyWackenPage() {
     '';
 
   const [highlightedConflict, setHighlightedConflict] = useState<string | null>(null);
-  const [collapsedDays, setCollapsedDays] = useState<Set<string>>(new Set());
-  const collapseSeededRef = useRef(false);
+  /** Days manually toggled away from the auto-collapsed default (cleared on time-travel context change). */
+  const [collapseFlipDays, setCollapseFlipDays] = useState<Set<string>>(new Set());
+  const collapseContextRef = useRef<string | null>(null);
   const { bands: rawBands, loading } = useBands();
   const { allMissed, missedBandIds, missedCountsByBand, toggleMissed } = useMissedBands(userId);
   const bands = useMemo(
     () => rawBands.slice().sort((a, b) => a.start_time.localeCompare(b.start_time)),
     [rawBands],
   );
-  const { pickedIds, togglePick } = usePickActions(userId);
+  const { pickedIds, picksReady, togglePick } = usePickActions(userId);
   const { userRatingByBand, toggleRating, clearRating } = useBandRatings(userId);
   const attendeesByBand = useBandAttendees();
   const pickCounts = usePickCounts();
@@ -58,7 +60,9 @@ export default function MyWackenPage() {
     [bands, pickedIds],
   );
 
-  const festivalActive = isFestivalActive(currentNow);
+  const festivalStarted = isFestivalActive(currentNow);
+  const festivalEnded = isFestivalEnded(currentNow, bands);
+  const collapsePastDays = festivalStarted && !festivalEnded;
   const todayKey = useMemo(() => festivalDayKeyFromNow(currentNow), [currentNow]);
 
   const dayGroups = useMemo(
@@ -71,21 +75,38 @@ export default function MyWackenPage() {
     [dayGroups],
   );
 
+  const hasEndedPicks = useMemo(
+    () => dayGroups.some((group) => group.ended.length > 0),
+    [dayGroups],
+  );
+
   const leftToday = useMemo(
     () => countUpcomingLeftToday(dayGroups, todayKey),
     [dayGroups, todayKey],
   );
 
+  const collapseContext = `${todayKey}|${collapsePastDays}`;
+
+  const autoCollapsedDays = useMemo(() => {
+    if (loading || !picksReady) return new Set<string>();
+    if (pickedIds.size > 0 && dayGroups.length === 0) return new Set<string>();
+    return computeInitialCollapsedDays(dayGroups, { collapsePastDays, todayKey });
+  }, [loading, picksReady, dayGroups, pickedIds.size, collapsePastDays, todayKey]);
+
   useEffect(() => {
-    if (loading || collapseSeededRef.current) return;
-    setCollapsedDays(
-      computeInitialCollapsedDays(dayGroups, {
-        festivalActive,
-        todayKey,
-      }),
-    );
-    collapseSeededRef.current = true;
-  }, [loading, dayGroups, festivalActive, todayKey]);
+    if (collapseContextRef.current === collapseContext) return;
+    collapseContextRef.current = collapseContext;
+    setCollapseFlipDays(new Set());
+  }, [collapseContext]);
+
+  const collapsedDays = useMemo(() => {
+    const next = new Set(autoCollapsedDays);
+    for (const day of collapseFlipDays) {
+      if (next.has(day)) next.delete(day);
+      else next.add(day);
+    }
+    return next;
+  }, [autoCollapsedDays, collapseFlipDays]);
 
   const conflicts = useBandConflicts(upcomingBands);
   const { openBand, modalProps } = useBandDetailModal({
@@ -145,7 +166,7 @@ export default function MyWackenPage() {
   );
 
   function toggleDayCollapse(day: string) {
-    setCollapsedDays((prev) => {
+    setCollapseFlipDays((prev) => {
       const next = new Set(prev);
       next.has(day) ? next.delete(day) : next.add(day);
       return next;
@@ -219,7 +240,7 @@ export default function MyWackenPage() {
               days: dayGroups.length,
             })}
           </span>
-          {festivalActive && leftToday >= 1 && (
+          {collapsePastDays && leftToday >= 1 && (
             <span className={`${styles.summaryLine} ${styles.summaryHighlight}`}>
               {t('headerLeftToday', { count: leftToday })}
             </span>
@@ -246,9 +267,11 @@ export default function MyWackenPage() {
         </a>
       )}
 
-      {!festivalActive && (
+      {!festivalStarted && (
         <PlaylistLaunchButton bands={myBands} userName={displayName} />
       )}
+
+      <MyWackenCoachBanner visible={!loading && hasEndedPicks} />
 
       <main className={styles.list}>
         {loading && <p className={styles.empty}>{t('loading')}</p>}

@@ -69,7 +69,7 @@ Components are organized by concern:
 **Key Pages:**
 - `/now` (RightNowPage) — Live band display, crew attendance, conflict detection
 - `/schedule` (SchedulePage) — Full lineup with filters (stage, genre, day, time)
-- `/my-picks` (MyPicksPage) — User's picks organized by day, conflict warnings
+- `/my-picks` (MyWackenPage) — User's picks by festival day (upcoming → divider → ended inline); Attended/Missed chips on ended rows; upcoming-only conflict counts; one-time coach banner (`localStorage` dismiss)
 - `/popular` (PopularPage) — Bands sorted by total pick count, avatar clusters
 - `/announcements` (AnnouncementsPage) — Mural-style announcements board
 - `/profile` (ProfilePage) — User info, role controls, godlike admin

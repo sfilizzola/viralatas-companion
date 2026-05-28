@@ -181,15 +181,13 @@ export default function PrivateRoute({ children }: Props) {
 **Purpose**: User's personal schedule (only bands they picked)
 
 **Key Features**:
-- **Grouped by day** — Collapsed sections per festival day
-- **Timeline layout** — Bands ordered chronologically
-- **Conflict chips** — Visual warnings on overlapping bands
-  - Soft conflicts (10-30 min overlap, user might make it)
-  - Hard conflicts (major overlap, impossible to attend both)
-- **Conflict banner** — If 3+ conflicts, show warning banner at top
-- **Playlist Launch strip** — `PlaylistLaunchButton` below conflict banner, above band list. Deep-links to Setlist Vira-Latas (`setlist.viralatas.org/launch`) with picked band names. Hidden when 0 picks; gated by `app_settings.playlist_testing` flag (see [Flow: Playlist Launch](flows/playlist-launch.md)).
-- **Quick actions** — Remove pick, view details
-- **Offline** — Works fully, shows pending picks with chip. Playlist strip requires live Supabase read on mount — hidden if offline at load time.
+- **Grouped by day** — Upcoming → optional **already played today** divider → ended inline (A2); no Saw / Didn't See footer
+- **Attendance** — Ended rows: Attended/Missed chip + teal/amber stripe; opt-out via band modal
+- **Conflict chips** — Upcoming rows only; header conflict/overlap counts exclude ended picks
+- **Conflict banner** — If 3+ upcoming conflicts, warning at top
+- **Coach banner** — `MyWackenCoachBanner` when ≥1 ended pick; dismiss once via `localStorage` (`viralatas:my-wacken-ended-coach-dismissed`)
+- **Playlist Launch strip** — `PlaylistLaunchButton` (post-festival / non-active festival). See [Flow: Playlist Launch](flows/playlist-launch.md).
+- **Offline** — IndexedDB-first; pending pick chips; playlist strip needs online flag read on mount
 
 **Data Flows**:
 - `useMyPicks()` — User's picked band IDs

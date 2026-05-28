@@ -5,12 +5,14 @@ import {
   FESTIVAL_DAY_1_START,
   FESTIVAL_DAY_1_START_ISO,
   clearTimeOverride,
+  formatWackenDatetimeLocal,
   getFestivalDay,
   getTimeOverride,
   isFestivalActive,
   isFestivalEnded,
   isTimeOverrideActive,
   now,
+  parseWackenDatetimeLocal,
   setTimeOverride,
   wackenLocalMidnight,
 } from '../services/time';
@@ -113,6 +115,20 @@ describe('time override', () => {
 
     expect(listener).toHaveBeenCalledTimes(1);
     window.removeEventListener(TIME_OVERRIDE_CHANGED_EVENT, listener);
+  });
+});
+
+describe('Wacken datetime-local', () => {
+  it('parseWackenDatetimeLocal treats input as Europe/Berlin (CEST)', () => {
+    expect(parseWackenDatetimeLocal('2026-07-30T14:30')).toBe('2026-07-30T12:30:00.000Z');
+  });
+
+  it('formatWackenDatetimeLocal shows Berlin wall time for an ISO instant', () => {
+    expect(formatWackenDatetimeLocal('2026-07-30T12:30:00.000Z')).toBe('2026-07-30T14:30');
+  });
+
+  it('parseWackenDatetimeLocal throws on invalid value', () => {
+    expect(() => parseWackenDatetimeLocal('nope')).toThrow(/Invalid Wacken datetime-local/);
   });
 });
 

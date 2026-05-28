@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-28 (Phase 33 — My Wacken inline attendance)
+
+### Added
+- **`MyWackenPage`** (renamed from `MyPicksPage`) — A2 day grouping: upcoming → **already played today** divider → ended inline; no Saw / Didn't See footer sections.
+- **`myWackenGrouping.ts`** — `groupMyWackenByDay`, collapse seeding, **{n} left today** count.
+- **`BandCard` `attendanceChip`** — timeline ended rows: Attended/Missed mono pill; teal/amber left stripe only; stage color on badge.
+- **`MyWackenCoachBanner`** + **`myWackenCoachDismiss.ts`** — one-time teal coach when ≥1 ended pick; `viralatas:my-wacken-ended-coach-dismissed` in `localStorage`.
+- **Lineup** nav label + **`LineupPage`** rename (route `/schedule` unchanged).
+
+### Changed
+- Bottom nav + page titles: **Lineup** / **My Wacken** (BR **Line-up** / **Meu Wacken**); empty state points to Line-up.
+- Header stats: `{days}` = all days with picks; conflicts/overlaps from upcoming picks only; **{n} left today** during festival when n ≥ 1.
+- Mid-festival collapse: past ended-only days collapsed; today expanded; post-festival all expanded.
+- **`docs/ai-wiki/routes.md`**, **`architecture.md`**, Design System BandCard + coach banner notes.
+
+### Architectural Notes
+- No schema or sync changes; attendance opt-out unchanged in `BandDetailModal`.
+- Coach dismiss is per-device only (not Supabase).
+
+---
+
 ## 2026-05-28 (Pick icon → paw)
 
 ### Changed

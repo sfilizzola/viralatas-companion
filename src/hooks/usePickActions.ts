@@ -3,7 +3,7 @@ import { picksRepository, ratingsRepository } from '../repositories';
 import { useMyPicks } from './useMyPicks';
 
 export function usePickActions(userId: string | null) {
-  const { pickedIds, refresh } = useMyPicks(userId);
+  const { pickedIds, picksReady, refresh } = useMyPicks(userId);
 
   const togglePick = useCallback(
     async (bandId: string) => {
@@ -36,5 +36,5 @@ export function usePickActions(userId: string | null) {
     [userId, refresh],
   );
 
-  return { pickedIds, refresh, togglePick, pickBand, unpickBand };
+  return { pickedIds, picksReady, refresh, togglePick, pickBand, unpickBand };
 }

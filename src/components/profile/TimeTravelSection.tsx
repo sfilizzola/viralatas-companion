@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import type { Language } from '../../lib/i18n';
 import {
   clearTimeOverride,
+  formatWackenDatetimeLocal,
   getTimeOverride,
+  parseWackenDatetimeLocal,
   setTimeOverride,
   TIME_OVERRIDE_CHANGED_EVENT,
 } from '../../services/time';
@@ -12,12 +14,6 @@ type TimeTravelSectionProps = {
   t: (key: string, values?: Record<string, string | number>) => string;
   language: Language;
 };
-
-function toDatetimeLocalValue(iso: string): string {
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
 
 const DATE_LOCALES: Record<Language, string> = {
   br: 'pt-BR',
@@ -45,7 +41,7 @@ const TIME_TRAVEL_DAY_CHIPS: { key: string; label: string; date: string; iso: st
 ];
 
 function chipDateWithCurrentTime(chipIso: string, currentInput: string): string {
-  const chipLocal = toDatetimeLocalValue(chipIso);
+  const chipLocal = formatWackenDatetimeLocal(chipIso);
   if (!currentInput || currentInput.length < 16) return chipLocal;
   const [chipDate] = chipLocal.split('T');
   const [, currentTime] = currentInput.split('T');
@@ -56,7 +52,7 @@ export default function TimeTravelSection({ t, language }: TimeTravelSectionProp
   const [override, setOverride] = useState<string | null>(() => getTimeOverride());
   const [inputValue, setInputValue] = useState<string>(() => {
     const stored = getTimeOverride();
-    return stored ? toDatetimeLocalValue(stored) : '';
+    return stored ? formatWackenDatetimeLocal(stored) : '';
   });
   const [error, setError] = useState<string | null>(null);
 
@@ -64,7 +60,7 @@ export default function TimeTravelSection({ t, language }: TimeTravelSectionProp
     function handler() {
       const next = getTimeOverride();
       setOverride(next);
-      if (next) setInputValue(toDatetimeLocalValue(next));
+      if (next) setInputValue(formatWackenDatetimeLocal(next));
     }
     window.addEventListener(TIME_OVERRIDE_CHANGED_EVENT, handler);
     return () => window.removeEventListener(TIME_OVERRIDE_CHANGED_EVENT, handler);
@@ -73,7 +69,7 @@ export default function TimeTravelSection({ t, language }: TimeTravelSectionProp
   function applyLocalInput(value: string) {
     setError(null);
     try {
-      setTimeOverride(new Date(value).toISOString());
+      setTimeOverride(parseWackenDatetimeLocal(value));
     } catch (err) {
       setError(err instanceof Error ? err.message : t('timeTravelInvalid'));
     }
