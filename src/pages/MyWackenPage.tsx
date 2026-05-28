@@ -201,6 +201,7 @@ export default function MyWackenPage() {
         pending={pendingBandIds.has(band.id)}
         hidePick
         isBandEnded
+        attendanceChip={missedBandIds.has(band.id) ? 'missed' : 'attended'}
         missedCount={missedCountsByBand[band.id] ?? 0}
       />
     );

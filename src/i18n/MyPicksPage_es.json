@@ -8,6 +8,8 @@
   "headerOverlaps": "{overlaps} superposición(es)",
   "headerLeftToday": "{count} quedan hoy",
   "dividerAlreadyPlayedToday": "ya tocaron hoy",
+  "chipAttended": "Asistí",
+  "chipMissed": "Perdida",
   "conflictWarningBanner": "Tienes {count} conflicto(s). Fácil de resolver en tu perfil →",
   "dayPickCount": "{count} Picks",
   "sectionSaw": "Vi ({count})",

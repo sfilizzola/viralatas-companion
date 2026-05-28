@@ -44,6 +44,18 @@
   grid-template-columns: 4px 64px 1fr auto;
 }
 
+.cardEnded {
+  opacity: 0.72;
+}
+
+.cardAttended {
+  opacity: 0.72;
+}
+
+.cardMissed {
+  opacity: 0.62;
+}
+
 .variantRanked {
   grid-template-columns: 4px 56px 1fr;
 }
@@ -64,6 +76,14 @@
    ============================================================ */
 .stripe {
   background: var(--stage-color, var(--accent));
+}
+
+.stripeAttended {
+  background: var(--signal-ok);
+}
+
+.stripeMissed {
+  background: var(--signal-warn);
 }
 
 /* ============================================================
@@ -157,6 +177,14 @@
 
 .bodyWithDayGhost {
   padding-right: 44px;
+}
+
+.metaWithAttendance {
+  width: 100%;
+}
+
+.metaWithAttendance .attendanceChip {
+  margin-left: auto;
 }
 
 .dayGhost {
@@ -307,6 +335,34 @@
   border-color: var(--signal-live);
 }
 
+/* ============================================================
+   ATTENDANCE CHIP — timeline ended rows (wireframe / DS §04)
+   ============================================================ */
+.attendanceChip {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 3px 7px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.attendanceChipAttended {
+  background: color-mix(in srgb, var(--signal-ok) 22%, transparent);
+  color: color-mix(in srgb, var(--signal-ok) 78%, var(--text));
+  border: 1px solid color-mix(in srgb, var(--signal-ok) 40%, transparent);
+}
+
+.attendanceChipMissed {
+  background: rgba(243, 156, 18, 0.15);
+  color: var(--signal-warn);
+  border: 1px solid rgba(243, 156, 18, 0.3);
+}
 
 /* ============================================================
    PICK — 64px hit area, paw icon

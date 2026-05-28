@@ -150,4 +150,53 @@ describe('BandCard', () => {
 
     expect(container.querySelector('span[class*="dayGhost"]')?.textContent).toBe('Wed');
   });
+
+  it('shows attendance chip on timeline ended rows only', () => {
+    const { getByText } = renderWithI18n(
+      <BandCard
+        band={sampleBand}
+        isPicked
+        count={5}
+        onToggle={vi.fn()}
+        variant="timeline"
+        hidePick
+        isBandEnded
+        attendanceChip="attended"
+      />,
+    );
+
+    expect(getByText('Attended')).toBeTruthy();
+  });
+
+  it('shows missed attendance chip label', () => {
+    const { getByText } = renderWithI18n(
+      <BandCard
+        band={sampleBand}
+        isPicked
+        count={5}
+        onToggle={vi.fn()}
+        variant="timeline"
+        hidePick
+        isBandEnded
+        attendanceChip="missed"
+      />,
+    );
+
+    expect(getByText('Missed')).toBeTruthy();
+  });
+
+  it('ignores attendanceChip on schedule variant', () => {
+    const { queryByText } = renderWithI18n(
+      <BandCard
+        band={sampleBand}
+        isPicked
+        count={5}
+        onToggle={vi.fn()}
+        isBandEnded
+        attendanceChip="attended"
+      />,
+    );
+
+    expect(queryByText('Attended')).toBeNull();
+  });
 });

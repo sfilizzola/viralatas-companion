@@ -8,6 +8,8 @@
   "headerOverlaps": "{overlaps} overlap(s)",
   "headerLeftToday": "{count} left today",
   "dividerAlreadyPlayedToday": "already played today",
+  "chipAttended": "Attended",
+  "chipMissed": "Missed",
   "conflictWarningBanner": "You have {count} conflict(s). Easy to fix in your profile →",
   "dayPickCount": "{count} picks",
   "sectionSaw": "Saw ({count})",

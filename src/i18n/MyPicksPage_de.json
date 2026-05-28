@@ -8,6 +8,8 @@
   "headerOverlaps": "{overlaps} Überschneidung(en)",
   "headerLeftToday": "{count} heute noch",
   "dividerAlreadyPlayedToday": "heute schon gespielt",
+  "chipAttended": "Dabei",
+  "chipMissed": "Verpasst",
   "conflictWarningBanner": "Du hast {count} Konflikt(e). Einfach im Profil lösen →",
   "dayPickCount": "{count} Picks",
   "sectionSaw": "Gesehen ({count})",

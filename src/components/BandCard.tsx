@@ -11,6 +11,7 @@ import DuckButton from './DuckButton';
 import styles from './BandCard.module.css';
 
 export type BandCardVariant = 'schedule' | 'timeline' | 'ranked';
+export type AttendanceChipKind = 'attended' | 'missed';
 
 type ConflictInfo = { severity: 'hard' | 'soft'; active: boolean; onClick: () => void };
 
@@ -27,6 +28,8 @@ type BandCardProps = {
   pending?: boolean;
   hidePick?: boolean;
   isBandEnded?: boolean;
+  /** Timeline + My Wacken ended rows only */
+  attendanceChip?: AttendanceChipKind;
   missedCount?: number;
   children?: ReactNode;
   /** When provided, renders the duck button (only for live + picked non-ceremony bands) */
@@ -74,6 +77,7 @@ export default function BandCard({
   pending,
   hidePick = false,
   isBandEnded = false,
+  attendanceChip,
   missedCount,
   children,
   onDuck,
@@ -115,15 +119,27 @@ export default function BandCard({
   const showDayGhost =
     showDayLabel && (variant === 'schedule' || variant === 'ranked');
 
+  const showAttendanceChip = variant === 'timeline' && attendanceChip !== undefined;
+
   const cardClasses = [
     styles.card,
     getVariantClass(variant, hasDuckSlot),
     isCeremony ? styles.cardCeremony : '',
     interactive ? '' : styles.cardStatic,
     getConflictCardClass(conflict),
+    showAttendanceChip && attendanceChip === 'attended' ? styles.cardAttended : '',
+    showAttendanceChip && attendanceChip === 'missed' ? styles.cardMissed : '',
+    variant === 'timeline' && isBandEnded && !showAttendanceChip ? styles.cardEnded : '',
   ]
     .filter(Boolean)
     .join(' ');
+
+  const stripeClass =
+    attendanceChip === 'attended'
+      ? styles.stripeAttended
+      : attendanceChip === 'missed'
+        ? styles.stripeMissed
+        : styles.stripe;
 
   return (
     // The card-as-button pattern is intentional: nested action buttons (star,
@@ -138,7 +154,7 @@ export default function BandCard({
       aria-pressed={interactive ? isPicked : undefined}
       style={{ '--stage-color': color } as React.CSSProperties}
     >
-      <div className={styles.stripe} aria-hidden />
+      <div className={stripeClass} aria-hidden />
 
       {variant === 'schedule' && (
         <CardThumb imageUrl={band.image_url} fallback={thumbFallback} />
@@ -165,7 +181,14 @@ export default function BandCard({
           </span>
         )}
         <h2 className={styles.bandName}>{band.name}</h2>
-        <div className={styles.meta}>
+        <div
+          className={[
+            styles.meta,
+            showAttendanceChip ? styles.metaWithAttendance : '',
+          ]
+            .filter(Boolean)
+            .join(' ')}
+        >
           {isCeremony ? (
             <span className={styles.ceremonyLabel}>
               ✦ {t('scheduleClosingCeremony')}
@@ -178,7 +201,7 @@ export default function BandCard({
               {formatTime(band.start_time)} – {formatTime(band.end_time)}
             </span>
           )}
-          {count > 0 && variant !== 'ranked' && (
+          {count > 0 && variant !== 'ranked' && !showAttendanceChip && (
             <span className={styles.going}>
               <AttendanceText
                 count={count}
@@ -188,6 +211,7 @@ export default function BandCard({
             </span>
           )}
           {variant === 'timeline' && conflict && <ConflictChip conflict={conflict} />}
+          {showAttendanceChip && <AttendanceChip kind={attendanceChip} />}
           {band.genre && variant === 'schedule' && (
             <span className={styles.genre}>{band.genre}</span>
           )}
@@ -351,6 +375,17 @@ function RatingStats({
         <span className={styles.ratingAvg}>{avgFormatted}</span>
       </div>
     </div>
+  );
+}
+
+function AttendanceChip({ kind }: Readonly<{ kind: AttendanceChipKind }>) {
+  const { t } = useI18n('MyPicksPage');
+  const label = kind === 'attended' ? t('chipAttended') : t('chipMissed');
+  const kindClass = kind === 'attended' ? styles.attendanceChipAttended : styles.attendanceChipMissed;
+  return (
+    <span className={`${styles.attendanceChip} ${kindClass}`} role="status">
+      {label}
+    </span>
   );
 }
 

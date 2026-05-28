@@ -48,14 +48,15 @@
 .dayDivider {
   height: 1px;
   background: var(--border);
-  margin: var(--s-1) 0 var(--s-2);
+  margin: var(--s-4) 0 var(--s-4);
+  padding-top: var(--s-2);
   position: relative;
 }
 
 .dayDivider span {
   position: absolute;
   left: 0;
-  top: -8px;
+  top: 0;
   font-family: var(--font-mono);
   font-size: 8px;
   color: var(--text-faint);
