@@ -1,5 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { User as AuthUser } from '@supabase/supabase-js';
+
+vi.mock('../lib/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn().mockResolvedValue({ data: { session: null }, error: null }),
+    },
+  },
+}));
+
 import { buildFestivalWrapStats } from '../services/festivalWrap';
 import {
   buildBadgeContextFromSnapshot,
