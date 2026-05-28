@@ -6,6 +6,8 @@
   "headerBandsDays": "{bands} picks / {days} days",
   "headerConflicts": "{conflicts} conflicts",
   "headerOverlaps": "{overlaps} overlap(s)",
+  "headerLeftToday": "{count} left today",
+  "dividerAlreadyPlayedToday": "already played today",
   "conflictWarningBanner": "You have {count} conflict(s). Easy to fix in your profile →",
   "dayPickCount": "{count} picks",
   "sectionSaw": "Saw ({count})",

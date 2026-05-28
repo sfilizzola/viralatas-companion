@@ -1,6 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Band } from '../types';
-import { bandDay } from '../services/bandTime';
 import { useAuth } from '../hooks/useAuth';
 import { useBandDetailModal } from '../hooks/useBandDetailModal';
 import { BandDetailModalHost } from '../components/BandDetailModalHost';
@@ -15,6 +14,12 @@ import { useI18n } from '../lib/i18n';
 import { useNow } from '../hooks/useNow';
 import { useOfflinePendingBandIds } from '../hooks/useOfflinePendingBandIds';
 import { isFestivalActive } from '../services/time';
+import {
+  computeInitialCollapsedDays,
+  countUpcomingLeftToday,
+  festivalDayKeyFromNow,
+  groupMyWackenByDay,
+} from '../services/myWackenGrouping';
 import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BandCard from '../components/BandCard';
@@ -34,6 +39,7 @@ export default function MyWackenPage() {
 
   const [highlightedConflict, setHighlightedConflict] = useState<string | null>(null);
   const [collapsedDays, setCollapsedDays] = useState<Set<string>>(new Set());
+  const collapseSeededRef = useRef(false);
   const { bands: rawBands, loading } = useBands();
   const { allMissed, missedBandIds, missedCountsByBand, toggleMissed } = useMissedBands(userId);
   const bands = useMemo(
@@ -52,28 +58,36 @@ export default function MyWackenPage() {
     [bands, pickedIds],
   );
 
-  const upcomingBands = useMemo(
-    () => myBands.filter((band) => new Date(band.end_time) >= currentNow),
-    [myBands, currentNow],
-  );
-
-  const endedBands = useMemo(
-    () => myBands.filter((band) => new Date(band.end_time) < currentNow),
-    [myBands, currentNow],
-  );
-
-  const sawBands = useMemo(
-    () => endedBands.filter((band) => !missedBandIds.has(band.id)),
-    [endedBands, missedBandIds],
-  );
-
-  const didntSeeBands = useMemo(
-    () => endedBands.filter((band) => missedBandIds.has(band.id)),
-    [endedBands, missedBandIds],
-  );
-
   const festivalActive = isFestivalActive(currentNow);
-  const conflicts = useBandConflicts(myBands);
+  const todayKey = useMemo(() => festivalDayKeyFromNow(currentNow), [currentNow]);
+
+  const dayGroups = useMemo(
+    () => groupMyWackenByDay(bands, pickedIds, currentNow),
+    [bands, pickedIds, currentNow],
+  );
+
+  const upcomingBands = useMemo(
+    () => dayGroups.flatMap((group) => group.upcoming),
+    [dayGroups],
+  );
+
+  const leftToday = useMemo(
+    () => countUpcomingLeftToday(dayGroups, todayKey),
+    [dayGroups, todayKey],
+  );
+
+  useEffect(() => {
+    if (loading || collapseSeededRef.current) return;
+    setCollapsedDays(
+      computeInitialCollapsedDays(dayGroups, {
+        festivalActive,
+        todayKey,
+      }),
+    );
+    collapseSeededRef.current = true;
+  }, [loading, dayGroups, festivalActive, todayKey]);
+
+  const conflicts = useBandConflicts(upcomingBands);
   const { openBand, modalProps } = useBandDetailModal({
     bands,
     pickedIds,
@@ -88,17 +102,6 @@ export default function MyWackenPage() {
     toggleRating,
     clearRating,
   });
-
-  const grouped = useMemo(() => {
-    const map = new Map<string, Band[]>();
-    for (const band of upcomingBands) {
-      const day = bandDay(band);
-      const list = map.get(day) ?? [];
-      list.push(band);
-      map.set(day, list);
-    }
-    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
-  }, [upcomingBands]);
 
   const hardConflictBands = useMemo(() => {
     const ids = new Set<string>();
@@ -156,6 +159,53 @@ export default function MyWackenPage() {
     setHighlightedConflict((current) => (current === firstPartner.id ? null : firstPartner.id));
   }
 
+  function renderUpcomingBand(band: Band) {
+    const entries = conflicts.get(band.id);
+    const hasSoftOverlap = entries?.some((e) => e.severity === 'soft');
+    const hasHardConflict = entries?.some((e) => e.severity === 'hard');
+    const severity = hasHardConflict ? 'hard' : hasSoftOverlap ? 'soft' : undefined;
+    return (
+      <BandCard
+        key={band.id}
+        band={band}
+        isPicked={pickedIds.has(band.id)}
+        count={pickCounts[band.id] ?? 0}
+        onToggle={() => togglePick(band.id)}
+        onClick={() => openBand(band.id)}
+        variant="timeline"
+        pending={pendingBandIds.has(band.id)}
+        conflict={
+          severity
+            ? {
+                severity,
+                active: highlightedConflict === band.id,
+                onClick: () => handleConflictClick(band.id),
+              }
+            : undefined
+        }
+        missedCount={missedCountsByBand[band.id] ?? 0}
+      />
+    );
+  }
+
+  function renderEndedBand(band: Band) {
+    return (
+      <BandCard
+        key={band.id}
+        band={band}
+        isPicked={pickedIds.has(band.id)}
+        count={pickCounts[band.id] ?? 0}
+        onToggle={() => togglePick(band.id)}
+        onClick={() => openBand(band.id)}
+        variant="timeline"
+        pending={pendingBandIds.has(band.id)}
+        hidePick
+        isBandEnded
+        missedCount={missedCountsByBand[band.id] ?? 0}
+      />
+    );
+  }
+
   return (
     <div className={styles.page}>
       <OfflineBanner />
@@ -165,9 +215,14 @@ export default function MyWackenPage() {
           <span className={styles.summaryLine}>
             {t('headerBandsDays', {
               bands: myBands.length,
-              days: grouped.length,
+              days: dayGroups.length,
             })}
           </span>
+          {festivalActive && leftToday >= 1 && (
+            <span className={`${styles.summaryLine} ${styles.summaryHighlight}`}>
+              {t('headerLeftToday', { count: leftToday })}
+            </span>
+          )}
           <span className={styles.summaryLine}>
             {t('headerConflicts', {
               conflicts: totalConflicts,
@@ -202,27 +257,28 @@ export default function MyWackenPage() {
             {t('empty')}
           </div>
         )}
-        {grouped.map(([day, dayBands]) => {
-          const isExpanded = !collapsedDays.has(day);
+        {dayGroups.map((group) => {
+          const isExpanded = !collapsedDays.has(group.dayKey);
+          const dayPickCount = group.upcoming.length + group.ended.length;
           return (
-            <section className={styles.daySection} key={day}>
+            <section className={styles.daySection} key={group.dayKey}>
               <h2
                 className={styles.dayHeader}
                 role="button"
                 tabIndex={0}
                 aria-expanded={isExpanded}
-                onClick={() => toggleDayCollapse(day)}
+                onClick={() => toggleDayCollapse(group.dayKey)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
-                    toggleDayCollapse(day);
+                    toggleDayCollapse(group.dayKey);
                   }
                 }}
               >
-                <span>{dayLabel(day)}</span>
+                <span>{dayLabel(group.dayKey)}</span>
                 <span className={styles.dayHeaderRight}>
                   <small className={styles.dayHeaderCount}>
-                    {t('dayPickCount', { count: dayBands.length })}
+                    {t('dayPickCount', { count: dayPickCount })}
                   </small>
                   <span className={`${styles.dayCollapseChevron} ${isExpanded ? styles.dayCollapseChevronOpen : ''}`}>
                     <Icon name="chevron" size={12} />
@@ -230,131 +286,17 @@ export default function MyWackenPage() {
                 </span>
               </h2>
               <div className={`${styles.dayBands} ${isExpanded ? styles.dayBandsOpen : ''}`}>
-                {dayBands.map((band) => {
-                  const entries = conflicts.get(band.id);
-                  const hasSoftOverlap = entries?.some((e) => e.severity === 'soft');
-                  const hasHardConflict = entries?.some((e) => e.severity === 'hard');
-                  const severity = hasHardConflict ? 'hard' : hasSoftOverlap ? 'soft' : undefined;
-                  return (
-                    <BandCard
-                      key={band.id}
-                      band={band}
-                      isPicked={pickedIds.has(band.id)}
-                      count={pickCounts[band.id] ?? 0}
-                      onToggle={() => togglePick(band.id)}
-                      onClick={() => openBand(band.id)}
-                      variant="timeline"
-                      pending={pendingBandIds.has(band.id)}
-                      conflict={
-                        severity
-                          ? {
-                              severity,
-                              active: highlightedConflict === band.id,
-                              onClick: () => handleConflictClick(band.id),
-                            }
-                          : undefined
-                      }
-                      isBandEnded={new Date(band.end_time) < currentNow}
-                      missedCount={missedCountsByBand[band.id] ?? 0}
-                    />
-                  );
-                })}
+                {group.upcoming.map(renderUpcomingBand)}
+                {group.showDivider && (
+                  <div className={styles.dayDivider} role="separator">
+                    <span>{t('dividerAlreadyPlayedToday')}</span>
+                  </div>
+                )}
+                {group.ended.map(renderEndedBand)}
               </div>
             </section>
           );
         })}
-
-        {sawBands.length > 0 && (() => {
-          const key = '__saw__';
-          const isExpanded = !collapsedDays.has(key);
-          return (
-            <section className={styles.daySection} key={key}>
-              <h2
-                className={`${styles.dayHeader} ${styles.dayHeaderSaw}`}
-                role="button"
-                tabIndex={0}
-                aria-expanded={isExpanded}
-                onClick={() => toggleDayCollapse(key)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleDayCollapse(key);
-                  }
-                }}
-              >
-                <span>{t('sectionSaw', { count: sawBands.length })}</span>
-                <span className={styles.dayHeaderRight}>
-                  <span className={`${styles.dayCollapseChevron} ${isExpanded ? styles.dayCollapseChevronOpen : ''}`}>
-                    <Icon name="chevron" size={12} />
-                  </span>
-                </span>
-              </h2>
-              <div className={`${styles.dayBands} ${isExpanded ? styles.dayBandsOpen : ''}`}>
-                {sawBands.map((band) => (
-                  <BandCard
-                    key={band.id}
-                    band={band}
-                    isPicked={pickedIds.has(band.id)}
-                    count={pickCounts[band.id] ?? 0}
-                    onToggle={() => togglePick(band.id)}
-                    onClick={() => openBand(band.id)}
-                    variant="timeline"
-                    pending={pendingBandIds.has(band.id)}
-                    hidePick
-                    isBandEnded
-                    missedCount={missedCountsByBand[band.id] ?? 0}
-                  />
-                ))}
-              </div>
-            </section>
-          );
-        })()}
-
-        {didntSeeBands.length > 0 && (() => {
-          const key = '__didntSee__';
-          const isExpanded = !collapsedDays.has(key);
-          return (
-            <section className={styles.daySection} key={key}>
-              <h2
-                className={`${styles.dayHeader} ${styles.dayHeaderDidntSee}`}
-                role="button"
-                tabIndex={0}
-                aria-expanded={isExpanded}
-                onClick={() => toggleDayCollapse(key)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    toggleDayCollapse(key);
-                  }
-                }}
-              >
-                <span>{t('sectionDidntSee', { count: didntSeeBands.length })}</span>
-                <span className={styles.dayHeaderRight}>
-                  <span className={`${styles.dayCollapseChevron} ${isExpanded ? styles.dayCollapseChevronOpen : ''}`}>
-                    <Icon name="chevron" size={12} />
-                  </span>
-                </span>
-              </h2>
-              <div className={`${styles.dayBands} ${isExpanded ? styles.dayBandsOpen : ''}`}>
-                {didntSeeBands.map((band) => (
-                  <BandCard
-                    key={band.id}
-                    band={band}
-                    isPicked={pickedIds.has(band.id)}
-                    count={pickCounts[band.id] ?? 0}
-                    onToggle={() => togglePick(band.id)}
-                    onClick={() => openBand(band.id)}
-                    variant="timeline"
-                    pending={pendingBandIds.has(band.id)}
-                    hidePick
-                    isBandEnded
-                    missedCount={missedCountsByBand[band.id] ?? 0}
-                  />
-                ))}
-              </div>
-            </section>
-          );
-        })()}
       </main>
 
       <BandDetailModalHost modalProps={modalProps} />

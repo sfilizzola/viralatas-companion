@@ -6,6 +6,8 @@
   "headerBandsDays": "{bands} escolhas / {days} dias",
   "headerConflicts": "{conflicts} conflitos",
   "headerOverlaps": "{overlaps} sobreposição(ões)",
+  "headerLeftToday": "{count} por vir hoje",
+  "dividerAlreadyPlayedToday": "já passaram hoje",
   "conflictWarningBanner": "Você tem {count} conflito(s). Resolva fácil no seu perfil →",
   "dayPickCount": "{count} escolhas",
   "sectionSaw": "Vi ({count})",

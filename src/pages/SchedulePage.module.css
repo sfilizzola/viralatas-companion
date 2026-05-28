@@ -41,6 +41,30 @@
   display: block;
 }
 
+.summaryHighlight {
+  color: var(--signal-ok);
+}
+
+.dayDivider {
+  height: 1px;
+  background: var(--border);
+  margin: var(--s-1) 0 var(--s-2);
+  position: relative;
+}
+
+.dayDivider span {
+  position: absolute;
+  left: 0;
+  top: -8px;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  background: var(--bg);
+  padding-right: var(--s-2);
+}
+
 /* PopularPage — title row + inset sort track */
 .popularHeader {
   flex-direction: column;
