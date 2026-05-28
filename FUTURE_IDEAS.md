@@ -17,6 +17,9 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 | 5 | Unit tests: Component and page integration | High | Low — auth pages + repository/hook coverage; SchedulePage logic tested at lower layers | ✅ Phase 26 |
 | 6 | Festival minimap with live user positions | Medium | Medium — requires maintained image asset, presence data accuracy, mobile layout fit | pending |
 | 7 | Festival wrap (`/wrap` recap page) | Medium | Low — client-side stats from existing IDB; no schema change; additive route | ✅ Phase 30 |
+| 8 | Rating on My Picks | Low | Low — read existing `user_band_ratings` IDB; display-only on ended sections | pending |
+| 9 | Rating stats on `/wrap` | Low | Low — aggregate from IDB; additive wrap section | pending |
+| 10 | Rating-based badges | Medium | Low — new `BadgeCondition` types; data exists after Phase 32 | pending |
 
 ---
 
@@ -376,3 +379,50 @@ Discovery
 - [ ] Empty-picks users see a friendly empty state, not broken layout.
 - [ ] "Open vest" navigates to `/profile` where `BadgesDisplay` shows full patch collection.
 - [ ] Design System documents Wrap page tokens and section anatomy.
+
+---
+
+## Idea 8 — Rating on My Picks
+
+**Goal:** Show the current user's 1–5 rating on ended bands in My Picks (`saw` / `didn't see` sections) — read-only display, same iconic component as band detail.
+
+**Depends on:** Phase 32 (`user_band_ratings` table + IDB + hooks).
+
+**Complexity:** Low · **Risk:** Low — no new schema; reuse `useBandRatings` + `BandRatingInput` in read-only mode or compact badge.
+
+**Acceptance (when scheduled):**
+- Ended band rows show user's score when rated; no score chip when unrated
+- Tapping row still opens modal where rating can be edited
+- Works offline from IndexedDB
+
+---
+
+## Idea 9 — Rating stats on `/wrap`
+
+**Goal:** Add a wrap recap section for festival ratings — e.g. highest-rated band the crew saw, user's average score, total ratings given.
+
+**Depends on:** Phase 32 crew-wide ratings in IndexedDB.
+
+**Complexity:** Low · **Risk:** Low — pure aggregates from existing IDB data.
+
+**Acceptance (when scheduled):**
+- Stats use same aggregate rules as Popular (all vira-latas included in averages)
+- Section hidden or empty-state when no ratings exist
+- Offline after first sync
+
+---
+
+## Idea 10 — Rating-based badges
+
+**Goal:** Badge conditions keyed off concert ratings — e.g. rated N bands, gave a 5 to a headliner, crew avg ≥ 4 on a band you picked.
+
+**Depends on:** Phase 32 data + badge engine extension.
+
+**Complexity:** Medium · **Risk:** Low — additive registry entries; no schema change if Phase 32 shipped.
+
+**Non-goals until scheduled:** No badge registry changes in Phase 32.
+
+**Acceptance (when scheduled):**
+- New supported `BadgeCondition` types documented in wiki + `.claude/context/badges.md`
+- All four locales for badge labels
+- Engine reads from `BadgeContext` fed by ratings IDB snapshot
