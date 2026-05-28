@@ -1194,7 +1194,7 @@
       <div class="component-section">
         <h3>BadgesDisplay <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/BadgesDisplay.tsx</span></h3>
         <p>Earned patches on <code>/now</code> and <code>/profile</code>. <strong>Variant C — Vest Stack:</strong> collapsed vest (fixed <strong>112 px</strong> tall, max-width 480 px). Default <strong>chaotic</strong> mode: meadow scatter with <strong>48 px</strong> patches; opt-in <strong>neat</strong> mode: horizontal chip stack (all badges, scaled). <em>Open vest</em> expands into a 4-column grid; <em>Close vest</em> reshuffles chaotic pile only.</p>
-        <p><strong>Collapsed chaotic:</strong> <code>buildStackPoses()</code> — <code>scatterSeed</code>, rotation ±55°, anti-bury. <strong>Collapsed neat:</strong> <code>buildNeatStackPoses()</code> — scale-down row, 0°–5° rotation, no reseed. Layout toggle in Edit profile (<code>PatchesLayoutToggle</code>, icon-only) beside fabric swatches; preference in <code>patchesLayout.ts</code>.</p>
+        <p><strong>Collapsed chaotic:</strong> <code>buildStackPoses()</code> — center-out golden spiral, <code>scatterSeed</code>, rotation ±55°, max 50% overlap. <strong>Collapsed neat:</strong> <code>buildNeatStackPoses()</code> — scale-down row, 0°–5° rotation, no reseed. Layout toggle in Edit profile (<code>PatchesLayoutToggle</code>, icon-only) beside fabric swatches; preference in <code>patchesLayout.ts</code>.</p>
         <table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
           <thead>
             <tr style="border-bottom:1px solid #333; text-align:left;">

@@ -6,6 +6,8 @@ import {
   hashSlug,
   stackCenterDist,
   stackGrid,
+  stackMinCenterDistPx,
+  stackPixelDist,
   stackStyle,
   VEST_ASPECT,
 } from '../services/badges/stackLayout';
@@ -60,6 +62,31 @@ describe('stackLayout', () => {
       expect(pose.scale).toBeLessThan(1);
     }
     expect(poses.get('b')!.zIndex).toBeGreaterThan(poses.get('a')!.zIndex);
+  });
+
+  it('buildStackPoses anchors the first badge near vest center', () => {
+    const badges = [badge('a'), badge('b'), badge('c'), badge('d')];
+    const first = buildStackPoses(badges, 42, new Set()).get('a')!;
+    expect(first.left).toBeGreaterThan(42);
+    expect(first.left).toBeLessThan(58);
+    expect(first.top).toBeGreaterThan(42);
+    expect(first.top).toBeLessThan(58);
+  });
+
+  it('buildStackPoses keeps patch overlap at or below 50%', () => {
+    const badges = Array.from({ length: 15 }, (_, i) => badge(`badge-${i}`));
+    const poses = buildStackPoses(badges, 7, new Set());
+    const entries = badges.map((b) => poses.get(b.slug)!);
+
+    for (let i = 0; i < entries.length; i++) {
+      for (let j = i + 1; j < entries.length; j++) {
+        const a = entries[i];
+        const b = entries[j];
+        expect(stackPixelDist(a, b)).toBeGreaterThanOrEqual(
+          stackMinCenterDistPx(a.scale, b.scale) - 0.01,
+        );
+      }
+    }
   });
 
   it('buildStackPoses is stable for the same seed', () => {

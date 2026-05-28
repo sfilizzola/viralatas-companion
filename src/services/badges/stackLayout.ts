@@ -25,7 +25,13 @@ export function stackGrid(total: number): { cols: number; rows: number } {
 }
 
 /** ~480×112 vest — distance in “physical” space for overlap checks */
-export const VEST_ASPECT = 480 / 112;
+export const VEST_WIDTH = 480;
+export const VEST_HEIGHT = 112;
+export const VEST_ASPECT = VEST_WIDTH / VEST_HEIGHT;
+export const STACK_PATCH_PX = 48;
+/** Max fraction of the smaller patch diameter that may overlap another. */
+export const STACK_MAX_OVERLAP = 0.5;
+export const STACK_PLACEMENT_ATTEMPTS = 24;
 
 export function stackCenterDist(
   a: { left: number; top: number },
@@ -34,6 +40,31 @@ export function stackCenterDist(
   const dx = (a.left - b.left) / 100;
   const dy = ((a.top - b.top) / 100) * VEST_ASPECT;
   return Math.hypot(dx, dy);
+}
+
+/** Pixel distance between patch centers on the vest. */
+export function stackPixelDist(
+  a: { left: number; top: number },
+  b: { left: number; top: number },
+): number {
+  const dx = ((a.left - b.left) / 100) * VEST_WIDTH;
+  const dy = ((a.top - b.top) / 100) * VEST_HEIGHT;
+  return Math.hypot(dx, dy);
+}
+
+/** Minimum center distance so two scaled patches overlap ≤ STACK_MAX_OVERLAP. */
+export function stackMinCenterDistPx(scaleA: number, scaleB: number): number {
+  const rA = (STACK_PATCH_PX * scaleA) / 2;
+  const rB = (STACK_PATCH_PX * scaleB) / 2;
+  const minR = Math.min(rA, rB);
+  return rA + rB - STACK_MAX_OVERLAP * 2 * minR;
+}
+
+export function stackPoseTooClose(
+  a: { left: number; top: number; scale: number },
+  b: { left: number; top: number; scale: number },
+): boolean {
+  return stackPixelDist(a, b) < stackMinCenterDistPx(a.scale, b.scale);
 }
 
 export function clampStackPoint(left: number, top: number): { left: number; top: number } {
@@ -52,25 +83,39 @@ export function stackPoseDraft(
 ): Omit<StackPose, 'zIndex'> {
   const h = hashSlug(`${seed}:${slug}:${index}:${attempt}`);
 
-  const { cols, rows } = stackGrid(total);
-  const row = Math.floor(index / cols);
-  const col = index % cols;
-  const colsInRow = row === rows - 1 ? total - row * cols : cols;
-
-  const cellW = 100 / cols;
-  const cellH = 100 / rows;
-  const baseLeft = colsInRow <= 1 ? 50 : (col + 0.5) * (100 / colsInRow);
-  const baseTop = rows <= 1 ? 50 : (row + 0.5) * cellH;
-
   const clutter = Math.min(1.35, 0.55 + total * 0.04);
-  let jitterX = ((h % 19) - 9) * (cellW * 0.32 * clutter) + (((h >> 6) % 11) - 5) * 1.6 * clutter;
-  let jitterY = (((h >> 4) % 19) - 9) * (cellH * 0.32 * clutter) + (((h >> 10) % 11) - 5) * 1.4 * clutter;
+
+  // Center-out golden spiral — first patch at the heart, pile grows outward
+  const centerLeft = 50;
+  const centerTop = 50;
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  const angle =
+    index * golden + ((h % 60) - 30) * (Math.PI / 180) * clutter;
+
+  const spread = total <= 1 ? 0 : Math.sqrt(index / (total - 1));
+  let radiusX = spread * 36 * clutter;
+  let radiusY = radiusX / VEST_ASPECT;
 
   if (attempt > 0) {
-    const angle = ((h >> 3) % 360) * (Math.PI / 180);
-    const push = 5 + attempt * 2.2;
-    jitterX += Math.cos(angle) * push;
-    jitterY += Math.sin(angle) * push * 0.55;
+    const push = 1 + attempt * 0.28;
+    radiusX *= push;
+    radiusY *= push;
+  }
+
+  const baseLeft = centerLeft + Math.cos(angle) * radiusX;
+  const baseTop = centerTop + Math.sin(angle) * radiusY;
+
+  const jitterScale = 1.2 + spread * 2.4;
+  let jitterX =
+    ((h % 19) - 9) * (jitterScale * 0.45) + (((h >> 6) % 11) - 5) * 0.35 * clutter;
+  let jitterY =
+    (((h >> 4) % 19) - 9) * (jitterScale * 0.38) + (((h >> 10) % 11) - 5) * 0.3 * clutter;
+
+  if (attempt > 0) {
+    const nudgeAngle = ((h >> 3) % 360) * (Math.PI / 180);
+    const push = 4 + attempt * 2;
+    jitterX += Math.cos(nudgeAngle) * push;
+    jitterY += Math.sin(nudgeAngle) * push * 0.55;
   }
 
   const { left, top } = clampStackPoint(baseLeft + jitterX, baseTop + jitterY);
@@ -83,28 +128,27 @@ export function stackPoseDraft(
   };
 }
 
-/** Place all collapsed patches; nudge apart when centers would fully bury a prior one */
+/** Place all collapsed patches; nudge apart when overlap would exceed STACK_MAX_OVERLAP */
 export function buildStackPoses(
   badges: BadgeConfig[],
   seed: number,
   glowing: Set<string>,
 ): Map<string, StackPose> {
   const poses = new Map<string, StackPose>();
-  const placed: { left: number; top: number }[] = [];
+  const placed: { left: number; top: number; scale: number }[] = [];
   const total = badges.length;
-  const minDist = Math.max(0.038, 0.072 - total * 0.0015);
 
   badges.forEach((badge, index) => {
     let chosen = stackPoseDraft(badge.slug, index, total, seed, 0);
 
-    for (let attempt = 0; attempt < 12; attempt++) {
+    for (let attempt = 0; attempt < STACK_PLACEMENT_ATTEMPTS; attempt++) {
       const draft = stackPoseDraft(badge.slug, index, total, seed, attempt);
       chosen = draft;
-      const buried = placed.some((p) => stackCenterDist(draft, p) < minDist);
-      if (!buried) break;
+      const tooClose = placed.some((p) => stackPoseTooClose(draft, p));
+      if (!tooClose) break;
     }
 
-    placed.push({ left: chosen.left, top: chosen.top });
+    placed.push({ left: chosen.left, top: chosen.top, scale: chosen.scale });
     poses.set(badge.slug, {
       ...chosen,
       zIndex: index + 1 + (glowing.has(badge.slug) ? 50 : 0),

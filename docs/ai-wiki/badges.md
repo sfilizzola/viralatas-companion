@@ -65,10 +65,10 @@ The patches UI uses a **collapsed vest stack** by default (fixed **112 px** heig
 
 ### Collapsed chaotic (default)
 
-- **Scatter:** `buildStackPoses()` in `stackLayout.ts` places badges sequentially on a virtual slot grid (`stackGrid`) with hash jitter; `clutter` factor grows with badge count so overlap intensifies inside the fixed box.
+- **Scatter:** `buildStackPoses()` in `stackLayout.ts` radiates badges from vest center via a golden-angle spiral (`stackPoseDraft`) with hash jitter; overlap is capped at **50%** of the smaller patch (`STACK_MAX_OVERLAP`).
 - **Reseed:** `scatterSeed` is random on mount and regenerated on **Close vest** — each collapse produces a new pile layout.
 - **Rotation:** ±55° (`(h % 111) - 55`) plus a tiny per-index twist; scale 0.88–0.99.
-- **Anti-bury:** if a new center would land within `minDist` of a prior center (aspect-corrected via `VEST_ASPECT`), up to 12 deterministic nudge attempts run before placement.
+- **Anti-bury:** if a new patch would overlap an existing one by more than **50%** of the smaller badge diameter (`STACK_MAX_OVERLAP` in `stackLayout.ts`), up to 24 deterministic nudge attempts run before placement (pixel-accurate check via `stackPixelDist` / `stackMinCenterDistPx`).
 - **Glow:** only unacknowledged badges animate (`badgeGlow` on `.glowing`); no idle wobble or hover motion when collapsed.
 - **Background:** user `data-bg` preference (`patchesBackground.ts`) applies to `.vestStack[data-bg=…]` — same variants as expanded (`none`, `grid`, `steel`, `indigo`, `leather`).
 
