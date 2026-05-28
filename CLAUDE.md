@@ -257,7 +257,7 @@ Stage colors live in `src/pages/SchedulePage.tsx`; unknown stages fall back to `
 
 ## LLM alerts
 
-`AlertContext` shape, prompt language (Brazilian Portuguese), max length, tone, and the 🤘 rule → `.claude/context/llm-alerts.md`.
+`AlertContext` shape, prompt language, max length, tone, and the 🤘 rule → `.claude/context/llm-alerts.md`.
 
 ---
 
