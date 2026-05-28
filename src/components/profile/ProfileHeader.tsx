@@ -12,7 +12,7 @@ function countryFlag(code: string | null | undefined): string {
 export function roleLabel(role: string): string {
   if (role === 'godlike') return 'Godlike';
   if (role === 'manager') return 'Manager';
-  return 'Vira-latas';
+  return 'Vira-lata';
 }
 
 type ProfileHeaderProps = {

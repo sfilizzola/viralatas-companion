@@ -13,6 +13,9 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ### Changed
 - **`ProfilePage_*`** — trimmed to ~58 user-facing keys (profile, conflicts, patches, badge history).
 - **`GodlikeAdminPanel`**, **`ManagerAdminPanel`**, **`TimeTravelSection`** — consume lazy admin i18n; collapsible trigger labels moved into translation files.
+- **`UserManagementSection`** — hybrid A layout: status pills + switches for manager/friend; action toolbar for assign patch / unblock.
+- **`roleLabel()`** — normal users show **Vira-lata** (singular), not Vira-latas.
+- New **`Switch`** UI primitive for admin toggles.
 
 ### Architectural Notes
 - Regular vira-latas no longer bundle godlike admin copy on first load; offline PWA caches the admin chunk after first godlike/manager profile visit.

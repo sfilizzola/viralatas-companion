@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Servants of Metal — card variants</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=JetBrains+Mono:wght@500;700&family=Oswald:wght@600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-surface: #141414;
+      --bg-elevated: #1e1e1e;
+      --border: #2a2a2a;
+      --text: #e8e8e8;
+      --text-muted: #888;
+      --accent: #c0392b;
+      --signal-warn: #f39c12;
+      --role-godlike: #d97706;
+      --role-manager: #58a8e6;
+      --role-manager-bg: rgba(41, 128, 185, 0.15);
+      --role-manager-border: rgba(41, 128, 185, 0.4);
+      --role-friend: #f59e0b;
+      --role-friend-bg: rgba(217, 119, 6, 0.15);
+      --role-friend-border: rgba(217, 119, 6, 0.4);
+      --role-blocked: #fb923c;
+      --role-blocked-bg: rgba(234, 88, 12, 0.12);
+      --role-badge: #bb8fce;
+      --role-badge-bg: rgba(142, 68, 173, 0.15);
+      --font-display: 'Oswald', sans-serif;
+      --font-body: 'IBM Plex Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --r-1: 4px;
+      --s-2: 8px;
+      --s-3: 12px;
+      --s-4: 16px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.45;
+    }
+
+    .page {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 32px 16px 80px;
+    }
+
+    h1 {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 6vw, 42px);
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      margin: 0 0 8px;
+    }
+
+    .lede {
+      color: var(--text-muted);
+      max-width: 62ch;
+      margin-bottom: 12px;
+      font-size: 15px;
+    }
+
+    .open-hint {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--signal-warn);
+      background: rgba(243, 156, 18, 0.08);
+      border: 1px solid rgba(243, 156, 18, 0.35);
+      padding: 10px 12px;
+      border-radius: var(--r-1);
+      margin-bottom: 24px;
+      max-width: 62ch;
+    }
+
+    .assumptions {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      padding: 16px 18px;
+      margin-bottom: 28px;
+      font-size: 14px;
+    }
+
+    .assumptions strong { color: var(--text); }
+    .assumptions ul { margin: 10px 0 0 18px; color: var(--text-muted); }
+
+    .variant-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .variant-tabs label {
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      border-radius: var(--r-1);
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+
+    .demo-shell > input[type="radio"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    #v-current:checked ~ .variant-tabs label[for="v-current"],
+    #v-a:checked ~ .variant-tabs label[for="v-a"],
+    #v-b:checked ~ .variant-tabs label[for="v-b"],
+    #v-c:checked ~ .variant-tabs label[for="v-c"] {
+      border-color: var(--accent);
+      color: var(--text);
+      background: rgba(192, 57, 43, 0.12);
+    }
+
+    .panel { display: none; }
+    .panel.is-active { display: block; }
+
+    #v-current:checked ~ .panels #panel-current,
+    #v-a:checked ~ .panels #panel-a,
+    #v-b:checked ~ .panels #panel-b,
+    #v-c:checked ~ .panels #panel-c { display: block; }
+
+    .variant-meta {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding: 14px 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-1);
+    }
+
+    .variant-meta h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 18px;
+      text-transform: uppercase;
+    }
+
+    .variant-meta p { margin: 0; color: var(--text-muted); font-size: 14px; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 7px;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    .tag.pro { border-color: rgba(22, 160, 133, 0.5); color: #16a085; }
+    .tag.con { border-color: rgba(192, 57, 43, 0.5); color: #e74c3c; }
+
+    /* phone frame */
+    .phone {
+      width: min(100%, 390px);
+      margin: 0 auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--bg);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.45);
+    }
+
+    .phone-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(217,119,6,0.08), transparent);
+    }
+
+    .phone-header span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-display);
+      font-size: 13px;
+      text-transform: uppercase;
+      color: var(--role-godlike);
+    }
+
+    .user-list { display: flex; flex-direction: column; }
+
+    /* shared row bits */
+    .row {
+      padding: var(--s-3) var(--s-4);
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-surface);
+    }
+    .row:last-child { border-bottom: none; }
+
+    .identity {
+      display: flex;
+      align-items: center;
+      gap: var(--s-3);
+      min-width: 0;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent);
+      display: grid;
+      place-items: center;
+      font-family: var(--font-display);
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .who { min-width: 0; flex: 1; }
+    .name {
+      font-family: var(--font-display);
+      font-size: 15px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .email {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .role {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 2px 6px;
+      border-radius: 2px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: var(--bg-elevated);
+      flex-shrink: 0;
+    }
+    .role.manager { background: var(--role-manager-bg); color: var(--role-manager); border-color: var(--role-manager-border); }
+    .role.godlike { background: rgba(243,156,18,0.15); color: var(--signal-warn); border-color: rgba(243,156,18,0.4); }
+
+    /* CURRENT (problem baseline) */
+    .current-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-2);
+      margin-top: var(--s-3);
+    }
+
+    .btn-current {
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: var(--r-1);
+      padding: 5px 9px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .btn-current.promote-off { background: rgba(41,128,185,0.1); border-color: rgba(41,128,185,0.4); color: #58a8e6; }
+    .btn-current.friend-off { background: rgba(217,119,6,0.1); border-color: rgba(217,119,6,0.4); color: #d97706; }
+    .btn-current.badge { background: rgba(142,68,173,0.1); border-color: rgba(142,68,173,0.4); color: #bb8fce; }
+    .btn-current.unblock { background: rgba(234,88,12,0.1); border-color: rgba(234,88,12,0.35); color: #fb923c; }
+
+    .problem-callout {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border: 1px dashed rgba(192,57,43,0.5);
+      background: rgba(192,57,43,0.06);
+      font-size: 13px;
+      color: var(--text-muted);
+      border-radius: var(--r-1);
+    }
+    .problem-callout em { color: #e74c3c; font-style: normal; }
+
+    /* VARIANT A — status strip + switches */
+    .status-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: var(--s-3);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 4px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: transparent;
+    }
+    .status-pill.on.manager { background: var(--role-manager-bg); border-color: var(--role-manager-border); color: var(--role-manager); }
+    .status-pill.on.friend { background: var(--role-friend-bg); border-color: var(--role-friend-border); color: var(--role-friend); }
+    .status-pill.on.blocked { background: var(--role-blocked-bg); border-color: rgba(234,88,12,0.45); color: var(--role-blocked); }
+    .status-pill.off { opacity: 0.45; }
+    .status-pill .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: 0.35; }
+    .status-pill.on .dot { opacity: 1; box-shadow: 0 0 6px currentColor; }
+
+    .switch-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .switch-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+    .switch-label strong { display: block; color: var(--text); font-size: 11px; margin-bottom: 2px; }
+
+    .switch {
+      position: relative;
+      width: 44px;
+      height: 26px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .switch::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: transform 0.15s, background 0.15s;
+    }
+    .switch.on.manager { background: var(--role-manager-bg); border-color: var(--role-manager-border); }
+    .switch.on.manager::after { transform: translateX(18px); background: var(--role-manager); }
+    .switch.on.friend { background: var(--role-friend-bg); border-color: var(--role-friend-border); }
+    .switch.on.friend::after { transform: translateX(18px); background: var(--role-friend); }
+
+    .row-actions-a {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-2);
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+    }
+    .row-actions-a .btn-current {
+      flex: 1 1 calc(50% - 4px);
+      min-width: 120px;
+      text-align: center;
+    }
+    .row-actions-a .btn-current:only-child {
+      flex: 1 1 100%;
+    }
+
+    .action-section-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-top: 12px;
+      margin-bottom: 6px;
+    }
+
+    /* VARIANT B — segmented toggles */
+    .seg-group { margin-top: var(--s-3); }
+    .seg-label {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    .segmented {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border);
+      border-radius: var(--r-1);
+      overflow: hidden;
+      background: var(--bg-elevated);
+    }
+    .segmented button {
+      border: none;
+      background: transparent;
+      padding: 8px 6px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .segmented button + button { border-left: 1px solid var(--border); }
+    .segmented button.active-off { background: rgba(255,255,255,0.03); color: var(--text); }
+    .segmented button.active-on.manager { background: var(--role-manager-bg); color: var(--role-manager); }
+    .segmented button.active-on.friend { background: var(--role-friend-bg); color: var(--role-friend); }
+
+    .toolbar-b {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--s-2);
+      margin-top: 12px;
+    }
+    .toolbar-b .btn-current { flex: 1; min-width: 120px; text-align: center; }
+
+    /* VARIANT C — matrix + icon row */
+    .matrix {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      margin-top: var(--s-3);
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r-1);
+      overflow: hidden;
+    }
+    .matrix-cell {
+      background: var(--bg-elevated);
+      padding: 8px 6px;
+      text-align: center;
+    }
+    .matrix-cell span {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+    .matrix-cell strong {
+      font-family: var(--font-display);
+      font-size: 13px;
+      letter-spacing: 0.04em;
+    }
+    .matrix-cell.on.manager strong { color: var(--role-manager); }
+    .matrix-cell.on.friend strong { color: var(--role-friend); }
+    .matrix-cell.on.blocked strong { color: var(--role-blocked); }
+    .matrix-cell.off strong { color: var(--text-faint, #555); }
+
+    .icon-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--r-1);
+      border: 1px solid var(--border);
+      background: var(--bg-elevated);
+      color: var(--text-muted);
+      font-size: 14px;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+    }
+    .icon-btn.primary { border-color: rgba(142,68,173,0.45); color: var(--role-badge); }
+    .icon-btn.danger { border-color: rgba(234,88,12,0.45); color: var(--role-blocked); }
+
+    .legend {
+      margin-top: 24px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .legend table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+    .legend th, .legend td {
+      text-align: left;
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .legend th { font-family: var(--font-mono); font-size: 10px; text-transform: uppercase; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <h1>Servants of Metal</h1>
+    <p class="lede">Design variants for godlike user-management rows. Goal: make <strong>Manager</strong>, <strong>Friend</strong>, and <strong>Blocked</strong> states readable at a glance — without four same-weight buttons fighting for attention.</p>
+
+    <p class="open-hint">Open this file in a browser (Chrome/Safari), not the editor markdown preview — the phone mockups need HTML + CSS.</p>
+
+    <div class="assumptions">
+      <strong>Assumptions (confirm before implementing in React)</strong>
+      <ul>
+        <li>Actions stay: assign patch, toggle manager, toggle friend, unblock (when blocked).</li>
+        <li>Godlike rows are read-only for role — only shown in samples as non-interactive.</li>
+        <li>Mobile-first (~390px); ~20 users max — scroll is OK, cognitive load is not.</li>
+        <li><em>Current bug:</em> colored button = «click to turn ON», gray button = «already ON» — inverted from common toggle mental model.</li>
+      </ul>
+    </div>
+
+    <div class="demo-shell">
+      <input type="radio" name="variant" id="v-current" checked />
+      <input type="radio" name="variant" id="v-a" />
+      <input type="radio" name="variant" id="v-b" />
+      <input type="radio" name="variant" id="v-c" />
+
+      <div class="variant-tabs">
+        <label for="v-current">0 · Current</label>
+        <label for="v-a">A · Hybrid (recommended)</label>
+        <label for="v-b">B · Segmented</label>
+        <label for="v-c">C · Status matrix</label>
+      </div>
+
+      <div class="panels">
+      <!-- CURRENT -->
+      <section class="panel" id="panel-current">
+        <div class="variant-meta">
+          <h2>0 · Current production pattern</h2>
+          <p>Four outline buttons in one row. Label flips (Promote ↔ Remove) but fill color drops when state is active — reads like «inactive» when it is actually ON.</p>
+          <div class="tags">
+            <span class="tag con">Inverted ON/OFF color</span>
+            <span class="tag con">Label-only state</span>
+            <span class="tag pro">Already shipped</span>
+          </div>
+        </div>
+        <div class="phone">
+          <div class="phone-header"><span>⚡ Servants of Metal</span></div>
+          <div class="user-list">
+            <div class="row">
+              <div class="identity">
+                <div class="avatar">R</div>
+                <div class="who"><div class="name">Rafa Metal</div><div class="email">rafa@example.com</div></div>
+                <span class="role">Normal</span>
+              </div>
+              <div class="current-actions">
+                <button class="btn-current badge" type="button">Assign patch</button>
+                <button class="btn-current promote-off" type="button">Promote to manager</button>
+                <button class="btn-current friend-off" type="button">Mark as friend</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="identity">
+                <div class="avatar">M</div>
+                <div class="who"><div class="name">Marina Stage</div><div class="email">marina@example.com</div></div>
+                <span class="role manager">Manager</span>
+              </div>
+              <div class="current-actions">
+                <button class="btn-current badge" type="button">Assign patch · 2</button>
+                <button class="btn-current" type="button">Remove manager</button>
+                <button class="btn-current" type="button">Remove friend</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="identity">
+                <div class="avatar">T</div>
+                <div class="who"><div class="name">Troll Poster</div><div class="email">troll@example.com</div></div>
+                <span class="role">Normal</span>
+              </div>
+              <div class="current-actions">
+                <button class="btn-current badge" type="button">Assign patch</button>
+                <button class="btn-current promote-off" type="button">Promote to manager</button>
+                <button class="btn-current friend-off" type="button">Mark as friend</button>
+                <button class="btn-current unblock" type="button">Unblock</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="problem-callout"><em>Why it fails:</em> Marina is manager + friend but both actions look «off» (gray). Only the small role chip hints manager — friend state is invisible until you read button copy.</p>
+      </section>
+
+      <!-- VARIANT A (refined hybrid) -->
+      <section class="panel" id="panel-a">
+        <div class="variant-meta">
+          <h2>A · Status + switches + action buttons</h2>
+          <p>Your mix: pills + switches for <strong>Manager</strong> / <strong>Friend</strong> (state you scan). <strong>Assign patch</strong> and <strong>Unblock</strong> stay as full buttons like B — one-shot actions, not toggles.</p>
+          <div class="tags">
+            <span class="tag pro">Recommended for implementation</span>
+            <span class="tag pro">Toggles ≠ actions visually separated</span>
+            <span class="tag pro">Patch count on button when assigned</span>
+          </div>
+        </div>
+        <div class="phone">
+          <div class="phone-header"><span>⚡ Servants of Metal</span></div>
+          <div class="user-list">
+            <div class="row">
+              <div class="identity">
+                <div class="avatar">R</div>
+                <div class="who"><div class="name">Rafa Metal</div><div class="email">rafa@example.com</div></div>
+                <span class="role">Normal</span>
+              </div>
+              <div class="status-strip">
+                <span class="status-pill off manager"><span class="dot"></span>Manager</span>
+                <span class="status-pill off friend"><span class="dot"></span>Friend</span>
+              </div>
+              <div class="switch-row">
+                <div class="switch-label"><strong>Manager access</strong>Can moderate announcements</div>
+                <div class="switch manager" role="switch" aria-checked="false" tabindex="0"></div>
+              </div>
+              <div class="switch-row">
+                <div class="switch-label"><strong>Crew friend</strong>Shows in friend badge logic</div>
+                <div class="switch friend" role="switch" aria-checked="false" tabindex="0"></div>
+              </div>
+              <div class="action-section-label">One-shot actions</div>
+              <div class="row-actions-a">
+                <button class="btn-current badge" type="button">Assign patch</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="identity">
+                <div class="avatar">M</div>
+                <div class="who"><div class="name">Marina Stage</div><div class="email">marina@example.com</div></div>
+                <span class="role manager">Manager</span>
+              </div>
+              <div class="status-strip">
+                <span class="status-pill on manager"><span class="dot"></span>Manager</span>
+                <span class="status-pill on friend"><span class="dot"></span>Friend</span>
+              </div>
+              <div class="switch-row">
+                <div class="switch-label"><strong>Manager access</strong>ON — tap to revoke</div>
+                <div class="switch on manager" role="switch" aria-checked="true" tabindex="0"></div>
+              </div>
+              <div class="switch-row">
+                <div class="switch-label"><strong>Crew friend</strong>ON — tap to revoke</div>
+                <div class="switch on friend" role="switch" aria-checked="true" tabindex="0"></div>
+              </div>
+              <div class="action-section-label">One-shot actions</div>
+              <div class="row-actions-a">
+                <button class="btn-current badge" type="button">Assign patch · 2</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="identity">
+                <div class="avatar">T</div>
+                <div class="who"><div class="name">Troll Poster</div><div class="email">troll@example.com</div></div>
+                <span class="role">Normal</span>
+              </div>
+              <div class="status-strip">
+                <span class="status-pill off manager"><span class="dot"></span>Manager</span>
+                <span class="status-pill off friend"><span class="dot"></span>Friend</span>
+                <span class="status-pill on blocked"><span class="dot"></span>Blocked</span>
+              </div>
+              <div class="switch-row">
+                <div class="switch-label"><strong>Manager access</strong>Can moderate announcements</div>
+                <div class="switch manager" role="switch" aria-checked="false" tabindex="0"></div>
+              </div>
+              <div class="switch-row">
+                <div class="switch-label"><strong>Crew friend</strong>Shows in friend badge logic</div>
+                <div class="switch friend" role="switch" aria-checked="false" tabindex="0"></div>
+              </div>
+              <div class="action-section-label">One-shot actions</div>
+              <div class="row-actions-a">
+                <button class="btn-current badge" type="button">Assign patch</button>
+                <button class="btn-current unblock" type="button">Unblock user</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VARIANT B -->
+      <section class="panel" id="panel-b">
+        <div class="variant-meta">
+          <h2>B · Segmented OFF | ON controls</h2>
+          <p>Binary states use a two-segment control — filled side shows current value. Keeps button vocabulary but fixes inverted color logic. Good if you want minimal layout change.</p>
+          <div class="tags">
+            <span class="tag pro">Smallest diff from today</span>
+            <span class="tag pro">Explicit OFF and ON labels</span>
+            <span class="tag con">Still 2 controls + assign per row</span>
+          </div>
+        </div>
+        <div class="phone">
+          <div class="phone-header"><span>⚡ Servants of Metal</span></div>
+          <div class="user-list">
+            <div class="row">
+              <div class="identity">
+                <div class="avatar">R</div>
+                <div class="who"><div class="name">Rafa Metal</div><div class="email">rafa@example.com</div></div>
+                <span class="role">Normal</span>
+              </div>
+              <div class="seg-group">
+                <div class="seg-label">Manager</div>
+                <div class="segmented">
+                  <button class="active-off" type="button">Off</button>
+                  <button type="button">On</button>
+                </div>
+              </div>
+              <div class="seg-group">
+                <div class="seg-label">Friend</div>
+                <div class="segmented">
+                  <button class="active-off" type="button">Off</button>
+                  <button type="button">On</button>
+                </div>
+              </div>
+              <div class="toolbar-b">
+                <button class="btn-current badge" type="button">Assign patch</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="identity">
+                <div class="avatar">M</div>
+                <div class="who"><div class="name">Marina Stage</div><div class="email">marina@example.com</div></div>
+                <span class="role manager">Manager</span>
+              </div>
+              <div class="seg-group">
+                <div class="seg-label">Manager</div>
+                <div class="segmented">
+                  <button type="button">Off</button>
+                  <button class="active-on manager" type="button">On</button>
+                </div>
+              </div>
+              <div class="seg-group">
+                <div class="seg-label">Friend</div>
+                <div class="segmented">
+                  <button type="button">Off</button>
+                  <button class="active-on friend" type="button">On</button>
+                </div>
+              </div>
+              <div class="toolbar-b">
+                <button class="btn-current badge" type="button">Assign patch · 2</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="identity">
+                <div class="avatar">T</div>
+                <div class="who"><div class="name">Troll Poster</div><div class="email">troll@example.com</div></div>
+                <span class="role">Normal</span>
+              </div>
+              <div class="seg-group">
+                <div class="seg-label">Manager</div>
+                <div class="segmented">
+                  <button class="active-off" type="button">Off</button>
+                  <button type="button">On</button>
+                </div>
+              </div>
+              <div class="seg-group">
+                <div class="seg-label">Friend</div>
+                <div class="segmented">
+                  <button class="active-off" type="button">Off</button>
+                  <button type="button">On</button>
+                </div>
+              </div>
+              <div class="toolbar-b">
+                <button class="btn-current badge" type="button">Assign patch</button>
+                <button class="btn-current unblock" type="button">Unblock</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VARIANT C -->
+      <section class="panel" id="panel-c">
+        <div class="variant-meta">
+          <h2>C · Status matrix + icon actions</h2>
+          <p>Dense dashboard read: 3-column ON/OFF matrix at a glance. Actions collapse to icons (patch, promote, friend, unblock) with aria-labels. Best when scanning many users quickly.</p>
+          <div class="tags">
+            <span class="tag pro">Fast scan down the list</span>
+            <span class="tag pro">Shortest row height after identity</span>
+            <span class="tag con">Icons need tooltips / labels for accessibility</span>
+          </div>
+        </div>
+        <div class="phone">
+          <div class="phone-header"><span>⚡ Servants of Metal</span></div>
+          <div class="user-list">
+            <div class="row">
+              <div class="identity">
+                <div class="avatar">R</div>
+                <div class="who"><div class="name">Rafa Metal</div><div class="email">rafa@example.com</div></div>
+                <span class="role">Normal</span>
+              </div>
+              <div class="matrix">
+                <div class="matrix-cell off manager"><span>Manager</span><strong>—</strong></div>
+                <div class="matrix-cell off friend"><span>Friend</span><strong>—</strong></div>
+                <div class="matrix-cell off blocked"><span>Blocked</span><strong>—</strong></div>
+              </div>
+              <div class="icon-row">
+                <button class="icon-btn primary" type="button" title="Assign patch">🎖</button>
+                <button class="icon-btn" type="button" title="Toggle manager">🛡</button>
+                <button class="icon-btn" type="button" title="Toggle friend">🤘</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="identity">
+                <div class="avatar">M</div>
+                <div class="who"><div class="name">Marina Stage</div><div class="email">marina@example.com</div></div>
+                <span class="role manager">Manager</span>
+              </div>
+              <div class="matrix">
+                <div class="matrix-cell on manager"><span>Manager</span><strong>ON</strong></div>
+                <div class="matrix-cell on friend"><span>Friend</span><strong>ON</strong></div>
+                <div class="matrix-cell off blocked"><span>Blocked</span><strong>—</strong></div>
+              </div>
+              <div class="icon-row">
+                <button class="icon-btn primary" type="button" title="Assign patch (2)">🎖</button>
+                <button class="icon-btn" type="button" title="Revoke manager" style="border-color: var(--role-manager-border); color: var(--role-manager);">🛡</button>
+                <button class="icon-btn" type="button" title="Revoke friend" style="border-color: var(--role-friend-border); color: var(--role-friend);">🤘</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="identity">
+                <div class="avatar">T</div>
+                <div class="who"><div class="name">Troll Poster</div><div class="email">troll@example.com</div></div>
+                <span class="role">Normal</span>
+              </div>
+              <div class="matrix">
+                <div class="matrix-cell off manager"><span>Manager</span><strong>—</strong></div>
+                <div class="matrix-cell off friend"><span>Friend</span><strong>—</strong></div>
+                <div class="matrix-cell on blocked"><span>Blocked</span><strong>YES</strong></div>
+              </div>
+              <div class="icon-row">
+                <button class="icon-btn primary" type="button" title="Assign patch">🎖</button>
+                <button class="icon-btn danger" type="button" title="Unblock">🔓</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    </div>
+
+    <div class="legend">
+      <strong>Pick-one guide</strong>
+      <table>
+        <thead>
+          <tr><th>If you prioritize…</th><th>Variant</th><th>Implementation note</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Fix confusion with least refactor risk</td><td><strong>B · Segmented</strong></td><td>Replace flip-label buttons with <code>SegmentedToggle</code>; keep existing handlers.</td></tr>
+          <tr><td><strong>Your pick — implement this</strong></td><td><strong>A · Hybrid</strong></td><td>Pills + switches for manager/friend; purple/orange <code>btn-current</code> toolbar for assign + unblock.</td></tr>
+          <tr><td>Scan 20 users in seconds</td><td><strong>C · Matrix</strong></td><td>Matrix is display-only; icon row opens confirm or sheet — add tooltips + aria.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const panelMap = {
+      'v-current': 'panel-current',
+      'v-a': 'panel-a',
+      'v-b': 'panel-b',
+      'v-c': 'panel-c',
+    };
+
+    function showPanel(id) {
+      document.querySelectorAll('.panel').forEach((panel) => {
+        panel.classList.toggle('is-active', panel.id === panelMap[id]);
+      });
+    }
+
+    document.querySelectorAll('.demo-shell input[type="radio"]').forEach((radio) => {
+      radio.addEventListener('change', () => showPanel(radio.id));
+    });
+
+    showPanel('v-current');
+
+    document.querySelectorAll('.switch').forEach((el) => {
+      el.addEventListener('click', () => el.classList.toggle('on'));
+      el.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          el.classList.toggle('on');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

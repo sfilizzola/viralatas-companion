@@ -867,7 +867,7 @@
           <span class="badge">Default</span>
           <span class="badge" style="color: #d97706; border-color: rgba(217, 119, 6, 0.45); background: rgba(217, 119, 6, 0.08);">Godlike 🤘</span>
           <span class="badge" style="color: #3b82f6; border-color: rgba(59, 130, 246, 0.45); background: rgba(59, 130, 246, 0.08);">Manager</span>
-          <span class="badge" style="color: #888;">Normal</span>
+          <span class="badge" style="color: #888;">Vira-lata</span>
         </div>
         <table>
           <thead>
@@ -891,6 +891,38 @@
               <td>—</td>
               <td>Badge label text</td>
             </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="component-section">
+        <h3>Switch <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/ui/Switch.tsx</span></h3>
+        <p>Accessible toggle for binary admin states. Used in godlike <strong>Servants of Metal</strong> user rows for manager access and crew-friend flags. Renders as a <code>button[role="switch"]</code> — not a checkbox — with tone-specific ON colors.</p>
+        <p><strong>Tones:</strong> <code>manager</code> (blue) · <code>friend</code> (amber). OFF = muted thumb on <code>--bg-elevated</code>; ON = filled track + colored thumb using role tokens.</p>
+        <div class="component-demo" style="background:#0a0a0a;padding:24px;display:flex;gap:28px;flex-wrap:wrap;align-items:center;">
+          <style>
+            .ds-sw { position:relative;width:44px;height:26px;border-radius:999px;border:1px solid #2a2a2a;background:#1e1e1e;flex-shrink:0; }
+            .ds-sw::after { content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#888; }
+            .ds-sw.on.manager { background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.45); }
+            .ds-sw.on.manager::after { transform:translateX(18px);background:#3b82f6; }
+            .ds-sw.on.friend { background:rgba(217,119,6,.15);border-color:rgba(217,119,6,.4); }
+            .ds-sw.on.friend::after { transform:translateX(18px);background:#f59e0b; }
+            .ds-sw-row { display:flex;align-items:center;gap:10px; }
+            .ds-sw-lbl { font-family:'JetBrains Mono',monospace;font-size:10px;color:#888;text-transform:uppercase;letter-spacing:.06em; }
+          </style>
+          <div class="ds-sw-row"><span class="ds-sw-lbl">Manager OFF</span><span class="ds-sw" aria-hidden="true"></span></div>
+          <div class="ds-sw-row"><span class="ds-sw-lbl">Manager ON</span><span class="ds-sw on manager" aria-hidden="true"></span></div>
+          <div class="ds-sw-row"><span class="ds-sw-lbl">Friend OFF</span><span class="ds-sw" aria-hidden="true"></span></div>
+          <div class="ds-sw-row"><span class="ds-sw-lbl">Friend ON</span><span class="ds-sw on friend" aria-hidden="true"></span></div>
+        </div>
+        <table>
+          <thead><tr><th>Property</th><th>Type</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td>checked</td><td>boolean</td><td>Current ON/OFF state.</td></tr>
+            <tr><td>onChange</td><td>(checked: boolean) =&gt; void</td><td>Called when user toggles.</td></tr>
+            <tr><td>tone</td><td>'manager' | 'friend'</td><td>ON-state color palette.</td></tr>
+            <tr><td>disabled</td><td>boolean</td><td>Loading / blocked interaction.</td></tr>
+            <tr><td>ariaLabel</td><td>string</td><td>Accessible name (required).</td></tr>
           </tbody>
         </table>
       </div>
@@ -1055,7 +1087,7 @@
           <div class="ds-pf-stack">
             <span class="ds-pf-stack-label">Vira-lata · ES · no Wackens yet (chip hidden)</span>
             <div class="ds-pf-meta">
-              <span class="ds-pf-chip">Vira-latas</span>
+              <span class="ds-pf-chip">Vira-lata</span>
               <span class="ds-pf-flag">🇪🇸</span>
             </div>
           </div>
@@ -1075,6 +1107,62 @@
             <tr><td>t</td><td>TFn</td><td>i18n function — must resolve <code>wackenCountSingular</code>, <code>wackenCountPlural</code>, and <code>wackenCountTooltip</code>.</td></tr>
           </tbody>
         </table>
+        <p style="margin-top:12px;font-size:14px;color:#888;"><strong>Role label copy:</strong> <code>roleLabel()</code> returns <code>Godlike</code>, <code>Manager</code>, or <code>Vira-lata</code> (singular) for normal users — never «Vira-latas» on a single-user chip.</p>
+      </div>
+
+      <div class="component-section">
+        <h3>UserManagementSection · Servants of Metal <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/profile/UserManagementSection.tsx</span></h3>
+        <p>Godlike-only collapsible (<code>GodlikeAdminPanel</code> → «Servants of Metal»). Lists all registered vira-latas with a <strong>hybrid A</strong> layout: scan pills → toggle switches → one-shot action buttons. Copy lives in lazy-loaded <code>GodlikeAdmin_*.json</code>.</p>
+        <p><strong>Three tiers per row (non-godlike users):</strong></p>
+        <ul style="margin:0 0 12px 18px;color:#888;font-size:14px;">
+          <li><strong>Status strip</strong> — pills for Manager / Friend / Blocked. Lit dot + fill = ON; dimmed = OFF.</li>
+          <li><strong>Switches</strong> — <code>Switch</code> toggles for manager access and crew friend. Helper text flips between hint and «ON — tap to revoke».</li>
+          <li><strong>One-shot actions</strong> — mono section label + toolbar: purple <code>.actionBadge</code> assign patch (shows <code>· N</code> when patches assigned); orange <code>.actionUnblock</code> when user is blocked.</li>
+        </ul>
+        <p>Godlike rows skip pills/switches; they only show the action toolbar (assign patch). CSS: <code>ProfilePage.module.css</code> — <code>.userStatusStrip</code>, <code>.userSwitchRow</code>, <code>.userActionToolbar</code>.</p>
+        <div class="component-demo" style="background:#060606;padding:24px;display:flex;justify-content:center;">
+          <style>
+            .ds-um-phone { width:min(100%,360px);border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;background:#0a0a0a; }
+            .ds-um-head { padding:12px 14px;border-bottom:1px solid #2a2a2a;background:linear-gradient(180deg,rgba(217,119,6,.08),transparent);font-family:'Oswald',sans-serif;font-size:12px;text-transform:uppercase;color:#d97706; }
+            .ds-um-row { padding:12px 14px;border-bottom:1px solid #2a2a2a;background:#141414; }
+            .ds-um-id { display:flex;align-items:center;gap:10px;margin-bottom:10px; }
+            .ds-um-av { width:36px;height:36px;border-radius:50%;background:#c0392b;display:grid;place-items:center;font-family:'Oswald',sans-serif;font-weight:700;font-size:14px; }
+            .ds-um-name { font-family:'Oswald',sans-serif;font-size:14px;text-transform:uppercase;line-height:1; }
+            .ds-um-email { font-family:'JetBrains Mono',monospace;font-size:9px;color:#888;margin-top:2px; }
+            .ds-um-role { margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;text-transform:uppercase;padding:2px 6px;border-radius:2px;border:1px solid rgba(59,130,246,.45);background:rgba(59,130,246,.08);color:#3b82f6; }
+            .ds-um-pills { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px; }
+            .ds-um-pill { display:inline-flex;align-items:center;gap:4px;font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;text-transform:uppercase;padding:3px 7px;border-radius:999px;border:1px solid #2a2a2a;color:#888;opacity:.45; }
+            .ds-um-pill.on { opacity:1; }
+            .ds-um-pill.mgr.on { background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.45);color:#3b82f6; }
+            .ds-um-pill.fr.on { background:rgba(217,119,6,.15);border-color:rgba(217,119,6,.4);color:#f59e0b; }
+            .ds-um-dot { width:5px;height:5px;border-radius:50%;background:currentColor; }
+            .ds-um-pill.on .ds-um-dot { box-shadow:0 0 5px currentColor; }
+            .ds-um-swrow { display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;padding-top:8px;border-top:1px solid #2a2a2a;font-family:'JetBrains Mono',monospace;font-size:9px;color:#888; }
+            .ds-um-swrow strong { display:block;color:#e8e8e8;font-size:10px;text-transform:uppercase;margin-bottom:1px; }
+            .ds-um-act-lbl { font-family:'JetBrains Mono',monospace;font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:#888;margin:10px 0 6px; }
+            .ds-um-toolbar { display:flex;gap:6px;padding-top:8px;border-top:1px solid #2a2a2a; }
+            .ds-um-btn { flex:1;padding:5px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border:1px solid; }
+            .ds-um-btn.badge { background:rgba(142,68,173,.1);border-color:rgba(142,68,173,.4);color:#bb8fce; }
+          </style>
+          <div class="ds-um-phone">
+            <div class="ds-um-head">⚡ Servants of Metal</div>
+            <div class="ds-um-row">
+              <div class="ds-um-id">
+                <div class="ds-um-av">M</div>
+                <div><div class="ds-um-name">Marina Stage</div><div class="ds-um-email">marina@example.com</div></div>
+                <span class="ds-um-role">Manager</span>
+              </div>
+              <div class="ds-um-pills">
+                <span class="ds-um-pill mgr on"><span class="ds-um-dot"></span>Manager</span>
+                <span class="ds-um-pill fr on"><span class="ds-um-dot"></span>Friend</span>
+              </div>
+              <div class="ds-um-swrow"><div><strong>Manager access</strong>ON — tap to revoke</div><span class="ds-sw on manager"></span></div>
+              <div class="ds-um-swrow" style="border-top:none;padding-top:6px;"><div><strong>Crew friend</strong>ON — tap to revoke</div><span class="ds-sw on friend"></span></div>
+              <div class="ds-um-act-lbl">One-shot actions</div>
+              <div class="ds-um-toolbar"><span class="ds-um-btn badge">Assign patch · 2</span></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="component-section">

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { usersRepository } from '../../repositories';
-import { Avatar } from '../../ui';
+import { Avatar, Switch } from '../../ui';
 import AssignBadgeModal from './AssignBadgeModal';
 import { roleLabel } from './ProfileHeader';
 import type { UserWithLoading } from './types';
@@ -14,6 +14,150 @@ type UserManagementSectionProps = {
 function getInitial(displayName: string | null, email: string): string {
   if (displayName) return displayName.charAt(0).toUpperCase();
   return email.charAt(0).toUpperCase();
+}
+
+function assignButtonLabel(t: UserManagementSectionProps['t'], badgeCount: number): string {
+  if (badgeCount <= 0) return t('assignBadgeBtn');
+  return `${t('assignBadgeBtn')} · ${badgeCount}`;
+}
+
+type UserRowProps = {
+  user: UserWithLoading;
+  isBlocked: boolean;
+  t: UserManagementSectionProps['t'];
+  onAssign: (user: UserWithLoading) => void;
+  onToggleManager: (userId: string, currentRole: string) => void;
+  onToggleFriend: (userId: string, isFriend: boolean | null | undefined) => void;
+  onUnblock: (userId: string) => void;
+};
+
+function UserRow({
+  user,
+  isBlocked,
+  t,
+  onAssign,
+  onToggleManager,
+  onToggleFriend,
+  onUnblock,
+}: UserRowProps) {
+  const isManager = user.role === 'manager';
+  const isFriend = user.is_friend === true;
+  const showToggles = user.role !== 'godlike';
+
+  return (
+    <div className={styles.userRow}>
+      <div className={styles.userInfo}>
+        <Avatar
+          size={40}
+          src={user.avatar_url}
+          initial={getInitial(user.display_name, user.email)}
+        />
+        <div className={styles.userDetails}>
+          <div className={styles.userDisplayName}>{user.display_name || user.email}</div>
+          <div className={styles.userEmail}>{user.email}</div>
+        </div>
+        <div className={`${styles.roleBadge} ${styles[`roleBadge_${user.role}`]}`}>
+          {roleLabel(user.role)}
+        </div>
+      </div>
+
+      {showToggles && (
+        <>
+          <div className={styles.userStatusStrip}>
+            <span
+              className={[
+                styles.userStatusPill,
+                styles.userStatusPillManager,
+                isManager ? styles.userStatusPillOn : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              <span className={styles.userStatusDot} aria-hidden="true" />
+              {t('statusManager')}
+            </span>
+            <span
+              className={[
+                styles.userStatusPill,
+                styles.userStatusPillFriend,
+                isFriend ? styles.userStatusPillOn : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              <span className={styles.userStatusDot} aria-hidden="true" />
+              {t('statusFriend')}
+            </span>
+            {isBlocked && (
+              <span
+                className={[
+                  styles.userStatusPill,
+                  styles.userStatusPillBlocked,
+                  styles.userStatusPillOn,
+                ].join(' ')}
+              >
+                <span className={styles.userStatusDot} aria-hidden="true" />
+                {t('statusBlocked')}
+              </span>
+            )}
+          </div>
+
+          <div className={styles.userControlsBlock}>
+            <div className={styles.userSwitchRow}>
+              <div className={styles.userSwitchCopy}>
+                <strong>{t('managerSwitchTitle')}</strong>
+                <span>{isManager ? t('managerSwitchOn') : t('managerSwitchHint')}</span>
+              </div>
+              <Switch
+                tone="manager"
+                checked={isManager}
+                disabled={user.loading}
+                ariaLabel={t('managerSwitchTitle')}
+                onChange={() => onToggleManager(user.id, user.role)}
+              />
+            </div>
+            <div className={styles.userSwitchRow}>
+              <div className={styles.userSwitchCopy}>
+                <strong>{t('friendSwitchTitle')}</strong>
+                <span>{isFriend ? t('friendSwitchOn') : t('friendSwitchHint')}</span>
+              </div>
+              <Switch
+                tone="friend"
+                checked={isFriend}
+                disabled={user.loading}
+                ariaLabel={t('friendSwitchTitle')}
+                onChange={() => onToggleFriend(user.id, user.is_friend)}
+              />
+            </div>
+          </div>
+        </>
+      )}
+
+      <div className={styles.userActionSectionLabel}>{t('oneShotActions')}</div>
+      <div className={styles.userActionToolbar}>
+        <button
+          className={`${styles.userActionButton} ${styles.actionBadge} ${user.loading ? styles.loading : ''}`}
+          onClick={() => onAssign(user)}
+          disabled={user.loading}
+          type="button"
+        >
+          {assignButtonLabel(t, user.special_badges.length)}
+        </button>
+        {isBlocked && (
+          <button
+            className={`${styles.userActionButton} ${styles.actionUnblock} ${user.loading ? styles.loading : ''}`}
+            onClick={() => onUnblock(user.id)}
+            disabled={user.loading}
+            type="button"
+          >
+            {user.loading ? <span className={styles.spinner}>⏳</span> : t('unblockUser')}
+          </button>
+        )}
+      </div>
+
+      {user.error && <p className={styles.userRowError}>{user.error}</p>}
+    </div>
+  );
 }
 
 export default function UserManagementSection({ t }: UserManagementSectionProps) {
@@ -168,97 +312,16 @@ export default function UserManagementSection({ t }: UserManagementSectionProps)
         ) : (
           <div className={styles.userList}>
             {allUsers.map((user) => (
-              <div key={user.id} className={styles.userRow}>
-                <div className={styles.userInfo}>
-                  <Avatar
-                    size={40}
-                    src={user.avatar_url}
-                    initial={getInitial(user.display_name, user.email)}
-                  />
-                  <div className={styles.userDetails}>
-                    <div className={styles.userDisplayName}>
-                      {user.display_name || user.email}
-                    </div>
-                    <div className={styles.userEmail}>{user.email}</div>
-                  </div>
-                  <div className={`${styles.roleBadge} ${styles[`roleBadge_${user.role}`]}`}>
-                    {roleLabel(user.role)}
-                  </div>
-                </div>
-
-                <div className={styles.userActionArea}>
-                  {user.special_badges.length > 0 && (
-                    <span className={styles.assignedBadgeChip}>
-                      {t('assignedBadgeCount', { count: user.special_badges.length })}
-                    </span>
-                  )}
-
-                  <button
-                    className={`${styles.userActionButton} ${styles.actionBadge}`}
-                    onClick={() => setAssignModalUser(user)}
-                    type="button"
-                  >
-                    {t('assignBadgeBtn')}
-                  </button>
-
-                  {user.role !== 'godlike' && (
-                    <button
-                      className={`${styles.userActionButton} ${
-                        user.role === 'normal' ? styles.actionPromote : ''
-                      } ${user.loading ? styles.loading : ''}`}
-                      onClick={() => handlePromoteOrDemote(user.id, user.role)}
-                      disabled={user.loading}
-                      type="button"
-                    >
-                      {user.loading ? (
-                        <span className={styles.spinner}>⏳</span>
-                      ) : user.role === 'normal' ? (
-                        t('promoverManager')
-                      ) : (
-                        t('removerManager')
-                      )}
-                    </button>
-                  )}
-
-                  {user.role !== 'godlike' && (
-                    <button
-                      className={`${styles.userActionButton} ${
-                        user.is_friend ? '' : styles.actionFriend
-                      } ${user.loading ? styles.loading : ''}`}
-                      onClick={() => handleToggleFriend(user.id, user.is_friend)}
-                      disabled={user.loading}
-                      type="button"
-                    >
-                      {user.loading ? (
-                        <span className={styles.spinner}>⏳</span>
-                      ) : user.is_friend ? (
-                        t('removerAmigo')
-                      ) : (
-                        t('marcarAmigo')
-                      )}
-                    </button>
-                  )}
-
-                  {blockedPosters.some((bp) => bp.user_id === user.id) && (
-                    <button
-                      className={`${styles.userActionButton} ${styles.actionUnblock} ${
-                        user.loading ? styles.loading : ''
-                      }`}
-                      onClick={() => handleUnblock(user.id)}
-                      disabled={user.loading}
-                      type="button"
-                    >
-                      {user.loading ? (
-                        <span className={styles.spinner}>⏳</span>
-                      ) : (
-                        t('unblockUser')
-                      )}
-                    </button>
-                  )}
-                </div>
-
-                {user.error && <p className={styles.userRowError}>{user.error}</p>}
-              </div>
+              <UserRow
+                key={user.id}
+                user={user}
+                isBlocked={blockedPosters.some((bp) => bp.user_id === user.id)}
+                t={t}
+                onAssign={setAssignModalUser}
+                onToggleManager={handlePromoteOrDemote}
+                onToggleFriend={handleToggleFriend}
+                onUnblock={handleUnblock}
+              />
             ))}
           </div>
         )}

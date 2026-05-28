@@ -121,5 +121,15 @@
   "archivePreviewError": "Vorschau konnte nicht aktualisiert werden. Erneut versuchen.",
   "godlikeToolsTrigger": "Godlike-Kräfte",
   "godlikeServantsTrigger": "Diener des Metals",
-  "managerToolsTrigger": "Manager-Tools"
+  "managerToolsTrigger": "Manager-Tools",
+  "statusManager": "Manager",
+  "statusFriend": "Freund",
+  "statusBlocked": "Blockiert",
+  "managerSwitchTitle": "Manager-Zugang",
+  "managerSwitchHint": "Kann Ankündigungen moderieren",
+  "managerSwitchOn": "AN — tippen zum Entziehen",
+  "friendSwitchTitle": "Rudel-Freund",
+  "friendSwitchHint": "Zählt für Friend-Badge-Logik",
+  "friendSwitchOn": "AN — tippen zum Entziehen",
+  "oneShotActions": "Einmal-Aktionen"
 }

@@ -121,5 +121,15 @@
   "archivePreviewError": "Could not update archive preview. Try again.",
   "godlikeToolsTrigger": "Godlike Powers",
   "godlikeServantsTrigger": "Servants of Metal",
-  "managerToolsTrigger": "Manager tools"
+  "managerToolsTrigger": "Manager tools",
+  "statusManager": "Manager",
+  "statusFriend": "Friend",
+  "statusBlocked": "Blocked",
+  "managerSwitchTitle": "Manager access",
+  "managerSwitchHint": "Can moderate announcements",
+  "managerSwitchOn": "ON — tap to revoke",
+  "friendSwitchTitle": "Crew friend",
+  "friendSwitchHint": "Shows in friend badge logic",
+  "friendSwitchOn": "ON — tap to revoke",
+  "oneShotActions": "One-shot actions"
 }

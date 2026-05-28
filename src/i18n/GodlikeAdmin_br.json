@@ -121,5 +121,15 @@
   "archivePreviewError": "Não deu pra atualizar o preview. Tente de novo.",
   "godlikeToolsTrigger": "Poderes Godlike",
   "godlikeServantsTrigger": "Servos do Metal",
-  "managerToolsTrigger": "Ferramentas de manager"
+  "managerToolsTrigger": "Ferramentas de manager",
+  "statusManager": "Manager",
+  "statusFriend": "Amigo",
+  "statusBlocked": "Bloqueado",
+  "managerSwitchTitle": "Acesso de manager",
+  "managerSwitchHint": "Pode moderar o mural",
+  "managerSwitchOn": "LIGADO — toque para revogar",
+  "friendSwitchTitle": "Amigo da matilha",
+  "friendSwitchHint": "Entra na lógica de badge de amigo",
+  "friendSwitchOn": "LIGADO — toque para revogar",
+  "oneShotActions": "Ações pontuais"
 }
