@@ -17,8 +17,8 @@ After Wacken ends, each vira-lata gets a private scrollable recap at `/wrap` —
 
 1. User logs in; IndexedDB already holds bands, picks, missed marks, crew users, presence.
 2. User taps teaser banner (or navigates to `/wrap` directly).
-3. `useFestivalWrapStats` loads the same IDB snapshot shape as `useBadgeCache` (no Supabase stats reads).
-4. `buildFestivalWrapStats()` delegates to `buildBadgeContextFromSnapshot` + `getEarnedBadges` + crew helpers.
+3. `useFestivalWrapStats` composes `useSocialSnapshot` (same IDB cells as `/now` and live vest; no Supabase stats reads).
+4. `buildFestivalWrapStats()` delegates to `buildBadgeContextFromSocialSnapshot` + `getEarnedBadges` + crew helpers.
 5. `WrapPage` renders a welcome gate, stat sections (with optional assigned-patches section), patches vest pile, and a closing thanks gate — 7–8 full-viewport scroll sections with progress dots.
 6. **Patches** section CTA **Open vest** links to `/profile?vest=open#vest` where `BadgesDisplay` shows the full collection.
 7. **Finale** thanks section signs off with Wacken 2027 (Rain or Shine) and CTA **Back to the App** → `/now`.
@@ -35,7 +35,7 @@ After Wacken ends, each vira-lata gets a private scrollable recap at `/wrap` —
 
 ## Sync Behavior (Reconnect)
 
-- Wrap stats refresh when underlying IDB data changes (picks, missed, presence events) via `useBadgeCache` refresh — same as badges.
+- Wrap stats refresh when underlying IDB data changes (picks, missed, presence, crew events) via `useSocialSnapshot` cache cells — same as badges and `/now`.
 - No dedicated wrap sync layer.
 
 ---
@@ -45,7 +45,8 @@ After Wacken ends, each vira-lata gets a private scrollable recap at `/wrap` —
 | File | Role |
 |------|------|
 | `src/services/festivalWrap.ts` | Pure `buildFestivalWrapStats()` + types |
-| `src/hooks/useFestivalWrapStats.ts` | IDB-first hook (mirrors badge cache load) |
+| `src/hooks/useFestivalWrapStats.ts` | Composes `useSocialSnapshot` + `useMissedBands`; assigned badges from crew IDB |
+| `src/hooks/useSocialSnapshot.ts` | Shared IDB load + `buildSocialSnapshot()` (Phase 31) |
 | `src/hooks/useWrapTeaserVisible.ts` | Teaser gate: `isFestivalEnded(now(), bands)` + dismiss |
 | `src/lib/wrapDismiss.ts` | `viralatas:wrap-dismissed-2026` helpers |
 | `src/pages/WrapPage.tsx` | Welcome + stat sections + patches + finale thanks; scroll-snap; IntersectionObserver progress |
@@ -64,9 +65,9 @@ After Wacken ends, each vira-lata gets a private scrollable recap at `/wrap` —
 ```
 User → /wrap
   → useFestivalWrapStats(userId)
-    → useBadgeCache (IndexedDB: picks, bands, missed, presence, crew)
-    → buildFestivalWrapStats(snapshot, userId, authUser)
-      → buildBadgeContextFromSnapshot (seen/picked/skipped semantics)
+    → useSocialSnapshot (IndexedDB: picks, bands, crew, presence, configs)
+    → buildFestivalWrapStats(idbSnap, userId, authUser, social)
+      → buildBadgeContextFromSocialSnapshot (seen/picked/skipped semantics)
       → getEarnedBadges / computeBandOverlaps / crew Jaccard
   → WrapPage (presentation only)
 ```
@@ -99,7 +100,7 @@ Teaser path:
 ## Important Hooks / Services / Repositories
 
 - **`buildFestivalWrapStats`** — single stats builder; must not duplicate badge seen-band logic.
-- **`useBadgeCache`** — shared IDB snapshot loader; wrap hook does not call persist side effects.
+- **`useSocialSnapshot`** — shared IDB + social snapshot loader; wrap hook does not call persist side effects.
 - **`isFestivalEnded`** — shared with Phase 29 consolidation gate; uses `now()` for godlike override.
 
 ---
@@ -134,3 +135,7 @@ Teaser path:
 - [x] Empty picks friendly state
 - [x] Open vest → `/profile?vest=open#vest`; finale CTA → `/now`
 - [x] Design System documents wrap anatomy
+
+---
+
+**Last updated:** 2026-05-28 — Phase 31: `useFestivalWrapStats` uses `useSocialSnapshot` (replaces `useBadgeCache`).

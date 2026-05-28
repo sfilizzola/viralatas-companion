@@ -11,6 +11,7 @@ Document the guarantees, tradeoffs, and mechanics of the offline-first architect
 - `src/lib/db/` — IndexedDB domain modules (barrel at `index.ts`; public shim `src/lib/db.ts`), stores, event emission
 - `src/repositories/bands.ts` — Band fetch on login (`sync()`), cache version wipe + full re-sync (Phase 27.H)
 - `src/repositories/picks.ts`, `announcements.ts`, `presence.ts`, `missed.ts`, `duck.ts` — Offline queue logic + `flushOfflineQueue()`
+- `src/repositories/users.ts` — `syncCrew()` crew profile cache incl. `special_badges` (Phase 31)
 - `src/repositories/badgeHistoryRepository.ts` — Badge archive IDB read + Supabase pull (no offline queue; Phase 29)
 - `src/lib/syncCoordinator.ts` — Single reconnect contract (Phase 27.C)
 - `src/components/sync/` — `BandSync`, `ReconnectSync`, `RealtimeSync`, `CacheVersionCheck` (Phase 26.G + 27.C/D/H)
@@ -57,7 +58,8 @@ The app **must** remain fully functional offline:
 - ✅ Post announcements (queued for sync)
 - ✅ Update presence (queued for sync)
 - ✅ Mark bands as seen (queued for sync)
-- ✅ View badge archive on `/profile` (cached after first sync; no Realtime)
+- ✅ View live vest assigned badges (from `crew_users.special_badges` after last `syncCrew()`)
+- ✅ `/now` and live vest crew counts aligned offline (shared `buildSocialSnapshot()`)
 - ❌ Run badge year consolidation (godlike; requires network)
 - ❌ Receive LLM alerts (requires network call)
 - ❌ See brand-new announcements (requires Realtime)
@@ -514,4 +516,4 @@ Appears when:
 
 ---
 
-**Last updated:** 2026-05-25 — Phase 27 seam restoration: coordinator reconnect, repository-owned band sync, OptimisticQueue, Realtime in sync layer.
+**Last updated:** 2026-05-28 — Phase 31 crew profile cache; vest display from IDB after sync.

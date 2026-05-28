@@ -189,7 +189,7 @@ window.addEventListener('viralatas:picks-changed', () => {
 │  - announcements     │                  │ 'announce-...'  │
 │  - offline_ann.      │                  │ 'badge-history' │
 │  - bands (cache)     │                  └─────────────────┘
-│  - crew_users (cache)│
+│  - crew_users (cache: is_friend, special_badges)│
 │  - user_presence     │
 │  - offline_presence  │
 │  - user_missed_bands │
@@ -216,6 +216,7 @@ window.addEventListener('viralatas:picks-changed', () => {
 |---------|-------|
 | **Offline Store** | `src/lib/db.ts`, `src/lib/db/badgeHistory.ts`, `src/repositories/badgeHistoryRepository.ts`, `src/__tests__/` |
 | **Badge archive** | `src/hooks/useUserBadgeHistory.ts`, `src/components/BadgeHistorySection.tsx`, `src/components/profile/ConsolidateBadgesSection.tsx`, `supabase/functions/consolidate-year-badges/` |
+| **Live vest / social snapshot** | `src/hooks/useSocialSnapshot.ts`, `src/services/socialSnapshot.ts`, `src/hooks/useBadgeContext.ts` (Phase 31) |
 | **Sync Engine** | `src/repositories/bands.ts`, `src/repositories/picks.ts`, `src/repositories/announcements.ts`, `src/lib/syncCoordinator.ts` |
 | **Realtime** | `src/lib/realtimeSync.ts`, `src/hooks/usePickCounts.ts`, `src/hooks/useBandAttendees.ts` |
 | **Auth** | `src/lib/supabase.ts`, `src/hooks/useAuth.ts`, `src/pages/LoginPage.tsx` |
@@ -480,4 +481,4 @@ Window events dispatched by hooks/components (not from db.ts):
 
 ---
 
-**Last edited**: 2026-05-27 — Phase 29 badge archive, IDB v10, vest terminology
+**Last edited**: 2026-05-28 — Phase 31 social snapshot unification, crew profile cache

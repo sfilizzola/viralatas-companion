@@ -18,6 +18,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - **`useBadgeCache`** — removed; vest and `/now` share one cache path.
 - **`badgeContextBuilder`** — `buildBadgeContextFromSocialSnapshot()` accepts pre-built snapshot.
 - **`architecture.md`**, **`phases-history.md`**, **`PHASES.md`** — Phase 31 documented; active work cleared.
+- **Wiki follow-up** — **`badges.md`**, **`flows/festival-wrap.md`**, **`domain-model.md`**, **`offline-first.md`**, **`testing.md`**, **`index.md`** synced to Phase 31 (removed stale `useBadgeCache` / two-phase Supabase vest paths).
 
 ### Architectural Notes
 - Golden rule preserved: live vest display is UI → IndexedDB (`crew_users.special_badges`, `is_friend`); persist-metadata writes remain best-effort online only.

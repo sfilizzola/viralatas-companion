@@ -8,7 +8,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 
 ## Relevant Source Files
 
-- `src/__tests__/` — All test files (**52 files**, **594 tests** as of Phase 30 close)
+- `src/__tests__/` — All test files (**53 files**, **599 tests** as of Phase 31 close)
 - `vitest.config.ts` — Test runner configuration
 - `package.json` — Test scripts (`test`, `test:coverage`) and seed scripts (`seed:bands`, `seed:bands:sync`, `seed:bands:backfill-slot-id`, `seed:bands:move`, `seed:test-users`, `seed:live-now`, `festival:reset`)
 - `supabase/seed/` — Seed scripts for test data and the destructive `festival-reset.ts` operator script (see `docs/ai-wiki/festival-reset.md`)
@@ -35,7 +35,9 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `useBandDetailModal.test.ts` | Shared band detail modal state (26.F) |
 | `useAnnouncements.test.ts` | Announcements mural hook: IDB, events, moderation (26.K) |
 | `announcementsDisplay.test.ts` | Pure display helpers for announcements (26.K) |
-| `useBadgeContext.test.ts` | Badge context from IDB, location counts, persist metadata (26.I + lost-badge fix) |
+| `useBadgeContext.test.ts` | Badge context from crew IDB, location counts, persist metadata (Phase 31 IDB-only display) |
+| `socialSnapshot.test.ts` | Pure `buildSocialSnapshot()` derivation (Phase 31) |
+| `useSocialSnapshot.test.ts` | Shared IDB cache hook (Phase 31) |
 | `stackLayout.test.ts` | Vest collapsed scatter layout math (26.I) |
 | `persistMetadata.test.ts` | `mergedPersistedBadgeSlugs`, `persistMetadataPatch` dual-key persist |
 | `useNowData.test.ts` | `/now` composable hook: presence toggle, skip/undo, duck gating (26.M) |
@@ -58,13 +60,13 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `picksRepository.test.ts` | `toggle()` online/offline/error, `flushOfflineQueue()` dedup/routing, `syncCrewFromRemote()` (26 tests) |
 | `presenceRepository.test.ts` | `setCampingStatus()` online/offline, `isTimeWithinMetalPlaceWindow()` boundary, `validateAndAutoCheckout()` (11 tests) |
 | `announcementsRepository.test.ts` | Online post, offline queue, `flushPendingAnnouncements()` (7 tests) |
-| `usersRepository.test.ts` | Crew sync, role map, user list, block/unblock, set role (10 tests) |
+| `usersRepository.test.ts` | Crew sync incl. `special_badges`, auth metadata hydration, role map, block/unblock (13 tests) |
 | `bandsRepository.test.ts` | `checkAndApplyCacheVersion()` match/mismatch/no-data (3 tests) |
 | `missedRepository.test.ts` | Mark/unmark missed band online and offline (4 tests) |
 | `festivalWrap.test.ts` | `buildFestivalWrapStats()` badge parity, crew Jaccard, assigned slugs, avatar URLs (Phase 30) |
 | `wrapDismiss.test.ts` | `viralatas:wrap-dismissed-2026` dismiss key round-trip (Phase 30) |
 
-**Coverage**: **594 tests** across **52** test files (Phase 30 wrap + Phase 29 archive)
+**Coverage**: **599 tests** across **53** test files (Phase 31 social snapshot + Phase 30 wrap)
 
 **Run**:
 ```bash
@@ -505,4 +507,4 @@ it('should show band as live when now equals start_time', () => {
 
 ---
 
-**Last updated:** 2026-05-24 — Phase 26 test inventory (502 tests, 37 files); lost-badge regression tests noted.
+**Last updated:** 2026-05-28 — Phase 31: 599 tests, 53 files; socialSnapshot + useSocialSnapshot tests.

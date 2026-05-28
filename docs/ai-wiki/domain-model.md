@@ -76,6 +76,36 @@ type Country = 'de' | 'es' | 'br' | 'us' | 'co' | 'be' | 'other';
 
 ---
 
+### CrewUser (crew profile cache)
+
+**Essence**: A lightweight roster row cached in IndexedDB (`crew_users` store) for social features — `/now`, live vest, wrap stats, arrival map. Not the full `User` entity; synced from `public.users` on reconnect.
+
+```typescript
+type CrewUser = {
+  id: string;
+  display_name: string | null;
+  avatar_url: string | null;
+  wacken_arrival_day?: string | null;
+  is_friend?: boolean | null;
+  special_badges?: string[];   // Godlike-assigned badge slugs (Phase 31)
+};
+```
+
+**Invariants:**
+- Replaced atomically on each `usersRepository.syncCrew()` (clear + put all rows)
+- Missing `special_badges` on legacy rows → `[]` (schemaless store; no IDB version bump)
+- Live vest display reads `special_badges` and `is_friend` from this cache — not live Supabase queries
+- Auth metadata hydrated from crew row on reconnect when drift detected
+
+**Lifecycle:**
+1. `runReconnectSync()` or cache-version invalidation calls `syncCrew()`
+2. `saveCrewUsers()` writes roster + emits `CREW_USERS_CHANGED_EVENT`
+3. `useSocialSnapshot` / hooks read via `useCrewUsersCache()`
+
+See also: **Crew profile cache** in `CONTEXT.md`; Phase 31 in [architecture.md](architecture.md#social-snapshot-flow-phase-31).
+
+---
+
 ### Band
 
 **Essence**: An act performing at a specific stage and time.
@@ -581,4 +611,4 @@ Computed in `useNowData()` using current time + user picks.
 
 ---
 
-**Last updated:** 2026-05-27 — Phase 29 `UserBadgeHistory` entity, consolidation lifecycle, live vest vs archive split.
+**Last updated:** 2026-05-28 — Phase 31 `CrewUser` crew profile cache (`special_badges`); Phase 29 `UserBadgeHistory`.

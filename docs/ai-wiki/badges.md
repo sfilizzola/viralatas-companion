@@ -18,12 +18,15 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 | `src/services/badges/neatStackLayout.ts` | Vest collapsed **neat** row — `buildNeatStackPoses`, scale-down sizing, 0°–5° rotation |
 | `src/services/badges/registry.ts` | `BADGES[]` array — all badge definitions + condition-examples reference |
 | `src/services/badges/index.ts` | Barrel re-export — preserves all existing `from '…/services/badges'` import paths |
-| `src/services/badges/badgeContextBuilder.ts` | Pure `buildBadgeContextFromSnapshot()` — IDB snapshot → `BadgeContext` (crew location parity with `/now`) |
+| `src/services/badges/badgeContextBuilder.ts` | `buildBadgeContextFromSocialSnapshot()` / `buildBadgeContextFromSnapshot()` — IDB snapshot + pre-built **social snapshot** → `BadgeContext` |
 | `src/services/badges/persistMetadata.ts` | `mergedPersistedBadgeSlugs`, `persistMetadataPatch` — dual-key persist for crew location badges |
-| `src/services/livePreview.ts` | `deriveUserBadgeLocation`, `crewLocationCountsFromGroups`, `computeCrewLocationCounts`, `resolveLiveTestBandId` — badge presence aligned with `/now` grouping |
-| `src/hooks/useBadgeCache.ts` | IDB-first snapshot loading + presence/crew window events + auth session read |
-| `src/hooks/useBadgePersist.ts` | Supabase `special_badges` drift sync + persist badge metadata writes |
-| `src/hooks/useBadgeContext.ts` | Thin composer — `useBadgeCache` + `useBadgePersist` |
+| `src/services/socialSnapshot.ts` | Pure `buildSocialSnapshot()` — shared crew derivation for `/now` and live vest (Phase 31) |
+| `src/services/livePreview.ts` | `deriveUserBadgeLocation`, `crewLocationCountsFromGroups`, `computeCrewLocationCounts` — consumed by `buildSocialSnapshot()` |
+| `src/hooks/useSocialSnapshot.ts` | Shared IDB load + `buildSocialSnapshot()`; feeds `/now` and live vest |
+| `src/hooks/useSocialSnapshotSpecs.ts` | `useCrewUsersCache`, `usePresenceCache` cache keys + loaders |
+| `src/hooks/useBadgePersist.ts` | Persist-metadata writes only (`auth.updateUser` best-effort); display reads crew IDB |
+| `src/hooks/useBadgeContext.ts` | Composer — `useSocialSnapshot` + `useMissedBands` + `useBadgePersist` |
+| `src/repositories/users.ts` | `syncCrew()` — writes **crew profile cache** incl. `special_badges`; hydrates auth metadata on reconnect |
 | `src/__tests__/badges.test.ts` | Condition engine + registry integration tests |
 | `src/__tests__/persistMetadata.test.ts` | Persist metadata merge/write tests |
 | `src/__tests__/stackLayout.test.ts` | Vest chaotic scatter layout unit tests |
@@ -570,7 +573,7 @@ Badge earned when user has **committed N+ "I am weak" skips** on `/now` (unpick 
 
 **Registry**: Condition and evaluator shipped; **no badge entries yet**. Choose `persist: true` or `false` per badge at author time.
 
-**Refresh**: `auth.updateUser` after commit → `USER_UPDATED` → `useBadgeCache.refresh()` → `BadgesDisplay` re-evaluates.
+**Refresh**: `auth.updateUser` after commit → `USER_UPDATED` → `useSocialSnapshot` child caches refresh → `BadgesDisplay` re-evaluates.
 
 #### `crew_at_location_min`
 Earned when user **is at a location AND N+ crew members are there** (permanent once earned).
@@ -588,7 +591,7 @@ Earned when user **is at a location AND N+ crew members are there** (permanent o
 - `lost-together` (15+ lost souls at once)
 
 **How it works**:
-1. `useBadgeCache` runs `mapCrewLivePlans` inputs via `buildBadgeContextFromSnapshot()` → `groupCrewLivePlans` (same as `/now`), then `deriveUserBadgeLocation()` for the focus user and `crewLocationCountsFromGroups()` for crew counts.
+1. `useSocialSnapshot` → `buildSocialSnapshot()` produces crew groups (same path as `/now`), then `buildBadgeContextFromSocialSnapshot()` calls `deriveUserBadgeLocation()` and uses `social.crewLocationCounts`.
 2. If user's `currentLocation` matches AND crew count ≥ N, badge is earned.
 3. Slug recorded permanently (even if crew later disperses). Crew-location badges write to **both** `achieved_badge_slugs` and `crew_earned_badge_slugs`; reads merge both keys.
 
@@ -610,12 +613,12 @@ Badge has **no automatic condition**; godlike assigns it manually.
 3. Selects badge slug from dropdown (only `assigned` condition badges appear)
 4. Badge slug added to `users.special_badges[]` array via the `assign-badge` Edge Function
 5. Edge Function mirrors the updated array into `auth.users.raw_user_meta_data.special_badges` via `supabase.auth.admin.updateUserById` — applies for both assign AND revoke
-6. Supabase JS client updates its localStorage session cache on the next `refreshSession()` call
-7. Badge appears in user's profile immediately; on next offline visit, badge is readable from `user.user_metadata.special_badges`
+6. Godlike admin calls `usersRepository.syncCrew()` after assign/revoke so **crew profile cache** (`crew_users` IDB) updates immediately
+7. Live vest reads `crewUsers.find(me)?.special_badges` — no display-path Supabase fetch
 
-**Offline behavior**: `useBadgeCache` / `useBadgePersist` read `assignedBadges` from IndexedDB-first snapshot (DB `special_badges` after background fetch; phase-1 uses `user_metadata.special_badges`). Because the Supabase JS client caches the session (including `user_metadata`) in localStorage, assigned badges load without any network call on first paint. If the user is offline, the last-known-good metadata is used.
+**Offline behavior (Phase 31)**: After reconnect `syncCrew()`, assigned badges and `is_friend` display from **`crew_users` IndexedDB**. Auth metadata is hydrated on reconnect for backward compat; persist-metadata writes remain best-effort online only. Vest renders from IDB without waiting on network.
 
-**Drift detection**: `useBadgePersist` compares the DB `special_badges` value (from `users` via Supabase) against `user_metadata.special_badges` on refresh. If they differ, it fires a one-shot `supabase.auth.updateUser({ data: { special_badges } })` to sync the session cache — no UI block, no spinner.
+**Drift hydration (reconnect seam only)**: `usersRepository.syncCrew()` compares DB `special_badges` on the current user's crew row against `user_metadata.special_badges` and fires a one-shot `auth.updateUser` when they differ — not on every vest render.
 
 **Example badges**:
 - `mosh-pit` (hit the floor and came back)
@@ -853,7 +856,7 @@ type BadgeContext = {
   wacken_years: number[];              // [2022, 2025, 2026]
   country: string | null;              // 'br', 'de', etc.
   wacken_arrival_day: string | null;   // 'wed-jul29'
-  assignedBadges: string[];            // From user_metadata.special_badges (localStorage cache); DB value used for drift detection
+  assignedBadges: string[];            // From crew profile cache (crew_users.special_badges) after sync
   bandsPicked: number;                 // Total picks
   maxAttendanceInPicks: number;         // Highest crew count in any pick
   pickedBands: BadgeBand[];            // Full band details
@@ -1132,7 +1135,7 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 - **src/hooks/useBadgeCache.ts** — IDB snapshot + window events
 - **src/hooks/useBadgePersist.ts** — Drift sync + persist recording
 - **src/hooks/useBadgeContext.ts** — Thin composer hook
-- **src/__tests__/badges.test.ts**, **persistMetadata.test.ts**, **badgeContextBuilder.test.ts**, **useBadgeCache.test.ts**, **useBadgeContext.test.ts** — Condition + hook tests
+- **src/__tests__/badges.test.ts**, **persistMetadata.test.ts**, **badgeContextBuilder.test.ts**, **socialSnapshot.test.ts**, **useBadgeContext.test.ts**, **useSocialSnapshot.test.ts** — Condition + hook tests
 - **src/components/BadgesDisplay.tsx** — Vest-stack patches (collapsed + expanded), detail modal, fullscreen zoom
 - **src/components/ProfilePage.tsx** — Patches section + godlike assign UI
 - **src/i18n/Badges_*.json** — All 4 language translations
@@ -1141,4 +1144,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-25 — Phase 27.H: band sync in `bandsRepository`; Phase 27.D Realtime ownership in sync layer.
+**Last updated:** 2026-05-28 — Phase 31: `useSocialSnapshot`, crew profile cache (`special_badges`), IDB-only vest display.
