@@ -1,7 +1,14 @@
 {
   "title": "Beliebt",
-  "headerViraLatas": "{count} vira-latas",
-  "headerSorted": "nach Picks",
+  "headerViraLatas": "{count} Vira-latas",
+  "headerSortedPicks": "nach Picks",
+  "headerSortedRating": "nach Bewertung",
+  "sortModeLabel": "Sortiermodus",
+  "popularModePicks": "Picks",
+  "popularModeRating": "Note",
+  "ratingCount": "{count} Vira-latas",
+  "ratingYouScore": "Du · {score}",
   "loading": "Beliebtheit wird geladen...",
-  "empty": "Noch hat kein Vira-lata eine Band gewählt. Wer zuerst speichert, gewinnt. 🤘"
+  "empty": "Noch kein Vira-lata hat eine Band gewählt. Wer zuerst speichert, gewinnt. 🤘",
+  "emptyRated": "Noch keine Bewertungen — nach dem Set im Band-Detail bewerten."
 }

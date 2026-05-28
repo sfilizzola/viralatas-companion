@@ -1,7 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { Band, UserMissedBand } from '../types';
+import type { Band, BandRatingScore, UserMissedBand } from '../types';
 import type { BandAttendee } from './useBandAttendees';
 import type { OverlapEntry } from './useBandConflicts';
+import { canRateBand } from '../services/bandRatings';
 
 export type BandDetailModalProps = {
   band: Band;
@@ -16,6 +17,9 @@ export type BandDetailModalProps = {
   onToggleMissed: () => void;
   conflictBands: Band[];
   overlapBands: Band[];
+  canRate: boolean;
+  userScore: BandRatingScore | null;
+  onRate: (score: BandRatingScore | null) => void;
 };
 
 type UseBandDetailModalParams = {
@@ -28,6 +32,9 @@ type UseBandDetailModalParams = {
   attendeesByBand: Record<string, BandAttendee[]>;
   currentNow: Date;
   conflicts: Map<string, OverlapEntry[]>;
+  userRatingByBand: Record<string, BandRatingScore>;
+  toggleRating: (bandId: string, score: BandRatingScore) => Promise<void>;
+  clearRating: (bandId: string) => Promise<void>;
 };
 
 function bandsForConflict(
@@ -48,6 +55,9 @@ export function useBandDetailModal({
   attendeesByBand,
   currentNow,
   conflicts,
+  userRatingByBand,
+  toggleRating,
+  clearRating,
 }: UseBandDetailModalParams) {
   const [activeBandId, setActiveBandId] = useState<string | null>(null);
 
@@ -88,8 +98,24 @@ export function useBandDetailModal({
 
   const handleToggleMissed = useCallback(async () => {
     if (!activeBand) return;
+    const wasMissed = missedBandIds.has(activeBand.id);
     await toggleMissed(activeBand.id);
-  }, [activeBand, toggleMissed]);
+    if (!wasMissed) {
+      void clearRating(activeBand.id);
+    }
+  }, [activeBand, missedBandIds, toggleMissed, clearRating]);
+
+  const handleRate = useCallback(
+    async (score: BandRatingScore | null) => {
+      if (!activeBand) return;
+      if (score === null) {
+        await clearRating(activeBand.id);
+      } else {
+        await toggleRating(activeBand.id, score);
+      }
+    },
+    [activeBand, clearRating, toggleRating],
+  );
 
   const modalProps = useMemo<BandDetailModalProps | null>(() => {
     if (!activeBand) return null;
@@ -107,6 +133,14 @@ export function useBandDetailModal({
       onToggleMissed: handleToggleMissed,
       conflictBands: bandsForConflict(conflicts, activeBand.id, 'hard'),
       overlapBands: bandsForConflict(conflicts, activeBand.id, 'soft'),
+      canRate: canRateBand({
+        band: activeBand,
+        now: currentNow,
+        isPicked: pickedIds.has(activeBand.id),
+        isMissed: missedBandIds.has(activeBand.id),
+      }),
+      userScore: userRatingByBand[activeBand.id] ?? null,
+      onRate: handleRate,
     };
   }, [
     activeBand,
@@ -119,6 +153,10 @@ export function useBandDetailModal({
     isMissed,
     handleToggleMissed,
     conflicts,
+    currentNow,
+    missedBandIds,
+    userRatingByBand,
+    handleRate,
   ]);
 
   return {

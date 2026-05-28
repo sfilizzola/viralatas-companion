@@ -71,6 +71,9 @@ function buildParams(overrides: Partial<Parameters<typeof useBandDetailModal>[0]
     },
     currentNow,
     conflicts,
+    userRatingByBand: {},
+    toggleRating: vi.fn().mockResolvedValue(undefined),
+    clearRating: vi.fn().mockResolvedValue(undefined),
     ...overrides,
   };
 }

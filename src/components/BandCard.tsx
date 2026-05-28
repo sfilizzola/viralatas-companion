@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
-import type { Band } from '../types';
+import type { Band, BandRatingScore } from '../types';
 import type { BandAttendee } from '../hooks/useBandAttendees';
 import { stageColorVar } from '../services/stageColors';
 import { bandWeekdayKey, formatTime } from '../services/bandTime';
@@ -33,6 +33,11 @@ type BandCardProps = {
   duckCooldownUntil?: number;
   /** Corner weekday label — schedule/ranked when day context is mixed */
   showDayLabel?: boolean;
+  ratingStats?: {
+    avgFormatted: string;
+    count: number;
+    userScore?: BandRatingScore;
+  };
 };
 
 function getVariantClass(variant: BandCardVariant, hasDuck: boolean): string {
@@ -73,8 +78,10 @@ export default function BandCard({
   onDuck,
   duckCooldownUntil,
   showDayLabel = false,
+  ratingStats,
 }: Readonly<BandCardProps>) {
   const { t } = useI18n('SchedulePage');
+  const { t: tPopular } = useI18n('PopularPage');
   const initial = band.name.charAt(0).toUpperCase();
   const interactive = Boolean(onClick);
   const showPick = variant !== 'ranked' && !hidePick;
@@ -193,10 +200,25 @@ export default function BandCard({
           </div>
         )}
 
-        {attendeeCluster && variant === 'ranked' && (
+        {attendeeCluster && variant === 'ranked' && !ratingStats && (
           <AttendeeCluster
             {...attendeeCluster}
             count={count}
+            isBandEnded={isBandEnded}
+            missedCount={missedCount}
+          />
+        )}
+        {ratingStats && variant === 'ranked' && (
+          <RatingStats
+            avgFormatted={ratingStats.avgFormatted}
+            count={ratingStats.count}
+            userScore={ratingStats.userScore}
+            countLabel={tPopular('ratingCount', { count: ratingStats.count })}
+            youLabel={
+              ratingStats.userScore !== undefined
+                ? tPopular('ratingYouScore', { score: ratingStats.userScore })
+                : undefined
+            }
             isBandEnded={isBandEnded}
             missedCount={missedCount}
           />
@@ -291,6 +313,39 @@ function AttendanceText({
     <>
       <b>{count}</b> {t('goingLabel')}
     </>
+  );
+}
+
+function RatingStats({
+  avgFormatted,
+  countLabel,
+  youLabel,
+  isBandEnded,
+  missedCount,
+}: Readonly<{
+  avgFormatted: string;
+  count: number;
+  userScore?: BandRatingScore;
+  countLabel: string;
+  youLabel?: string;
+  isBandEnded?: boolean;
+  missedCount?: number;
+}>) {
+  const { t } = useI18n('SchedulePage');
+
+  return (
+    <div className={styles.ratingCluster}>
+      <span className={styles.ratingLinePrimary}>
+        <b>{avgFormatted}</b> · {countLabel}
+      </span>
+      {youLabel && <span className={styles.ratingLineSecondary}>{youLabel}</span>}
+      {isBandEnded && missedCount !== undefined && missedCount > 0 && (
+        <span className={styles.ratingLineMissed}>
+          {' · '}
+          <b>{missedCount}</b> {t('skipLabel')}
+        </span>
+      )}
+    </div>
   );
 }
 

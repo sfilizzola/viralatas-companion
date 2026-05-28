@@ -11,6 +11,10 @@ Document the real-world entities, their relationships, business rules, and invar
 - `src/types/index.ts` — All type definitions
 - `supabase/migrations/` — Database schema (source of truth)
 - `src/repositories/` — Business rules enforcement
+- `src/services/bandRatings.ts` — Eligibility, aggregates, Popular sort helpers
+- `src/repositories/ratings.ts` — Rating writes, offline queue, reconnect sync, Realtime
+- `src/lib/db/ratings.ts` — IndexedDB `user_band_ratings` + `offline_band_ratings` stores
+- `src/hooks/useBandRatings.ts` — UI hook over crew-wide IDB snapshot
 
 ---
 
@@ -28,6 +32,7 @@ Viralatas Metaleiros is a small group (~20 people) attending Wacken Open Air 202
 8. **Announcement** — A mural post from any vira-lata
 9. **BlockedPoster** — Manager blocking moderation rules
 10. **UserBadgeHistory** — Frozen year-badge row after godlike consolidation (Phase 29)
+11. **UserBandRating** — A vira-lata's 1–5 score for a concert they attended (Phase 32)
 
 ---
 
@@ -176,6 +181,83 @@ type UserPick = {
 2. `picksRepository.toggle()` writes to IndexedDB immediately (optimistic)
 3. Async Supabase call made; if fails, queued to offline_picks
 4. Other users see the pick via Realtime subscription within ~3s
+
+---
+
+### UserBandRating
+
+**Essence**: After a set ends, a vira-lata scores how good the concert was (1–5 paw icons). One row per `(user_id, band_id)`.
+
+```typescript
+type BandRatingScore = 1 | 2 | 3 | 4 | 5;
+
+type UserBandRating = {
+  user_id: string;             // uuid, foreign key to users
+  band_id: string;             // uuid, foreign key to bands
+  score: BandRatingScore;      // 1 (worst) … 5 (best)
+  rated_at: string;            // ISO 8601, last score change
+};
+```
+
+**Eligibility** (`canRateBand()` in `src/services/bandRatings.ts` — all must pass):
+
+| Rule | Rationale |
+|------|-----------|
+| `band.category !== 'ceremony'` | Ceremony slots are not rateable concerts |
+| User has an active pick for the band | Must have intended to watch it |
+| Band is not marked missed for this user | "Didn't see" disqualifies rating |
+| `band.end_time < now` | Rating unlocks only after the set ends |
+
+Rating UI appears only in `BandDetailModal` when `canRate` is true. No inline rating on schedule cards.
+
+**Clear / purge rules** (row deleted locally + on Supabase):
+
+| Trigger | Behavior |
+|---------|----------|
+| Tap the same paw score again | Toggle off — clears rating (`toggleRating`) |
+| "Clear" text button in `BandRatingInput` | Sets score to `null` |
+| Unpick band | `usePickActions` → `ratingsRepository.clearRating()` |
+| Mark band as missed | `useBandDetailModal` → `clearRating()` on first miss |
+
+**Change rules:**
+
+- Any eligible score 1–5 can be set or changed at any time while still eligible
+- Tapping a different score replaces the previous score (upsert)
+
+**Aggregates** (client-side, not stored in Postgres):
+
+```typescript
+type BandRatingAggregate = { avg: number; count: number };
+```
+
+- `computeRatingAggregates(allRatings)` groups all crew rows by `band_id`
+- **Average includes every rater**, including the current user; a solo rating → `avg === score`, `count === 1`
+- `/popular` rating mode sorts bands with `count ≥ 1` by: **avg desc → count desc → `start_time` asc**
+- Ceremony bands excluded from the rated list even if rows existed
+- Display uses `formatRatingAvg()` (one decimal, trailing zero trimmed); sort uses raw `avg`
+
+**Invariants:**
+
+- Composite primary key `(user_id, band_id)` — at most one score per user per band
+- `score` constrained to 1–5 in DB and TypeScript
+- Ratings are crew-visible (SELECT open to all authenticated users)
+
+**Offline-first lifecycle:**
+
+1. UI reads crew-wide ratings from IndexedDB store `user_band_ratings` (IDB v11)
+2. `setRating` / `clearRating` / `toggleRating` write IDB immediately → `RATINGS_CHANGED_EVENT`
+3. Online: upsert/delete on `public.user_band_ratings`; on failure → `offline_band_ratings` queue
+4. Offline: queue only; `runReconnectSync()` flushes queue then `syncCrewFromRemote()` full replace
+5. Peer changes arrive via Realtime → `ratingsRepository.subscribeToRealtime()` → IDB patch
+
+**Relevant source files:**
+
+- `supabase/migrations/20260528100000_phase32_user_band_ratings.sql`
+- `src/components/BandRatingInput.tsx`, `src/components/icons/PawIcon.tsx`
+- `src/hooks/useBandRatings.ts`, `src/hooks/useBandDetailModal.ts`
+- `src/pages/PopularPage.tsx` — dual sort mode + aggregate display on cards
+
+**Out of scope (Phase 32):** read-only rating on My Picks, `/wrap` stats, badge conditions → `FUTURE_IDEAS.md` #8–#10.
 
 ---
 
@@ -483,6 +565,8 @@ User (1) ──┬─→ (∞) UserPick ←─ (∞) Band
            │
            ├─→ (∞) UserMissedBand ←─ (∞) Band
            │
+           ├─→ (∞) UserBandRating ←─ (∞) Band
+           │
            └─→ (∞) UserBadgeHistory
 
 
@@ -507,6 +591,17 @@ GROUP BY band_id;
 ```
 
 Cached in `usePickCounts()` hook, updated via Realtime.
+
+### BandRatingAggregate (Computed)
+
+Not stored in PostgreSQL; derived in the client from all `UserBandRating` rows in IndexedDB:
+
+```typescript
+// Per band_id: { avg: total / count, count }
+computeRatingAggregates(allRatings)
+```
+
+Consumed by `useBandRatings().aggregates` and `/popular` rating sort mode. Updated on `RATINGS_CHANGED_EVENT` and Realtime patches.
 
 ### BandConflict (Computed)
 

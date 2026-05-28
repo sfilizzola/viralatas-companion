@@ -1,7 +1,14 @@
 {
   "title": "Popular",
   "headerViraLatas": "{count} vira-latas",
-  "headerSorted": "por Picks",
+  "headerSortedPicks": "por picks",
+  "headerSortedRating": "por nota",
+  "sortModeLabel": "Modo de orden",
+  "popularModePicks": "Picks",
+  "popularModeRating": "Nota",
+  "ratingCount": "{count} vira-latas",
+  "ratingYouScore": "Tú · {score}",
   "loading": "Cargando popularidad...",
-  "empty": "Ningún vira-lata ha elegido una banda todavía. El primero en guardar gana. 🤘"
+  "empty": "Ningún vira-lata ha elegido banda aún. El primero gana. 🤘",
+  "emptyRated": "Sin notas aún — puntúa en el detalle de la banda tras el set."
 }

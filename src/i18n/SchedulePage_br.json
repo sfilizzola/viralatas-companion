@@ -59,5 +59,9 @@
   "genreGuideIncludes": "inclui",
   "genreGuidePartyMetalNote": "Alestorm, Airbourne — inalterados",
   "genreGuideMetalBattleNote": "Bandas da competição Wacken Metal Battle",
-  "genreGuideMetalNote": "Genérico para tags sem categoria / TBD"
+  "genreGuideMetalNote": "Genérico para tags sem categoria / TBD",
+  "ratingSectionTitle": "Sua nota",
+  "ratingClear": "Limpar",
+  "ratingClearHint": "Toque na mesma pata de novo para limpar",
+  "ratingScoreLabel": "Nota {score} de 5"
 }

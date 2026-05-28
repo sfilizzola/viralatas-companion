@@ -226,6 +226,58 @@ USING (auth.uid() = user_id);
 
 ---
 
+### `public.user_band_ratings`
+
+**Purpose**: Crew-visible 1–5 concert scores after a set ends. One row per `(user_id, band_id)`.
+
+**Migration**: `20260528100000_phase32_user_band_ratings.sql`
+
+```sql
+CREATE TABLE public.user_band_ratings (
+  user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  band_id uuid NOT NULL REFERENCES public.bands(id) ON DELETE CASCADE,
+  score smallint NOT NULL CHECK (score BETWEEN 1 AND 5),
+  rated_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, band_id)
+);
+```
+
+**IndexedDB mirror** (IDB v11): store `user_band_ratings` (key `[user_id, band_id]`, index `by_user`); offline queue `offline_band_ratings` (key `id` = `${user_id}|${band_id}`).
+
+**Realtime**: Enabled (`alter publication supabase_realtime add table public.user_band_ratings`). Subscribed in `RealtimeSync` via `ratingsRepository.subscribeToRealtime()` — INSERT/UPDATE upsert to IDB; DELETE removes by composite key.
+
+**RLS Policy** (select):
+```sql
+CREATE POLICY "authenticated users can view all ratings"
+ON public.user_band_ratings FOR SELECT
+USING (auth.role() = 'authenticated');
+```
+
+**RLS Policy** (insert):
+```sql
+CREATE POLICY "users can insert their own ratings"
+ON public.user_band_ratings FOR INSERT
+WITH CHECK (auth.uid() = user_id);
+```
+
+**RLS Policy** (update):
+```sql
+CREATE POLICY "users can update their own ratings"
+ON public.user_band_ratings FOR UPDATE
+USING (auth.uid() = user_id);
+```
+
+**RLS Policy** (delete):
+```sql
+CREATE POLICY "users can delete their own ratings"
+ON public.user_band_ratings FOR DELETE
+USING (auth.uid() = user_id);
+```
+
+**Client sync**: `ratingsRepository` — optimistic IDB write → Supabase upsert/delete; offline queue flushed in `runReconnectSync()`; full crew pull via `syncCrewFromRemote()` on reconnect.
+
+---
+
 ### `public.announcements`
 
 **Purpose**: Mural-style posts.
@@ -518,6 +570,7 @@ INSERT INTO public.app_settings DEFAULT VALUES;
 
 **Enabled Tables**:
 - public.user_picks
+- public.user_band_ratings
 - public.user_presence
 - public.announcements
 - public.user_missed_bands
@@ -638,6 +691,7 @@ npm run festival:reset -- --with-bands --force
 | `users` | All | (via trigger) | Own user (via trigger) | (via trigger) |
 | `bands` | All | Godlike | Godlike | Godlike |
 | `user_picks` | All | Own user | Own user | Own user |
+| `user_band_ratings` | Authenticated | Own user | Own user | Own user |
 | `announcements` | Non-deleted | Own author | Author / Manager+ | Author / Manager+ |
 | `user_presence` | All | Own user | Own user | Own user |
 | `user_missed_bands` | All | Own user | Own user | Own user |

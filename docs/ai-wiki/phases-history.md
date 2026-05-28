@@ -686,3 +686,40 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Reconnect + post-assign `syncCrew()` sufficient for v1; no Realtime on `users.special_badges`.
 
 ---
+
+### Phase 32 — Vira-lata Rating
+**Status:** ✅ Complete
+
+**Goal:** After a set ends, eligible vira-latas rate concerts 1–5 in band detail; `/popular` gains a second sort mode by crew average rating (offline-first, Supabase sync).
+
+**Deliverables:**
+- `supabase/migrations/20260528100000_phase32_user_band_ratings.sql` — table, RLS, Realtime publication
+- IDB v11 — `user_band_ratings` + `offline_band_ratings` stores; `src/lib/db/ratings.ts`
+- `src/services/bandRatings.ts` — `canRateBand()`, `computeRatingAggregates()`, `sortBandsByRating()`, `formatRatingAvg()`
+- `src/repositories/ratings.ts` — optimistic writes, offline queue, reconnect sync, Realtime handlers
+- `src/hooks/useBandRatings.ts`, `useBandDetailModal` + `usePickActions` eligibility purge
+- `BandRatingInput` + `PawIcon` in `BandDetailModal`; rating cluster on `BandCard` (Popular rating mode)
+- `/popular` segmented sort pill (picks vs rating); ceremony excluded from rated list
+- i18n `SchedulePage_*` + `PopularPage_*` (4 locales); Design System rating section
+- Tests: `bandRatings.test.ts`, `ratingsRepository.test.ts`, `useBandRatings.test.ts`
+
+**Acceptance criteria (all met):**
+- [x] Eligible vira-lata can rate 1–5 only in `BandDetailModal` (picked + ended + not missed)
+- [x] Rating changeable anytime; tap same score clears row
+- [x] Mark missed or unpick deletes user's rating for that band
+- [x] Crew average includes all raters (including self); solo rating → avg equals that score
+- [x] `/popular` second mode lists bands with ≥1 rating, sorted avg → count → start_time
+- [x] Ceremony bands excluded from rated list
+- [x] Offline-first: UI reads IndexedDB; writes queue when offline; sync on reconnect
+- [x] Realtime updates peer ratings into IndexedDB
+- [x] All four locales updated; Design System documents rating control
+- [x] `rtk npm run build` and `rtk npm test` green
+
+**Wiki:** `domain-model.md` · `supabase-schema.md` · `changelog.md` · `Design System.html` · `PHASES.md`
+
+**Architectural notes:**
+- No server-side aggregate; Popular sort reads full crew snapshot from IDB.
+- Eligibility is client/service-layer only — DB enforces score range and row ownership via RLS.
+- Out of scope deferred to `FUTURE_IDEAS.md` #8–#10: My Picks display, `/wrap` stats, rating badges.
+
+---

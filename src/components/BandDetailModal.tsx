@@ -1,10 +1,11 @@
 import { type ReactNode } from 'react';
-import type { Band } from '../types';
+import type { Band, BandRatingScore } from '../types';
 import type { BandAttendee } from '../hooks/useBandAttendees';
 import { stageColor } from '../services/stageColors';
 import { bandDay, formatTime } from '../services/bandTime';
 import { useI18n } from '../lib/i18n';
 import Icon from './icons/Icon';
+import BandRatingInput from './BandRatingInput';
 import { Avatar, Modal } from '../ui';
 import styles from './BandDetailModal.module.css';
 
@@ -22,6 +23,9 @@ type Props = {
   conflictBands?: Band[];
   overlapBands?: Band[];
   hidePick?: boolean;
+  canRate?: boolean;
+  userScore?: BandRatingScore | null;
+  onRate?: (score: BandRatingScore | null) => void;
 };
 
 export default function BandDetailModal({
@@ -38,6 +42,9 @@ export default function BandDetailModal({
   conflictBands,
   overlapBands,
   hidePick = false,
+  canRate = false,
+  userScore = null,
+  onRate,
 }: Props) {
   const { t } = useI18n('SchedulePage');
   const color = stageColor(band.stage);
@@ -130,6 +137,17 @@ export default function BandDetailModal({
                 <span />
               </button>
             </div>
+          )}
+
+          {canRate && onRate && (
+            <BandRatingInput
+              value={userScore}
+              onChange={onRate}
+              sectionTitle={t('ratingSectionTitle')}
+              clearLabel={t('ratingClear')}
+              clearHint={t('ratingClearHint')}
+              scoreLabel={(score) => t('ratingScoreLabel', { score })}
+            />
           )}
         </div>
 

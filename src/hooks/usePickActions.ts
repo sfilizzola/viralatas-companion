@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { picksRepository } from '../repositories';
+import { picksRepository, ratingsRepository } from '../repositories';
 import { useMyPicks } from './useMyPicks';
 
 export function usePickActions(userId: string | null) {
@@ -8,7 +8,11 @@ export function usePickActions(userId: string | null) {
   const togglePick = useCallback(
     async (bandId: string) => {
       if (!userId) return;
-      await picksRepository.toggle(userId, bandId, pickedIds.has(bandId));
+      const wasPicked = pickedIds.has(bandId);
+      await picksRepository.toggle(userId, bandId, wasPicked);
+      if (wasPicked) {
+        void ratingsRepository.clearRating(userId, bandId);
+      }
       await refresh();
     },
     [userId, pickedIds, refresh],

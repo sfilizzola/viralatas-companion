@@ -458,7 +458,7 @@
 
     <div class="summary">
       <div class="metric">
-        <div class="metric-value">20</div>
+        <div class="metric-value">22</div>
         <div class="metric-label">Core Components</div>
       </div>
       <div class="metric">
@@ -977,6 +977,7 @@
         <p><strong>Features:</strong> duck button, conflict indicators, stage badge, attendee avatars, corner weekday label (V1 ghost)</p>
         <p><strong>Day label (<code>showDayLabel</code>):</strong> optional corner ghost — mono 9px weekday abbr in <code>--text-faint</code>, top-right of the body column (<code>.dayGhost</code>). Only on <code>schedule</code> and <code>ranked</code> variants. Weekday comes from <code>bandWeekdayKey()</code> in <code>bandTime.ts</code> (CEST, same rules as <code>bandDay()</code>) via existing SchedulePage i18n keys. <strong>Schedule:</strong> shown when no day tab is active (<code>filters.day === null</code> — search, all-days browse). Hidden when a single day filter is selected. <strong>Popular:</strong> always shown (cross-day list). <strong>My Picks:</strong> not used (timeline variant + day section headers).</p>
         <p><strong>Duck button visibility:</strong> only when band is currently live, the user has picked it, <code>band.category !== 'ceremony'</code>, AND the global <code>duck_enabled</code> killswitch (Phase 21) is on. The killswitch is a single boolean on <code>app_settings</code>, fetched once at app boot via <code>DuckEnabledProvider</code> and toggled from Godlike Powers → Duck feature. When off, the duck button is not rendered anywhere; offline-queued ducks still flush on reconnect.</p>
+        <p><strong>Popular rating mode (<code>ratingStats</code>, Phase 32):</strong> when <code>PopularPage</code> sort mode is <code>rating</code>, ranked cards pass <code>ratingStats</code> instead of <code>attendeeCluster</code>. Line 1: avg · count vira-latas (<code>.ratingLinePrimary</code>). Line 2 (optional): <code>You · {score}</code> in accent mono (<code>.ratingLineSecondary</code>). Ended bands still show missed skip count on line 1 via <code>.ratingLineMissed</code>. Pick avatars hidden in rating mode.</p>
         <div class="component-demo" style="background: #0a0a0a; padding: 20px; max-width: 420px;">
           <style>
             .ds-bc-card { display: grid; grid-template-columns: 4px 56px 1fr 64px; background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; --stage-color: #2980b9; }
@@ -1007,6 +1008,146 @@
           </div>
         </div>
         <p><strong>Status:</strong> <span class="status-warn">⚠ Hardcoded colors in component—needs refactor</span></p>
+      </div>
+
+      <div class="component-section">
+        <h3>BandRatingInput</h3>
+        <p>Five-paw 1–5 rating control for ended concerts. Renders in <code>BandDetailModal</code> <strong>below</strong> the missed toggle when <code>canRate</code> is true (picked + ended + not missed + not ceremony). No crew average in modal — aggregates live on Popular only.</p>
+        <p><strong>Icon:</strong> <code>PawIcon</code> — canine paw + heel, rotated −14° (<code>IconPawFinal</code>, Phase 32 locked). 20px in buttons; outline stroke when inactive, filled <code>currentColor</code> when score ≥ index.</p>
+        <p><strong>Interaction:</strong> tap paw sets score (cumulative highlight 1…N); tap exact paw again clears; uppercase mono <strong>Clear</strong> link when score set. Both clear paths delete the row.</p>
+        <p><strong>Modal placement:</strong> compact box after “didn’t see” toggle; mono kicker <code>ratingSectionTitle</code> (“Your score” EN); hint <code>ratingClearHint</code>.</p>
+        <p><strong>CSS module:</strong> <code>BandRatingInput.module.css</code> — section on <code>--bg-elevated</code>; buttons 36×36 on <code>--bg-sunken</code>; active <code>rgba(192, 57, 43, 0.1)</code>; exact border <code>--accent</code>.</p>
+        <div class="component-demo" style="background: #0a0a0a; padding: 20px; max-width: 440px;">
+          <style>
+            .ds-paw { display: block; }
+            .ds-ri-section { display: grid; gap: 8px; padding: 12px; background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 4px; }
+            .ds-ri-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+            .ds-ri-title { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #888; }
+            .ds-ri-clear { border: none; background: none; color: #555; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; padding: 2px 0; }
+            .ds-ri-clear:hover { color: #888; }
+            .ds-ri-row { display: flex; gap: 4px; flex-wrap: wrap; }
+            .ds-ri-btn { width: 36px; height: 36px; border: 1px solid #2a2a2a; border-radius: 4px; background: #050505; color: #888; display: grid; place-items: center; cursor: default; transition: border-color .12s, background .12s, color .12s; }
+            .ds-ri-btn.active { background: rgba(192, 57, 43, 0.1); border-color: rgba(192, 57, 43, 0.28); color: #c0392b; }
+            .ds-ri-btn.exact { border-color: #c0392b; }
+            .ds-ri-hint { margin: 0; font-family: 'JetBrains Mono', monospace; font-size: 8px; letter-spacing: .05em; color: #555; }
+            .ds-sp-pill { display: flex; border: 1px solid #2a2a2a; border-radius: 999px; overflow: hidden; width: fit-content; }
+            .ds-sp-btn { min-width: 56px; padding: 4px 10px; background: #1e1e1e; border: none; color: #888; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; cursor: default; }
+            .ds-sp-btn + .ds-sp-btn { border-left: 1px solid #2a2a2a; }
+            .ds-sp-btn.on { background: #c0392b; color: #fff; }
+            .ds-sp-caption { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: .1em; margin: 20px 0 8px; }
+            .ds-rc-card { display: grid; grid-template-columns: 44px 1fr; background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; margin-top: 8px; --stage-color: #2980b9; }
+            .ds-rc-rank { display: flex; align-items: center; justify-content: center; font-family: 'Oswald', sans-serif; font-size: 22px; font-weight: 700; color: #c0392b; background: #1e1e1e; border-right: 1px solid #2a2a2a; }
+            .ds-rc-body { padding: 12px 16px; position: relative; }
+            .ds-rc-day { position: absolute; top: 10px; right: 12px; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: #555; }
+            .ds-rc-name { font-family: 'Oswald', sans-serif; font-weight: 700; font-size: 17px; text-transform: uppercase; color: #e8e8e8; }
+            .ds-rc-meta { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; align-items: center; }
+            .ds-rc-stage { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: #fff; background: var(--stage-color); padding: 4px 8px; }
+            .ds-rc-time { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8e8e8; }
+            .ds-rc-rating { display: grid; gap: 2px; margin-top: 12px; }
+            .ds-rc-line1 { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .06em; }
+            .ds-rc-line1 b { color: #fff; font-family: 'Oswald', sans-serif; font-size: 18px; font-weight: 700; margin-right: 4px; }
+            .ds-rc-line2 { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #c0392b; text-transform: uppercase; letter-spacing: .06em; }
+          </style>
+          <!-- Paw SVG inline (matches PawIcon.tsx IconPawFinal) -->
+          <svg width="0" height="0" aria-hidden="true" style="position:absolute">
+            <defs>
+              <symbol id="ds-paw" viewBox="0 0 24 24">
+                <g transform="rotate(-14 12 12)">
+                  <ellipse cx="6.5" cy="8.8" rx="1.95" ry="2.45"/>
+                  <ellipse cx="9.8" cy="5.5" rx="2.1" ry="2.7"/>
+                  <ellipse cx="14.2" cy="5.5" rx="2.1" ry="2.7"/>
+                  <ellipse cx="17.5" cy="8.8" rx="1.95" ry="2.45"/>
+                  <ellipse cx="12" cy="15.8" rx="5.8" ry="4.2"/>
+                  <ellipse cx="12" cy="19.2" rx="2.8" ry="1.6" opacity="0.85"/>
+                </g>
+              </symbol>
+            </defs>
+          </svg>
+          <div class="ds-ri-section">
+            <div class="ds-ri-header">
+              <span class="ds-ri-title">Your score</span>
+              <button type="button" class="ds-ri-clear">Clear</button>
+            </div>
+            <div class="ds-ri-row" role="group" aria-label="Your score">
+              <span class="ds-ri-btn"><svg class="ds-paw" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.35"><use href="#ds-paw"/></svg></span>
+              <span class="ds-ri-btn"><svg class="ds-paw" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.35"><use href="#ds-paw"/></svg></span>
+              <span class="ds-ri-btn active"><svg class="ds-paw" width="20" height="20" fill="currentColor" stroke="none"><use href="#ds-paw"/></svg></span>
+              <span class="ds-ri-btn active"><svg class="ds-paw" width="20" height="20" fill="currentColor" stroke="none"><use href="#ds-paw"/></svg></span>
+              <span class="ds-ri-btn active exact"><svg class="ds-paw" width="20" height="20" fill="currentColor" stroke="none"><use href="#ds-paw"/></svg></span>
+            </div>
+            <p class="ds-ri-hint">Tap same paw again to clear</p>
+          </div>
+
+          <div class="ds-sp-caption">PopularPage · sort pill (visible when ≥1 rated band)</div>
+          <div class="ds-sp-pill" role="group" aria-label="Sort mode">
+            <span class="ds-sp-btn">Picks</span>
+            <span class="ds-sp-btn on">Rating</span>
+          </div>
+          <p style="color: #888; font-size: 11px; margin-top: 10px; line-height: 1.45;">Header right column: pill above subtitle. Classes in <code>SchedulePage.module.css</code> (<code>.sortPill</code>, <code>.sortPillBtn</code>, <code>.sortPillActive</code>). Hidden when zero ratings — forces picks mode and clears <code>sessionStorage.popularSortMode</code>. Subtitle swaps: sorted by picks ↔ sorted by rating (vira-latas wording).</p>
+
+          <div class="ds-sp-caption">BandCard ranked · rating mode</div>
+          <div class="ds-rc-card">
+            <div class="ds-rc-rank">01</div>
+            <div class="ds-rc-body">
+              <span class="ds-rc-day">Tue</span>
+              <div class="ds-rc-name">Blind Guardian</div>
+              <div class="ds-rc-meta">
+                <span class="ds-rc-stage">Faster</span>
+                <span class="ds-rc-time">18:30 – 19:15</span>
+              </div>
+              <div class="ds-rc-rating">
+                <span class="ds-rc-line1"><b>4.2</b> · 7 vira-latas</span>
+                <span class="ds-rc-line2">You · 5</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Prop / token</th>
+              <th>Type</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>value</code></td>
+              <td>1–5 | null</td>
+              <td>Current user score</td>
+            </tr>
+            <tr>
+              <td><code>onChange</code></td>
+              <td>(score | null) =&gt; void</td>
+              <td>Score set or cleared</td>
+            </tr>
+            <tr>
+              <td><code>sectionTitle</code></td>
+              <td>string</td>
+              <td>Mono kicker — i18n <code>ratingSectionTitle</code></td>
+            </tr>
+            <tr>
+              <td><code>clearLabel</code> / <code>clearHint</code></td>
+              <td>string</td>
+              <td>Clear link + tap-again hint</td>
+            </tr>
+            <tr>
+              <td><code>ratingStats</code> (BandCard)</td>
+              <td>object</td>
+              <td>Popular rating mode card lines</td>
+            </tr>
+            <tr>
+              <td><code>.sortPill*</code></td>
+              <td>CSS</td>
+              <td>Popular header segmented control</td>
+            </tr>
+            <tr>
+              <td><code>.ratingCluster*</code></td>
+              <td>CSS</td>
+              <td>Rated card stat block in <code>BandCard.module.css</code></td>
+            </tr>
+          </tbody>
+        </table>
       </div>
 
       <div class="component-section">

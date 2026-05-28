@@ -41,6 +41,43 @@
   display: block;
 }
 
+.headerRight {
+  display: grid;
+  gap: var(--s-2);
+  justify-items: end;
+}
+
+.sortPill {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.sortPillBtn {
+  min-width: 56px;
+  padding: 4px 10px;
+  background: var(--bg-elevated);
+  border: none;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sortPillBtn + .sortPillBtn {
+  border-left: 1px solid var(--border);
+}
+
+.sortPillActive {
+  background: var(--accent);
+  color: #fff;
+}
+
 .list {
   flex: 1;
   overflow-y: auto;

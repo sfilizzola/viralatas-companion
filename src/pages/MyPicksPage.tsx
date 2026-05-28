@@ -10,6 +10,7 @@ import { useMissedBands } from '../hooks/useMissedBands';
 import { usePickActions } from '../hooks/usePickActions';
 import { usePickCounts } from '../hooks/usePickCounts';
 import { useBandConflicts } from '../hooks/useBandConflicts';
+import { useBandRatings } from '../hooks/useBandRatings';
 import { useI18n } from '../lib/i18n';
 import { useNow } from '../hooks/useNow';
 import { useOfflinePendingBandIds } from '../hooks/useOfflinePendingBandIds';
@@ -40,6 +41,7 @@ export default function MyPicksPage() {
     [rawBands],
   );
   const { pickedIds, togglePick } = usePickActions(userId);
+  const { userRatingByBand, toggleRating, clearRating } = useBandRatings(userId);
   const attendeesByBand = useBandAttendees();
   const pickCounts = usePickCounts();
   const currentNow = useNow(60_000);
@@ -82,6 +84,9 @@ export default function MyPicksPage() {
     attendeesByBand,
     currentNow,
     conflicts,
+    userRatingByBand,
+    toggleRating,
+    clearRating,
   });
 
   const grouped = useMemo(() => {

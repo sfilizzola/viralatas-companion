@@ -1,7 +1,14 @@
 {
   "title": "Popular",
   "headerViraLatas": "{count} vira-latas",
-  "headerSorted": "sorted by picks",
+  "headerSortedPicks": "sorted by picks",
+  "headerSortedRating": "sorted by rating",
+  "sortModeLabel": "Sort mode",
+  "popularModePicks": "Picks",
+  "popularModeRating": "Rating",
+  "ratingCount": "{count} vira-latas",
+  "ratingYouScore": "You · {score}",
   "loading": "Loading popularity...",
-  "empty": "No vira-lata has picked a band yet. First to save wins. 🤘"
+  "empty": "No vira-lata has picked a band yet. First to save wins. 🤘",
+  "emptyRated": "No ratings yet — score a set in band detail after it ends."
 }

@@ -22,6 +22,35 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-28 (Phase 32 — Vira-lata Rating)
+
+### Added
+- **`user_band_ratings` table** — composite PK `(user_id, band_id)`, `score` 1–5, `rated_at`; RLS (authenticated SELECT all rows; INSERT/UPDATE/DELETE own rows only); Realtime enabled
+- **IndexedDB v11** — stores `user_band_ratings` (index `by_user`) and `offline_band_ratings` queue
+- **`UserBandRating` domain entity** — eligibility via `canRateBand()` (picked + ended + not missed + not ceremony); purge on unpick, mark missed, or tap-same-score clear
+- **`ratingsRepository`** — optimistic IDB writes, Supabase upsert/delete, offline queue flush on reconnect, `syncCrewFromRemote()` full replace, Realtime subscription
+- **`useBandRatings` hook** — crew-wide IDB snapshot, `userRatingByBand`, `aggregates`, `toggleRating` / `clearRating`
+- **`BandRatingInput` + `PawIcon`** — five paw buttons in `BandDetailModal`; filled paws for scores ≤ selected; accent highlight on exact score
+- **`/popular` dual sort** — segmented pill toggles pick-count vs crew-avg rating mode; rating list excludes ceremony; sort avg → count → `start_time`; `sessionStorage` persistence when any rated band exists
+- **BandCard rating cluster** — ranked variant shows formatted avg, rater count, optional "you: N" line in rating sort mode
+- **Tests** — `bandRatings.test.ts`, `ratingsRepository.test.ts`, `useBandRatings.test.ts`; updated sync/db/modal tests
+- **i18n** — `SchedulePage_*` rating strings; `PopularPage_*` sort modes, rating stats, empty states (br, en, es, de)
+- **Design System** — `BandRatingInput` paw control + Popular sort pill section
+
+### Changed
+- **`useBandDetailModal`** — wires `canRate`, `userScore`, `onRate`; clears rating when marking missed
+- **`usePickActions`** — clears rating when unpicking
+- **`runReconnectSync()`** — flushes ratings offline queue and pulls remote crew ratings
+- **`RealtimeSync`** — mounts `ratingsRepository.subscribeToRealtime()`
+- **`domain-model.md`**, **`supabase-schema.md`**, **`phases-history.md`**, **`PHASES.md`** — Phase 32 documentation
+
+### Architectural Notes
+- UI → IndexedDB for all rating reads; Supabase is sync target only — same pattern as picks/missed bands
+- Crew averages computed client-side from full IDB snapshot; no Postgres aggregate view
+- Rating eligibility enforced in UI/services, not DB — RLS only restricts who can write which rows
+
+---
+
 ### Added
 - **`buildSocialSnapshot()`** — pure service in `src/services/socialSnapshot.ts`; single derivation path for crew plans, groups, and location counts.
 - **`useSocialSnapshot`** + **`useSocialSnapshotSpecs`** — shared IDB cache cells (`useCrewUsersCache`, `usePresenceCache`) feeding `/now` and live vest.
