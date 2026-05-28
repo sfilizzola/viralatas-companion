@@ -6,6 +6,7 @@ import { bandWeekdayKey, formatTime } from '../services/bandTime';
 import { useI18n } from '../lib/i18n';
 import { Avatar, Chip } from '../ui';
 import StarIcon from './icons/StarIcon';
+import PawIcon from './icons/PawIcon';
 import DuckButton from './DuckButton';
 import styles from './BandCard.module.css';
 
@@ -332,19 +333,23 @@ function RatingStats({
   missedCount?: number;
 }>) {
   const { t } = useI18n('SchedulePage');
+  const showMissed = isBandEnded && missedCount !== undefined && missedCount > 0;
 
   return (
     <div className={styles.ratingCluster}>
-      <span className={styles.ratingLinePrimary}>
-        <b>{avgFormatted}</b> · {countLabel}
-      </span>
-      {youLabel && <span className={styles.ratingLineSecondary}>{youLabel}</span>}
-      {isBandEnded && missedCount !== undefined && missedCount > 0 && (
-        <span className={styles.ratingLineMissed}>
-          {' · '}
-          <b>{missedCount}</b> {t('skipLabel')}
-        </span>
-      )}
+      <div className={styles.ratingDetails}>
+        <p className={styles.ratingMeta}>{countLabel}</p>
+        {youLabel && <p className={styles.ratingYou}>{youLabel}</p>}
+        {showMissed && (
+          <p className={styles.ratingMissed}>
+            <b>{missedCount}</b> {t('skipLabel')}
+          </p>
+        )}
+      </div>
+      <div className={styles.ratingHero} aria-label={avgFormatted}>
+        <PawIcon filled size={16} />
+        <span className={styles.ratingAvg}>{avgFormatted}</span>
+      </div>
     </div>
   );
 }

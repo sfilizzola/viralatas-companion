@@ -108,9 +108,9 @@ export default function PopularPage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <span className={styles.title}>{t('title')}</span>
-        <div className={styles.headerRight}>
+      <header className={`${styles.header} ${styles.popularHeader}`}>
+        <div className={styles.popularHeaderTop}>
+          <span className={styles.title}>{t('title')}</span>
           {hasRatedBands && (
             <div className={styles.sortPill} role="group" aria-label={t('sortModeLabel')}>
               <button
@@ -131,11 +131,14 @@ export default function PopularPage() {
               </button>
             </div>
           )}
-          <div className={styles.summary}>
-            <span className={styles.summaryLine}>{t('headerViraLatas', { count: totalViraLatas })}</span>
-            <span className={styles.summaryLine}>{t(headerSortedKey)}</span>
-          </div>
         </div>
+        <p className={styles.popularHeaderMeta}>
+          <span>{t('headerViraLatas', { count: totalViraLatas })}</span>
+          <span className={styles.popularHeaderSep} aria-hidden>
+            ·
+          </span>
+          <span>{t(headerSortedKey)}</span>
+        </p>
       </header>
 
       <main className={`${styles.list} ${styles.scheduleList}`}>

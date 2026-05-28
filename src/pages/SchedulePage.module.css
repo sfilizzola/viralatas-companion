@@ -41,41 +41,86 @@
   display: block;
 }
 
-.headerRight {
-  display: grid;
+/* PopularPage — title row + inset sort track */
+.popularHeader {
+  flex-direction: column;
+  align-items: stretch;
   gap: var(--s-2);
-  justify-items: end;
+}
+
+.popularHeaderTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  min-width: 0;
+}
+
+.popularHeaderMeta {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.popularHeaderSep {
+  color: var(--text-faint);
 }
 
 .sortPill {
-  display: flex;
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 3px;
+  background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--r-pill);
-  overflow: hidden;
 }
 
 .sortPillBtn {
-  min-width: 56px;
-  padding: 4px 10px;
-  background: var(--bg-elevated);
+  min-width: 52px;
+  padding: 6px 12px;
   border: none;
+  border-radius: var(--r-pill);
+  background: transparent;
   color: var(--text-muted);
   font-family: var(--font-mono);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
-.sortPillBtn + .sortPillBtn {
-  border-left: 1px solid var(--border);
+.sortPillBtn:hover:not(.sortPillActive) {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sortPillBtn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
 }
 
 .sortPillActive {
   background: var(--accent);
-  color: #fff;
+  color: var(--text-white);
+  box-shadow: 0 1px 6px rgba(192, 57, 43, 0.35);
+}
+
+.sortPillActive:hover {
+  background: var(--accent-hover);
+  color: var(--text-white);
 }
 
 .list {
