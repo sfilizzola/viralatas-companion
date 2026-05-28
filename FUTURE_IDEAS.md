@@ -399,6 +399,8 @@ Discovery
 
 ## Idea 9 — Rating stats on `/wrap`
 
+**Status:** Scheduled — **Phase 34** (`PHASES.md` · `docs/superpowers/specs/2026-05-28-rating-wrap-badge-predicates-design.md`)
+
 **Goal:** Add a wrap recap section for festival ratings — e.g. highest-rated band the crew saw, user's average score, total ratings given.
 
 **Depends on:** Phase 32 crew-wide ratings in IndexedDB.
@@ -413,6 +415,8 @@ Discovery
 ---
 
 ## Idea 10 — Rating-based badges
+
+**Status:** Scheduled — **Phase 34** (engine predicates only; badge catalog deferred) · `PHASES.md` · `docs/superpowers/specs/2026-05-28-rating-wrap-badge-predicates-design.md`
 
 **Goal:** Badge conditions keyed off concert ratings — e.g. rated N bands, gave a 5 to a headliner, crew avg ≥ 4 on a band you picked.
 
