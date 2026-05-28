@@ -1,11 +1,11 @@
 import type { User as AuthUser } from '@supabase/supabase-js';
-import type { Band, CrewUser, UserPick, UserPresence } from '../../types';
+import type { Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserPick, UserPresence } from '../../types';
 import {
   crewLocationCountsFromGroups,
   deriveUserBadgeLocation,
   groupCrewLivePlans,
-  mapCrewLivePlans,
 } from '../livePreview';
+import { buildSocialSnapshot, type SocialSnapshot } from '../socialSnapshot';
 import { now } from '../time';
 import { getWeakSkipCount } from '../weakSkipMetadata';
 import { buildBadgeContext } from './engine';
@@ -40,10 +40,57 @@ export type BadgeIdbSnapshot = {
   isCurrentUserFriend: boolean;
   metalPlaceWindowActive: boolean;
   liveTestBandId?: string | null;
+  metalPlaceConfig?: MetalPlaceConfig | null;
+  liveBandTestConfig?: LiveBandTestConfig | null;
 };
 
-export function buildBadgeContextFromSnapshot(
+function legacyLiveBandTestConfig(
+  liveTestBandId: string | null | undefined,
+  liveBandTestConfig: LiveBandTestConfig | null | undefined,
+): LiveBandTestConfig | null {
+  if (liveBandTestConfig !== undefined) return liveBandTestConfig ?? null;
+  if (!liveTestBandId) return null;
+  return { band_id: liveTestBandId, enabled: true };
+}
+
+function buildSocialSnapshotForBadgeSnap(
   snap: BadgeIdbSnapshot,
+  currentNow: Date,
+): SocialSnapshot {
+  const social = buildSocialSnapshot({
+    bands: snap.bands,
+    picks: snap.allPicks,
+    crewUsers: snap.crewUsers,
+    presence: snap.presence,
+    metalPlaceConfig: snap.metalPlaceConfig ?? null,
+    liveBandTestConfig: legacyLiveBandTestConfig(
+      snap.liveTestBandId,
+      snap.liveBandTestConfig,
+    ),
+    now: currentNow,
+  });
+
+  if (
+    snap.metalPlaceConfig === undefined &&
+    snap.metalPlaceWindowActive !== social.metalPlaceWindowActive
+  ) {
+    const crewGroups = groupCrewLivePlans(social.crewPlans, {
+      metalPlaceWindowActive: snap.metalPlaceWindowActive,
+    });
+    return {
+      ...social,
+      metalPlaceWindowActive: snap.metalPlaceWindowActive,
+      crewGroups,
+      crewLocationCounts: crewLocationCountsFromGroups(crewGroups),
+    };
+  }
+
+  return social;
+}
+
+export function buildBadgeContextFromSocialSnapshot(
+  snap: BadgeIdbSnapshot,
+  social: SocialSnapshot,
   userId: string,
   authUser: AuthUser,
 ): BadgeContext {
@@ -54,10 +101,6 @@ export function buildBadgeContextFromSnapshot(
     allMissed,
     assignedBadges,
     isCurrentUserFriend,
-    presence,
-    crewUsers,
-    metalPlaceWindowActive,
-    liveTestBandId,
   } = snap;
   const userPickBandIds = userPicks.map((p) => p.band_id);
   const allPickCounts = new Map<string, number>();
@@ -72,17 +115,12 @@ export function buildBadgeContextFromSnapshot(
   );
 
   const currentNow = now();
-  const crewPlans = mapCrewLivePlans(
-    bands,
-    allPicks,
-    crewUsers,
-    presence,
-    currentNow,
-    liveTestBandId ?? null,
+  const currentLocation = deriveUserBadgeLocation(
+    userId,
+    social.crewGroups,
+    isCurrentUserFriend,
   );
-  const crewGroups = groupCrewLivePlans(crewPlans, { metalPlaceWindowActive });
-  const currentLocation = deriveUserBadgeLocation(userId, crewGroups, isCurrentUserFriend);
-  const crewLocationCounts = crewLocationCountsFromGroups(crewGroups);
+  const crewLocationCounts = social.crewLocationCounts;
 
   const locationVisits = (authUser.user_metadata?.location_visits as Record<string, number>) ?? {};
   const weakSkipCount = getWeakSkipCount(authUser.user_metadata);
@@ -102,4 +140,13 @@ export function buildBadgeContextFromSnapshot(
     achievedBadgeSlugs,
     weakSkipCount,
   );
+}
+
+export function buildBadgeContextFromSnapshot(
+  snap: BadgeIdbSnapshot,
+  userId: string,
+  authUser: AuthUser,
+): BadgeContext {
+  const social = buildSocialSnapshotForBadgeSnap(snap, now());
+  return buildBadgeContextFromSocialSnapshot(snap, social, userId, authUser);
 }

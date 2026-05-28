@@ -5,6 +5,14 @@ import { evaluateBadge, BADGES, type BadgeConfig } from '../services/badges';
 import { SCENARIO_NOW } from './fixtures/liveNowScenarios';
 import type { Band, CrewUser } from '../types';
 
+vi.mock('../lib/supabase', () => ({
+  supabase: {
+    auth: {
+      getSession: vi.fn().mockResolvedValue({ data: { session: null } }),
+    },
+  },
+}));
+
 vi.mock('../services/time', () => ({
   now: () => new Date(SCENARIO_NOW),
 }));
