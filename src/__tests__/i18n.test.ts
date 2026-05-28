@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import React from 'react';
-import { I18nContext, isLanguage, useI18n, type Language } from '../lib/i18n';
+import { I18nContext, isLanguage, useGodlikeAdminI18n, useI18n, type Language } from '../lib/i18n';
 
 // Builds a minimal context wrapper that provides the given locale.
 // This bypasses I18nProvider (which depends on Supabase/localStorage) so
@@ -116,6 +116,22 @@ describe('isLanguage()', () => {
     expect(isLanguage(null)).toBe(false);
     expect(isLanguage(undefined)).toBe(false);
     expect(isLanguage(42)).toBe(false);
+  });
+});
+
+describe('useGodlikeAdminI18n – lazy load', () => {
+  it('loads admin strings on demand for the active locale', async () => {
+    const { result, rerender } = renderHook(() => useGodlikeAdminI18n(), {
+      wrapper: makeWrapper('en'),
+    });
+
+    expect(result.current.ready).toBe(false);
+    await vi.waitFor(() => expect(result.current.ready).toBe(true));
+    expect(result.current.t('resetAllData')).toBe('Clear cache');
+    expect(result.current.t('godlikeToolsTrigger')).toBe('Godlike Powers');
+
+    rerender();
+    expect(result.current.t('resetAllData')).toBe('Clear cache');
   });
 });
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useI18n, type Language } from '../../lib/i18n';
+import type { Language } from '../../lib/i18n';
 import {
   clearTimeOverride,
   getTimeOverride,
@@ -7,6 +7,11 @@ import {
   TIME_OVERRIDE_CHANGED_EVENT,
 } from '../../services/time';
 import styles from '../../pages/ProfilePage.module.css';
+
+type TimeTravelSectionProps = {
+  t: (key: string, values?: Record<string, string | number>) => string;
+  language: Language;
+};
 
 function toDatetimeLocalValue(iso: string): string {
   const d = new Date(iso);
@@ -47,8 +52,7 @@ function chipDateWithCurrentTime(chipIso: string, currentInput: string): string 
   return `${chipDate}T${currentTime}`;
 }
 
-export default function TimeTravelSection() {
-  const { t, language } = useI18n('ProfilePage');
+export default function TimeTravelSection({ t, language }: TimeTravelSectionProps) {
   const [override, setOverride] = useState<string | null>(() => getTimeOverride());
   const [inputValue, setInputValue] = useState<string>(() => {
     const stored = getTimeOverride();

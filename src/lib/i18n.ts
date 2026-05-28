@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import appBr from '../i18n/App_br.json';
 import appDe from '../i18n/App_de.json';
 import appEn from '../i18n/App_en.json';
@@ -72,9 +72,11 @@ type TranslationFile =
   | 'OfflineBanner'
   | 'SyncToast'
   | 'DuckButton'
-  | 'WrapPage';
+  | 'WrapPage'
+  | 'GodlikeAdmin';
 
-type Translations = Record<Language, Record<TranslationFile, Record<string, string>>>;
+type TranslationStrings = Record<string, string>;
+type Translations = Record<Language, Record<TranslationFile, TranslationStrings>>;
 
 export const LANGUAGE_STORAGE_KEY = 'viralatas-language';
 
@@ -94,6 +96,7 @@ const translations: Translations = {
     SyncToast: syncToastBr,
     DuckButton: duckButtonBr,
     WrapPage: wrapBr,
+    GodlikeAdmin: {},
   },
   en: {
     App: appEn,
@@ -110,6 +113,7 @@ const translations: Translations = {
     SyncToast: syncToastEn,
     DuckButton: duckButtonEn,
     WrapPage: wrapEn,
+    GodlikeAdmin: {},
   },
   es: {
     App: appEs,
@@ -126,6 +130,7 @@ const translations: Translations = {
     SyncToast: syncToastEs,
     DuckButton: duckButtonEs,
     WrapPage: wrapEs,
+    GodlikeAdmin: {},
   },
   de: {
     App: appDe,
@@ -142,8 +147,48 @@ const translations: Translations = {
     SyncToast: syncToastDe,
     DuckButton: duckButtonDe,
     WrapPage: wrapDe,
+    GodlikeAdmin: {},
   },
 };
+
+const godlikeAdminLoaders: Record<Language, () => Promise<{ default: TranslationStrings }>> = {
+  br: () => import('../i18n/GodlikeAdmin_br.json'),
+  en: () => import('../i18n/GodlikeAdmin_en.json'),
+  es: () => import('../i18n/GodlikeAdmin_es.json'),
+  de: () => import('../i18n/GodlikeAdmin_de.json'),
+};
+
+const godlikeAdminLoadPromises = new Map<Language, Promise<void>>();
+
+function isGodlikeAdminLoaded(language: Language): boolean {
+  return Object.keys(translations[language].GodlikeAdmin).length > 0;
+}
+
+export function loadGodlikeAdminTranslations(language: Language): Promise<void> {
+  if (isGodlikeAdminLoaded(language)) return Promise.resolve();
+
+  let promise = godlikeAdminLoadPromises.get(language);
+  if (!promise) {
+    promise = godlikeAdminLoaders[language]().then((mod) => {
+      translations[language].GodlikeAdmin = mod.default;
+    });
+    godlikeAdminLoadPromises.set(language, promise);
+  }
+  return promise;
+}
+
+function translate(
+  strings: TranslationStrings,
+  key: string,
+  values?: Record<string, string | number>,
+): string {
+  const template = strings[key] ?? key;
+  if (!values) return template;
+  return Object.entries(values).reduce(
+    (message, [name, value]) => message.split(`{${name}}`).join(String(value)),
+    template,
+  );
+}
 
 export type I18nContextValue = {
   language: Language;
@@ -164,12 +209,45 @@ export function useI18n(file: TranslationFile) {
     language: context.language,
     setLanguage: context.setLanguage,
     t(key: string, values?: Record<string, string | number>) {
-      const template = translations[context.language][file][key] ?? key;
-      if (!values) return template;
-      return Object.entries(values).reduce(
-        (message, [name, value]) => message.split(`{${name}}`).join(String(value)),
-        template,
-      );
+      return translate(translations[context.language][file], key, values);
     },
+  };
+}
+
+export function useGodlikeAdminI18n() {
+  const context = useContext(I18nContext);
+  if (!context) throw new Error('useGodlikeAdminI18n must be used inside I18nProvider');
+
+  const [ready, setReady] = useState(() => isGodlikeAdminLoaded(context.language));
+
+  useEffect(() => {
+    let cancelled = false;
+
+    if (isGodlikeAdminLoaded(context.language)) {
+      setReady(true);
+      return;
+    }
+
+    setReady(false);
+    loadGodlikeAdminTranslations(context.language).then(() => {
+      if (!cancelled) setReady(true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [context.language]);
+
+  const t = useCallback(
+    (key: string, values?: Record<string, string | number>) =>
+      translate(translations[context.language].GodlikeAdmin, key, values),
+    [context.language, ready],
+  );
+
+  return {
+    language: context.language,
+    setLanguage: context.setLanguage,
+    ready,
+    t,
   };
 }

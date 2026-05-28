@@ -1,13 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { UserRole } from '../../types';
 import { announcementsRepository, usersRepository } from '../../repositories';
+import { useGodlikeAdminI18n } from '../../lib/i18n';
 import { Avatar, Collapsible } from '../../ui';
 import type { UserWithLoading } from './types';
 import styles from '../../pages/ProfilePage.module.css';
 
 type ManagerAdminPanelProps = {
   userId: string;
-  t: (key: string, values?: Record<string, string | number>) => string;
 };
 
 function getInitial(displayName: string | null, email: string): string {
@@ -15,7 +15,8 @@ function getInitial(displayName: string | null, email: string): string {
   return email.charAt(0).toUpperCase();
 }
 
-export default function ManagerAdminPanel({ userId, t }: ManagerAdminPanelProps) {
+export default function ManagerAdminPanel({ userId }: ManagerAdminPanelProps) {
+  const { ready, t } = useGodlikeAdminI18n();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [blockedUsers, setBlockedUsers] = useState<UserWithLoading[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,7 +82,7 @@ export default function ManagerAdminPanel({ userId, t }: ManagerAdminPanelProps)
     [t],
   );
 
-  if (loading || userRole !== 'manager') return null;
+  if (loading || !ready || userRole !== 'manager') return null;
 
   const trigger = (
     <span className={styles.adminTriggerInner}>
@@ -90,7 +91,7 @@ export default function ManagerAdminPanel({ userId, t }: ManagerAdminPanelProps)
           <path d="M12 2 L20 6 V12 c0 5 -4 9 -8 10 -4 -1 -8 -5 -8 -10 V6 Z" />
         </svg>
       </span>
-      <span className={`${styles.adminTriggerLabel} ${styles.managerTriggerLabel}`}>Manager tools</span>
+      <span className={`${styles.adminTriggerLabel} ${styles.managerTriggerLabel}`}>{t('managerToolsTrigger')}</span>
     </span>
   );
 

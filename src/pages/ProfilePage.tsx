@@ -121,8 +121,8 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
         t={t}
       />
 
-      <GodlikeAdminPanel userId={user.id} t={t} />
-      <ManagerAdminPanel userId={user.id} t={t} />
+      <GodlikeAdminPanel userId={user.id} />
+      <ManagerAdminPanel userId={user.id} />
     </main>
   );
 }

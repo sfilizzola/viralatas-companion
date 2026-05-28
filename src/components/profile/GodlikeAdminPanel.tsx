@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import type { UserRole } from '../../types';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { useGodlikeAdminI18n } from '../../lib/i18n';
 import { announcementsRepository } from '../../repositories';
 import { useCooldown } from '../../hooks/useCooldown';
 import { Collapsible } from '../../ui';
@@ -19,10 +20,10 @@ import styles from '../../pages/ProfilePage.module.css';
 
 type GodlikeAdminPanelProps = {
   userId: string;
-  t: (key: string, values?: Record<string, string | number>) => string;
 };
 
-export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps) {
+export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
+  const { ready, t, language } = useGodlikeAdminI18n();
   const { user } = useAuth();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
@@ -109,7 +110,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
     await liveBandTestClearRef.current?.();
   }, []);
 
-  if (loading || userRole !== 'godlike') return null;
+  if (loading || !ready || userRole !== 'godlike') return null;
 
   const toolsTrigger = (
     <span className={styles.adminTriggerInner}>
@@ -118,7 +119,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
           <path d="M5 18 L7 4 L12 12 L17 4 L19 18 Z" />
         </svg>
       </span>
-      <span className={`${styles.adminTriggerLabel} ${styles.godlikeTriggerLabel}`}>Godlike Powers</span>
+      <span className={`${styles.adminTriggerLabel} ${styles.godlikeTriggerLabel}`}>{t('godlikeToolsTrigger')}</span>
     </span>
   );
 
@@ -132,7 +133,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
           <path d="M13 21v-2a4 4 0 0 1 4-4h0a4 4 0 0 1 4 4v2" />
         </svg>
       </span>
-      <span className={`${styles.adminTriggerLabel} ${styles.godlikeTriggerLabel}`}>Servants of Metal</span>
+      <span className={`${styles.adminTriggerLabel} ${styles.godlikeTriggerLabel}`}>{t('godlikeServantsTrigger')}</span>
     </span>
   );
 
@@ -192,7 +193,7 @@ export default function GodlikeAdminPanel({ userId, t }: GodlikeAdminPanelProps)
               </button>
             </div>
 
-            <TimeTravelSection />
+            <TimeTravelSection t={t} language={language} />
             <ConsolidateBadgesSection t={t} />
             <TestBadgeSection t={t} user={user!} />
           </div>

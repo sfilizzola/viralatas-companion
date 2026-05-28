@@ -4,7 +4,20 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
-## 2026-05-28 (Phase 31 — Social Snapshot Unification)
+## 2026-05-28 (Godlike admin i18n lazy load)
+
+### Added
+- **`GodlikeAdmin_{br,en,es,de}.json`** — 123 admin-only strings split out of `ProfilePage_*`.
+- **`useGodlikeAdminI18n()`** + **`loadGodlikeAdminTranslations()`** — dynamic import per locale; separate Vite chunk loaded only for godlike/manager sessions.
+
+### Changed
+- **`ProfilePage_*`** — trimmed to ~58 user-facing keys (profile, conflicts, patches, badge history).
+- **`GodlikeAdminPanel`**, **`ManagerAdminPanel`**, **`TimeTravelSection`** — consume lazy admin i18n; collapsible trigger labels moved into translation files.
+
+### Architectural Notes
+- Regular vira-latas no longer bundle godlike admin copy on first load; offline PWA caches the admin chunk after first godlike/manager profile visit.
+
+---
 
 ### Added
 - **`buildSocialSnapshot()`** — pure service in `src/services/socialSnapshot.ts`; single derivation path for crew plans, groups, and location counts.
