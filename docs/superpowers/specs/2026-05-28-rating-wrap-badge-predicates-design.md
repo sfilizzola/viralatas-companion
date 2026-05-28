@@ -51,6 +51,32 @@ Phase 32 shipped rating input and `/popular` sort, but festival recap and badges
 | Personal zero ratings | One-line copy (*You didn't rate any sets*); crew block still full |
 | Top score row | Unified kicker **Your top score**; 5★ if any, else highest score fallback |
 | Lowest pick row | Hidden when **<2 distinct bands** qualify for lowest-pick pool |
+| **Wrap Ratings layout** | **C · Popular Echo** (huashu-design locked 2026-05-28) — prototype `_temp/wrap-ratings-proposals/index.html` § C |
+
+---
+
+## Layout — C · Popular Echo (locked 2026-05-28)
+
+**Reference:** `_temp/wrap-ratings-proposals/index.html` — Variant **C · Popular Echo** (huashu-design Phase 34 prototypes). Rejected: A Chronicle Card, B Verdict Hero.
+
+**Shell:** Same A2 section frame as other wrap stats — `.sectionEpigraph` above card; card has 4px `--stage` bar, glow, mono kicker.
+
+**Anatomy (inside card):**
+
+| Block | Content |
+|-------|---------|
+| Kicker | Mono uppercase (e.g. *Vira-lata scores* — i18n) |
+| **Personal strip** | Label *You* + one mono line: `{n} rated · {avg} avg · {pct}% seen` via `formatRatingAvg()` |
+| Personal zero | Replace strip with one-line italic copy (*You didn't rate any sets — the vira-latas still did.*) |
+| **Crew top card** | Nested card; border tint `--signal-ok`; kicker *Crew top rated*; Oswald band name; **paw + large avg** hero (accent `#c0392b`, reuse `PawIcon`); footer mono `{count} ratings` |
+| **Crew lowest card** | Same chrome; border tint `--signal-warn`; avg hero uses warn color; **hidden** when &lt;2 distinct qualifying bands |
+| **Your top score** | Bottom row separated by top border; kicker *Your top score*; band name + score + paw; hidden when user has zero ratings |
+
+**Reuse:** Mirror Popular `BandCard` rating-mode cluster semantics (`ratingHero`, paw + avg, count line) — adapted for wrap nested cards, not full schedule row.
+
+**Epigraph:** Localized editorial quote above card (prototype: *Ranked by the mosh pit jury.* — final copy in i18n).
+
+**States to implement:** Toggle personal full / zero, lowest visible / hidden, top score 5★ vs best fallback — see prototype control bar.
 
 ---
 
@@ -102,7 +128,7 @@ Both require: non-ceremony, `end_time < now()`, ≥1 rating. Crew avg includes a
 | **Crew top rated** | Highest crew avg; tie → earlier `start_time` |
 | **Crew lowest pick** | Lowest crew avg among bands with ≥1 rating **and** ≥**2 crew picks**; tie → earlier `start_time`; **row hidden** when **<2 distinct** bands qualify |
 
-Display: `{name} · {avg} · {count} ratings` (not “vira-latas” — not every member rated).
+Display: crew cards use **paw + avg hero** + footer `{count} ratings` (Variant C — not a single inline line).
 
 ### Your top score row
 
@@ -114,7 +140,7 @@ Row hidden when user has zero eligible ratings (personal block shows copy instea
 
 Ceremony bands excluded everywhere. “Seen” uses badge semantics: picked, past `end_time`, not in `user_missed_bands`.
 
-**Visual:** A2 Vest Chronicle card — 4px `--stage` top bar, Oswald/IBM Plex/JetBrains Mono, paw motif from existing rating UI (`PawIcon` / Popular cluster styling).
+**Visual:** **C · Popular Echo** — A2 outer card + nested crew rating cards (Popular-mode chrome). See **Layout — C · Popular Echo** above and `_temp/wrap-ratings-proposals/index.html`.
 
 ---
 
@@ -234,8 +260,8 @@ ratedPctOfSeen: number;
 
 - [ ] Ratings section after Chaos when ≥1 crew rating **and** `hasPicks`; hidden otherwise (no empty card).
 - [ ] Progress dots omit Ratings when section hidden; indices stay correct with Assigned optional section.
-- [ ] Personal zero ratings → one-line copy; crew highlights + top score rules per grill table.
-- [ ] Crew rows show `{name} · {avg} · {count} ratings`; lowest hidden when <2 distinct qualifiers.
+- [ ] Personal zero ratings → one-line copy; crew cards per **Variant C** anatomy.
+- [ ] Crew cards: paw + avg hero + `{count} ratings` footer; lowest hidden when <2 distinct qualifiers.
 - [ ] Crew averages include all raters (self included); ties break on `start_time`; crew highlights respect `now()`.
 - [ ] Page works offline after first sync (IDB-only reads).
 - [ ] Copy uses **vira-latas** in all four locales.

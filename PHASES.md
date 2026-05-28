@@ -12,7 +12,9 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 ### Phase 34 — Rating recap & badge predicates
 
 **Status:** Planned (grill-locked 2026-05-28)  
-**Spec:** `docs/superpowers/specs/2026-05-28-rating-wrap-badge-predicates-design.md` (§ Grill amendments)
+**Spec:** `docs/superpowers/specs/2026-05-28-rating-wrap-badge-predicates-design.md` (§ Grill amendments · § Layout C)  
+**Plan:** `docs/superpowers/plans/2026-05-28-rating-wrap-badge-predicates-plan.md`  
+**UI prototype:** `_temp/wrap-ratings-proposals/index.html` — **Variant C · Popular Echo** (locked)
 **Parent ideas:** `FUTURE_IDEAS.md` #9 (wrap stats) · #10 (badge engine — no registry entries)  
 **Depends on:** Phase 32 (`user_band_ratings` IDB + `computeRatingAggregates`)
 
@@ -27,7 +29,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 | Sub-phase | Deliverables |
 |-----------|--------------|
 | **34.A** | `src/services/ratingStats.ts` + `src/hooks/useAllRatingsCache.ts` + `src/__tests__/ratingStats.test.ts` |
-| **34.B** | Wrap Ratings section (after Chaos, before Crew); dynamic progress dots; i18n ×4; Design System |
+| **34.B** | Wrap Ratings section — **C · Popular Echo** layout; dynamic progress dots; i18n ×4; Design System |
 | **34.C** | `BadgeContext` + six new `BadgeCondition` types in `engine.ts`; wiki + `.claude/context/badges.md`; badge tests |
 
 ---
@@ -43,7 +45,8 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 | Top score row | Kicker **Your top score**; 5★ or best-score fallback |
 | Crew top rated | Ended at `now()`; ≥1 rating |
 | Crew lowest pick | Ended at `now()`; ≥1 rating + ≥2 crew picks; hide when <2 distinct bands qualify |
-| Crew row display | `{name} · {avg} · {count} ratings` |
+| Crew row display | **Variant C cards** — paw + avg hero + `{count} ratings` footer |
+| **Wrap layout** | **C · Popular Echo** — `_temp/wrap-ratings-proposals/index.html` |
 | IDB load | `useAllRatingsCache` (read-only); not `useSocialSnapshot` |
 | Badge scope | Engine only — **no** `registry.ts` entries, PNG assets, or badge i18n |
 | Condition types | Six predicates — see spec § Badge engine |
@@ -79,7 +82,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Wrap (Idea 9)**
 - [ ] Ratings section after Chaos when ≥1 crew rating and `hasPicks`; hidden otherwise
 - [ ] Progress dots correct with optional Ratings + Assigned sections
-- [ ] Grill-locked stats: personal copy when 0 ratings; crew rows with count; lowest guard; top score fallback
+- [ ] Grill-locked stats + **Variant C** nested crew cards; lowest guard; top score fallback
 - [ ] Fully offline after first load (IDB-only)
 - [ ] Four locales updated
 
