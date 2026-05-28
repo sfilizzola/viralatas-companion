@@ -1,3 +1,5 @@
+import PawIcon from './PawIcon';
+
 type IconProps = {
   name: IconName;
   size?: number;
@@ -32,12 +34,7 @@ export type IconName =
 type PathDef = (filled: boolean) => React.ReactNode;
 
 const ICONS: Record<IconName, PathDef> = {
-  pick: (filled) => (
-    <polygon
-      points="12 2 15 8.5 22 9.3 17 14 18.2 21 12 17.8 5.8 21 7 14 2 9.3 9 8.5 12 2"
-      fill={filled ? 'currentColor' : 'none'}
-    />
-  ),
+  pick: () => null,
   live: (filled) => (
     <circle cx="12" cy="12" r="6" fill={filled ? 'currentColor' : 'none'} />
   ),
@@ -176,6 +173,10 @@ export default function Icon({
   className,
   'aria-hidden': ariaHidden = true,
 }: IconProps) {
+  if (name === 'pick') {
+    return <PawIcon filled={filled} size={size} />;
+  }
+
   return (
     <svg
       viewBox="0 0 24 24"

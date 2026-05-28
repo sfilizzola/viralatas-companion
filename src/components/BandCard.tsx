@@ -391,7 +391,7 @@ function PickButton({
       aria-label={isPicked ? t('removePick') : t('addPick')}
       aria-pressed={isPicked}
     >
-      <StarIcon filled={isPicked} />
+      <StarIcon filled={isPicked} size={28} />
     </button>
   );
 }

@@ -1,4 +1,4 @@
-import Icon from './Icon';
+import PawIcon from './PawIcon';
 
 type StarIconProps = {
   filled: boolean;
@@ -6,6 +6,7 @@ type StarIconProps = {
   strokeWidth?: number;
 };
 
-export default function StarIcon({ filled, size = 22, strokeWidth = 2 }: StarIconProps) {
-  return <Icon name="pick" size={size} strokeWidth={strokeWidth} filled={filled} />;
+/** Pick toggle on BandCard — locked canine paw (Phase 32 asset). */
+export default function StarIcon({ filled, size = 22 }: StarIconProps) {
+  return <PawIcon filled={filled} size={size} />;
 }

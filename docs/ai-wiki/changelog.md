@@ -4,6 +4,15 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-28 (Pick icon → paw)
+
+### Changed
+- **Pick affordance** — schedule/my-picks `BandCard` toggle, bottom nav My Picks tab, and empty state use locked **`PawIcon`** (canine + heel, −14°) instead of star polygon.
+- **`Icon name="pick"`** — delegates to `PawIcon`; **`StarIcon`** wraps same asset for BandCard.
+- **Design System** — BandCard pick column demo updated.
+
+---
+
 ## 2026-05-28 (Godlike admin i18n lazy load)
 
 ### Added
