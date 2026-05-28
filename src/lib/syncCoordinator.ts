@@ -4,6 +4,7 @@ import {
   missedRepository,
   picksRepository,
   presenceRepository,
+  ratingsRepository,
   usersRepository,
 } from '../repositories';
 
@@ -12,12 +13,13 @@ import {
  * return total flushed item count (for sync toast).
  */
 export async function runReconnectSync(userId: string): Promise<number> {
-  const [picksFlushed, presenceFlushed, announcementsFlushed, duckFlushed] = await Promise.all([
+  const [picksFlushed, presenceFlushed, announcementsFlushed, duckFlushed, , ratingsFlushed] = await Promise.all([
     picksRepository.flushOfflineQueue(),
     presenceRepository.flushOfflineQueue(),
     announcementsRepository.flushOfflineQueue(),
     duckRepository.flushOfflineQueue(),
     missedRepository.flushOfflineQueue(),
+    ratingsRepository.flushOfflineQueue(),
   ]);
 
   await Promise.all([
@@ -26,7 +28,8 @@ export async function runReconnectSync(userId: string): Promise<number> {
     presenceRepository.syncCrewFromRemote(),
     announcementsRepository.sync(),
     missedRepository.syncFromRemote(userId),
+    ratingsRepository.syncCrewFromRemote(),
   ]);
 
-  return picksFlushed + presenceFlushed + announcementsFlushed + duckFlushed;
+  return picksFlushed + presenceFlushed + announcementsFlushed + duckFlushed + ratingsFlushed;
 }

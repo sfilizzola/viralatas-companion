@@ -4,6 +4,7 @@ import {
   missedRepository,
   picksRepository,
   presenceRepository,
+  ratingsRepository,
   usersRepository,
 } from '../../repositories';
 import { subscribeToLiveBandTestConfigRealtime } from '../../services/liveBandTest';
@@ -21,6 +22,7 @@ export function RealtimeSync() {
       presenceRepository.subscribeToMetalPlaceConfigRealtime(),
       subscribeToLiveBandTestConfigRealtime(),
       missedRepository.subscribeToRealtime(),
+      ratingsRepository.subscribeToRealtime(),
       usersRepository.subscribeToRealtime(),
     ];
 

@@ -16,6 +16,7 @@ vi.mock('../repositories', () => ({
   announcementsRepository: { subscribeToRealtime },
   presenceRepository: { subscribeToRealtime, subscribeToMetalPlaceConfigRealtime },
   missedRepository: { subscribeToRealtime },
+  ratingsRepository: { subscribeToRealtime },
   usersRepository: { subscribeToRealtime },
 }));
 
@@ -36,7 +37,7 @@ describe('RealtimeSync', () => {
   it('mounts all repository Realtime subscriptions on mount', () => {
     render(<RealtimeSync />);
 
-    expect(subscribeToRealtime).toHaveBeenCalledTimes(5);
+    expect(subscribeToRealtime).toHaveBeenCalledTimes(6);
     expect(subscribeToMetalPlaceConfigRealtime).toHaveBeenCalledOnce();
     expect(subscribeToLiveBandTestConfigRealtime).toHaveBeenCalledOnce();
   });
@@ -46,6 +47,7 @@ describe('RealtimeSync', () => {
     const unsubAnnouncements = vi.fn();
     const unsubPresence = vi.fn();
     const unsubMissed = vi.fn();
+    const unsubRatings = vi.fn();
     const unsubUsers = vi.fn();
     const unsubMetalPlace = vi.fn();
     const unsubLiveBandTest = vi.fn();
@@ -55,6 +57,7 @@ describe('RealtimeSync', () => {
       .mockReturnValueOnce(unsubAnnouncements)
       .mockReturnValueOnce(unsubPresence)
       .mockReturnValueOnce(unsubMissed)
+      .mockReturnValueOnce(unsubRatings)
       .mockReturnValueOnce(unsubUsers);
     subscribeToMetalPlaceConfigRealtime.mockReturnValue(unsubMetalPlace);
     subscribeToLiveBandTestConfigRealtime.mockReturnValue(unsubLiveBandTest);
@@ -66,6 +69,7 @@ describe('RealtimeSync', () => {
     expect(unsubAnnouncements).toHaveBeenCalledOnce();
     expect(unsubPresence).toHaveBeenCalledOnce();
     expect(unsubMissed).toHaveBeenCalledOnce();
+    expect(unsubRatings).toHaveBeenCalledOnce();
     expect(unsubUsers).toHaveBeenCalledOnce();
     expect(unsubMetalPlace).toHaveBeenCalledOnce();
     expect(unsubLiveBandTest).toHaveBeenCalledOnce();

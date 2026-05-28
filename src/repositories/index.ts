@@ -1,6 +1,7 @@
 export { picksRepository } from './picks';
 export { presenceRepository } from './presence';
 export { missedRepository } from './missed';
+export { ratingsRepository } from './ratings';
 export { announcementsRepository } from './announcements';
 export { usersRepository } from './users';
 export { bandsRepository } from './bands';

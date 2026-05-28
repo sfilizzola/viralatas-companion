@@ -279,6 +279,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      user_band_ratings: {
+        Row: {
+          user_id: string;
+          band_id: string;
+          score: number;
+          rated_at: string;
+        };
+        Insert: {
+          user_id: string;
+          band_id: string;
+          score: number;
+          rated_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          band_id?: string;
+          score?: number;
+          rated_at?: string;
+        };
+        Relationships: [];
+      };
       duck_quacks: {
         Row: {
           id: string;

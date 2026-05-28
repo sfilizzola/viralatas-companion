@@ -20,6 +20,10 @@ vi.mock('../repositories', () => ({
     flushOfflineQueue: vi.fn().mockResolvedValue(0),
     syncFromRemote: vi.fn().mockResolvedValue(undefined),
   },
+  ratingsRepository: {
+    flushOfflineQueue: vi.fn().mockResolvedValue(0),
+    syncCrewFromRemote: vi.fn().mockResolvedValue(undefined),
+  },
   usersRepository: {
     syncCrew: vi.fn().mockResolvedValue(undefined),
   },
@@ -32,6 +36,7 @@ import {
   missedRepository,
   picksRepository,
   presenceRepository,
+  ratingsRepository,
   usersRepository,
 } from '../repositories';
 
@@ -44,6 +49,7 @@ beforeEach(() => {
   vi.mocked(announcementsRepository.flushOfflineQueue).mockResolvedValue(0);
   vi.mocked(duckRepository.flushOfflineQueue).mockResolvedValue(0);
   vi.mocked(missedRepository.flushOfflineQueue).mockResolvedValue(0);
+  vi.mocked(ratingsRepository.flushOfflineQueue).mockResolvedValue(0);
 });
 
 describe('runReconnectSync', () => {
@@ -70,6 +76,10 @@ describe('runReconnectSync', () => {
       callOrder.push('flush-missed');
       return 0;
     });
+    vi.mocked(ratingsRepository.flushOfflineQueue).mockImplementation(async () => {
+      callOrder.push('flush-ratings');
+      return 1;
+    });
     vi.mocked(picksRepository.syncCrewFromRemote).mockImplementation(async () => {
       callOrder.push('pull-picks');
     });
@@ -85,15 +95,19 @@ describe('runReconnectSync', () => {
     vi.mocked(missedRepository.syncFromRemote).mockImplementation(async () => {
       callOrder.push('pull-missed');
     });
+    vi.mocked(ratingsRepository.syncCrewFromRemote).mockImplementation(async () => {
+      callOrder.push('pull-ratings');
+    });
 
     const flushed = await runReconnectSync(userId);
 
-    expect(flushed).toBe(4);
+    expect(flushed).toBe(5);
     expect(callOrder.indexOf('flush-picks')).toBeLessThan(callOrder.indexOf('pull-picks'));
     expect(callOrder.indexOf('flush-presence')).toBeLessThan(callOrder.indexOf('pull-presence'));
     expect(callOrder.indexOf('flush-announcements')).toBeLessThan(callOrder.indexOf('pull-announcements'));
     expect(callOrder.indexOf('flush-duck')).toBeLessThan(callOrder.indexOf('pull-picks'));
     expect(callOrder.indexOf('flush-missed')).toBeLessThan(callOrder.indexOf('pull-missed'));
+    expect(callOrder.indexOf('flush-ratings')).toBeLessThan(callOrder.indexOf('pull-ratings'));
   });
 
   it('calls all flush and pull repository methods', async () => {
@@ -109,11 +123,13 @@ describe('runReconnectSync', () => {
     expect(announcementsRepository.flushOfflineQueue).toHaveBeenCalledOnce();
     expect(duckRepository.flushOfflineQueue).toHaveBeenCalledOnce();
     expect(missedRepository.flushOfflineQueue).toHaveBeenCalledOnce();
+    expect(ratingsRepository.flushOfflineQueue).toHaveBeenCalledOnce();
     expect(picksRepository.syncCrewFromRemote).toHaveBeenCalledOnce();
     expect(usersRepository.syncCrew).toHaveBeenCalledOnce();
     expect(presenceRepository.syncCrewFromRemote).toHaveBeenCalledOnce();
     expect(announcementsRepository.sync).toHaveBeenCalledOnce();
     expect(missedRepository.syncFromRemote).toHaveBeenCalledWith(userId);
+    expect(ratingsRepository.syncCrewFromRemote).toHaveBeenCalledOnce();
   });
 
   it('returns zero when no queue items were flushed', async () => {
