@@ -4,8 +4,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ProfilePage from './pages/ProfilePage';
-import SchedulePage from './pages/SchedulePage';
-import MyPicksPage from './pages/MyPicksPage';
+import LineupPage from './pages/LineupPage';
+import MyWackenPage from './pages/MyWackenPage';
 import PopularPage from './pages/PopularPage';
 import RightNowPage from './pages/RightNowPage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
@@ -32,7 +32,7 @@ export default function App() {
             path="/schedule"
             element={
               <PrivateRoute>
-                <SchedulePage />
+                <LineupPage />
               </PrivateRoute>
             }
           />
@@ -40,7 +40,7 @@ export default function App() {
             path="/my-picks"
             element={
               <PrivateRoute>
-                <MyPicksPage />
+                <MyWackenPage />
               </PrivateRoute>
             }
           />

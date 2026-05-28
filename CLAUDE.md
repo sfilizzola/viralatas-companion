@@ -251,7 +251,7 @@ Never invert this to: `UI → API → local cache`. IndexedDB is the source of t
 ## Stage configuration
 
 8 stages × 4 days at Wacken 2026. Full table, colors, festival schedule, and lineup update procedure → `.claude/context/stages-and-lineup.md`.
-Stage colors live in `src/pages/SchedulePage.tsx`; unknown stages fall back to `var(--accent)`.
+Stage colors live in `src/pages/LineupPage.tsx`; unknown stages fall back to `var(--accent)`.
 
 ---
 

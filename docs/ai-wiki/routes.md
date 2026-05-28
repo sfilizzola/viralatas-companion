@@ -21,8 +21,8 @@ Document all app routes, their purpose, access control, and key components.
 /login               → LoginPage (public)
 /register            → RegisterPage (public)
 /now                 → RightNowPage (protected) ← landing page after auth
-/schedule            → SchedulePage (protected)
-/my-picks            → MyPicksPage (protected)
+/schedule            → LineupPage (protected) — `LineupPage.tsx`; URL unchanged
+/my-picks            → MyWackenPage (protected) — `MyWackenPage.tsx`; URL unchanged
 /popular             → PopularPage (protected)
 /announcements       → AnnouncementsPage (protected)
 /profile             → ProfilePage (protected)
@@ -142,9 +142,9 @@ export default function PrivateRoute({ children }: Props) {
 
 ---
 
-### /schedule (SchedulePage)
+### /schedule (LineupPage)
 
-**Component**: `src/pages/SchedulePage.tsx`
+**Component**: `src/pages/LineupPage.tsx` (i18n namespace `SchedulePage`; CSS `SchedulePage.module.css`)
 
 **Purpose**: Browse full band lineup with filters
 
@@ -174,9 +174,9 @@ export default function PrivateRoute({ children }: Props) {
 
 ---
 
-### /my-picks (MyPicksPage)
+### /my-picks (MyWackenPage)
 
-**Component**: `src/pages/MyPicksPage.tsx`
+**Component**: `src/pages/MyWackenPage.tsx` (i18n namespace `MyPicksPage`)
 
 **Purpose**: User's personal schedule (only bands they picked)
 
@@ -391,7 +391,7 @@ RightNowPage
 ### Browse Schedule → Pick Band
 
 ```
-SchedulePage
+LineupPage
   ↓ (apply filters, search)
   ↓ tap BandCard
 BandDetailModal opens
@@ -401,13 +401,13 @@ BandDetailModal opens
   ↓ useMyPicks() + usePickCounts() hooks re-render
   ↓ Detail modal shows updated state
   ↓ (close modal)
-SchedulePage updates with new counts
+LineupPage updates with new counts
 ```
 
 ### View My Picks → See Conflicts
 
 ```
-MyPicksPage loads
+MyWackenPage loads
   ↓ useMyPicks() fetches from IDB
   ↓ useBandConflicts() detects overlaps
   ↓ Conflict chips rendered on band cards

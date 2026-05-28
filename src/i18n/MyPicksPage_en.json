@@ -1,7 +1,7 @@
 {
-  "title": "My picks",
+  "title": "My Wacken",
   "loading": "Loading picks...",
-  "empty": "You haven't picked any bands yet. Head to the schedule. 🤘",
+  "empty": "You haven't picked any bands yet. Head to the Line-up. 🤘",
   "summary": "{bands} bands across {days} days · {conflicts} conflicts",
   "headerBandsDays": "{bands} picks / {days} days",
   "headerConflicts": "{conflicts} conflicts",

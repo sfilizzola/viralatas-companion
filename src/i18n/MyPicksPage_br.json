@@ -1,7 +1,7 @@
 {
-  "title": "Minhas escolhas",
+  "title": "Meu Wacken",
   "loading": "Carregando escolhas...",
-  "empty": "Você ainda não escolheu nenhuma banda. Vá para a programação 🤘",
+  "empty": "Você ainda não escolheu nenhuma banda. Vá para o Line-up 🤘",
   "summary": "{bands} bandas em {days} dias · {conflicts} conflito(s)",
   "headerBandsDays": "{bands} escolhas / {days} dias",
   "headerConflicts": "{conflicts} conflitos",

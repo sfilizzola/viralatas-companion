@@ -76,7 +76,7 @@ Stage order convention within each day in the wiki: Harder · Faster · Louder �
 
 ## Source files
 
-- `src/pages/SchedulePage.tsx` — consumes the stage colors via the CSS variables.
+- `src/pages/LineupPage.tsx` — consumes the stage colors via the CSS variables.
 - `src/services/stageColors.ts` — `getStageColor(stage)` mapping.
 - `src/index.css` — actual `--stage-*` custom property definitions.
 - `src/types/index.ts` — `Band` type with `stage: string` and `category` fields.

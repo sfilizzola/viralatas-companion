@@ -61,7 +61,7 @@ function DuckableBandCard({
   );
 }
 
-export default function SchedulePage() {
+export default function LineupPage() {
   const { t } = useI18n('SchedulePage');
   const { session } = useAuth();
   const userId = session?.user?.id ?? null;

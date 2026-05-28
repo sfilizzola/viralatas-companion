@@ -22,7 +22,7 @@ import Icon from '../components/icons/Icon';
 import PlaylistLaunchButton from '../components/PlaylistLaunchButton';
 import styles from './SchedulePage.module.css';
 
-export default function MyPicksPage() {
+export default function MyWackenPage() {
   const { t } = useI18n('MyPicksPage');
   const { t: tSchedule } = useI18n('SchedulePage');
   const { session } = useAuth();
