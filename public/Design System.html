@@ -458,7 +458,7 @@
 
     <div class="summary">
       <div class="metric">
-        <div class="metric-value">22</div>
+        <div class="metric-value">24</div>
         <div class="metric-label">Core Components</div>
       </div>
       <div class="metric">
@@ -975,9 +975,8 @@
         <p>Displays band information with pick toggles and attendance counts.</p>
         <p><strong>Variants:</strong> schedule, timeline, ranked, ceremony</p>
         <p><strong>Features:</strong> duck button, conflict indicators, stage badge, attendee avatars, corner weekday label (V1 ghost)</p>
-        <p><strong>Day label (<code>showDayLabel</code>):</strong> optional corner ghost — mono 9px weekday abbr in <code>--text-faint</code>, top-right of the body column (<code>.dayGhost</code>). Only on <code>schedule</code> and <code>ranked</code> variants. Weekday comes from <code>bandWeekdayKey()</code> in <code>bandTime.ts</code> (CEST, same rules as <code>bandDay()</code>) via existing SchedulePage i18n keys. <strong>Schedule:</strong> shown when no day tab is active (<code>filters.day === null</code> — search, all-days browse). Hidden when a single day filter is selected. <strong>Popular:</strong> always shown (cross-day list). <strong>My Wacken:</strong> not used (timeline variant + day section headers).</p>
-        <p><strong>Attendance chip (<code>attendanceChip</code>, Phase 33):</strong> timeline variant only, on <code>/my-picks</code> ended rows. Mono pill in <code>.meta</code>; pick hidden via <code>hidePick</code>. Card surface + time column match upcoming rows; <strong>only the 4px left stripe</strong> signals status — teal <code>.stripeAttended</code> / amber <code>.stripeMissed</code>. Stage color stays on <code>.stageBadge</code> only. Ended dimming: <code>.cardAttended</code> 72% · <code>.cardMissed</code> 62%. Day divider <code>.dayDivider</code> has extra vertical margin. No conflict stripe on ended rows.</p>
-        <p><strong>Coach banner (<code>MyWackenCoachBanner</code>, Phase 33):</strong> teal tint (<code>rgba(22,160,133,0.1)</code> + bottom border), mono kicker <code>coachBannerTitle</code>, body copy below header/conflict/playlist and above day sections. Shows when ≥1 ended pick and not dismissed; × sets <code>viralatas:my-wacken-ended-coach-dismissed</code> in <code>localStorage</code> (per device, no sync).</p>
+        <p><strong>Day label (<code>showDayLabel</code>):</strong> optional corner ghost — mono 9px weekday abbr in <code>--text-faint</code>, top-right of the body column (<code>.dayGhost</code>). Only on <code>schedule</code> and <code>ranked</code> variants. Weekday comes from <code>bandWeekdayKey()</code> in <code>bandTime.ts</code> (CEST, same rules as <code>bandDay()</code>) via SchedulePage i18n keys. <strong>Lineup (<code>/schedule</code>):</strong> shown when no day tab is active (<code>filters.day === null</code>). Hidden when a single day filter is selected. <strong>Popular:</strong> always shown. <strong>My Wacken:</strong> not used — festival day comes from section headers (<code>.dayHeader</code>).</p>
+        <p><strong>Attendance chip (<code>attendanceChip</code>, Phase 33):</strong> <code>timeline</code> variant on <code>/my-picks</code> <strong>ended rows only</strong>. Values <code>attended</code> | <code>missed</code> (not “Saw”). Mono pill <code>.attendanceChipAttended</code> / <code>.attendanceChipMissed</code> in <code>.meta</code>; <code>hidePick</code> on ended rows. Card background + time column = same as upcoming; status = <strong>4px left stripe only</strong> (<code>.stripeAttended</code> → <code>--signal-ok</code>, <code>.stripeMissed</code> → <code>--signal-warn</code>). Stage color on <code>.stageBadge</code> only. Opacity: <code>.cardAttended</code> 72% · <code>.cardMissed</code> 62%. No conflict outline on ended rows. See <strong>My Wacken Page</strong> section for page-level layout.</p>
         <p><strong>Duck button visibility:</strong> only when band is currently live, the user has picked it, <code>band.category !== 'ceremony'</code>, AND the global <code>duck_enabled</code> killswitch (Phase 21) is on. The killswitch is a single boolean on <code>app_settings</code>, fetched once at app boot via <code>DuckEnabledProvider</code> and toggled from Godlike Powers → Duck feature. When off, the duck button is not rendered anywhere; offline-queued ducks still flush on reconnect.</p>
         <p><strong>Pick toggle:</strong> <code>StarIcon</code> → <code>PawIcon</code> (canine + heel, −14°) in the 64px column at <strong>28px</strong>; outline when unpicked, filled accent when picked. Bottom nav My Wacken tab stays 18px.</p>
         <p><strong>Popular rating mode (<code>ratingStats</code>, Phase 32):</strong> when sort mode is <code>rating</code>, ranked cards pass <code>ratingStats</code> instead of <code>attendeeCluster</code>. Footer strip (border-top): left column = count + optional <code>You · {score}</code> + optional missed skip; right column = paw + large avg (<code>.ratingHero</code>). Pick avatars hidden.</p>
@@ -1020,8 +1019,149 @@
               </svg>
             </div>
           </div>
+
+          <div class="ds-bc-caption" style="margin-top: 20px;">My Wacken · timeline · ended attended</div>
+          <div class="ds-bc-card ds-mw-ended" style="grid-template-columns: 4px 1fr; opacity: 0.72;">
+            <div class="ds-bc-stripe" style="background: #27ae60;"></div>
+            <div style="display: grid; grid-template-columns: 56px 1fr; min-width: 0;">
+              <div style="padding: 12px 0 12px 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8e8e8; display: grid; align-content: center; gap: 2px;">
+                <span>16:00</span><span style="font-size: 10px; color: #888;">16:45</span>
+              </div>
+              <div class="ds-bc-body" style="padding-right: 12px;">
+                <div class="ds-bc-name">Blind Guardian</div>
+                <div class="ds-bc-meta">
+                  <span class="ds-bc-stage">Faster</span>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; background: rgba(39,174,96,.22); color: #7dcea0; border: 1px solid rgba(39,174,96,.4);">Attended</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ds-bc-caption">My Wacken · timeline · ended missed</div>
+          <div class="ds-bc-card ds-mw-ended" style="grid-template-columns: 4px 1fr; opacity: 0.62;">
+            <div class="ds-bc-stripe" style="background: #f39c12;"></div>
+            <div style="display: grid; grid-template-columns: 56px 1fr; min-width: 0;">
+              <div style="padding: 12px 0 12px 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8e8e8; display: grid; align-content: center; gap: 2px;">
+                <span>18:00</span><span style="font-size: 10px; color: #888;">18:45</span>
+              </div>
+              <div class="ds-bc-body" style="padding-right: 12px;">
+                <div class="ds-bc-name">Angel Witch</div>
+                <div class="ds-bc-meta">
+                  <span class="ds-bc-stage">Louder</span>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; background: rgba(243,156,18,.22); color: #f5b041; border: 1px solid rgba(243,156,18,.4);">Missed</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <p><strong>Status:</strong> <span class="status-warn">⚠ Hardcoded colors in component—needs refactor</span></p>
+      </div>
+
+      <div class="component-section">
+        <h3>My Wacken Page <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">Phase 33 · MyWackenPage.tsx · route /my-picks</span></h3>
+        <p>Personal festival schedule — all picks stay on their <strong>festival day</strong> (CEST <code>bandDay()</code>). Ended and upcoming bands share one day section; footer <strong>Saw / Didn't See</strong> buckets removed. Shares <code>SchedulePage.module.css</code> with Lineup and Popular; i18n namespace stays <code>MyPicksPage</code>.</p>
+
+        <table>
+          <thead><tr><th>Surface</th><th>EN</th><th>BR (locked)</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>Bottom nav tab</td><td>Lineup · My Wacken</td><td>Line-up · Meu Wacken</td><td>Routes unchanged: <code>/schedule</code>, <code>/my-picks</code></td></tr>
+            <tr><td>Page title</td><td>My Wacken</td><td>Meu Wacken</td><td><code>MyPicksPage.title</code></td></tr>
+            <tr><td>Lineup page title</td><td>Lineup</td><td>Line-up</td><td><code>LineupPage.tsx</code> · namespace <code>SchedulePage</code></td></tr>
+            <tr><td>Empty state CTA</td><td>Head to the Line-up</td><td>…Line-up</td><td>Paw icon 24px</td></tr>
+            <tr><td>Divider</td><td>already played today</td><td>já passaram hoje</td><td>Only when day has ≥1 ended and ≥1 upcoming</td></tr>
+            <tr><td>Header highlight</td><td>{n} left today</td><td>{count} por vir hoje</td><td><code>--signal-ok</code> · hidden when n = 0</td></tr>
+            <tr><td>Ended chips</td><td>Attended · Missed</td><td>Assistida · Perdi</td><td>Opt-out via modal — unchanged</td></tr>
+          </tbody>
+        </table>
+
+        <p><strong>Page stack (top → bottom):</strong></p>
+        <ol style="color: #888; margin: 0 0 16px 20px; max-width: 80ch;">
+          <li><code>.header</code> — Oswald 24px title + right-aligned mono summary grid</li>
+          <li><code>.conflictBanner</code> — red tint when ≥3 <strong>upcoming</strong> hard conflicts (links to profile)</li>
+          <li><code>PlaylistLaunchButton</code> — only when <code>!isFestivalActive</code> (pre-festival)</li>
+          <li><code>MyWackenCoachBanner</code> — teal coach when ≥1 ended pick (see below)</li>
+          <li><code>.list</code> — collapsible <code>.daySection</code> blocks</li>
+        </ol>
+
+        <p><strong>Header summary lines</strong> (<code>.summary</code> · mono 10px · uppercase · right-aligned):</p>
+        <ul style="color: #888; margin: 0 0 16px 20px; max-width: 80ch;">
+          <li><code>headerBandsDays</code> — total picks / distinct festival days with picks (includes past ended-only days)</li>
+          <li><code>headerLeftToday</code> — upcoming count on today's <code>bandDay()</code>; only while festival ongoing (<code>collapsePastDays</code>) and n ≥ 1; <code>.summaryHighlight</code></li>
+          <li><code>headerConflicts</code> / <code>headerOverlaps</code> — derived from <strong>upcoming picks only</strong></li>
+        </ul>
+
+        <p><strong>Day sections</strong> (<code>myWackenGrouping.ts</code>): Within each day: upcoming ASC → optional <code>.dayDivider</code> → ended ASC. Day header shows localized weekday + <code>dayPickCount</code> (total picks that day). Chevron toggles <code>.dayBands</code> / <code>.dayBandsOpen</code> (max-height 0 ↔ 4000px).</p>
+
+        <p><strong>Collapse rules (implemented):</strong></p>
+        <ul style="color: #888; margin: 0 0 16px 20px; max-width: 80ch;">
+          <li><strong>Mid-festival:</strong> auto-collapse every festival day with <code>dayKey &lt; todayKey</code> (calendar past days). Today + future days start expanded.</li>
+          <li><strong>Post-festival:</strong> all days expanded when <code>isFestivalEnded(now, bands)</code> — review mode.</li>
+          <li><strong>Gate:</strong> waits for <code>picksReady</code> from IDB before applying collapse (fixes remount flash).</li>
+          <li><strong>Time travel:</strong> changing godlike override day re-seeds collapse via <code>todayKey|collapsePastDays</code> context; manual chevron toggles reset on context change only.</li>
+          <li>Not persisted to <code>localStorage</code> (session-only overrides).</li>
+        </ul>
+
+        <div class="component-demo" style="background: #0a0a0a; padding: 0; max-width: 420px; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden;">
+          <style>
+            .ds-mw-hdr { padding: 16px 16px 12px; border-bottom: 1px solid #2a2a2a; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+            .ds-mw-title { font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700; text-transform: uppercase; color: #e8e8e8; line-height: 1; margin: 0; }
+            .ds-mw-sum { display: grid; gap: 2px; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #888; text-transform: uppercase; line-height: 1.25; }
+            .ds-mw-sum-hi { color: #27ae60; }
+            .ds-mw-coach { position: relative; padding: 12px 16px; background: rgba(22,160,133,.1); border-bottom: 1px solid rgba(22,160,133,.25); font-size: 11px; color: #8fdcc8; line-height: 1.4; }
+            .ds-mw-coach-k { display: block; font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: #27ae60; margin-bottom: 4px; }
+            .ds-mw-coach-x { position: absolute; top: 8px; right: 12px; color: #555; font-size: 14px; }
+            .ds-mw-day { margin: 12px 16px; padding-top: 6px; border-top: 2px solid #c0392b; display: flex; align-items: center; justify-content: space-between; font-family: 'Oswald', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; color: #e8e8e8; }
+            .ds-mw-day-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 400; color: #888; display: flex; align-items: center; gap: 8px; }
+            .ds-mw-div { height: 1px; background: #2a2a2a; margin: 16px 0 16px; padding-top: 8px; position: relative; }
+            .ds-mw-div span { position: absolute; left: 0; top: 0; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #555; text-transform: uppercase; letter-spacing: .04em; background: #0a0a0a; padding-right: 8px; }
+            .ds-mw-collapsed .ds-mw-day-body { display: none; }
+          </style>
+          <div class="ds-mw-hdr">
+            <h4 class="ds-mw-title">My Wacken</h4>
+            <div class="ds-mw-sum">
+              <span>8 picks / 3 days</span>
+              <span class="ds-mw-sum-hi">2 left today</span>
+              <span>1 conflicts</span>
+            </div>
+          </div>
+          <div class="ds-mw-coach">
+            <span class="ds-mw-coach-x" aria-hidden="true">×</span>
+            <strong class="ds-mw-coach-k">First time</strong>
+            Shows that already ended stay on the same day. We count them as attended — didn't go? Open the band and tap "I didn't see this band".
+          </div>
+          <div class="ds-mw-day ds-mw-collapsed">
+            <div><span>Wed 29/07</span><span class="ds-mw-day-meta">3 picks ▾</span></div>
+          </div>
+          <div class="ds-mw-day">
+            <div><span>Thu 30/07</span><span class="ds-mw-day-meta">4 picks ▴</span></div>
+            <div class="ds-mw-day-body" style="margin-top: 8px; color: #555; font-family: 'JetBrains Mono', monospace; font-size: 9px;">…upcoming BandCards…</div>
+            <div class="ds-mw-div"><span>already played today</span></div>
+            <div class="ds-mw-day-body" style="color: #555; font-family: 'JetBrains Mono', monospace; font-size: 9px;">…ended rows + Attended/Missed chips…</div>
+          </div>
+        </div>
+
+        <p style="margin-top: 12px;"><strong>Removed (Phase 33):</strong> footer <code>sectionSaw</code> / <code>sectionDidntSee</code> blocks — keys remain in JSON but are not rendered. <code>.dayHeaderSaw</code> / <code>.dayHeaderDidntSee</code> border accents unused on My Wacken.</p>
+      </div>
+
+      <div class="component-section">
+        <h3>MyWackenCoachBanner <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/MyWackenCoachBanner.tsx</span></h3>
+        <p>One-time education strip — not conflict styling. Explains opt-out attendance after the user's first ended pick.</p>
+        <table>
+          <thead><tr><th>Rule</th><th>Behavior</th></tr></thead>
+          <tbody>
+            <tr><td>Show</td><td>≥1 ended pick on page and <code>!isMyWackenCoachDismissed()</code></td></tr>
+            <tr><td>Dismiss</td><td>× button → <code>viralatas:my-wacken-ended-coach-dismissed</code> in <code>localStorage</code> (per device, no Supabase sync)</td></tr>
+            <tr><td>Placement</td><td>After header / conflict / playlist strip; before <code>&lt;main class="list"&gt;</code></td></tr>
+            <tr><td>i18n</td><td><code>coachBannerTitle</code>, <code>coachBannerBody</code>, <code>coachBannerDismiss</code> (4 locales)</td></tr>
+          </tbody>
+        </table>
+        <p><strong>CSS module:</strong> teal wash <code>rgba(22,160,133,0.1)</code>, border-bottom <code>rgba(22,160,133,0.25)</code>, kicker 9px mono <code>--signal-ok</code>, body 11px <code>color-mix(--signal-ok 55%, --text-muted)</code>, dismiss absolute top-right with <code>focus-visible</code> teal outline.</p>
+      </div>
+
+      <div class="component-section">
+        <h3>Godlike Time Travel <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">TimeTravelSection · services/time.ts</span></h3>
+        <p>Profile-only clock override for testing Live Now, My Wacken grouping, badges, and wrap gates. <strong>Datetime-local input is interpreted as Europe/Berlin (Wacken CEST)</strong> via <code>parseWackenDatetimeLocal()</code> / <code>formatWackenDatetimeLocal()</code> — not the browser's local timezone. Quick day chips (D-1…D+1) keep the current wall-clock time when switching festival days.</p>
+        <p>Changing override dispatches <code>viralatas:time-override-changed</code>; <code>useNow()</code> consumers (including My Wacken) recompute <code>todayKey</code>, upcoming vs ended split, collapse context, and coach visibility.</p>
       </div>
 
       <div class="component-section">
@@ -1872,6 +2012,8 @@
       <div class="component-section">
         <h3>Other Components</h3>
         <ul>
+          <li><strong>BottomNav</strong> — five tabs; labels Lineup + My Wacken (Phase 33); routes unchanged</li>
+          <li><strong>MyWackenCoachBanner</strong> — one-time teal coach on <code>/my-picks</code> (Phase 33)</li>
           <li><strong>SectionTitle</strong> — Display section headings (no CSS module, uses t-h class)</li>
           <li><strong>Collapsible</strong> — Expandable content container</li>
           <li><strong>SegmentedControl</strong> — Tab-like toggle buttons</li>
@@ -2024,10 +2166,18 @@
           <tr>
             <td>BandCard</td>
             <td>✅</td>
-            <td>✅ 4 variants</td>
-            <td>❌ Missing</td>
-            <td>Hardcoded colors, mixed spacing units, inline styles</td>
-            <td>5/10</td>
+            <td>✅ 4 variants + attendanceChip (Phase 33)</td>
+            <td>⚠️ Partial</td>
+            <td>Hardcoded colors; timeline attended/missed documented</td>
+            <td>6/10</td>
+          </tr>
+          <tr>
+            <td>My Wacken Page</td>
+            <td>✅</td>
+            <td>✅ Day inline A2 + collapse + coach</td>
+            <td>✅ Phase 33</td>
+            <td>Shares SchedulePage.module.css; picksReady collapse gate</td>
+            <td>9/10</td>
           </tr>
           <tr>
             <td>Avatar</td>

@@ -16,8 +16,8 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ### Changed
 - Bottom nav + page titles: **Lineup** / **My Wacken** (BR **Line-up** / **Meu Wacken**); empty state points to Line-up.
 - Header stats: `{days}` = all days with picks; conflicts/overlaps from upcoming picks only; **{n} left today** during festival when n ≥ 1.
-- Mid-festival collapse: past ended-only days collapsed; today expanded; post-festival all expanded.
-- **`docs/ai-wiki/routes.md`**, **`architecture.md`**, Design System BandCard + coach banner notes.
+- Mid-festival collapse: calendar days before `todayKey` collapsed; today + future expanded; post-festival all expanded; `picksReady` + CEST time-travel parsing.
+- **`docs/ai-wiki/routes.md`**, **`architecture.md`**, **`public/Design System.html`** — My Wacken page section, coach banner, godlike CEST time travel, timeline chip demos.
 
 ### Architectural Notes
 - No schema or sync changes; attendance opt-out unchanged in `BandDetailModal`.
