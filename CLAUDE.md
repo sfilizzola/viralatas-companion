@@ -293,6 +293,32 @@ Phases 1–30 are complete. See `PHASES.md` and `FUTURE_IDEAS.md` for upcoming w
 
 ---
 
+## Skill routing
+
+**Hybrid mode:** infer the skill from the task → **announce and ask** before reading the skill file → skip ask if the user typed `/skill-name` or named the skill explicitly. Routine work (existing patterns, typos, small fixes) uses CLAUDE.md + wiki only — no skill.
+
+**Default comms:** when possible, always **`caveman`** mode for token savings (see skill-routing doc for exceptions: brainstorming, grill-me, humanize-writing, prod DB/destructive warnings, user says “normal mode”).
+
+**Full matrix, handoffs, and examples** → `.claude/context/skill-routing.md`
+
+| Trigger | Skill |
+|---------|--------|
+| New feature / scope unclear / `/brainstorming` | `brainstorming` |
+| Spec or plan needed; edit **`PHASES.md`** or **`FUTURE_IDEAS.md`** | `writing-plans` |
+| Design exploration, DS update, HTML prototypes | `huashu-design` |
+| Ship locked design → production React in `src/` | `frontend-design` |
+| Plan in `docs/superpowers/plans/` or **execute phase from `PHASES.md`** | `executing-plans` |
+| Close phase / branch wrap-up | `finishing-a-development-branch` |
+| Bug, failing tests, regression | `diagnose` or `systematic-debugging` |
+
+**UI pipeline:** `huashu-design` (creativity + `public/Design System.html`) → user locks variant → `frontend-design` (implement in `src/`).
+
+**User-direct (never auto-suggest; `/skill` only):** `grill-me`, `grill-with-docs`, `handoff`, `humanize-writing`, `prototype`, `tdd`.
+
+Skills define *how* the main agent works; **subagents** below define *who* reviews — both can apply in one task.
+
+---
+
 ## Subagent locations
 
 Specialized agents live in `.claude/agents/`. Each reads CLAUDE.md plus its own system prompt. Delegate when the trigger matches:
@@ -373,7 +399,7 @@ Only when **both the build and all tests are green** may you proceed with the co
 
 - `PHASES.md` — Current phase: acceptance criteria, deliverables
 - `docs/ai-wiki/` — Architecture wiki
-- `.claude/context/` — On-demand context: rtk-reference, stages-and-lineup, **production-database**, llm-alerts, badges, auth-trigger, wiki-template, key-decisions
+- `.claude/context/` — On-demand context: **skill-routing**, rtk-reference, stages-and-lineup, **production-database**, llm-alerts, badges, auth-trigger, wiki-template, key-decisions
 - `.claude/agents/` — Specialized subagents (see Subagent locations above)
 - `README.md`, `supabase/migrations/`, `src/types/index.ts`
 
