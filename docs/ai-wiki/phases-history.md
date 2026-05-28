@@ -655,3 +655,34 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Teaser discovery only — route never gated on `isFestivalEnded()`.
 
 ---
+
+### Phase 31 — Social Snapshot Unification
+**Status:** ✅ Complete
+
+**Goal:** Unify `/now` and live vest crew derivation behind one deep module (`buildSocialSnapshot`), dedupe IDB loads via shared hooks, and eliminate display-path Supabase reads so assigned badges and friend status work offline after crew sync.
+
+**Deliverables:**
+- `src/services/socialSnapshot.ts` — pure `buildSocialSnapshot()` from IDB inputs (crew plans, groups, location counts, Metal Place window, live test band id)
+- `src/hooks/useSocialSnapshot.ts`, `useSocialSnapshotSpecs.ts` — shared IDB cache cells (`useCrewUsersCache`, `usePresenceCache`); composes `useAllPicks`, `useBands`, config hooks
+- `CrewUser.special_badges` on `crew_users` IDB — synced in `usersRepository.syncCrew()`; auth metadata hydration on reconnect; godlike assign/revoke triggers resync
+- `useNowData` / `useNowPlans` — consume pre-built `SocialSnapshot`; slim `useNowCache` for announcements only
+- `useBadgeContext` — `useSocialSnapshot` + `useBadgePersist`; IDB-only display (no `supabase.from('users')` in vest path)
+- `buildBadgeContextFromSocialSnapshot()` in `badgeContextBuilder.ts`; `useBadgeCache` deleted
+- `useFestivalWrapStats` / `buildFestivalWrapStats` — accept `SocialSnapshot` where crew pipeline was duplicated
+- Tests: `socialSnapshot.test.ts`, updated `useBadgeContext.test.ts`, `usersRepository.test.ts`, `badgeContextBuilder.test.ts`
+- Wiki + `CONTEXT.md` — **Social snapshot**, **Crew profile cache** terms; architecture file map updated
+
+**Acceptance criteria (all met):**
+- [x] Assigned badges and `is_friend` display from `crew_users` IDB after sync — no live Supabase reads in vest
+- [x] `/now` and live vest share one `buildSocialSnapshot()` derivation — lost/camping counts aligned
+- [x] `useSocialSnapshot` shared hook pattern (not prop-drilling from `/now` only)
+- [x] `rtk npm run build` green · `rtk npm test` green
+
+**Wiki:** `architecture.md` · `changelog.md` · `CONTEXT.md` · `PHASES.md`
+
+**Architectural notes:**
+- Crew profile cache extends `crew_users` with `special_badges`; no IDB version bump (schemaless store).
+- Persist-metadata `auth.updateUser` writes remain best-effort online; out of scope for offline queue.
+- Reconnect + post-assign `syncCrew()` sufficient for v1; no Realtime on `users.special_badges`.
+
+---

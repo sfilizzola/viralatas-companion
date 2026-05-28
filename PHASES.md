@@ -9,7 +9,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Active development
 
-**No active phased work.** Phases **1–30** are complete.
+**No active phased work.** Phases **1–31** are complete (Phase 31 — Social Snapshot Unification closed 2026-05-28).
 
 Next features will be scheduled from `FUTURE_IDEAS.md` (e.g. LLM proactive alerts, festival minimap) or ad-hoc maintenance.
 

@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-28 (Phase 31 — Social Snapshot Unification)
+
+### Added
+- **`buildSocialSnapshot()`** — pure service in `src/services/socialSnapshot.ts`; single derivation path for crew plans, groups, and location counts.
+- **`useSocialSnapshot`** + **`useSocialSnapshotSpecs`** — shared IDB cache cells (`useCrewUsersCache`, `usePresenceCache`) feeding `/now` and live vest.
+- **Crew profile cache** — `special_badges` on `CrewUser` synced via `usersRepository.syncCrew()`; auth metadata hydration on reconnect; godlike assign/revoke triggers resync.
+- **CONTEXT.md** — **Social snapshot** and **Crew profile cache** domain terms.
+
+### Changed
+- **`useNowData`** / **`useNowPlans`** — consume pre-built `SocialSnapshot` instead of re-running `mapCrewLivePlans` / `groupCrewLivePlans`.
+- **`useBadgeContext`** — composes `useSocialSnapshot` + `useBadgePersist`; display reads crew IDB only (no Supabase `users` fetch for assigned badges or friend status).
+- **`useBadgeCache`** — removed; vest and `/now` share one cache path.
+- **`badgeContextBuilder`** — `buildBadgeContextFromSocialSnapshot()` accepts pre-built snapshot.
+- **`architecture.md`**, **`phases-history.md`**, **`PHASES.md`** — Phase 31 documented; active work cleared.
+
+### Architectural Notes
+- Golden rule preserved: live vest display is UI → IndexedDB (`crew_users.special_badges`, `is_friend`); persist-metadata writes remain best-effort online only.
+- `/now` crew cards and live vest patches now derive from the same `buildSocialSnapshot()` call — counts stay aligned offline after crew sync.
+
+---
+
 ## 2026-05-27 (Wiki audit — Phase 30 doc sync)
 
 ### Changed

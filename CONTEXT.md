@@ -40,6 +40,14 @@ _Avoid_: In-place image replace, badge image overwrite
 The client's copy of `user_badge_history` rows in IndexedDB. UI reads this store first; a sync-on-profile-load pulls from Supabase when online and replaces local rows for the signed-in user.
 _Avoid_: Badge history IDB, offline badge archive
 
+**Social snapshot**:
+The derived festival-social state shared by `/now` and the live vest — crew plans, crew groups (camping / Metal Place / lost / at band), Metal Place window flag, live test band id, and crew location counts. Built by `buildSocialSnapshot()` from IDB inputs.
+_Avoid_: Live preview state, crew cache DTO
+
+**Crew profile cache**:
+The `crew_users` IndexedDB store — roster fields including `is_friend` and `special_badges`. Synced from Supabase on reconnect; UI reads this store for display, not live `users` queries.
+_Avoid_: Crew IDB, users cache
+
 **Consolidation window**:
 The operator period after `isFestivalEnded()` is true and before the next `festival:reset`. Badge consolidation for a festival year may only run inside this window; re-runs within it are idempotent. Godlike users may bypass the gate via existing time override or an explicit admin force action for QA.
 _Avoid_: Freeze window, archive period

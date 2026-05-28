@@ -24,7 +24,10 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/components/BadgesDisplay.tsx` — Vest-stack patches UI (presentation)
 - `src/components/BadgeHistorySection.tsx` — Previously Achieved archive (U2 layout)
 - `src/components/profile/ConsolidateBadgesSection.tsx` — Godlike year consolidation panel
-- `src/hooks/useBadgeContext.ts` — IDB-first badge context + persist recording + `computeCrewLocationCounts`
+- `src/hooks/useBadgeContext.ts` — composes `useSocialSnapshot` + `useBadgePersist`; IDB-only vest display
+- `src/hooks/useSocialSnapshot.ts` — shared IDB load + `buildSocialSnapshot()` derivation for `/now` and live vest (Phase 31)
+- `src/hooks/useSocialSnapshotSpecs.ts` — `useCrewUsersCache`, `usePresenceCache` cache keys + loaders (Phase 31)
+- `src/services/socialSnapshot.ts` — pure `buildSocialSnapshot()`; single crew derivation path (Phase 31)
 - `src/hooks/useUserBadgeHistory.ts` — IDB-first badge history; sync on profile mount / reconnect
 - `src/repositories/badgeHistoryRepository.ts` — IDB read + Supabase pull; `consolidateYear()` Edge Function invoke
 - `src/lib/db/badgeHistory.ts` — IndexedDB replace-all for current user on sync
@@ -135,7 +138,7 @@ Hooks encapsulate state logic and subscriptions. They:
 | `useAnnouncements()` | Announcements mural state + actions | IDB + `ANNOUNCEMENTS_CHANGED_EVENT` + `BLOCKED_POSTERS_CHANGED_EVENT` |
 | `usePickCounts()` | Attendance per band | `useAllPicks()` shared cache → `countPicks()` |
 | `useBandAttendees(bandId)` | Users going to a band | `useAllPicks()` + `CREW_USERS_CHANGED_EVENT` |
-| `useNowData()` | Current/next band for user | IDB + `useNow()` (time) |
+| `useNowData()` | Current/next band for user | `useSocialSnapshot` + slim `useNowCache` + `useNow()` (time) |
 | `useBandConflicts(bandIds)` | Overlapping bands | Computed, no DB |
 | `useNow()` | Current time (with override) | localStorage + hook state |
 | `useBandDetailModal()` | Band detail modal state | Composes pick/missed/attendee inputs |
@@ -147,7 +150,10 @@ Multiple hooks read the same IDB store on the same window event. `useIdbSubscrip
 
 | Cache hook | Key | Events | Consumers |
 |------------|-----|--------|-----------|
-| `useAllPicks()` | `all-user-picks` | `PICKS_CHANGED_EVENT` | `usePickCounts`, `useBandAttendees`, `useNowCache`, `useBadgeContext` |
+| `useAllPicks()` | `all-user-picks` | `PICKS_CHANGED_EVENT` | `usePickCounts`, `useBandAttendees`, `useSocialSnapshot`, `useBadgeContext` |
+| `useCrewUsersCache()` | `crew-users` | `CREW_USERS_CHANGED_EVENT` | `useSocialSnapshot`, `useBadgeContext`, `useNowData` |
+| `usePresenceCache()` | `all-user-presence` | `PRESENCE_CHANGED_EVENT` | `useSocialSnapshot`, `useBadgeContext`, `useNowData` |
+| `useSocialSnapshot(now)` | _(composes above + bands + config)_ | same as child caches | `useNowData`, `useBadgeContext`, `useFestivalWrapStats` |
 
 **Example: usePickCounts()**
 ```typescript
@@ -215,7 +221,7 @@ Public import path remains `src/lib/db.ts` (thin re-export shim). Domain modules
 |-------|-----|---------|
 | `session` | string `'current'` | Supabase auth session (custom persistence) |
 | `bands` | band.id | Band schedule cache (fetched once on login) |
-| `crew_users` | user.id | Crew member profiles (for attendance display) |
+| `crew_users` | user.id | Crew member profiles (`display_name`, `avatar_url`, `is_friend`, `special_badges`) — **crew profile cache** |
 | `user_picks` | [user_id, band_id] | User's picks (index by user_id) |
 | `offline_picks` | uuid | Picks made while offline, awaiting sync |
 | `user_presence` | user_id | Camping + Metal Place status per crew member |
@@ -429,7 +435,8 @@ INSERT into user_picks
 | `useMyPicks()` | `{ pickedIds, refresh }` | `PICKS_CHANGED_EVENT` | Internal to `usePickActions` |
 | `usePickActions()` | `{ pickedIds, refresh, togglePick, pickBand, unpickBand }` | `PICKS_CHANGED_EVENT` | SchedulePage, MyPicksPage, PopularPage, ConflictSection, useNowData |
 | `useMissedBands()` | `{ allMissed, missedBandIds, missedCountsByBand, mark, unmark, toggleMissed, refresh }` | `MISSED_CHANGED_EVENT` | MyPicksPage, PopularPage, `useBadgeContext` |
-| `useBadgeContext(user)` | `{ ctx, loading }` | `PICKS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT`, auth `USER_UPDATED` | BadgesDisplay, ProfilePage |
+| `useBadgeContext(user)` | `{ ctx, loading }` | `useSocialSnapshot` child events + auth `USER_UPDATED` (persist only) | BadgesDisplay, ProfilePage |
+| `useSocialSnapshot(now)` | `{ snapshot, crewUsers, presence, picks, bands, loading }` | `PICKS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT`, `BANDS_CHANGED_EVENT` | `useNowData`, `useBadgeContext`, `useFestivalWrapStats` |
 | `useUserBadgeHistory(userId)` | `{ rows, loading }` | `BADGE_HISTORY_CHANGED_EVENT`, `online` | BadgeHistorySection |
 | `useBandDetailModal()` | `{ activeBand, openBand, closeBand, modalProps }` | None (local state + composed inputs) | MyPicksPage, PopularPage |
 | `useAnnouncements()` | `{ announcements, visibleAnnouncements, crewUsers, userRoles, blockedUserIds, pendingAnnouncementIds, loading, isBlocked, canModerate, loadMore, post, deleteAnnouncement, blockUser, pin, … }` | `ANNOUNCEMENTS_CHANGED_EVENT`, `BLOCKED_POSTERS_CHANGED_EVENT` | AnnouncementsPage |
@@ -437,9 +444,9 @@ INSERT into user_picks
 | `useBandAttendees(bandId)` | `User[]` | `PICKS_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT` | BandDetailModal |
 | `useMetalPlaceConfig()` | `MetalPlaceConfig \| null` | `METAL_PLACE_CONFIG_CHANGED_EVENT` | useNowData |
 | `useLiveBandTestConfig()` | `LiveBandTestConfig \| null` | `LIVE_BAND_TEST_CONFIG_CHANGED_EVENT` | useNowData |
-| `useNowCache(undoTimerId)` | `{ picks, crewUsers, presence, latestAnnouncement, cacheLoading }` | `PICKS_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, `ANNOUNCEMENTS_CHANGED_EVENT` | useNowData |
-| `useNowPlans({…})` | `{ myPlan, crewPlans, crewGroups, presenceValue, duckBandId, … }` | None (computed from cache + config + time) | useNowData |
-| `useNowData()` | `{ myPlan, crewGroups, handleSkip, handleUndo, duckQuack, … }` | composes hooks above + `useNow()`; weak-skip commit timer → `recordCommittedSkip()` | RightNowPage |
+| `useNowCache(undoTimerId)` | `{ latestAnnouncement, cacheLoading }` | `ANNOUNCEMENTS_CHANGED_EVENT` | useNowData (announcements only; crew/presence/picks via `useSocialSnapshot`) |
+| `useNowPlans({…})` | `{ myPlan, crewPlans, crewGroups, presenceValue, duckBandId, … }` | None (reads pre-built `SocialSnapshot` + focus-user extras) | useNowData |
+| `useNowData()` | `{ myPlan, crewGroups, handleSkip, handleUndo, duckQuack, … }` | composes `useSocialSnapshot` + slim `useNowCache` + `useNow()`; weak-skip commit timer → `recordCommittedSkip()` | RightNowPage |
 | `useBandConflicts(bandIds)` | `Conflict[]` | None (computed) | MyPicksPage |
 | `useNow()` | `{ now, override }` | localStorage, window events | Time-based views |
 | `useOfflinePendingBandIds()` | `Set<bandId>` | `PICKS_CHANGED_EVENT` | BandCard (show pending chip) |
@@ -451,7 +458,7 @@ INSERT into user_picks
 | `picksRepository` | `toggle()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues offline, calls Supabase |
 | `announcementsRepository` | `post()`, `sync()`, `delete()`, `flushPending()`, `pinAnnouncement()`, `unpinAnnouncement()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues pending |
 | `presenceRepository` | `update()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `subscribeToRealtime()`, `subscribeToMetalPlaceConfigRealtime()` | Writes IndexedDB, enqueues offline |
-| `usersRepository` | `syncCrew()`, `fetchUserRolesMap()`, `fetchAllUsers()`, `setUserRole()`, `fetchBlockedPosters*()`, `blockUser()`, `unblockUser()`, `subscribeToRealtime()` | Writes crew_users IDB (syncCrew); admin ops network-only |
+| `usersRepository` | `syncCrew()`, `fetchUserRolesMap()`, `fetchAllUsers()`, `setUserRole()`, `fetchBlockedPosters*()`, `blockUser()`, `unblockUser()`, `subscribeToRealtime()` | Writes `crew_users` IDB incl. `special_badges`; hydrates auth metadata on reconnect; admin ops network-only |
 | `missedRepository` | `toggle()`, `flushOfflineQueue()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues offline |
 | `bandsRepository` | `checkAndApplyCacheVersion()`, `loadBands()` | Wipes IDB if cache version changes |
 | `badgeHistoryRepository` | `loadLocal()`, `syncFromRemote()`, `consolidateYear()`, `seedLocalPreview()`, `clearLocalPreview()` | Writes `user_badge_history` IDB; pull from Supabase; godlike consolidate via Edge Function |
@@ -465,7 +472,8 @@ INSERT into user_picks
 | `badges.ts` | Badge condition evaluation | ✅ Yes |
 | `stageColors.ts` | Map stage → CSS color | ✅ Yes |
 | `alerts.ts` | Queue alerts for Edge Function | Calls Supabase Edge Function |
-| `livePreview.ts` | Live plan grouping, `computeCrewLocationCounts` (badge counts aligned with `/now`) | Reads/writes test config in IDB |
+| `livePreview.ts` | Live plan grouping helpers (`mapCrewLivePlans`, `groupCrewLivePlans`, `deriveUserBadgeLocation`) — consumed by `buildSocialSnapshot()` | Reads/writes test config in IDB |
+| `socialSnapshot.ts` | Pure `buildSocialSnapshot()` — **social snapshot** shared by `/now` and live vest | ✅ Yes (IDB inputs only) |
 | `bandFilter.ts` | `filterBands(bands, filters, now)` — pure filter predicate extracted from `SchedulePage`; testable without mounting any component | ✅ Yes |
 | `scheduleFilterStorage.ts` | `loadStoredFilters()` / `saveStoredFilters()` — localStorage persistence for schedule filter state; extracted from `SchedulePage` | ✅ Yes |
 | `attendees.ts` | `computeAttendees(picks, crewUsers)` — maps raw picks to hydrated `BandAttendee[]` per band; exports `BandAttendee` and `AttendeeMap` types | ✅ Yes |
@@ -490,6 +498,28 @@ Live vest (BadgesDisplay): isLiveVestBadge() → evergreen + current festival ye
 ```
 
 Consolidation is **network-only** (no offline queue). Archive reads are fully offline after first profile sync. `festival:reset` never touches `user_badge_history`. See [Badge System — Year-Badge Archive](badges.md#year-badge-archive--consolidation-phase-29).
+
+### Social snapshot flow (Phase 31)
+
+`/now` and the live vest share one derivation path — no duplicate `mapCrewLivePlans` / `groupCrewLivePlans` runs in hooks.
+
+```
+IDB inputs (bands, picks, crew_users, presence, config)
+    │
+    ▼
+useSocialSnapshot(now) ──► buildSocialSnapshot() ──► SocialSnapshot
+    │                              │
+    ├─ useNowData / useNowPlans ◄──┘  (crew groups, plans, location counts)
+    │
+    └─ useBadgeContext ──► buildBadgeContextFromSocialSnapshot()
+                              │
+BadgesDisplay ◄───────────────┘  (assigned badges + is_friend from crew_users IDB)
+
+crew_users sync: usersRepository.syncCrew() on reconnect + after godlike badge assign/revoke
+Display path: no supabase.from('users') in vest hooks
+```
+
+**Crew profile cache** (`crew_users` IDB): roster fields include `is_friend` and `special_badges`. Missing `special_badges` on legacy rows defaults to `[]` (schemaless store — no IDB version bump). Persist-metadata writes (`auth.updateUser` for newly earned badges) remain best-effort online only; display works via live evaluation + crew cache after sync.
 
 ---
 
@@ -585,7 +615,7 @@ for (const { all, last } of groups.values()) {
 
 5. **Queue size unbounded**: If user makes 1000+ pick changes offline, the queue grows indefinitely. No pruning. Accepted for small groups; needs review for larger audiences.
 
-6. **Crew user cache stale**: Offline, crew member profiles (display_name, avatar_url) are stale. This is expected and documented.
+6. **Crew user cache stale**: Offline, crew member profiles (`display_name`, `avatar_url`, `special_badges`, `is_friend`) are stale until reconnect sync. Assigned badges and friend status display from last `syncCrew()` — expected and documented.
 
 ---
 
@@ -598,4 +628,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-05-27 — Phase 29 badge archive (IDB v10, `useUserBadgeHistory`, consolidate Edge Function); live vest year filter.
+**Last updated:** 2026-05-28 — Phase 31 social snapshot unification (`buildSocialSnapshot`, `useSocialSnapshot`, crew profile cache with `special_badges`).
