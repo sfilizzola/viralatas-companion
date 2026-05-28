@@ -1,22 +1,20 @@
 import { useMemo } from 'react';
-import type { Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserPick, UserPresence } from '../types';
+import type { Band, CrewUser, UserPick, UserPresence } from '../types';
 import {
   derivePresenceValue,
   findLivePlan,
-  groupCrewLivePlans,
-  mapCrewLivePlans,
   resolveFocusUserLivePlan,
-  resolveLiveTestBandId,
   type CrewLiveGroup,
   type CrewLivePlan,
   type LivePlan,
   type PresenceLocation,
 } from '../services/livePreview';
-import { presenceRepository } from '../repositories';
+import type { SocialSnapshot } from '../services/socialSnapshot';
 
 const DUCK_WINDOW_MS = 15 * 60 * 1000;
 
 type UseNowPlansParams = {
+  social: SocialSnapshot;
   bands: Band[];
   picks: UserPick[];
   crewUsers: CrewUser[];
@@ -24,8 +22,6 @@ type UseNowPlansParams = {
   userId: string | null;
   userDisplayName: string | null;
   now: Date;
-  metalPlaceConfig: MetalPlaceConfig | null;
-  liveBandTestConfig: LiveBandTestConfig | null;
 };
 
 export type NowPlans = {
@@ -45,25 +41,16 @@ export type NowPlans = {
 };
 
 export function useNowPlans({
+  social,
   bands,
   picks,
   crewUsers,
   presence,
   userId,
-  userDisplayName,
   now,
-  metalPlaceConfig,
-  liveBandTestConfig,
 }: UseNowPlansParams): NowPlans {
-  const isMetalPlaceWindowActive = useMemo(
-    () => presenceRepository.isTimeWithinMetalPlaceWindow(metalPlaceConfig, now),
-    [metalPlaceConfig, now],
-  );
-
-  const liveTestBandId = useMemo(
-    () => resolveLiveTestBandId(liveBandTestConfig),
-    [liveBandTestConfig],
-  );
+  const isMetalPlaceWindowActive = social.metalPlaceWindowActive;
+  const liveTestBandId = social.liveTestBandId;
 
   const liveTestBand = useMemo(
     () => (liveTestBandId ? bands.find((b) => b.id === liveTestBandId) ?? null : null),
@@ -99,18 +86,8 @@ export function useNowPlans({
     [myRawPlan, myPresence, isMetalPlaceWindowActive],
   );
 
-  const crewPlans = useMemo(() => {
-    const users = [...crewUsers];
-    if (userId && !users.some((crewUser) => crewUser.id === userId)) {
-      users.push({ id: userId, display_name: userDisplayName, avatar_url: null });
-    }
-    return mapCrewLivePlans(bands, picks, users, presence, now, liveTestBandId);
-  }, [bands, picks, crewUsers, presence, userId, userDisplayName, now, liveTestBandId]);
-
-  const crewGroups = useMemo(
-    () => groupCrewLivePlans(crewPlans, { metalPlaceWindowActive: isMetalPlaceWindowActive }),
-    [crewPlans, isMetalPlaceWindowActive],
-  );
+  const crewPlans = social.crewPlans;
+  const crewGroups = social.crewGroups;
 
   const duckBandId = useMemo(() => {
     if (myPlan.status !== 'current' || !myPlan.band) return null;

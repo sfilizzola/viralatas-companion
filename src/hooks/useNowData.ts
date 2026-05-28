@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { Announcement, Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserPick, UserPresence } from '../types';
+import type { Announcement, Band, LiveBandTestConfig, MetalPlaceConfig, UserPick } from '../types';
 import type { CrewLiveGroup, CrewLivePlan, LivePlan, PresenceLocation } from '../services/livePreview';
 import { loadUserPicks } from '../lib/db';
 import { presenceRepository } from '../repositories';
@@ -7,12 +7,12 @@ import { WEAK_SKIP_UNDO_MS, recordCommittedSkip } from '../services/weakSkips';
 import { usePickActions } from './usePickActions';
 import { useDuckQuack } from './useDuckQuack';
 import { useAuth } from './useAuth';
-import { useBands } from './useBands';
 import { useLiveBandTestConfig } from './useLiveBandTestConfig';
 import { useMetalPlaceConfig } from './useMetalPlaceConfig';
 import { useNowCache } from './useNowCache';
 import { useNowPlans } from './useNowPlans';
 import { useNow } from './useNow';
+import { useSocialSnapshot } from './useSocialSnapshot';
 
 export type NowData = {
   userId: string | null;
@@ -21,8 +21,8 @@ export type NowData = {
   isFriend: boolean;
   bands: Band[];
   picks: UserPick[];
-  crewUsers: CrewUser[];
-  presence: UserPresence[];
+  crewUsers: ReturnType<typeof useSocialSnapshot>['crewUsers'];
+  presence: ReturnType<typeof useSocialSnapshot>['presence'];
   latestAnnouncement: Announcement | null;
   now: Date;
   loading: boolean;
@@ -50,7 +50,14 @@ export function useNowData(): NowData {
     (user?.user_metadata?.['display_name'] as string | undefined) ?? user?.email ?? null;
 
   const now = useNow(30_000);
-  const { bands: rawBands, loading: bandsLoading } = useBands();
+  const {
+    snapshot: social,
+    crewUsers,
+    presence,
+    picks,
+    bands: rawBands,
+    loading: socialLoading,
+  } = useSocialSnapshot(now);
   const bands = useMemo(
     () => rawBands.slice().sort((a, b) => a.start_time.localeCompare(b.start_time)),
     [rawBands],
@@ -63,9 +70,8 @@ export function useNowData(): NowData {
   const metalPlaceConfig = useMetalPlaceConfig();
   const liveBandTestConfig = useLiveBandTestConfig();
 
-  const { picks, crewUsers, presence, latestAnnouncement, cacheLoading } =
-    useNowCache(undoTimerId);
-  const loading = bandsLoading || cacheLoading;
+  const { latestAnnouncement, cacheLoading: announcementLoading } = useNowCache();
+  const loading = socialLoading || announcementLoading || social === null;
 
   const {
     isMetalPlaceWindowActive,
@@ -80,6 +86,13 @@ export function useNowData(): NowData {
     crewGroups,
     duckBandId,
   } = useNowPlans({
+    social: social ?? {
+      metalPlaceWindowActive: false,
+      liveTestBandId: null,
+      crewPlans: [],
+      crewGroups: [],
+      crewLocationCounts: { camping: 0, metal_place: 0, lost: 0 },
+    },
     bands,
     picks,
     crewUsers,
@@ -87,9 +100,13 @@ export function useNowData(): NowData {
     userId,
     userDisplayName,
     now,
-    metalPlaceConfig,
-    liveBandTestConfig,
   });
+
+  useEffect(() => {
+    return () => {
+      if (undoTimerId) clearTimeout(undoTimerId);
+    };
+  }, [undoTimerId]);
 
   useEffect(() => {
     if (!metalPlaceConfig || !userId) return;

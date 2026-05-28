@@ -1,60 +1,33 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { Announcement, CrewUser, UserPresence } from '../types';
-import {
-  ANNOUNCEMENTS_CHANGED_EVENT,
-  CREW_USERS_CHANGED_EVENT,
-  PRESENCE_CHANGED_EVENT,
-  loadAllUserPresence,
-  loadCrewUsers,
-  loadLatestAnnouncement,
-} from '../lib/db';
-import { useAllPicks } from './useAllPicks';
+import type { Announcement } from '../types';
+import { ANNOUNCEMENTS_CHANGED_EVENT, loadLatestAnnouncement } from '../lib/db';
 
-export function useNowCache(undoTimerId: ReturnType<typeof setTimeout> | null) {
-  const allPicks = useAllPicks();
-  const [crewUsers, setCrewUsers] = useState<CrewUser[]>([]);
-  const [presence, setPresence] = useState<UserPresence[]>([]);
+export function useNowCache() {
   const [latestAnnouncement, setLatestAnnouncement] = useState<Announcement | null>(null);
-  const [otherCacheLoaded, setOtherCacheLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
-  const refreshOtherCache = useCallback(async () => {
+  const refresh = useCallback(async () => {
     try {
-      const [cachedUsers, cachedPresence, ann] = await Promise.all([
-        loadCrewUsers(),
-        loadAllUserPresence(),
-        loadLatestAnnouncement(),
-      ]);
-      setCrewUsers(cachedUsers);
-      setPresence(cachedPresence);
+      const ann = await loadLatestAnnouncement();
       setLatestAnnouncement(ann ?? null);
     } finally {
-      setOtherCacheLoaded(true);
+      setLoaded(true);
     }
   }, []);
 
   useEffect(() => {
     function handleCacheChange() {
-      refreshOtherCache();
+      refresh();
     }
     window.queueMicrotask(handleCacheChange);
-    window.addEventListener(CREW_USERS_CHANGED_EVENT, handleCacheChange);
-    window.addEventListener(PRESENCE_CHANGED_EVENT, handleCacheChange);
     window.addEventListener(ANNOUNCEMENTS_CHANGED_EVENT, handleCacheChange);
     return () => {
-      window.removeEventListener(CREW_USERS_CHANGED_EVENT, handleCacheChange);
-      window.removeEventListener(PRESENCE_CHANGED_EVENT, handleCacheChange);
       window.removeEventListener(ANNOUNCEMENTS_CHANGED_EVENT, handleCacheChange);
-      if (undoTimerId) clearTimeout(undoTimerId);
     };
-  }, [refreshOtherCache, undoTimerId]);
-
-  const cacheLoading = allPicks === undefined || !otherCacheLoaded;
+  }, [refresh]);
 
   return {
-    picks: allPicks ?? [],
-    crewUsers,
-    presence,
     latestAnnouncement,
-    cacheLoading,
+    cacheLoading: !loaded,
   };
 }
