@@ -12,6 +12,10 @@ const { updateUser, onAuthStateChange } = vi.hoisted(() => ({
   onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
 }));
 
+vi.mock('../services/liveBandTest', () => ({
+  syncLiveBandTestConfig: vi.fn().mockResolvedValue(undefined),
+}));
+
 vi.mock('../lib/supabase', () => ({
   supabase: {
     auth: {
@@ -42,6 +46,10 @@ vi.mock('../repositories', async (importOriginal) => {
       ...actual.missedRepository,
       sync: vi.fn().mockResolvedValue(undefined),
       subscribeToRealtime: vi.fn().mockReturnValue(() => {}),
+    },
+    presenceRepository: {
+      ...actual.presenceRepository,
+      syncMetalPlaceConfig: vi.fn().mockResolvedValue(undefined),
     },
   };
 });
@@ -148,11 +156,21 @@ describe('useBadgeContext', () => {
     await waitFor(() => expect(result.current.ctx.bandsPicked).toBe(1));
   });
 
-  it('shows godlike-assigned badge from crew IDB without Supabase fetch', async () => {
+  it('shows godlike-assigned badge from crew IDB without Supabase users fetch', async () => {
     await saveCrewUsers([{ ...brCrewUser, special_badges: ['code-wizards'] }]);
     const fromUsers = vi.fn();
-    vi.mocked(supabase.from).mockImplementation(fromUsers);
-    const { result } = renderHook(() => useBadgeContext(authUser()));
+    vi.mocked(supabase.from).mockImplementation((table: string) => {
+      if (table === 'users') fromUsers();
+      const single = vi.fn().mockResolvedValue({
+        data: { special_badges: [], is_friend: false },
+        error: null,
+      });
+      const eq = vi.fn(() => ({ single }));
+      const select = vi.fn(() => ({ eq }));
+      return { select } as never;
+    });
+    const user = authUser();
+    const { result } = renderHook(() => useBadgeContext(user));
     await waitFor(() => expect(result.current.ctx.assignedBadges).toContain('code-wizards'));
     expect(fromUsers).not.toHaveBeenCalled();
   });

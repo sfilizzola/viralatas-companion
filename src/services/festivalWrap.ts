@@ -3,11 +3,13 @@ import { computeBandOverlaps } from '../hooks/useBandConflicts';
 import type { Band } from '../types';
 import {
   buildBadgeContextFromSnapshot,
+  buildBadgeContextFromSocialSnapshot,
   type BadgeIdbSnapshot,
 } from './badges/badgeContextBuilder';
 import { getEarnedBadges } from './badges/engine';
 import { BADGES } from './badges/registry';
 import type { BadgeBand } from './badges/types';
+import type { SocialSnapshot } from './socialSnapshot';
 
 const ASSIGNABLE_BADGE_SLUGS = new Set(
   BADGES.filter((b) => b.condition.type === 'assigned').map((b) => b.slug),
@@ -218,8 +220,11 @@ export function buildFestivalWrapStats(
   snap: BadgeIdbSnapshot,
   userId: string,
   authUser: AuthUser,
+  social?: SocialSnapshot,
 ): FestivalWrapStats {
-  const ctx = buildBadgeContextFromSnapshot(snap, userId, authUser);
+  const ctx = social
+    ? buildBadgeContextFromSocialSnapshot(snap, social, userId, authUser)
+    : buildBadgeContextFromSnapshot(snap, userId, authUser);
 
   if (ctx.bandsPicked === 0) {
     return {

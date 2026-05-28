@@ -1,9 +1,10 @@
 import { useMemo } from 'react';
-import {
-  type BadgeIdbSnapshot,
-} from '../services/badges/badgeContextBuilder';
+import { type BadgeIdbSnapshot } from '../services/badges/badgeContextBuilder';
 import { buildFestivalWrapStats, type FestivalWrapStats } from '../services/festivalWrap';
-import { useBadgeCache } from './useBadgeCache';
+import { useAuth } from './useAuth';
+import { useMissedBands } from './useMissedBands';
+import { useNow } from './useNow';
+import { useSocialSnapshot } from './useSocialSnapshot';
 
 export type FestivalWrapData = {
   stats: FestivalWrapStats | null;
@@ -12,32 +13,36 @@ export type FestivalWrapData = {
 };
 
 export function useFestivalWrapStats(userId: string): FestivalWrapData {
-  const { snapshot, cacheLoading } = useBadgeCache(userId);
+  const { user } = useAuth();
+  const nowDate = useNow();
+  const { snapshot: social, crewUsers, presence, picks, bands, loading } =
+    useSocialSnapshot(nowDate);
+  const { allMissed } = useMissedBands(userId);
 
   const stats = useMemo(() => {
-    if (!snapshot) return null;
-    const crewRow = snapshot.crewUsers.find((u) => u.id === userId);
+    if (loading || !social || !user || user.id !== userId) return null;
+    const crewRow = crewUsers.find((u) => u.id === userId);
     const idbSnap: BadgeIdbSnapshot = {
-      userPicks: snapshot.userPicks,
-      allPicks: snapshot.allPicks,
-      bands: snapshot.bands,
-      allMissed: snapshot.allMissed,
-      presence: snapshot.presence,
-      crewUsers: snapshot.crewUsers,
+      userPicks: picks.filter((p) => p.user_id === userId),
+      allPicks: picks,
+      bands,
+      allMissed,
+      presence,
+      crewUsers,
       assignedBadges: crewRow?.special_badges ?? [],
       isCurrentUserFriend: crewRow?.is_friend === true,
-      metalPlaceWindowActive: snapshot.metalPlaceWindowActive,
-      liveTestBandId: snapshot.liveTestBandId,
+      metalPlaceWindowActive: social.metalPlaceWindowActive,
+      liveTestBandId: social.liveTestBandId,
     };
-    return buildFestivalWrapStats(idbSnap, userId, snapshot.sessionUser);
-  }, [snapshot, userId]);
+    return buildFestivalWrapStats(idbSnap, userId, user, social);
+  }, [loading, social, user, userId, crewUsers, presence, picks, bands, allMissed]);
 
   return useMemo(
     () => ({
       stats,
-      loading: cacheLoading,
+      loading: loading || !user,
       error: null,
     }),
-    [stats, cacheLoading],
+    [stats, loading, user],
   );
 }
