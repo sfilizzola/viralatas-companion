@@ -148,33 +148,13 @@ describe('useBadgeContext', () => {
     await waitFor(() => expect(result.current.ctx.bandsPicked).toBe(1));
   });
 
-  it('syncs special_badges drift from Supabase into auth metadata once', async () => {
-    vi.mocked(supabase.auth.getSession).mockResolvedValue({
-      data: {
-        session: {
-          user: authUser({ special_badges: ['old-badge'] }),
-        },
-      },
-      error: null,
-    } as never);
-
-    const single = vi.fn().mockResolvedValue({
-      data: { special_badges: ['mosh-pit'], is_friend: false },
-      error: null,
-    });
-    const eq = vi.fn(() => ({ single }));
-    const select = vi.fn(() => ({ eq }));
-    vi.mocked(supabase.from).mockReturnValue({ select } as never);
-
-    await saveCrewUsers([brCrewUser]);
-
-    const { result } = renderHook(() => useBadgeContext(authUser({ special_badges: ['old-badge'] })));
-    await waitFor(() => expect(result.current.loading).toBe(false));
-
-    await waitFor(() => {
-      expect(updateUser).toHaveBeenCalledWith({ data: { special_badges: ['mosh-pit'] } });
-    });
-    expect(result.current.ctx.assignedBadges).toEqual(['mosh-pit']);
+  it('shows godlike-assigned badge from crew IDB without Supabase fetch', async () => {
+    await saveCrewUsers([{ ...brCrewUser, special_badges: ['code-wizards'] }]);
+    const fromUsers = vi.fn();
+    vi.mocked(supabase.from).mockImplementation(fromUsers);
+    const { result } = renderHook(() => useBadgeContext(authUser()));
+    await waitFor(() => expect(result.current.ctx.assignedBadges).toContain('code-wizards'));
+    expect(fromUsers).not.toHaveBeenCalled();
   });
 
   it('counts crew without presence rows toward lost location badges', async () => {

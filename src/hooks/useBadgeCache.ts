@@ -28,8 +28,6 @@ export type BadgeCacheSnapshot = {
   metalPlaceWindowActive: boolean;
   liveTestBandId: string | null;
   sessionUser: AuthUser;
-  assignedBadgesFromMeta: string[];
-  isCurrentUserFriendFromIdb: boolean;
 };
 
 export type BadgeCacheData = {
@@ -76,10 +74,6 @@ export function useBadgeCache(userId: string): BadgeCacheData {
       metalPlaceWindowActive,
       liveTestBandId,
       sessionUser,
-      assignedBadgesFromMeta:
-        (sessionUser.user_metadata?.special_badges as string[]) ?? [],
-      isCurrentUserFriendFromIdb:
-        crewUsers.find((u) => u.id === userId)?.is_friend === true,
     });
   }, [userId, allPicks, allMissed]);
 

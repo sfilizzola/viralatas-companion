@@ -16,6 +16,7 @@ export function useFestivalWrapStats(userId: string): FestivalWrapData {
 
   const stats = useMemo(() => {
     if (!snapshot) return null;
+    const crewRow = snapshot.crewUsers.find((u) => u.id === userId);
     const idbSnap: BadgeIdbSnapshot = {
       userPicks: snapshot.userPicks,
       allPicks: snapshot.allPicks,
@@ -23,8 +24,8 @@ export function useFestivalWrapStats(userId: string): FestivalWrapData {
       allMissed: snapshot.allMissed,
       presence: snapshot.presence,
       crewUsers: snapshot.crewUsers,
-      assignedBadges: snapshot.assignedBadgesFromMeta,
-      isCurrentUserFriend: snapshot.isCurrentUserFriendFromIdb,
+      assignedBadges: crewRow?.special_badges ?? [],
+      isCurrentUserFriend: crewRow?.is_friend === true,
       metalPlaceWindowActive: snapshot.metalPlaceWindowActive,
       liveTestBandId: snapshot.liveTestBandId,
     };
