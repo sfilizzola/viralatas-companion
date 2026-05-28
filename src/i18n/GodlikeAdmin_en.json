@@ -128,8 +128,8 @@
   "managerSwitchTitle": "Manager access",
   "managerSwitchHint": "Can moderate announcements",
   "managerSwitchOn": "ON — tap to revoke",
-  "friendSwitchTitle": "Crew friend",
-  "friendSwitchHint": "Shows in friend badge logic",
+  "friendSwitchTitle": "Vira-lata friend",
+  "friendSwitchHint": "Set user as friend",
   "friendSwitchOn": "ON — tap to revoke",
   "oneShotActions": "One-shot actions"
 }

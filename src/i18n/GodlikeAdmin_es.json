@@ -128,8 +128,8 @@
   "managerSwitchTitle": "Acceso de manager",
   "managerSwitchHint": "Puede moderar el mural",
   "managerSwitchOn": "ON — toca para revocar",
-  "friendSwitchTitle": "Amigo del grupo",
-  "friendSwitchHint": "Cuenta en la lógica de badge amigo",
+  "friendSwitchTitle": "Vira-lata amigo",
+  "friendSwitchHint": "Marcar como amigo",
   "friendSwitchOn": "ON — toca para revocar",
   "oneShotActions": "Acciones puntuales"
 }
