@@ -2,6 +2,7 @@ import { saveCrewUsers } from '../lib/db';
 import { BLOCKED_POSTERS_CHANGED_EVENT } from '../lib/db';
 import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { supabase } from '../lib/supabase';
+import { badgeArraysEqual } from '../services/badges/badgeArrayEqual';
 import type { BlockedPoster, CrewUser, UserRole } from '../types';
 
 export type UserWithDetails = {
@@ -21,6 +22,17 @@ export type BlockedPosterWithUserDetails = BlockedPoster & {
   user_special_badges: string[];
 };
 
+async function hydrateCurrentUserBadgeMetadataFromCrew(crew: CrewUser[]): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  const row = crew.find((u) => u.id === user.id);
+  if (!row) return;
+  const dbBadges = row.special_badges ?? [];
+  const metaBadges = (user.user_metadata?.special_badges as string[] | undefined) ?? [];
+  if (badgeArraysEqual(dbBadges, metaBadges)) return;
+  await supabase.auth.updateUser({ data: { special_badges: dbBadges } });
+}
+
 async function syncCrew(): Promise<void> {
   const { data, error } = await supabase
     .from('users')
@@ -33,6 +45,7 @@ async function syncCrew(): Promise<void> {
     (u) => ({ ...u, special_badges: u.special_badges ?? [] }),
   );
   await saveCrewUsers(crew);
+  await hydrateCurrentUserBadgeMetadataFromCrew(crew);
 }
 
 async function fetchUserRolesMap(): Promise<Record<string, UserRole>> {

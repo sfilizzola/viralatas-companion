@@ -153,6 +153,7 @@ export default function UserManagementSection({ t }: UserManagementSectionProps)
       if (assignModalUser?.id === targetUserId) {
         setAssignModalUser((prev) => (prev ? { ...prev, special_badges: updated } : prev));
       }
+      await usersRepository.syncCrew();
     },
     [assignModalUser],
   );

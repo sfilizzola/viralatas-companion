@@ -4,6 +4,10 @@ vi.mock('../lib/supabase', () => ({
   supabase: {
     from: vi.fn(),
     rpc: vi.fn(),
+    auth: {
+      getUser: vi.fn(),
+      updateUser: vi.fn(),
+    },
   },
 }));
 
@@ -17,6 +21,8 @@ import { usersRepository } from '../repositories/users';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  vi.mocked(supabase.auth.getUser).mockResolvedValue({ data: { user: null }, error: null } as any);
+  vi.mocked(supabase.auth.updateUser).mockResolvedValue({ data: { user: null }, error: null } as any);
 });
 
 describe('usersRepository.syncCrew', () => {
@@ -46,6 +52,38 @@ describe('usersRepository.syncCrew', () => {
     expect(db.saveCrewUsers).toHaveBeenCalledWith([
       expect.objectContaining({ id: 'u1', special_badges: ['code-wizards'] }),
     ]);
+  });
+
+  it('updates auth metadata when special_badges drift from crew row', async () => {
+    const crew = [{ id: 'u1', display_name: 'Alice', avatar_url: null, wacken_arrival_day: 1, is_friend: false, special_badges: ['code-wizards'] }];
+    const mockOrder = vi.fn().mockResolvedValue({ data: crew, error: null });
+    const mockSelect = vi.fn().mockReturnValue({ order: mockOrder });
+    vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
+    vi.mocked(supabase.auth.getUser).mockResolvedValue({
+      data: { user: { id: 'u1', user_metadata: { special_badges: [] } } },
+      error: null,
+    } as any);
+
+    await usersRepository.syncCrew();
+
+    expect(supabase.auth.updateUser).toHaveBeenCalledWith({
+      data: { special_badges: ['code-wizards'] },
+    });
+  });
+
+  it('skips auth update when metadata already matches crew row', async () => {
+    const crew = [{ id: 'u1', display_name: 'Alice', avatar_url: null, wacken_arrival_day: 1, is_friend: false, special_badges: ['code-wizards'] }];
+    const mockOrder = vi.fn().mockResolvedValue({ data: crew, error: null });
+    const mockSelect = vi.fn().mockReturnValue({ order: mockOrder });
+    vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
+    vi.mocked(supabase.auth.getUser).mockResolvedValue({
+      data: { user: { id: 'u1', user_metadata: { special_badges: ['code-wizards'] } } },
+      error: null,
+    } as any);
+
+    await usersRepository.syncCrew();
+
+    expect(supabase.auth.updateUser).not.toHaveBeenCalled();
   });
 });
 
