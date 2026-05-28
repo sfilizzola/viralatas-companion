@@ -25,9 +25,32 @@
 | Popular list | Bands with ≥1 rating; ceremony excluded |
 | Sort tie-break | avg DESC → count DESC → start_time ASC |
 | Scope v1 | Modal + Popular only |
-| Visual design | `huashu-design` picks Popular mode control; **paw icon locked:** Canine+heel, −14°; **modal:** user score only, no crew avg |
+| Visual design | **Paw icon locked:** Canine+heel, −14°; **modal:** user score only, no crew avg; **Popular pill locked** (grill 2026-05-28) |
 | **Band detail modal layout (approved 2026-05-28)** | `_temp/rating-prototypes/band-detail-full-prototype.html` — rating **below** missed toggle; compact box (36px buttons, 20px paws); no crew avg |
 | **Modal copy (approved layout, copy TBD at build)** | Final i18n strings may differ slightly from prototype English; match approved structure + tone in Step 6 |
+
+### Grill locked (2026-05-28)
+
+Decisions from `/grill-me` session — **do not re-open** without explicit product review.
+
+| Topic | Locked choice |
+|-------|---------------|
+| **Popular sort control** | Segmented pill **`Picks` · `Rating`** in header; **hidden until ≥1 band has a rating** (local IndexedDB counts — offline OK) |
+| **Pill at zero ratings** | Pill hides immediately; force **By picks**; clear `sessionStorage` sort preference |
+| **Mode persistence** | `sessionStorage` per device while pill visible |
+| **Header subtitle** | Swaps with mode (e.g. sorted-by-picks ↔ sorted-by-rating); **user-facing copy uses vira-latas, never “crew”** |
+| **Rated list scope** | Crew-wide — all bands with ≥1 rating; unpicked bands open modal read-only (no rating UI) |
+| **Card stats (rating mode)** | Line 1: avg · count; line 2: `You · N` only when viewer rated; **hide pick attendee cluster** |
+| **Missed count on cards** | **Keep** on ended bands in **both** modes |
+| **Avg display** | One decimal, trim trailing zero (`4.2`, `3`, `5`); sort uses full precision |
+| **Ceremony** | **Never rateable** — `canRateBand` false for `category === 'ceremony'`; excluded from Popular rated list |
+| **Undo missed** | Mark missed deletes rating; undo missed restores eligibility only — **must re-rate from scratch** |
+| **Modal clear** | Explicit **Clear** link + tap active paw (both delete row) |
+| **`rated_at`** | Updates on every score change (upsert) |
+| **Eligibility enforcement** | **Client-only** (RLS own-row only) — same as picks/missed |
+| **Time travel** | `canRateBand` uses simulated `now()` / `useNow()` — same clock as missed toggle |
+| **Test users** | Included in aggregates (no `is_test_user` filter) |
+| **Pill labels (EN)** | Short segments: `Picks` · `Rating` (4 locales at build) |
 
 ---
 
@@ -154,6 +177,7 @@ import { describe, it, expect } from 'vitest';
 import {
   canRateBand,
   computeRatingAggregates,
+  formatRatingAvg,
   sortBandsByRating,
 } from '../services/bandRatings';
 import type { Band, UserBandRating } from '../types';
@@ -209,6 +233,17 @@ describe('canRateBand', () => {
       }),
     ).toBe(false);
   });
+
+  it('denies ceremony bands', () => {
+    expect(
+      canRateBand({
+        band: { ...band, category: 'ceremony' },
+        now: new Date('2026-07-29T20:00:00+02:00'),
+        isPicked: true,
+        isMissed: false,
+      }),
+    ).toBe(false);
+  });
 });
 
 describe('computeRatingAggregates', () => {
@@ -225,6 +260,14 @@ describe('computeRatingAggregates', () => {
       { user_id: 'u1', band_id: 'b1', score: 3, rated_at: 't' },
     ];
     expect(computeRatingAggregates(ratings).b1).toEqual({ avg: 3, count: 1 });
+  });
+});
+
+describe('formatRatingAvg', () => {
+  it('shows one decimal and trims trailing zero', () => {
+    expect(formatRatingAvg(4.2)).toBe('4.2');
+    expect(formatRatingAvg(3)).toBe('3');
+    expect(formatRatingAvg(5)).toBe('5');
   });
 });
 
@@ -263,8 +306,15 @@ export function canRateBand(input: {
   isPicked: boolean;
   isMissed: boolean;
 }): boolean {
+  if (input.band.category === 'ceremony') return false;
   if (!input.isPicked || input.isMissed) return false;
   return new Date(input.band.end_time) < input.now;
+}
+
+/** Display avg for Popular cards — one decimal, trim trailing zero. Sort uses raw avg. */
+export function formatRatingAvg(avg: number): string {
+  const rounded = Math.round(avg * 10) / 10;
+  return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
 }
 
 export function computeRatingAggregates(
@@ -448,11 +498,13 @@ Run: `rtk npm test -- src/__tests__/syncCoordinator.test.ts`
 - `_temp/rating-prototypes/band-detail-full-prototype.html` — **full modal layout** (user-approved)
 - `_temp/rating-prototypes/brand-spec.md` — tokens + icon lock
 
-**Still open (Task 9):** Popular mode switch prototype — segmented pill recommended, not user-locked yet.
+**Still open:** none for modal or Popular sort UX (grill locked 2026-05-28).
 
 - [x] **Step 1: Paw icon** — Canine+heel at −14° (`IconPawFinal`).
 
 - [x] **Step 2: Band detail modal** — user approved `band-detail-full-prototype.html` (below missed toggle, compact, no crew avg).
+
+- [x] **Step 2b: Popular sort pill** — grill locked: segmented `Picks` · `Rating`; visibility rules in grill table.
 
 - [ ] **Step 3: Design System** — document rating control in `public/Design System.html` during Task 8/9 (after React implementation matches prototype).
 
@@ -484,14 +536,19 @@ Tap active icon → call `onChange(null)` or dedicated clear.
 When `canRateBand(...)`:
 - Pass `userScore`, `onRate(score)`, `canRate` — **no** `crewAggregate` in modal
 
-On `handleToggleMissed` after mark missed → `ratingsRepository.clearRating(userId, bandId)`.
+On `handleToggleMissed` after mark missed → `ratingsRepository.clearRating(userId, bandId)`. Undo missed does **not** restore prior score (user re-rates from scratch).
+
+Use `currentNow` from `useNow()` for `canRateBand` (godlike time travel uses simulated clock).
 
 - [ ] **Step 4: Extend `BandDetailModal`**
 
 Render compact rating block **below** missed toggle when `canRate`:
 - User score + `BandRatingInput` only
 - **No crew average or rating count** (anti-bias; aggregates on Popular)
+- **Clear link + tap active paw** both call clear
 - Match `_temp/rating-prototypes/band-detail-full-prototype.html` styling
+
+Repository upsert sets **`rated_at` to now** on every score change.
 
 - [ ] **Step 5: Purge on unpick**
 
@@ -507,8 +564,12 @@ Prototype English is a placeholder. Lock **structure** from approved layout; ref
 | `ratingClear` | Modal | “Clear” link when score set |
 | `ratingClearHint` | Modal | Tap same paw to clear (short hint line) |
 | `ratingCrewAvg` | **Popular only** | Not used in modal |
-| `ratingCount` | **Popular only** | e.g. “N vira-latas” on rated cards |
-| `popularSortByRating` | Popular | Mode label (Task 9) |
+| `ratingCount` | **Popular only** | e.g. “{count} vira-latas” on rated cards (**never “crew”** in UI) |
+| `popularModePicks` | Popular pill | Short segment: “Picks” |
+| `popularModeRating` | Popular pill | Short segment: “Rating” |
+| `headerSortedPicks` | Popular subtitle | Sorted-by-picks line (existing key may reuse) |
+| `headerSortedRating` | Popular subtitle | Sorted-by-rating line (vira-lata wording) |
+| `ratingYouScore` | Popular card line 2 | e.g. “You · {score}” when viewer rated |
 
 - [ ] **Step 7: Tests + build**
 
@@ -518,18 +579,30 @@ Run: `rtk npm test -- src/__tests__/useBandRatings.test.ts` · `rtk npm run buil
 
 ## Sub-phase 32.D — Popular page dual mode
 
-### Task 9: Popular by-rating mode
+### Task 9: Popular by-rating mode ✅ grill locked 2026-05-28
 
 **Files:**
 - Modify: `src/pages/PopularPage.tsx`
+- Modify: `src/components/BandCard.tsx` (+ module CSS if needed)
 - Modify: `src/i18n/PopularPage_*.json` (4 files)
 - Modify: `public/Design System.html`
 
-- [ ] **Step 1: huashu-design** — prototype Popular header with mode switch (segmented control or tabs per design lock) in `_temp/rating-prototypes/popular-mode-prototype.html`
+- [ ] **Step 1: Sort mode state + persistence**
 
-- [ ] **Step 2: Add state `sortMode: 'picks' | 'rating'`**
+```typescript
+const STORAGE_KEY = 'popularSortMode'; // sessionStorage: 'picks' | 'rating'
 
-- [ ] **Step 3: Derive `ratedBands`**
+const hasRatedBands = useMemo(
+  () => Object.values(aggregates).some((a) => (a?.count ?? 0) > 0),
+  [aggregates],
+);
+
+// Pill hidden when !hasRatedBands; force sortMode 'picks' + remove STORAGE_KEY when count drops to 0
+```
+
+Segmented pill in header: **`Picks` · `Rating`**. Subtitle swaps: sorted-by-picks ↔ sorted-by-rating (i18n; **vira-latas**, not “crew”).
+
+- [ ] **Step 2: Derive `ratedBands`**
 
 ```typescript
 const ratedBands = useMemo(() => {
@@ -540,17 +613,25 @@ const ratedBands = useMemo(() => {
 }, [bands, aggregates]);
 ```
 
-- [ ] **Step 4: Render list by mode; pass rating display props to `BandCard`**
+- [ ] **Step 3: Render list by mode; extend `BandCard` ranked variant**
 
-Extend `BandCard` minimally: optional `ratingAvg`, `userRating`, `ratingCount` props for ranked variant — or inline in PopularPage if smaller diff.
+**Pick mode:** unchanged (attendee cluster, missed count on ended bands).
 
-- [ ] **Step 5: Empty state** — `emptyRated`: "No ratings yet — be the first after a set ends 🤘"
+**Rating mode:**
+- Sort/list `ratedBands`; rank badge = rating sort position
+- **Hide** `attendeeCluster` (pick avatars)
+- **Keep** `missedCount` on ended bands
+- Card stats via `formatRatingAvg(aggregate.avg)`:
+  - Line 1: `{avg} · {count} vira-latas`
+  - Line 2 (only if viewer rated): `You · {score}`
 
-- [ ] **Step 6: i18n** — `headerSortedRating`, `modePicks`, `modeRating`, `emptyRated`, `ratingAvgLabel`
+- [ ] **Step 4: Empty state** — only relevant while pill visible; if crew ratings exist, list is non-empty. No separate empty-rated UX when pill hidden.
 
-- [ ] **Step 7: Update Design System** — rating input + Popular mode switch section
+- [ ] **Step 5: i18n** — keys from Task 8 Step 6 + `emptyRated` if needed
 
-- [ ] **Step 8: Build + test**
+- [ ] **Step 6: Update Design System** — rating input + Popular segmented pill section
+
+- [ ] **Step 7: Build + test**
 
 Run: `rtk npm run build` · `rtk npm test`
 
@@ -585,20 +666,24 @@ Run: `rtk npm run build` · `rtk npm test`
 
 | Spec requirement | Task |
 |------------------|------|
-| Eligibility picked+ended+not missed | Task 3 `canRateBand`, Task 8 modal gate |
-| All raters in average | Task 3 `computeRatingAggregates` |
-| Clear on same tap | Task 8 `BandRatingInput`, Task 5 `toggleRating` |
-| Delete on missed/unpick | Task 8 purge hooks |
+| Eligibility picked+ended+not missed+not ceremony | Task 3 `canRateBand`, Task 8 modal gate |
+| All raters in average (incl. test users) | Task 3 `computeRatingAggregates` |
+| Clear on same tap + Clear link | Task 8 `BandRatingInput` |
+| Delete on missed/unpick; no restore on undo missed | Task 8 purge hooks |
+| `rated_at` on every change | Task 5 repo upsert |
+| Client-only eligibility; simulated `now()` | Task 3, Task 8 `useNow()` |
+| Popular pill + grill UX | Task 9 |
 | Popular ≥1 rating, ceremony excluded | Task 9 |
 | Sort tie-break | Task 3 `sortBandsByRating` |
+| Avg display format | Task 3 `formatRatingAvg`, Task 9 cards |
 | Offline-first + crew sync | Task 4 IDB, Task 5 repo, Task 6 coordinator |
 | Realtime | Task 5 subscribe, Task 6 mount |
-| huashu-design visuals | Task 7, Task 9 step 1 |
-| 4 locales | Tasks 8, 9 |
+| Modal + Popular visuals locked | Task 7–9 |
+| 4 locales; vira-latas not “crew” in UI | Tasks 8, 9 |
 | FUTURE_IDEAS B/C/D | Already in FUTURE_IDEAS #8–#10 |
 | Out of scope My Picks/wrap/badges | Not in plan ✓ |
 
-No TBD placeholders remain.
+Grill decisions captured in **Grill locked (2026-05-28)** table above.
 
 ---
 

@@ -11,7 +11,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ### Phase 32 — Vira-lata Rating
 
-**Status:** Planned — spec approved; **band detail modal prototype approved** 2026-05-28 (`band-detail-full-prototype.html`). Popular sort control still TBD in design pass.  
+**Status:** Planned — spec + grill locked 2026-05-28; band detail modal prototype approved. Popular sort pill + card UX grill-locked.  
 **Spec:** `docs/superpowers/specs/2026-05-28-vira-lata-rating-design.md`  
 **Plan:** `docs/superpowers/plans/2026-05-28-vira-lata-rating-plan.md`
 
