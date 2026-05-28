@@ -8,7 +8,7 @@
 
 **Tech stack:** React 18, TypeScript, Vitest, existing hooks/repos, CSS modules.
 
-**Spec source:** `docs/superpowers/specs/2026-05-28-my-wacken-inline-attendance-design.md`
+**Spec source:** `docs/superpowers/specs/2026-05-28-my-wacken-inline-attendance-design.md` (includes **Grill amendments 2026-05-28**)
 
 **Wireframe:** `docs/wireframes/my-programacao-direction-a.html`
 
@@ -18,18 +18,28 @@
 
 ## Locked decisions (do not re-open)
 
+Includes original spec locks + grill session (2026-05-28). Full rationale → spec **Grill amendments** table.
+
 | Decision | Locked choice |
 |----------|---------------|
-| Nav: Schedule tab | **Lineup** |
+| Nav: Schedule tab | **Lineup** (BR: **Line-up**) |
 | Nav + page: Picks tab | **My Wacken** |
 | File rename | `LineupPage.tsx`, `MyWackenPage.tsx` only |
 | Routes | `/schedule`, `/my-picks` unchanged |
 | i18n namespaces | `SchedulePage`, `MyPicksPage` filenames unchanged |
 | CSS module | `SchedulePage.module.css` shared name unchanged |
 | Day sort | A2 — upcoming → divider → ended |
-| Divider | **already played today** when ≥1 ended in day |
-| Chips | Attended / Missed on ended only; no timing chips |
-| Alert | Coach banner only, dismiss once |
+| Divider | **already played today** when ≥1 ended **and** ≥1 upcoming in same day |
+| Chips | **Attended** / Missed on ended only; no timing chips |
+| Ended row conflicts | **None** — no stripe/highlight on ended rows |
+| Header `{days}` | All festival days with ≥1 pick |
+| Header conflicts/overlaps | **Upcoming picks only** |
+| Day header count | Total picks that day (upcoming + ended) |
+| `{n} left today` | Show when `isFestivalActive && n >= 1`; hide at 0 |
+| Day collapse (festival) | Past ended-only days collapsed; today expanded; no `localStorage` |
+| Day collapse (post-festival) | All days expanded |
+| Empty state | User-facing **Line-up** copy |
+| Alert | Coach banner only, dismiss once per device |
 | Attendance | Opt-out unchanged |
 
 ---
@@ -90,11 +100,11 @@
 
 - [ ] Update `BottomNav_*.json` (4 files): schedule key → **Lineup** labels; picks key → **My Wacken** labels (localized)
 - [ ] Update `BottomNav.tsx` only if key names change (prefer reusing `schedule`/`picks` keys with new string values to avoid TS churn)
-- [ ] Update `SchedulePage_*.json` `title` → Lineup (4 locales)
+- [ ] Update `SchedulePage_*.json` `title` → Lineup (4 locales; BR **Line-up**)
 - [ ] Update `MyPicksPage_*.json` `title` → My Wacken (4 locales)
-- [ ] Update `MyPicksPage` empty state if it says "schedule" — point users to Lineup in copy
+- [ ] Update `MyPicksPage` empty state — user-facing **Line-up** copy (namespace unchanged)
 
-**Acceptance:** Nav shows Lineup + My Wacken in EN; BR/DE/ES have sensible equivalents.
+**Acceptance:** Nav shows Lineup + My Wacken in EN; BR uses *Line-up* / *Meu Wacken*.
 
 ---
 
@@ -133,12 +143,16 @@
 
 - [ ] Replace `upcomingBands` / `sawBands` / `didntSeeBands` / old `grouped` memos with `groupMyWackenByDay`
 - [ ] Remove bottom sections that render `sectionSaw` / `sectionDidntSee`
-- [ ] Per day render: upcoming `BandCard`s → divider (if `showDivider`) → ended `BandCard`s
+- [ ] Per day render: upcoming `BandCard`s → divider (if `showDivider`) → ended `BandCard`s (no `conflict` prop on ended rows)
 - [ ] Add i18n key `dividerAlreadyPlayedToday` (4 locales)
-- [ ] Add header stat `headerLeftToday` with count of upcoming picks on **today's** festival day (use `bandDay` + `isFestivalActive` / existing today logic from `useNow`)
+- [ ] Fix `headerBandsDays` `{days}` to count all festival days with picks (not upcoming-only)
+- [ ] Restrict `totalConflicts` / `totalOverlaps` memos to **upcoming** picks only
+- [ ] Add header stat `headerLeftToday` — upcoming picks on today's festival day; render only when `isFestivalActive && n >= 1`
+- [ ] Day header `dayPickCount` = upcoming + ended for that day
+- [ ] Initial `collapsedDays`: mid-festival → collapse past ended-only days, keep today expanded; post-festival → all expanded; re-derive on mount (no `localStorage`)
 - [ ] Keep conflict banner, playlist button, collapsible day headers as today
 
-**Acceptance:** Manual — ended pick remains under its day; no Saw footer.
+**Acceptance:** Manual — ended pick remains under its day; no Saw footer; past days collapsed mid-festival; all expanded post-festival.
 
 **Gate:** `rtk npm run build` · `rtk npm test`
 
@@ -154,7 +168,7 @@
   - Attended — teal border/bg (`--signal-ok`)
   - Missed — amber (`--signal-warn`)
   - Mono 8–9px uppercase
-- [ ] Ended rows: pass chip from `missedBandIds`; apply existing ended dimming (`isBandEnded` + optional class)
+- [ ] Ended rows: pass chip from `missedBandIds`; apply existing ended dimming (`isBandEnded` + optional class); **do not pass `conflict` prop**
 - [ ] Do **not** add In X min / Now chips
 - [ ] i18n chip labels in `MyPicksPage_*.json`: `chipAttended`, `chipMissed`
 
@@ -198,14 +212,20 @@
 
 ## Manual test checklist
 
-- [ ] Bottom nav: **Lineup** + **My Wacken** labels (EN)
+- [ ] Bottom nav: **Lineup** + **My Wacken** labels (EN); BR **Line-up** / **Meu Wacken**
 - [ ] Pick bands on Lineup; open My Wacken — all under correct days
 - [ ] Time-travel or pick past band — band stays on day with **Attended** chip
 - [ ] Open modal → **I didn't see this band** → chip **Missed**, same row
 - [ ] No **Saw (N)** / **Didn't See (N)** sections at page bottom
 - [ ] Divider **already played today** appears when day has both upcoming and ended
-- [ ] Coach banner on first ended pick; dismiss works
-- [ ] Header shows **N left today** during festival
+- [ ] Coach banner on first ended pick; dismiss works (per device)
+- [ ] Header shows **N left today** during festival when N ≥ 1; hidden when N = 0
+- [ ] Header `{days}` includes past days with ended-only picks
+- [ ] Day header count = total picks that day
+- [ ] Mid-festival: past ended-only days collapsed; today expanded
+- [ ] Post-festival: all day sections expanded on load
+- [ ] No conflict stripe on ended rows; header conflict/overlap counts ignore ended picks
+- [ ] Empty state references **Line-up**
 - [ ] Offline: page still reads IDB; no new network dependency
 - [ ] Playlist button + conflict banner still work
 
@@ -224,6 +244,7 @@
 | No timing chips | Task 6 (explicit) |
 | Coach banner | Task 8 |
 | headerLeftToday | Task 5 |
+| Header days / conflicts / collapse | Task 5 (grill amendments) |
 | Wireframe layout | Tasks 5–6 |
 | Design System | Task 7 |
 | Tests | Task 4 |

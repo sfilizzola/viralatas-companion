@@ -28,12 +28,17 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Acceptance criteria:**
 
-- [ ] Bottom nav shows **Lineup** and **My Wacken** (4 locales)
+- [ ] Bottom nav shows **Lineup** and **My Wacken** (4 locales; BR Lineup = **Line-up**)
 - [ ] Page files renamed; `rtk npm run build` green; URLs unchanged
 - [ ] Ended picks remain under their festival day (no footer Saw/Didn't See sections)
 - [ ] Within each day: upcoming by time → optional divider → ended by time
 - [ ] Ended rows show **Attended** (opt-out) or **Missed** chip; upcoming rows have no status chip
-- [ ] Coach banner appears once when user first has an ended pick; dismiss persists in `localStorage`
+- [ ] Ended rows have no conflict/overlap indicators; header conflict/overlap counts use upcoming picks only
+- [ ] Header `{days}` counts all festival days with picks; day header count = total picks that day
+- [ ] **{n} left today** shown during festival when n ≥ 1; hidden when n = 0
+- [ ] Mid-festival: past ended-only days collapsed by default; today expanded; post-festival: all days expanded
+- [ ] Empty state uses user-facing **Line-up** copy
+- [ ] Coach banner appears once when user first has an ended pick; dismiss persists in `localStorage` (per device)
 - [ ] `BandDetailModal` missed flow unchanged; no schema/sync changes
 - [ ] `rtk npm run build` and `rtk npm test` green at phase close
 - [ ] Design System + `docs/ai-wiki/changelog.md` updated
