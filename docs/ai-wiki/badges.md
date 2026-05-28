@@ -265,7 +265,7 @@ type BadgeConfig = {
 
 ---
 
-## BadgeCondition Types (28 Total)
+## BadgeCondition Types (34 Total)
 
 ### WACKEN HISTORY — Attendance Records
 
@@ -605,6 +605,44 @@ Badge has **no automatic condition**; godlike assigns it manually.
 ```typescript
 { type: 'assigned' }
 ```
+
+---
+
+### RATING — Concert score predicates (Phase 34)
+
+Engine capabilities only — **no registry entries** until a follow-up badge catalog phase. All counts use bands **eligible at eval time** (`canRateBand` semantics). Context fields populated via `buildRatingStatsSnapshot()` in `badgeContextBuilder`.
+
+#### `bands_rated_min`
+```typescript
+{ type: 'bands_rated_min', count: 5 }
+```
+User rated ≥ N eligible bands.
+
+#### `band_rated_score_min`
+```typescript
+{ type: 'band_rated_score_min', score: 5, name?: string, stage?: string, genre?: string }
+```
+User score **≥** `score` on a band matching **all** provided filters (AND).
+
+#### `crew_avg_on_picked_band_min`
+```typescript
+{ type: 'crew_avg_on_picked_band_min', avg: 4, minRaters?: 1 }
+```
+Crew avg ≥ `avg` on ≥1 band in user's **`seenBands`**. `minRaters` defaults to **1**.
+
+#### `user_rating_avg_min` / `user_rating_avg_max`
+```typescript
+{ type: 'user_rating_avg_min', avg: 4, minRatings: 3 }
+{ type: 'user_rating_avg_max', avg: 2.5, minRatings: 5 }
+```
+User mean eligible rating ≥ or ≤ threshold when user has ≥ `minRatings` eligible ratings (**required**).
+
+#### `bands_rated_pct_of_seen_min`
+```typescript
+{ type: 'bands_rated_pct_of_seen_min', pct: 80 }
+```
+Strict `(ratedSeen × 100) / seenCount >= pct`; **false** when `seenCount === 0`.
+
 **Use case**: Inside-joke badges, merit badges, honor awards
 
 **How it works**:

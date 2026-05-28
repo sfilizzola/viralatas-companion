@@ -20,6 +20,12 @@ function assignedBadgeSlugsFromMeta(assignedBadges: string[]): string[] {
 }
 import { getWeakSkipCount } from './weakSkipMetadata';
 import { now } from './time';
+import {
+  buildRatingStatsInputFromPicks,
+  buildRatingStatsSnapshot,
+  type RatingStatsSnapshot,
+} from './ratingStats';
+import type { UserBandRating } from '../types';
 
 export type FestivalWrapPersonal = {
   bandsPicked: number;
@@ -55,6 +61,7 @@ export type FestivalWrapStats = {
   hasPicks: boolean;
   personal: FestivalWrapPersonal;
   crew: FestivalWrapCrew;
+  ratings: RatingStatsSnapshot | null;
 };
 
 export const EMPTY_WRAP_STATS: FestivalWrapStats = {
@@ -87,6 +94,7 @@ export const EMPTY_WRAP_STATS: FestivalWrapStats = {
     currentUserDisplayName: null,
     currentUserAvatarUrl: null,
   },
+  ratings: null,
 };
 
 function modeFromSeenBands(
@@ -221,7 +229,26 @@ export function buildFestivalWrapStats(
   userId: string,
   authUser: AuthUser,
   social?: SocialSnapshot,
+  allRatings: UserBandRating[] = [],
 ): FestivalWrapStats {
+  const currentNow = now();
+  const userPickBandIds = snap.userPicks.map((p) => p.band_id);
+  const userMissedIds = new Set(
+    snap.allMissed.filter((m) => m.user_id === userId).map((m) => m.band_id),
+  );
+  const ratingInput = buildRatingStatsInputFromPicks(
+    allRatings,
+    snap.bands,
+    userId,
+    userPickBandIds,
+    snap.allPicks,
+    userMissedIds,
+    currentNow,
+  );
+  const ratingSnapshot = buildRatingStatsSnapshot(ratingInput);
+  const ratings =
+    ratingSnapshot.hasCrewRatings && snap.userPicks.length > 0 ? ratingSnapshot : null;
+
   const ctx = social
     ? buildBadgeContextFromSocialSnapshot(snap, social, userId, authUser)
     : buildBadgeContextFromSnapshot(snap, userId, authUser);
@@ -230,6 +257,7 @@ export function buildFestivalWrapStats(
     return {
       ...EMPTY_WRAP_STATS,
       crew: computeCrewWrapStats(snap, userId, authUser),
+      ratings: null,
     };
   }
 
@@ -237,7 +265,6 @@ export function buildFestivalWrapStats(
   const { hard, soft } = countConflictPairs(ctx.pickedBands as Band[]);
   const weakSkips = getWeakSkipCount(authUser.user_metadata);
 
-  const currentNow = now();
   const bandsSkipped = ctx.pickedBands.filter(
     (b) => new Date(b.end_time) < currentNow && ctx.missedBandIds.has(b.id),
   ).length;
@@ -271,5 +298,6 @@ export function buildFestivalWrapStats(
       locationVisitsTotal,
     },
     crew: computeCrewWrapStats(snap, userId, authUser),
+    ratings,
   };
 }

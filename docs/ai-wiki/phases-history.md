@@ -753,3 +753,22 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Coach flag not synced — intentional per-device UX.
 
 ---
+
+### Phase 34 — Rating recap & badge predicates
+**Status:** ✅ Complete
+
+**Goal:** Rich rating stats on `/wrap` (Variant **C · Popular Echo**); six badge engine predicates; no registry badges, schema, or sync changes.
+
+**Deliverables:**
+- `src/services/ratingStats.ts` + `src/hooks/useAllRatingsCache.ts` + tests
+- Wrap Ratings section (after Chaos) + dynamic progress dots + i18n ×4 + Design System
+- Six `BadgeCondition` types in `engine.ts`; `BadgeContext` rating fields via `badgeContextBuilder`
+- Wiki + `.claude/context/badges.md` updated; `registry.ts` unchanged
+
+**Acceptance criteria (all met):**
+- [x] Ratings section when ≥1 crew rating and `hasPicks`; hidden otherwise
+- [x] Variant C nested crew cards; lowest guard; top score fallback
+- [x] Six predicates per spec; wiki documented
+- [x] `rtk npm run build` + `rtk npm test` green
+
+---

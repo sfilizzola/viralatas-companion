@@ -1,4 +1,5 @@
 import type { Band } from '../../types';
+import type { BandRatingAggregate } from '../bandRatings';
 
 export type BadgeBand = Pick<Band, 'id' | 'name' | 'stage' | 'start_time' | 'end_time' | 'genre' | 'category'>;
 
@@ -50,7 +51,20 @@ export type BadgeCondition =
   // Stage diversity: earned when user has seen at least 1 band on N+ distinct stages
   | { type: 'stage_diversity_min'; count: number }
   // Assigned: godlike manually assigns this badge slug via the assign-badge Edge Function
-  | { type: 'assigned' };
+  | { type: 'assigned' }
+  // Rating predicates (Phase 34 — engine only; no registry entries yet)
+  | { type: 'bands_rated_min'; count: number }
+  | {
+      type: 'band_rated_score_min';
+      score: number;
+      name?: string;
+      stage?: string;
+      genre?: string;
+    }
+  | { type: 'crew_avg_on_picked_band_min'; avg: number; minRaters?: number }
+  | { type: 'user_rating_avg_min'; avg: number; minRatings: number }
+  | { type: 'user_rating_avg_max'; avg: number; minRatings: number }
+  | { type: 'bands_rated_pct_of_seen_min'; pct: number };
 
 export type BadgeConfig = {
   slug: string;
@@ -81,4 +95,9 @@ export type BadgeContext = {
   currentLocation: string | null;
   crewLocationCounts: Record<string, number>;
   achievedBadgeSlugs: Set<string>; // persist:true badges already recorded in user_metadata
+  userRatingsByBandId: Map<string, number>;
+  ratingAggregates: Record<string, BandRatingAggregate>;
+  bandsRatedCount: number;
+  userRatingAvg: number | null;
+  ratedPctOfSeen: number;
 };

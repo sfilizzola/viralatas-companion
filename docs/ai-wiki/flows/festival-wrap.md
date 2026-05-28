@@ -17,9 +17,9 @@ After Wacken ends, each vira-lata gets a private scrollable recap at `/wrap` —
 
 1. User logs in; IndexedDB already holds bands, picks, missed marks, crew users, presence.
 2. User taps teaser banner (or navigates to `/wrap` directly).
-3. `useFestivalWrapStats` composes `useSocialSnapshot` (same IDB cells as `/now` and live vest; no Supabase stats reads).
-4. `buildFestivalWrapStats()` delegates to `buildBadgeContextFromSocialSnapshot` + `getEarnedBadges` + crew helpers.
-5. `WrapPage` renders a welcome gate, stat sections (with optional assigned-patches section), patches vest pile, and a closing thanks gate — 7–8 full-viewport scroll sections with progress dots.
+3. `useFestivalWrapStats` composes `useSocialSnapshot` + `useAllRatingsCache` (same IDB cells as `/now` and live vest; no Supabase stats reads).
+4. `buildFestivalWrapStats()` delegates to `buildBadgeContextFromSocialSnapshot` + `buildRatingStatsSnapshot` + `getEarnedBadges` + crew helpers.
+5. `WrapPage` renders a welcome gate, stat sections (optional **Ratings** after Chaos, optional assigned-patches section), patches vest pile, and a closing thanks gate — **7–9** full-viewport scroll sections with progress dots.
 6. **Patches** section CTA **Open vest** links to `/profile?vest=open#vest` where `BadgesDisplay` shows the full collection.
 7. **Finale** thanks section signs off with Wacken 2027 (Rain or Shine) and CTA **Back to the App** → `/now`.
 
@@ -45,12 +45,14 @@ After Wacken ends, each vira-lata gets a private scrollable recap at `/wrap` —
 | File | Role |
 |------|------|
 | `src/services/festivalWrap.ts` | Pure `buildFestivalWrapStats()` + types |
-| `src/hooks/useFestivalWrapStats.ts` | Composes `useSocialSnapshot` + `useMissedBands`; assigned badges from crew IDB |
+| `src/services/ratingStats.ts` | Pure `buildRatingStatsSnapshot()` — wrap + badge context |
+| `src/hooks/useAllRatingsCache.ts` | Read-only crew-wide ratings IDB cell |
+| `src/hooks/useFestivalWrapStats.ts` | Composes `useSocialSnapshot` + `useAllRatingsCache` + `useMissedBands` |
 | `src/hooks/useSocialSnapshot.ts` | Shared IDB load + `buildSocialSnapshot()` (Phase 31) |
 | `src/hooks/useWrapTeaserVisible.ts` | Teaser gate: `isFestivalEnded(now(), bands)` + dismiss |
 | `src/lib/wrapDismiss.ts` | `viralatas:wrap-dismissed-2026` helpers |
 | `src/pages/WrapPage.tsx` | Welcome + stat sections + patches + finale thanks; scroll-snap; IntersectionObserver progress |
-| `src/components/wrap/WrapProgress.tsx` | Fixed progress dots (7–8 depending on assigned patches) |
+| `src/components/wrap/WrapProgress.tsx` | Fixed progress dots (7–9 depending on optional Ratings + Assigned) |
 | `src/components/wrap/WrapTeaserBanner.tsx` | Variant B discovery bar |
 | `src/pages/RightNowPage.tsx` / `ProfilePage.tsx` | Teaser mount + time-override reactivity |
 | `src/components/profile/TimeTravelSection.tsx` | Godlike wrap QA disclaimer |
@@ -66,8 +68,10 @@ After Wacken ends, each vira-lata gets a private scrollable recap at `/wrap` —
 User → /wrap
   → useFestivalWrapStats(userId)
     → useSocialSnapshot (IndexedDB: picks, bands, crew, presence, configs)
-    → buildFestivalWrapStats(idbSnap, userId, authUser, social)
+    → useAllRatingsCache (IndexedDB: user_band_ratings)
+    → buildFestivalWrapStats(idbSnap, userId, authUser, social, allRatings)
       → buildBadgeContextFromSocialSnapshot (seen/picked/skipped semantics)
+      → buildRatingStatsSnapshot (personal + crew rating highlights)
       → getEarnedBadges / computeBandOverlaps / crew Jaccard
   → WrapPage (presentation only)
 ```

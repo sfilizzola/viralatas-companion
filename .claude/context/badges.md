@@ -41,7 +41,7 @@ type BadgeConfig = {
 
 ---
 
-## All 28 `BadgeCondition` types
+## All 34 `BadgeCondition` types
 
 Conditions evaluate against a `BadgeContext` built once per profile load. **A predicate not in this list is unsupported — adding a new one requires changing `types.ts`, `engine.ts`, the wiki, and this file.**
 
@@ -106,6 +106,16 @@ A band is **seen** when `now > band.end_time` AND its id is **not** in `missedBa
 |---|---|---|
 | `assigned` | (none) | Slug must appear in `users.special_badges[]`. Godlike-only assignment. |
 
+### Rating (6) — Phase 34 engine only; no registry entries yet
+| Type | Inputs | Meaning |
+|---|---|---|
+| `bands_rated_min` | `count` | User rated ≥ N bands **eligible at eval time** (`canRateBand`) |
+| `band_rated_score_min` | `score`, optional `name` / `stage` / `genre` | User score **≥** `score` on a band matching **all** provided filters (AND); band must be eligible |
+| `crew_avg_on_picked_band_min` | `avg`, optional `minRaters` (default **1**) | Crew avg ≥ `avg` on ≥1 band in user's **`seenBands`**; optional `minRaters` on that band |
+| `user_rating_avg_min` | `avg`, **`minRatings` (required)** | User's mean eligible rating ≥ `avg` when user has ≥ `minRatings` eligible ratings |
+| `user_rating_avg_max` | `avg`, **`minRatings` (required)** | User's mean eligible rating ≤ `avg` when user has ≥ `minRatings` eligible ratings |
+| `bands_rated_pct_of_seen_min` | `pct` | `(ratedSeen × 100) / seenCount >= pct` (strict); **false** when `seenCount === 0` |
+
 ---
 
 ## Hour rule (CEST = UTC+2)
@@ -132,6 +142,11 @@ type BadgeContext = {
   currentLocation: string | null;
   crewLocationCounts: Record<string, number>;  // computeCrewLocationCounts — aligned with /now
   achievedBadgeSlugs: Set<string>;             // persist:true slugs already recorded
+  userRatingsByBandId: Map<string, number>;     // eligible user ratings by band id
+  ratingAggregates: Record<string, BandRatingAggregate>; // crew-wide per-band avg/count
+  bandsRatedCount: number;                      // eligible user rating count
+  userRatingAvg: number | null;
+  ratedPctOfSeen: number;                       // display pct (rounded); pct predicate uses strict ratio
 };
 ```
 

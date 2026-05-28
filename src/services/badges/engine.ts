@@ -51,6 +51,11 @@ export function buildBadgeContext(
     currentLocation,
     crewLocationCounts,
     achievedBadgeSlugs,
+    userRatingsByBandId: new Map(),
+    ratingAggregates: {},
+    bandsRatedCount: 0,
+    userRatingAvg: null,
+    ratedPctOfSeen: 0,
   };
 }
 
@@ -156,6 +161,45 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
     }
     case 'assigned':
       return ctx.assignedBadges.includes(badge.slug);
+    case 'bands_rated_min':
+      return ctx.bandsRatedCount >= condition.count;
+    case 'band_rated_score_min': {
+      for (const band of ctx.seenBands) {
+        const score = ctx.userRatingsByBandId.get(band.id);
+        if (score === undefined || score < condition.score) continue;
+        if (condition.name !== undefined && band.name !== condition.name) continue;
+        if (condition.stage !== undefined && band.stage !== condition.stage) continue;
+        if (condition.genre !== undefined && band.genre !== condition.genre) continue;
+        return true;
+      }
+      return false;
+    }
+    case 'crew_avg_on_picked_band_min': {
+      const minRaters = condition.minRaters ?? 1;
+      for (const band of ctx.seenBands) {
+        const aggregate = ctx.ratingAggregates[band.id];
+        if (!aggregate || aggregate.count < minRaters) continue;
+        if (aggregate.avg >= condition.avg) return true;
+      }
+      return false;
+    }
+    case 'user_rating_avg_min':
+      return (
+        ctx.bandsRatedCount >= condition.minRatings &&
+        ctx.userRatingAvg !== null &&
+        ctx.userRatingAvg >= condition.avg
+      );
+    case 'user_rating_avg_max':
+      return (
+        ctx.bandsRatedCount >= condition.minRatings &&
+        ctx.userRatingAvg !== null &&
+        ctx.userRatingAvg <= condition.avg
+      );
+    case 'bands_rated_pct_of_seen_min': {
+      const seenCount = ctx.seenBands.length;
+      if (seenCount === 0) return false;
+      return (ctx.bandsRatedCount * 100) / seenCount >= condition.pct;
+    }
   }
 }
 

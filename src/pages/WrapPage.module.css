@@ -1034,3 +1034,154 @@
     transform: none;
   }
 }
+
+/* ---- Ratings section (Phase 34 · C · Popular Echo) ---- */
+.ratingsPersonalStrip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.ratingsYouBlock {
+  text-align: left;
+}
+
+.ratingsYouLabel {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+}
+
+.ratingsYouStats {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.ratingsZeroCopy {
+  margin: 0 0 14px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.ratingsCrewCard {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 10px;
+  background: color-mix(in srgb, var(--bg) 50%, transparent);
+}
+
+.ratingsCrewCardTop {
+  border-color: color-mix(in srgb, var(--signal-ok) 35%, var(--border));
+}
+
+.ratingsCrewCardLow {
+  border-color: color-mix(in srgb, var(--signal-warn) 30%, var(--border));
+}
+
+.ratingsCrewCardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ratingsCrewKicker {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  margin-bottom: 4px;
+}
+
+.ratingsCrewBand {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+
+.ratingsHero {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.ratingsHeroWarn {
+  color: var(--signal-warn);
+}
+
+.ratingsHeroAvg {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ratingsCrewFooter {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.ratingsTopScoreRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.ratingsTopScoreLeft {
+  min-width: 0;
+}
+
+.ratingsTopScoreBand {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.ratingsTopScoreValue {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  color: var(--accent);
+}
+
+.ratingsTopScoreNum {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1;
+}

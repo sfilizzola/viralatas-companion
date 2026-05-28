@@ -1,5 +1,5 @@
 import type { User as AuthUser } from '@supabase/supabase-js';
-import type { Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserPick, UserPresence } from '../../types';
+import type { Band, CrewUser, LiveBandTestConfig, MetalPlaceConfig, UserPick, UserPresence, UserBandRating } from '../../types';
 import {
   crewLocationCountsFromGroups,
   deriveUserBadgeLocation,
@@ -11,6 +11,10 @@ import { getWeakSkipCount } from '../weakSkipMetadata';
 import { buildBadgeContext } from './engine';
 import type { BadgeBand, BadgeContext } from './types';
 import { mergedPersistedBadgeSlugs } from './persistMetadata';
+import {
+  buildRatingStatsInputFromPicks,
+  buildRatingStatsSnapshot,
+} from '../ratingStats';
 
 export const EMPTY_BADGE_CONTEXT: BadgeContext = {
   wacken_years: [],
@@ -27,6 +31,11 @@ export const EMPTY_BADGE_CONTEXT: BadgeContext = {
   currentLocation: null,
   crewLocationCounts: {},
   achievedBadgeSlugs: new Set(),
+  userRatingsByBandId: new Map(),
+  ratingAggregates: {},
+  bandsRatedCount: 0,
+  userRatingAvg: null,
+  ratedPctOfSeen: 0,
 };
 
 export type BadgeIdbSnapshot = {
@@ -42,6 +51,7 @@ export type BadgeIdbSnapshot = {
   liveTestBandId?: string | null;
   metalPlaceConfig?: MetalPlaceConfig | null;
   liveBandTestConfig?: LiveBandTestConfig | null;
+  ratings?: UserBandRating[];
 };
 
 function legacyLiveBandTestConfig(
@@ -126,7 +136,7 @@ export function buildBadgeContextFromSocialSnapshot(
   const weakSkipCount = getWeakSkipCount(authUser.user_metadata);
   const achievedBadgeSlugs = mergedPersistedBadgeSlugs(authUser.user_metadata);
 
-  return buildBadgeContext(
+  const ctx = buildBadgeContext(
     authUser,
     userPickBandIds,
     allPickCounts,
@@ -140,6 +150,35 @@ export function buildBadgeContextFromSocialSnapshot(
     achievedBadgeSlugs,
     weakSkipCount,
   );
+
+  return mergeRatingFields(ctx, snap, userId, currentNow);
+}
+
+function mergeRatingFields(
+  ctx: BadgeContext,
+  snap: BadgeIdbSnapshot,
+  userId: string,
+  currentNow: Date,
+): BadgeContext {
+  const ratings = snap.ratings ?? [];
+  const ratingInput = buildRatingStatsInputFromPicks(
+    ratings,
+    snap.bands,
+    userId,
+    snap.userPicks.map((p) => p.band_id),
+    snap.allPicks,
+    new Set(snap.allMissed.filter((m) => m.user_id === userId).map((m) => m.band_id)),
+    currentNow,
+  );
+  const ratingSnap = buildRatingStatsSnapshot(ratingInput);
+  return {
+    ...ctx,
+    userRatingsByBandId: ratingSnap.userRatingsByBandId,
+    ratingAggregates: ratingSnap.aggregates,
+    bandsRatedCount: ratingSnap.bandsRatedCount,
+    userRatingAvg: ratingSnap.userRatingAvg,
+    ratedPctOfSeen: ratingSnap.ratedPctOfSeen,
+  };
 }
 
 export function buildBadgeContextFromSnapshot(

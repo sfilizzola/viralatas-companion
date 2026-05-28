@@ -272,4 +272,69 @@ describe('buildFestivalWrapStats', () => {
     const stats = buildFestivalWrapStats(snap, 'u1', authUser());
     expect(stats.personal.assignedBadgeSlugs).toEqual([]);
   });
+
+  it('ratings null when no crew ratings exist', () => {
+    const bands = [
+      band({ id: 'b1', name: 'Alpha' }),
+    ];
+    const snap = minimalSnapshot({
+      userPicks: [{ band_id: 'b1' }],
+      allPicks: [{ user_id: 'u1', band_id: 'b1', created_at: '2026-07-01T00:00:00Z' }],
+      bands,
+    });
+    const stats = buildFestivalWrapStats(snap, 'u1', authUser());
+    expect(stats.ratings).toBeNull();
+  });
+
+  it('ratings populated when crew has ratings and user has picks', () => {
+    const bands = [
+      band({ id: 'b1', name: 'Alpha' }),
+      band({ id: 'b2', name: 'Beta', start_time: '2026-07-29T10:00:00.000Z', end_time: '2026-07-29T11:00:00.000Z' }),
+    ];
+    const snap = minimalSnapshot({
+      userPicks: [{ band_id: 'b1' }, { band_id: 'b2' }],
+      allPicks: [
+        { user_id: 'u1', band_id: 'b1', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'b2', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'b1', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'b2', created_at: '2026-07-01T00:00:00Z' },
+      ],
+      bands,
+    });
+    const allRatings = [
+      { user_id: 'u1', band_id: 'b1', score: 5 as const, rated_at: '' },
+      { user_id: 'u2', band_id: 'b1', score: 4 as const, rated_at: '' },
+      { user_id: 'u1', band_id: 'b2', score: 3 as const, rated_at: '' },
+      { user_id: 'u2', band_id: 'b2', score: 2 as const, rated_at: '' },
+    ];
+    const stats = buildFestivalWrapStats(snap, 'u1', authUser(), undefined, allRatings);
+    expect(stats.ratings).not.toBeNull();
+    expect(stats.ratings!.hasCrewRatings).toBe(true);
+    expect(stats.ratings!.crewTopRated?.name).toBe('Alpha');
+    expect(stats.ratings!.crewLowestPick?.name).toBe('Beta');
+    expect(stats.ratings!.userTopScore?.score).toBe(5);
+  });
+
+  it('crew lowest null when fewer than two qualifying bands', () => {
+    const bands = [band({ id: 'b1', name: 'Solo' })];
+    const snap = minimalSnapshot({
+      userPicks: [{ band_id: 'b1' }],
+      allPicks: [
+        { user_id: 'u1', band_id: 'b1', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'b1', created_at: '2026-07-01T00:00:00Z' },
+      ],
+      bands,
+    });
+    const stats = buildFestivalWrapStats(
+      snap,
+      'u1',
+      authUser(),
+      undefined,
+      [
+        { user_id: 'u1', band_id: 'b1', score: 2 as const, rated_at: '' },
+        { user_id: 'u2', band_id: 'b1', score: 3 as const, rated_at: '' },
+      ],
+    );
+    expect(stats.ratings?.crewLowestPick).toBeNull();
+  });
 });

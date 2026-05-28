@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-28 (Phase 34 — Rating wrap & badge predicates)
+
+### Added
+- **`src/services/ratingStats.ts`** — `buildRatingStatsSnapshot()` shared by wrap and badge context
+- **`src/hooks/useAllRatingsCache.ts`** — read-only crew-wide ratings IDB cell + `RATINGS_CHANGED_EVENT`
+- **Wrap Ratings section** — Variant **C · Popular Echo** on `/wrap` (after Chaos, before Vira-latas); dynamic progress dots
+- **Six badge engine predicates** — `bands_rated_min`, `band_rated_score_min`, `crew_avg_on_picked_band_min`, `user_rating_avg_min` / `_max`, `bands_rated_pct_of_seen_min`
+- Tests: `ratingStats.test.ts`; extended `festivalWrap.test.ts`, `badges.test.ts`
+
+### Changed
+- `festivalWrap.ts` / `useFestivalWrapStats` — merge rating snapshot into `FestivalWrapStats`
+- `badgeContextBuilder.ts` / `useBadgePersist` — feed rating fields into `BadgeContext`
+- `WrapPage` + i18n ×4 — Ratings copy uses **vira-latas** terminology
+- Design System — Wrap Ratings § C anatomy in `public/vira-lata-ds.html`
+
+### Architectural Notes
+- **`registry.ts` unchanged** — zero new badge slugs; future phases add catalog entries using Phase 34 predicates
+- Offline-first unchanged: stats from IndexedDB via `useAllRatingsCache`, not Supabase
+
+---
+
 ## 2026-05-28 (Design system — single canonical file)
 
 ### Changed

@@ -13,6 +13,7 @@ import type { BadgeIdbSnapshot } from '../services/badges/badgeContextBuilder';
 import type { SocialSnapshot } from '../services/socialSnapshot';
 import { supabase } from '../lib/supabase';
 import type { Band, CrewUser, UserPick, UserPresence } from '../types';
+import { useAllRatingsCache } from './useAllRatingsCache';
 
 export type BadgePersistInput = {
   social: SocialSnapshot | null;
@@ -25,7 +26,7 @@ export type BadgePersistInput = {
   loading: boolean;
 };
 
-function buildIdbSnap(input: BadgePersistInput, userId: string): BadgeIdbSnapshot {
+function buildIdbSnap(input: BadgePersistInput, userId: string, allRatings: BadgeIdbSnapshot['ratings']): BadgeIdbSnapshot {
   const crewRow = input.crewUsers.find((u) => u.id === userId);
   return {
     userPicks: input.picks.filter((p) => p.user_id === userId),
@@ -38,12 +39,13 @@ function buildIdbSnap(input: BadgePersistInput, userId: string): BadgeIdbSnapsho
     crewUsers: input.crewUsers,
     metalPlaceWindowActive: input.social!.metalPlaceWindowActive,
     liveTestBandId: input.social!.liveTestBandId,
+    ratings: allRatings,
   };
 }
 
-function buildCtxFromInput(input: BadgePersistInput, userId: string): BadgeContext {
+function buildCtxFromInput(input: BadgePersistInput, userId: string, allRatings: BadgeIdbSnapshot['ratings']): BadgeContext {
   return buildBadgeContextFromSocialSnapshot(
-    buildIdbSnap(input, userId),
+    buildIdbSnap(input, userId, allRatings),
     input.social!,
     userId,
     input.user,
@@ -52,16 +54,17 @@ function buildCtxFromInput(input: BadgePersistInput, userId: string): BadgeConte
 
 export function useBadgePersist(userId: string, input: BadgePersistInput): BadgeContext {
   const { social, bands, crewUsers, presence, picks, allMissed, user, loading } = input;
+  const { allRatings } = useAllRatingsCache();
 
   const ctx = useMemo(() => {
     if (loading || !social) return EMPTY_BADGE_CONTEXT;
-    return buildCtxFromInput(input, userId);
-  }, [userId, loading, social, bands, crewUsers, presence, picks, allMissed, user]);
+    return buildCtxFromInput(input, userId, allRatings);
+  }, [userId, loading, social, bands, crewUsers, presence, picks, allMissed, user, allRatings]);
 
   useEffect(() => {
     if (loading || !social) return;
 
-    const fullCtx = buildCtxFromInput(input, userId);
+    const fullCtx = buildCtxFromInput(input, userId, allRatings);
     const achievedBadgeSlugs = mergedPersistedBadgeSlugs(user.user_metadata);
     const earnedBadges = BADGES.filter((b) => evaluateBadge(b, fullCtx));
     const newlyAchieved = earnedBadges.filter(
@@ -74,7 +77,7 @@ export function useBadgePersist(userId: string, input: BadgePersistInput): Badge
         // badge earning is best-effort
       });
     }
-  }, [userId, loading, social, bands, crewUsers, presence, picks, allMissed, user]);
+  }, [userId, loading, social, bands, crewUsers, presence, picks, allMissed, user, allRatings]);
 
   return ctx;
 }

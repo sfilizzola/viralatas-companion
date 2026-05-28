@@ -8,21 +8,14 @@ import { BADGES } from '../services/badges/registry';
 import { badgeYearSuffix } from '../components/badges/PatchTile';
 import { buildStackPoses, stackStyle } from '../services/badges/stackLayout';
 import { stageColorVar } from '../services/stageColors';
+import { formatRatingAvg } from '../services/bandRatings';
+import PawIcon from '../components/icons/PawIcon';
 import WrapProgress from '../components/wrap/WrapProgress';
 import styles from './WrapPage.module.css';
 
 const WEAK_SKIP_METER_MAX = 20;
 const CONFLICT_METER_MAX = 10;
 const BADGE_METER_MAX = 15;
-
-const SECTION = {
-  welcome: 0,
-  hero: 1,
-  personality: 2,
-  chaos: 3,
-  crew: 4,
-  assigned: 5,
-} as const;
 
 function meterWidth(value: number, max: number): string {
   const pct = Math.min(100, Math.round((value / max) * 100));
@@ -99,9 +92,21 @@ export default function WrapPage() {
   }, [stats]);
 
   const hasAssignedSection = assignedBadges.length > 0;
-  const patchesSectionIndex = hasAssignedSection ? 6 : 5;
-  const finaleSectionIndex = patchesSectionIndex + 1;
-  const totalSections = finaleSectionIndex + 1;
+  const hasRatingsSection = Boolean(stats?.ratings?.hasCrewRatings);
+
+  const sectionIndices = useMemo(() => {
+    let i = 0;
+    const welcome = i++;
+    const hero = i++;
+    const personality = i++;
+    const chaos = i++;
+    const ratings = hasRatingsSection ? i++ : null;
+    const crew = i++;
+    const assigned = hasAssignedSection ? i++ : null;
+    const patches = i++;
+    const finale = i++;
+    return { welcome, hero, personality, chaos, ratings, crew, assigned, patches, finale, total: i };
+  }, [hasRatingsSection, hasAssignedSection]);
 
   const stackPoses = useMemo(
     () => (earnedBadges.length > 0 ? buildStackPoses(earnedBadges, 42, new Set()) : new Map()),
@@ -164,7 +169,7 @@ export default function WrapPage() {
   }, [stats?.hasPicks]);
 
   useEffect(() => {
-    if (!stats?.hasPicks || !revealedSections.has(SECTION.hero)) return;
+    if (!stats?.hasPicks || !revealedSections.has(sectionIndices.hero)) return;
 
     const target = stats.personal.bandsSeen;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -213,17 +218,17 @@ export default function WrapPage() {
     );
   }
 
-  const { personal, crew } = stats;
+  const { personal, crew, ratings } = stats;
 
   return (
     <div className={styles.page}>
       <WrapAmbient />
-      <WrapProgress activeIndex={activeSection} total={totalSections} />
+      <WrapProgress activeIndex={activeSection} total={sectionIndices.total} />
       <div className={styles.scrollContainer} ref={containerRef}>
         <section
-          className={sectionClass(SECTION.welcome)}
+          className={sectionClass(sectionIndices.welcome)}
           data-wrap-section
-          data-wrap-index={SECTION.welcome}
+          data-wrap-index={sectionIndices.welcome}
           aria-label={t('sectionWelcome')}
         >
           <div className={styles.welcomeGate}>
@@ -235,9 +240,9 @@ export default function WrapPage() {
         </section>
 
         <section
-          className={sectionClass(SECTION.hero)}
+          className={sectionClass(sectionIndices.hero)}
           data-wrap-section
-          data-wrap-index={SECTION.hero}
+          data-wrap-index={sectionIndices.hero}
           aria-label={t('sectionHero')}
         >
           <div className={styles.sectionFrame}>
@@ -253,7 +258,7 @@ export default function WrapPage() {
               <div className={styles.stageBar} />
               <span className={styles.kicker}>{t('heroKicker')}</span>
               <div className={styles.heroNumber}>
-                {revealedSections.has(SECTION.hero) ? heroCount : personal.bandsSeen}
+                {revealedSections.has(sectionIndices.hero) ? heroCount : personal.bandsSeen}
               </div>
               <div className={styles.heroLabel}>{t('heroSeenLabel')}</div>
               <div className={styles.heroRow}>
@@ -266,9 +271,9 @@ export default function WrapPage() {
         </section>
 
         <section
-          className={sectionClass(SECTION.personality)}
+          className={sectionClass(sectionIndices.personality)}
           data-wrap-section
-          data-wrap-index={SECTION.personality}
+          data-wrap-index={sectionIndices.personality}
           aria-label={t('sectionPersonality')}
         >
           <div className={styles.sectionFrame}>
@@ -295,9 +300,9 @@ export default function WrapPage() {
         </section>
 
         <section
-          className={sectionClass(SECTION.chaos)}
+          className={sectionClass(sectionIndices.chaos)}
           data-wrap-section
-          data-wrap-index={SECTION.chaos}
+          data-wrap-index={sectionIndices.chaos}
           aria-label={t('sectionChaos')}
         >
           <div className={styles.sectionFrame}>
@@ -354,10 +359,101 @@ export default function WrapPage() {
           </div>
         </section>
 
+        {hasRatingsSection && ratings && sectionIndices.ratings !== null && (
+          <section
+            className={sectionClass(sectionIndices.ratings)}
+            data-wrap-section
+            data-wrap-index={sectionIndices.ratings}
+            aria-label={t('sectionRatings')}
+          >
+            <div className={styles.sectionFrame}>
+              <p className={styles.sectionEpigraph}>{t('ratingsPhrase')}</p>
+              <div className={styles.card}>
+                <div className={styles.cardGlow} aria-hidden="true" />
+                <div className={styles.stageBar} />
+                <span className={styles.kicker}>{t('ratingsKicker')}</span>
+
+                {ratings.bandsRatedCount > 0 && ratings.userRatingAvg !== null ? (
+                  <div className={styles.ratingsPersonalStrip}>
+                    <div className={styles.ratingsYouBlock}>
+                      <span className={styles.ratingsYouLabel}>{t('ratingsYouLabel')}</span>
+                      <span className={styles.ratingsYouStats}>
+                        {t('ratingsPersonalLine', {
+                          count: ratings.bandsRatedCount,
+                          avg: formatRatingAvg(ratings.userRatingAvg),
+                          pct: ratings.ratedPctOfSeen,
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <p className={styles.ratingsZeroCopy}>{t('ratingsZeroPersonal')}</p>
+                )}
+
+                {ratings.crewTopRated && (
+                  <div className={`${styles.ratingsCrewCard} ${styles.ratingsCrewCardTop}`}>
+                    <div className={styles.ratingsCrewCardHead}>
+                      <div>
+                        <span className={styles.ratingsCrewKicker}>{t('ratingsCrewTop')}</span>
+                        <span className={styles.ratingsCrewBand}>{ratings.crewTopRated.name}</span>
+                      </div>
+                      <div className={styles.ratingsHero} aria-label={formatRatingAvg(ratings.crewTopRated.avg)}>
+                        <PawIcon filled size={18} />
+                        <span className={styles.ratingsHeroAvg}>
+                          {formatRatingAvg(ratings.crewTopRated.avg)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className={styles.ratingsCrewFooter}>
+                      {t('ratingsCountFooter', { count: ratings.crewTopRated.count })}
+                    </div>
+                  </div>
+                )}
+
+                {ratings.crewLowestPick && (
+                  <div className={`${styles.ratingsCrewCard} ${styles.ratingsCrewCardLow}`}>
+                    <div className={styles.ratingsCrewCardHead}>
+                      <div>
+                        <span className={styles.ratingsCrewKicker}>{t('ratingsCrewLow')}</span>
+                        <span className={styles.ratingsCrewBand}>{ratings.crewLowestPick.name}</span>
+                      </div>
+                      <div
+                        className={`${styles.ratingsHero} ${styles.ratingsHeroWarn}`}
+                        aria-label={formatRatingAvg(ratings.crewLowestPick.avg)}
+                      >
+                        <PawIcon filled size={18} />
+                        <span className={styles.ratingsHeroAvg}>
+                          {formatRatingAvg(ratings.crewLowestPick.avg)}
+                        </span>
+                      </div>
+                    </div>
+                    <div className={styles.ratingsCrewFooter}>
+                      {t('ratingsCountFooter', { count: ratings.crewLowestPick.count })}
+                    </div>
+                  </div>
+                )}
+
+                {ratings.userTopScore && (
+                  <div className={styles.ratingsTopScoreRow}>
+                    <div className={styles.ratingsTopScoreLeft}>
+                      <span className={styles.ratingsCrewKicker}>{t('ratingsTopScore')}</span>
+                      <span className={styles.ratingsTopScoreBand}>{ratings.userTopScore.name}</span>
+                    </div>
+                    <div className={styles.ratingsTopScoreValue}>
+                      <span className={styles.ratingsTopScoreNum}>{ratings.userTopScore.score}</span>
+                      <PawIcon filled size={20} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+        )}
+
         <section
-          className={sectionClass(SECTION.crew)}
+          className={sectionClass(sectionIndices.crew)}
           data-wrap-section
-          data-wrap-index={SECTION.crew}
+          data-wrap-index={sectionIndices.crew}
           aria-label={t('sectionCrew')}
         >
           <div className={styles.sectionFrame}>
@@ -367,7 +463,7 @@ export default function WrapPage() {
                 src={crew.pickTwinAvatarUrl}
                 name={crew.pickTwinDisplayName}
                 tag={t('crewPickTwinTag')}
-                revealed={revealedSections.has(SECTION.crew)}
+                revealed={revealedSections.has(sectionIndices.crew)}
               />
             )}
             <div className={styles.card}>
@@ -405,11 +501,11 @@ export default function WrapPage() {
           </div>
         </section>
 
-        {hasAssignedSection && (
+        {hasAssignedSection && sectionIndices.assigned !== null && (
           <section
-            className={sectionClass(SECTION.assigned)}
+            className={sectionClass(sectionIndices.assigned)}
             data-wrap-section
-            data-wrap-index={SECTION.assigned}
+            data-wrap-index={sectionIndices.assigned}
             aria-label={t('sectionAssigned')}
           >
             <div className={styles.sectionFrame}>
@@ -451,9 +547,9 @@ export default function WrapPage() {
         )}
 
         <section
-          className={sectionClass(patchesSectionIndex)}
+          className={sectionClass(sectionIndices.patches)}
           data-wrap-section
-          data-wrap-index={patchesSectionIndex}
+          data-wrap-index={sectionIndices.patches}
           aria-label={t('sectionPatches')}
         >
           <div className={styles.sectionFrame}>
@@ -494,9 +590,9 @@ export default function WrapPage() {
         </section>
 
         <section
-          className={sectionClass(finaleSectionIndex)}
+          className={sectionClass(sectionIndices.finale)}
           data-wrap-section
-          data-wrap-index={finaleSectionIndex}
+          data-wrap-index={sectionIndices.finale}
           aria-label={t('sectionFinale')}
         >
           <div className={styles.finaleGate}>

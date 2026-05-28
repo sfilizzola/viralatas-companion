@@ -12,6 +12,7 @@ Document the real-world entities, their relationships, business rules, and invar
 - `supabase/migrations/` — Database schema (source of truth)
 - `src/repositories/` — Business rules enforcement
 - `src/services/bandRatings.ts` — Eligibility, aggregates, Popular sort helpers
+- `src/services/ratingStats.ts` — Wrap + badge rating snapshot (`buildRatingStatsSnapshot`)
 - `src/repositories/ratings.ts` — Rating writes, offline queue, reconnect sync, Realtime
 - `src/lib/db/ratings.ts` — IndexedDB `user_band_ratings` + `offline_band_ratings` stores
 - `src/hooks/useBandRatings.ts` — UI hook over crew-wide IDB snapshot

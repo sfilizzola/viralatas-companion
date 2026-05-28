@@ -3820,7 +3820,7 @@
         </div>
 
       <div class="subhead">Festival Wrap — `/wrap` + Teaser <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">WrapPage · WrapTeaserBanner</span></div>
-        <p><strong>A2 Vest Chronicle</strong> (<code>WrapPage.tsx</code>): welcome gate + stat sections + closing thanks gate with CTA to <code>/now</code> (<strong>7–8</strong> scroll sections depending on assigned patches) with <code>scroll-snap-type: y mandatory</code>; fixed progress bar (<code>WrapProgress</code>, <strong>7–8</strong> dots) driven by <code>IntersectionObserver</code>. Document root sets dynamic <code>--stage</code> from user's top stage (<code>stageColorVar</code>).</p>
+        <p><strong>A2 Vest Chronicle</strong> (<code>WrapPage.tsx</code>): welcome gate + stat sections + closing thanks gate with CTA to <code>/now</code> (<strong>7–9</strong> scroll sections depending on optional Ratings + Assigned) with <code>scroll-snap-type: y mandatory</code>; fixed progress bar (<code>WrapProgress</code>, <strong>7–9</strong> dots) driven by <code>IntersectionObserver</code>. Document root sets dynamic <code>--stage</code> from user's top stage (<code>stageColorVar</code>).</p>
         <table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
           <thead>
             <tr style="border-bottom:1px solid #333; text-align:left;">
@@ -3833,10 +3833,11 @@
             <tr><td style="padding:6px 8px;">1 Hero</td><td style="padding:6px 8px;">Giant bands seen; row: picked · skipped · stages</td></tr>
             <tr><td style="padding:6px 8px;">2 Personality</td><td style="padding:6px 8px;">Top genre + stage; stage pill with visit count</td></tr>
             <tr><td style="padding:6px 8px;">3 Chaos</td><td style="padding:6px 8px;">Horizontal meters: weak skips, hard conflicts, badges</td></tr>
-            <tr><td style="padding:6px 8px;">4 Vira-latas</td><td style="padding:6px 8px;">Pick-twin spotlight portrait (twin only, name below); stats in card</td></tr>
-            <tr><td style="padding:6px 8px;">5 Assigned (conditional)</td><td style="padding:6px 8px;">Godlike hand-picked patches grid; only when <code>assignedBadgeSlugs.length &gt; 0</code></td></tr>
-            <tr><td style="padding:6px 8px;">6/7 Patches</td><td style="padding:6px 8px;">Decorative <code>buildStackPoses</code> pile; CTA Open vest → /profile?vest=open#vest</td></tr>
-            <tr><td style="padding:6px 8px;">7/8 Thanks</td><td style="padding:6px 8px;">Closing gate — thanks + Wacken 2027 (Rain or Shine); CTA Back to the App → /now</td></tr>
+            <tr><td style="padding:6px 8px;">4 Ratings (conditional)</td><td style="padding:6px 8px;"><strong>C · Popular Echo</strong> — personal strip (or zero copy); nested crew top/low cards (paw + avg hero + count footer); your top score row. Hidden when zero crew ratings or <code>!hasPicks</code>. Prototype: <code>_temp/wrap-ratings-proposals/index.html</code> § C</td></tr>
+            <tr><td style="padding:6px 8px;">4/5 Vira-latas</td><td style="padding:6px 8px;">Pick-twin spotlight portrait (twin only, name below); stats in card</td></tr>
+            <tr><td style="padding:6px 8px;">5/6 Assigned (conditional)</td><td style="padding:6px 8px;">Godlike hand-picked patches grid; only when <code>assignedBadgeSlugs.length &gt; 0</code></td></tr>
+            <tr><td style="padding:6px 8px;">6–7/7–8 Patches</td><td style="padding:6px 8px;">Decorative <code>buildStackPoses</code> pile; CTA Open vest → /profile?vest=open#vest</td></tr>
+            <tr><td style="padding:6px 8px;">7–8/8–9 Thanks</td><td style="padding:6px 8px;">Closing gate — thanks + Wacken 2027 (Rain or Shine); CTA Back to the App → /now</td></tr>
           </tbody>
         </table>
         <p>Stat sections (hero → patches, plus optional assigned): <strong>4px</strong> top bar <code>background: var(--stage)</code> (fallback <code>var(--accent)</code>); shimmer + glow on reveal. Typography: Oswald display, IBM Plex body, JetBrains Mono kickers. Per-section <strong>epigraph</strong> (<code>.sectionEpigraph</code>) sits <em>above</em> the card in <code>.sectionFrame</code> — editorial voice against ambient orbs; card holds stats only. Welcome and thanks finale are poster gates (no card).</p>

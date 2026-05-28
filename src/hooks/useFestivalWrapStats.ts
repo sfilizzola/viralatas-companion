@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { type BadgeIdbSnapshot } from '../services/badges/badgeContextBuilder';
 import { buildFestivalWrapStats, type FestivalWrapStats } from '../services/festivalWrap';
+import { useAllRatingsCache } from './useAllRatingsCache';
 import { useAuth } from './useAuth';
 import { useMissedBands } from './useMissedBands';
 import { useNow } from './useNow';
@@ -18,6 +19,7 @@ export function useFestivalWrapStats(userId: string): FestivalWrapData {
   const { snapshot: social, crewUsers, presence, picks, bands, loading } =
     useSocialSnapshot(nowDate);
   const { allMissed } = useMissedBands(userId);
+  const { allRatings } = useAllRatingsCache();
 
   const stats = useMemo(() => {
     if (loading || !social || !user || user.id !== userId) return null;
@@ -34,8 +36,8 @@ export function useFestivalWrapStats(userId: string): FestivalWrapData {
       metalPlaceWindowActive: social.metalPlaceWindowActive,
       liveTestBandId: social.liveTestBandId,
     };
-    return buildFestivalWrapStats(idbSnap, userId, user, social);
-  }, [loading, social, user, userId, crewUsers, presence, picks, bands, allMissed]);
+    return buildFestivalWrapStats(idbSnap, userId, user, social, allRatings);
+  }, [loading, social, user, userId, crewUsers, presence, picks, bands, allMissed, allRatings]);
 
   return useMemo(
     () => ({

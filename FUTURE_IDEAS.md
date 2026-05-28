@@ -399,7 +399,7 @@ Discovery
 
 ## Idea 9 — Rating stats on `/wrap`
 
-**Status:** Scheduled — **Phase 34** (`PHASES.md` · `docs/superpowers/specs/2026-05-28-rating-wrap-badge-predicates-design.md`)
+**Status:** ✅ Shipped — **Phase 34** (`docs/ai-wiki/phases-history.md`)
 
 **Goal:** Add a wrap recap section for festival ratings — e.g. highest-rated band the crew saw, user's average score, total ratings given.
 
@@ -407,16 +407,13 @@ Discovery
 
 **Complexity:** Low · **Risk:** Low — pure aggregates from existing IDB data.
 
-**Acceptance (when scheduled):**
-- Stats use same aggregate rules as Popular (all vira-latas included in averages)
-- Section hidden or empty-state when no ratings exist
-- Offline after first sync
+**Shipped:** Variant **C · Popular Echo** on `/wrap` after Chaos; `ratingStats.ts` + `useAllRatingsCache`; hidden when zero crew ratings or `!hasPicks`.
 
 ---
 
 ## Idea 10 — Rating-based badges
 
-**Status:** Scheduled — **Phase 34** (engine predicates only; badge catalog deferred) · `PHASES.md` · `docs/superpowers/specs/2026-05-28-rating-wrap-badge-predicates-design.md`
+**Status:** Partial — **Phase 34** shipped engine predicates only; badge catalog deferred
 
 **Goal:** Badge conditions keyed off concert ratings — e.g. rated N bands, gave a 5 to a headliner, crew avg ≥ 4 on a band you picked.
 
@@ -424,9 +421,8 @@ Discovery
 
 **Complexity:** Medium · **Risk:** Low — additive registry entries; no schema change if Phase 32 shipped.
 
-**Non-goals until scheduled:** No badge registry changes in Phase 32.
+**Shipped (Phase 34):** Six `BadgeCondition` types in `engine.ts`; `BadgeContext` rating fields; wiki documented. **Deferred:** registry entries, PNG assets, badge i18n.
 
-**Acceptance (when scheduled):**
-- New supported `BadgeCondition` types documented in wiki + `.claude/context/badges.md`
+**Acceptance (remaining for catalog phase):**
+- New badge slugs in `registry.ts` using Phase 34 predicates
 - All four locales for badge labels
-- Engine reads from `BadgeContext` fed by ratings IDB snapshot

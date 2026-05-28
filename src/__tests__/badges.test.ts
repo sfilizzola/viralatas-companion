@@ -1438,3 +1438,123 @@ describe('registry — patient-zero (assigned)', () => {
     expect(evaluateBadge(cfg, ctx)).toBe(false);
   });
 });
+
+function ratingCtx(overrides: Partial<import('../services/badges/types').BadgeContext> = {}) {
+  const base = buildBadgeContext(
+    authUser(),
+    ['b1', 'b2'],
+    new Map([
+      ['b1', 2],
+      ['b2', 2],
+    ]),
+    new Map([
+      ['b1', band({ id: 'b1', name: 'Alpha', genre: 'Power Metal', stage: 'Faster' })],
+      ['b2', band({ id: 'b2', name: 'Beta', genre: 'Black Metal', stage: 'Harder' })],
+    ]),
+    new Set(),
+    new Date('2026-08-10T00:00:00.000Z'),
+  );
+  return {
+    ...base,
+    userRatingsByBandId: new Map([
+      ['b1', 5],
+      ['b2', 3],
+    ]),
+    ratingAggregates: {
+      b1: { avg: 4.5, count: 2 },
+      b2: { avg: 2.5, count: 2 },
+    },
+    bandsRatedCount: 2,
+    userRatingAvg: 4,
+    ratedPctOfSeen: 100,
+    ...overrides,
+  };
+}
+
+describe('evaluateBadge — rating predicates (Phase 34)', () => {
+  it('bands_rated_min counts eligible ratings', () => {
+    expect(evaluateBadge(badge({ type: 'bands_rated_min', count: 2 }), ratingCtx())).toBe(true);
+    expect(evaluateBadge(badge({ type: 'bands_rated_min', count: 3 }), ratingCtx())).toBe(false);
+  });
+
+  it('band_rated_score_min applies AND filters and score threshold', () => {
+    expect(
+      evaluateBadge(
+        badge({ type: 'band_rated_score_min', score: 5, name: 'Alpha' }),
+        ratingCtx(),
+      ),
+    ).toBe(true);
+    expect(
+      evaluateBadge(
+        badge({ type: 'band_rated_score_min', score: 5, genre: 'Black Metal' }),
+        ratingCtx(),
+      ),
+    ).toBe(false);
+    expect(
+      evaluateBadge(
+        badge({ type: 'band_rated_score_min', score: 5, stage: 'Faster', genre: 'Power Metal' }),
+        ratingCtx(),
+      ),
+    ).toBe(true);
+  });
+
+  it('crew_avg_on_picked_band_min defaults minRaters to 1 and scopes to seenBands', () => {
+    expect(
+      evaluateBadge(badge({ type: 'crew_avg_on_picked_band_min', avg: 4 }), ratingCtx()),
+    ).toBe(true);
+    expect(
+      evaluateBadge(
+        badge({ type: 'crew_avg_on_picked_band_min', avg: 4, minRaters: 3 }),
+        ratingCtx(),
+      ),
+    ).toBe(false);
+    expect(
+      evaluateBadge(
+        badge({ type: 'crew_avg_on_picked_band_min', avg: 4 }),
+        ratingCtx({ seenBands: [] }),
+      ),
+    ).toBe(false);
+  });
+
+  it('user_rating_avg_min and max require minRatings', () => {
+    expect(
+      evaluateBadge(
+        badge({ type: 'user_rating_avg_min', avg: 3.5, minRatings: 2 }),
+        ratingCtx(),
+      ),
+    ).toBe(true);
+    expect(
+      evaluateBadge(
+        badge({ type: 'user_rating_avg_max', avg: 4.5, minRatings: 2 }),
+        ratingCtx(),
+      ),
+    ).toBe(true);
+    expect(
+      evaluateBadge(
+        badge({ type: 'user_rating_avg_min', avg: 5, minRatings: 3 }),
+        ratingCtx(),
+      ),
+    ).toBe(false);
+  });
+
+  it('bands_rated_pct_of_seen_min uses strict ratio and false when seenCount is 0', () => {
+    expect(
+      evaluateBadge(
+        badge({ type: 'bands_rated_pct_of_seen_min', pct: 100 }),
+        ratingCtx(),
+      ),
+    ).toBe(true);
+    expect(
+      evaluateBadge(
+        badge({ type: 'bands_rated_pct_of_seen_min', pct: 101 }),
+        ratingCtx(),
+      ),
+    ).toBe(false);
+    expect(
+      evaluateBadge(
+        badge({ type: 'bands_rated_pct_of_seen_min', pct: 1 }),
+        ratingCtx({ seenBands: [], bandsRatedCount: 0 }),
+      ),
+    ).toBe(false);
+  });
+});
