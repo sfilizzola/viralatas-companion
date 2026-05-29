@@ -11,7 +11,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ### Phase 35 — Festival minimap (live vira-lata positions)
 
-**Status:** Planned — design locked + grilled (7 refinements 2026-05-29), not started.
+**Status:** Planned — design locked + grilled (7 refinements 2026-05-29), broken into subphases 35.A–E, not started.
 **Design spec:** `docs/superpowers/specs/2026-05-29-festival-minimap-design.md`
 **Product spec:** `FUTURE_IDEAS.md` § Idea 6
 **Map asset:** `public/infield_map.png` (already exists).
@@ -40,6 +40,46 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Non-goals:** GPS / geolocation, navigation, distance accuracy, manual check-in, privacy opt-out, drag/zoom, redrawing the asset.
 
 **Acceptance criteria** → see design spec.
+
+---
+
+#### Subphases
+
+Ordered for incremental shipping; each is a clean commit. Dependencies noted.
+
+**35.A — Asset optimization** _(first; no app code)_
+- **Goal:** make `public/infield_map.png` lighter/faster so it can precache without punishing first load.
+- **Source today:** `1122 × 1402`, **3.1 MB**. Display size is ≤ ~440 px CSS wide (≤ ~880 px @2x), so the source is far larger than needed.
+- **Do:** downscale to a sane max (~1000 px wide) + lossy palette quantize + lossless squeeze, **in place, same path/format (PNG)**. (Tooling note: no `pngquant`/`oxipng`/`magick` on this machine yet — install one, or use `sips` to downscale + a Node/`sharp` pass.)
+- **Acceptance:** file **≤ ~800 KB** (aim lower); no perceptible quality loss at display size; appears in the generated precache manifest after `npm run build`.
+- **Deps:** none. Independent, revertible (git-tracked).
+
+**35.B — Zone config + placement core + calibration** _(pure logic + dev harness)_
+- **Goal:** the single source of zone geometry and the pure placement function, tuned against the (optimized) artwork.
+- **New files:** `src/components/map/minimapZones.ts` (`MINIMAP_ZONES` seeded from the calibrate prototype, `stageToZone`, `groupKindToZone`), `src/services/minimapPlacement.ts` (`buildPlacements(crewGroups, zones, selfUserId)` — deterministic spaced layout, `isSelf`, self ordered last), `src/services/userColor.ts` (`colorForUserId`).
+- **Dev-only:** wire a deletable `?calibrate` overlay to tune boxes (visual sign-off), per `prototypes/minimap-calibrate.html`.
+- **Tests:** `minimapPlacement.test.ts` + `userColor.test.ts` (group→zone, in-box, N distinct coords, friend rules, Jungle→Wasteland, unknown→Elsewhere, lost→left-margin, determinism, color stability).
+- **Acceptance:** unit tests green; zone boxes visually signed off via `?calibrate`; no Supabase reads.
+- **Deps:** 35.A (tune against final artwork).
+
+**35.C — Map page + overlay + route** _(the visible feature)_
+- **Goal:** the `/map` screen renders live dots over the map.
+- **New files:** `src/pages/MapPage.tsx` (`useSocialSnapshot(useNow(30_000))` + `useAuth` for `selfUserId`, derive placements, offline note, back nav), `src/components/map/MinimapOverlay.tsx` (presentation-only: `<img>` + absolute avatar `<button>`s, tap-to-toggle name pill, self highlight).
+- **Touches:** `src/App.tsx` (`<Route path="/map">` behind `PrivateRoute`).
+- **Acceptance:** dots at fractional coords scale at 375 px → desktop; self gold-ring on top; tap toggles pill; works offline; "Elsewhere" never on a stage box; image-load failure degrades gracefully.
+- **Deps:** 35.B.
+
+**35.D — Entry button on `/now` + i18n** _(small, mostly independent)_
+- **Goal:** reach `/map` from `/now`.
+- **Touches:** `src/pages/RightNowPage.tsx` (**Variant A header glyph, glyph F "Pin + bolt"** beside the timestamp, links to `/map`), `src/i18n/{br,en,es,de}.json` (button label "vira-latas" not "crew", page title, offline-note keys).
+- **Acceptance:** button visible in `/now` header at 375 px; navigates to `/map`; all 4 locales present; hover→accent.
+- **Deps:** 35.C (target route must exist).
+
+**35.E — Docs + design system + phase close** _(wrap-up)_
+- **Goal:** sync institutional memory and close.
+- **Do:** wiki (architecture/domain-model/routes as needed) + new `docs/ai-wiki/flows/festival-minimap.md`; `docs/ai-wiki/changelog.md` dated entry; `public/vira-lata-ds.html` minimap section (zones, dot, self highlight, glyph F, offline note); flip `FUTURE_IDEAS.md` Idea 6 status; **remove the `?calibrate` dev harness**; append to `phases-history.md`; single commit + push.
+- **Acceptance:** build + tests green; harness gone; all three memory surfaces updated.
+- **Deps:** 35.A–D.
 
 ---
 
