@@ -31,8 +31,8 @@ export const MINIMAP_ZONES: Record<ZoneId, FractionalBox> = {
   headbangers: { x: 0.547, y: 0.322, w: 0.429, h: 0.189 },
   wackinger:   { x: 0.278, y: 0.465, w: 0.260, h: 0.194 },
   louder:      { x: 0.038, y: 0.703, w: 0.406, h: 0.155 },
-  faster:      { x: 0.453, y: 0.750, w: 0.203, h: 0.242 },
-  harder:      { x: 0.667, y: 0.740, w: 0.225, h: 0.244 },
+  faster:      { x: 0.480, y: 0.750, w: 0.203, h: 0.242 },
+  harder:      { x: 0.698, y: 0.740, w: 0.225, h: 0.244 },
   metal_place: { x: 0.014, y: 0.886, w: 0.289, h: 0.114 },
   elsewhere:   { x: 0.020, y: 0.258, w: 0.215, h: 0.435 },
 };
