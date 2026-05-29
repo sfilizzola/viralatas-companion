@@ -4,6 +4,16 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-29
+
+### Added
+- **Three rating badges (2026)** — `zine-pup` (4 ratings), `press-pass` (12), `pitchfork-paw` (20); all use `bands_rated_min`; PNG assets + registry + i18n ×4
+
+### Changed
+- `docs/ai-wiki/badges.md` — first `bands_rated_min` registry entries; inventory count 71
+
+---
+
 ## 2026-05-28 (Phase 34 — Rating wrap & badge predicates)
 
 ### Added

@@ -1471,6 +1471,34 @@ function ratingCtx(overrides: Partial<import('../services/badges/types').BadgeCo
   };
 }
 
+describe('registry — rating badges (2026)', () => {
+  const ratedCtx = (count: number) => ratingCtx({ bandsRatedCount: count });
+
+  it('zine-pup earns at 4+ eligible ratings', () => {
+    const cfg = findBadge('zine-pup');
+    expect(evaluateBadge(cfg, ratedCtx(4))).toBe(true);
+    expect(evaluateBadge(cfg, ratedCtx(3))).toBe(false);
+    expect(cfg.year).toBe(2026);
+    expect(cfg.condition).toEqual({ type: 'bands_rated_min', count: 4 });
+  });
+
+  it('press-pass earns at 12+ eligible ratings', () => {
+    const cfg = findBadge('press-pass');
+    expect(evaluateBadge(cfg, ratedCtx(12))).toBe(true);
+    expect(evaluateBadge(cfg, ratedCtx(11))).toBe(false);
+    expect(cfg.year).toBe(2026);
+    expect(cfg.condition).toEqual({ type: 'bands_rated_min', count: 12 });
+  });
+
+  it('pitchfork-paw earns at 20+ eligible ratings', () => {
+    const cfg = findBadge('pitchfork-paw');
+    expect(evaluateBadge(cfg, ratedCtx(20))).toBe(true);
+    expect(evaluateBadge(cfg, ratedCtx(19))).toBe(false);
+    expect(cfg.year).toBe(2026);
+    expect(cfg.condition).toEqual({ type: 'bands_rated_min', count: 20 });
+  });
+});
+
 describe('evaluateBadge — rating predicates (Phase 34)', () => {
   it('bands_rated_min counts eligible ratings', () => {
     expect(evaluateBadge(badge({ type: 'bands_rated_min', count: 2 }), ratingCtx())).toBe(true);

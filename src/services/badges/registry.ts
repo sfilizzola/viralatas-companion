@@ -570,6 +570,30 @@ export const BADGES: BadgeConfig[] = [
     condition: { type: 'assigned' },
     year: 2026,
   },
+  {
+    slug: 'zine-pup',
+    imagePath: '/badges/badge_zine-pup.png',
+    labelKey: 'badgeZinePup',
+    descriptionKey: 'badgeZinePupDescription',
+    condition: { type: 'bands_rated_min', count: 4 },
+    year: 2026,
+  },
+  {
+    slug: 'press-pass',
+    imagePath: '/badges/badge_press-pass.png',
+    labelKey: 'badgePressPass',
+    descriptionKey: 'badgePressPassDescription',
+    condition: { type: 'bands_rated_min', count: 12 },
+    year: 2026,
+  },
+  {
+    slug: 'pitchfork-paw',
+    imagePath: '/badges/badge_pitchfork-paw.png',
+    labelKey: 'badgePitchforkPaw',
+    descriptionKey: 'badgePitchforkPawDescription',
+    condition: { type: 'bands_rated_min', count: 20 },
+    year: 2026,
+  },
 ];
 
 // ─── CONDITION EXAMPLES ───────────────────────────────────────────────────────

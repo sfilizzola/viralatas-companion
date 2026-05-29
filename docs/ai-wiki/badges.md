@@ -610,7 +610,7 @@ Badge has **no automatic condition**; godlike assigns it manually.
 
 ### RATING — Concert score predicates (Phase 34)
 
-Engine capabilities only — **no registry entries** until a follow-up badge catalog phase. All counts use bands **eligible at eval time** (`canRateBand` semantics). Context fields populated via `buildRatingStatsSnapshot()` in `badgeContextBuilder`.
+Engine capabilities — first registry entries landed 2026-05-29. All counts use bands **eligible at eval time** (`canRateBand` semantics). Context fields populated via `buildRatingStatsSnapshot()` in `badgeContextBuilder`.
 
 #### `bands_rated_min`
 ```typescript
@@ -672,7 +672,7 @@ Strict `(ratedSeen × 100) / seenCount >= pct`; **false** when `seenCount === 0`
 
 ---
 
-## Current Badges Inventory (67 Total)
+## Current Badges Inventory (71 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -725,6 +725,14 @@ Committed `/now` "I am weak" skips only (`user_metadata.weak_skips_2026`). Gener
 
 - `weak` — "Fraco" / "Weak". 3+ committed weak skips.
 - `weakling-supreme` — "Fraco Supremo" / "Weakling Supreme". 10+ committed weak skips.
+
+### Rating 2026 (3) — `bands_rated_min`, no persist
+
+Eligible band ratings only (`canRateBand` at eval time). Tiers reward growing critic cred.
+
+- `zine-pup` — "Zine Pup". Rated 4+ eligible bands.
+- `press-pass` — "Press Pass" / "Passe de Imprensa" / "Pase de Prensa" / "Presseausweis". Rated 12+ eligible bands.
+- `pitchfork-paw` — "Pitchfork Paw". Rated 20+ eligible bands.
 
 ### Arrival Day 2026 (4) — `wacken_arrived_on`, mutually exclusive
 

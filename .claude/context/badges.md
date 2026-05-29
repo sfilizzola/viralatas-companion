@@ -11,7 +11,7 @@ Badges are fully client-side. Source files:
 | `src/services/badges/persistMetadata.ts` | `mergedPersistedBadgeSlugs`, `persistMetadataPatch` |
 | `src/services/livePreview.ts` | `computeCrewLocationCounts` — badge counts match `/now` location cards |
 | `src/hooks/useBadgeContext.ts` | IDB-first context build + persist recording |
-| `src/services/badges/registry.ts` | `BADGES[]` array — 68 entries today |
+| `src/services/badges/registry.ts` | `BADGES[]` array — 71 entries today |
 | `src/services/badges/index.ts` | Barrel re-export |
 | `src/__tests__/badges.test.ts` | Condition engine + registry tests |
 | `public/badges/` | PNG assets, 96×96 px, transparent background |
