@@ -17,27 +17,25 @@ export type ZoneId =
 export type FractionalBox = { x: number; y: number; w: number; h: number };
 
 /**
- * Single source of zone geometry. Seeded from the locked calibration prototype
- * (`docs/superpowers/prototypes/minimap-calibrate.html` → `DEFAULT_ZONES`),
- * tuned against `public/infield_map.png`. Phase 35.A only downscaled the asset
- * (framing unchanged), so these fractional values still hold.
+ * Single source of zone geometry. Seeded from the calibration prototype, then
+ * fine-tuned against `public/infield_map.png` via the dev `/map?calibrate`
+ * harness (visual sign-off, Phase 35.C) so each box hugs its stage artwork.
  *
  * `elsewhere` sits over the empty LEFT MARGIN of the image so lost/unknown dots
  * never overlap a stage or camping box (Decision 11).
  */
 export const MINIMAP_ZONES: Record<ZoneId, FractionalBox> = {
-  wasteland:   { x: 0.13, y: 0.06, w: 0.42, h: 0.26 },
-  camping:     { x: 0.64, y: 0.06, w: 0.31, h: 0.20 },
-  wet:         { x: 0.52, y: 0.31, w: 0.43, h: 0.20 },
-  headbangers: { x: 0.40, y: 0.46, w: 0.18, h: 0.10 },
-  wackinger:   { x: 0.20, y: 0.40, w: 0.30, h: 0.21 },
-  louder:      { x: 0.06, y: 0.66, w: 0.32, h: 0.15 },
-  faster:      { x: 0.42, y: 0.84, w: 0.20, h: 0.09 },
-  harder:      { x: 0.62, y: 0.79, w: 0.31, h: 0.12 },
-  metal_place: { x: 0.04, y: 0.87, w: 0.18, h: 0.09 },
-  elsewhere:   { x: 0.00, y: 0.33, w: 0.11, h: 0.50 },
+  wasteland:   { x: 0.340, y: 0.183, w: 0.264, h: 0.164 },
+  camping:     { x: 0.682, y: 0.029, w: 0.292, h: 0.283 },
+  wet:         { x: 0.621, y: 0.527, w: 0.337, h: 0.177 },
+  headbangers: { x: 0.547, y: 0.322, w: 0.429, h: 0.189 },
+  wackinger:   { x: 0.278, y: 0.465, w: 0.260, h: 0.194 },
+  louder:      { x: 0.038, y: 0.703, w: 0.406, h: 0.155 },
+  faster:      { x: 0.453, y: 0.750, w: 0.203, h: 0.242 },
+  harder:      { x: 0.667, y: 0.740, w: 0.225, h: 0.244 },
+  metal_place: { x: 0.014, y: 0.886, w: 0.289, h: 0.114 },
+  elsewhere:   { x: 0.020, y: 0.258, w: 0.215, h: 0.435 },
 };
-
 /**
  * Canonical `bands.stage` string → map zone. Welcome to the Jungle shares the
  * Wasteland box (Decision 6); any unrecognized stage falls back to `elsewhere`.

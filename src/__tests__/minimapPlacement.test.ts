@@ -103,10 +103,12 @@ describe('buildPlacements — group → zone mapping', () => {
       null,
     );
     const box = MINIMAP_ZONES.elsewhere;
-    expect(box.x).toBe(0); // pinned to the left edge
+    // pinned to the empty left margin (Decision 11), never over a stage box:
+    // hugs the left edge and stays clear of the leftmost stage zone (Wackinger).
+    expect(box.x).toBeLessThanOrEqual(0.05);
+    expect(box.x + box.w).toBeLessThanOrEqual(MINIMAP_ZONES.wackinger.x);
     for (const p of placements) {
       expect(p.zone).toBe('elsewhere');
-      // never overlaps a stage box: stays within the narrow left margin
       expect(p.xPct).toBeLessThanOrEqual((box.x + box.w) * 100);
       expectInsideZone(p.xPct, p.yPct, 'elsewhere');
     }
