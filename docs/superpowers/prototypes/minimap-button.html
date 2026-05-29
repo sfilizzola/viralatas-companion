@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 35 · Vira-latas map entry button — variants</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:#0a0a0a; --bg-surface:#141414; --bg-elevated:#1e1e1e; --bg-sunken:#050505;
+    --border:#2a2a2a; --border-strong:#3a3a3a;
+    --text:#e8e8e8; --text-muted:#888; --text-faint:#555;
+    --accent:#c0392b; --accent-hover:#e74c3c; --accent-soft:rgba(192,57,43,0.1); --accent-muted:rgba(192,57,43,0.3);
+    --gold:#d4af37; --gold-soft:rgba(212,175,55,0.1); --gold-border:rgba(212,175,55,0.4);
+    --font-display:'Oswald','Arial Narrow',sans-serif;
+    --font-sans:'IBM Plex Sans',-apple-system,sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,monospace;
+    --r-1:4px; --r-2:8px;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { background:#000; color:var(--text); font-family:var(--font-sans); -webkit-font-smoothing:antialiased; }
+  body { padding:40px 24px 80px; }
+
+  .lede { max-width:980px; margin:0 auto 36px; }
+  .lede .kicker { font-family:var(--font-mono); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); }
+  .lede h1 { font-family:var(--font-display); font-weight:700; text-transform:uppercase; font-size:30px; line-height:1.05; margin:6px 0 10px; letter-spacing:-.01em; }
+  .lede p { color:var(--text-muted); font-size:14px; line-height:1.55; max-width:62ch; }
+  .lede code { font-family:var(--font-mono); color:var(--text); background:var(--bg-surface); padding:1px 6px; border-radius:var(--r-1); border:1px solid var(--border); font-size:12px; }
+
+  .grid { display:flex; gap:40px; flex-wrap:wrap; justify-content:center; align-items:flex-start; }
+  .variant { display:flex; flex-direction:column; align-items:center; gap:14px; }
+  .vlabel { text-align:center; }
+  .vlabel .tag { font-family:var(--font-mono); font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); }
+  .vlabel .name { font-family:var(--font-display); font-weight:600; text-transform:uppercase; font-size:17px; color:var(--text); margin-top:2px; }
+  .vlabel .note { font-size:12px; color:var(--text-muted); margin-top:4px; max-width:30ch; line-height:1.4; }
+  .vlabel.rec .name { color:var(--gold); }
+  .rec-pill { display:inline-block; font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); border:1px solid var(--gold-border); background:var(--gold-soft); padding:2px 7px; border-radius:999px; margin-top:6px; }
+
+  /* phone shell */
+  .phone { width:340px; height:600px; border-radius:34px; background:#000; border:1px solid var(--border-strong); padding:8px; box-shadow:0 24px 60px rgba(0,0,0,.6); position:relative; }
+  .screen { width:100%; height:100%; border-radius:27px; overflow:hidden; background:var(--bg); display:flex; flex-direction:column; position:relative; }
+
+  /* /now header — faithful to RightNowPage.module.css */
+  .now-header { padding:16px 16px 12px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; gap:12px; align-items:flex-end; flex-shrink:0; }
+  .now-title { font-family:var(--font-display); font-weight:700; font-size:24px; line-height:1; text-transform:uppercase; }
+  .now-title .horns { color:var(--accent); }
+  .now-ts { display:grid; gap:2px; color:var(--text-muted); font-family:var(--font-mono); font-size:10px; line-height:1.25; text-align:right; text-transform:uppercase; }
+  .now-ts b { color:var(--text); font-weight:500; }
+
+  .now-main { flex:1; overflow:hidden; padding:16px; display:flex; flex-direction:column; gap:12px; }
+
+  /* presence pill row (mock) */
+  .presence { display:flex; gap:8px; }
+  .presence .seg { flex:1; text-align:center; font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase; padding:9px 6px; border:1px solid var(--border); border-radius:var(--r-1); color:var(--text-muted); }
+  .presence .seg.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+  /* my plan card */
+  .myplan { border:1px solid var(--border); border-radius:var(--r-2); background:var(--bg-surface); padding:14px; }
+  .myplan .k { font-family:var(--font-mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); }
+  .myplan .band { font-family:var(--font-display); font-weight:700; font-size:26px; line-height:1.05; margin-top:4px; }
+  .myplan .stage { font-size:13px; color:var(--text-muted); margin-top:2px; }
+
+  /* crew section header */
+  .crew-h { display:flex; align-items:baseline; justify-content:space-between; margin-top:2px; }
+  .crew-h .t { font-family:var(--font-display); font-weight:600; font-size:15px; text-transform:uppercase; letter-spacing:.02em; }
+  .crew-h .c { font-family:var(--font-mono); font-size:11px; color:var(--text-muted); }
+  .avatars { display:flex; gap:6px; }
+  .av { width:30px; height:30px; border-radius:999px; border:1px solid var(--border-strong); display:grid; place-items:center; font-family:var(--font-mono); font-size:10px; font-weight:500; color:#0a0a0a; }
+
+  /* ===== the actual button treatments ===== */
+  .pin { width:15px; height:15px; display:block; }
+
+  /* V1 — header glyph button */
+  .map-glyph-btn {
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:var(--r-1);
+    color:var(--text); padding:7px 9px 5px; cursor:pointer; line-height:1; transition:all .15s;
+  }
+  .map-glyph-btn:hover { border-color:var(--accent); color:var(--accent-hover); }
+  .map-glyph-btn .lab { font-family:var(--font-mono); font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); }
+  .map-glyph-btn:hover .lab { color:var(--accent-hover); }
+  .hdr-actions { display:flex; align-items:flex-end; gap:10px; }
+
+  /* V2 — inline banner */
+  .map-banner {
+    display:flex; align-items:stretch; gap:0; border:1px solid var(--border); border-radius:var(--r-2);
+    overflow:hidden; background:var(--bg-surface); cursor:pointer; transition:border-color .15s;
+  }
+  .map-banner:hover { border-color:var(--accent-muted); }
+  .map-banner .txt { flex:1; padding:12px 14px; display:flex; flex-direction:column; justify-content:center; gap:2px; }
+  .map-banner .txt .k { font-family:var(--font-mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--text-faint); }
+  .map-banner .txt .h { font-family:var(--font-display); font-weight:600; font-size:16px; text-transform:uppercase; display:flex; align-items:center; gap:7px; }
+  .map-banner .txt .h .arrow { color:var(--accent); }
+  .map-banner .thumb { width:84px; flex-shrink:0; background-image:url('../../../public/infield_map.png'); background-size:cover; background-position:center; border-left:1px solid var(--border); position:relative; }
+  .map-banner .thumb::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg, var(--bg-surface), transparent 60%); }
+
+  /* V3 — floating pill (FAB) */
+  .fab-wrap { position:absolute; right:16px; bottom:18px; }
+  .map-fab {
+    display:inline-flex; align-items:center; gap:8px; cursor:pointer;
+    background:var(--bg-elevated); border:1px solid var(--accent-muted); border-radius:999px;
+    color:var(--text); padding:10px 15px; font-family:var(--font-display); font-weight:600; font-size:13px;
+    text-transform:uppercase; letter-spacing:.03em; box-shadow:0 8px 22px rgba(0,0,0,.55); transition:all .15s;
+  }
+  .map-fab:hover { border-color:var(--accent); color:var(--accent-hover); transform:translateY(-1px); }
+
+  /* faux bottom nav so placement reads honestly */
+  .botnav { display:flex; border-top:1px solid var(--border); flex-shrink:0; background:var(--bg-sunken); }
+  .botnav .item { flex:1; text-align:center; padding:9px 0 11px; font-family:var(--font-mono); font-size:9px; letter-spacing:.06em; text-transform:uppercase; color:var(--text-faint); }
+  .botnav .item.active { color:var(--accent); }
+  .botnav .item .ico { display:block; font-size:14px; margin-bottom:3px; }
+
+  .legend { max-width:980px; margin:40px auto 0; border-top:1px solid var(--border); padding-top:18px; color:var(--text-muted); font-size:13px; line-height:1.6; }
+  .legend b { color:var(--text); }
+</style>
+</head>
+<body>
+  <div class="lede">
+    <div class="kicker">Phase 35 · prototype 1 / 2</div>
+    <h1>Entry point: how you reach the vira-latas map from <code>/now</code></h1>
+    <p>Three placements for the <code>/map</code> entry button, shown in a faithful <code>/now</code> shell (real DS tokens: Oswald display, metal-red accent <code>#c0392b</code>, gold <code>#d4af37</code> reserved for "self"). The spec says <em>small button, no new bottom-nav tab</em> — so all three avoid adding a 6th tab. Label uses <b>"vira-latas"</b>, not "crew", per <code>CLAUDE.md</code> copy rule. The 🗺️ is replaced by a hand-drawn pin glyph to dodge generic emoji.</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- ============ V1: header glyph ============ -->
+    <div class="variant">
+      <div class="vlabel rec">
+        <div class="tag">Variant A</div>
+        <div class="name">Header glyph</div>
+        <div class="note">Lives in the header beside the clock. Always visible, zero body space, reads as a utility.</div>
+        <span class="rec-pill">Recommended</span>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="now-header">
+          <div class="now-title">AGORA <span class="horns">🤘</span></div>
+          <div class="hdr-actions">
+            <button class="map-glyph-btn" title="Mapa dos vira-latas">
+              <svg class="pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              <span class="lab">Mapa</span>
+            </button>
+            <div class="now-ts"><span>SEX 31 JUL</span><b>21:14</b></div>
+          </div>
+        </div>
+        <div class="now-main">
+          <div class="presence">
+            <div class="seg on">No show</div><div class="seg">Camping</div><div class="seg">Metal Place</div>
+          </div>
+          <div class="myplan">
+            <div class="k">Tocando agora</div>
+            <div class="band">Megadeth</div>
+            <div class="stage">Faster · 21:00–22:00</div>
+          </div>
+          <div class="crew-h"><div class="t">Vira-latas live</div><div class="c">12 online</div></div>
+          <div class="avatars">
+            <div class="av" style="background:#c0392b">FE</div><div class="av" style="background:#2980b9">LU</div>
+            <div class="av" style="background:#27ae60">MA</div><div class="av" style="background:#8e44ad">RA</div>
+            <div class="av" style="background:#e67e22">TH</div><div class="av" style="background:#16a085;border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-soft)">EU</div>
+          </div>
+        </div>
+        <div class="botnav">
+          <div class="item active"><span class="ico">◉</span>Agora</div>
+          <div class="item"><span class="ico">▦</span>Line-up</div>
+          <div class="item"><span class="ico">★</span>Picks</div>
+          <div class="item"><span class="ico">▲</span>Mural</div>
+          <div class="item"><span class="ico">☰</span>Perfil</div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ============ V2: inline banner ============ -->
+    <div class="variant">
+      <div class="vlabel">
+        <div class="tag">Variant B</div>
+        <div class="name">Inline banner</div>
+        <div class="note">A teaser row with a live map sliver. Most inviting / discoverable, but eats vertical space on a dense screen.</div>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="now-header">
+          <div class="now-title">AGORA <span class="horns">🤘</span></div>
+          <div class="now-ts"><span>SEX 31 JUL</span><b>21:14</b></div>
+        </div>
+        <div class="now-main">
+          <div class="presence">
+            <div class="seg on">No show</div><div class="seg">Camping</div><div class="seg">Metal Place</div>
+          </div>
+          <div class="map-banner" title="Mapa dos vira-latas">
+            <div class="txt">
+              <div class="k">Onde tá a galera</div>
+              <div class="h">Mapa dos vira-latas <span class="arrow">→</span></div>
+            </div>
+            <div class="thumb"></div>
+          </div>
+          <div class="myplan">
+            <div class="k">Tocando agora</div>
+            <div class="band">Megadeth</div>
+            <div class="stage">Faster · 21:00–22:00</div>
+          </div>
+          <div class="crew-h"><div class="t">Vira-latas live</div><div class="c">12 online</div></div>
+          <div class="avatars">
+            <div class="av" style="background:#c0392b">FE</div><div class="av" style="background:#2980b9">LU</div>
+            <div class="av" style="background:#27ae60">MA</div><div class="av" style="background:#8e44ad">RA</div>
+            <div class="av" style="background:#16a085;border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-soft)">EU</div>
+          </div>
+        </div>
+        <div class="botnav">
+          <div class="item active"><span class="ico">◉</span>Agora</div>
+          <div class="item"><span class="ico">▦</span>Line-up</div>
+          <div class="item"><span class="ico">★</span>Picks</div>
+          <div class="item"><span class="ico">▲</span>Mural</div>
+          <div class="item"><span class="ico">☰</span>Perfil</div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- ============ V3: floating pill ============ -->
+    <div class="variant">
+      <div class="vlabel">
+        <div class="tag">Variant C</div>
+        <div class="name">Floating pill</div>
+        <div class="note">Thumb-reachable FAB above the nav. Punchy, but floats over content and risks FAB clutter.</div>
+      </div>
+      <div class="phone"><div class="screen">
+        <div class="now-header">
+          <div class="now-title">AGORA <span class="horns">🤘</span></div>
+          <div class="now-ts"><span>SEX 31 JUL</span><b>21:14</b></div>
+        </div>
+        <div class="now-main">
+          <div class="presence">
+            <div class="seg on">No show</div><div class="seg">Camping</div><div class="seg">Metal Place</div>
+          </div>
+          <div class="myplan">
+            <div class="k">Tocando agora</div>
+            <div class="band">Megadeth</div>
+            <div class="stage">Faster · 21:00–22:00</div>
+          </div>
+          <div class="crew-h"><div class="t">Vira-latas live</div><div class="c">12 online</div></div>
+          <div class="avatars">
+            <div class="av" style="background:#c0392b">FE</div><div class="av" style="background:#2980b9">LU</div>
+            <div class="av" style="background:#27ae60">MA</div><div class="av" style="background:#8e44ad">RA</div>
+            <div class="av" style="background:#e67e22">TH</div><div class="av" style="background:#16a085;border-color:var(--gold);box-shadow:0 0 0 2px var(--gold-soft)">EU</div>
+          </div>
+          <div class="fab-wrap">
+            <button class="map-fab" title="Mapa dos vira-latas">
+              <svg class="pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              Mapa
+            </button>
+          </div>
+        </div>
+        <div class="botnav">
+          <div class="item active"><span class="ico">◉</span>Agora</div>
+          <div class="item"><span class="ico">▦</span>Line-up</div>
+          <div class="item"><span class="ico">★</span>Picks</div>
+          <div class="item"><span class="ico">▲</span>Mural</div>
+          <div class="item"><span class="ico">☰</span>Perfil</div>
+        </div>
+      </div></div>
+    </div>
+
+  </div>
+
+  <div class="legend">
+    <p><b>Recommendation —</b> Variant A (header glyph). It honors the spec's "small button, no nav tab", stays visible without competing with the live cards, and the pin+"Mapa" pairing reads instantly. Variant C is the fallback if discoverability tests poorly. Variant B is strongest for first-time discovery but costs the most vertical space on an already-dense screen — keep it as a possible one-time onboarding nudge, not the permanent control.</p>
+  </div>
+</body>
+</html>

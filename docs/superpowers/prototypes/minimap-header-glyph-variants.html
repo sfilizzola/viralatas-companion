@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phase 35 · Header glyph variants (Variant A) — for approval</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:#0a0a0a; --bg-surface:#141414; --bg-elevated:#1e1e1e; --bg-sunken:#050505;
+    --border:#2a2a2a; --border-strong:#3a3a3a;
+    --text:#e8e8e8; --text-muted:#888; --text-faint:#555;
+    --accent:#c0392b; --accent-hover:#e74c3c; --accent-soft:rgba(192,57,43,.12);
+    --gold:#d4af37; --gold-soft:rgba(212,175,55,.12); --gold-border:rgba(212,175,55,.5);
+    --font-display:'Oswald','Arial Narrow',sans-serif;
+    --font-sans:'IBM Plex Sans',-apple-system,sans-serif;
+    --font-mono:'JetBrains Mono',ui-monospace,monospace;
+    --r-1:4px; --r-2:8px;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html,body { background:#000; color:var(--text); font-family:var(--font-sans); -webkit-font-smoothing:antialiased; }
+  body { padding:40px 24px 80px; }
+
+  .lede { max-width:1080px; margin:0 auto 34px; }
+  .lede .kicker { font-family:var(--font-mono); font-size:11px; letter-spacing:.18em; text-transform:uppercase; color:var(--accent); }
+  .lede h1 { font-family:var(--font-display); font-weight:700; text-transform:uppercase; font-size:28px; line-height:1.05; margin:6px 0 10px; }
+  .lede p { color:var(--text-muted); font-size:14px; line-height:1.55; max-width:70ch; }
+  .lede code { font-family:var(--font-mono); color:var(--text); background:var(--bg-surface); padding:1px 6px; border-radius:var(--r-1); border:1px solid var(--border); font-size:12px; }
+
+  .grid { max-width:1080px; margin:0 auto; display:grid; grid-template-columns:repeat(2,1fr); gap:22px; }
+  .card { border:1px solid var(--border); border-radius:var(--r-2); background:var(--bg-surface); overflow:hidden; }
+  .card.rec { border-color:var(--gold-border); }
+  .card .meta { padding:13px 16px; display:flex; align-items:baseline; justify-content:space-between; gap:10px; border-bottom:1px solid var(--border); }
+  .card .meta .l { display:flex; align-items:baseline; gap:10px; }
+  .card .meta .tag { font-family:var(--font-mono); font-size:11px; color:var(--text-faint); }
+  .card .meta .name { font-family:var(--font-display); font-weight:600; text-transform:uppercase; font-size:16px; }
+  .card.rec .meta .name { color:var(--gold); }
+  .card .meta .rec-pill { font-family:var(--font-mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--gold); border:1px solid var(--gold-border); background:var(--gold-soft); padding:2px 7px; border-radius:999px; }
+  .card .note { padding:0 16px 13px; color:var(--text-muted); font-size:12.5px; line-height:1.5; }
+
+  /* faithful /now header strip */
+  .hstrip { background:var(--bg); border-top:1px solid var(--border); }
+  .now-header { padding:16px 16px 12px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; gap:12px; align-items:flex-end; }
+  .now-title { font-family:var(--font-display); font-weight:700; font-size:24px; line-height:1; text-transform:uppercase; }
+  .now-title .horns { color:var(--accent); }
+  .now-ts { display:grid; gap:2px; color:var(--text-muted); font-family:var(--font-mono); font-size:10px; line-height:1.25; text-align:right; text-transform:uppercase; }
+  .now-ts b { color:var(--text); font-weight:500; }
+  .hdr-actions { display:flex; align-items:flex-end; gap:10px; }
+  .demo-row { display:flex; align-items:center; gap:22px; padding:14px 16px 18px; }
+  .demo-row .cap { font-family:var(--font-mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-faint); width:50px; }
+
+  /* the glyph button — Variant A form, locked */
+  .gbtn {
+    display:flex; flex-direction:column; align-items:center; gap:3px;
+    background:var(--bg-elevated); border:1px solid var(--border-strong); border-radius:var(--r-1);
+    color:var(--text); padding:7px 9px 5px; cursor:pointer; line-height:1; transition:all .15s; min-width:38px;
+  }
+  .gbtn.iconly { padding:8px; }
+  .gbtn:hover { border-color:var(--accent); color:var(--accent-hover); }
+  .gbtn .lab { font-family:var(--font-mono); font-size:8px; letter-spacing:.1em; text-transform:uppercase; color:var(--text-muted); }
+  .gbtn:hover .lab { color:var(--accent-hover); }
+  .gbtn svg { width:16px; height:16px; display:block; }
+  /* forced hover preview */
+  .gbtn.hov { border-color:var(--accent); color:var(--accent-hover); }
+  .gbtn.hov .lab { color:var(--accent-hover); }
+
+  /* radar sweep */
+  .radar-sweep { transform-origin:12px 12px; animation:spin 2.4s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  /* pulse rings */
+  .pulse-r { transform-origin:12px 12px; animation:pulse 1.8s ease-out infinite; }
+  .pulse-r.b { animation-delay:.9s; }
+  @keyframes pulse { 0%{ transform:scale(.3); opacity:.9 } 100%{ transform:scale(1); opacity:0 } }
+
+  .footer { max-width:1080px; margin:30px auto 0; border-top:1px solid var(--border); padding-top:18px; color:var(--text-muted); font-size:13px; line-height:1.6; }
+  .footer b { color:var(--text); }
+  .footer .g { color:var(--gold); }
+</style>
+</head>
+<body>
+  <div class="lede">
+    <div class="kicker">Phase 35 · header glyph · for approval</div>
+    <h1>Pick the glyph for the <code>/map</code> header button</h1>
+    <p>The <b>form is locked</b> (Variant A: compact bordered button beside the timestamp). What's varying is the <b>glyph metaphor</b> and whether it carries a "MAPA" label. Each is shown in the real <code>/now</code> header — left column is the resting state, the small row beneath each shows the same glyph in its hover/active (accent) state. Hover any button to feel it live; two glyphs animate to signal <em>live positions</em>.</p>
+  </div>
+
+  <div class="grid">
+
+    <!-- A: Pin + label -->
+    <div class="card rec">
+      <div class="meta">
+        <div class="l"><span class="tag">A</span><span class="name">Pin + label</span></div>
+        <span class="rec-pill">Safe pick</span>
+      </div>
+      <div class="note">The universal "place" marker. Instantly legible, zero ambiguity. The label removes any doubt for first-timers.</div>
+      <div class="hstrip">
+        <div class="now-header">
+          <div class="now-title">AGORA <span class="horns">🤘</span></div>
+          <div class="hdr-actions">
+            <button class="gbtn" title="Mapa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              <span class="lab">Mapa</span>
+            </button>
+            <div class="now-ts"><span>SEX 31 JUL</span><b>21:14</b></div>
+          </div>
+        </div>
+        <div class="demo-row"><span class="cap">hover</span>
+          <button class="gbtn hov"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg><span class="lab">Mapa</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- B: Pin solid, icon-only -->
+    <div class="card">
+      <div class="meta"><div class="l"><span class="tag">B</span><span class="name">Solid pin</span></div></div>
+      <div class="note">Same metaphor, heavier ink, no label — the most compact. Reads as a firmly "dropped" pin. Trades a little clarity for tidiness.</div>
+      <div class="hstrip">
+        <div class="now-header">
+          <div class="now-title">AGORA <span class="horns">🤘</span></div>
+          <div class="hdr-actions">
+            <button class="gbtn iconly" title="Mapa">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 4.5 7 11 7 11s7-6.5 7-11a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg>
+            </button>
+            <div class="now-ts"><span>SEX 31 JUL</span><b>21:14</b></div>
+          </div>
+        </div>
+        <div class="demo-row"><span class="cap">hover</span>
+          <button class="gbtn iconly hov"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 4.5 7 11 7 11s7-6.5 7-11a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- C: Folded map + label -->
+    <div class="card">
+      <div class="meta"><div class="l"><span class="tag">C</span><span class="name">Folded map</span></div></div>
+      <div class="note">Names the destination literally — it's a map, not a pin. Slightly busier glyph; the creases can muddy at 16 px.</div>
+      <div class="hstrip">
+        <div class="now-header">
+          <div class="now-title">AGORA <span class="horns">🤘</span></div>
+          <div class="hdr-actions">
+            <button class="gbtn" title="Mapa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg>
+              <span class="lab">Mapa</span>
+            </button>
+            <div class="now-ts"><span>SEX 31 JUL</span><b>21:14</b></div>
+          </div>
+        </div>
+        <div class="demo-row"><span class="cap">hover</span>
+          <button class="gbtn hov"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14"/><path d="M15 6v14"/></svg><span class="lab">Mapa</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- D: Locate crosshair, icon-only -->
+    <div class="card">
+      <div class="meta"><div class="l"><span class="tag">D</span><span class="name">Locate crosshair</span></div></div>
+      <div class="note">The "find me / live location" utility glyph (à la GPS recenter). Feels active and current — but leans GPS, which the map deliberately is <em>not</em>.</div>
+      <div class="hstrip">
+        <div class="now-header">
+          <div class="now-title">AGORA <span class="horns">🤘</span></div>
+          <div class="hdr-actions">
+            <button class="gbtn iconly" title="Mapa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>
+            </button>
+            <div class="now-ts"><span>SEX 31 JUL</span><b>21:14</b></div>
+          </div>
+        </div>
+        <div class="demo-row"><span class="cap">hover</span>
+          <button class="gbtn iconly hov"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- E: Radar sweep + label (animated) -->
+    <div class="card">
+      <div class="meta"><div class="l"><span class="tag">E</span><span class="name">Radar sweep</span></div><span class="rec-pill" style="color:var(--accent-hover);border-color:var(--accent);background:var(--accent-soft)">live · animated</span></div>
+      <div class="note">Says "who's out there, right now" better than any pin. The sweep animates subtly. Most expressive of the social/live nature; least literal as "a map".</div>
+      <div class="hstrip">
+        <div class="now-header">
+          <div class="now-title">AGORA <span class="horns">🤘</span></div>
+          <div class="hdr-actions">
+            <button class="gbtn" title="Mapa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="8" opacity=".4"/><circle cx="12" cy="12" r="4" opacity=".4"/>
+                <g class="radar-sweep"><path d="M12 12 L12 4" stroke-width="2"/><path d="M12 12 L19 9" opacity=".25"/></g>
+                <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/>
+                <circle cx="16" cy="8" r="1.1" fill="currentColor" stroke="none"/>
+              </svg>
+              <span class="lab">Mapa</span>
+            </button>
+            <div class="now-ts"><span>SEX 31 JUL</span><b>21:14</b></div>
+          </div>
+        </div>
+        <div class="demo-row"><span class="cap">hover</span>
+          <button class="gbtn hov"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8" opacity=".4"/><circle cx="12" cy="12" r="4" opacity=".4"/><g class="radar-sweep"><path d="M12 12 L12 4" stroke-width="2"/><path d="M12 12 L19 9" opacity=".25"/></g><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg><span class="lab">Mapa</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- F: Pin + lightning (brand twist) -->
+    <div class="card rec">
+      <div class="meta"><div class="l"><span class="tag">F</span><span class="name">Pin + bolt</span></div><span class="rec-pill">On-brand pick</span></div>
+      <div class="note">A pin whose dot is the lightning bolt from the map artwork itself — keeps the clear "place" read but injects the metal energy. Ties the button visually to the <code>infield_map.png</code> it opens.</div>
+      <div class="hstrip">
+        <div class="now-header">
+          <div class="now-title">AGORA <span class="horns">🤘</span></div>
+          <div class="hdr-actions">
+            <button class="gbtn" title="Mapa">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11Z"/><path d="M12.6 6.2 10 10.4h2.1l-1 3.3 2.9-4.4h-2.1l.8-3.1Z" fill="currentColor" stroke="none"/></svg>
+              <span class="lab">Mapa</span>
+            </button>
+            <div class="now-ts"><span>SEX 31 JUL</span><b>21:14</b></div>
+          </div>
+        </div>
+        <div class="demo-row"><span class="cap">hover</span>
+          <button class="gbtn hov"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11Z"/><path d="M12.6 6.2 10 10.4h2.1l-1 3.3 2.9-4.4h-2.1l.8-3.1Z" fill="currentColor" stroke="none"/></svg><span class="lab">Mapa</span></button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <p><b>Recommendation —</b> two finalists depending on the read you want: <span class="g">F (Pin + bolt)</span> for the most on-brand option — it's unmistakably "a place to go" while carrying the map's own lightning energy and tying the button to the artwork it opens. <b>A (Pin + label)</b> is the zero-risk safe pick if you'd rather not get clever. <b>E (Radar sweep)</b> is the bolder, most "live/social" choice but reads less like "a map". I'd lock <span class="g">F</span> unless you want maximum legibility, in which case A.</p>
+  </div>
+</body>
+</html>
