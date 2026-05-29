@@ -4,7 +4,9 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 
 > **Rule:** When adding a new idea, evaluate its complexity and risk and add a row to the table below before writing the full spec.
 >
-> **Status values:** `pending` · `✅ Phase N` (shipped — spec collapsed; see `docs/ai-wiki/phases-history.md`)
+> **Status values:** `pending` · `partial — Phase N` (engine/data only) · `✅ Phase N` (shipped — spec collapsed; see `docs/ai-wiki/phases-history.md`)
+>
+> **Last synced:** 2026-05-29 — Phases 30–34 (wrap, social snapshot, My Wacken, ratings, wrap rating stats, badge predicates).
 
 ## Ideas at a glance
 
@@ -16,16 +18,18 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 | 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — pure services + scenario tests; no network | ✅ Phase 26 |
 | 5 | Unit tests: Component and page integration | High | Low — auth pages + repository/hook coverage; SchedulePage logic tested at lower layers | ✅ Phase 26 |
 | 6 | Festival minimap with live user positions | Medium | Medium — requires maintained image asset, presence data accuracy, mobile layout fit | pending |
-| 7 | Festival wrap (`/wrap` recap page) | Medium | Low — client-side stats from existing IDB; no schema change; additive route | ✅ Phase 30 |
-| 8 | Rating on My Picks | Low | Low — read existing `user_band_ratings` IDB; display-only on ended sections | pending |
-| 9 | Rating stats on `/wrap` | Low | Low — aggregate from IDB; additive wrap section | pending |
-| 10 | Rating-based badges | Medium | Low — new `BadgeCondition` types; data exists after Phase 32 | pending |
+| 7 | Festival wrap (`/wrap` recap page) | Medium | Low — client-side stats from existing IDB; no schema change; additive route | ✅ Phase 30 (+34 Ratings) |
+| 8 | Rating on My Wacken | Low | Low — read existing `user_band_ratings` IDB; display-only on ended rows | pending (data ✅ Phase 32) |
+| 9 | Rating stats on `/wrap` | Low | Low — aggregate from IDB; additive wrap section | ✅ Phase 34 |
+| 10 | Rating-based badges | Medium | Low — predicates ✅ Phase 34; catalog entries still pending | partial — Phase 34 |
 
 ---
 
 ## Idea 1 — LLM proactive alerts
 
-**Goal:** Claude proactively taps the crew on the shoulder at key festival moments. No user needs to ask — the app just knows.
+**Status:** `pending` — types + in-memory queue stub only (`src/services/alerts.ts`; not wired to Edge Function or UI).
+
+**Goal:** Claude proactively taps vira-latas on the shoulder at key festival moments. No user needs to ask — the app just knows.
 
 **Architecture:**
 ```
@@ -47,14 +51,14 @@ Client (Service Worker timer or Realtime event)
 - **Cooldown:** Once per conflicting pair per festival day
 - **Example message:** "Você marcou Blind Guardian e Powerwolf ao mesmo tempo. Qual palco vai rolar? 🤘"
 
-#### 1b — Crew split alert
-- **Trigger:** When crew picks for the next time slot split across 3 or more stages
+#### 1b — Vira-latas split alert
+- **Trigger:** When vira-latas' picks for the next time slot split across 3 or more stages
 - **Offline capable:** No — requires Claude API
 - **Cooldown:** Once per hour
-- **Example message:** "Crew dividida em 4 palcos agora. Ponto de encontro: portão principal às 22h? 🤘"
+- **Example message:** "Vira-latas divididas em 4 palcos agora. Ponto de encontro: portão principal às 22h? 🤘"
 
 #### 1c — Discovery nudge
-- **Trigger:** User has a gap of 45+ minutes with no picks; a band the crew loves is starting soon
+- **Trigger:** User has a gap of 45+ minutes with no picks; a band the vira-latas love is starting soon
 - **Offline capable:** No — requires Claude API
 - **Cooldown:** Once per gap window
 - **Example message:** "Você tem 50 min livre. Fernanda e Beto adoraram Bloodbath — começam em 10 min no HARDER STAGE 🤘"
@@ -112,7 +116,7 @@ Regras:
 | Alert | Cooldown |
 |---|---|
 | Conflict alert | Once per conflicting pair per day |
-| Crew split | Once per hour |
+| Vira-latas split | Once per hour |
 | Discovery nudge | Once per gap window |
 | Day recap | Once per festival day |
 
@@ -204,7 +208,7 @@ MinimapPage (or overlay on /now)
   │   ├── <circle> per user at stage zone (jittered inside bbox)
   │   ├── <circle> per camping user (jittered inside camping bbox)
   │   └── <circle> per unknown user (random in "elsewhere" region)
-  └── Data source: usePresence() hook → already drives /now page
+  └── Data source: useSocialSnapshot / usePresenceCache (Phase 31) — same presence IndexedDB as /now
 ```
 
 No new backend work is needed — `user_presence` is already synced via Supabase Realtime and cached in IndexedDB.
@@ -234,195 +238,86 @@ No new backend work is needed — `user_presence` is already synced via Supabase
 
 ## Idea 7 — Festival wrap (`/wrap` recap page)
 
-**Status:** ✅ **Phase 30** — shipped (`docs/ai-wiki/flows/festival-wrap.md`)
+**Status:** ✅ **Implemented — Phase 30** (2026-05-27), extended **Phase 34** (Ratings section). Full deliverables, acceptance criteria, and flow → `docs/ai-wiki/phases-history.md` (Phases 30, 34) · `docs/ai-wiki/flows/festival-wrap.md`.
 
-**Goal:** After Wacken ends, give each vira-lata a single scrollable recap page — Spotify Wrapped energy, but one route instead of a carousel or modal. Lead with **personal** stats; close with **1–2 crew highlights**. No LLM prose; all numbers computed offline from IndexedDB.
+**Shipped summary:** Private scroll-snap route `/wrap` with welcome gate, personal stats (hero, personality, chaos), optional **Ratings** section (Phase 34 · Variant **C · Popular Echo**), vira-latas highlights (pick twin, crew favorite), optional godlike-assigned patches section, chaotic vest patch pile, and finale thanks. Stats from IndexedDB via `useSocialSnapshot` (Phase 31) + `useAllRatingsCache` (Phase 34); no Supabase reads. Post-festival teaser banner (Variant B) on `/now` and `/profile` when `isFestivalEnded(now(), bands)` and not dismissed (`viralatas:wrap-dismissed-2026`). Route always reachable when logged in (no festival-ended gate on the route).
 
-**Inspiration:** Spotify Wrapped, but scoped to what the app already knows (picks, seen bands, badges, schedule chaos, crew overlap).
+**Key paths:** `src/services/festivalWrap.ts` · `src/services/ratingStats.ts` · `src/hooks/useFestivalWrapStats.ts` · `src/hooks/useAllRatingsCache.ts` · `src/hooks/useWrapTeaserVisible.ts` · `src/pages/WrapPage.tsx` · `src/components/wrap/WrapProgress.tsx` · `src/components/wrap/WrapTeaserBanner.tsx` · `src/__tests__/festivalWrap.test.ts` · `src/__tests__/ratingStats.test.ts`.
 
-**When:** Available once the last non-ceremony band's `end_time` has passed. Discovery via a teaser banner on `/now` and/or `/profile` (dismissible per device). Route remains reachable for godlike time-travel testing before festival end.
+**Original design specs (pre-ship):** `docs/superpowers/specs/2026-05-27-festival-wrap-page-design.md` (A2 Vest Chronicle) · `docs/superpowers/specs/2026-05-27-festival-wrap-banner-design.md` · `docs/superpowers/specs/2026-05-27-festival-wrap-godlike-qa-design.md`.
 
-**Layout decisions (locked — see specs before implementation):**
-- **`/wrap` page:** **A2 · Vest Chronicle** → `docs/superpowers/specs/2026-05-27-festival-wrap-page-design.md` (prototype `_temp/wrap-proposals/variant-a2-vest-chronicle.html`)
-- **Teaser banner** on `/now` + `/profile`: **B · Vest Chronicle bar** → `docs/superpowers/specs/2026-05-27-festival-wrap-banner-design.md` (prototype `_temp/wrap-banner-proposals/index.html` § B; variants A/C/D/B+D rejected)
-
----
-
-### UX — scroll story (Approach A)
-
-One private route `/wrap`. Five full-viewport sections with optional `scroll-snap`. Fixed **5-dot progress bar** at top (updates via `IntersectionObserver` as user scrolls).
-
-| # | Section | Content |
-|---|---------|---------|
-| 1 | Hero | Giant **bands seen** count; secondary row: picked · skipped · stages visited |
-| 2 | Personality | Top genre + top stage copy; stage-colored pill (`Harder stage · N visited`) |
-| 3 | Chaos | Horizontal meters: weak skips, hard schedule conflicts, patches earned |
-| 4 | Crew | Pick twin (name + overlap %); crew favorite band (name + pick count / active vira-latas) |
-| 5 | Patches | Chaotic scattered earned badge thumbnails on denim vest texture; CTA **Open vest on profile** → `/profile` |
-
-**Visual system (from Design System):**
-- Tokens: `--bg`, `--bg-surface`, `--text`, `--text-muted`, `--accent` (#c0392b CTA)
-- Typography: Oswald display, IBM Plex Sans body, JetBrains Mono kickers
-- **Dynamic `--stage` color** from user's top stage (same map as `SchedulePage` stage colors)
-- 4px stage-color bar at top of each section card
-
-**Edge cases:**
-- `is_friend` users: hide location-toggle stats if ever surfaced; crew comparisons still valid
-- Zero picks: friendly empty state — survived Wacken without the app knowing your schedule
-- Sparse `user_missed_bands` adoption: prefer pick-based stats over skip-based when missed data is thin
+**Relationship to other ideas:**
+- **Idea 1 (day recap alert):** LLM push per festival day — complementary; wrap is static on-demand.
+- **Idea 2 (badge consolidation):** ✅ Phase 29 — wrap shows live earned badges; **Previously Achieved** on `/profile` after consolidate.
+- **Idea 9 (rating stats):** ✅ Phase 34 — merged into wrap as optional Ratings section (see above).
 
 ---
 
-### Stats — personal (from IndexedDB + auth metadata)
+## Idea 8 — Rating on My Wacken
 
-All computed client-side; reuse patterns from `badgeContextBuilder.ts`, `engine.ts`, `usePickCounts.ts`, `useBandConflicts.ts`.
+**Status:** `pending` — **Phase 32** shipped rating data + modal input; **Phase 33** shipped inline Attended/Missed chips on ended rows but explicitly deferred read-only rating display on the timeline.
 
-| Stat | Source |
-|------|--------|
-| Bands picked | `user_picks` |
-| Bands seen | picks where `end_time < now`, minus `user_missed_bands` (same as badge `seenBands`) |
-| Bands skipped | picked + ended + in missed set |
-| Top genre / stage | aggregate `seenBands` |
-| Stage diversity | distinct stages in `seenBands` |
-| Hard / soft conflicts | `computeBandOverlaps()` on picked bands |
-| Weak skips | `user_metadata.weak_skips_2026` |
-| Badges earned | `getEarnedBadges(ctx)` |
-| Location toggles | `user_metadata.location_visits` (optional; hide for friends) |
-| Max crew at a pick | `maxAttendanceInPicks` in `BadgeContext` |
+**Goal:** Show the current user's 1–5 rating on ended bands in **My Wacken** (`/my-picks`) — read-only on the row, same paw visual language as band detail; edit remains in `BandDetailModal`.
 
-### Stats — crew closing beats
+**Depends on:** ✅ **Phase 32** — `user_band_ratings` table, IDB v11, `useBandRatings`, `BandRatingInput` in modal.
 
-| Stat | Source |
-|------|--------|
-| Crew's #1 band | highest pick count across vira-latas (`PopularPage` logic) |
-| Pick twin | vira-lata with highest pick-set overlap (Jaccard) |
-| Active vira-latas | unique user IDs in all picks |
-| Shared seen moment | band you saw that N crew members also picked (optional copy variant) |
+**Complexity:** Low · **Risk:** Low — no new schema; reuse `userRatingByBand` + compact paw badge or read-only `BandRatingInput` on `BandCard` timeline rows.
 
-### Not in v1 (documented gaps)
-
-| Stat | Gap |
-|------|-----|
-| Duck quacks sent/received | `duck_quacks` in Supabase only — not cached in IndexedDB |
-| Historical presence trail | only toggle counters in metadata |
-| True attendance proof | "seen" = didn't opt out of missed mark |
-| MoshSplit balance | external API on Profile — out of scope |
-| LLM day recap | separate future alert type (`day_recap` in Idea 1) |
-| Public shareable URL | no server-side persistence of wrap snapshot |
-
-Optional v2: percentile rank ("You saw more bands than X% of vira-latas") — trivial client-side when crew is ~20 people; copy needs care.
-
----
-
-### Festival-ended gate
-
-`isFestivalEnded(at, bands)` in `time.ts` — **implemented in Phase 29** (shared with badge consolidation gate). True when `at` is past the max non-ceremony band `end_time`.
-
-- Teaser banner only when `isFestivalEnded(now(), bands)` — uses `now()` so godlike **D+1** Time Travel previews the teaser on `/now` and `/profile` (see `docs/superpowers/specs/2026-05-27-festival-wrap-godlike-qa-design.md`)
-- `/wrap` always reachable when logged in — **no** festival-ended gate on the route (direct QA URL)
-- Godlike Time Travel: always-visible disclaimer that recap teaser follows post-festival simulated time; wrap-only copy (not consolidate)
-- Banner dismiss: `localStorage['viralatas:wrap-dismissed-2026']`
-
----
-
-### Architecture sketch
-
-```
-WrapPage (scroll-snap sections × 5)
-  ├── useFestivalWrapStats()  ← IDB snapshot + auth metadata
-  │     └── festivalWrap.ts   ← pure stats builder
-  ├── WrapProgress            ← 5-dot bar (A2+)
-  ├── WrapHero / Personality / Chaos / Crew / Patches
-  └── Link → /profile (Open vest)
-
-Discovery
-  └── Banner on RightNowPage + ProfilePage when isFestivalEnded && !dismissed
-```
-
-**Offline-first:** Same as rest of app — reads IndexedDB first; no Supabase reads for stats.
-
----
-
-### Files (when implemented)
-
-| File | Action |
-|------|--------|
-| `src/services/festivalWrap.ts` | Pure stats builder + types |
-| `src/services/time.ts` | `isFestivalEnded()` ✅ Phase 29 |
-| `src/hooks/useFestivalWrapStats.ts` | IDB + auth compose hook |
-| `src/pages/WrapPage.tsx` | A2 Vest layout |
-| `src/pages/WrapPage.module.css` | Stage bar, meters, vest finale |
-| `src/i18n/WrapPage_*.json` | br, en, es, de |
-| `src/App.tsx` | Private route `/wrap` |
-| `src/pages/RightNowPage.tsx` / `ProfilePage.tsx` | Post-festival teaser banner |
-| `public/vira-lata-ds.html` | Wrap section |
-| `src/__tests__/festivalWrap.test.ts` | Edge cases: 0 picks, friend user, sparse missed |
-| `_temp/wrap-proposals/` | Design-only HTML (already drafted) |
-
----
-
-### Relationship to other ideas
-
-- **Idea 1 (day recap alert):** LLM push notification per festival day — complementary, not a substitute; wrap is a static on-demand page.
-- **Idea 2 (badge consolidation):** ✅ Phase 29 — wrap shows live earned badges from the current engine; **Previously Achieved** shows consolidated year badges after the godlike operator runs consolidate (and after reset, year-badges live only in archive).
-
----
-
-### Acceptance criteria
-
-- [ ] `/wrap` renders five scroll sections with A2 Vest visual language (stage bar, meters, patch pile, progress dots).
-- [ ] All displayed stats match badge engine semantics for seen/picked/skipped/conflicts.
-- [ ] Page works fully offline after first load (stats from IndexedDB only).
-- [ ] Teaser banner appears only after `isFestivalEnded()` and respects dismiss localStorage key.
-- [ ] Copy uses **vira-latas** (not "crew") in all four locales.
-- [ ] Friend users never see location-toggle stats on the wrap page.
-- [ ] Empty-picks users see a friendly empty state, not broken layout.
-- [ ] "Open vest" navigates to `/profile` where `BadgesDisplay` shows full patch collection.
-- [ ] Design System documents Wrap page tokens and section anatomy.
-
----
-
-## Idea 8 — Rating on My Picks
-
-**Goal:** Show the current user's 1–5 rating on ended bands in My Picks (`saw` / `didn't see` sections) — read-only display, same iconic component as band detail.
-
-**Depends on:** Phase 32 (`user_band_ratings` table + IDB + hooks).
-
-**Complexity:** Low · **Risk:** Low — no new schema; reuse `useBandRatings` + `BandRatingInput` in read-only mode or compact badge.
+**Not yet shipped:**
+- Ended `BandCard` rows (`renderEndedBand` in `MyWackenPage.tsx`) pass `attendanceChip` only — no `userScore` / rating cluster
+- Rating is editable only via modal tap-through (already wired via `useBandDetailModal`)
 
 **Acceptance (when scheduled):**
 - Ended band rows show user's score when rated; no score chip when unrated
 - Tapping row still opens modal where rating can be edited
 - Works offline from IndexedDB
+- Design System documents My Wacken ended-row rating chip (coordinate with `attendanceChip` layout from Phase 33)
+
+**Design reference:** `docs/superpowers/specs/2026-05-28-vira-lata-rating-design.md` (non-goals) · `docs/superpowers/specs/2026-05-28-my-wacken-inline-attendance-design.md` (explicit deferral)
 
 ---
 
 ## Idea 9 — Rating stats on `/wrap`
 
-**Status:** ✅ Shipped — **Phase 34** (`docs/ai-wiki/phases-history.md`)
+**Status:** ✅ **Implemented — Phase 34** (2026-05-28). Full deliverables → `docs/ai-wiki/phases-history.md` (Phase 34) · `docs/ai-wiki/flows/festival-wrap.md`.
 
-**Goal:** Add a wrap recap section for festival ratings — e.g. highest-rated band the crew saw, user's average score, total ratings given.
+**Shipped summary:** Optional **Ratings** scroll section on `/wrap` (after Chaos, before vira-latas highlights) — Variant **C · Popular Echo**: personal strip (bands rated, user avg, % of seen rated), crew top-rated card, crew lowest-rated picked band (guard when no crew ratings), user top single-score band. Hidden when zero crew ratings or `!hasPicks`. Progress dots scale dynamically (7–9 sections). Pure aggregates via `buildRatingStatsSnapshot()` + `useAllRatingsCache`; same snapshot feeds badge context.
 
-**Depends on:** Phase 32 crew-wide ratings in IndexedDB.
+**Key paths:** `src/services/ratingStats.ts` · `src/hooks/useAllRatingsCache.ts` · `src/services/festivalWrap.ts` · `src/pages/WrapPage.tsx` · `src/__tests__/ratingStats.test.ts` · `public/vira-lata-ds.html` (Wrap Ratings § C).
 
-**Complexity:** Low · **Risk:** Low — pure aggregates from existing IDB data.
-
-**Shipped:** Variant **C · Popular Echo** on `/wrap` after Chaos; `ratingStats.ts` + `useAllRatingsCache`; hidden when zero crew ratings or `!hasPicks`.
+**Depends on:** ✅ **Phase 32** crew-wide ratings in IndexedDB.
 
 ---
 
 ## Idea 10 — Rating-based badges
 
-**Status:** Partial — **Phase 34** shipped engine predicates only; badge catalog deferred
+**Status:** **Partial — Phase 34** (2026-05-28). Engine predicates shipped; badge catalog (registry slugs, PNG assets, i18n) still pending.
 
-**Goal:** Badge conditions keyed off concert ratings — e.g. rated N bands, gave a 5 to a headliner, crew avg ≥ 4 on a band you picked.
+**Goal:** Badge conditions keyed off concert ratings — e.g. rated N bands, gave a 5 to a headliner, vira-latas avg ≥ 4 on a band you picked.
 
-**Depends on:** Phase 32 data + badge engine extension.
+**Depends on:** ✅ **Phase 32** data · ✅ **Phase 34** engine extension.
 
-**Complexity:** Medium · **Risk:** Low — additive registry entries; no schema change if Phase 32 shipped.
+**Complexity:** Medium · **Risk:** Low — additive registry entries; no further schema change.
 
-**Shipped (Phase 34):** Six `BadgeCondition` types in `engine.ts`; `BadgeContext` rating fields; wiki documented. **Deferred:** registry entries, PNG assets, badge i18n.
+**Shipped (Phase 34) — six `BadgeCondition` types in `engine.ts`:**
+| Type | Meaning |
+|------|---------|
+| `bands_rated_min` | User rated ≥ N eligible bands |
+| `band_rated_score_min` | User gave band score ≥ N |
+| `crew_avg_on_picked_band_min` | Crew avg on a band user picked ≥ threshold |
+| `user_rating_avg_min` | User mean rating ≥ avg (requires `minRatings`) |
+| `user_rating_avg_max` | User mean rating ≤ avg (requires `minRatings`) |
+| `bands_rated_pct_of_seen_min` | Rated ÷ seen ≥ pct |
 
-**Acceptance (remaining for catalog phase):**
+`BadgeContext` rating fields via `badgeContextBuilder` + `buildRatingStatsSnapshot`. Documented in `docs/ai-wiki/badges.md` and `.claude/context/badges.md`. **`registry.ts` unchanged** — zero new badge slugs.
+
+**Deferred (future phase or ad-hoc):**
 - New badge slugs in `registry.ts` using Phase 34 predicates
-- All four locales for badge labels
+- PNG assets under `public/badges/`
+- `Badges_{br,en,es,de}.json` label + description keys
+- Design System badge inventory update
+- Follow `badge-author` subagent procedure when scheduled
+
+**Key paths:** `src/services/badges/engine.ts` · `src/services/badges/types.ts` · `src/services/badges/badgeContextBuilder.ts` · `src/services/ratingStats.ts` · `src/__tests__/badges.test.ts`.
+
+**Design reference:** `docs/superpowers/specs/2026-05-28-rating-wrap-badge-predicates-design.md`
