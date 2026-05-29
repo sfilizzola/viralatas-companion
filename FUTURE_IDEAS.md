@@ -17,7 +17,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 | 3 | Unit tests: IDB layer (`src/lib/db/`) | Medium | Low — `fake-indexeddb` dev dependency; isolated from app runtime | ✅ Phase 26 |
 | 4 | Unit tests: Hook logic (pure memoized computations) | Medium | Low — pure services + scenario tests; no network | ✅ Phase 26 |
 | 5 | Unit tests: Component and page integration | High | Low — auth pages + repository/hook coverage; SchedulePage logic tested at lower layers | ✅ Phase 26 |
-| 6 | Festival minimap with live user positions | Medium | Medium — requires maintained image asset, presence data accuracy, mobile layout fit | pending |
+| 6 | Festival minimap with live user positions | Medium | Medium — requires maintained image asset, presence data accuracy, mobile layout fit | planned — Phase 35 |
 | 7 | Festival wrap (`/wrap` recap page) | Medium | Low — client-side stats from existing IDB; no schema change; additive route | ✅ Phase 30 (+34 Ratings) |
 | 8 | Rating on My Wacken | Low | Low — read existing `user_band_ratings` IDB; display-only on ended rows | pending (data ✅ Phase 32) |
 | 9 | Rating stats on `/wrap` | Low | Low — aggregate from IDB; additive wrap section | ✅ Phase 34 |
@@ -163,6 +163,10 @@ Regras:
 ---
 
 ## Idea 6 — Festival minimap with live user positions
+
+**Status:** `planned — Phase 35` — design locked, not started. Full design → `docs/superpowers/specs/2026-05-29-festival-minimap-design.md`; phase entry → `PHASES.md`.
+
+**Locked decisions (supersede the open questions below):** placement is **derived** from `useSocialSnapshot`/`crewGroups` (no `stage` field on `user_presence`); the map asset **already exists** (`public/infield_map.png`); **Welcome to the Jungle** shares the **Wasteland** zone; **no new privacy control** (mirrors `/now`, honors `is_friend`); reached via a button on `/now` to a dedicated `/map` route; avatar-circle dots; fully offline.
 
 **Goal:** Show a cartoonish, schematic image of the Wacken festival grounds — infield stages + camping area — as a minimap, with vira-latas' avatars (or colored dots) overlaid on their current location. Purely visual social awareness; not a GPS map, not a real-distance representation.
 
