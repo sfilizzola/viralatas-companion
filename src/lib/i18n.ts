@@ -55,6 +55,10 @@ import wrapBr from '../i18n/WrapPage_br.json';
 import wrapDe from '../i18n/WrapPage_de.json';
 import wrapEn from '../i18n/WrapPage_en.json';
 import wrapEs from '../i18n/WrapPage_es.json';
+import mapBr from '../i18n/MapPage_br.json';
+import mapDe from '../i18n/MapPage_de.json';
+import mapEn from '../i18n/MapPage_en.json';
+import mapEs from '../i18n/MapPage_es.json';
 
 export type Language = 'br' | 'en' | 'es' | 'de';
 
@@ -73,6 +77,7 @@ type TranslationFile =
   | 'SyncToast'
   | 'DuckButton'
   | 'WrapPage'
+  | 'MapPage'
   | 'GodlikeAdmin';
 
 type TranslationStrings = Record<string, string>;
@@ -96,6 +101,7 @@ const translations: Translations = {
     SyncToast: syncToastBr,
     DuckButton: duckButtonBr,
     WrapPage: wrapBr,
+    MapPage: mapBr,
     GodlikeAdmin: {},
   },
   en: {
@@ -113,6 +119,7 @@ const translations: Translations = {
     SyncToast: syncToastEn,
     DuckButton: duckButtonEn,
     WrapPage: wrapEn,
+    MapPage: mapEn,
     GodlikeAdmin: {},
   },
   es: {
@@ -130,6 +137,7 @@ const translations: Translations = {
     SyncToast: syncToastEs,
     DuckButton: duckButtonEs,
     WrapPage: wrapEs,
+    MapPage: mapEs,
     GodlikeAdmin: {},
   },
   de: {
@@ -147,6 +155,7 @@ const translations: Translations = {
     SyncToast: syncToastDe,
     DuckButton: duckButtonDe,
     WrapPage: wrapDe,
+    MapPage: mapDe,
     GodlikeAdmin: {},
   },
 };

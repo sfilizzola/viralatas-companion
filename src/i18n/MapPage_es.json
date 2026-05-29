@@ -1,0 +1,9 @@
+{
+  "title": "Mapa de los vira-latas",
+  "subtitle": "Quién está más o menos dónde ahora",
+  "back": "Volver",
+  "offlineNote": "sin conexión — las posiciones pueden estar desactualizadas",
+  "empty": "Aún no hay vira-latas para ubicar en el mapa.",
+  "loading": "Leyendo el terreno…",
+  "mapAlt": "Mapa caricaturesco del recinto del festival Wacken"
+}

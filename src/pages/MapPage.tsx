@@ -1,0 +1,100 @@
+import { lazy, Suspense, useMemo, useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useI18n } from '../lib/i18n';
+import { useNow } from '../hooks/useNow';
+import { useAuth } from '../hooks/useAuth';
+import { useSocialSnapshot } from '../hooks/useSocialSnapshot';
+import { buildPlacements } from '../services/minimapPlacement';
+import { MINIMAP_ZONES } from '../components/map/minimapZones';
+import MinimapOverlay from '../components/map/MinimapOverlay';
+import OfflineBanner from '../components/OfflineBanner';
+import styles from './MapPage.module.css';
+
+// Dev-only zone-box tuning harness (Phase 35.B/C). Lazy so it stays out of the
+// production bundle; deleted entirely in Phase 35.E.
+const MinimapCalibrate = lazy(() => import('../components/map/MinimapCalibrate'));
+
+function useOffline(): boolean {
+  const [offline, setOffline] = useState(
+    () => typeof navigator !== 'undefined' && !navigator.onLine,
+  );
+  useEffect(() => {
+    const on = () => setOffline(false);
+    const off = () => setOffline(true);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
+    return () => {
+      window.removeEventListener('online', on);
+      window.removeEventListener('offline', off);
+    };
+  }, []);
+  return offline;
+}
+
+function BackArrow() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path
+        d="M15 18l-6-6 6-6"
+        stroke="currentColor"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export default function MapPage() {
+  const { t } = useI18n('MapPage');
+  const now = useNow(30_000);
+  const { snapshot, loading } = useSocialSnapshot(now);
+  const { user } = useAuth();
+  const selfUserId = user?.id ?? null;
+  const offline = useOffline();
+
+  const [searchParams] = useSearchParams();
+  const calibrateMode = import.meta.env.DEV && searchParams.has('calibrate');
+
+  const placements = useMemo(
+    () => (snapshot ? buildPlacements(snapshot.crewGroups, MINIMAP_ZONES, selfUserId) : []),
+    [snapshot, selfUserId],
+  );
+
+  return (
+    <div className={styles.page}>
+      <OfflineBanner />
+
+      <header className={styles.header}>
+        <Link to="/now" className={styles.back} aria-label={t('back')}>
+          <BackArrow />
+        </Link>
+        <div className={styles.titleBlock}>
+          <h1 className={styles.title}>{t('title')}</h1>
+          <span className={styles.subtitle}>{t('subtitle')}</span>
+        </div>
+      </header>
+
+      {offline && (
+        <p className={styles.offlineNote} role="status">
+          {t('offlineNote')}
+        </p>
+      )}
+
+      <main className={styles.main}>
+        {calibrateMode ? (
+          <Suspense fallback={null}>
+            <MinimapCalibrate />
+          </Suspense>
+        ) : loading ? (
+          <p className={styles.empty}>{t('loading')}</p>
+        ) : (
+          <>
+            <MinimapOverlay placements={placements} mapAlt={t('mapAlt')} />
+            {placements.length === 0 && <p className={styles.empty}>{t('empty')}</p>}
+          </>
+        )}
+      </main>
+    </div>
+  );
+}
