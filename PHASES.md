@@ -9,9 +9,13 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Active development
 
+No active phased work. See `FUTURE_IDEAS.md` for upcoming ideas.
+
+---
+
 ### Phase 35 — Festival minimap (live vira-lata positions)
 
-**Status:** Planned — design locked + grilled (7 refinements 2026-05-29), broken into subphases 35.A–E, not started.
+**Status:** ✅ Complete (2026-05-29). Full history → `docs/ai-wiki/phases-history.md`.
 **Design spec:** `docs/superpowers/specs/2026-05-29-festival-minimap-design.md`
 **Product spec:** `FUTURE_IDEAS.md` § Idea 6
 **Map asset:** `public/infield_map.png` (already exists).

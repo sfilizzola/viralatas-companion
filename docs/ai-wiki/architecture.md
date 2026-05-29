@@ -33,6 +33,11 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/lib/db/badgeHistory.ts` — IndexedDB replace-all for current user on sync
 - `src/services/badges/currentFestivalYear.ts` — `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()`
 - `supabase/functions/consolidate-year-badges/` — Server-side year-badge snapshot (Deno badge engine copies)
+- `src/pages/MapPage.tsx` — `/map` live minimap; derives placements via `useSocialSnapshot` + `buildPlacements` (Phase 35)
+- `src/components/map/MinimapOverlay.tsx` — Presentation-only map image + avatar dot buttons at fractional coords (Phase 35)
+- `src/components/map/minimapZones.ts` — `MINIMAP_ZONES` zone geometry config, `stageToZone()`, `groupKindToZone()` (Phase 35)
+- `src/services/minimapPlacement.ts` — Pure `buildPlacements()` with phyllotaxis layout + self-ordering (Phase 35)
+- `src/services/userColor.ts` — `colorForUserId()` deterministic HSL color for avatar initials (Phase 35)
 - `vite.config.ts` — PWA configuration, caching strategy, and local dev proxy for MoshSplit API
 - `vercel.json` — Vercel rewrites including MoshSplit CORS proxy (`/api/moshsplit/:path*`)
 
@@ -74,6 +79,7 @@ Components are organized by concern:
 - `/announcements` (AnnouncementsPage) — Mural-style announcements board
 - `/profile` (ProfilePage) — User info, role controls, godlike admin
 - `/wrap` (WrapPage) — Post-festival recap; IDB-only stats; scroll-snap A2 Vest Chronicle (see `flows/festival-wrap.md`)
+- `/map` (MapPage) — Live minimap; avatar dots from same `useSocialSnapshot` as `/now`; no new schema or sync; reached via glyph F on `/now` (see `flows/festival-minimap.md`)
 
 **Pattern**: All pages read from custom hooks, never call repositories directly.
 

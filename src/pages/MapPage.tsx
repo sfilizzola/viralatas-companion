@@ -1,5 +1,5 @@
-import { lazy, Suspense, useMemo, useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useMemo, useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useI18n } from '../lib/i18n';
 import { useNow } from '../hooks/useNow';
 import { useAuth } from '../hooks/useAuth';
@@ -9,10 +9,6 @@ import { MINIMAP_ZONES } from '../components/map/minimapZones';
 import MinimapOverlay from '../components/map/MinimapOverlay';
 import OfflineBanner from '../components/OfflineBanner';
 import styles from './MapPage.module.css';
-
-// Dev-only zone-box tuning harness (Phase 35.B/C). Lazy so it stays out of the
-// production bundle; deleted entirely in Phase 35.E.
-const MinimapCalibrate = lazy(() => import('../components/map/MinimapCalibrate'));
 
 function useOffline(): boolean {
   const [offline, setOffline] = useState(
@@ -53,9 +49,6 @@ export default function MapPage() {
   const selfUserId = user?.id ?? null;
   const offline = useOffline();
 
-  const [searchParams] = useSearchParams();
-  const calibrateMode = import.meta.env.DEV && searchParams.has('calibrate');
-
   const placements = useMemo(
     () => (snapshot ? buildPlacements(snapshot.crewGroups, MINIMAP_ZONES, selfUserId) : []),
     [snapshot, selfUserId],
@@ -82,11 +75,7 @@ export default function MapPage() {
       )}
 
       <main className={styles.main}>
-        {calibrateMode ? (
-          <Suspense fallback={null}>
-            <MinimapCalibrate />
-          </Suspense>
-        ) : loading ? (
+        {loading ? (
           <p className={styles.empty}>{t('loading')}</p>
         ) : (
           <>

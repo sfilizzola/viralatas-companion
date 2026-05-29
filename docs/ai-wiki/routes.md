@@ -25,6 +25,7 @@ Document all app routes, their purpose, access control, and key components.
 /my-picks            → MyWackenPage (protected) — `MyWackenPage.tsx`; URL unchanged
 /popular             → PopularPage (protected)
 /announcements       → AnnouncementsPage (protected)
+/map                 → MapPage (protected) — live vira-lata minimap; reached via glyph F on /now
 /profile             → ProfilePage (protected)
 /wrap                → WrapPage (protected) — festival recap; no festival-ended route gate
 /*                   → Redirect to /now
@@ -243,6 +244,28 @@ export default function PrivateRoute({ children }: Props) {
 **Offline**:
 - Fully functional
 - Pending posts visible locally until synced
+
+---
+
+### /map (MapPage)
+
+**Component**: `src/pages/MapPage.tsx`
+
+**Purpose**: Live minimap showing vira-latas' current positions on the Wacken festival grounds as avatar dots over `public/infield_map.png`.
+
+**Access**: Protected (`PrivateRoute`). Not in the bottom nav — reached via the glyph F "Pin + bolt" button in the `/now` header.
+
+**Data**: `useSocialSnapshot(useNow(30_000))` → IndexedDB only (same `crewGroups` derivation as `/now`). No new schema, no new sync.
+
+**Placement**: Derived by `buildPlacements(crewGroups, MINIMAP_ZONES, selfUserId)` in `src/services/minimapPlacement.ts`. Each member's zone is determined by `stageToZone()` / `groupKindToZone()`. Layout within each zone uses a deterministic phyllotaxis (sunflower-spiral) algorithm.
+
+**Self highlight**: Current user's dot has a gold ring, is rendered last (never buried), and shows its name pill by default.
+
+**Tap**: Tap any dot to toggle its name pill (single selection); tap map or same dot to dismiss (reverts to self pill).
+
+**Offline**: Fully offline — map image precached by Service Worker; placement derived from IndexedDB cache.
+
+**Flow wiki**: `docs/ai-wiki/flows/festival-minimap.md`
 
 ---
 

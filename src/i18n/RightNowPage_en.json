@@ -66,5 +66,6 @@
   "lostCountLabel": "wandering",
   "hereNowSection": "Here now",
   "headingNextSection": "Heading next",
-  "noUpcomingPicks": "no upcoming picks"
+  "noUpcomingPicks": "no upcoming picks",
+  "mapButton": "Map"
 }

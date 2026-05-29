@@ -4,6 +4,25 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-29 (Phase 35 — Festival minimap)
+
+### Added
+- **`docs/ai-wiki/flows/festival-minimap.md`** — new flow page covering trigger, happy path, offline behavior, sync behavior, data flow diagram, edge cases, and hooks/services for the `/map` minimap feature
+- **`/map` route** — documented in `routes.md` with full component breakdown and flow wiki link
+
+### Changed
+- `docs/ai-wiki/routes.md` — added `/map` route entry in route map + dedicated `MapPage` section
+- `docs/ai-wiki/architecture.md` — added `MapPage`, `MinimapOverlay`, `minimapZones`, `minimapPlacement`, `userColor` to Relevant Source Files and Key Pages list
+- `docs/ai-wiki/domain-model.md` — added derived minimap placement note to `UserPresence` section (no new schema; positions derived from existing picks + presence + clock)
+- `FUTURE_IDEAS.md` Idea 6 — status flipped to `✅ Phase 35`
+
+### Architectural Notes
+- Minimap placement is **derived**, not stored: `buildPlacements(crewGroups, MINIMAP_ZONES, selfUserId)` runs over the same `crewGroups` as `/now`. No `current_stage` column on `user_presence`; no new sync.
+- `public/infield_map.png` (628 KB) is precached by Workbox; `/map` is fully offline after first load.
+- `?calibrate` dev harness (MinimapCalibrate component) removed in Phase 35.E.
+
+---
+
 ## 2026-05-29
 
 ### Added

@@ -66,5 +66,6 @@
   "lostCountLabel": "unterwegs",
   "hereNowSection": "Jetzt hier",
   "headingNextSection": "Geht als nächstes zu",
-  "noUpcomingPicks": "keine weiteren Picks"
+  "noUpcomingPicks": "keine weiteren Picks",
+  "mapButton": "Karte"
 }

@@ -3,6 +3,7 @@ import { useNowData } from '../hooks/useNowData';
 import { useDuckEnabled } from '../contexts/DuckEnabledContext';
 import type { CrewLiveGroup } from '../services/livePreview';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BadgesDisplay from '../components/BadgesDisplay';
@@ -64,10 +65,19 @@ export default function RightNowPage() {
       <OfflineBanner />
       <header className={styles.header}>
         <span className={styles.title}>{t('title')}</span>
-        <span className={styles.timestamp}>
-          <span>{nowLabel(now, language)}</span>
-          <span>{t('wackenTime')}</span>
-        </span>
+        <div className={styles.headerRight}>
+          <Link to="/map" className={styles.mapButton} aria-label={t('mapButton')}>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11Z"/>
+              <path d="M12.6 6.2 10 10.4h2.1l-1 3.3 2.9-4.4h-2.1l.8-3.1Z" fill="currentColor" stroke="none"/>
+            </svg>
+            <span>{t('mapButton')}</span>
+          </Link>
+          <span className={styles.timestamp}>
+            <span>{nowLabel(now, language)}</span>
+            <span>{t('wackenTime')}</span>
+          </span>
+        </div>
       </header>
 
       {liveTestBand && (

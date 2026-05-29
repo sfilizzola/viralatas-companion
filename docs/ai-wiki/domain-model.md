@@ -290,6 +290,8 @@ type UserPresence = {
 3. Async write to Supabase; if offline, queued
 4. Other crew see the change via Realtime
 
+**Derived minimap placement (Phase 35):** The `/map` route derives a user's stage position from `UserPick` + `Band.stage` rather than storing a `current_stage` field on `UserPresence`. A dot appears at a stage zone only when that user has a picked band that is live now. `UserPresence` (`is_camping`, `is_at_metal_place`) accounts for the Camping and Metal Place zones. Users with no live pick and no camping/Metal Place presence appear in the `elsewhere` (lost) zone. This is a pure client-side derivation via `buildPlacements()` (`src/services/minimapPlacement.ts`) over the same `crewGroups` used by `/now` — no new schema column exists.
+
 ---
 
 ### UserMissedBand

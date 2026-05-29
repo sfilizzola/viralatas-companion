@@ -772,3 +772,53 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - [x] `rtk npm run build` + `rtk npm test` green
 
 ---
+
+### Phase 35 — Festival Minimap (live vira-lata positions)
+**Status:** ✅ Complete
+**Completed:** 2026-05-29
+
+**Goal:** New private route `/map` showing live vira-lata avatar dots over a cartoon Wacken festival map. Pure presentation over existing data — no schema change, no Edge Function, no new sync. Positions are derived from the same `useSocialSnapshot` pipeline as `/now`.
+
+**Sub-phases:**
+
+| Sub-phase | Deliverable |
+|---|---|
+| **35.A** | Optimize `public/infield_map.png` in-place (3.3 MB → 628 KB; same path/format) |
+| **35.B** | `src/components/map/minimapZones.ts` (MINIMAP_ZONES 10 zones, stageToZone, groupKindToZone) · `src/services/minimapPlacement.ts` (buildPlacements, phyllotaxis layout, self ordering) · `src/services/userColor.ts` (colorForUserId) · dev `?calibrate` harness (MinimapCalibrate) |
+| **35.C** | `src/pages/MapPage.tsx` · `src/components/map/MinimapOverlay.tsx` · `/map` route in `src/App.tsx` |
+| **35.D** | Glyph F "Pin + bolt" button in `/now` header (`RightNowPage.tsx` + CSS module) · `mapButton` i18n key in all 4 locales |
+| **35.E** | Docs + design system + harness removal + phase close |
+
+**Key deliverables:**
+- `src/pages/MapPage.tsx` — page container; `useSocialSnapshot(useNow(30_000))` + `buildPlacements`; offline note; back nav to `/now`
+- `src/components/map/MinimapOverlay.tsx` — presentation-only: `<img>` + absolute avatar `<button>`s; tap-toggle name pill; self gold ring on top; image-load fallback
+- `src/components/map/minimapZones.ts` — single source of zone geometry (10 fractional bounding boxes)
+- `src/services/minimapPlacement.ts` — pure `buildPlacements(crewGroups, zones, selfUserId)`; deterministic phyllotaxis layout; isSelf ordered last
+- `src/services/userColor.ts` — `colorForUserId(id)` deterministic HSL color for initials fallback
+- `src/pages/RightNowPage.tsx` — glyph F header button (Variant A, glyph F "Pin + bolt") linking to `/map`
+- `src/i18n/MapPage_{br,en,es,de}.json` + `RightNowPage_{br,en,es,de}.json` — `mapButton`, `title`, `subtitle`, `offlineNote`, `mapAlt` keys
+- **Removed:** `src/components/map/MinimapCalibrate.tsx` + `MinimapCalibrate.module.css` (35.E); `?calibrate` gate removed from `MapPage.tsx`
+- `FUTURE_IDEAS.md` — Idea 6 status flipped to `✅ Phase 35`
+- `docs/ai-wiki/flows/festival-minimap.md` — new flow page
+- `docs/ai-wiki/routes.md`, `architecture.md`, `domain-model.md`, `changelog.md` updated
+- `public/vira-lata-ds.html` — §13 Minimap section (zone config, avatar dot, glyph F button, offline note)
+
+**Acceptance criteria (all met):**
+- [x] `/map` renders dots at fractional coords; scales from 375 px to desktop
+- [x] Self gold-ring dot on top; tap toggles name pill; self pill default open
+- [x] `elsewhere` never overlaps a stage or camping box (left-margin zone)
+- [x] Fully offline after first load (map image precached, positions from IndexedDB)
+- [x] Image-load failure degrades to flat backdrop; dots still render
+- [x] Glyph F button visible in `/now` header at 375 px; navigates to `/map`; all 4 locales present
+- [x] `?calibrate` dev harness removed; no MinimapCalibrate chunk in production build
+- [x] `rtk npm run build` green · `rtk npm test` green (680 tests)
+
+**Wiki:** `docs/ai-wiki/flows/festival-minimap.md` · `routes.md` · `architecture.md` · `domain-model.md` · `changelog.md` · `public/vira-lata-ds.html`
+
+**Architectural notes:**
+- Placement is derived, not stored: a dot appears at a stage zone only when the user's picked band is live now; `UserPresence` handles camping + Metal Place. No `current_stage` column on `user_presence` exists.
+- `buildPlacements` is pure + deterministic — no Supabase, no clock, no randomness — so re-renders are stable.
+- Welcome to the Jungle shares the Wasteland zone; unknown stages fall back to `elsewhere`.
+- `is_friend` semantics inherited from `crewGroups` unchanged — friends absent from camping/lost, appear in band groups only.
+
+---
