@@ -4989,6 +4989,153 @@
       </div>
     </div>
 
+    <div class="subhead">UpcomingBandCard · <code>src/components/now/UpcomingBandCard.tsx</code> + <code>UpcomingBandCard.module.css</code></div>
+    <p class="desc" style="margin-top:0">
+      Phase 37. A dismissible full-width horizontal banner on <code>/now</code> that appears when the user's next picked band starts within <b>15 minutes</b> and the user is not currently watching a band. Stage-colored left stripe, gradient dark background, crew-going count, expand/collapse crew drawer, X dismiss, and optional QuackStrip below.
+    </p>
+    <div class="demo">
+      <div class="demo-stage" style="display:flex;flex-direction:column;gap:var(--s-4)">
+        <!-- Collapsed state -->
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-2)">Collapsed (default)</div>
+          <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-2);overflow:hidden;width:360px;position:relative">
+            <div style="display:flex;align-items:stretch">
+              <!-- Stage stripe -->
+              <div style="width:4px;background:var(--stage-louder);flex-shrink:0"></div>
+              <!-- Info -->
+              <div style="padding:10px 12px;flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                  <span style="font-family:var(--font-display);font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:0.01em;line-height:1">POWERWOLF</span>
+                  <span style="font-family:var(--font-mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#f3c26a;border:1px solid #f3c26a55;border-radius:3px;padding:1px 5px;white-space:nowrap">Upcoming</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="font-family:var(--font-mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;background:var(--stage-louder);color:#fff;padding:1px 6px;border-radius:3px">Louder</span>
+                  <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"><span style="color:var(--text-faint)">at </span>22:00</span>
+                  <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"><b>4</b> going</span>
+                </div>
+              </div>
+              <!-- Dismiss button -->
+              <button style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text-muted);font-size:14px;cursor:pointer;line-height:1;padding:2px 4px">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expanded state -->
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-2)">Expanded (crew drawer visible)</div>
+          <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-2);overflow:hidden;width:360px;position:relative">
+            <!-- Banner row -->
+            <div style="display:flex;align-items:stretch">
+              <div style="width:4px;background:var(--stage-louder);flex-shrink:0"></div>
+              <div style="padding:10px 12px;flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                  <span style="font-family:var(--font-display);font-size:20px;font-weight:700;text-transform:uppercase;line-height:1">POWERWOLF</span>
+                  <span style="font-family:var(--font-mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#f3c26a;border:1px solid #f3c26a55;border-radius:3px;padding:1px 5px">Upcoming</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="font-family:var(--font-mono);font-size:10px;font-weight:600;text-transform:uppercase;background:var(--stage-louder);color:#fff;padding:1px 6px;border-radius:3px">Louder</span>
+                  <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"><span style="color:var(--text-faint)">at </span>22:00</span>
+                  <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"><b>4</b> going</span>
+                </div>
+              </div>
+              <button style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text-muted);font-size:14px;cursor:pointer;line-height:1;padding:2px 4px">✕</button>
+            </div>
+            <!-- Crew drawer -->
+            <div style="border-top:1px solid var(--border)">
+              <!-- You row -->
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(229,85,85,0.06)">
+                <div class="av s28" style="background:var(--accent);border:2px solid var(--accent);font-size:11px">SF</div>
+                <div>
+                  <span style="font-size:13px;font-weight:600;color:var(--text)">Salvatore</span>
+                  <span style="font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-left:6px">you</span>
+                </div>
+              </div>
+              <!-- Crew rows -->
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 12px">
+                <div class="av s28" style="background:#4a7c59;font-size:11px">MR</div>
+                <span style="font-size:13px;font-weight:600;color:var(--text)">Marina</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 12px">
+                <div class="av s28" style="background:#5c4a7c;font-size:11px">RK</div>
+                <span style="font-size:13px;font-weight:600;color:var(--text)">Rafael K.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- With QuackStrip -->
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-2)">With QuackStrip attached (duck enabled)</div>
+          <div style="width:360px">
+            <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-2) var(--r-2) 0 0;overflow:hidden;position:relative">
+              <div style="display:flex;align-items:stretch">
+                <div style="width:4px;background:var(--stage-faster);flex-shrink:0"></div>
+                <div style="padding:10px 12px;flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                    <span style="font-family:var(--font-display);font-size:20px;font-weight:700;text-transform:uppercase;line-height:1">KREATOR</span>
+                    <span style="font-family:var(--font-mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#f3c26a;border:1px solid #f3c26a55;border-radius:3px;padding:1px 5px">Upcoming</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-family:var(--font-mono);font-size:10px;font-weight:600;text-transform:uppercase;background:var(--stage-faster);color:#fff;padding:1px 6px;border-radius:3px">Faster</span>
+                    <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"><span style="color:var(--text-faint)">at </span>20:30</span>
+                    <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"><b>2</b> going</span>
+                  </div>
+                </div>
+                <button style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text-muted);font-size:14px;cursor:pointer;line-height:1;padding:2px 4px">✕</button>
+              </div>
+            </div>
+            <!-- QuackStrip mockup -->
+            <div style="background:var(--bg-sunken);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-2) var(--r-2);height:34px;display:flex;align-items:center;padding:0 12px;gap:8px">
+              <img src="rubber-duck.png" alt="" style="width:16px;height:16px;object-fit:contain" />
+              <span style="font-family:var(--font-mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted)">QUACK</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Visibility rule</h4>
+        <ul>
+          <li>Shows when <code>nextBand !== null &amp;&amp; !dismissed &amp;&amp; myPlan.status !== 'current' &amp;&amp; timeDelta ∈ [0, 15] min</code></li>
+          <li><code>timeDelta</code> computed in <code>RightNowPage</code>: <code>(nextBand.start_time − now) / 60_000</code></li>
+          <li>Dismissed IDs stored in <code>useState&lt;Set&lt;string&gt;&gt;</code> — session-only, resets on reload</li>
+        </ul>
+        <h4>Anatomy</h4>
+        <ul>
+          <li><b>Left stripe</b> 4 px · color = <code>stageColor(nextBand.stage)</code> — same palette as CrewGroupsSection cards</li>
+          <li><b>Background</b> <code>--bg-elevated</code> with subtle gradient overlay</li>
+          <li><b>"Upcoming" badge</b> mono 9 px · gold <code>#f3c26a</code> text + 1 px gold border · top-right of name row</li>
+          <li><b>Stage pill</b> colored background from <code>stageColor()</code> · mono 10 px uppercase</li>
+          <li><b>Time</b> mono · "at HH:MM" (localized "at" from <code>atLabel</code> i18n key)</li>
+          <li><b>Crew going</b> "<b>N</b> going" · hidden when <code>crewMembers.length === 0</code></li>
+          <li><b>Dismiss ✕</b> absolute top-right · <code>e.stopPropagation()</code> prevents toggle</li>
+        </ul>
+        <h4>Expand / Collapse</h4>
+        <ul>
+          <li>Click anywhere on card body (except ✕) toggles <code>isExpanded</code></li>
+          <li>Expanded: drawer below card with <code>crewMembers</code> rows; current-user row highlighted + "you" mono tag</li>
+          <li><code>aria-expanded</code> set on card div; keyboard: Enter / Space triggers toggle</li>
+        </ul>
+        <h4>QuackStrip integration</h4>
+        <ul>
+          <li>Card has no bottom border-radius when QuackStrip is present (<code>.cardNoStrip</code> class adds radii when duck is disabled)</li>
+          <li>Separate <code>useDuckQuack(userId, nextBand.id)</code> instance — does not share cooldown with current-band duck</li>
+        </ul>
+        <h4>Slot priority on /now</h4>
+        <ul>
+          <li>1st priority: <b>UpcomingBandCard</b> (if <code>nextBandInWindow</code>)</li>
+          <li>2nd priority: <b>LatestAnnouncementBanner</b> (if announcement exists &amp; not at band)</li>
+          <li>Neither: slot empty</li>
+        </ul>
+        <h4>i18n keys</h4>
+        <ul>
+          <li><code>upcomingLabel</code> — "Upcoming" badge text</li>
+          <li><code>atLabel</code> — "at" preposition before time</li>
+          <li><code>goingLabel</code> — "going" suffix after crew count</li>
+          <li><code>dismissLabel</code> — aria-label for ✕ button</li>
+        </ul>
+      </div>
+    </div>
+
     <div class="subhead">BandFilters sort modes · <code>src/components/BandFilters.tsx</code></div>
     <div class="demo">
       <div class="demo-stage" style="display:flex;gap:var(--s-2);flex-wrap:wrap;align-items:center">

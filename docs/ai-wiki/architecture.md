@@ -19,6 +19,7 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/hooks/` — Custom hooks for state management
 - `src/pages/` — Route-level page components
 - `src/components/` — Shared UI components, modals, sections
+- `src/components/now/UpcomingBandCard.tsx` — Dismissible 15-min pre-show banner on `/now` (Phase 37)
 - `src/components/PlaylistLaunchButton.tsx` — Setlist deep-link strip (Phase 22)
 - `src/components/profile/MoshSplitSection.tsx` — MoshSplit balance section (Phase 23 Part 2 — real API via Vercel proxy)
 - `src/components/BadgesDisplay.tsx` — Vest-stack patches UI (presentation)
@@ -72,7 +73,7 @@ Components are organized by concern:
 | `src/ui/` | Design system (Button, Modal, Input, etc.) |
 
 **Key Pages:**
-- `/now` (RightNowPage) — Live band display, crew attendance, conflict detection
+- `/now` (RightNowPage) — Live band display, crew attendance, conflict detection; shows `UpcomingBandCard` (15-min pre-show banner) when user's next picked band is within window (Phase 37)
 - `/schedule` (SchedulePage) — Full lineup with filters (stage, genre, day, time)
 - `/my-picks` (MyWackenPage) — User's picks by festival day (upcoming → divider → ended inline); Attended/Missed chips on ended rows; upcoming-only conflict counts; one-time coach banner (`localStorage` dismiss)
 - `/popular` (PopularPage) — Bands sorted by total pick count, avatar clusters
@@ -452,7 +453,7 @@ INSERT into user_picks
 | `useLiveBandTestConfig()` | `LiveBandTestConfig \| null` | `LIVE_BAND_TEST_CONFIG_CHANGED_EVENT` | useNowData |
 | `useNowCache(undoTimerId)` | `{ latestAnnouncement, cacheLoading }` | `ANNOUNCEMENTS_CHANGED_EVENT` | useNowData (announcements only; crew/presence/picks via `useSocialSnapshot`) |
 | `useNowPlans({…})` | `{ myPlan, crewPlans, crewGroups, presenceValue, duckBandId, … }` | None (reads pre-built `SocialSnapshot` + focus-user extras) | useNowData |
-| `useNowData()` | `{ myPlan, crewGroups, handleSkip, handleUndo, duckQuack, … }` | composes `useSocialSnapshot` + slim `useNowCache` + `useNow()`; weak-skip commit timer → `recordCommittedSkip()` | RightNowPage |
+| `useNowData()` | `{ myPlan, nextBand, crewGroups, handleSkip, handleUndo, duckQuack, … }` | composes `useSocialSnapshot` + slim `useNowCache` + `useNow()`; weak-skip commit timer → `recordCommittedSkip()`; derives `nextBand` for UpcomingBandCard (Phase 37) | RightNowPage |
 | `useBandConflicts(bandIds)` | `Conflict[]` | None (computed) | MyPicksPage |
 | `useNow()` | `{ now, override }` | localStorage, window events | Time-based views |
 | `useOfflinePendingBandIds()` | `Set<bandId>` | `PICKS_CHANGED_EVENT` | BandCard (show pending chip) |
@@ -634,4 +635,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-05-28 — Phase 31 social snapshot unification (`buildSocialSnapshot`, `useSocialSnapshot`, crew profile cache with `special_badges`).
+**Last updated:** 2026-05-31 — Phase 37 Upcoming Band Card: `nextBand` derivation in `useNowData`; `UpcomingBandCard` component on `/now`.

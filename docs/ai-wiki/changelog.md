@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-05-31 (Phase 37 — Upcoming Band Card)
+
+### Added
+- **`src/components/now/UpcomingBandCard.tsx`** — Full-width horizontal banner that appears on `/now` when the user's next picked band starts within 15 minutes and the user is not currently watching a band. Features: stage-colored left stripe, gradient background, band name + stage pill + formatted start time, crew-going count, "Upcoming" badge, X dismiss button, expand/collapse toggle revealing per-member crew drawer, and optional QuackStrip below.
+- **i18n strings** in all 4 locales (br, en, es, de) for `upcomingLabel`, `atLabel`, `goingLabel`, `dismissLabel` keys under the `UpcomingBandCard` namespace.
+- **Unit tests** in `src/__tests__/` covering visibility logic (15-min window boundary, dismiss, status guard), expand/collapse, crew filtering, and offline state.
+
+### Changed
+- `src/hooks/useNowData.ts` — added `nextBand: Band | null` to `NowData`; computed as earliest user-picked band with `start_time > now` when `myPlan.status !== 'current'`.
+- `src/pages/RightNowPage.tsx` — renders `UpcomingBandCard` above `BadgesDisplay` when `nextBandInWindow`; manages `dismissedBandIds` (`Set<string>` session state) and `expandedUpcoming` toggle; `UpcomingBandCard` and `LatestAnnouncementBanner` share one render slot (card has priority).
+- `docs/ai-wiki/flows/live-now.md` — documented Upcoming Band Card section (visibility logic, anatomy, dismiss/expand behavior, priority slot, QuackStrip, offline behavior).
+- `docs/ai-wiki/architecture.md` — added `UpcomingBandCard.tsx` to Relevant Source Files; updated `/now` key pages note and `useNowData` hook table entry.
+- `public/vira-lata-ds.html` — added Upcoming Band Card design system section (collapsed/expanded states, stripe, crew avatars, QuackStrip attachment).
+
+### Architectural Notes
+- `dismissedBandIds` is session-only React state (no IndexedDB); dismissal resets on page reload — intentional so the reminder reappears if user navigates away and back.
+- `nextBandCrew` is derived from `crewPlans` by matching `plan.band?.id` or `plan.nextBand?.id` — no new IDB query.
+- The card uses a **separate `useDuckQuack` instance** (`nextDuckQuack`) keyed to `nextBand.id` so quacking the upcoming band does not interfere with the current-band duck cooldown.
+
+---
+
 ## 2026-05-29 (Phase 35 — Festival minimap)
 
 ### Added

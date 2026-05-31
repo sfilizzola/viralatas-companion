@@ -864,3 +864,36 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Countdown derivation factored into shared `useCountdownProgress(cooldownUntil, DUCK_COOLDOWN_MS)` hook — returns `{ fillFraction, countdown }` for two different visual representations (fill sweep vs. underline progress)
 - Godlike admin panel remains out of scope but was updated to not break when DuckButton removed
 - Asset `/rubber-duck.png` stays in use; user to replace with more compact variant independently
+
+---
+
+### Phase 37 — Upcoming Band Card
+**Status:** ✅ Complete
+
+**Goal:** Show a dismissible pre-show banner on `/now` 15 minutes before the user's next picked band starts, with crew attendance context.
+
+**Design:** Horizontal Banner (V2) — full-width card with gold accent left stripe, gradient background, overlapping crew avatars as focal point, collapsible crew drawer, QuackStrip always attached below.
+
+**Key deliverables:**
+- `src/components/now/UpcomingBandCard.tsx` — full-width banner with collapsed/expanded states, dismiss (X) button, crew avatar overlaps, band name/stage/time, QuackStrip below
+- `src/hooks/useNowData.ts` — added `nextBand` (next picked band within 15 min that isn't current) and `timeDelta` (ms until start) to hook return
+- `src/pages/RightNowPage.tsx` — renders UpcomingBandCard, manages `dismissedBands` (session-only `Set<string>`) and `expandedUpcoming` toggle; card mutually exclusive with `LatestAnnouncementBanner`
+- i18n: upcoming card strings in all 4 locales (br, en, es, de)
+- Unit tests: visibility logic, expand/collapse toggle, dismiss, offline state
+
+**Acceptance criteria (all met):**
+- [x] Card appears when: user NOT at a band + next pick starts ≤15 min away + not dismissed
+- [x] Card replaces LatestAnnouncementBanner slot (mutually exclusive)
+- [x] Collapsed: "Upcoming" badge, band name, stage, time, crew avatars, X button
+- [x] Expanded: collapsed header + full crew list (names + avatars)
+- [x] Tap body toggles collapsed ↔ expanded; X dismisses for session
+- [x] Card auto-disappears when band starts (myPlan updates to 'current')
+- [x] QuackStrip always visible below (both states)
+- [x] All interactions offline-capable (no new network calls)
+- [x] Build green · Tests green (707 tests)
+
+**Architectural notes:**
+- Dismissal is session-only (`Set<string>` in component state) — no IDB writes needed
+- Crew list derived from existing `crewPlans` memo — zero new DB queries
+- QuackStrip below card is a separate duck instance with its own cooldown, not shared with group cards
+- Card slot priority: UpcomingBandCard > LatestAnnouncementBanner (only one renders at a time)
