@@ -78,15 +78,22 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
         return;
       }
 
+      console.log('Invoking send-test-push with token:', session.access_token.slice(0, 20) + '...');
+
       const res = await supabase.functions.invoke('send-test-push', {
-        headers: { Authorization: `Bearer ${session.access_token}` },
+        body: {},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
       });
 
       console.log('send-test-push response:', res);
 
       if (res.error) {
         console.error('Edge Function error:', res.error);
-        setTestPushResult({ ok: false, message: `${t('testPushError')}: ${res.error.message || 'Unknown error'}` });
+        const errorMsg = res.error.message || String(res.error);
+        setTestPushResult({ ok: false, message: `${t('testPushError')}: ${errorMsg}` });
         return;
       }
 
