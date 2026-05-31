@@ -47,10 +47,14 @@ import syncToastBr from '../i18n/SyncToast_br.json';
 import syncToastDe from '../i18n/SyncToast_de.json';
 import syncToastEn from '../i18n/SyncToast_en.json';
 import syncToastEs from '../i18n/SyncToast_es.json';
-import duckButtonBr from '../i18n/DuckButton_br.json';
-import duckButtonDe from '../i18n/DuckButton_de.json';
-import duckButtonEn from '../i18n/DuckButton_en.json';
-import duckButtonEs from '../i18n/DuckButton_es.json';
+import quackStripBr from '../i18n/QuackStrip_br.json';
+import quackStripDe from '../i18n/QuackStrip_de.json';
+import quackStripEn from '../i18n/QuackStrip_en.json';
+import quackStripEs from '../i18n/QuackStrip_es.json';
+import quackGhostRowBr from '../i18n/QuackGhostRow_br.json';
+import quackGhostRowDe from '../i18n/QuackGhostRow_de.json';
+import quackGhostRowEn from '../i18n/QuackGhostRow_en.json';
+import quackGhostRowEs from '../i18n/QuackGhostRow_es.json';
 import wrapBr from '../i18n/WrapPage_br.json';
 import wrapDe from '../i18n/WrapPage_de.json';
 import wrapEn from '../i18n/WrapPage_en.json';
@@ -75,7 +79,8 @@ type TranslationFile =
   | 'Badges'
   | 'OfflineBanner'
   | 'SyncToast'
-  | 'DuckButton'
+  | 'QuackStrip'
+  | 'QuackGhostRow'
   | 'WrapPage'
   | 'MapPage'
   | 'GodlikeAdmin';
@@ -99,7 +104,8 @@ const translations: Translations = {
     Badges: badgesBr,
     OfflineBanner: offlineBannerBr,
     SyncToast: syncToastBr,
-    DuckButton: duckButtonBr,
+    QuackStrip: quackStripBr,
+    QuackGhostRow: quackGhostRowBr,
     WrapPage: wrapBr,
     MapPage: mapBr,
     GodlikeAdmin: {},
@@ -117,7 +123,8 @@ const translations: Translations = {
     Badges: badgesEn,
     OfflineBanner: offlineBannerEn,
     SyncToast: syncToastEn,
-    DuckButton: duckButtonEn,
+    QuackStrip: quackStripEn,
+    QuackGhostRow: quackGhostRowEn,
     WrapPage: wrapEn,
     MapPage: mapEn,
     GodlikeAdmin: {},
@@ -135,7 +142,8 @@ const translations: Translations = {
     Badges: badgesEs,
     OfflineBanner: offlineBannerEs,
     SyncToast: syncToastEs,
-    DuckButton: duckButtonEs,
+    QuackStrip: quackStripEs,
+    QuackGhostRow: quackGhostRowEs,
     WrapPage: wrapEs,
     MapPage: mapEs,
     GodlikeAdmin: {},
@@ -153,7 +161,8 @@ const translations: Translations = {
     Badges: badgesDe,
     OfflineBanner: offlineBannerDe,
     SyncToast: syncToastDe,
-    DuckButton: duckButtonDe,
+    QuackStrip: quackStripDe,
+    QuackGhostRow: quackGhostRowDe,
     WrapPage: wrapDe,
     MapPage: mapDe,
     GodlikeAdmin: {},
