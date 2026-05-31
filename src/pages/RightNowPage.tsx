@@ -80,7 +80,11 @@ export default function RightNowPage() {
     timeDelta <= 15;
 
   const nextBandCrew = nextBand
-    ? crewPlans.filter((member) => member.plan.band?.id === nextBand.id)
+    ? crewPlans.filter(
+        (member) =>
+          member.plan.band?.id === nextBand.id ||
+          member.plan.nextBand?.id === nextBand.id,
+      )
     : [];
 
   function handleDismissCard(bandId: string) {
@@ -137,8 +141,9 @@ export default function RightNowPage() {
               <UpcomingBandCard
                 nextBand={nextBand}
                 crewMembers={nextBandCrew}
+                userId={userId}
                 onDismiss={handleDismissCard}
-                onDuck={duckEnabled ? nextDuckQuack : () => {}}
+                onDuck={duckEnabled ? nextDuckQuack : undefined}
                 duckCooldownUntil={duckEnabled ? nextDuckCooldown : null}
               />
             ) : latestAnnouncement && myPlan.status !== 'current' ? (

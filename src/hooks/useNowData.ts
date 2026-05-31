@@ -192,13 +192,14 @@ export function useNowData(): NowData {
   }, [userId, myRawPlan.status, isAtMetalPlace, isCamping]);
 
   const nextBand = useMemo(() => {
-    if (myPlan.status === 'current' || !myPlan.band) return null;
+    if (myPlan.status === 'current' || !userId) return null;
     const upcomingBands = picks
+      .filter((pick) => pick.user_id === userId)
       .map((pick) => bands.find((b) => b.id === pick.band_id))
       .filter((b): b is Band => b !== undefined && b.start_time > now.toISOString())
       .sort((a, b) => a.start_time.localeCompare(b.start_time));
     return upcomingBands[0] ?? null;
-  }, [picks, bands, myPlan.status, myPlan.band, now]);
+  }, [picks, bands, myPlan.status, userId, now]);
 
   return {
     userId,

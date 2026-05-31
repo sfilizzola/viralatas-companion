@@ -1,4 +1,6 @@
 {
   "upcomingLabel": "Upcoming",
-  "dismissLabel": "Dismiss"
+  "dismissLabel": "Dismiss",
+  "atLabel": "at",
+  "goingLabel": "going"
 }

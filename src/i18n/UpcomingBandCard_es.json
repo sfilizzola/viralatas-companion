@@ -1,4 +1,6 @@
 {
   "upcomingLabel": "Próxima",
-  "dismissLabel": "Descartar"
+  "dismissLabel": "Descartar",
+  "atLabel": "a las",
+  "goingLabel": "van"
 }

@@ -72,7 +72,7 @@ describe('UpcomingBandCard', () => {
         nextBand={mockBand}
         crewMembers={mockCrew}
         onDismiss={onDismiss}
-        onDuck={onDuck}
+        userId="test-user" onDuck={onDuck}
         duckCooldownUntil={null}
       />,
     );
@@ -82,23 +82,21 @@ describe('UpcomingBandCard', () => {
     expect(screen.getByText('Main Stage')).toBeInTheDocument();
   });
 
-  it('renders crew avatars', () => {
+  it('shows crew count in collapsed view', () => {
     const onDismiss = vi.fn();
     const onDuck = vi.fn();
-    const { container } = render(
+    render(
       <UpcomingBandCard
         nextBand={mockBand}
         crewMembers={mockCrew}
         onDismiss={onDismiss}
-        onDuck={onDuck}
+        userId="test-user" onDuck={onDuck}
         duckCooldownUntil={null}
       />,
     );
 
-    const avatarImages = container.querySelectorAll('img[src*="example.com"]');
-    expect(avatarImages).toHaveLength(2);
-    expect(avatarImages[0]).toHaveAttribute('src', 'https://example.com/alice.jpg');
-    expect(avatarImages[1]).toHaveAttribute('src', 'https://example.com/bob.jpg');
+    expect(screen.getByText('2')).toBeInTheDocument();
+    expect(screen.getByText('goingLabel')).toBeInTheDocument();
   });
 
   it('expands to show crew list on click', () => {
@@ -109,7 +107,7 @@ describe('UpcomingBandCard', () => {
         nextBand={mockBand}
         crewMembers={mockCrew}
         onDismiss={onDismiss}
-        onDuck={onDuck}
+        userId="test-user" onDuck={onDuck}
         duckCooldownUntil={null}
       />,
     );
@@ -131,7 +129,7 @@ describe('UpcomingBandCard', () => {
         nextBand={mockBand}
         crewMembers={mockCrew}
         onDismiss={onDismiss}
-        onDuck={onDuck}
+        userId="test-user" onDuck={onDuck}
         duckCooldownUntil={null}
       />,
     );
@@ -153,7 +151,7 @@ describe('UpcomingBandCard', () => {
         nextBand={mockBand}
         crewMembers={mockCrew}
         onDismiss={onDismiss}
-        onDuck={onDuck}
+        userId="test-user" onDuck={onDuck}
         duckCooldownUntil={null}
       />,
     );
@@ -170,7 +168,7 @@ describe('UpcomingBandCard', () => {
         nextBand={mockBand}
         crewMembers={mockCrew}
         onDismiss={onDismiss}
-        onDuck={onDuck}
+        userId="test-user" onDuck={onDuck}
         duckCooldownUntil={null}
       />,
     );
@@ -187,7 +185,7 @@ describe('UpcomingBandCard', () => {
         nextBand={mockBand}
         crewMembers={mockCrew}
         onDismiss={onDismiss}
-        onDuck={onDuck}
+        userId="test-user" onDuck={onDuck}
         duckCooldownUntil={cooldownTime}
       />,
     );
@@ -203,7 +201,7 @@ describe('UpcomingBandCard', () => {
         nextBand={mockBand}
         crewMembers={mockCrew}
         onDismiss={onDismiss}
-        onDuck={onDuck}
+        userId="test-user" onDuck={onDuck}
         duckCooldownUntil={null}
       />,
     );
@@ -212,7 +210,7 @@ describe('UpcomingBandCard', () => {
     expect(onDuck).toHaveBeenCalled();
   });
 
-  it('shows overflow indicator when >5 crew', () => {
+  it('shows all crew names when expanded with many members', () => {
     const largeCrew = Array.from({ length: 10 }, (_, i) => ({
       id: `crew-${i}`,
       display_name: `Person ${i}`,
@@ -227,17 +225,19 @@ describe('UpcomingBandCard', () => {
 
     const onDismiss = vi.fn();
     const onDuck = vi.fn();
-    render(
+    const { container } = render(
       <UpcomingBandCard
         nextBand={mockBand}
         crewMembers={largeCrew}
         onDismiss={onDismiss}
-        onDuck={onDuck}
+        userId="test-user" onDuck={onDuck}
         duckCooldownUntil={null}
       />,
     );
 
-    expect(screen.getByText('+5')).toBeInTheDocument();
+    fireEvent.click(container.querySelector('[role="button"]')!);
+    expect(screen.getByText('Person 0')).toBeInTheDocument();
+    expect(screen.getByText('Person 9')).toBeInTheDocument();
   });
 
   it('stops propagation on dismiss button click', () => {
@@ -248,7 +248,7 @@ describe('UpcomingBandCard', () => {
         nextBand={mockBand}
         crewMembers={mockCrew}
         onDismiss={onDismiss}
-        onDuck={onDuck}
+        userId="test-user" onDuck={onDuck}
         duckCooldownUntil={null}
       />,
     );
