@@ -73,6 +73,7 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
+        console.error('No session token available');
         setTestPushResult({ ok: false, message: t('testPushError') });
         return;
       }
@@ -81,8 +82,11 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
 
+      console.log('send-test-push response:', res);
+
       if (res.error) {
-        setTestPushResult({ ok: false, message: t('testPushError') });
+        console.error('Edge Function error:', res.error);
+        setTestPushResult({ ok: false, message: `${t('testPushError')}: ${res.error.message || 'Unknown error'}` });
         return;
       }
 
