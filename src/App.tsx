@@ -26,6 +26,7 @@ export default function App() {
         <SyncToast />
         <DuckToast />
         <Routes>
+          <Route path="/" element={<Navigate to="/now" replace />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />

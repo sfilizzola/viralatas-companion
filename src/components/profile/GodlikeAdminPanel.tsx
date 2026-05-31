@@ -72,8 +72,13 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
     setTestPushResult(null);
     try {
       const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setTestPushResult({ ok: false, message: t('testPushError') });
+        return;
+      }
+
       const res = await supabase.functions.invoke('send-test-push', {
-        headers: { Authorization: `Bearer ${session?.access_token}` },
+        headers: { Authorization: `Bearer ${session.access_token}` },
       });
 
       if (res.error) {
@@ -81,16 +86,19 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
         return;
       }
 
-      const data = res.data as { sent?: number; failed?: number; error?: string };
+      const data = res.data as { sent?: number; failed?: number; error?: string; errors?: string[] };
 
       if (data.error === 'no_subscription') {
         setTestPushResult({ ok: false, message: t('testPushNoSubscription') });
       } else if (data.sent && data.sent > 0) {
         setTestPushResult({ ok: true, message: t('testPushSent') });
+      } else if (data.failed && data.failed > 0) {
+        setTestPushResult({ ok: false, message: t('testPushFailed') });
       } else {
         setTestPushResult({ ok: false, message: t('testPushFailed') });
       }
-    } catch {
+    } catch (err) {
+      console.error('Test push error:', err);
       setTestPushResult({ ok: false, message: t('testPushError') });
     } finally {
       setTestPushLoading(false);
