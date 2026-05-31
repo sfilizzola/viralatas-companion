@@ -1,4 +1,6 @@
 {
+  "quack": "Quack",
+  "cooldown": "Cooldown",
   "quackLabel": "Quack! 🦆",
   "cooldownLabel": "Recharging..."
 }

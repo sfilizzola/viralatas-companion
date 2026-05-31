@@ -1,6 +1,7 @@
 import { useI18n, type Language } from '../lib/i18n';
 import { useNowData } from '../hooks/useNowData';
 import { useDuckEnabled } from '../contexts/DuckEnabledContext';
+import { useDuckQuack } from '../hooks/useDuckQuack';
 import type { CrewLiveGroup } from '../services/livePreview';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -9,6 +10,7 @@ import OfflineBanner from '../components/OfflineBanner';
 import BadgesDisplay from '../components/BadgesDisplay';
 import PresenceToggle from '../components/PresenceToggle';
 import LatestAnnouncementBanner from '../components/now/LatestAnnouncementBanner';
+import UpcomingBandCard from '../components/now/UpcomingBandCard';
 import WrapTeaserBanner from '../components/wrap/WrapTeaserBanner';
 import { useWrapTeaserVisible } from '../hooks/useWrapTeaserVisible';
 import CrewGroupsSection from '../components/now/CrewGroupsSection';
@@ -35,6 +37,7 @@ export default function RightNowPage() {
   const { language, t } = useI18n('RightNowPage');
   const duckEnabled = useDuckEnabled();
   const [activeGroup, setActiveGroup] = useState<CrewLiveGroup | null>(null);
+  const [dismissedBandIds, setDismissedBandIds] = useState<Set<string>>(new Set());
   const {
     user,
     userId,
@@ -49,6 +52,7 @@ export default function RightNowPage() {
     isMetalPlaceWindowActive,
     presenceValue,
     myPlan,
+    nextBand,
     crewPlans,
     crewGroups,
     handleSkip,
@@ -58,7 +62,34 @@ export default function RightNowPage() {
     duckQuack,
     duckCooldownUntil,
   } = useNowData();
+  const { quack: nextDuckQuack, cooldownUntil: nextDuckCooldown } = useDuckQuack(
+    userId,
+    nextBand?.id ?? null,
+  );
   const showWrapTeaser = useWrapTeaserVisible();
+
+  const timeDelta = nextBand
+    ? (new Date(nextBand.start_time).getTime() - now.getTime()) / (1000 * 60)
+    : Infinity;
+
+  const nextBandInWindow =
+    nextBand &&
+    !dismissedBandIds.has(nextBand.id) &&
+    myPlan.status !== 'current' &&
+    timeDelta >= 0 &&
+    timeDelta <= 15;
+
+  const nextBandCrew = nextBand
+    ? crewPlans.filter(
+        (member) =>
+          member.plan.band?.id === nextBand.id ||
+          member.plan.nextBand?.id === nextBand.id,
+      )
+    : [];
+
+  function handleDismissCard(bandId: string) {
+    setDismissedBandIds((prev) => new Set(prev).add(bandId));
+  }
 
   return (
     <div className={styles.page}>
@@ -106,13 +137,22 @@ export default function RightNowPage() {
           <p className={styles.empty}>{t('loading')}</p>
         ) : (
           <>
-            {latestAnnouncement && myPlan.status !== 'current' && (
+            {nextBandInWindow && nextBand ? (
+              <UpcomingBandCard
+                nextBand={nextBand}
+                crewMembers={nextBandCrew}
+                userId={userId}
+                onDismiss={handleDismissCard}
+                onDuck={duckEnabled ? nextDuckQuack : undefined}
+                duckCooldownUntil={duckEnabled ? nextDuckCooldown : null}
+              />
+            ) : latestAnnouncement && myPlan.status !== 'current' ? (
               <LatestAnnouncementBanner
                 announcement={latestAnnouncement}
                 crewUsers={crewUsers}
                 t={t}
               />
-            )}
+            ) : null}
 
             {user && <BadgesDisplay user={user} />}
 

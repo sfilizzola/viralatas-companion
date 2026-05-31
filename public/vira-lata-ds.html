@@ -4989,6 +4989,153 @@
       </div>
     </div>
 
+    <div class="subhead">UpcomingBandCard · <code>src/components/now/UpcomingBandCard.tsx</code> + <code>UpcomingBandCard.module.css</code></div>
+    <p class="desc" style="margin-top:0">
+      Phase 37. A dismissible full-width horizontal banner on <code>/now</code> that appears when the user's next picked band starts within <b>15 minutes</b> and the user is not currently watching a band. Stage-colored left stripe, gradient dark background, crew-going count, expand/collapse crew drawer, X dismiss, and optional QuackStrip below.
+    </p>
+    <div class="demo">
+      <div class="demo-stage" style="display:flex;flex-direction:column;gap:var(--s-4)">
+        <!-- Collapsed state -->
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-2)">Collapsed (default)</div>
+          <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-2);overflow:hidden;width:360px;position:relative">
+            <div style="display:flex;align-items:stretch">
+              <!-- Stage stripe -->
+              <div style="width:4px;background:var(--stage-louder);flex-shrink:0"></div>
+              <!-- Info -->
+              <div style="padding:10px 12px;flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                  <span style="font-family:var(--font-display);font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:0.01em;line-height:1">POWERWOLF</span>
+                  <span style="font-family:var(--font-mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#f3c26a;border:1px solid #f3c26a55;border-radius:3px;padding:1px 5px;white-space:nowrap">Upcoming</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="font-family:var(--font-mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;background:var(--stage-louder);color:#fff;padding:1px 6px;border-radius:3px">Louder</span>
+                  <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"><span style="color:var(--text-faint)">at </span>22:00</span>
+                  <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"><b>4</b> going</span>
+                </div>
+              </div>
+              <!-- Dismiss button -->
+              <button style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text-muted);font-size:14px;cursor:pointer;line-height:1;padding:2px 4px">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expanded state -->
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-2)">Expanded (crew drawer visible)</div>
+          <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-2);overflow:hidden;width:360px;position:relative">
+            <!-- Banner row -->
+            <div style="display:flex;align-items:stretch">
+              <div style="width:4px;background:var(--stage-louder);flex-shrink:0"></div>
+              <div style="padding:10px 12px;flex:1;min-width:0">
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                  <span style="font-family:var(--font-display);font-size:20px;font-weight:700;text-transform:uppercase;line-height:1">POWERWOLF</span>
+                  <span style="font-family:var(--font-mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#f3c26a;border:1px solid #f3c26a55;border-radius:3px;padding:1px 5px">Upcoming</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <span style="font-family:var(--font-mono);font-size:10px;font-weight:600;text-transform:uppercase;background:var(--stage-louder);color:#fff;padding:1px 6px;border-radius:3px">Louder</span>
+                  <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"><span style="color:var(--text-faint)">at </span>22:00</span>
+                  <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"><b>4</b> going</span>
+                </div>
+              </div>
+              <button style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text-muted);font-size:14px;cursor:pointer;line-height:1;padding:2px 4px">✕</button>
+            </div>
+            <!-- Crew drawer -->
+            <div style="border-top:1px solid var(--border)">
+              <!-- You row -->
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(229,85,85,0.06)">
+                <div class="av s28" style="background:var(--accent);border:2px solid var(--accent);font-size:11px">SF</div>
+                <div>
+                  <span style="font-size:13px;font-weight:600;color:var(--text)">Salvatore</span>
+                  <span style="font-family:var(--font-mono);font-size:9px;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);margin-left:6px">you</span>
+                </div>
+              </div>
+              <!-- Crew rows -->
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 12px">
+                <div class="av s28" style="background:#4a7c59;font-size:11px">MR</div>
+                <span style="font-size:13px;font-weight:600;color:var(--text)">Marina</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:8px 12px">
+                <div class="av s28" style="background:#5c4a7c;font-size:11px">RK</div>
+                <span style="font-size:13px;font-weight:600;color:var(--text)">Rafael K.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- With QuackStrip -->
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:var(--s-2)">With QuackStrip attached (duck enabled)</div>
+          <div style="width:360px">
+            <div style="background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--r-2) var(--r-2) 0 0;overflow:hidden;position:relative">
+              <div style="display:flex;align-items:stretch">
+                <div style="width:4px;background:var(--stage-faster);flex-shrink:0"></div>
+                <div style="padding:10px 12px;flex:1;min-width:0">
+                  <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                    <span style="font-family:var(--font-display);font-size:20px;font-weight:700;text-transform:uppercase;line-height:1">KREATOR</span>
+                    <span style="font-family:var(--font-mono);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#f3c26a;border:1px solid #f3c26a55;border-radius:3px;padding:1px 5px">Upcoming</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-family:var(--font-mono);font-size:10px;font-weight:600;text-transform:uppercase;background:var(--stage-faster);color:#fff;padding:1px 6px;border-radius:3px">Faster</span>
+                    <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"><span style="color:var(--text-faint)">at </span>20:30</span>
+                    <span style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted)"><b>2</b> going</span>
+                  </div>
+                </div>
+                <button style="position:absolute;top:8px;right:10px;background:none;border:none;color:var(--text-muted);font-size:14px;cursor:pointer;line-height:1;padding:2px 4px">✕</button>
+              </div>
+            </div>
+            <!-- QuackStrip mockup -->
+            <div style="background:var(--bg-sunken);border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-2) var(--r-2);height:34px;display:flex;align-items:center;padding:0 12px;gap:8px">
+              <img src="rubber-duck.png" alt="" style="width:16px;height:16px;object-fit:contain" />
+              <span style="font-family:var(--font-mono);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted)">QUACK</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo-notes">
+        <h4>Visibility rule</h4>
+        <ul>
+          <li>Shows when <code>nextBand !== null &amp;&amp; !dismissed &amp;&amp; myPlan.status !== 'current' &amp;&amp; timeDelta ∈ [0, 15] min</code></li>
+          <li><code>timeDelta</code> computed in <code>RightNowPage</code>: <code>(nextBand.start_time − now) / 60_000</code></li>
+          <li>Dismissed IDs stored in <code>useState&lt;Set&lt;string&gt;&gt;</code> — session-only, resets on reload</li>
+        </ul>
+        <h4>Anatomy</h4>
+        <ul>
+          <li><b>Left stripe</b> 4 px · color = <code>stageColor(nextBand.stage)</code> — same palette as CrewGroupsSection cards</li>
+          <li><b>Background</b> <code>--bg-elevated</code> with subtle gradient overlay</li>
+          <li><b>"Upcoming" badge</b> mono 9 px · gold <code>#f3c26a</code> text + 1 px gold border · top-right of name row</li>
+          <li><b>Stage pill</b> colored background from <code>stageColor()</code> · mono 10 px uppercase</li>
+          <li><b>Time</b> mono · "at HH:MM" (localized "at" from <code>atLabel</code> i18n key)</li>
+          <li><b>Crew going</b> "<b>N</b> going" · hidden when <code>crewMembers.length === 0</code></li>
+          <li><b>Dismiss ✕</b> absolute top-right · <code>e.stopPropagation()</code> prevents toggle</li>
+        </ul>
+        <h4>Expand / Collapse</h4>
+        <ul>
+          <li>Click anywhere on card body (except ✕) toggles <code>isExpanded</code></li>
+          <li>Expanded: drawer below card with <code>crewMembers</code> rows; current-user row highlighted + "you" mono tag</li>
+          <li><code>aria-expanded</code> set on card div; keyboard: Enter / Space triggers toggle</li>
+        </ul>
+        <h4>QuackStrip integration</h4>
+        <ul>
+          <li>Card has no bottom border-radius when QuackStrip is present (<code>.cardNoStrip</code> class adds radii when duck is disabled)</li>
+          <li>Separate <code>useDuckQuack(userId, nextBand.id)</code> instance — does not share cooldown with current-band duck</li>
+        </ul>
+        <h4>Slot priority on /now</h4>
+        <ul>
+          <li>1st priority: <b>UpcomingBandCard</b> (if <code>nextBandInWindow</code>)</li>
+          <li>2nd priority: <b>LatestAnnouncementBanner</b> (if announcement exists &amp; not at band)</li>
+          <li>Neither: slot empty</li>
+        </ul>
+        <h4>i18n keys</h4>
+        <ul>
+          <li><code>upcomingLabel</code> — "Upcoming" badge text</li>
+          <li><code>atLabel</code> — "at" preposition before time</li>
+          <li><code>goingLabel</code> — "going" suffix after crew count</li>
+          <li><code>dismissLabel</code> — aria-label for ✕ button</li>
+        </ul>
+      </div>
+    </div>
+
     <div class="subhead">BandFilters sort modes · <code>src/components/BandFilters.tsx</code></div>
     <div class="demo">
       <div class="demo-stage" style="display:flex;gap:var(--s-2);flex-wrap:wrap;align-items:center">
@@ -5233,64 +5380,42 @@
       <div class="num">11</div>
       <div>
         <h2>The Duck 🦆</h2>
-        <p class="desc">Phase 20 social feature: a rubber-duck quack button on live picked band cards and a global floating quack notification. Both components are new in Phase 20 and do not exist in the codebase before it.</p>
+        <p class="desc">Phase 20 social feature: a rubber-duck quack button on live picked band cards and a global floating quack notification. Phase 36 redesign replaces the 64×64 <code>DuckButton</code> tile with two contextually-appropriate components: <code>QuackStrip</code> (34 px strip below <code>/now</code> group card) and <code>QuackGhostRow</code> (ghost row inside band card body). Both share the prop contract <code>{ onDuck, cooldownUntil }</code> and use shared countdown animation hook.</p>
       </div>
     </div>
 
-    <div class="subhead">DuckButton · <code>src/components/DuckButton.tsx</code> + <code>DuckButton.module.css</code></div>
+    <div class="subhead">QuackStrip · <code>src/components/QuackStrip.tsx</code> + <code>QuackStrip.module.css</code></div>
+    <p class="desc" style="margin-top:0">
+      Phase 36 redesign. Replaces the old 64×64 duck tile on the <code>/now</code> group card. A 34 px strip attached below the card with duck image (16 px), mono label, and optional countdown. Idle: <code>QUACK</code> label; cooldown: progress fill sweep left→right + MM:SS countdown right-aligned.
+    </p>
     <div class="demo">
-      <div class="demo-stage">
-        <div style="display:flex;gap:var(--s-6);align-items:flex-end;flex-wrap:wrap">
-
-          <!-- Normal / ready -->
-          <div style="display:flex;flex-direction:column;align-items:center;gap:var(--s-2)">
-            <button class="duck-btn">
-              <img src="rubber-duck.png" alt="quack" />
-            </button>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.1em">Ready</div>
-          </div>
-
-          <!-- Cooldown ~10% elapsed -->
-          <div style="display:flex;flex-direction:column;align-items:center;gap:var(--s-2)">
-            <button class="duck-btn duck-btn--cooldown">
-              <img src="rubber-duck.png" alt="quack" />
-              <div class="duck-drain duck-drain--10"></div>
-            </button>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.1em">~10%</div>
-          </div>
-
-          <!-- Cooldown ~50% elapsed -->
-          <div style="display:flex;flex-direction:column;align-items:center;gap:var(--s-2)">
-            <button class="duck-btn duck-btn--cooldown">
-              <img src="rubber-duck.png" alt="quack" />
-              <div class="duck-drain duck-drain--50"></div>
-            </button>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.1em">~50%</div>
-          </div>
-
-          <!-- Cooldown ~85% elapsed -->
-          <div style="display:flex;flex-direction:column;align-items:center;gap:var(--s-2)">
-            <button class="duck-btn duck-btn--cooldown">
-              <img src="rubber-duck.png" alt="quack" />
-              <div class="duck-drain duck-drain--85"></div>
-            </button>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--text-faint);text-transform:uppercase;letter-spacing:0.1em">~85%</div>
-          </div>
-
-        </div>
-      </div>
       <div class="demo-notes">
         <h4>Specs</h4>
         <ul>
-          <li><b>Size</b> 44×44 px · <code>border-radius: 50%</code> · border: 2px solid <code>--border-strong</code> (rest) / <code>#f3c26a</code> (hover) / <code>--border</code> (cooldown)</li>
-          <li><b>Image</b> <code>/rubber-duck.png</code> · 30 px · <code>object-fit: contain</code></li>
-          <li><b>Hover</b> <code>scale(1.08)</code> + amber border · 120 ms — no effect during cooldown</li>
-          <li><b>Active press</b> <code>scale(0.94)</code> · 80 ms</li>
-          <li><b>Cooldown drain</b> <code>conic-gradient(from -90deg, rgba(0,0,0,0.62) {elapsed}deg, transparent {elapsed}deg)</code> — dark overlay sweeps CW from 12 o'clock over 90 s</li>
-          <li><b>Cooldown state</b> <code>cursor: not-allowed · opacity: 0.8</code> · press handler is a no-op · duck image renders <code>grayscale(1)</code> via <code>.duckImgCooldown</code>; transitions back to colour in 0.4 s when cooldown ends</li>
-          <li><b>Visibility rule</b> only rendered when <code>isBandLive &amp;&amp; isPicked &amp;&amp; band.category !== 'ceremony'</code></li>
-          <li><b>Cooldown storage</b> <code>localStorage</code> key <code>duck_cooldown:{userId}:{bandId}</code> — value is epoch ms of unlock time</li>
-          <li><b>Props</b> <code>onDuck: () =&gt; void</code> · <code>isOnCooldown: boolean</code> · <code>cooldownUntil: number</code></li>
+          <li><b>Height</b> 34 px · full width of card below</li>
+          <li><b>Idle state</b> duck image 16 px · mono label <code>QUACK</code> · cursor pointer · background <code>--bg-sunken</code> with subtle hover darkening</li>
+          <li><b>Cooldown state</b> fill sweeps left→right <code>rgba(255,215,0,0.055)</code> · countdown MM:SS right-aligned mono 10 px · disabled, cursor not-allowed</li>
+          <li><b>Integration</b> card above has <code>.groupCardAboveStrip</code> to remove bottom radius and border</li>
+          <li><b>Component contract</b> <code>{ onDuck: () =&gt; void, cooldownUntil: number | null }</code></li>
+          <li><b>Cooldown derivation</b> <code>useCooldown(cooldownUntil)</code> + <code>useCountdownProgress(cooldownUntil, DUCK_COOLDOWN_MS)</code></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="subhead">QuackGhostRow · <code>src/components/QuackGhostRow.tsx</code> + <code>QuackGhostRow.module.css</code></div>
+    <p class="desc" style="margin-top:0">
+      Phase 36 redesign. Replaces the old duck tile on <code>/schedule</code> and <code>/my-picks</code> band cards. A ghost row inside the card body below meta/content with duck image (13 px), mono label, and optional countdown. Idle: <code>QUACK</code> label; cooldown: 1 px underline progress + MM:SS countdown right-aligned.
+    </p>
+    <div class="demo">
+      <div class="demo-notes">
+        <h4>Specs</h4>
+        <ul>
+          <li><b>Position</b> inside card <code>.body</code> div, below all other content (children, meta, etc.)</li>
+          <li><b>Layout</b> flex row · full width · 8 px gap · 8 px padding-top, margin-top with top border separator</li>
+          <li><b>Idle state</b> duck image 13 px · mono label <code>QUACK</code> · cursor pointer · light hover effect</li>
+          <li><b>Cooldown state</b> 1 px underline progress grows left→right <code>rgba(255,215,0,0.35)</code> · countdown MM:SS right-aligned mono 10 px · disabled, cursor not-allowed</li>
+          <li><b>Component contract</b> <code>{ onDuck: () =&gt; void, cooldownUntil: number | null }</code></li>
+          <li><b>Cooldown derivation</b> <code>useCooldown(cooldownUntil)</code> + <code>useCountdownProgress(cooldownUntil, DUCK_COOLDOWN_MS)</code></li>
         </ul>
       </div>
     </div>

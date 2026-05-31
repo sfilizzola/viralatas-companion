@@ -35,11 +35,6 @@
   grid-template-columns: 4px 56px 1fr auto;
 }
 
-/* Schedule variant with live duck: adds a 64px duck column before the star */
-.variantScheduleWithDuck {
-  grid-template-columns: 4px 56px 1fr 64px 64px;
-}
-
 .variantTimeline {
   grid-template-columns: 4px 64px 1fr auto;
 }
@@ -260,22 +255,6 @@
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-muted);
-}
-
-/* Duck column — schedule variant inline position (direct grid child, 64px wide) */
-.duckColumn {
-  border-left: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Duck button row — timeline variant only, below meta inside body */
-.duckRow {
-  width: 64px;
-  height: 64px;
-  margin-top: var(--s-2);
-  margin-left: auto;
 }
 
 /* ============================================================

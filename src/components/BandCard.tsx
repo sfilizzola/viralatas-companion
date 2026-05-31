@@ -7,7 +7,7 @@ import { useI18n } from '../lib/i18n';
 import { Avatar, Chip } from '../ui';
 import StarIcon from './icons/StarIcon';
 import PawIcon from './icons/PawIcon';
-import DuckButton from './DuckButton';
+import QuackGhostRow from './QuackGhostRow';
 import styles from './BandCard.module.css';
 
 export type BandCardVariant = 'schedule' | 'timeline' | 'ranked';
@@ -44,10 +44,9 @@ type BandCardProps = {
   };
 };
 
-function getVariantClass(variant: BandCardVariant, hasDuck: boolean): string {
+function getVariantClass(variant: BandCardVariant): string {
   if (variant === 'timeline') return styles.variantTimeline;
   if (variant === 'ranked') return styles.variantRanked;
-  if (hasDuck) return styles.variantScheduleWithDuck;
   return styles.variantSchedule;
 }
 
@@ -115,7 +114,6 @@ export default function BandCard({
   const color = isCeremony ? 'var(--ceremony-gold)' : stageColorVar(band.stage);
   const thumbFallback = isCeremony ? '✦' : initial;
   const showDuck = Boolean(onDuck) && !isCeremony;
-  const hasDuckSlot = showDuck && Boolean(onDuck);
   const showDayGhost =
     showDayLabel && (variant === 'schedule' || variant === 'ranked');
 
@@ -123,7 +121,7 @@ export default function BandCard({
 
   const cardClasses = [
     styles.card,
-    getVariantClass(variant, hasDuckSlot),
+    getVariantClass(variant),
     isCeremony ? styles.cardCeremony : '',
     interactive ? '' : styles.cardStatic,
     getConflictCardClass(conflict),
@@ -218,13 +216,6 @@ export default function BandCard({
           {pending && <span className="pending-chip">{t('pendingSync')}</span>}
         </div>
 
-        {/* Timeline variant: duck stays below meta inside body */}
-        {showDuck && onDuck && variant === 'timeline' && (
-          <div className={styles.duckRow}>
-            <DuckButton onDuck={onDuck} cooldownUntil={duckCooldownUntil ?? null} tile />
-          </div>
-        )}
-
         {attendeeCluster && variant === 'ranked' && !ratingStats && (
           <AttendeeCluster
             {...attendeeCluster}
@@ -249,14 +240,10 @@ export default function BandCard({
           />
         )}
         {children}
+        {showDuck && onDuck && (
+          <QuackGhostRow onDuck={onDuck} cooldownUntil={duckCooldownUntil ?? null} />
+        )}
       </div>
-
-      {/* Schedule variant: duck as inline grid column between body and star */}
-      {showDuck && onDuck && variant === 'schedule' && (
-        <div className={styles.duckColumn}>
-          <DuckButton onDuck={onDuck} cooldownUntil={duckCooldownUntil ?? null} tile />
-        </div>
-      )}
 
       {showPick && (
         <PickButton

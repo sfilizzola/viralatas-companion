@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { duckRepository } from '../repositories/duck';
 import { useCooldown } from './useCooldown';
-
-const COOLDOWN_MS = 90_000;
+import { DUCK_COOLDOWN_MS } from '../services/duck/constants';
 
 function cooldownKey(userId: string, bandId: string) {
   return `duck_cooldown:${userId}:${bandId}`;
@@ -58,7 +57,7 @@ export function useDuckQuack(userId: string | null, bandId: string | null) {
   const quack = useCallback(async () => {
     if (!userId || !bandId || isOnCooldown) return;
 
-    const until = Date.now() + COOLDOWN_MS;
+    const until = Date.now() + DUCK_COOLDOWN_MS;
     localStorage.setItem(cooldownKey(userId, bandId), String(until));
     setCooldownUntil(until);
 

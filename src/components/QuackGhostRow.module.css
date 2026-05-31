@@ -1,0 +1,84 @@
+/* ============================================================
+   QUACK GHOST ROW — design system § 11 (replaces DuckButton tile on /schedule + /my-picks)
+   Renders inside BandCard body below the meta row.
+   No background, no border box — reads as a tertiary text action.
+   ============================================================ */
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding-top: 8px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  text-align: left;
+}
+
+.row:disabled {
+  cursor: default;
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* Progress underline grows left→right, represents elapsed cooldown */
+.progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: rgba(255, 215, 0, 0.35);
+  pointer-events: none;
+}
+
+.duck {
+  width: 13px;
+  height: 13px;
+  object-fit: contain;
+  flex-shrink: 0;
+  transition: filter 0.3s ease;
+  user-select: none;
+  pointer-events: none;
+}
+
+.duckCooldown {
+  filter: grayscale(0.75);
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-faint);
+  flex: 1;
+  transition: color 0.15s;
+}
+
+.row:hover:not(:disabled) .label {
+  color: var(--text-muted);
+}
+
+.countdown {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  min-width: 28px;
+  text-align: right;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .row {
+    transition: none;
+  }
+}

@@ -822,3 +822,78 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `is_friend` semantics inherited from `crewGroups` unchanged — friends absent from camping/lost, appear in band groups only.
 
 ---
+
+### Phase 36 — Duck Button Redesign (QuackStrip + QuackGhostRow)
+**Status:** ✅ Complete
+
+**Goal:** Replace the 64×64 duck tile with two lighter, contextually appropriate components. Delete `DuckButton` entirely.
+
+**Deliverables:**
+
+| Location | Old | New |
+|---|---|---|
+| `/now` group card | 64×64 tile in count column | `QuackStrip` — 34px strip attached below card |
+| `/schedule` band card | 64px extra grid column | `QuackGhostRow` — ghost row inside card body |
+| `/my-picks` band card | 64×64 tile in duckRow | `QuackGhostRow` — ghost row inside card body |
+
+**Key deliverables:**
+- `src/components/QuackStrip.tsx` + `.module.css` + tests — 34px strip with duck 16px + `QUACK` label + optional MM:SS countdown
+- `src/components/QuackGhostRow.tsx` + `.module.css` + tests — ghost row with duck 13px + `QUACK` label + 1px underline progress
+- `src/services/duck/constants.ts` — shared `DUCK_COOLDOWN_MS = 90_000`
+- `src/hooks/useCountdownProgress.ts` + tests — RAF loop for MM:SS + fill fraction, used by both components
+- i18n: `QuackStrip_{br,en,es,de}.json` + `QuackGhostRow_{br,en,es,de}.json` (8 files) · deleted `DuckButton_{br,en,es,de}.json` (4 files)
+- `src/lib/i18n.ts` — swapped imports and TranslationFile type
+- `src/components/now/CrewGroupsSection.tsx` + `src/pages/RightNowPage.module.css` — wired `QuackStrip` into `/now` group card, removed duck column width hacks
+- `src/components/BandCard.tsx` + `.module.css` — wired `QuackGhostRow` into body, removed variant duck layout logic + duck column/row CSS
+- `src/components/profile/GodlikeAdminPanel.tsx` — updated test quack to use `QuackGhostRow` instead of deleted `DuckButton`
+- Deleted: `src/components/DuckButton.tsx` + `.module.css`
+- `public/vira-lata-ds.html` — replaced § 11 DuckButton docs with `QuackStrip` + `QuackGhostRow` specs
+
+**Acceptance criteria (all met):**
+- [x] `/now` group card shows no tile; discreet strip below with progress + MM:SS countdown during cooldown
+- [x] `/schedule` + `/my-picks` band cards show no extra column; ghost row inside body with underline progress + MM:SS
+- [x] `DuckButton` and all its files fully removed
+- [x] Build green · Tests green (697 tests)
+- [x] Admin test quack updated to use new component
+
+**Wiki:** `public/vira-lata-ds.html` (§ 11 updated) · no new architecture pages (pure component extraction)
+
+**Architectural notes:**
+- Two focused components sharing prop contract `{ onDuck, cooldownUntil }` and countdown animation logic
+- Both use `useCooldown(cooldownUntil)` to derive disabled state
+- Countdown derivation factored into shared `useCountdownProgress(cooldownUntil, DUCK_COOLDOWN_MS)` hook — returns `{ fillFraction, countdown }` for two different visual representations (fill sweep vs. underline progress)
+- Godlike admin panel remains out of scope but was updated to not break when DuckButton removed
+- Asset `/rubber-duck.png` stays in use; user to replace with more compact variant independently
+
+---
+
+### Phase 37 — Upcoming Band Card
+**Status:** ✅ Complete
+
+**Goal:** Show a dismissible pre-show banner on `/now` 15 minutes before the user's next picked band starts, with crew attendance context.
+
+**Design:** Horizontal Banner (V2) — full-width card with gold accent left stripe, gradient background, overlapping crew avatars as focal point, collapsible crew drawer, QuackStrip always attached below.
+
+**Key deliverables:**
+- `src/components/now/UpcomingBandCard.tsx` — full-width banner with collapsed/expanded states, dismiss (X) button, crew avatar overlaps, band name/stage/time, QuackStrip below
+- `src/hooks/useNowData.ts` — added `nextBand` (next picked band within 15 min that isn't current) and `timeDelta` (ms until start) to hook return
+- `src/pages/RightNowPage.tsx` — renders UpcomingBandCard, manages `dismissedBands` (session-only `Set<string>`) and `expandedUpcoming` toggle; card mutually exclusive with `LatestAnnouncementBanner`
+- i18n: upcoming card strings in all 4 locales (br, en, es, de)
+- Unit tests: visibility logic, expand/collapse toggle, dismiss, offline state
+
+**Acceptance criteria (all met):**
+- [x] Card appears when: user NOT at a band + next pick starts ≤15 min away + not dismissed
+- [x] Card replaces LatestAnnouncementBanner slot (mutually exclusive)
+- [x] Collapsed: "Upcoming" badge, band name, stage, time, crew avatars, X button
+- [x] Expanded: collapsed header + full crew list (names + avatars)
+- [x] Tap body toggles collapsed ↔ expanded; X dismisses for session
+- [x] Card auto-disappears when band starts (myPlan updates to 'current')
+- [x] QuackStrip always visible below (both states)
+- [x] All interactions offline-capable (no new network calls)
+- [x] Build green · Tests green (707 tests)
+
+**Architectural notes:**
+- Dismissal is session-only (`Set<string>` in component state) — no IDB writes needed
+- Crew list derived from existing `crewPlans` memo — zero new DB queries
+- QuackStrip below card is a separate duck instance with its own cooldown, not shared with group cards
+- Card slot priority: UpcomingBandCard > LatestAnnouncementBanner (only one renders at a time)

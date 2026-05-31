@@ -8,7 +8,7 @@ import { formatFestivalTime } from '../../services/livePreview';
 import { stageColor } from '../../services/stageColors';
 import Avatar from '../../ui/Avatar';
 import Icon from '../icons/Icon';
-import DuckButton from '../DuckButton';
+import QuackStrip from '../QuackStrip';
 import styles from '../../pages/RightNowPage.module.css';
 
 type TFn = (key: string, values?: Record<string, string | number>) => string;
@@ -144,13 +144,14 @@ export default function CrewGroupsSection({
           group.kind === 'band' &&
           myPlan.status === 'current' &&
           myPlan.band?.id === group.band.id;
+        const showStrip = showWeakButton && !!onDuck;
+        const key = group.kind === 'band' ? group.band.id : group.kind;
 
-        return (
+        const card = (
           <article
             className={`${styles.groupCard} ${styles[group.kind]} ${
               isUserHere ? styles.youAreHere : ''
-            }`}
-            key={group.kind === 'band' ? group.band.id : group.kind}
+            } ${showStrip ? styles.groupCardAboveStrip : ''}`}
             onClick={() => onGroupSelect(group)}
             style={{ cursor: 'pointer' }}
           >
@@ -183,14 +184,6 @@ export default function CrewGroupsSection({
                     {group.members.length}
                     <small className={styles.locCountLabel}>{t('crewCountLabel')}</small>
                   </div>
-                  {showWeakButton && onDuck && (
-                    <DuckButton
-                      onDuck={onDuck}
-                      cooldownUntil={duckCooldownUntil ?? null}
-                      inBody
-                      tile
-                    />
-                  )}
                 </div>
               </div>
               {showWeakButton && (
@@ -202,6 +195,15 @@ export default function CrewGroupsSection({
               )}
             </div>
           </article>
+        );
+
+        return (
+          <div key={key}>
+            {card}
+            {showStrip && (
+              <QuackStrip onDuck={onDuck!} cooldownUntil={duckCooldownUntil ?? null} />
+            )}
+          </div>
         );
       })}
     </section>

@@ -395,6 +395,12 @@
   grid-template-columns: 6px 1fr;
 }
 
+/* Card that sits above a QuackStrip — remove bottom radius so strip closes the shape */
+.groupCardAboveStrip {
+  border-radius: var(--r-2) var(--r-2) 0 0;
+  border-bottom-color: transparent;
+}
+
 /* You-are-here: per-variant left rail color is set on .locStrip;
    the card itself gains a subtle elevated bg */
 .youAreHere {
@@ -474,18 +480,13 @@
   text-transform: uppercase;
 }
 
-/* Right column: twin 64×64 tiles when duck is shown, otherwise count auto */
+/* Right column: count tile */
 .groupCountCol {
   display: flex;
   flex-direction: column;
   align-items: stretch;
   gap: 6px;
   flex-shrink: 0;
-}
-
-/* When duck is rendered alongside count, force matching square footprint */
-.groupCountCol:has(button) {
-  width: 64px;
 }
 
 .groupCount {
@@ -500,11 +501,6 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   font-variant-numeric: tabular-nums;
   text-align: center;
-}
-
-/* When duck is rendered, count grows into a square tile to match */
-.groupCountCol:has(button) .groupCount {
-  padding: 8px 4px;
 }
 
 .locCountLabel {

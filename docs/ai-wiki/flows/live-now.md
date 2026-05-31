@@ -11,13 +11,14 @@ Document how the app displays the current/next band for each crew member, includ
 | File | Role |
 |---|---|
 | `src/pages/RightNowPage.tsx` | `/now` route shell |
-| `src/hooks/useNowData.ts` | Thin composer — wires config, cache, plans, presence side effects, weak-skip commit timer (Phase 26.M) |
+| `src/hooks/useNowData.ts` | Thin composer — wires config, cache, plans, presence side effects, weak-skip commit timer (Phase 26.M); calculates `nextBand` and `timeDelta` (Phase 37) |
 | `src/services/weakSkips.ts` | Committed “I am weak” counter in `user_metadata.weak_skips_2026` |
 | `src/hooks/useNowCache.ts` | IDB cache load + window event listeners for picks/crew/presence/announcements |
 | `src/hooks/useNowPlans.ts` | Live plan memos (`myPlan`, `crewPlans`, `crewGroups`, `duckBandId`, …) |
 | `src/hooks/useMetalPlaceConfig.ts` | Metal Place config IDB + window events (Realtime via `RealtimeSync`) |
 | `src/hooks/useLiveBandTestConfig.ts` | Live band test config IDB + window events (Realtime via `RealtimeSync`) |
 | `src/components/sync/RealtimeSync.tsx` | Mounts repository Realtime subscriptions (Phase 27.D) |
+| `src/components/now/UpcomingBandCard.tsx` | Dismissible 15-minute pre-show banner (Phase 37) |
 | `src/repositories/presence.ts` | `applyPresenceToggle`, `autoClearCampingOnCurrentBand`, `validateAndAutoCheckout` |
 | `src/services/livePreview.ts` | `findLivePlan`, `mapCrewLivePlans`, `groupCrewLivePlans`, `computeCrewLocationCounts` |
 | `src/lib/realtimeSync.ts` | `subscribePostgresChanges()` helper (Phase 26.H) |
@@ -199,7 +200,8 @@ User taps /now route
    RightNowPage displays:
      - Header: current time (Wacken CEST)
      - Presence toggle: camping / metal place / auto
-     - Latest announcement (if not watching)
+     - UpcomingBandCard (if within 15-min window, see below)
+       OR LatestAnnouncementBanner (if no upcoming card)
      - Badges: user's earned badges
      - CrewGroupsSection:
        For each group:
@@ -250,6 +252,83 @@ handleUndo (within 5s):
 **Isolation:** `togglePick`, `BandDetailModal`, and `ConflictSection` never call `recordCommittedSkip()`.
 
 **Storage:** `user_metadata.weak_skips_2026` via best-effort `auth.updateUser` — same family as `location_visits`. No badge registry entries yet; festival reset strip deferred. See `docs/superpowers/specs/2026-05-26-weak-skip-counter-design.md`.
+
+---
+
+## Upcoming Band Card (Phase 37)
+
+A dismissible full-width banner that appears on `/now` when the user's next picked band starts within **15 minutes** and the user is not currently watching a band (`myPlan.status !== 'current'`).
+
+### Visibility Logic
+
+```
+timeDelta = (nextBand.start_time - now) / 60_000   // ms → minutes
+
+show card when:
+  nextBand !== null
+  && !dismissedBandIds.has(nextBand.id)        // not dismissed this session
+  && myPlan.status !== 'current'               // not already at a band
+  && timeDelta >= 0                            // band hasn't started yet
+  && timeDelta <= 15                           // within 15-minute window
+```
+
+`nextBand` is computed in `useNowData` as the earliest user-picked band whose `start_time > now` when `myPlan.status !== 'current'`:
+
+```typescript
+const nextBand = useMemo(() => {
+  if (myPlan.status === 'current' || !userId) return null;
+  const upcomingBands = picks
+    .filter((pick) => pick.user_id === userId)
+    .map((pick) => bands.find((b) => b.id === pick.band_id))
+    .filter((b): b is Band => b !== undefined && b.start_time > now.toISOString())
+    .sort((a, b) => a.start_time.localeCompare(b.start_time));
+  return upcomingBands[0] ?? null;
+}, [picks, bands, myPlan.status, userId, now]);
+```
+
+### Card Anatomy
+
+```
+┌──────────────────────────────────────────────────────┐
+│▌ BAND NAME                         [Upcoming]   [✕] │
+│  ██Stage██  22:00     3 going                        │
+└──────────────────────────────────────────────────────┘
+│ ──── QuackStrip (if duck enabled) ─────────────────  │
+└──────────────────────────────────────────────────────┘
+```
+
+- **Left stripe** — 4 px, colored with `stageColor(nextBand.stage)`, same palette as CrewGroupsSection cards.
+- **Gradient background** — dark elevated surface from `--bg-elevated`.
+- **Name row** — band name (`var(--font-display)`, uppercase) + gold "Upcoming" badge.
+- **Meta row** — colored stage pill + formatted start time (`formatFestivalTime`) + crew going count (hidden when 0).
+- **Dismiss button** — absolute top-right `✕`; taps do NOT propagate to the expand toggle.
+- **Crew going** — `crewMembers` is filtered from `crewPlans` (members whose `plan.band?.id` or `plan.nextBand?.id` matches `nextBand.id`).
+
+### Expand / Collapse
+
+Clicking anywhere on the card body (except the dismiss button) toggles `isExpanded`. When expanded, a drawer below the card lists all `crewMembers` with avatar + name rows; the current user's row is visually highlighted and annotated with a "you" tag.
+
+### Dismiss Behavior
+
+Dismissal is **session-only** (React `useState<Set<string>>`). After dismiss:
+- The card disappears.
+- If there is a `latestAnnouncement` and `myPlan.status !== 'current'`, the `LatestAnnouncementBanner` replaces the card slot.
+- Navigating away and back resets `dismissedBandIds`, so the card reappears if still within window.
+
+### Priority / Slot Sharing
+
+The upcoming card and the announcement banner share the same render slot. Priority:
+1. **UpcomingBandCard** — if `nextBandInWindow` is truthy.
+2. **LatestAnnouncementBanner** — otherwise, if an announcement exists and user not currently at band.
+3. **Nothing** — if neither condition holds.
+
+### QuackStrip
+
+`UpcomingBandCard` accepts an optional `onDuck` prop. When duck is enabled (`useDuckEnabled()`), `RightNowPage` passes `nextDuckQuack` (a `useDuckQuack(userId, nextBand.id)` instance distinct from the current-band duck) so users can quack the upcoming band before it starts.
+
+### Offline Behavior
+
+The card is entirely derived from IndexedDB data (`picks`, `bands`, `now`). It renders correctly offline — no network calls required. There is no separate persistence for dismissed IDs; dismiss state resets on reload.
 
 ---
 
@@ -696,4 +775,4 @@ useEffect(() => {
 
 ---
 
-**Last updated:** 2026-05-24 — Phase 26.M composable `/now` hooks; Realtime via `usePresenceRealtime` + `subscribePostgresChanges`.
+**Last updated:** 2026-05-31 — Phase 37 Upcoming Band Card (15-minute pre-show banner, dismiss, expand/collapse, crew going, QuackStrip attachment, slot priority with LatestAnnouncementBanner).
