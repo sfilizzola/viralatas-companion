@@ -6,7 +6,7 @@ import { useGodlikeAdminI18n } from '../../lib/i18n';
 import { announcementsRepository } from '../../repositories';
 import { useCooldown } from '../../hooks/useCooldown';
 import { Collapsible } from '../../ui';
-import DuckButton from '../DuckButton';
+import QuackGhostRow from '../QuackGhostRow';
 import { DUCK_QUACK_EVENT } from '../../hooks/useDuckNotifications';
 import TimeTravelSection from './TimeTravelSection';
 import TestBadgeSection from './TestBadgeSection';
@@ -173,8 +173,7 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
               {!duckFeatureEnabled && (
                 <p className={styles.testModeHint}>{t('testQuackDisabledHint')}</p>
               )}
-              <DuckButton
-                tile
+              <QuackGhostRow
                 onDuck={() => {
                   if (isTestQuackOnCooldown) return;
                   setTestQuackCooldownUntil(Date.now() + TEST_QUACK_COOLDOWN_MS);

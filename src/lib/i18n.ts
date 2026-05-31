@@ -55,10 +55,6 @@ import quackGhostRowBr from '../i18n/QuackGhostRow_br.json';
 import quackGhostRowDe from '../i18n/QuackGhostRow_de.json';
 import quackGhostRowEn from '../i18n/QuackGhostRow_en.json';
 import quackGhostRowEs from '../i18n/QuackGhostRow_es.json';
-import duckButtonBr from '../i18n/DuckButton_br.json';
-import duckButtonDe from '../i18n/DuckButton_de.json';
-import duckButtonEn from '../i18n/DuckButton_en.json';
-import duckButtonEs from '../i18n/DuckButton_es.json';
 import wrapBr from '../i18n/WrapPage_br.json';
 import wrapDe from '../i18n/WrapPage_de.json';
 import wrapEn from '../i18n/WrapPage_en.json';
@@ -85,7 +81,6 @@ type TranslationFile =
   | 'SyncToast'
   | 'QuackStrip'
   | 'QuackGhostRow'
-  | 'DuckButton'
   | 'WrapPage'
   | 'MapPage'
   | 'GodlikeAdmin';
@@ -111,7 +106,6 @@ const translations: Translations = {
     SyncToast: syncToastBr,
     QuackStrip: quackStripBr,
     QuackGhostRow: quackGhostRowBr,
-    DuckButton: duckButtonBr,
     WrapPage: wrapBr,
     MapPage: mapBr,
     GodlikeAdmin: {},
@@ -131,7 +125,6 @@ const translations: Translations = {
     SyncToast: syncToastEn,
     QuackStrip: quackStripEn,
     QuackGhostRow: quackGhostRowEn,
-    DuckButton: duckButtonEn,
     WrapPage: wrapEn,
     MapPage: mapEn,
     GodlikeAdmin: {},
@@ -151,7 +144,6 @@ const translations: Translations = {
     SyncToast: syncToastEs,
     QuackStrip: quackStripEs,
     QuackGhostRow: quackGhostRowEs,
-    DuckButton: duckButtonEs,
     WrapPage: wrapEs,
     MapPage: mapEs,
     GodlikeAdmin: {},
@@ -171,7 +163,6 @@ const translations: Translations = {
     SyncToast: syncToastDe,
     QuackStrip: quackStripDe,
     QuackGhostRow: quackGhostRowDe,
-    DuckButton: duckButtonDe,
     WrapPage: wrapDe,
     MapPage: mapDe,
     GodlikeAdmin: {},
