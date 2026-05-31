@@ -35,25 +35,43 @@ try {
 }
 
 Deno.serve(async (req) => {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    return new Response(null, {
+      status: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+      },
+    });
+  }
+
   try {
     // Extract the caller's JWT to identify them
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'Missing auth' }), { status: 401 });
+      return new Response(JSON.stringify({ error: 'Missing auth' }), { status: 401, headers: { 'Access-Control-Allow-Origin': '*' } });
     }
     const jwt = authHeader.slice(7);
 
     // Use service role client for DB queries, but verify JWT first
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
       console.error('Missing Supabase config');
-      return new Response(JSON.stringify({ error: 'Server misconfigured' }), { status: 500 });
+      return new Response(JSON.stringify({ error: 'Server misconfigured' }), {
+        status: 500,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+      });
     }
 
     const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const { data: { user }, error: authError } = await serviceClient.auth.getUser(jwt);
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Invalid token' }), { status: 401 });
+      return new Response(JSON.stringify({ error: 'Invalid token' }), {
+        status: 401,
+        headers: { 'Access-Control-Allow-Origin': '*' },
+      });
     }
 
     // Look up this user's push subscription(s)
@@ -65,6 +83,7 @@ Deno.serve(async (req) => {
     if (subError) {
       return new Response(JSON.stringify({ error: 'DB error', detail: subError.message }), {
         status: 500,
+        headers: { 'Access-Control-Allow-Origin': '*' },
       });
     }
 
@@ -74,7 +93,10 @@ Deno.serve(async (req) => {
           error: 'no_subscription',
           message: 'No push subscription found for this user. Make sure push permission was granted.',
         }),
-        { status: 404 },
+        {
+          status: 404,
+          headers: { 'Access-Control-Allow-Origin': '*' },
+        },
       );
     }
 
@@ -103,12 +125,19 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ sent, failed, errors }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
   } catch (err) {
     console.error('send-test-push error:', err);
     return new Response(JSON.stringify({ error: 'Server error', detail: String(err) }), {
       status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      },
     });
   }
 });
