@@ -3,6 +3,7 @@ import type { Band, BandRatingScore } from '../types';
 import type { BandAttendee } from '../hooks/useBandAttendees';
 import { stageColorVar } from '../services/stageColors';
 import { bandWeekdayKey, formatTime } from '../services/bandTime';
+import { getMetalBattleCountryFlag } from '../services/metalBattle';
 import { useI18n } from '../lib/i18n';
 import { Avatar, Chip } from '../ui';
 import StarIcon from './icons/StarIcon';
@@ -211,7 +212,11 @@ export default function BandCard({
           {variant === 'timeline' && conflict && <ConflictChip conflict={conflict} />}
           {showAttendanceChip && <AttendanceChip kind={attendanceChip} />}
           {band.genre && variant === 'schedule' && (
-            <span className={styles.genre}>{band.genre}</span>
+            <span className={styles.genre}>
+              {band.genre === 'Metal Battle'
+                ? `${getMetalBattleCountryFlag(band.slot_id) ?? ''} Metal Battle`.trim()
+                : band.genre}
+            </span>
           )}
           {pending && <span className="pending-chip">{t('pendingSync')}</span>}
         </div>
