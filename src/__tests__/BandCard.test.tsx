@@ -199,4 +199,44 @@ describe('BandCard', () => {
 
     expect(queryByText('Attended')).toBeNull();
   });
+
+  it('shows country flag prepended to "Metal Battle" in schedule variant', () => {
+    const metalBattleBand: Band = {
+      id: 'mb1',
+      slot_id: 'WET2',       // Cyprus → 🇨🇾
+      name: 'Speak in Whispers',
+      stage: 'WET',
+      start_time: '2026-07-30T11:50:00Z',
+      end_time: '2026-07-30T12:10:00Z',
+      image_url: null,
+      genre: 'Metal Battle',
+      category: 'band',
+    };
+
+    const { getByText } = renderWithI18n(
+      <BandCard band={metalBattleBand} isPicked={false} count={0} onToggle={() => {}} />,
+    );
+
+    expect(getByText('🇨🇾 Metal Battle')).toBeInTheDocument();
+  });
+
+  it('shows plain "Metal Battle" when the slot has no confirmed country (WET23)', () => {
+    const unknownBand: Band = {
+      id: 'mb2',
+      slot_id: 'WET23',      // Day 3 TBA — not in the map
+      name: 'TDB MTB',
+      stage: 'WET',
+      start_time: '2026-08-01T11:00:00Z',
+      end_time: '2026-08-01T11:45:00Z',
+      image_url: null,
+      genre: 'Metal Battle',
+      category: 'band',
+    };
+
+    const { getByText } = renderWithI18n(
+      <BandCard band={unknownBand} isPicked={false} count={0} onToggle={() => {}} />,
+    );
+
+    expect(getByText('Metal Battle')).toBeInTheDocument();
+  });
 });
