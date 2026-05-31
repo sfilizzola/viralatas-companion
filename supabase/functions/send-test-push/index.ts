@@ -42,7 +42,7 @@ Deno.serve(async (req) => {
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-client-info',
+        'Access-Control-Allow-Headers': req.headers.get('Access-Control-Request-Headers') || '*',
         'Access-Control-Max-Age': '86400',
       },
     });
