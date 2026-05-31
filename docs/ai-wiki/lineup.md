@@ -10,7 +10,7 @@
 >
 > Use destructive `npm run seed:bands` only for festival reset / full rebuild — see [lineup-sync.md](lineup-sync.md).
 
-**Summary:** 155 bands CONFIRMED · 31 `TDB MTB` Metal Battle placeholders · 12 TBD · 199 total · 1 ceremony (Farewell & Announcements, HAR13)
+**Summary:** 155 bands CONFIRMED · 12 `TDB MTB` Metal Battle placeholders · 19 named TDB (known name, image pending) · 12 TBD (dropped, Name=TBD) · 199 total · 1 ceremony (Farewell & Announcements, HAR13)
 
 **Genres:** 13 canonical labels after Phase 25 collapse — **[old → new mapping table](genre-collapse-mapping.md)** · [domain-model](domain-model.md#band) · [ADR](decisions/genre-collapse-canonical-labels.md). Unknown/TBD tags in this file seed as `Metal`.
 
