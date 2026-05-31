@@ -73,16 +73,27 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
+        console.error('No session token available');
         setTestPushResult({ ok: false, message: t('testPushError') });
         return;
       }
 
+      console.log('Invoking send-test-push with token:', session.access_token.slice(0, 20) + '...');
+
       const res = await supabase.functions.invoke('send-test-push', {
-        headers: { Authorization: `Bearer ${session.access_token}` },
+        body: {},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
       });
 
+      console.log('send-test-push response:', res);
+
       if (res.error) {
-        setTestPushResult({ ok: false, message: t('testPushError') });
+        console.error('Edge Function error:', res.error);
+        const errorMsg = res.error.message || String(res.error);
+        setTestPushResult({ ok: false, message: `${t('testPushError')}: ${errorMsg}` });
         return;
       }
 
