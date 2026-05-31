@@ -63,6 +63,10 @@ import mapBr from '../i18n/MapPage_br.json';
 import mapDe from '../i18n/MapPage_de.json';
 import mapEn from '../i18n/MapPage_en.json';
 import mapEs from '../i18n/MapPage_es.json';
+import upcomingBandCardBr from '../i18n/UpcomingBandCard_br.json';
+import upcomingBandCardDe from '../i18n/UpcomingBandCard_de.json';
+import upcomingBandCardEn from '../i18n/UpcomingBandCard_en.json';
+import upcomingBandCardEs from '../i18n/UpcomingBandCard_es.json';
 
 export type Language = 'br' | 'en' | 'es' | 'de';
 
@@ -83,6 +87,7 @@ type TranslationFile =
   | 'QuackGhostRow'
   | 'WrapPage'
   | 'MapPage'
+  | 'UpcomingBandCard'
   | 'GodlikeAdmin';
 
 type TranslationStrings = Record<string, string>;
@@ -108,6 +113,7 @@ const translations: Translations = {
     QuackGhostRow: quackGhostRowBr,
     WrapPage: wrapBr,
     MapPage: mapBr,
+    UpcomingBandCard: upcomingBandCardBr,
     GodlikeAdmin: {},
   },
   en: {
@@ -127,6 +133,7 @@ const translations: Translations = {
     QuackGhostRow: quackGhostRowEn,
     WrapPage: wrapEn,
     MapPage: mapEn,
+    UpcomingBandCard: upcomingBandCardEn,
     GodlikeAdmin: {},
   },
   es: {
@@ -146,6 +153,7 @@ const translations: Translations = {
     QuackGhostRow: quackGhostRowEs,
     WrapPage: wrapEs,
     MapPage: mapEs,
+    UpcomingBandCard: upcomingBandCardEs,
     GodlikeAdmin: {},
   },
   de: {
@@ -165,6 +173,7 @@ const translations: Translations = {
     QuackGhostRow: quackGhostRowDe,
     WrapPage: wrapDe,
     MapPage: mapDe,
+    UpcomingBandCard: upcomingBandCardDe,
     GodlikeAdmin: {},
   },
 };
