@@ -37,5 +37,11 @@ coverage/
 # Visual brainstorm sessions
 .superpowers/
 
+# Claude Code tooling (agents, context, worktrees)
+.claude/
+
+# Superpowers working documents (plans, specs, prototypes)
+docs/superpowers/
+
 # Local design demos and scratch work
 _temp/
