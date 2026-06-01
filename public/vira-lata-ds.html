@@ -152,6 +152,7 @@
     line-height: 1.7;
   }
   .masthead .specs b { color: var(--text); font-weight: 500; }
+  .masthead .lede--secondary { margin-top: var(--s-3); font-size: 13px; color: var(--text-faint); max-width: 52ch; }
 
   /* ---- section headers ---- */
   .section { padding: var(--s-12) 0; border-bottom: 1px solid var(--border); }
@@ -2610,8 +2611,8 @@
     <div>
       <div class="eyebrow">Vira-Lata DS &middot; v3.0 &middot; Wacken Open Air 2026 &middot; canonical</div>
       <h1>Viralatas<br />Metaleiros<span class="horns"> 🤘</span></h1>
-      <p class="lede">A festival companion PWA for ~20 metal vira-latas. Dark-first, offline-first. Feels like a backstage wristband, not a corporate app. <strong style="color:var(--text-muted)">Canonical design system</strong> — edit only this file (<code>public/vira-lata-ds.html</code>).</p>
-      <p class="lede" style="margin-top:var(--s-3);font-size:13px;color:var(--text-faint);max-width:52ch"><strong style="color:var(--text-muted)">Visual relationship to Wacken Open Air:</strong> We reference the festival by using its 8 canonical stage colors as the only saturated palette in the app. We do not recreate, copy, or approximate Wacken's own graphic identity (logotype, mascot, stage graphics). Stage color assignments are fixed and must not be changed — they are the festival's identity, not ours to reinterpret.</p>
+      <p class="lede">A festival companion PWA for ~20 metal vira-latas. Dark-first, offline-first. Feels like a backstage wristband, not a corporate app. <strong class="text-muted">Canonical design system</strong> — edit only this file (<code>public/vira-lata-ds.html</code>).</p>
+      <p class="lede lede--secondary"><strong class="text-muted">Visual relationship to Wacken Open Air:</strong> We reference the festival by using its 8 canonical stage colors as the only saturated palette in the app. We do not recreate, copy, or approximate Wacken's own graphic identity (logotype, mascot, stage graphics). Stage color assignments are fixed and must not be changed — they are the festival's identity, not ours to reinterpret.</p>
     </div>
     <div class="specs">
       <b>FOUNDATION</b><br />
@@ -2623,7 +2624,7 @@
       no glow / no gradients*<br />
       stage colors are fixed<br />
       offline-first &mdash; no spinners<br />
-      <small style="color:var(--text-faint)">* see §01 Crew-state exception</small>
+      <small class="text-faint">* see §01 Crew-state exception</small>
     </div>
   </header>
 
