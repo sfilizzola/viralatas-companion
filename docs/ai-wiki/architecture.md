@@ -39,6 +39,7 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/components/map/minimapZones.ts` — `MINIMAP_ZONES` zone geometry config, `stageToZone()`, `groupKindToZone()` (Phase 35)
 - `src/services/minimapPlacement.ts` — Pure `buildPlacements()` with phyllotaxis layout + self-ordering (Phase 35)
 - `src/services/userColor.ts` — `colorForUserId()` deterministic HSL color for avatar initials (Phase 35)
+- `src/services/metalBattle.ts` — `getMetalBattleCountryFlag(slotId)`; static `slot_id`→country map → ISO2 flag emoji (or regional 🌍) for the Metal Battle genre label on `BandCard`
 - `vite.config.ts` — PWA configuration, caching strategy, and local dev proxy for MoshSplit API
 - `vercel.json` — Vercel rewrites including MoshSplit CORS proxy (`/api/moshsplit/:path*`)
 
@@ -486,6 +487,7 @@ INSERT into user_picks
 | `attendees.ts` | `computeAttendees(picks, crewUsers)` — maps raw picks to hydrated `BandAttendee[]` per band; exports `BandAttendee` and `AttendeeMap` types | ✅ Yes |
 | `weakSkips.ts` | `getWeakSkipCount()`, `recordCommittedSkip()` — committed “I am weak” skips in `user_metadata.weak_skips_2026` via best-effort `auth.updateUser` (same pattern as `location_visits` in `presenceRepository`) | Auth metadata only |
 | `badges/currentFestivalYear.ts` | `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()` — live vest year filter + consolidation gate | ✅ Yes |
+| `metalBattle.ts` | `getMetalBattleCountryFlag(slotId)` — static `slot_id`→country map → ISO2 flag emoji (or regional 🌍); prefixes the `Metal Battle` genre label on `BandCard` | ✅ Yes (static data, no IDB) |
 
 ### Badge archive flow (Phase 29)
 

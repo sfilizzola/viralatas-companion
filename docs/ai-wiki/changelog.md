@@ -4,6 +4,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-01 (Metal Battle country flags)
+
+### Added
+- **`src/services/metalBattle.ts`** — `getMetalBattleCountryFlag(slotId)`: maps each Metal Battle `slot_id` (WET*/HBA*) to a country/region, returning the ISO2→emoji flag (built via `isoToFlag()` regional-indicator math) or a pre-built regional 🌍 glyph for multi-country entries (Sub-Saharan Africa, Balkans). Returns `null` when the slot has no confirmed representative yet.
+- **Unit tests** — `src/__tests__/metalBattle.test.ts` (slot→flag mapping, regional fallback, unknown slot → null) and a `BandCard.test.tsx` case asserting the flag prefix renders for Metal Battle bands.
+
+### Changed
+- `src/components/BandCard.tsx` — the genre label now prefixes the country flag emoji for bands whose `genre === 'Metal Battle'` (`` `${getMetalBattleCountryFlag(band.slot_id) ?? ''} Metal Battle`.trim() ``); all other genres render unchanged.
+- `docs/ai-wiki/architecture.md` — added `src/services/metalBattle.ts` to Relevant Source Files and the Services table.
+- `public/vira-lata-ds.html` — documented the Metal Battle flag prefix in the BandCard genre-label section.
+
+### Architectural Notes
+- Fully client-side and offline-safe: the slot→country table is static data baked into the bundle; no IDB or network reads. New competitor reveals are shipped as code edits to `METAL_BATTLE_COUNTRIES`.
+- Mapping is keyed on `slot_id` (stable across lineup syncs), not band name — survives TBD→named band fills without touching the flag logic.
+
+---
+
 ## 2026-05-31 (Phase 37 — Upcoming Band Card)
 
 ### Added
