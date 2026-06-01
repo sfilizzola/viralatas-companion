@@ -1905,7 +1905,30 @@
     line-height: 1.6;
   }
   .sidenav a:hover { color: var(--text); border-left-color: var(--accent); }
-  @media (max-width: 1100px) { .sidenav { display: none; } }
+  /* sidenav toggle — hidden on desktop, shown ≤1100px */
+  .sidenav-toggle {
+    display: none;
+    position: fixed; top: var(--s-5); left: var(--s-5); z-index: 60;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text); background: var(--bg-elevated);
+    border: 1px solid var(--border-strong); border-radius: var(--r-1);
+    padding: var(--s-2) var(--s-3); cursor: pointer;
+  }
+  @media (max-width: 1100px) {
+    .sidenav {
+      transform: translateX(-130%);
+      transition: transform 0.2s ease;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-2);
+      padding: var(--s-3);
+      z-index: 55;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .sidenav.open { transform: translateX(0); }
+    .sidenav-toggle { display: block; }
+  }
 
   /* ============================================================
      INPUT COMPONENT (Design System demo)
@@ -2259,7 +2282,8 @@
   ]
 }
 </script>
-<nav class="sidenav">
+<button class="sidenav-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="ds-sidenav">☰ Sections</button>
+<nav class="sidenav" id="ds-sidenav">
   <a href="#color">01 Color</a>
   <a href="#type">02 Type</a>
   <a href="#space">03 Space</a>
@@ -2268,11 +2292,11 @@
   <a href="#icons">06 Icons</a>
   <a href="#motion">07 Motion</a>
   <a href="#additional">08 Additional</a>
-  <a href="#empty-states">10 Empty</a>
+  <a href="#empty-states">10 Empty &amp; Error</a>
   <a href="#duck">11 Duck 🦆</a>
-  <a href="#minimap">13 Minimap</a>
   <a href="#governance">12 Governance</a>
-  <a href="#changelog">Log</a>
+  <a href="#minimap">13 Minimap</a>
+  <a href="#changelog">Changelog</a>
 </nav>
 <div class="page">
 
@@ -6358,6 +6382,20 @@ export const MINIMAP_ZONES: Record&lt;ZoneId, FractionalBox&gt; = {
     });
   });
 })();
+</script>
+<script>
+  (function () {
+    var t = document.querySelector('.sidenav-toggle'),
+        n = document.getElementById('ds-sidenav');
+    if (!t || !n) return;
+    t.addEventListener('click', function () {
+      var open = n.classList.toggle('open');
+      t.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    n.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') n.classList.remove('open');
+    });
+  })();
 </script>
 </body>
 </html>
