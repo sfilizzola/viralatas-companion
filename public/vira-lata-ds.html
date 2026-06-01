@@ -2204,6 +2204,9 @@
   .ds-table td.ds-table-key{color:var(--text)}
   .ds-table code{color:var(--text-faint)}
   .ds-swatch-cell{display:inline-block;width:16px;height:16px;border-radius:2px;margin-right:8px;vertical-align:middle}
+  /* dark ink on light swatch/stage fills (scoped to beat .swatch .chip and .stage-rail > div) */
+  .swatch .chip.swatch-ink{color:#0a0a0a}
+  .stage-rail > div.swatch-ink{color:#0a0a0a}
   .subhead--tight{border-bottom:0;padding-bottom:0;margin-top:var(--s-5);font-size:11px}
 </style>
 </head>
@@ -2344,9 +2347,9 @@
       <div class="swatch"><div class="chip" style="background:#050505">#050505</div><div class="meta"><div class="name">Sunken</div><div class="tok">--bg-sunken</div><div class="hex">modal scrim, input</div></div></div>
       <div class="swatch"><div class="chip" style="background:#2a2a2a">#2a2a2a</div><div class="meta"><div class="name">Border</div><div class="tok">--border</div><div class="hex">hairlines</div></div></div>
       <div class="swatch"><div class="chip" style="background:#3a3a3a">#3a3a3a</div><div class="meta"><div class="name">Border Strong</div><div class="tok">--border-strong</div><div class="hex">btn, focus</div></div></div>
-      <div class="swatch"><div class="chip" style="background:#e8e8e8;color:#0a0a0a">#e8e8e8</div><div class="meta"><div class="name">Text</div><div class="tok">--text</div><div class="hex">primary copy</div></div></div>
-      <div class="swatch"><div class="chip" style="background:#888;color:#0a0a0a">#888888</div><div class="meta"><div class="name">Text Muted</div><div class="tok">--text-muted</div><div class="hex">secondary</div></div></div>
-      <div class="swatch"><div class="chip" style="background:#555;color:#0a0a0a">#555555</div><div class="meta"><div class="name">Text Faint</div><div class="tok">--text-faint</div><div class="hex">disabled</div></div></div>
+      <div class="swatch"><div class="chip swatch-ink" style="background:#e8e8e8">#e8e8e8</div><div class="meta"><div class="name">Text</div><div class="tok">--text</div><div class="hex">primary copy</div></div></div>
+      <div class="swatch"><div class="chip swatch-ink" style="background:#888">#888888</div><div class="meta"><div class="name">Text Muted</div><div class="tok">--text-muted</div><div class="hex">secondary</div></div></div>
+      <div class="swatch"><div class="chip swatch-ink" style="background:#555">#555555</div><div class="meta"><div class="name">Text Faint</div><div class="tok">--text-faint</div><div class="hex">disabled</div></div></div>
     </div>
 
     <div class="subhead">Stage palette &middot; canonical, never reinterpret</div>
@@ -2357,74 +2360,74 @@
       <div style="background:#c0392b"><div class="name">W.E.T.</div><div><div>Outside Infield</div><div class="hex">#C0392B</div></div></div>
       <div style="background:#16a085"><div class="name">Headbangers</div><div><div>Outside Infield</div><div class="hex">#16A085</div></div></div>
       <div style="background:#2c3e50"><div class="name">Wasteland</div><div><div>Specialized</div><div class="hex">#2C3E50</div></div></div>
-      <div style="background:#95a5a6;color:#0a0a0a"><div class="name">Wackinger</div><div><div>Specialized</div><div class="hex">#95A5A6</div></div></div>
+      <div class="swatch-ink" style="background:#95a5a6"><div class="name">Wackinger</div><div><div>Specialized</div><div class="hex">#95A5A6</div></div></div>
       <div style="background:#f39c12"><div class="name">W.T.J.</div><div><div>Specialized</div><div class="hex">#F39C12</div></div></div>
     </div>
-    <p class="t-small" style="margin-top:var(--s-3)">Use stage colors as solid fills (badges, stripes, pills, hero strips). When tinting at low alpha, target 8–18% over surface; never tint backgrounds above 25% — they stop reading as accent.</p>
+    <p class="t-small mt-3">Use stage colors as solid fills (badges, stripes, pills, hero strips). When tinting at low alpha, target 8–18% over surface; never tint backgrounds above 25% — they stop reading as accent.</p>
 
-    <div class="subhead" style="margin-top:var(--s-8)">Stage color token map</div>
-    <table style="width:100%;border-collapse:collapse;margin-top:var(--s-4);font-family:var(--font-mono);font-size:13px;border:1px solid var(--border)">
+    <div class="subhead mt-8">Stage color token map</div>
+    <table class="ds-table">
       <thead>
-        <tr style="background:var(--bg-surface);border-bottom:1px solid var(--border)">
-          <th style="padding:var(--s-3) var(--s-4);text-align:left;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.06em;font-size:11px">Stage</th>
-          <th style="padding:var(--s-3) var(--s-4);text-align:left;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.06em;font-size:11px">Token Name</th>
-          <th style="padding:var(--s-3) var(--s-4);text-align:left;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.06em;font-size:11px">Hex Value</th>
-          <th style="padding:var(--s-3) var(--s-4);text-align:left;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:0.06em;font-size:11px">Use Case / Semantic</th>
+        <tr>
+          <th>Stage</th>
+          <th>Token Name</th>
+          <th>Hex Value</th>
+          <th>Use Case / Semantic</th>
         </tr>
       </thead>
       <tbody>
-        <tr style="border-bottom:1px solid var(--border)">
-          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#2980b9;border-radius:2px;margin-right:8px;vertical-align:middle"></span>Faster</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-faster</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#2980B9</code></td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Main Infield stage badge</td>
-        </tr>
-        <tr style="border-bottom:1px solid var(--border)">
-          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#e67e22;border-radius:2px;margin-right:8px;vertical-align:middle"></span>Harder</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-harder</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#E67E22</code></td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Main Infield stage badge</td>
-        </tr>
-        <tr style="border-bottom:1px solid var(--border)">
-          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#8e44ad;border-radius:2px;margin-right:8px;vertical-align:middle"></span>Louder</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-louder</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#8E44AD</code></td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Main Infield stage badge</td>
-        </tr>
-        <tr style="border-bottom:1px solid var(--border)">
-          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#c0392b;border-radius:2px;margin-right:8px;vertical-align:middle"></span>W.E.T.</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-wet</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#C0392B</code></td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Outside Infield; also --signal-live / --accent (5× Wacken role)</td>
-        </tr>
-        <tr style="border-bottom:1px solid var(--border)">
-          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#16a085;border-radius:2px;margin-right:8px;vertical-align:middle"></span>Headbangers</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-headbangers</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#16A085</code></td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Outside Infield; also --signal-ok (camping state)</td>
-        </tr>
-        <tr style="border-bottom:1px solid var(--border)">
-          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#2c3e50;border-radius:2px;margin-right:8px;vertical-align:middle"></span>Wasteland</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-wasteland</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#2C3E50</code></td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Specialized venue</td>
-        </tr>
-        <tr style="border-bottom:1px solid var(--border)">
-          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#95a5a6;border-radius:2px;margin-right:8px;vertical-align:middle"></span>Wackinger</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-wackinger</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#95A5A6</code></td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Specialized venue</td>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#2980b9"></span>Faster</td>
+          <td>--stage-faster</td>
+          <td><code>#2980B9</code></td>
+          <td>Main Infield stage badge</td>
         </tr>
         <tr>
-          <td style="padding:var(--s-3) var(--s-4)"><span style="display:inline-block;width:16px;height:16px;background:#f39c12;border-radius:2px;margin-right:8px;vertical-align:middle"></span>W.T.J.</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">--stage-jungle</td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)"><code style="color:var(--text-faint)">#F39C12</code></td>
-          <td style="padding:var(--s-3) var(--s-4);color:var(--text-muted)">Specialized venue; also --signal-warn (conflict state)</td>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#e67e22"></span>Harder</td>
+          <td>--stage-harder</td>
+          <td><code>#E67E22</code></td>
+          <td>Main Infield stage badge</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#8e44ad"></span>Louder</td>
+          <td>--stage-louder</td>
+          <td><code>#8E44AD</code></td>
+          <td>Main Infield stage badge</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#c0392b"></span>W.E.T.</td>
+          <td>--stage-wet</td>
+          <td><code>#C0392B</code></td>
+          <td>Outside Infield; also --signal-live / --accent (5× Wacken role)</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#16a085"></span>Headbangers</td>
+          <td>--stage-headbangers</td>
+          <td><code>#16A085</code></td>
+          <td>Outside Infield; also --signal-ok (camping state)</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#2c3e50"></span>Wasteland</td>
+          <td>--stage-wasteland</td>
+          <td><code>#2C3E50</code></td>
+          <td>Specialized venue</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#95a5a6"></span>Wackinger</td>
+          <td>--stage-wackinger</td>
+          <td><code>#95A5A6</code></td>
+          <td>Specialized venue</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#f39c12"></span>W.T.J.</td>
+          <td>--stage-jungle</td>
+          <td><code>#F39C12</code></td>
+          <td>Specialized venue; also --signal-warn (conflict state)</td>
         </tr>
       </tbody>
     </table>
 
-    <div class="subhead" style="margin-top:var(--s-8)">Semantic state</div>
+    <div class="subhead mt-8">Semantic state</div>
     <div class="swatch-grid">
       <div class="swatch"><div class="chip" style="background:#c0392b">#c0392b</div><div class="meta"><div class="name">Live / Now</div><div class="tok">--signal-live</div><div class="hex">also primary accent</div></div></div>
       <div class="swatch"><div class="chip" style="background:#f39c12">#f39c12</div><div class="meta"><div class="name">Warn / Conflict / Queued</div><div class="tok">--signal-warn</div><div class="hex">overlap, offline pending</div></div></div>
@@ -2435,7 +2438,7 @@
 
     <div class="exception-note">
       <div class="exception-title">Crew-state exception</div>
-      Cards representing a vira-lata's physical location (<b style="color:var(--text)">camping, metal place, lost</b>) may use a single low-opacity gradient + ambient glow to signal emotional state. The glow must be <strong style="color:var(--text)">static — no animation</strong>. Total exception budget: <strong style="color:var(--text)">1 gradient + 1 text-shadow + 1 box-shadow, all at ≤ 50% opacity</strong>. This is the only context where gradients and glows are permitted; the masthead rule "no glow / no gradients" applies everywhere else.
+      Cards representing a vira-lata's physical location (<b class="text-base">camping, metal place, lost</b>) may use a single low-opacity gradient + ambient glow to signal emotional state. The glow must be <strong class="text-base">static — no animation</strong>. Total exception budget: <strong class="text-base">1 gradient + 1 text-shadow + 1 box-shadow, all at ≤ 50% opacity</strong>. This is the only context where gradients and glows are permitted; the masthead rule "no glow / no gradients" applies everywhere else.
     </div>
   </section>
 
