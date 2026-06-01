@@ -2163,6 +2163,79 @@
 </style>
 </head>
 <body>
+<script type="application/json" id="ds-manifest">
+{
+  "version": "3.0",
+  "file": "public/vira-lata-ds.html",
+  "note": "Agent table of contents. Read this first to navigate the file. Anchors and section numbers are STABLE and referenced across docs/code — never renumber. Keep this manifest in sync when adding/renaming a section, token, or component.",
+  "sections": [
+    { "num": "01", "id": "color",        "title": "Color",              "purpose": "Color tokens: neutrals, the 8 canonical stage colors, semantic state colors, crew-state gradient exception" },
+    { "num": "02", "id": "type",         "title": "Type",               "purpose": "Typographic scale and the three font families" },
+    { "num": "03", "id": "space",        "title": "Spacing & Radius",   "purpose": "4px spacing scale and radius scale" },
+    { "num": "04", "id": "components",   "title": "Components",         "purpose": "Core component anatomy and live demos (BandCard, modals, chips, inputs, badges, profile, etc.)" },
+    { "num": "05", "id": "layouts",      "title": "Page layouts",       "purpose": "Full-page compositions: Right Now, Schedule, My Picks, Popular" },
+    { "num": "06", "id": "icons",        "title": "Iconography",        "purpose": "Icon set and stroke conventions" },
+    { "num": "07", "id": "motion",       "title": "Motion",             "purpose": "Animation/transition specifications" },
+    { "num": "08", "id": "additional",   "title": "Additional Components", "purpose": "Later component specs: SyncToast, banners, UpcomingBandCard, BandFilters, ArrivalMap, admin panels" },
+    { "num": "09", "id": null,           "title": "(retired)",          "purpose": "Retired slot — number intentionally skipped; do not reuse" },
+    { "num": "10", "id": "empty-states", "title": "Empty & Error States", "purpose": "Canonical empty states and ErrorState variants" },
+    { "num": "11", "id": "duck",         "title": "The Duck",           "purpose": "Duck feature: QuackStrip, QuackGhostRow, DuckToast, /now Monument live cards" },
+    { "num": "12", "id": "governance",   "title": "Governance",         "purpose": "DS audit score, implementation checklist, best practices" },
+    { "num": "13", "id": "minimap",      "title": "Festival Minimap",   "purpose": "Minimap zones, avatar dots, entry button" }
+  ],
+  "tokens": {
+    "neutrals": ["--bg","--bg-surface","--bg-elevated","--bg-sunken","--border","--border-strong","--text","--text-muted","--text-faint","--white"],
+    "accent":   ["--accent","--accent-hover","--accent-soft","--accent-muted"],
+    "signal":   ["--signal-live","--signal-warn","--signal-warn-soft","--signal-warn-muted","--signal-ok","--signal-ok-bright","--signal-ok-soft","--signal-ok-muted","--signal-ok-dim","--signal-ok-glow","--signal-lost"],
+    "ceremony": ["--ceremony-gold","--ceremony-gold-dim","--ceremony-gold-bg","--ceremony-gold-soft","--ceremony-gold-muted","--ceremony-gold-border"],
+    "location": ["--metal-place-bright","--metal-place","--metal-place-dim","--metal-place-bg"],
+    "roles":    ["--role-manager","--role-manager-soft","--role-manager-muted","--role-godlike","--role-godlike-soft","--role-godlike-muted","--role-conflict"],
+    "stages":   ["--stage-faster","--stage-harder","--stage-louder","--stage-wet","--stage-headbangers","--stage-wasteland","--stage-wackinger","--stage-jungle"],
+    "type":     ["--font-display","--font-sans","--font-mono"],
+    "spacing":  ["--s-1","--s-2","--s-3","--s-4","--s-5","--s-6","--s-8","--s-10","--s-12"],
+    "radii":    ["--r-0","--r-1","--r-2","--r-3","--r-pill"]
+  },
+  "components": [
+    { "name": "BandCard",              "sectionId": "components" },
+    { "name": "PresenceToggle",        "sectionId": "components" },
+    { "name": "LocationCard",          "sectionId": "components" },
+    { "name": "BandDetailModal",       "sectionId": "components" },
+    { "name": "AlertBanner",           "sectionId": "components" },
+    { "name": "BadgesDisplay",         "sectionId": "components" },
+    { "name": "AnnouncementCard",      "sectionId": "components" },
+    { "name": "StageFilterPill",       "sectionId": "components" },
+    { "name": "DayTabBar",             "sectionId": "components" },
+    { "name": "PickToggle",            "sectionId": "components" },
+    { "name": "Avatar",                "sectionId": "components" },
+    { "name": "RoleChips",             "sectionId": "components" },
+    { "name": "TextInput",             "sectionId": "components" },
+    { "name": "FilterDrawer",          "sectionId": "components" },
+    { "name": "Switch",                "sectionId": "components" },
+    { "name": "MyWackenPage",          "sectionId": "components" },
+    { "name": "MyWackenCoachBanner",   "sectionId": "components" },
+    { "name": "GodlikeTimeTravel",     "sectionId": "components" },
+    { "name": "BandRatingInput",       "sectionId": "components" },
+    { "name": "ProfileHeader",         "sectionId": "components" },
+    { "name": "UserManagementSection", "sectionId": "components" },
+    { "name": "FestivalWrap",          "sectionId": "components" },
+    { "name": "MoshSplitSection",      "sectionId": "components" },
+    { "name": "PlaylistLaunchButton",  "sectionId": "components" },
+    { "name": "ClusterRow",            "sectionId": "components" },
+    { "name": "LiveCardSheet",         "sectionId": "components" },
+    { "name": "SyncToast",             "sectionId": "additional" },
+    { "name": "LatestAnnouncementBanner", "sectionId": "additional" },
+    { "name": "UpcomingBandCard",      "sectionId": "additional" },
+    { "name": "BandFilters",           "sectionId": "additional" },
+    { "name": "GenreGuideCollapsible", "sectionId": "additional" },
+    { "name": "ArrivalMap",            "sectionId": "additional" },
+    { "name": "ErrorState",            "sectionId": "empty-states" },
+    { "name": "QuackStrip",            "sectionId": "duck" },
+    { "name": "QuackGhostRow",         "sectionId": "duck" },
+    { "name": "DuckToast",             "sectionId": "duck" },
+    { "name": "MinimapOverlay",        "sectionId": "minimap" }
+  ]
+}
+</script>
 <nav class="sidenav">
   <a href="#color">01 Color</a>
   <a href="#type">02 Type</a>
