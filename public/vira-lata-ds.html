@@ -2212,6 +2212,73 @@
   .swatch .chip.swatch-ink{color:#0a0a0a}
   .stage-rail > div.swatch-ink{color:#0a0a0a}
   .subhead--tight{border-bottom:0;padding-bottom:0;margin-top:var(--s-5);font-size:11px}
+
+  /* ============================================================
+     §04 COMPONENTS — inline-style extraction (DS readability pass)
+     ============================================================ */
+  /* generic spacing / position utilities (literal-value variants) */
+  .p-0{padding:0}
+  .ml-auto{margin-left:auto}
+  .mt-12px{margin-top:12px} .mt-16px{margin-top:16px} .mt-20px{margin-top:20px}
+  .c-888{color:#888}
+  .av.av-ink{color:#0a0a0a}
+  .pill-sm{padding:5px 10px;font-size:10px}
+
+  /* shared DS-doc table (the hand-styled wrap / badge / component tables) */
+  .dstbl{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+  .dstbl-hr{border-bottom:1px solid #333;text-align:left}
+  .dstbl-th{padding:6px 8px;color:#aaa}
+  .dstbl-cell{padding:6px 8px}
+  .dslist-80{color:#888;margin:0 0 16px 20px;max-width:80ch}
+  .dslist-18{margin:0 0 12px 18px;color:#888;font-size:14px}
+
+  /* hand-built demo helpers (main-stylesheet component demos) */
+  .ann-lead{margin:-6px 0 var(--s-3)}
+  .pop-going{display:flex;align-items:center;gap:var(--s-3);margin-top:var(--s-3)}
+  .pop-count-num{color:#fff;font-family:var(--font-display);font-size:18px}
+  .kicker-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block}
+  .seen-avail{color:var(--text-faint);font-family:var(--font-mono);font-size:10px}
+  .demo-stage--grid3{display:grid;gap:var(--s-3)}
+  .demo-stage--colgap5{display:flex;flex-direction:column;gap:var(--s-5)}
+  .demo-stage--scrim-center{display:flex;justify-content:center;align-items:center;background:rgba(0,0,0,0.6)}
+  .demo-stage--drawer{position:relative;padding:0;overflow:hidden;min-height:200px}
+  .drawer-scrim{position:absolute;inset:0;background:rgba(0,0,0,0.45)}
+  .drawer-hint{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;text-align:center;padding-bottom:var(--s-3)}
+
+  /* .component-demo wrapper variants (each reproduces its inline shell) */
+  .cdemo--switch{background:#0a0a0a;padding:24px;display:flex;gap:28px;flex-wrap:wrap;align-items:center}
+  .cdemo--bandcard{background:#0a0a0a;padding:20px;max-width:420px}
+  .cdemo--mywacken{background:#0a0a0a;padding:0;max-width:420px;border:1px solid #2a2a2a;border-radius:8px;overflow:hidden}
+  .cdemo--rating{background:#0a0a0a;padding:20px;max-width:440px}
+  .cdemo--profile{background:#0a0a0a;padding:24px;display:flex;flex-direction:column;gap:18px;align-items:center}
+  .cdemo--usermgmt{background:#060606;padding:24px;display:flex;justify-content:center}
+  .cdemo--badges{background:#0a0a0a;padding:24px;max-width:360px}
+  .cdemo--history{background:#0a0a0a;padding:24px;display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start;justify-content:center}
+  .cdemo--moshsplit{background:#060606;padding:24px;display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start;justify-content:center}
+  .cdemo--playlist{background:#0a0a0a;padding:0;overflow:hidden}
+  .cdemo--cluster{background:#0a0a0a;padding:20px;display:flex;gap:24px;flex-wrap:wrap;align-items:center}
+  .cdemo--sheet{background:#050505;padding:20px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end}
+
+  /* one-off doc paragraph / caption helpers */
+  .p-note1{color:#888;font-size:11px;margin-top:10px;line-height:1.45}
+  .p-note2{margin-top:12px;font-size:14px;color:#888}
+  .cap-note-a{font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:10px 0 0}
+  .cap-note-b{font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:6px 0 16px}
+  .cap-note-c{font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:4px 0 0}
+  .bh-aside{max-width:280px;font-size:12px;color:#666;line-height:1.5}
+  .bh-aside-h{color:#888;display:block;margin-bottom:6px;font-size:11px}
+
+  /* ClusterRow raw-div demo (CrewGroupsSection) */
+  .cl-col{display:flex;flex-direction:column;gap:6px}
+  .cl-cap{font-family:'JetBrains Mono',monospace;font-size:10px;color:#555;text-transform:uppercase;letter-spacing:.08em}
+  .cl-row{display:flex;align-items:center;gap:8px}
+  .cl-stack{display:flex}
+  .cl-stack-c{display:flex;align-items:center}
+  .cl-av{width:24px;height:24px;border-radius:50%;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+  .cl-av-ink{color:#ccc}
+  .cl-av-lap{margin-left:-8px}
+  .cl-lbl{font-size:12px;color:#888}
+  .cl-lbl-of{font-size:11px;color:#888;margin-left:4px}
 </style>
 </head>
 <body>
@@ -2671,15 +2738,15 @@
               <span class="stage" style="background:var(--stage-louder)">Louder</span>
               <span class="time">D3 · 22:30</span>
             </div>
-            <div style="display:flex;align-items:center;gap:var(--s-3);margin-top:var(--s-3)">
+            <div class="pop-going">
               <div class="cluster">
                 <span class="av s32" style="background:#c0392b">SF</span>
                 <span class="av s32" style="background:#2980b9">JP</span>
                 <span class="av s32" style="background:#16a085">LM</span>
                 <span class="av s32" style="background:#8e44ad">RC</span>
-                <span class="av s32" style="background:#f39c12;color:#0a0a0a">VB</span>
+                <span class="av s32 av-ink" style="background:#f39c12">VB</span>
               </div>
-              <div class="t-label" style="color:var(--accent-hover)"><b style="color:#fff;font-family:var(--font-display);font-size:18px">14</b>&nbsp;going</div>
+              <div class="t-label" style="color:var(--accent-hover)"><b class="pop-count-num">14</b>&nbsp;going</div>
             </div>
           </div>
         </div>
@@ -2692,14 +2759,14 @@
               <span class="stage" style="background:var(--stage-faster)">Faster</span>
               <span class="time">D2 · 22:00</span>
             </div>
-            <div style="display:flex;align-items:center;gap:var(--s-3);margin-top:var(--s-3)">
+            <div class="pop-going">
               <div class="cluster">
                 <span class="av s32" style="background:#16a085">LM</span>
                 <span class="av s32" style="background:#8e44ad">RC</span>
                 <span class="av s32" style="background:#e67e22">DK</span>
                 <span class="av s32" style="background:#2c3e50">FF</span>
               </div>
-              <div class="t-label"><b style="color:#fff;font-family:var(--font-display);font-size:18px">11</b>&nbsp;going</div>
+              <div class="t-label"><b class="pop-count-num">11</b>&nbsp;going</div>
             </div>
           </div>
         </div>
@@ -2799,7 +2866,7 @@
             <button class="on camping"><span class="dot"></span>Estou no camping</button>
           </div>
           <div class="help">When off, your location auto-resolves from your current pick. If you have no active pick, you fall to <b>Lost 🤘</b>.</div>
-          <div class="presence-toggle has-metal" style="margin-top:12px">
+          <div class="presence-toggle has-metal mt-12px">
             <button><span class="dot" style="color:var(--signal-ok-bright)"></span>Camping</button>
             <button class="on metal"><span class="dot" style="color:var(--metal-place)"></span>Metal Place</button>
           </div>
@@ -2828,7 +2895,7 @@
             <div class="loc-strip" style="background:var(--stage-louder)"></div>
             <div class="loc-head">
               <div>
-                <div class="kicker"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block"></span>Live now &middot; you are here</div>
+                <div class="kicker"><span class="kicker-dot"></span>Live now &middot; you are here</div>
                 <div class="title">Powerwolf</div>
                 <div class="sub">Louder &middot; 22:30 — 23:45</div>
               </div>
@@ -2855,7 +2922,7 @@
             <div class="loc-people">
               <span class="loc-chip"><span class="av" style="background:#2980b9">JP</span>Joana</span>
               <span class="loc-chip"><span class="av" style="background:#16a085">LM</span>Lucas</span>
-              <span class="loc-chip"><span class="av" style="background:#f39c12;color:#0a0a0a">VB</span>Victor</span>
+              <span class="loc-chip"><span class="av av-ink" style="background:#f39c12">VB</span>Victor</span>
             </div>
           </div>
           <div class="loc camping">
@@ -2923,7 +2990,7 @@
     <!-- BAND DETAIL MODAL -->
     <div class="subhead">Band detail modal</div>
     <div class="demo">
-      <div class="demo-stage" style="padding:0">
+      <div class="demo-stage p-0">
         <div class="modal-frame">
           <div class="modal">
             <div class="hero" style="background:var(--stage-louder)"></div>
@@ -2950,7 +3017,7 @@
                     <div class="who-row"><span class="av s24" style="background:#16a085">LM</span><span class="nm">Lucas</span></div>
                     <div class="who-row"><span class="av s24" style="background:#8e44ad">RC</span><span class="nm">Rafael</span></div>
                     <div class="who-row"><span class="av s24" style="background:#e67e22">DK</span><span class="nm">Diogo</span></div>
-                    <div class="who-row"><span class="av s24" style="background:#f39c12;color:#0a0a0a">VB</span><span class="nm">Victor</span></div>
+                    <div class="who-row"><span class="av s24 av-ink" style="background:#f39c12">VB</span><span class="nm">Victor</span></div>
                     <div class="who-row"><span class="av s24" style="background:#2c3e50">FF</span><span class="nm">Felipe</span></div>
                   </div>
                 </div>
@@ -2961,7 +3028,7 @@
                     <div class="who-row saw"><span class="av s24" style="background:#2980b9">JP</span><span class="nm">Joana</span></div>
                     <div class="who-row saw"><span class="av s24" style="background:#16a085">LM</span><span class="nm">Lucas</span></div>
                     <div class="who-row saw"><span class="av s24" style="background:#e67e22">DK</span><span class="nm">Diogo</span></div>
-                    <div class="who-row saw"><span class="av s24" style="background:#f39c12;color:#0a0a0a">VB</span><span class="nm">Victor</span></div>
+                    <div class="who-row saw"><span class="av s24 av-ink" style="background:#f39c12">VB</span><span class="nm">Victor</span></div>
                     <div class="who-row no-show"><span class="av s24" style="background:#8e44ad">RC</span><span class="nm">Rafael &middot; didn't see</span></div>
                     <div class="who-row no-show"><span class="av s24" style="background:#2c3e50">FF</span><span class="nm">Felipe &middot; didn't see</span></div>
                   </div>
@@ -2972,13 +3039,13 @@
                 <div>You also picked <b>Blind Guardian</b> at 22:00 on Faster. One of these has to give.</div>
               </div>
               <div class="seen-toggle">
-                <div class="label">Didn't see this band<br /><small style="color:var(--text-faint);font-family:var(--font-mono);font-size:10px">Available after 23:45</small></div>
+                <div class="label">Didn't see this band<br /><small class="seen-avail">Available after 23:45</small></div>
                 <div class="toggle-track"></div>
               </div>
             </div>
             <div class="actions">
               <button class="btn ghost">Close</button>
-              <button class="btn primary" style="margin-left:auto">★ Picked</button>
+              <button class="btn primary ml-auto">★ Picked</button>
             </div>
           </div>
         </div>
@@ -3053,8 +3120,8 @@
 
     <!-- BADGE -->
     <div class="subhead">BadgesDisplay &middot; vest stack · <code>src/components/BadgesDisplay.tsx</code></div>
-        <p class="t-small" style="margin:-6px 0 var(--s-3)">Earned patches on <code>/now</code> and <code>/profile</code>. Collapsed vest: fixed <b>112px</b> tall. Default <b>chaotic</b> scatter (48px patches, ±55° rotation, reseed on close) or opt-in <b>neat</b> horizontal chip row (<code>PatchesLayoutToggle</code> in Edit profile). Expanded = 4-column grid with 42ms stagger. Background textures via <code>data-bg</code>: none · grid · steel · indigo · leather.</p>
-    <p class="t-small" style="margin:-6px 0 var(--s-3);color:var(--text-faint)">Grid demo below (expanded spread). Live vest uses <b>patches on a metal vest</b>, not entries in a settings list. The default state is image-only — no captions visible. Tap any patch to open the detail modal with name, description, and (if historical) the Wacken year chip.</p>
+        <p class="t-small ann-lead">Earned patches on <code>/now</code> and <code>/profile</code>. Collapsed vest: fixed <b>112px</b> tall. Default <b>chaotic</b> scatter (48px patches, ±55° rotation, reseed on close) or opt-in <b>neat</b> horizontal chip row (<code>PatchesLayoutToggle</code> in Edit profile). Expanded = 4-column grid with 42ms stagger. Background textures via <code>data-bg</code>: none · grid · steel · indigo · leather.</p>
+    <p class="t-small ann-lead text-faint">Grid demo below (expanded spread). Live vest uses <b>patches on a metal vest</b>, not entries in a settings list. The default state is image-only — no captions visible. Tap any patch to open the detail modal with name, description, and (if historical) the Wacken year chip.</p>
 
     <div class="demo">
       <div class="demo-stage">
@@ -3085,9 +3152,9 @@
       </div>
     </div>
 
-    <div class="subhead" style="font-size:11px;border-bottom:0;padding-bottom:0;margin-top:var(--s-5)">Detail modal &middot; on tap</div>
+    <div class="subhead subhead--tight">Detail modal &middot; on tap</div>
     <div class="demo">
-      <div class="demo-stage" style="justify-content:center;align-items:center;display:flex;background:rgba(0,0,0,0.6)">
+      <div class="demo-stage demo-stage--scrim-center">
         <div class="ds-modal-card">
           <div class="ds-modal-circle">
             <img src="badges/badge_wackinger.png" alt="Wackinger" class="ds-modal-img" />
@@ -3116,9 +3183,9 @@
       </div>
     </div>
 
-    <div class="subhead" style="font-size:11px;border-bottom:0;padding-bottom:0;margin-top:var(--s-5)">Fullscreen overlay &middot; on zoom tap</div>
+    <div class="subhead subhead--tight">Fullscreen overlay &middot; on zoom tap</div>
     <div class="demo">
-      <div class="demo-stage" style="padding:0">
+      <div class="demo-stage p-0">
         <div class="ds-fullscreen-overlay">
           <img src="badges/badge_wackinger.png" alt="Wackinger" class="ds-fullscreen-img" />
           <span class="ds-fullscreen-close" aria-hidden="true">
@@ -3269,12 +3336,12 @@
           <span class="av s40" style="background:#8e44ad">SF</span>
           <span class="av s56" style="background:#16a085">SF</span>
         </div>
-        <div style="margin-top:var(--s-4)" class="cluster">
+        <div class="cluster mt-4">
           <span class="av s32" style="background:#c0392b">SF</span>
           <span class="av s32" style="background:#2980b9">JP</span>
           <span class="av s32" style="background:#16a085">LM</span>
           <span class="av s32" style="background:#8e44ad">RC</span>
-          <span class="av s32" style="background:#f39c12;color:#0a0a0a">VB</span>
+          <span class="av s32 av-ink" style="background:#f39c12">VB</span>
           <span class="more">+9</span>
         </div>
       </div>
@@ -3293,7 +3360,7 @@
     <!-- OFFLINE / SYNC -->
     <div class="subhead">Offline &amp; sync states</div>
     <div class="demo">
-      <div class="demo-stage" style="display:grid;gap:var(--s-3)">
+      <div class="demo-stage demo-stage--grid3">
         <div class="offline-banner">No connection — offline mode</div>
         <div class="row">
           <span class="pending-chip">↻ queued · pick</span>
@@ -3340,9 +3407,9 @@
     <!-- TEXT INPUT -->
     <div class="subhead">Text input &middot; <code>src/ui/Input.module.css</code></div>
     <div class="demo">
-      <div class="demo-stage" style="display:flex;flex-direction:column;gap:var(--s-5)">
+      <div class="demo-stage demo-stage--colgap5">
         <div class="ds-input-group">
-          <div class="ds-input-label">Email &middot; <span style="color:var(--text-faint)">rest</span></div>
+          <div class="ds-input-label">Email &middot; <span class="text-faint">rest</span></div>
           <input class="ds-input" type="text" placeholder="you@viralatas.com" />
         </div>
         <div class="ds-input-group">
@@ -3360,7 +3427,7 @@
           <span class="ds-input-error-text">Invalid email</span>
         </div>
         <div class="ds-input-group">
-          <div class="ds-input-label faint">Username &middot; <span style="color:var(--text-faint)">disabled</span></div>
+          <div class="ds-input-label faint">Username &middot; <span class="text-faint">disabled</span></div>
           <input class="ds-input" type="text" value="@salvatore" disabled />
         </div>
       </div>
@@ -3372,20 +3439,20 @@
           <li><b>Error</b> border-color: --signal-live · error msg below in --signal-live · --font-mono 11px</li>
           <li><b>Disabled</b> opacity 0.45 · cursor: not-allowed</li>
         </ul>
-        <h4 style="margin-top:var(--s-3)">Typography</h4>
+        <h4 class="mt-3">Typography</h4>
         <ul>
           <li><b>Input text</b> --font-sans · 15px · --text</li>
           <li><b>Placeholder</b> --font-mono · 13px · --text-faint</li>
           <li><b>Label</b> --font-mono · 10px · uppercase · 0.1em tracking</li>
           <li><b>Error text</b> --font-mono · 11px · --signal-live</li>
         </ul>
-        <h4 style="margin-top:var(--s-3)">Password field</h4>
+        <h4 class="mt-3">Password field</h4>
         <ul>
           <li>Eye icon: stroke SVG 16px, absolute right: 10px</li>
           <li>Tap toggles <code>type="password"</code> ↔ <code>type="text"</code></li>
           <li>Icon uses <code>stroke="currentColor"</code> — inherits muted → text on hover</li>
         </ul>
-        <h4 style="margin-top:var(--s-3)">Used on</h4>
+        <h4 class="mt-3">Used on</h4>
         <ul>
           <li>/login &middot; /register (email, password)</li>
           <li>/schedule (search field)</li>
@@ -3397,15 +3464,15 @@
     <!-- FILTER DRAWER CLOSE GESTURE -->
     <div class="subhead">Filter drawer &middot; close gesture spec</div>
     <div class="demo">
-      <div class="demo-stage" style="position:relative;padding:0;overflow:hidden;min-height:200px">
-        <div style="position:absolute;inset:0;background:rgba(0,0,0,0.45)"></div>
-        <div class="drawer" style="position:absolute">
+      <div class="demo-stage demo-stage--drawer">
+        <div class="drawer-scrim"></div>
+        <div class="drawer">
           <div class="grab"></div>
-          <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.1em;text-align:center;padding-bottom:var(--s-3)">swipe ↓ to close</div>
+          <div class="drawer-hint">swipe ↓ to close</div>
           <h4>Stage</h4>
           <div class="pill-row">
-            <button class="pill on" style="padding:5px 10px;font-size:10px">Faster</button>
-            <button class="pill" style="padding:5px 10px;font-size:10px">Louder</button>
+            <button class="pill on pill-sm">Faster</button>
+            <button class="pill pill-sm">Louder</button>
           </div>
         </div>
       </div>
@@ -3416,12 +3483,12 @@
           <li><b>Tap scrim</b> (backdrop) closes immediately</li>
           <li><b>Escape key</b> closes on desktop</li>
         </ul>
-        <h4 style="margin-top:var(--s-3)">Spring-back</h4>
+        <h4 class="mt-3">Spring-back</h4>
         <ul>
           <li>If threshold not met: 200 ms ease-out return to open position</li>
           <li>No bounceback overshoot — ease-out only</li>
         </ul>
-        <h4 style="margin-top:var(--s-3)">Grab handle</h4>
+        <h4 class="mt-3">Grab handle</h4>
         <ul>
           <li>36×4px bar · --border-strong · centered at top</li>
           <li>Visual affordance only — drag initiates from anywhere in the drawer header</li>
@@ -3429,10 +3496,10 @@
       </div>
     </div>
 
-    <div class="subhead">Switch <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/ui/Switch.tsx</span></div>
+    <div class="subhead">Switch <span class="mono-11">src/ui/Switch.tsx</span></div>
         <p>Accessible toggle for binary admin states. Used in godlike <strong>Servants of Metal</strong> user rows for manager access and vira-lata friend (<code>is_friend</code>) flags. Renders as a <code>button[role="switch"]</code> — not a checkbox — with tone-specific ON colors.</p>
         <p><strong>Tones:</strong> <code>manager</code> (blue) · <code>friend</code> (amber). OFF = muted thumb on <code>--bg-elevated</code>; ON = filled track + colored thumb using role tokens.</p>
-        <div class="component-demo" style="background:#0a0a0a;padding:24px;display:flex;gap:28px;flex-wrap:wrap;align-items:center;">
+        <div class="component-demo cdemo--switch">
           <style>
             .ds-sw { position:relative;width:44px;height:26px;border-radius:999px;border:1px solid #2a2a2a;background:#1e1e1e;flex-shrink:0; }
             .ds-sw::after { content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#888; }
@@ -3469,7 +3536,7 @@
         <p><strong>Pick toggle:</strong> <code>StarIcon</code> → <code>PawIcon</code> (canine + heel, −14°) in the 64px column at <strong>28px</strong>; outline when unpicked, filled accent when picked. Bottom nav My Wacken tab stays 18px.</p>
         <p><strong>Popular rating mode (<code>ratingStats</code>, Phase 32):</strong> when sort mode is <code>rating</code>, ranked cards pass <code>ratingStats</code> instead of <code>attendeeCluster</code>. Footer strip (border-top): left column = count + optional <code>You · {score}</code> + optional missed skip; right column = paw + large avg (<code>.ratingHero</code>). Pick avatars hidden.</p>
         <p><strong>Metal Battle country flag:</strong> when <code>band.genre === 'Metal Battle'</code>, the genre label (<code>.genre</code>) is prefixed with the competitor's country flag emoji — e.g. <code>🇭🇺 Metal Battle</code>. The flag comes from <code>getMetalBattleCountryFlag(band.slot_id)</code> in <code>src/services/metalBattle.ts</code> (static <code>slot_id</code>→country map; ISO2→emoji, or a regional 🌍 for multi-country entries like Sub-Saharan Africa / Balkans). Slots with no confirmed representative return <code>null</code> and the label renders as plain <code>Metal Battle</code>. All other genres render unchanged. Country flags are an allowed emoji exception in-UI (see icon language note).</p>
-        <div class="component-demo" style="background: #0a0a0a; padding: 20px; max-width: 420px;">
+        <div class="component-demo cdemo--bandcard">
           <style>
             .ds-bc-card { display: grid; grid-template-columns: 4px 56px 1fr 64px; background: #141414; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; --stage-color: #2980b9; }
             .ds-bc-stripe { background: var(--stage-color); }
@@ -3482,6 +3549,15 @@
             .ds-bc-time { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8e8e8; }
             .ds-bc-pick { width: 64px; border-left: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: center; color: #888; }
             .ds-bc-caption { font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #555; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
+            .ds-bc-card.ds-mw-ended { grid-template-columns: 4px 1fr; }
+            .ds-bc-card.ds-mw-att { opacity: 0.72; }
+            .ds-bc-card.ds-mw-miss { opacity: 0.62; }
+            .ds-mw-grid { display: grid; grid-template-columns: 56px 1fr; min-width: 0; }
+            .ds-mw-time { padding: 12px 0 12px 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8e8e8; display: grid; align-content: center; gap: 2px; }
+            .ds-mw-end { font-size: 10px; color: #888; }
+            .ds-bc-body.ds-mw-bpr { padding-right: 12px; }
+            .ds-mw-chip-att { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; background: rgba(39,174,96,.22); color: #7dcea0; border: 1px solid rgba(39,174,96,.4); }
+            .ds-mw-chip-miss { font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; background: rgba(243,156,18,.22); color: #f5b041; border: 1px solid rgba(243,156,18,.4); }
           </style>
           <div class="ds-bc-caption">Schedule · showDayLabel=true</div>
           <div class="ds-bc-card">
@@ -3509,35 +3585,35 @@
             </div>
           </div>
 
-          <div class="ds-bc-caption" style="margin-top: 20px;">My Wacken · timeline · ended attended</div>
-          <div class="ds-bc-card ds-mw-ended" style="grid-template-columns: 4px 1fr; opacity: 0.72;">
+          <div class="ds-bc-caption mt-20px">My Wacken · timeline · ended attended</div>
+          <div class="ds-bc-card ds-mw-ended ds-mw-att">
             <div class="ds-bc-stripe" style="background: #27ae60;"></div>
-            <div style="display: grid; grid-template-columns: 56px 1fr; min-width: 0;">
-              <div style="padding: 12px 0 12px 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8e8e8; display: grid; align-content: center; gap: 2px;">
-                <span>16:00</span><span style="font-size: 10px; color: #888;">16:45</span>
+            <div class="ds-mw-grid">
+              <div class="ds-mw-time">
+                <span>16:00</span><span class="ds-mw-end">16:45</span>
               </div>
-              <div class="ds-bc-body" style="padding-right: 12px;">
+              <div class="ds-bc-body ds-mw-bpr">
                 <div class="ds-bc-name">Blind Guardian</div>
                 <div class="ds-bc-meta">
                   <span class="ds-bc-stage">Faster</span>
-                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; background: rgba(39,174,96,.22); color: #7dcea0; border: 1px solid rgba(39,174,96,.4);">Attended</span>
+                  <span class="ds-mw-chip-att">Attended</span>
                 </div>
               </div>
             </div>
           </div>
 
           <div class="ds-bc-caption">My Wacken · timeline · ended missed</div>
-          <div class="ds-bc-card ds-mw-ended" style="grid-template-columns: 4px 1fr; opacity: 0.62;">
+          <div class="ds-bc-card ds-mw-ended ds-mw-miss">
             <div class="ds-bc-stripe" style="background: #f39c12;"></div>
-            <div style="display: grid; grid-template-columns: 56px 1fr; min-width: 0;">
-              <div style="padding: 12px 0 12px 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #e8e8e8; display: grid; align-content: center; gap: 2px;">
-                <span>18:00</span><span style="font-size: 10px; color: #888;">18:45</span>
+            <div class="ds-mw-grid">
+              <div class="ds-mw-time">
+                <span>18:00</span><span class="ds-mw-end">18:45</span>
               </div>
-              <div class="ds-bc-body" style="padding-right: 12px;">
+              <div class="ds-bc-body ds-mw-bpr">
                 <div class="ds-bc-name">Angel Witch</div>
                 <div class="ds-bc-meta">
                   <span class="ds-bc-stage">Louder</span>
-                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 9px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 8px; border-radius: 2px; background: rgba(243,156,18,.22); color: #f5b041; border: 1px solid rgba(243,156,18,.4);">Missed</span>
+                  <span class="ds-mw-chip-miss">Missed</span>
                 </div>
               </div>
             </div>
@@ -3545,7 +3621,7 @@
         </div>
         <p><strong>Status:</strong> <span class="status-warn">⚠ Hardcoded colors in component—needs refactor</span></p>
 
-      <div class="subhead">My Wacken Page <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">Phase 33 · MyWackenPage.tsx · route /my-picks</span></div>
+      <div class="subhead">My Wacken Page <span class="mono-11">Phase 33 · MyWackenPage.tsx · route /my-picks</span></div>
         <p>Personal festival schedule — all picks stay on their <strong>festival day</strong> (CEST <code>bandDay()</code>). Ended and upcoming bands share one day section; footer <strong>Saw / Didn't See</strong> buckets removed. Shares <code>SchedulePage.module.css</code> with Lineup and Popular; i18n namespace stays <code>MyPicksPage</code>.</p>
 
         <table>
@@ -3562,7 +3638,7 @@
         </table>
 
         <p><strong>Page stack (top → bottom):</strong></p>
-        <ol style="color: #888; margin: 0 0 16px 20px; max-width: 80ch;">
+        <ol class="dslist-80">
           <li><code>.header</code> — Oswald 24px title + right-aligned mono summary grid</li>
           <li><code>.conflictBanner</code> — red tint when ≥3 <strong>upcoming</strong> hard conflicts (links to profile)</li>
           <li><code>PlaylistLaunchButton</code> — only when <code>!isFestivalActive</code> (pre-festival)</li>
@@ -3571,7 +3647,7 @@
         </ol>
 
         <p><strong>Header summary lines</strong> (<code>.summary</code> · mono 10px · uppercase · right-aligned):</p>
-        <ul style="color: #888; margin: 0 0 16px 20px; max-width: 80ch;">
+        <ul class="dslist-80">
           <li><code>headerBandsDays</code> — total picks / distinct festival days with picks (includes past ended-only days)</li>
           <li><code>headerLeftToday</code> — upcoming count on today's <code>bandDay()</code>; only while festival ongoing (<code>collapsePastDays</code>) and n ≥ 1; <code>.summaryHighlight</code></li>
           <li><code>headerConflicts</code> / <code>headerOverlaps</code> — derived from <strong>upcoming picks only</strong></li>
@@ -3580,7 +3656,7 @@
         <p><strong>Day sections</strong> (<code>myWackenGrouping.ts</code>): Within each day: upcoming ASC → optional <code>.dayDivider</code> → ended ASC. Day header shows localized weekday + <code>dayPickCount</code> (total picks that day). Chevron toggles <code>.dayBands</code> / <code>.dayBandsOpen</code> (max-height 0 ↔ 4000px).</p>
 
         <p><strong>Collapse rules (implemented):</strong></p>
-        <ul style="color: #888; margin: 0 0 16px 20px; max-width: 80ch;">
+        <ul class="dslist-80">
           <li><strong>Mid-festival:</strong> auto-collapse every festival day with <code>dayKey &lt; todayKey</code> (calendar past days). Today + future days start expanded.</li>
           <li><strong>Post-festival:</strong> all days expanded when <code>isFestivalEnded(now, bands)</code> — review mode.</li>
           <li><strong>Gate:</strong> waits for <code>picksReady</code> from IDB before applying collapse (fixes remount flash).</li>
@@ -3588,7 +3664,7 @@
           <li>Not persisted to <code>localStorage</code> (session-only overrides).</li>
         </ul>
 
-        <div class="component-demo" style="background: #0a0a0a; padding: 0; max-width: 420px; border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden;">
+        <div class="component-demo cdemo--mywacken">
           <style>
             .ds-mw-hdr { padding: 16px 16px 12px; border-bottom: 1px solid #2a2a2a; display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
             .ds-mw-title { font-family: 'Oswald', sans-serif; font-size: 24px; font-weight: 700; text-transform: uppercase; color: #e8e8e8; line-height: 1; margin: 0; }
@@ -3602,6 +3678,8 @@
             .ds-mw-div { height: 1px; background: #2a2a2a; margin: 16px 0 16px; padding-top: 8px; position: relative; }
             .ds-mw-div span { position: absolute; left: 0; top: 0; font-family: 'JetBrains Mono', monospace; font-size: 8px; color: #555; text-transform: uppercase; letter-spacing: .04em; background: #0a0a0a; padding-right: 8px; }
             .ds-mw-collapsed .ds-mw-day-body { display: none; }
+            .ds-mw-body-a { margin-top: 8px; color: #555; font-family: 'JetBrains Mono', monospace; font-size: 9px; }
+            .ds-mw-body-b { color: #555; font-family: 'JetBrains Mono', monospace; font-size: 9px; }
           </style>
           <div class="ds-mw-hdr">
             <h4 class="ds-mw-title">My Wacken</h4>
@@ -3621,15 +3699,15 @@
           </div>
           <div class="ds-mw-day">
             <div><span>Thu 30/07</span><span class="ds-mw-day-meta">4 picks ▴</span></div>
-            <div class="ds-mw-day-body" style="margin-top: 8px; color: #555; font-family: 'JetBrains Mono', monospace; font-size: 9px;">…upcoming BandCards…</div>
+            <div class="ds-mw-day-body ds-mw-body-a">…upcoming BandCards…</div>
             <div class="ds-mw-div"><span>already played today</span></div>
-            <div class="ds-mw-day-body" style="color: #555; font-family: 'JetBrains Mono', monospace; font-size: 9px;">…ended rows + Attended/Missed chips…</div>
+            <div class="ds-mw-day-body ds-mw-body-b">…ended rows + Attended/Missed chips…</div>
           </div>
         </div>
 
-        <p style="margin-top: 12px;"><strong>Removed (Phase 33):</strong> footer <code>sectionSaw</code> / <code>sectionDidntSee</code> blocks — keys remain in JSON but are not rendered. <code>.dayHeaderSaw</code> / <code>.dayHeaderDidntSee</code> border accents unused on My Wacken.</p>
+        <p class="mt-12px"><strong>Removed (Phase 33):</strong> footer <code>sectionSaw</code> / <code>sectionDidntSee</code> blocks — keys remain in JSON but are not rendered. <code>.dayHeaderSaw</code> / <code>.dayHeaderDidntSee</code> border accents unused on My Wacken.</p>
 
-      <div class="subhead">MyWackenCoachBanner <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/MyWackenCoachBanner.tsx</span></div>
+      <div class="subhead">MyWackenCoachBanner <span class="mono-11">src/components/MyWackenCoachBanner.tsx</span></div>
         <p>One-time education strip — not conflict styling. Explains opt-out attendance after the user's first ended pick.</p>
         <table>
           <thead><tr><th>Rule</th><th>Behavior</th></tr></thead>
@@ -3642,7 +3720,7 @@
         </table>
         <p><strong>CSS module:</strong> teal wash <code>rgba(22,160,133,0.1)</code>, border-bottom <code>rgba(22,160,133,0.25)</code>, kicker 9px mono <code>--signal-ok</code>, body 11px <code>color-mix(--signal-ok 55%, --text-muted)</code>, dismiss absolute top-right with <code>focus-visible</code> teal outline.</p>
 
-      <div class="subhead">Godlike Time Travel <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">TimeTravelSection · services/time.ts</span></div>
+      <div class="subhead">Godlike Time Travel <span class="mono-11">TimeTravelSection · services/time.ts</span></div>
         <p>Profile-only clock override for testing Live Now, My Wacken grouping, badges, and wrap gates. <strong>Datetime-local input is interpreted as Europe/Berlin (Wacken CEST)</strong> via <code>parseWackenDatetimeLocal()</code> / <code>formatWackenDatetimeLocal()</code> — not the browser's local timezone. Quick day chips (D-1…D+1) keep the current wall-clock time when switching festival days.</p>
         <p>Changing override dispatches <code>viralatas:time-override-changed</code>; <code>useNow()</code> consumers (including My Wacken) recompute <code>todayKey</code>, upcoming vs ended split, collapse context, and coach visibility.</p>
 
@@ -3652,7 +3730,7 @@
         <p><strong>Interaction:</strong> tap paw sets score (cumulative highlight 1…N); tap exact paw again clears; uppercase mono <strong>Clear</strong> link when score set. Both clear paths delete the row.</p>
         <p><strong>Modal placement:</strong> compact box after “didn’t see” toggle; mono kicker <code>ratingSectionTitle</code> (“How awesome was this band?” EN); hint <code>ratingClearHint</code>.</p>
         <p><strong>CSS module:</strong> <code>BandRatingInput.module.css</code> — section on <code>--bg-elevated</code>; buttons 36×36 on <code>--bg-sunken</code>; active <code>rgba(192, 57, 43, 0.1)</code>; exact border <code>--accent</code>.</p>
-        <div class="component-demo" style="background: #0a0a0a; padding: 20px; max-width: 440px;">
+        <div class="component-demo cdemo--rating">
           <style>
             .ds-paw { display: block; }
             .ds-ri-section { display: grid; gap: 8px; padding: 12px; background: #1e1e1e; border: 1px solid #2a2a2a; border-radius: 4px; }
@@ -3726,7 +3804,7 @@
             </div>
           </div>
           <p class="ds-sp-meta">20 vira-latas · sorted by rating</p>
-          <p style="color: #888; font-size: 11px; margin-top: 10px; line-height: 1.45;">Title + inset segmented track on one row; meta line below (<code>.popularHeaderTop</code> / <code>.popularHeaderMeta</code>). Track uses 3px inset padding — active segment is floating pill, not divider split.</p>
+          <p class="p-note1">Title + inset segmented track on one row; meta line below (<code>.popularHeaderTop</code> / <code>.popularHeaderMeta</code>). Track uses 3px inset padding — active segment is floating pill, not divider split.</p>
 
           <div class="ds-sp-caption">BandCard ranked · rating mode</div>
           <div class="ds-rc-card">
@@ -3831,17 +3909,17 @@
           </tbody>
         </table>
 
-      <div class="subhead">ProfileHeader <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/profile/ProfileHeader.tsx</span></div>
+      <div class="subhead">ProfileHeader <span class="mono-11">src/components/profile/ProfileHeader.tsx</span></div>
         <p>Top of <code>/profile</code>. Stacks avatar → name → email → metadata row (<code>.pfMeta</code>). The metadata row shows, in order: <strong>role chip</strong>, <strong>country flag emoji</strong> (no chrome — just the glyph), and the <strong>Wackens chip</strong>. Wackens chip only renders when the user has at least one Wacken year saved; tapping the count reveals the year list via the native tooltip.</p>
         <p><strong>Wackens chip rules:</strong></p>
-        <ul style="margin: 0 0 12px 18px; color: #888; font-size: 14px;">
+        <ul class="dslist-18">
           <li>Reuses the shared <code>Chip</code> primitive with the <em>default</em> (muted gray) variant — same palette as a normal vira-lata role chip. Discreet on purpose: it's ambient metadata, not a CTA. No accent dot, no colored fill.</li>
           <li>Label is plural-aware: <code>{count} Wacken</code> when count = 1, <code>{count} Wackens</code> otherwise. German collapses to <code>{count}× Wacken</code> for both cases. Strings live in <code>ProfilePage_*.json</code> under <code>wackenCountSingular</code> / <code>wackenCountPlural</code>.</li>
           <li>Tooltip exposes the sorted list of years (<code>wackenCountTooltip</code>) — useful for inspecting veterans on the team.</li>
           <li>Always sits to the <em>right</em> of the country flag and wraps on narrow widths via <code>.pfMeta { flex-wrap: wrap }</code>.</li>
           <li>Replaces the earlier diamond-shaped <code>.pfYearDiamond</code> badge — kept the badge in pill form because users could not read the year count from a clipped diamond. An earlier red-accented version was reverted to the default gray Chip for visual quietness.</li>
         </ul>
-        <div class="component-demo" style="background: #0a0a0a; padding: 24px; display: flex; flex-direction: column; gap: 18px; align-items: center;">
+        <div class="component-demo cdemo--profile">
           <style>
             .ds-pf-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; }
             .ds-pf-chip { display: inline-flex; align-items: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; padding: 3px 8px; border-radius: 999px; border: 1px solid #2a2a2a; background: #141414; color: #888; white-space: nowrap; line-height: 1; }
@@ -3893,18 +3971,18 @@
             <tr><td>t</td><td>TFn</td><td>i18n function — must resolve <code>wackenCountSingular</code>, <code>wackenCountPlural</code>, and <code>wackenCountTooltip</code>.</td></tr>
           </tbody>
         </table>
-        <p style="margin-top:12px;font-size:14px;color:#888;"><strong>Role label copy:</strong> <code>roleLabel()</code> returns <code>Godlike</code>, <code>Manager</code>, or <code>Vira-lata</code> (singular) for normal users — never «Vira-latas» on a single-user chip.</p>
+        <p class="p-note2"><strong>Role label copy:</strong> <code>roleLabel()</code> returns <code>Godlike</code>, <code>Manager</code>, or <code>Vira-lata</code> (singular) for normal users — never «Vira-latas» on a single-user chip.</p>
 
-      <div class="subhead">UserManagementSection · Servants of Metal <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/profile/UserManagementSection.tsx</span></div>
+      <div class="subhead">UserManagementSection · Servants of Metal <span class="mono-11">src/components/profile/UserManagementSection.tsx</span></div>
         <p>Godlike-only collapsible (<code>GodlikeAdminPanel</code> → «Servants of Metal»). Lists all registered vira-latas with a <strong>hybrid A</strong> layout: scan pills → toggle switches → one-shot action buttons. Copy lives in lazy-loaded <code>GodlikeAdmin_*.json</code>.</p>
         <p><strong>Three tiers per row (non-godlike users):</strong></p>
-        <ul style="margin:0 0 12px 18px;color:#888;font-size:14px;">
+        <ul class="dslist-18">
           <li><strong>Status strip</strong> — pills for Manager / Friend / Blocked. Lit dot + fill = ON; dimmed = OFF.</li>
           <li><strong>Switches</strong> — <code>Switch</code> toggles for manager access and vira-lata friend. Helper text flips between hint and «ON — tap to revoke».</li>
           <li><strong>One-shot actions</strong> — mono section label + toolbar: purple <code>.actionBadge</code> assign patch (shows <code>· N</code> when patches assigned); orange <code>.actionUnblock</code> when user is blocked.</li>
         </ul>
         <p>Godlike rows skip pills/switches; they only show the action toolbar (assign patch). CSS: <code>ProfilePage.module.css</code> — <code>.userStatusStrip</code>, <code>.userSwitchRow</code>, <code>.userActionToolbar</code>.</p>
-        <div class="component-demo" style="background:#060606;padding:24px;display:flex;justify-content:center;">
+        <div class="component-demo cdemo--usermgmt">
           <style>
             .ds-um-phone { width:min(100%,360px);border:1px solid #2a2a2a;border-radius:12px;overflow:hidden;background:#0a0a0a; }
             .ds-um-head { padding:12px 14px;border-bottom:1px solid #2a2a2a;background:linear-gradient(180deg,rgba(217,119,6,.08),transparent);font-family:'Oswald',sans-serif;font-size:12px;text-transform:uppercase;color:#d97706; }
@@ -3927,6 +4005,7 @@
             .ds-um-toolbar { display:flex;gap:6px;padding-top:8px;border-top:1px solid #2a2a2a; }
             .ds-um-btn { flex:1;padding:5px 8px;border-radius:4px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;border:1px solid; }
             .ds-um-btn.badge { background:rgba(142,68,173,.1);border-color:rgba(142,68,173,.4);color:#bb8fce; }
+            .ds-um-swrow.ds-um-swrow2 { border-top: none; padding-top: 6px; }
           </style>
           <div class="ds-um-phone">
             <div class="ds-um-head">⚡ Servants of Metal</div>
@@ -3941,58 +4020,58 @@
                 <span class="ds-um-pill fr on"><span class="ds-um-dot"></span>Friend</span>
               </div>
               <div class="ds-um-swrow"><div><strong>Manager access</strong>ON — tap to revoke</div><span class="ds-sw on manager"></span></div>
-              <div class="ds-um-swrow" style="border-top:none;padding-top:6px;"><div><strong>Vira-lata friend</strong>ON — tap to revoke</div><span class="ds-sw on friend"></span></div>
+              <div class="ds-um-swrow ds-um-swrow2"><div><strong>Vira-lata friend</strong>ON — tap to revoke</div><span class="ds-sw on friend"></span></div>
               <div class="ds-um-act-lbl">One-shot actions</div>
               <div class="ds-um-toolbar"><span class="ds-um-btn badge">Assign patch · 2</span></div>
             </div>
           </div>
         </div>
 
-      <div class="subhead">Festival Wrap — `/wrap` + Teaser <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">WrapPage · WrapTeaserBanner</span></div>
+      <div class="subhead">Festival Wrap — `/wrap` + Teaser <span class="mono-11">WrapPage · WrapTeaserBanner</span></div>
         <p><strong>A2 Vest Chronicle</strong> (<code>WrapPage.tsx</code>): welcome gate + stat sections + closing thanks gate with CTA to <code>/now</code> (<strong>7–9</strong> scroll sections depending on optional Ratings + Assigned) with <code>scroll-snap-type: y mandatory</code>; fixed progress bar (<code>WrapProgress</code>, <strong>7–9</strong> dots) driven by <code>IntersectionObserver</code>. Document root sets dynamic <code>--stage</code> from user's top stage (<code>stageColorVar</code>).</p>
-        <table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
+        <table class="dstbl">
           <thead>
-            <tr style="border-bottom:1px solid #333; text-align:left;">
-              <th style="padding:6px 8px; color:#aaa;">Section</th>
-              <th style="padding:6px 8px; color:#aaa;">Content</th>
+            <tr class="dstbl-hr">
+              <th class="dstbl-th">Section</th>
+              <th class="dstbl-th">Content</th>
             </tr>
           </thead>
-          <tbody style="color:#888;">
-            <tr><td style="padding:6px 8px;">0 Welcome</td><td style="padding:6px 8px;">Poster gate — title, phrase, scroll hint (no card)</td></tr>
-            <tr><td style="padding:6px 8px;">1 Hero</td><td style="padding:6px 8px;">Giant bands seen; row: picked · skipped · stages</td></tr>
-            <tr><td style="padding:6px 8px;">2 Personality</td><td style="padding:6px 8px;">Top genre + stage; stage pill with visit count</td></tr>
-            <tr><td style="padding:6px 8px;">3 Chaos</td><td style="padding:6px 8px;">Horizontal meters: weak skips, hard conflicts, badges</td></tr>
-            <tr><td style="padding:6px 8px;">4 Ratings (conditional)</td><td style="padding:6px 8px;"><strong>C · Popular Echo</strong> — personal strip (or zero copy); nested crew top/low cards (paw + avg hero + count footer); your top score row. Hidden when zero crew ratings or <code>!hasPicks</code>. Prototype: <code>_temp/wrap-ratings-proposals/index.html</code> § C</td></tr>
-            <tr><td style="padding:6px 8px;">4/5 Vira-latas</td><td style="padding:6px 8px;">Pick-twin spotlight portrait (twin only, name below); stats in card</td></tr>
-            <tr><td style="padding:6px 8px;">5/6 Assigned (conditional)</td><td style="padding:6px 8px;">Godlike hand-picked patches grid; only when <code>assignedBadgeSlugs.length &gt; 0</code></td></tr>
-            <tr><td style="padding:6px 8px;">6–7/7–8 Patches</td><td style="padding:6px 8px;">Decorative <code>buildStackPoses</code> pile; CTA Open vest → /profile?vest=open#vest</td></tr>
-            <tr><td style="padding:6px 8px;">7–8/8–9 Thanks</td><td style="padding:6px 8px;">Closing gate — thanks + Wacken 2027 (Rain or Shine); CTA Back to the App → /now</td></tr>
+          <tbody class="c-888">
+            <tr><td class="dstbl-cell">0 Welcome</td><td class="dstbl-cell">Poster gate — title, phrase, scroll hint (no card)</td></tr>
+            <tr><td class="dstbl-cell">1 Hero</td><td class="dstbl-cell">Giant bands seen; row: picked · skipped · stages</td></tr>
+            <tr><td class="dstbl-cell">2 Personality</td><td class="dstbl-cell">Top genre + stage; stage pill with visit count</td></tr>
+            <tr><td class="dstbl-cell">3 Chaos</td><td class="dstbl-cell">Horizontal meters: weak skips, hard conflicts, badges</td></tr>
+            <tr><td class="dstbl-cell">4 Ratings (conditional)</td><td class="dstbl-cell"><strong>C · Popular Echo</strong> — personal strip (or zero copy); nested crew top/low cards (paw + avg hero + count footer); your top score row. Hidden when zero crew ratings or <code>!hasPicks</code>. Prototype: <code>_temp/wrap-ratings-proposals/index.html</code> § C</td></tr>
+            <tr><td class="dstbl-cell">4/5 Vira-latas</td><td class="dstbl-cell">Pick-twin spotlight portrait (twin only, name below); stats in card</td></tr>
+            <tr><td class="dstbl-cell">5/6 Assigned (conditional)</td><td class="dstbl-cell">Godlike hand-picked patches grid; only when <code>assignedBadgeSlugs.length &gt; 0</code></td></tr>
+            <tr><td class="dstbl-cell">6–7/7–8 Patches</td><td class="dstbl-cell">Decorative <code>buildStackPoses</code> pile; CTA Open vest → /profile?vest=open#vest</td></tr>
+            <tr><td class="dstbl-cell">7–8/8–9 Thanks</td><td class="dstbl-cell">Closing gate — thanks + Wacken 2027 (Rain or Shine); CTA Back to the App → /now</td></tr>
           </tbody>
         </table>
         <p>Stat sections (hero → patches, plus optional assigned): <strong>4px</strong> top bar <code>background: var(--stage)</code> (fallback <code>var(--accent)</code>); shimmer + glow on reveal. Typography: Oswald display, IBM Plex body, JetBrains Mono kickers. Per-section <strong>epigraph</strong> (<code>.sectionEpigraph</code>) sits <em>above</em> the card in <code>.sectionFrame</code> — editorial voice against ambient orbs; card holds stats only. Welcome and thanks finale are poster gates (no card).</p>
         <p><strong>Celebration layer (Phase 30 polish):</strong> fixed ambient stage/accent orbs + film grain; cards fade/slide in on scroll (<code>IntersectionObserver</code> → <code>.sectionRevealed</code>); hero count-up; staggered meter fills; patch pile drop-in; pill CTA for Open vest. Respects <code>prefers-reduced-motion</code>.</p>
         <p><strong>WrapTeaserBanner Variant B</strong> (<code>/now</code>, <code>/profile</code>): full-width bar on <code>--bg-surface</code>; <strong>4px</strong> solid <code>var(--accent)</code> top strip; decorative 3-patch pile (18×18 stage colors); Oswald headline + mono CTA; dismiss column 44px touch target. Gated post-festival only; not in bottom nav.</p>
 
-      <div class="subhead">BadgesDisplay <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/BadgesDisplay.tsx</span></div>
+      <div class="subhead">BadgesDisplay <span class="mono-11">src/components/BadgesDisplay.tsx</span></div>
         <p>Earned patches on <code>/now</code> and <code>/profile</code>. <strong>Variant C — Vest Stack:</strong> collapsed vest (fixed <strong>112 px</strong> tall, max-width 480 px). Default <strong>chaotic</strong> mode: meadow scatter with <strong>48 px</strong> patches; opt-in <strong>neat</strong> mode: horizontal chip stack (all badges, scaled). <em>Open vest</em> expands into a 4-column grid; <em>Close vest</em> reshuffles chaotic pile only.</p>
         <p><strong>Collapsed chaotic:</strong> <code>buildStackPoses()</code> — center-out golden spiral, <code>scatterSeed</code>, rotation ±55°, max 50% overlap. <strong>Collapsed neat:</strong> <code>buildNeatStackPoses()</code> — scale-down row, 0°–5° rotation, no reseed. Layout toggle in Edit profile (<code>PatchesLayoutToggle</code>, icon-only) beside fabric swatches; preference in <code>patchesLayout.ts</code>.</p>
-        <table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
+        <table class="dstbl">
           <thead>
-            <tr style="border-bottom:1px solid #333; text-align:left;">
-              <th style="padding:6px 8px; color:#aaa;">Prop / state</th>
-              <th style="padding:6px 8px; color:#aaa;">Detail</th>
+            <tr class="dstbl-hr">
+              <th class="dstbl-th">Prop / state</th>
+              <th class="dstbl-th">Detail</th>
             </tr>
           </thead>
-          <tbody style="color:#888;">
-            <tr><td style="padding:6px 8px;"><code>user</code></td><td style="padding:6px 8px;">Supabase auth user — badge context built offline-first (two-phase load).</td></tr>
-            <tr><td style="padding:6px 8px;">Collapsed chaotic</td><td style="padding:6px 8px;"><code>.vestStack</code> + <code>.vestStackMeadow</code> · 48 px · scatter · reseed on close</td></tr>
-            <tr><td style="padding:6px 8px;">Collapsed neat</td><td style="padding:6px 8px;"><code>.vestStack.vestNeat</code> · scaled px · horizontal row · <code>patchesLayout.ts</code></td></tr>
-            <tr><td style="padding:6px 8px;">Expanded</td><td style="padding:6px 8px;"><code>.vestSpread.patchesGrid</code> 4 cols · 48 px · <code>settlePatch</code> stagger 42 ms · i18n <em>Close vest</em></td></tr>
-            <tr><td style="padding:6px 8px;"><code>data-bg</code></td><td style="padding:6px 8px;"><code>none</code> · <code>grid</code> · <code>steel</code> (default) · <code>indigo</code> · <code>leather</code> — from <code>patchesBackground.ts</code></td></tr>
-            <tr><td style="padding:6px 8px;">Glow</td><td style="padding:6px 8px;"><code>badgeGlow</code> on unacknowledged slugs; cleared via <code>localStorage badgeAcknowledged</code></td></tr>
+          <tbody class="c-888">
+            <tr><td class="dstbl-cell"><code>user</code></td><td class="dstbl-cell">Supabase auth user — badge context built offline-first (two-phase load).</td></tr>
+            <tr><td class="dstbl-cell">Collapsed chaotic</td><td class="dstbl-cell"><code>.vestStack</code> + <code>.vestStackMeadow</code> · 48 px · scatter · reseed on close</td></tr>
+            <tr><td class="dstbl-cell">Collapsed neat</td><td class="dstbl-cell"><code>.vestStack.vestNeat</code> · scaled px · horizontal row · <code>patchesLayout.ts</code></td></tr>
+            <tr><td class="dstbl-cell">Expanded</td><td class="dstbl-cell"><code>.vestSpread.patchesGrid</code> 4 cols · 48 px · <code>settlePatch</code> stagger 42 ms · i18n <em>Close vest</em></td></tr>
+            <tr><td class="dstbl-cell"><code>data-bg</code></td><td class="dstbl-cell"><code>none</code> · <code>grid</code> · <code>steel</code> (default) · <code>indigo</code> · <code>leather</code> — from <code>patchesBackground.ts</code></td></tr>
+            <tr><td class="dstbl-cell">Glow</td><td class="dstbl-cell"><code>badgeGlow</code> on unacknowledged slugs; cleared via <code>localStorage badgeAcknowledged</code></td></tr>
           </tbody>
         </table>
-        <div class="component-demo" style="background: #0a0a0a; padding: 24px; max-width: 360px;">
+        <div class="component-demo cdemo--badges">
           <style>
             .ds-bd-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
             .ds-bd-kicker { font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #666; }
@@ -4012,60 +4091,76 @@
               border: 1px solid #333; box-shadow: 0 2px 6px rgba(0,0,0,.65);
               transform: translate(-50%, -50%);
             }
+            .ds-bd-p1 { left: 18%; top: 38%; transform: translate(-50%,-50%) rotate(-48deg) scale(.94); z-index: 2; }
+            .ds-bd-p2 { left: 42%; top: 62%; transform: translate(-50%,-50%) rotate(35deg) scale(.91); z-index: 5; }
+            .ds-bd-p3 { left: 68%; top: 30%; transform: translate(-50%,-50%) rotate(-55deg) scale(.97); z-index: 3; }
+            .ds-bd-p4 { left: 31%; top: 78%; transform: translate(-50%,-50%) rotate(22deg) scale(.89); z-index: 4; }
+            .ds-bd-p5 { left: 55%; top: 44%; transform: translate(-50%,-50%) rotate(41deg) scale(.96); z-index: 9; box-shadow: 0 0 14px rgba(255,160,40,.55); }
+            .ds-bd-p6 { left: 80%; top: 58%; transform: translate(-50%,-50%) rotate(-31deg) scale(.92); z-index: 6; }
+            .ds-bd-p7 { left: 12%; top: 70%; transform: translate(-50%,-50%) rotate(52deg) scale(.88); z-index: 7; }
+            .ds-bd-p8 { left: 88%; top: 42%; transform: translate(-50%,-50%) rotate(-18deg) scale(.95); z-index: 8; }
+            .ds-bd-neat { display: flex; align-items: center; justify-content: center; }
+            .ds-bd-neatrow { display: inline-flex; align-items: center; padding: 0 12px; }
+            .ds-bd-n1 { position: relative; left: auto; top: auto; width: 32px; height: 32px; transform: rotate(2deg); margin: 0; }
+            .ds-bd-n2 { position: relative; left: auto; top: auto; width: 32px; height: 32px; transform: rotate(4deg); margin: 0 0 0 -11px; z-index: 2; }
+            .ds-bd-n3 { position: relative; left: auto; top: auto; width: 32px; height: 32px; transform: rotate(1deg); margin: 0 0 0 -11px; z-index: 3; }
+            .ds-bd-n4 { position: relative; left: auto; top: auto; width: 32px; height: 32px; transform: rotate(3deg); margin: 0 0 0 -11px; z-index: 4; }
+            .ds-bd-n5 { position: relative; left: auto; top: auto; width: 32px; height: 32px; transform: rotate(0deg); margin: 0 0 0 -11px; z-index: 5; box-shadow: 0 0 14px rgba(255,160,40,.55); }
+            .ds-bd-n6 { position: relative; left: auto; top: auto; width: 32px; height: 32px; transform: rotate(5deg); margin: 0 0 0 -11px; z-index: 6; }
           </style>
           <div class="ds-bd-header">
             <span class="ds-bd-kicker">PATCHES · 22</span>
             <span class="ds-bd-btn">Open vest</span>
           </div>
           <div class="ds-bd-stack">
-            <div class="ds-bd-patch" style="left: 18%; top: 38%; transform: translate(-50%,-50%) rotate(-48deg) scale(.94); z-index: 2;"></div>
-            <div class="ds-bd-patch" style="left: 42%; top: 62%; transform: translate(-50%,-50%) rotate(35deg) scale(.91); z-index: 5;"></div>
-            <div class="ds-bd-patch" style="left: 68%; top: 30%; transform: translate(-50%,-50%) rotate(-55deg) scale(.97); z-index: 3;"></div>
-            <div class="ds-bd-patch" style="left: 31%; top: 78%; transform: translate(-50%,-50%) rotate(22deg) scale(.89); z-index: 4;"></div>
-            <div class="ds-bd-patch" style="left: 55%; top: 44%; transform: translate(-50%,-50%) rotate(41deg) scale(.96); z-index: 9; box-shadow: 0 0 14px rgba(255,160,40,.55);"></div>
-            <div class="ds-bd-patch" style="left: 80%; top: 58%; transform: translate(-50%,-50%) rotate(-31deg) scale(.92); z-index: 6;"></div>
-            <div class="ds-bd-patch" style="left: 12%; top: 70%; transform: translate(-50%,-50%) rotate(52deg) scale(.88); z-index: 7;"></div>
-            <div class="ds-bd-patch" style="left: 88%; top: 42%; transform: translate(-50%,-50%) rotate(-18deg) scale(.95); z-index: 8;"></div>
+            <div class="ds-bd-patch ds-bd-p1"></div>
+            <div class="ds-bd-patch ds-bd-p2"></div>
+            <div class="ds-bd-patch ds-bd-p3"></div>
+            <div class="ds-bd-patch ds-bd-p4"></div>
+            <div class="ds-bd-patch ds-bd-p5"></div>
+            <div class="ds-bd-patch ds-bd-p6"></div>
+            <div class="ds-bd-patch ds-bd-p7"></div>
+            <div class="ds-bd-patch ds-bd-p8"></div>
           </div>
-          <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:10px 0 0;">Collapsed chaotic demo — steel <code>data-bg</code>, 48 px patches, ±55° scatter.</p>
-          <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:6px 0 16px;">Edit profile: fabric swatches + I1 layout toggle (scatter dots / stacked circles, aria-label only).</p>
+          <p class="cap-note-a">Collapsed chaotic demo — steel <code>data-bg</code>, 48 px patches, ±55° scatter.</p>
+          <p class="cap-note-b">Edit profile: fabric swatches + I1 layout toggle (scatter dots / stacked circles, aria-label only).</p>
           <div class="ds-bd-header">
             <span class="ds-bd-kicker">PATCHES · 22 · NEAT</span>
             <span class="ds-bd-btn">Open vest</span>
           </div>
-          <div class="ds-bd-stack" style="display:flex;align-items:center;justify-content:center;">
-            <div style="display:inline-flex;align-items:center;padding:0 12px;">
-              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(2deg);margin:0;"></div>
-              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(4deg);margin:0 0 0 -11px;z-index:2;"></div>
-              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(1deg);margin:0 0 0 -11px;z-index:3;"></div>
-              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(3deg);margin:0 0 0 -11px;z-index:4;"></div>
-              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(0deg);margin:0 0 0 -11px;z-index:5;box-shadow:0 0 14px rgba(255,160,40,.55);"></div>
-              <div class="ds-bd-patch" style="position:relative;left:auto;top:auto;width:32px;height:32px;transform:rotate(5deg);margin:0 0 0 -11px;z-index:6;"></div>
+          <div class="ds-bd-stack ds-bd-neat">
+            <div class="ds-bd-neatrow">
+              <div class="ds-bd-patch ds-bd-n1"></div>
+              <div class="ds-bd-patch ds-bd-n2"></div>
+              <div class="ds-bd-patch ds-bd-n3"></div>
+              <div class="ds-bd-patch ds-bd-n4"></div>
+              <div class="ds-bd-patch ds-bd-n5"></div>
+              <div class="ds-bd-patch ds-bd-n6"></div>
             </div>
           </div>
-          <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:10px 0 0;">Collapsed neat demo — scaled 32 px patches, ~35% overlap, 0°–5° rotation.</p>
+          <p class="cap-note-a">Collapsed neat demo — scaled 32 px patches, ~35% overlap, 0°–5° rotation.</p>
         </div>
 
-      <div class="subhead">Previously Achieved + Consolidation <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">Phase 29 · U2</span></div>
+      <div class="subhead">Previously Achieved + Consolidation <span class="mono-11">Phase 29 · U2</span></div>
         <p><strong>Previously Achieved</strong> (<code>BadgeHistorySection.tsx</code>) — collapsible archive below live vest on <code>/profile</code>. Hidden when IndexedDB history empty. Locked layout: <strong>U2</strong> from <code>_temp/badge-history-proposals/index.html</code> — flat 4×48 px grid per year (no denim vest shell), Oswald year headings, mono section title, muted patch opacity. Tap → overlay <code>BadgeDetailModal</code> (M2: label + year chip only; no description; no zoom).</p>
         <p><strong>Live vest filter</strong> — <code>isLiveVestBadge()</code>: evergreen + <code>year === getCurrentFestivalYear()</code> only. After reset, year-badges live in archive only.</p>
         <p><strong>Godlike consolidate</strong> (<code>ConsolidateBadgesSection</code>) — year selector, force checkbox, gate until <code>isFestivalEnded()</code>, confirm modal, inline result. <strong>Archive preview (dev)</strong> — Test Badges panel seeds local IDB without Supabase.</p>
-        <table style="width:100%; border-collapse:collapse; font-size:13px; margin:12px 0;">
+        <table class="dstbl">
           <thead>
-            <tr style="border-bottom:1px solid #333; text-align:left;">
-              <th style="padding:6px 8px; color:#aaa;">Element</th>
-              <th style="padding:6px 8px; color:#aaa;">Spec</th>
+            <tr class="dstbl-hr">
+              <th class="dstbl-th">Element</th>
+              <th class="dstbl-th">Spec</th>
             </tr>
           </thead>
-          <tbody style="color:#888;">
-            <tr><td style="padding:6px 8px;">Section shell</td><td style="padding:6px 8px;">max-width 400 px · centered · opacity ~0.94 · no bordered collapsible card</td></tr>
-            <tr><td style="padding:6px 8px;">Header</td><td style="padding:6px 8px;">Mono 10 px title + count · chevron + expand/collapse hint</td></tr>
-            <tr><td style="padding:6px 8px;">Year heading</td><td style="padding:6px 8px;">Oswald 14 px uppercase · <em>Wacken {year}</em></td></tr>
-            <tr><td style="padding:6px 8px;">Grid</td><td style="padding:6px 8px;"><code>repeat(4, 48px)</code> · gap 10 px · frozen <code>image_path</code></td></tr>
-            <tr><td style="padding:6px 8px;">Patch</td><td style="padding:6px 8px;">48 px · opacity 0.88 → 1 hover · red enamel diamond year chip (24 px, same as live vest · scaled from 29 px @ 58 px)</td></tr>
+          <tbody class="c-888">
+            <tr><td class="dstbl-cell">Section shell</td><td class="dstbl-cell">max-width 400 px · centered · opacity ~0.94 · no bordered collapsible card</td></tr>
+            <tr><td class="dstbl-cell">Header</td><td class="dstbl-cell">Mono 10 px title + count · chevron + expand/collapse hint</td></tr>
+            <tr><td class="dstbl-cell">Year heading</td><td class="dstbl-cell">Oswald 14 px uppercase · <em>Wacken {year}</em></td></tr>
+            <tr><td class="dstbl-cell">Grid</td><td class="dstbl-cell"><code>repeat(4, 48px)</code> · gap 10 px · frozen <code>image_path</code></td></tr>
+            <tr><td class="dstbl-cell">Patch</td><td class="dstbl-cell">48 px · opacity 0.88 → 1 hover · red enamel diamond year chip (24 px, same as live vest · scaled from 29 px @ 58 px)</td></tr>
           </tbody>
         </table>
-        <div class="component-demo" style="background:#0a0a0a;padding:24px;display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start;justify-content:center;">
+        <div class="component-demo cdemo--history">
           <style>
             .ds-bh-section { width:100%; max-width:360px; opacity:.94; }
             .ds-bh-header { display:flex; align-items:center; justify-content:space-between; width:100%; margin-bottom:10px; }
@@ -4094,7 +4189,7 @@
           <div class="ds-bh-section">
             <div class="ds-bh-header">
               <span class="ds-bh-title">Conquistas Anteriores<span class="ds-bh-count">· 11</span></span>
-              <span><span class="ds-bh-hint">recolher</span><span style="color:#888;">▾</span></span>
+              <span><span class="ds-bh-hint">recolher</span><span class="c-888">▾</span></span>
             </div>
             <div class="ds-bh-year">Wacken 2027</div>
             <div class="ds-bh-grid">
@@ -4115,18 +4210,18 @@
               <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'26</span></span></div>
               <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'26</span></span></div>
             </div>
-            <p style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#555;margin:4px 0 0;">U2 multi-year demo — flat grid scales linearly; no mini-vest per year (U3 rejected).</p>
+            <p class="cap-note-c">U2 multi-year demo — flat grid scales linearly; no mini-vest per year (U3 rejected).</p>
           </div>
-          <div style="max-width:280px;font-size:12px;color:#666;line-height:1.5;">
-            <strong style="color:#888;display:block;margin-bottom:6px;font-size:11px;">vs live vest</strong>
+          <div class="bh-aside">
+            <strong class="bh-aside-h">vs live vest</strong>
             Live patches use <code>.vestStack</code> denim shell + chaotic scatter or neat row. Archive deliberately skips <code>data-bg</code> — quieter trophy shelf so the live vest above stays the hero.
           </div>
         </div>
 
-      <div class="subhead">MoshSplitSection <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/profile/MoshSplitSection.tsx</span></div>
+      <div class="subhead">MoshSplitSection <span class="mono-11">src/components/profile/MoshSplitSection.tsx</span></div>
         <p>Collapsible profile section showing the current user's net balance from <strong>MoshSplit</strong> (<code>split.viralatas.org</code>) — the festival finance app used by the vira-latas at Wacken. Placed after <code>&lt;ConflictSection&gt;</code>, before <code>&lt;EditProfileForm&gt;</code>. Accepts only <code>userEmail: string</code>; fetches live data via <code>POST /api/moshsplit/pitboss/v1/balances/external-summary</code> (Vercel proxy → <code>split.viralatas.org</code>, bearer token from <code>VITE_MOSHSPLIT_TOKEN</code>).</p>
         <p><strong>Five render states:</strong></p>
-        <ul style="margin: 0 0 12px 18px; color: #888; font-size: 14px;">
+        <ul class="dslist-18">
           <li><strong>loading</strong> — spinner chip in header, pulse-skeleton in body.</li>
           <li><strong>not_found</strong> — API 404; <code>return null</code>, component fully invisible.</li>
           <li><strong>error</strong> — non-OK response or network failure; orange <code>!</code> chip in header; <code>⚠ Could not load MoshSplit data</code> + CTA in body.</li>
@@ -4136,7 +4231,7 @@
         <p><strong>Collapsible trigger layout:</strong> logo (22×22, border-radius 5px, remote SVG with wallet fallback) → label group (Oswald 14px + mono sub-label) → balance chip (right-aligned). Uses <code>&lt;Collapsible&gt;</code> from <code>src/ui</code> with <code>defaultOpen={false}</code>. Wrapper: <code>margin: var(--s-3) var(--s-4)</code>, max-width 400px.</p>
         <p><strong>Chip palette:</strong> owes = <code>rgba(--accent, 0.20)</code> bg / <code>--accent-hover</code> text; owed = <code>rgba(--signal-ok, 0.20)</code> bg / teal text; settled = attenuated teal; error = <code>rgba(255,165,0,0.20)</code> bg / orange text. Font mono 11px tabular-nums.</p>
         <p><strong>CTA:</strong> full-width <code>&lt;a&gt;</code> element, "Open MoshSplit →", <code>rgba(--accent, 0.08)</code> bg, opens <code>https://split.viralatas.org</code> in new tab. Visible in settled, active, and error states.</p>
-        <div class="component-demo" style="background: #060606; padding: 24px; display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; justify-content: center;">
+        <div class="component-demo cdemo--moshsplit">
           <style>
             .ds-ms-wrap { border: 1px solid #2a2a2a; border-radius: 8px; overflow: hidden; width: 280px; }
             .ds-ms-trigger { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #1e1e1e; }
@@ -4252,13 +4347,13 @@
           </tbody>
         </table>
 
-      <div class="subhead">PlaylistLaunchButton <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/PlaylistLaunchButton.tsx</span></div>
+      <div class="subhead">PlaylistLaunchButton <span class="mono-11">src/components/PlaylistLaunchButton.tsx</span></div>
         <p>Full-width action strip shown on <code>/picks</code> (below conflict banner, above band list) that deep-links the user to <strong>Setlist Vira-Latas</strong> (<code>setlist.viralatas.org</code>) with their picked bands pre-filled. Ships behind a feature flag (<code>playlist_testing</code> on <code>app_settings</code>).</p>
         <p><strong>Visibility rules:</strong> hidden when user has 0 picks; hidden to <code>normal</code> role while <code>playlist_testing = true</code>; visible to all when <code>playlist_testing = false</code>. Godlike toggles the flag in the admin panel.</p>
         <p><strong>URL construction:</strong> <code>GET /launch</code> on Setlist Vira-Latas with repeated <code>bands</code> params, <code>user_name</code> trimmed to 20 chars, <code>lang</code> mapped (<code>br → pt-BR</code>, else <code>en</code>). Renders as <code>&lt;a target="_blank"&gt;</code> — no loading state, instant redirect.</p>
         <p><strong>Layout:</strong> left side = 22×22 inline SVG icon (playlist motif, teal, border-radius 5px) + two-line text stack (Oswald 13px 700 uppercase label + JetBrains Mono 10px sub-label with band count); right side = <code>→</code> arrow in mono.</p>
         <p><strong>Tokens used:</strong> <code>--signal-ok</code>, <code>--font-display</code>, <code>--font-mono</code>, <code>--s-3</code>, <code>--s-4</code>. No new custom properties.</p>
-        <div class="component-demo" style="background: #0a0a0a; padding: 0; overflow: hidden;">
+        <div class="component-demo cdemo--playlist">
           <style>
             .ds-plb { display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; background: rgba(22,160,133,0.06); border-bottom: 1px solid rgba(22,160,133,0.18); text-decoration: none; cursor: pointer; }
             .ds-plb-left { display: flex; align-items: center; gap: 10px; }
@@ -4288,7 +4383,7 @@
             <span class="ds-plb-arrow">→</span>
           </div>
         </div>
-        <table class="prop-table" style="margin-top: 16px;">
+        <table class="prop-table mt-16px">
           <thead><tr><th>Prop</th><th>Type</th><th>Description</th></tr></thead>
           <tbody>
             <tr><td>bands</td><td>Band[]</td><td>User's picked bands. Component is hidden when empty.</td></tr>
@@ -4296,46 +4391,46 @@
           </tbody>
         </table>
 
-      <div class="subhead">ClusterRow <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/now/CrewGroupsSection.tsx</span></div>
+      <div class="subhead">ClusterRow <span class="mono-11">src/components/now/CrewGroupsSection.tsx</span></div>
         <p>Collapsed stacked-avatar row used on all 4 live page card types. Replaces the always-visible member pill list. Max 5 avatars shown; overflow shown as +N. Tapping the parent card opens the LiveCardSheet.</p>
-        <div class="component-demo" style="background: #0a0a0a; padding: 20px; display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
+        <div class="component-demo cdemo--cluster">
           <!-- Band cluster -->
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .08em;">band card</span>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="display: flex;">
-                <div style="width:24px;height:24px;border-radius:50%;background:#2980b9;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">S</div>
-                <div style="width:24px;height:24px;border-radius:50%;background:#333;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ccc;margin-left:-8px;">R</div>
-                <div style="width:24px;height:24px;border-radius:50%;background:#333;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ccc;margin-left:-8px;">M</div>
-                <div style="width:24px;height:24px;border-radius:50%;background:#333;border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#ccc;margin-left:-8px;">A</div>
+          <div class="cl-col">
+            <span class="cl-cap">band card</span>
+            <div class="cl-row">
+              <div class="cl-stack">
+                <div class="cl-av" style="background:#2980b9">S</div>
+                <div class="cl-av cl-av-ink cl-av-lap" style="background:#333">R</div>
+                <div class="cl-av cl-av-ink cl-av-lap" style="background:#333">M</div>
+                <div class="cl-av cl-av-ink cl-av-lap" style="background:#333">A</div>
               </div>
-              <span style="font-size:12px;color:#888;">4 vira-latas</span>
+              <span class="cl-lbl">4 vira-latas</span>
             </div>
           </div>
           <!-- Metal Place cluster -->
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .08em;">metal place</span>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="display: flex;">
-                <div style="width:24px;height:24px;border-radius:50%;background:rgba(217,119,6,.55);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">C</div>
-                <div style="width:24px;height:24px;border-radius:50%;background:rgba(217,119,6,.55);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">P</div>
+          <div class="cl-col">
+            <span class="cl-cap">metal place</span>
+            <div class="cl-row">
+              <div class="cl-stack">
+                <div class="cl-av" style="background:rgba(217,119,6,.55)">C</div>
+                <div class="cl-av cl-av-lap" style="background:rgba(217,119,6,.55)">P</div>
               </div>
-              <span style="font-size:12px;color:#888;">2 here</span>
+              <span class="cl-lbl">2 here</span>
             </div>
           </div>
           <!-- Camping cluster with overflow -->
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #555; text-transform: uppercase; letter-spacing: .08em;">camping (overflow)</span>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <div style="display: flex; align-items: center;">
-                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;">T</div>
-                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">V</div>
-                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">L</div>
-                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">N</div>
-                <div style="width:24px;height:24px;border-radius:50%;background:rgba(22,160,133,.4);border:2px solid #141414;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-left:-8px;">B</div>
-                <span style="font-size:11px;color:#888;margin-left:4px;">+3</span>
+          <div class="cl-col">
+            <span class="cl-cap">camping (overflow)</span>
+            <div class="cl-row">
+              <div class="cl-stack-c">
+                <div class="cl-av" style="background:rgba(22,160,133,.4)">T</div>
+                <div class="cl-av cl-av-lap" style="background:rgba(22,160,133,.4)">V</div>
+                <div class="cl-av cl-av-lap" style="background:rgba(22,160,133,.4)">L</div>
+                <div class="cl-av cl-av-lap" style="background:rgba(22,160,133,.4)">N</div>
+                <div class="cl-av cl-av-lap" style="background:rgba(22,160,133,.4)">B</div>
+                <span class="cl-lbl-of">+3</span>
               </div>
-              <span style="font-size:12px;color:#888;">8 resting</span>
+              <span class="cl-lbl">8 resting</span>
             </div>
           </div>
         </div>
@@ -4351,12 +4446,12 @@
         </table>
         <p><strong>Count labels by kind:</strong> band → <em>"N vira-latas"</em> · metal_place → <em>"N here"</em> · camping → <em>"N resting"</em> · lost → <em>"N wandering"</em></p>
 
-      <div class="subhead">LiveCardSheet <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #888; font-weight: 400; text-transform: none; letter-spacing: 0;">src/components/now/LiveCardSheet.tsx</span></div>
+      <div class="subhead">LiveCardSheet <span class="mono-11">src/components/now/LiveCardSheet.tsx</span></div>
         <p>Themed bottom sheet opened by tapping any live page group card. Slide-up entrance (280ms iOS spring). Tapping the backdrop dismisses. State lives at <code>RightNowPage</code> level — only one sheet open at a time.</p>
         <p><strong>Sections:</strong> Members with no next band → "Here now" (pulsing live dot). Members with <code>plan.nextBand</code> → "Heading next" (stage-coloured pill). Sections omitted when empty. Divider only shown when both sections non-empty.</p>
 
         <!-- Live preview of all 4 sheet types -->
-        <div class="component-demo" style="background: #050505; padding: 20px; display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end;">
+        <div class="component-demo cdemo--sheet">
           <style>
             .ds-sheet { border-radius: 14px; overflow: hidden; width: 180px; font-family: 'IBM Plex Sans', sans-serif; font-size: 12px; color: #f0f0f0; border-top: 2px solid var(--ds-accent); background: var(--ds-bg); }
             .ds-sheet-handle { width: 28px; height: 3px; border-radius: 2px; background: rgba(255,255,255,.15); margin: 8px auto 10px; }
@@ -4381,12 +4476,19 @@
             .ds-next-pill { display: flex; align-items: center; gap: 3px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.09); border-radius: 20px; padding: 2px 5px 2px 4px; flex-shrink: 0; }
             .ds-next-dot { width: 4px; height: 4px; border-radius: 50%; flex-shrink: 0; }
             .ds-next-name { font-size: 9px; color: rgba(255,255,255,.5); white-space: nowrap; }
+            .ds-sheet-cap { font-family: 'JetBrains Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: .08em; text-align: center; margin-bottom: 6px; }
+            .ds-sheet-band { --ds-accent:#2980b9; --ds-bg:#0a1929; --ds-avatar-bg:rgba(41,128,185,.3); }
+            .ds-sheet-metal { --ds-accent:rgba(217,119,6,1); --ds-bg:rgba(217,119,6,.09); --ds-avatar-bg:rgba(217,119,6,.4); --ds-title:rgba(253,224,71,.95); }
+            .ds-sheet-camping { --ds-accent:#16a085; --ds-bg:rgba(22,160,133,.09); --ds-avatar-bg:rgba(22,160,133,.35); }
+            .ds-sheet-lost { --ds-accent:rgba(168,85,247,.9); --ds-bg:rgba(88,28,135,.3); --ds-avatar-bg:rgba(88,28,135,.5); }
+            .ds-sheet-lost-title { color:rgba(233,213,255,.95); text-shadow:0 0 12px rgba(168,85,247,.4); }
+            .ds-sheet-nopicks { font-size:9px; color:rgba(255,255,255,.2); font-style:italic; }
           </style>
 
           <!-- Band (blue) -->
           <div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#2980b9;text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px;">Band</div>
-            <div class="ds-sheet" style="--ds-accent:#2980b9;--ds-bg:#0a1929;--ds-avatar-bg:rgba(41,128,185,.3);">
+            <div class="ds-sheet-cap" style="color:#2980b9">Band</div>
+            <div class="ds-sheet ds-sheet-band">
               <div class="ds-sheet-handle"></div>
               <div class="ds-sheet-header">
                 <div class="ds-stage-row"><div class="ds-stage-dot"></div><span class="ds-stage-name">Faster</span><span class="ds-stage-time">20:30–22:00</span></div>
@@ -4406,8 +4508,8 @@
 
           <!-- Metal Place (amber) -->
           <div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(217,119,6,1);text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px;">Metal Place</div>
-            <div class="ds-sheet" style="--ds-accent:rgba(217,119,6,1);--ds-bg:rgba(217,119,6,.09);--ds-avatar-bg:rgba(217,119,6,.4);--ds-title:rgba(253,224,71,.95);">
+            <div class="ds-sheet-cap" style="color:rgba(217,119,6,1)">Metal Place</div>
+            <div class="ds-sheet ds-sheet-metal">
               <div class="ds-sheet-handle"></div>
               <div class="ds-sheet-header">
                 <div class="ds-stage-row"><div class="ds-stage-dot"></div><span class="ds-stage-name" style="color:rgba(217,119,6,1);">Special zone</span><span class="ds-stage-time">14:00–22:00</span></div>
@@ -4423,8 +4525,8 @@
 
           <!-- Camping (teal) -->
           <div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#16a085;text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px;">Camping</div>
-            <div class="ds-sheet" style="--ds-accent:#16a085;--ds-bg:rgba(22,160,133,.09);--ds-avatar-bg:rgba(22,160,133,.35);">
+            <div class="ds-sheet-cap" style="color:#16a085">Camping</div>
+            <div class="ds-sheet ds-sheet-camping">
               <div class="ds-sheet-handle"></div>
               <div class="ds-sheet-header">
                 <div class="ds-title">Vira-Latas HQ 🏕</div>
@@ -4432,29 +4534,29 @@
               </div>
               <div class="ds-members">
                 <div class="ds-row"><div class="ds-av">T</div><span class="ds-name">tiago</span><div class="ds-next-pill"><div class="ds-next-dot" style="background:#2980b9;"></div><span class="ds-next-name">Judas P.</span></div></div>
-                <div class="ds-row"><div class="ds-av">V</div><span class="ds-name">vitor</span><span style="font-size:9px;color:rgba(255,255,255,.2);font-style:italic;">no picks</span></div>
+                <div class="ds-row"><div class="ds-av">V</div><span class="ds-name">vitor</span><span class="ds-sheet-nopicks">no picks</span></div>
               </div>
             </div>
           </div>
 
           <!-- Lost (purple) -->
           <div>
-            <div style="font-family:'JetBrains Mono',monospace;font-size:9px;color:#a855f7;text-transform:uppercase;letter-spacing:.08em;text-align:center;margin-bottom:6px;">Lost</div>
-            <div class="ds-sheet" style="--ds-accent:rgba(168,85,247,.9);--ds-bg:rgba(88,28,135,.3);--ds-avatar-bg:rgba(88,28,135,.5);">
+            <div class="ds-sheet-cap" style="color:#a855f7">Lost</div>
+            <div class="ds-sheet ds-sheet-lost">
               <div class="ds-sheet-handle"></div>
               <div class="ds-sheet-header">
-                <div class="ds-title" style="color:rgba(233,213,255,.95);text-shadow:0 0 12px rgba(168,85,247,.4);">Lost in the pit 🤘</div>
+                <div class="ds-title ds-sheet-lost-title">Lost in the pit 🤘</div>
                 <div class="ds-count">2 wandering</div>
               </div>
               <div class="ds-members">
                 <div class="ds-row"><div class="ds-av">L</div><span class="ds-name">lucas</span><div class="ds-next-pill"><div class="ds-next-dot" style="background:#e67e22;"></div><span class="ds-next-name">Slipknot</span></div></div>
-                <div class="ds-row"><div class="ds-av">N</div><span class="ds-name">nanda</span><span style="font-size:9px;color:rgba(255,255,255,.2);font-style:italic;">no picks</span></div>
+                <div class="ds-row"><div class="ds-av">N</div><span class="ds-name">nanda</span><span class="ds-sheet-nopicks">no picks</span></div>
               </div>
             </div>
           </div>
         </div>
 
-        <p style="margin-top: 12px;"><strong>Colour system:</strong> All 4 sheet types use a <code>--sheet-*</code> CSS variable bundle injected inline by a <code>groupAccentColor()</code> helper. Band cards derive accent from <code>stageColor(stage)</code>; presence cards use fixed values: metal_place <code>rgba(217,119,6,1)</code> · camping <code>var(--signal-ok)</code> · lost <code>var(--signal-lost)</code>.</p>
+        <p class="mt-12px"><strong>Colour system:</strong> All 4 sheet types use a <code>--sheet-*</code> CSS variable bundle injected inline by a <code>groupAccentColor()</code> helper. Band cards derive accent from <code>stageColor(stage)</code>; presence cards use fixed values: metal_place <code>rgba(217,119,6,1)</code> · camping <code>var(--signal-ok)</code> · lost <code>var(--signal-lost)</code>.</p>
         <p><strong>Animation:</strong> Sheet entrance: <code>translateY(100%) → 0</code> over 280ms <code>cubic-bezier(0.32, 0.72, 0, 1)</code>. Backdrop: opacity 0→0.55 over 200ms. Live dot pulses with CSS <code>box-shadow</code> animation every 2.2s.</p>
         <table>
           <thead>
