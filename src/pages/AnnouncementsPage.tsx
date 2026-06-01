@@ -291,7 +291,7 @@ function AnnouncementCard({
               aria-label={t('delete')}
               type="button"
             >
-              ⚐ {t('delete')}
+              {t('delete')}
             </button>
           )}
         </div>

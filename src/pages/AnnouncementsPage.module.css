@@ -310,6 +310,9 @@
   }
   .card::before { display: none; }
   .tapeCorner { display: none; }
+  .actionBtn,
+  .cardActions .actionBtn:nth-of-type(2),
+  .cardActions .actionBtn:nth-of-type(3) { transform: none; }
 }
 
 /* ---- Avatar (column 1, row 1) ---- */
@@ -387,6 +390,12 @@
   background: color-mix(in srgb, var(--bg-surface) 90%, var(--accent) 10%);
 }
 
+/* the pinned flyer is held by a marked piece of red tape */
+.cardPinned .tapeCorner {
+  background: color-mix(in srgb, var(--accent) 28%, var(--tape));
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
 /* ---- Pinned chip in head row ---- */
 
 .pinnedChip {
@@ -412,19 +421,35 @@
 
 .actionBtn {
   background: transparent;
-  border: 0;
-  padding: 0;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 2px;
+  padding: 4px 9px;
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 700;
   color: var(--text-muted);
   cursor: pointer;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  transition: color 0.15s;
+  letter-spacing: 0.08em;
+  transform: rotate(-1deg);
+  transition: color 0.15s, background 0.15s, border-color 0.15s, transform 0.08s;
+}
+
+.cardActions .actionBtn:nth-of-type(2) {
+  transform: rotate(0.8deg);
+}
+
+.cardActions .actionBtn:nth-of-type(3) {
+  transform: rotate(-0.5deg);
 }
 
 .actionBtn:hover:not(:disabled) {
   color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.actionBtn:active:not(:disabled) {
+  transform: translateY(1px) rotate(0deg);
 }
 
 .actionBtn:disabled {
@@ -432,12 +457,21 @@
   cursor: not-allowed;
 }
 
+.actionBtnDanger {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
 .actionBtnDanger:hover:not(:disabled) {
-  color: var(--signal-warn);
+  color: var(--accent-hover);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  border-color: color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 .actionBtnActive {
-  color: var(--accent);
+  color: var(--text-white);
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 /* ============================================================
