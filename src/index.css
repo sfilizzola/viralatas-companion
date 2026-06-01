@@ -163,10 +163,6 @@
   --duration-slow: 0.5s;
   --easing-ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   --easing-ease-in: cubic-bezier(0.4, 0, 1, 1);
-
-  /* ---------- legacy aliases (kept for components not yet migrated) ---------- */
-  --radius: 8px;
-  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 html, body, #root {
@@ -306,4 +302,10 @@ input {
 @keyframes pending-pulse {
   0%, 100% { opacity: 0.4; }
   50%       { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pending-chip::before {
+    animation: none;
+  }
 }

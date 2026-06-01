@@ -152,7 +152,7 @@
 
 .latestSignalName {
   overflow: hidden;
-  font-size: 0.75rem;
+  font-size: 12px;
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -193,7 +193,7 @@
 }
 
 .latestSignalClickable:active {
-  background: rgba(229, 85, 85, 0.06);
+  background: rgba(192, 57, 43, 0.08);
 }
 
 .latestSignalText {
@@ -216,7 +216,7 @@
   background: rgba(217, 119, 6, 0.18);
   border-bottom: 1px solid rgba(217, 119, 6, 0.45);
   color: rgba(251, 191, 36, 0.95);
-  font-size: 0.78rem;
+  font-size: 12px;
   font-weight: 700;
   text-align: center;
   letter-spacing: 0.02em;
@@ -235,7 +235,7 @@
   width: 86px;
   height: 86px;
   overflow: hidden;
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   background: var(--bg-elevated);
 }
 
@@ -255,21 +255,21 @@
   justify-content: center;
   background: var(--accent);
   color: #fff;
-  font-size: 1.8rem;
-  font-weight: 800;
+  font-size: 28px;
+  font-weight: 700;
 }
 
 .eyebrow {
   color: var(--accent-hover);
-  font-size: 0.72rem;
-  font-weight: 800;
+  font-size: 11px;
+  font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .bandName {
   margin-top: 0.25rem;
-  font-size: 1.55rem;
+  font-size: 24px;
   line-height: 1.1;
 }
 
@@ -285,7 +285,7 @@
 .time {
   border-radius: 4px;
   padding: 0.22rem 0.45rem;
-  font-size: 0.72rem;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -302,7 +302,7 @@
 
 .empty {
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: 14px;
   line-height: 1.45;
 }
 
@@ -314,20 +314,20 @@
   padding: 2rem 1rem;
   color: var(--text-muted);
   font-family: var(--font-sans);
-  font-size: 0.9rem;
+  font-size: 14px;
   text-align: center;
 }
 
 .nextHint {
   margin-top: 0.55rem;
   color: var(--text);
-  font-size: 0.82rem;
-  font-weight: 800;
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .sectionTitle {
   margin: 1.25rem 0 0.75rem;
-  font-size: 0.9rem;
+  font-size: 14px;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -447,7 +447,7 @@
   flex-shrink: 0;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 10px rgba(229, 85, 85, 0.45);
+  box-shadow: 0 0 10px rgba(192, 57, 43, 0.45);
 }
 
 .groupTitle {
@@ -538,8 +538,8 @@
 }
 
 .memberPill.me {
-  border-color: rgba(229, 85, 85, 0.75);
-  background: rgba(229, 85, 85, 0.12);
+  border-color: rgba(192, 57, 43, 0.75);
+  background: rgba(192, 57, 43, 0.12);
   color: var(--text);
 }
 
@@ -560,7 +560,7 @@
   background: var(--accent);
   color: #fff;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .memberText {
@@ -790,7 +790,7 @@
 }
 
 .announcementContent {
-  font-size: 1.2rem;
+  font-size: 19px;
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
@@ -843,14 +843,14 @@
   left: 1rem;
   right: 1rem;
   padding: 0.75rem 1rem;
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   background: var(--bg-surface);
   border: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  font-size: 0.9rem;
+  font-size: 14px;
   animation: slideUp 0.24s ease;
   z-index: 10;
 }
@@ -866,8 +866,8 @@
   border-radius: 3px;
   background: transparent;
   color: var(--accent);
-  font-size: 0.78rem;
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.16s ease, color 0.16s ease;
@@ -910,7 +910,7 @@
   }
 
   .bandName {
-    font-size: 1.3rem;
+    font-size: 20px;
   }
 
   .crewGroups {
@@ -919,5 +919,15 @@
 
   .groupTitle {
     font-size: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .undoToast {
+    animation: none;
+  }
+
+  .latestSignalKicker::before {
+    animation: none;
   }
 }
