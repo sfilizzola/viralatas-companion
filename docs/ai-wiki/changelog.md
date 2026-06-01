@@ -4,6 +4,17 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-01
+
+### Changed
+- `public/vira-lata-ds.html` — readability pass: added `#ds-manifest` agent table of contents (sections + token index + component index); extracted all inline styles into reusable classes; rebuilt nav (ordered, labelled, mobile-collapsible); reordered DOM so §12 Governance precedes §13 Minimap (anchors/numbers unchanged); fixed broken self-referential `--metal-place*` tokens.
+- `CLAUDE.md` — design-system rule now points agents to read `#ds-manifest` first.
+
+### Architectural Notes
+- The DS file stays a single standalone HTML (no split, no build step). `#ds-manifest` is the agent navigation layer; the rendered page is the human layer. Both live in one source of truth; a governance checklist item enforces manifest sync.
+
+---
+
 ## 2026-06-01 (Design-system consistency pass)
 
 ### Changed

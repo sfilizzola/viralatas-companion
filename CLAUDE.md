@@ -50,7 +50,7 @@ Each page follows the 8-section template in `.claude/context/wiki-template.md`.
 Update **all three**:
 - Relevant wiki pages (architecture.md, domain-model.md, etc.)
 - `docs/ai-wiki/changelog.md` with your changes
-- `public/vira-lata-ds.html` — if any UI element is added, changed, or removed, update the relevant DS section. Treat the design system as a living spec: it must stay in sync with the code.
+- `public/vira-lata-ds.html` — if any UI element is added, changed, or removed, update the relevant DS section. Treat the design system as a living spec: it must stay in sync with the code. Agents: read the `#ds-manifest` JSON block at the top of `public/vira-lata-ds.html` first — it indexes every section (anchor + purpose), token (by category), and component (→ section), so you can jump without scanning the whole file. Keep the manifest in sync on any section/token/component change.
 
 ### Changelog format
 

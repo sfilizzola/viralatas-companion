@@ -2509,6 +2509,67 @@
   .ds-x-778202fd{display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--r-sm);background:var(--bg-elevated);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;flex-shrink:0}
   .ds-x-865c33f0{font-size:12px;color:var(--text-muted)}
   .ds-x-c9d2ae45{font-size:13px;color:var(--text-muted);line-height:1.8;list-style:disc inside}
+
+
+  /* ============================================================
+     §05 LAYOUTS — inline-style extraction (DS readability pass)
+     ============================================================ */
+  .l5-overflow-y-auto{overflow-y:auto}
+  .l5-mb-s3{margin-bottom:var(--s-3)}
+  .l5-presence-btn{font-size:11px;padding:7px 4px}
+  .l5-dot-camping{color:var(--signal-ok-bright)}
+  .l5-dot-metal{color:var(--metal-place)}
+  .l5-bg-stage-louder{background:var(--stage-louder)}
+  .l5-bg-stage-faster{background:var(--stage-faster)}
+  .l5-bg-stage-headbangers{background:var(--stage-headbangers)}
+  .l5-bg-stage-jungle{background:var(--stage-jungle)}
+  .l5-pad-head{padding:10px 12px}
+  .l5-fs-9{font-size:9px}
+  .l5-live-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);display:inline-block}
+  .l5-title{font-size:18px;margin-top:3px}
+  .l5-fs-10{font-size:10px}
+  .l5-count{font-size:18px;padding:4px 7px}
+  .l5-people{padding:0 12px 10px;gap:4px}
+  .l5-loc-chip{font-size:10px;padding:2px 7px 2px 2px}
+  .l5-av18{width:18px;height:18px;font-size:9px}
+  .l5-av-red{background:#c0392b}
+  .l5-av-purple{background:#8e44ad}
+  .l5-av-orange{background:#e67e22}
+  .l5-av-slate{background:#2c3e50}
+  .l5-av-teal{background:#16a085}
+  .l5-av-blue{background:#2980b9}
+  .l5-av-amber{background:#f39c12;color:#0a0a0a}
+  .l5-av-lost{background:#581c87}
+  .l5-rel-hidden{position:relative;overflow:hidden}
+  .l5-row-between{display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--s-3)}
+  .l5-mb-6-fs-9{margin-bottom:6px;font-size:9px}
+  .l5-mb-0{margin-bottom:0}
+  .l5-fs-14{font-size:14px}
+  .l5-pill-faster{background:#2980b9;border-color:#2980b9;color:#fff}
+  .l5-color-harder{color:#e67e22}
+  .l5-pill-louder{background:#8e44ad;border-color:#8e44ad;color:#fff}
+  .l5-color-wet{color:#c0392b}
+  .l5-pill-headb{background:#16a085;border-color:#16a085;color:#fff}
+  .l5-color-wtj{color:#f39c12}
+  .l5-pill-thrash{background:var(--bg-elevated);border-color:var(--text);color:var(--text)}
+  .l5-btn-full-14{width:100%;margin-top:14px}
+  .l5-mb-s2{margin-bottom:var(--s-2)}
+  .l5-bg-red{background:#c0392b}
+  .l5-bg-blue{background:#2980b9}
+  .l5-bg-purple{background:#8e44ad}
+  .l5-bg-orange{background:#e67e22}
+  .l5-pt-0{padding-top:0}
+  .l5-bg-red-mb10{background:#c0392b;margin-bottom:10px}
+  .l5-row-center-10{justify-content:center;margin-top:10px;gap:6px}
+  .l5-chip-br{background:#009c3b;color:#fff;border-color:#fae042}
+  .l5-chip-wacken{background:rgba(192,57,43,0.18);color:#e6735a;border:1px solid rgba(192,57,43,0.45)}
+  .l5-patch-grid{grid-template-columns:repeat(4,1fr);gap:14px 8px}
+  .l5-patch-54-16{width:54px;height:54px;font-size:16px}
+  .l5-super-9{font-size:9px;vertical-align:super}
+  .l5-patch-54-14{width:54px;height:54px;font-size:14px}
+  .l5-patch-54-20{width:54px;height:54px;font-size:20px}
+  .l5-patch-54-18{width:54px;height:54px;font-size:18px}
+  .l5-border-bottom-0{border-bottom:0}
 </style>
 </head>
 <body>
@@ -6476,6 +6537,7 @@
         <li><strong>Use semantic colors.</strong> Use --signal-* tokens for state indicators (live, warn, ok, lost) rather than arbitrary colors.</li>
         <li><strong>Scale consistently.</strong> All spacing, sizes, and font sizes should reference the defined scales.</li>
         <li><strong>Update <code>public/vira-lata-ds.html</code> with every change.</strong> The design system is a living document — keep it in sync with the codebase.</li>
+        <li>When you add, rename, or remove a section, token, or component, update the <code>#ds-manifest</code> JSON block at the top of this file in the same edit. Never renumber existing sections or change anchors — they are referenced across docs and source comments.</li>
       </ul>
     </div>
   </section>
@@ -6597,6 +6659,13 @@ export const MINIMAP_ZONES: Record&lt;ZoneId, FractionalBox&gt; = {
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.1 — Readability pass · Jun 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>2026-06-01</b> — Readability pass: added <code>#ds-manifest</code> agent table of contents; extracted all inline styles into reusable classes; rebuilt nav (ordered + mobile-collapsible); reordered DOM so §12 precedes §13; fixed broken <code>--metal-place*</code> tokens. No intentional visual change except the corrected Metal Place amber.</li>
+        </ul>
+      </div>
+
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.0 — Unified canonical DS · May 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
