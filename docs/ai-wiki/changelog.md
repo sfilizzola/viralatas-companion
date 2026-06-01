@@ -6,6 +6,9 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ## 2026-06-01
 
+### Added
+- `docs/design/2026-06-01-ds-code-sync-design.md` — approved spec: code-led full DS resync (vertical slices, §12 checklist, `ds:audit` drift script). Local copy: `docs/superpowers/specs/2026-06-01-ds-code-sync-design.md`.
+
 ### Changed
 - `public/vira-lata-ds.html` — readability pass: added `#ds-manifest` agent table of contents (sections + token index + component index); extracted all inline styles into reusable classes; rebuilt nav (ordered, labelled, mobile-collapsible); reordered DOM so §12 Governance precedes §13 Minimap (anchors/numbers unchanged); fixed broken self-referential `--metal-place*` tokens.
 - `CLAUDE.md` — design-system rule now points agents to read `#ds-manifest` first.
