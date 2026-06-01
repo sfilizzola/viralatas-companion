@@ -166,7 +166,7 @@ export default function CrewGroupsSection({
                     {isUserHere && <span className={styles.liveDot} aria-hidden />}
                     {groupKicker(group, t, isUserHere)}
                   </span>
-                  <h3 className={styles.groupTitle}>{groupTitle(group, t)}</h3>
+                  <h3 className={styles.groupTitle} data-text={groupTitle(group, t)}>{groupTitle(group, t)}</h3>
                   <p className={styles.groupSubtitle}>{groupSubtitle(group, t, metalPlaceConfig)}</p>
                   {isUserHere && group.kind === 'band' && myPlan.nextBand && (
                     <p className={styles.groupNextUp}>

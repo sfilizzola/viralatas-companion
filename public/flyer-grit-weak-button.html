@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>"I am weak" button variants</title>
+
+<!-- ============================================================
+     STANDALONE design exploration. Not wired into the app.
+     Variants for the souFraco / "I am weak" skip action on the
+     live band card the user is in (CrewGroupsSection .skipButton).
+     It is a TERTIARY action (bail / skip the band), so every
+     variant stays restrained: accent only on hover / active.
+       A  Underline link   (current, baseline)
+       B  Stamp            (matches the new announcement buttons)
+       C  Ghost pill       (compact outlined)
+       D  Full-width bar   (bigger tap target, centered)
+       E  Strength meter   (thematic: a near-empty bar)
+     Toggle GRIT (top right) for the clean fallback.
+     ============================================================ -->
+
+<style>
+@font-face { font-family:'Oswald'; font-weight:700; font-display:swap; src:url('/fonts/oswald/oswald-latin-700.woff2') format('woff2'); }
+@font-face { font-family:'IBM Plex Sans'; font-weight:400; font-display:swap; src:url('/fonts/ibm-plex-sans/ibm-plex-sans-latin-400.woff2') format('woff2'); }
+@font-face { font-family:'IBM Plex Sans'; font-weight:600; font-display:swap; src:url('/fonts/ibm-plex-sans/ibm-plex-sans-latin-600.woff2') format('woff2'); }
+@font-face { font-family:'JetBrains Mono'; font-weight:500; font-display:swap; src:url('/fonts/jetbrains-mono/jetbrains-mono-latin-500.woff2') format('woff2'); }
+@font-face { font-family:'JetBrains Mono'; font-weight:700; font-display:swap; src:url('/fonts/jetbrains-mono/jetbrains-mono-latin-700.woff2') format('woff2'); }
+
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+:root {
+  --bg:#0a0a0a; --bg-surface:#141414; --bg-elevated:#1e1e1e; --bg-sunken:#050505;
+  --border:#2a2a2a; --border-strong:#3a3a3a;
+  --text:#e8e8e8; --text-muted:#888; --text-faint:#555; --text-white:#fff;
+  --accent:#c0392b; --accent-hover:#e74c3c;
+  --font-display:'Oswald','Arial Narrow',sans-serif;
+  --font-sans:'IBM Plex Sans',-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-8:32px;
+  --r-1:4px; --r-2:8px; --r-pill:999px;
+  --grain-opacity:0.05;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+html,body { background:var(--bg); color:var(--text); font-family:var(--font-sans); -webkit-font-smoothing:antialiased; }
+body { max-width:440px; margin:0 auto; padding:var(--s-6) var(--s-4) 96px; position:relative; min-height:100dvh; }
+
+.grain { position:fixed; inset:0; z-index:90; pointer-events:none; opacity:var(--grain-opacity);
+  background-image:var(--noise); background-size:180px 180px; mix-blend-mode:overlay; }
+body.no-grit { --grain-opacity:0; }
+@media (prefers-reduced-transparency:reduce), (prefers-contrast:more) { :root { --grain-opacity:0; } }
+
+/* ---- page chrome ---- */
+.head { display:flex; align-items:flex-start; justify-content:space-between; gap:var(--s-4); margin-bottom:var(--s-3); }
+.head h1 { font-family:var(--font-display); font-weight:700; font-size:24px; line-height:0.95; text-transform:uppercase; letter-spacing:-0.01em; }
+.head p { font-family:var(--font-mono); font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-top:6px; }
+.grit-toggle { display:inline-flex; align-items:center; gap:8px; flex-shrink:0; cursor:pointer; user-select:none;
+  font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); }
+.grit-toggle .box { width:34px; height:18px; border:1px solid var(--border-strong); border-radius:var(--r-pill); position:relative; background:var(--bg-elevated); transition:background .18s, border-color .18s; }
+.grit-toggle .box::after { content:""; position:absolute; top:1px; left:1px; width:14px; height:14px; border-radius:50%; background:var(--text-muted); transition:transform .18s, background .18s; }
+body:not(.no-grit) .grit-toggle .box { background:rgba(192,57,43,0.22); border-color:var(--accent); }
+body:not(.no-grit) .grit-toggle .box::after { transform:translateX(16px); background:var(--accent-hover); }
+
+.lead { font-size:13px; line-height:1.55; color:var(--text-muted); margin:var(--s-3) 0 var(--s-6); }
+.lead b { color:var(--text); font-weight:600; }
+.section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-faint);
+  margin:var(--s-8) 0 6px; display:flex; align-items:center; gap:8px; }
+.section-label::before { content:""; width:18px; height:1px; background:var(--border-strong); }
+.section-sub { font-family:var(--font-mono); font-size:9px; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-faint); margin:0 0 var(--s-3); }
+
+/* ============================================================
+   LIVE BAND CARD (you-are-here) — context, trimmed from CrewGroupsSection
+   ============================================================ */
+.groupCard { border:1px solid var(--border); border-radius:var(--r-2); background:var(--bg-elevated);
+  overflow:hidden; display:grid; grid-template-columns:10px 1fr; }
+.locStrip { align-self:stretch; background:var(--accent); }
+.groupBody { min-width:0; padding:var(--s-3) var(--s-4); }
+.groupMain { display:grid; grid-template-columns:1fr auto; gap:var(--s-3); align-items:start; }
+.groupLeft { min-width:0; }
+.groupKicker { font-family:var(--font-mono); font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; display:flex; align-items:center; gap:6px; }
+.liveDot { width:6px; height:6px; flex-shrink:0; border-radius:50%; background:var(--accent); box-shadow:0 0 10px rgba(192,57,43,0.45); }
+.groupTitle { font-family:var(--font-display); font-size:26px; font-weight:700; text-transform:uppercase; line-height:1; margin-top:4px; letter-spacing:0.01em; position:relative; z-index:0; }
+.groupTitle::before { content:attr(data-text); position:absolute; left:0; top:0; color:var(--accent); transform:translate(1.5px,-1px); opacity:0.85; z-index:-1; pointer-events:none; }
+body.no-grit .groupTitle::before { opacity:0; }
+.groupSubtitle { margin:5px 0 0; color:var(--text-muted); font-family:var(--font-mono); font-size:11px; line-height:1.35; text-transform:uppercase; letter-spacing:0.04em; }
+.groupNextUp { margin:6px 0 0; color:var(--accent); font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; }
+.groupCount { background:rgba(255,255,255,0.02); color:var(--text); font-family:var(--font-display); font-size:22px; font-weight:700; line-height:1;
+  padding:6px 10px; border-radius:var(--r-1); border:1px solid rgba(255,255,255,0.08); font-variant-numeric:tabular-nums; text-align:center; flex-shrink:0; }
+.locCountLabel { display:block; font-family:var(--font-mono); font-size:8px; font-weight:500; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-top:4px; white-space:nowrap; }
+
+/* footer that holds the weak button */
+.groupActions { border-top:1px solid var(--border); margin-top:var(--s-3); padding-top:var(--s-3); }
+.groupActions.bar { padding-top:0; }
+
+/* ============================================================
+   "I AM WEAK" BUTTON VARIANTS
+   ============================================================ */
+/* A — underline link (current baseline) */
+.wk-link { display:inline-flex; align-items:center; gap:6px; padding:2px 0; background:transparent; border:none; border-bottom:1px solid transparent;
+  color:var(--text-faint); font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; cursor:pointer; transition:color .16s, border-color .16s, letter-spacing .16s; }
+.wk-link:hover { color:var(--text-muted); border-bottom-color:var(--border-strong); letter-spacing:0.18em; }
+.wk-link:active { color:var(--text); border-bottom-color:var(--accent-hover); }
+
+/* B — stamp (matches the new announcement buttons) */
+.wk-stamp { background:transparent; border:1.5px solid var(--border-strong); border-radius:2px; padding:5px 11px; transform:rotate(-1deg);
+  color:var(--text-muted); font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; cursor:pointer; transition:color .15s, background .15s, border-color .15s, transform .08s; }
+.wk-stamp:hover { color:var(--accent-hover); border-color:color-mix(in srgb, var(--accent) 45%, transparent); background:color-mix(in srgb, var(--accent) 10%, transparent); }
+.wk-stamp:active { transform:translateY(1px) rotate(0deg); }
+
+/* C — ghost pill (compact outlined) */
+.wk-pill { background:transparent; border:1px solid var(--border-strong); border-radius:var(--r-pill); padding:5px 14px;
+  color:var(--text-muted); font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; transition:color .15s, border-color .15s; }
+.wk-pill:hover { color:var(--text); border-color:var(--accent-hover); }
+.wk-pill:active { background:color-mix(in srgb, var(--accent) 12%, transparent); }
+
+/* D — full-width bar (bigger tap target) */
+.wk-bar { display:block; width:100%; background:transparent; border:none; border-top:1px solid var(--border); padding:11px 0; margin-top:var(--s-3);
+  color:var(--text-faint); font-family:var(--font-mono); font-size:11px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; cursor:pointer; text-align:center; transition:color .15s, background .15s; }
+.wk-bar:hover { color:var(--accent-hover); background:color-mix(in srgb, var(--accent) 7%, transparent); }
+.wk-bar:active { background:color-mix(in srgb, var(--accent) 12%, transparent); }
+
+/* E — strength meter (thematic near-empty bar) */
+.wk-meter { display:inline-flex; align-items:center; gap:8px; padding:3px 0; background:transparent; border:none; cursor:pointer;
+  color:var(--text-faint); font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase; transition:color .15s; }
+.wk-meter .bars { display:inline-flex; gap:2px; }
+.wk-meter .bars i { width:4px; height:11px; background:var(--border-strong); border-radius:1px; transition:background .15s; }
+.wk-meter .bars i:first-child { background:var(--accent); }
+.wk-meter:hover { color:var(--text-muted); }
+.wk-meter:hover .bars i:first-child { background:var(--accent-hover); }
+.wk-meter:active .bars i { background:var(--border); }
+.wk-meter:active .bars i:first-child { background:var(--accent); }
+
+@media (prefers-reduced-transparency:reduce), (prefers-contrast:more) {
+  .wk-stamp { transform:none; }
+  .groupTitle::before { opacity:0; }
+}
+
+/* variant frame */
+.variant { background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--r-2); padding:var(--s-3) var(--s-4) var(--s-4); margin-bottom:var(--s-4); }
+.variant.bar-frame { padding-bottom:0; overflow:hidden; }
+.vlabel { font-family:var(--font-mono); font-size:9px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-faint); margin-bottom:var(--s-3); }
+.note { font-family:var(--font-mono); font-size:10px; color:var(--text-faint); line-height:1.7; margin-top:var(--s-5); text-transform:uppercase; letter-spacing:0.05em; }
+</style>
+</head>
+
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="head">
+  <div>
+    <h1>"I am weak"</h1>
+    <p>Live card skip action / variants</p>
+  </div>
+  <label class="grit-toggle">
+    <span>Grit</span>
+    <span class="box" aria-hidden="true"></span>
+    <input type="checkbox" id="gritToggle" checked hidden />
+  </label>
+</header>
+
+<p class="lead">It is a <b>tertiary bail action</b>, so each variant stays quiet, accent only on hover/active. My pick: <b>D (full-width bar)</b> for the bigger tap target, or <b>B (stamp)</b> to match the announcement buttons.</p>
+
+<!-- live card in context (current button) -->
+<p class="section-label">In context</p>
+<p class="section-sub">live band you are in</p>
+<article class="groupCard">
+  <div class="locStrip"></div>
+  <div class="groupBody">
+    <div class="groupMain">
+      <div class="groupLeft">
+        <span class="groupKicker"><span class="liveDot" aria-hidden="true"></span> You are here</span>
+        <h3 class="groupTitle" data-text="Sepultura">Sepultura</h3>
+        <p class="groupSubtitle">W.E.T. Stage / 21:30 - 22:40</p>
+        <p class="groupNextUp">Next up &rarr; Nervosa</p>
+      </div>
+      <div class="groupCount">7<small class="locCountLabel">vira-latas</small></div>
+    </div>
+    <div class="groupActions">
+      <button class="wk-link" type="button">I am weak</button>
+    </div>
+  </div>
+</article>
+
+<!-- variants -->
+<p class="section-label">Variants</p>
+<p class="section-sub">shown in the card footer frame</p>
+
+<div class="variant">
+  <p class="vlabel">A Underline link (current)</p>
+  <div class="groupActions"><button class="wk-link" type="button">I am weak</button></div>
+</div>
+
+<div class="variant">
+  <p class="vlabel">B Stamp</p>
+  <div class="groupActions"><button class="wk-stamp" type="button">I am weak</button></div>
+</div>
+
+<div class="variant">
+  <p class="vlabel">C Ghost pill</p>
+  <div class="groupActions"><button class="wk-pill" type="button">I am weak</button></div>
+</div>
+
+<div class="variant bar-frame">
+  <p class="vlabel">D Full-width bar</p>
+  <button class="wk-bar" type="button">I am weak</button>
+</div>
+
+<div class="variant">
+  <p class="vlabel">E Strength meter</p>
+  <div class="groupActions">
+    <button class="wk-meter" type="button">
+      <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      I am weak
+    </button>
+  </div>
+</div>
+
+<p class="note">All variants keep the action quiet (it is a bail/skip).<br/>Accent shows only on hover / active. Stamp rotation and the<br/>title ghost flatten under reduced-transparency / high-contrast.</p>
+
+<script>
+  var t = document.getElementById('gritToggle');
+  t.addEventListener('change', function () {
+    document.body.classList.toggle('no-grit', !t.checked);
+  });
+</script>
+</body>
+</html>
