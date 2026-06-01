@@ -116,6 +116,7 @@ Update **all three**:
 │   └── vira-lata-ds.html   # Living UI spec (design system)
 ├── docs/
 │   └── ai-wiki/          # Architecture wiki (core/, flows/, decisions/)
+│   # Local scratch (gitignored): docs/superpowers/{specs,plans,prototypes}/
 ├── .claude/
 │   ├── context/          # On-demand context files
 │   └── agents/           # Specialized subagents
@@ -123,6 +124,26 @@ Update **all three**:
 ├── PHASES.md             # Current and upcoming development phases
 └── README.md             # User-facing setup & features
 ```
+
+---
+
+## Artifact layout (local scratch vs committed truth)
+
+**Gitignored local scratch** — entire `docs/superpowers/` tree; never commit.
+
+| Subfolder | Skill / use | Naming |
+|-----------|-------------|--------|
+| `specs/` | `brainstorming` | `YYYY-MM-DD-<topic>-design.md` |
+| `plans/` | `writing-plans`, `executing-plans` | `YYYY-MM-DD-<feature>.md` |
+| `prototypes/<feature-slug>/` | `huashu-design`, wireframes, HTML variants | kebab-case folder; any `.html` / `.png` inside |
+
+Use the same `<feature-slug>` across specs, plans, and prototypes when they belong to one effort.
+
+**Committed truth after ship** — update `docs/ai-wiki/` (+ changelog) and `public/vira-lata-ds.html` for UI. Wiki pages must not depend on local spec paths for essential understanding.
+
+**`public/` rule** — shippable assets only (DS, badges, fonts, maps, manifest). Do **not** add exploration HTML under `public/`; prototypes live in `docs/superpowers/prototypes/`. Prototype HTML may reference fonts via relative paths (e.g. `../../../../public/fonts/…`).
+
+**Deprecated scratch locations** — repo-root `_*.html`, `docs/design/`, `docs/wireframes/`, `_temp/design-demos/`. Throwaway **code** prototypes (`prototype` skill) stay next to target modules in `src/` with clear naming.
 
 ---
 
@@ -311,7 +332,7 @@ Phases 1–30 are complete. See `PHASES.md` and `FUTURE_IDEAS.md` for upcoming w
 | Close phase / branch wrap-up | `finishing-a-development-branch` |
 | Bug, failing tests, regression | `diagnose` or `systematic-debugging` |
 
-**UI pipeline:** `huashu-design` (creativity + `public/vira-lata-ds.html`) → user locks variant → `frontend-design` (implement in `src/`).
+**UI pipeline:** `huashu-design` (creativity → `docs/superpowers/prototypes/<feature-slug>/`; locked UI → `public/vira-lata-ds.html`) → user locks variant → `frontend-design` (implement in `src/`).
 
 **User-direct (never auto-suggest; `/skill` only):** `grill-me`, `grill-with-docs`, `handoff`, `humanize-writing`, `prototype`, `tdd`.
 

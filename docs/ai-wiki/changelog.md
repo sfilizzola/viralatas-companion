@@ -7,13 +7,16 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ## 2026-06-01
 
 ### Added
-- `docs/design/2026-06-01-ds-code-sync-design.md` — approved spec: code-led full DS resync (vertical slices, §12 checklist, `ds:audit` drift script). Local copy: `docs/superpowers/specs/2026-06-01-ds-code-sync-design.md`.
+- **Artifact layout** — `CLAUDE.md` § Artifact layout: gitignored `docs/superpowers/{specs,plans,prototypes}/` for local scratch; wiki + `public/vira-lata-ds.html` remain committed truth after ship.
 
 ### Changed
+- **Prototype migration** — moved exploration HTML out of repo root, `docs/design/`, `docs/wireframes/`, and `public/flyer-grit-*.html` into local `docs/superpowers/prototypes/{upcoming-band-card,flyer-grit,servants-of-metal-card,my-programacao}/`. Removed tracked `docs/design/` and `docs/wireframes/` directories.
+- `docs/design/2026-06-01-ds-code-sync-design.md` — removed tracked duplicate; local pre-ship spec remains at `docs/superpowers/specs/2026-06-01-ds-code-sync-design.md` (gitignored).
 - `public/vira-lata-ds.html` — readability pass: added `#ds-manifest` agent table of contents (sections + token index + component index); extracted all inline styles into reusable classes; rebuilt nav (ordered, labelled, mobile-collapsible); reordered DOM so §12 Governance precedes §13 Minimap (anchors/numbers unchanged); fixed broken self-referential `--metal-place*` tokens.
 - `CLAUDE.md` — design-system rule now points agents to read `#ds-manifest` first.
 
 ### Architectural Notes
+- Pre-ship specs/plans/prototypes are local-only (`docs/superpowers/` gitignored). Committed docs link wiki pages, not local spec paths, for essential context.
 - The DS file stays a single standalone HTML (no split, no build step). `#ds-manifest` is the agent navigation layer; the rendered page is the human layer. Both live in one source of truth; a governance checklist item enforces manifest sync.
 
 ---
