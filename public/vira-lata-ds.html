@@ -2341,6 +2341,17 @@
 
 /* DS extract: icons */
   .ds-x-d81a1b28{margin-top:var(--s-4)}
+
+/* DS extract: motion */
+  .ds-x-c2791c7b{color:var(--text-faint)}
+  .ds-x-69824400{overflow:hidden}
+  .ds-x-0466783d{width:100%}
+  .ds-x-11696618{margin:0}
+  .ds-x-5e0faad2{font-size:13px}
+  .ds-x-e2c960fb{padding:8px}
+  .ds-x-6f0d7c57{background:#581c87}
+  .ds-x-4ff818ff{font-size:18px}
+  .ds-x-91a87015{text-align:center}
 </style>
 </head>
 <body>
@@ -5123,7 +5134,7 @@
           <b>320 ms</b> · cubic-bezier(0.34, 1.56, 0.64, 1)<br />
           scale 0.9 → 1.15 → 1.0<br />
           color: muted → accent-hover<br />
-          <i style="color:var(--text-faint)">// the only celebratory animation in the system</i>
+          <i class="ds-x-c2791c7b">// the only celebratory animation in the system</i>
         </div>
       </div>
       <div class="motion-demo">
@@ -5141,14 +5152,14 @@
           stack from top, max <b>3</b> visible
         </div>
       </div>
-      <div class="motion-demo" style="overflow:hidden">
-        <div class="motion-alert" style="width:100%">
-          <div class="alert warn" style="margin:0">
+      <div class="motion-demo ds-x-69824400">
+        <div class="motion-alert ds-x-0466783d">
+          <div class="alert warn ds-x-11696618">
             <div class="stripe"></div>
             <div class="icon warn">
               <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2 L22 20 L2 20 Z"/><path d="M12 9 V14"/></svg>
             </div>
-            <div class="text"><b>Conflito</b><span style="font-size:13px">Blind G. e Powerwolf — escolhe um. 🤘</span></div>
+            <div class="text"><b>Conflito</b><span class="ds-x-5e0faad2">Blind G. e Powerwolf — escolhe um. 🤘</span></div>
           </div>
         </div>
       </div>
@@ -5160,7 +5171,7 @@
         <div class="specs">
           <b>2 s</b> ease, opacity 0.4 → 1 → 0.4<br />
           applied to dot in offline banner + pending chip<br />
-          <i style="color:var(--text-faint)">// only ambient animation allowed in chrome</i>
+          <i class="ds-x-c2791c7b">// only ambient animation allowed in chrome</i>
         </div>
       </div>
       <div class="motion-demo">
@@ -5178,11 +5189,11 @@
           persists across reloads — state stored in <code>localStorage.badgeAcknowledged</code><br />
           clicking the badge opens the modal <b>and</b> removes the glow<br />
           <code>prefers-reduced-motion</code>: static glow ring, no pulse<br />
-          <i style="color:var(--text-faint)">// drop-shadow on button (not img) so glow follows circular shape</i>
+          <i class="ds-x-c2791c7b">// drop-shadow on button (not img) so glow follows circular shape</i>
         </div>
       </div>
       <div class="motion-demo">
-        <button class="patch-img-btn motion-badge-preview" style="padding:8px"><img src="badges/badge_heat.png" alt="Heat badge" class="patch-img" /></button>
+        <button class="patch-img-btn motion-badge-preview ds-x-e2c960fb"><img src="badges/badge_heat.png" alt="Heat badge" class="patch-img" /></button>
       </div>
     </div>
 
@@ -5196,12 +5207,12 @@
         </div>
       </div>
       <div class="motion-demo">
-        <div class="crew-card lost" style="width:100%">
+        <div class="crew-card lost ds-x-0466783d">
           <div class="who">
-            <div class="avatar" style="background:#581c87">RC</div>
+            <div class="avatar ds-x-6f0d7c57">RC</div>
             <div><div class="name">Rafael</div><div class="status">no pick this slot</div></div>
           </div>
-          <div class="lost-msg" style="font-size:18px">LOST 🤘</div>
+          <div class="lost-msg ds-x-4ff818ff">LOST 🤘</div>
         </div>
       </div>
     </div>
@@ -5213,11 +5224,11 @@
           tab switch is <b>instant</b> — no slide, no fade<br />
           PWAs feel native when tab content swaps in zero frames<br />
           rely on cached IndexedDB content to load synchronously<br />
-          <i style="color:var(--text-faint)">// loading spinners are forbidden by offline-first rule</i>
+          <i class="ds-x-c2791c7b">// loading spinners are forbidden by offline-first rule</i>
         </div>
       </div>
       <div class="motion-demo">
-        <div class="t-label" style="text-align:center">no transition · zero ms</div>
+        <div class="t-label ds-x-91a87015">no transition · zero ms</div>
       </div>
     </div>
   </section>
