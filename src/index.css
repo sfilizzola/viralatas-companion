@@ -163,6 +163,18 @@
   --duration-slow: 0.5s;
   --easing-ease-out: cubic-bezier(0.4, 0, 0.2, 1);
   --easing-ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  /* ---------- flyer-grit (subtle photocopied-flyer surface layer) ---------- */
+  --grit-toner: rgba(255, 255, 255, 0.04);
+  --tape: rgba(218, 215, 205, 0.16);
+  --grain-opacity: 0.05;
+  --noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Grit is a surface layer only: drop it for users who ask for fewer
+   transparency effects or higher contrast. Legibility never depends on it. */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  :root { --grain-opacity: 0; }
 }
 
 html, body, #root {

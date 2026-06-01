@@ -85,6 +85,7 @@ export default function AnnouncementsPage() {
 
   return (
     <div className={styles.page}>
+      <div className={styles.grain} aria-hidden="true" />
       <header className={styles.header}>
         <h1 className={styles.title}>{t('title')}</h1>
       </header>
@@ -141,7 +142,7 @@ export default function AnnouncementsPage() {
             {t('empty')}
           </div>
         ) : (
-          <>
+          <div className={styles.mural}>
             <ul className={styles.feed}>
               {visibleAnnouncements.map((a) => (
                 <AnnouncementCard
@@ -172,7 +173,7 @@ export default function AnnouncementsPage() {
                 {loadingMore ? t('loadingMore') : t('loadMore')}
               </button>
             )}
-          </>
+          </div>
         )}
 
         {showArrivalMapBottom && (
@@ -235,6 +236,7 @@ function AnnouncementCard({
 
   return (
     <li className={`${styles.card} ${a.is_pinned ? styles.cardPinned : ''}`}>
+      <span className={styles.tapeCorner} aria-hidden="true" />
       <Avatar
         size={40}
         src={author?.avatar_url ?? null}

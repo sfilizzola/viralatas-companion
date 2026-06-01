@@ -214,26 +214,102 @@
    FEED + ANNOUNCEMENT CARD
    ============================================================ */
 
+/* ---- flyer-grit: global grain overlay (subtle, pointer-events-none) ---- */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: var(--noise);
+  background-size: 180px 180px;
+  mix-blend-mode: overlay;
+}
+
+/* ---- flyer-grit: corkboard the feed sits on ---- */
+.mural {
+  background: var(--bg-sunken);
+  border: 1px solid var(--border);
+  border-radius: var(--r-2);
+  padding: var(--s-5);
+}
+
 .feed {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-/* Grid layout: 40px avatar col | 1fr content col */
+/* Grid layout: 40px avatar col | 1fr content col.
+   Flyer-grit: each card is a flyer taped to the board — slight rotation,
+   toner speckle, a gaffer-tape corner. Texture never touches legibility. */
 .card {
+  position: relative;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: var(--r-2);
+  border-radius: var(--r-1);
   padding: var(--s-4);
-  margin-bottom: var(--s-3);
+  margin-bottom: var(--s-5);
   display: grid;
   grid-template-columns: 40px 1fr;
   gap: var(--s-3);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 .card:last-child {
   margin-bottom: 0;
+}
+
+/* deterministic, tiny rotation so the board feels hand-pinned */
+.feed .card:nth-child(odd) { transform: rotate(-0.8deg); }
+.feed .card:nth-child(even) { transform: rotate(0.6deg); }
+
+/* toner speckle on the flyer surface */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background-image: var(--noise);
+  background-size: 160px 160px;
+  opacity: calc(var(--grain-opacity) * 1.4);
+  mix-blend-mode: soft-light;
+}
+
+/* lift real content above the toner layer */
+.card > .avatar,
+.card > .avatarInitial,
+.card > .head,
+.card > .body,
+.card > .cardActions {
+  position: relative;
+  z-index: 1;
+}
+
+/* gaffer-tape corner holding the flyer to the board */
+.tapeCorner {
+  position: absolute;
+  top: -9px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-3deg);
+  width: 54px;
+  height: 18px;
+  z-index: 2;
+  background: var(--tape);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+/* honor reduced-transparency / high-contrast: flat, square, untextured */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .card {
+    transform: none;
+    box-shadow: none;
+  }
+  .card::before { display: none; }
+  .tapeCorner { display: none; }
 }
 
 /* ---- Avatar (column 1, row 1) ---- */
