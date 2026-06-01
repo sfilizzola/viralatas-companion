@@ -10,7 +10,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - **Artifact layout** — `CLAUDE.md` § Artifact layout: gitignored `docs/superpowers/{specs,plans,prototypes}/` for local scratch; wiki + `public/vira-lata-ds.html` remain committed truth after ship.
 
 ### Changed
-- **Prototype consolidation** — moved all remaining `_temp/` and `.superpowers/brainstorm/` HTML/PNG into `docs/superpowers/prototypes/{badge-history,band-card-day,duck-button-redesign,festival-minimap,festival-wrap,live-card-sheet,moshsplit,playlist-launch,vira-lata-rating,wrap-banner,wrap-ratings}/`. Removed `_temp/` and `.superpowers/brainstorm/`. Updated `badges.md` and `vira-lata-ds.html` prototype path references.
+- **Agent routing for artifact layout** — `.cursor/rules/artifact-layout.mdc` (Cursor always-apply) and `.claude/context/skill-routing.md` (Claude Code: skill matrix, huashu path override, handoffs). `.gitignore` now allows committing `.claude/context/*.md`.
 - `docs/design/2026-06-01-ds-code-sync-design.md` — removed tracked duplicate; local pre-ship spec remains at `docs/superpowers/specs/2026-06-01-ds-code-sync-design.md` (gitignored).
 - `public/vira-lata-ds.html` — readability pass: added `#ds-manifest` agent table of contents (sections + token index + component index); extracted all inline styles into reusable classes; rebuilt nav (ordered, labelled, mobile-collapsible); reordered DOM so §12 Governance precedes §13 Minimap (anchors/numbers unchanged); fixed broken self-referential `--metal-place*` tokens.
 - `CLAUDE.md` — design-system rule now points agents to read `#ds-manifest` first.

@@ -1,0 +1,40 @@
+---
+description: Local scratch paths for specs, plans, and HTML prototypes (docs/superpowers/)
+alwaysApply: true
+---
+
+# Artifact layout
+
+**Gitignored local scratch** — entire `docs/superpowers/` tree. Never commit it.
+
+| Subfolder | Skill / use | Naming |
+|-----------|-------------|--------|
+| `docs/superpowers/specs/` | `brainstorming` | `YYYY-MM-DD-<topic>-design.md` |
+| `docs/superpowers/plans/` | `writing-plans`, `executing-plans` | `YYYY-MM-DD-<feature>.md` |
+| `docs/superpowers/prototypes/<feature-slug>/` | `huashu-design`, wireframes, HTML variants | kebab-case folder; `.html` / `.png` inside |
+
+Use the same `<feature-slug>` across specs, plans, and prototypes for one effort.
+
+## Project overrides (global skills)
+
+Global `huashu-design` defaults to `_temp/design-demos/` — **ignore that here**. Always write HTML to `docs/superpowers/prototypes/<feature-slug>/`.
+
+## Committed truth after ship
+
+- Architecture / flows → `docs/ai-wiki/` (+ `changelog.md`)
+- UI spec → `public/vira-lata-ds.html` only
+- Wiki must not depend on local spec paths for essential understanding
+
+## `public/` rule
+
+Shippable assets only (DS, badges, fonts, maps, manifest). No exploration HTML except `vira-lata-ds.html`. Prototype fonts: relative path e.g. `../../../../public/fonts/…`.
+
+## Deprecated — do not use
+
+Repo-root `_*.html`, `docs/design/`, `docs/wireframes/`, `_temp/`. Throwaway **code** prototypes (`prototype` skill) live next to target modules in `src/` with clear naming.
+
+## UI pipeline
+
+`huashu-design` → `docs/superpowers/prototypes/<feature-slug>/` → user locks → `frontend-design` in `src/` + update `vira-lata-ds.html`.
+
+Full skill matrix → `.claude/context/skill-routing.md` · canonical copy in `CLAUDE.md` § Artifact layout.

@@ -37,8 +37,11 @@ coverage/
 # Visual brainstorm sessions
 .superpowers/
 
-# Claude Code tooling (agents, context, worktrees)
-.claude/
+# Claude Code tooling (agents, worktrees) — keep context docs committable
+.claude/*
+!.claude/context/
+.claude/context/*
+!.claude/context/*.md
 
 # Superpowers working documents (plans, specs, prototypes)
 docs/superpowers/

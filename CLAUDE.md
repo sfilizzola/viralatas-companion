@@ -320,7 +320,7 @@ Phases 1–30 are complete. See `PHASES.md` and `FUTURE_IDEAS.md` for upcoming w
 
 **Default comms:** when possible, always **`caveman`** mode for token savings (see skill-routing doc for exceptions: brainstorming, grill-me, humanize-writing, prod DB/destructive warnings, user says “normal mode”).
 
-**Full matrix, handoffs, and examples** → `.claude/context/skill-routing.md`
+**Full matrix, handoffs, and examples** → `.claude/context/skill-routing.md` (artifact paths, huashu override, lifecycle)
 
 | Trigger | Skill |
 |---------|--------|
