@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Flyer-Grit Prototype (subtle) - Surfaces 02 & 03</title>
+
+<!-- ============================================================
+     STANDALONE design exploration. Not wired into the app.
+     Subtle "photocopied black-metal flyer" treatment, restricted to
+     the two surfaces being pursued, each mirroring the REAL component
+     buttons / variants / conditions found in the codebase:
+
+       02  /now crew live-group card  (CrewGroupsSection + QuackStrip)
+           variants:  band | metal_place | camping | lost
+           states:    you-are-here, next-up, empty group
+           buttons:   "Sou fraco" (skip), QuackStrip duck (idle/cooldown)
+
+       03  Announcements mural  (AnnouncementsPage + AnnouncementCard)
+           composer:  textarea + Post button (+ blocked-user variant)
+           card variants: pinned, role godlike/manager/normal, pending-sync
+           buttons:   Pin/Unpin, Block (block/blocking/blocked), Delete
+
+     Grit is a surface layer only; data legibility is never touched.
+     Toggle GRIT off (top right) to preview the clean fallback.
+     ============================================================ -->
+
+<style>
+@font-face { font-family:'Oswald'; font-weight:400; font-display:swap; src:url('/fonts/oswald/oswald-latin-400.woff2') format('woff2'); }
+@font-face { font-family:'Oswald'; font-weight:600; font-display:swap; src:url('/fonts/oswald/oswald-latin-600.woff2') format('woff2'); }
+@font-face { font-family:'Oswald'; font-weight:700; font-display:swap; src:url('/fonts/oswald/oswald-latin-700.woff2') format('woff2'); }
+@font-face { font-family:'IBM Plex Sans'; font-weight:400; font-display:swap; src:url('/fonts/ibm-plex-sans/ibm-plex-sans-latin-400.woff2') format('woff2'); }
+@font-face { font-family:'IBM Plex Sans'; font-weight:500; font-display:swap; src:url('/fonts/ibm-plex-sans/ibm-plex-sans-latin-500.woff2') format('woff2'); }
+@font-face { font-family:'IBM Plex Sans'; font-weight:600; font-display:swap; src:url('/fonts/ibm-plex-sans/ibm-plex-sans-latin-600.woff2') format('woff2'); }
+@font-face { font-family:'IBM Plex Sans'; font-weight:700; font-display:swap; src:url('/fonts/ibm-plex-sans/ibm-plex-sans-latin-700.woff2') format('woff2'); }
+@font-face { font-family:'JetBrains Mono'; font-weight:400; font-display:swap; src:url('/fonts/jetbrains-mono/jetbrains-mono-latin-400.woff2') format('woff2'); }
+@font-face { font-family:'JetBrains Mono'; font-weight:500; font-display:swap; src:url('/fonts/jetbrains-mono/jetbrains-mono-latin-500.woff2') format('woff2'); }
+@font-face { font-family:'JetBrains Mono'; font-weight:700; font-display:swap; src:url('/fonts/jetbrains-mono/jetbrains-mono-latin-700.woff2') format('woff2'); }
+
+*, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+
+:root {
+  --bg:#0a0a0a; --bg-surface:#141414; --bg-elevated:#1e1e1e; --bg-sunken:#050505;
+  --border:#2a2a2a; --border-strong:#3a3a3a;
+  --text:#e8e8e8; --text-muted:#888; --text-faint:#555; --text-white:#fff;
+  --accent:#c0392b; --accent-hover:#e74c3c;
+  --signal-live:#c0392b; --signal-warn:#f39c12; --signal-warn-light:#f9c66b; --signal-ok:#16a085; --signal-lost:#a855f7;
+
+  --role-godlike:#d97706; --role-godlike-bg:rgba(217,119,6,0.08); --role-godlike-border:rgba(217,119,6,0.45);
+  --role-manager:#3b82f6; --role-manager-bg:rgba(59,130,246,0.08); --role-manager-border:rgba(59,130,246,0.45);
+
+  --stage-faster:#2980b9; --stage-harder:#e67e22; --stage-louder:#8e44ad;
+  --stage-wet:#c0392b; --stage-headbangers:#16a085; --stage-wasteland:#2c3e50;
+  --stage-wackinger:#95a5a6; --stage-jungle:#f39c12;
+
+  --font-display:'Oswald','Arial Narrow',sans-serif;
+  --font-sans:'IBM Plex Sans',-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:20px; --s-6:24px; --s-8:32px;
+  --r-1:4px; --r-2:8px; --r-3:12px; --r-pill:999px;
+
+  /* flyer-grit (subtle) */
+  --grit-toner:rgba(255,255,255,0.04);
+  --tape:rgba(218,215,205,0.16);
+  --stamp-ink:rgba(192,57,43,0.85);
+  --misreg-x:1.5px; --misreg-y:-1px;
+  --grain-opacity:0.05;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+html,body { background:var(--bg); color:var(--text); font-family:var(--font-sans); -webkit-font-smoothing:antialiased; }
+body { max-width:480px; margin:0 auto; padding:var(--s-6) var(--s-4) 96px; position:relative; min-height:100dvh; }
+
+.grain { position:fixed; inset:0; z-index:90; pointer-events:none; opacity:var(--grain-opacity);
+  background-image:var(--noise); background-size:180px 180px; mix-blend-mode:overlay; }
+
+.toner { position:relative; }
+.toner::before { content:""; position:absolute; inset:0; z-index:0; pointer-events:none; border-radius:inherit;
+  background-image:var(--noise); background-size:160px 160px; opacity:calc(var(--grain-opacity) * 1.4); mix-blend-mode:soft-light; }
+.toner > * { position:relative; z-index:1; }
+
+body.no-grit { --grain-opacity:0; }
+
+@media (prefers-reduced-transparency:reduce), (prefers-contrast:more) { :root { --grain-opacity:0; } }
+
+/* ---- page chrome ---- */
+.head { display:flex; align-items:flex-start; justify-content:space-between; gap:var(--s-4); margin-bottom:var(--s-3); }
+.head h1 { font-family:var(--font-display); font-weight:700; font-size:28px; line-height:0.95; text-transform:uppercase; letter-spacing:-0.01em; }
+.head p { font-family:var(--font-mono); font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; margin-top:6px; }
+.grit-toggle { display:inline-flex; align-items:center; gap:8px; flex-shrink:0; cursor:pointer; user-select:none;
+  font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); }
+.grit-toggle .box { width:34px; height:18px; border:1px solid var(--border-strong); border-radius:var(--r-pill); position:relative; background:var(--bg-elevated); transition:background .18s, border-color .18s; }
+.grit-toggle .box::after { content:""; position:absolute; top:1px; left:1px; width:14px; height:14px; border-radius:50%; background:var(--text-muted); transition:transform .18s, background .18s; }
+body:not(.no-grit) .grit-toggle .box { background:rgba(192,57,43,0.22); border-color:var(--accent); }
+body:not(.no-grit) .grit-toggle .box::after { transform:translateX(16px); background:var(--accent-hover); }
+
+.section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-faint);
+  margin:var(--s-8) 0 var(--s-3); display:flex; align-items:center; gap:8px; }
+.section-label::before { content:""; width:18px; height:1px; background:var(--border-strong); }
+.variant-tag { font-family:var(--font-mono); font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-faint); margin:var(--s-4) 0 6px; }
+
+.avatar { border-radius:50%; overflow:hidden; display:inline-flex; align-items:center; justify-content:center;
+  background:var(--accent); color:#fff; font-family:var(--font-display); font-weight:700; flex-shrink:0; }
+
+/* ============================================================
+   02  CREW LIVE-GROUP CARD  (mirrors CrewGroupsSection)
+   grid: locStrip rail + body ; variants band/metal_place/camping/lost
+   ============================================================ */
+.groupCard { border:1px solid var(--border); border-radius:var(--r-2); background:var(--bg-surface);
+  overflow:hidden; display:grid; grid-template-columns:10px 1fr; }
+.groupCard + .variant-tag { margin-top:var(--s-5); }
+.groupCardAboveStrip { border-radius:var(--r-2) var(--r-2) 0 0; border-bottom-color:transparent; }
+.youAreHere { background:var(--bg-elevated); }
+
+/* the rail rendered as colored gaffer tape */
+.locStrip { align-self:stretch; background:var(--text-muted); position:relative; }
+.locStrip::after { content:""; position:absolute; inset:0;
+  background:linear-gradient(180deg, rgba(0,0,0,0.18), rgba(255,255,255,0.05) 45%, rgba(0,0,0,0.22)); mix-blend-mode:multiply; }
+.locStrip::before { content:""; position:absolute; left:0; right:0; top:-2px; height:5px; background:inherit; transform:rotate(-1.2deg); opacity:0.85; }
+body.no-grit .locStrip::after, body.no-grit .locStrip::before { display:none; }
+
+.groupBody { min-width:0; padding:var(--s-3) var(--s-4); }
+.groupMain { display:grid; grid-template-columns:1fr auto; gap:var(--s-3); align-items:start; }
+.groupLeft { min-width:0; }
+.groupKicker { font-family:var(--font-mono); font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.1em; display:flex; align-items:center; gap:6px; }
+.liveDot { width:6px; height:6px; flex-shrink:0; border-radius:50%; background:var(--accent); box-shadow:0 0 10px rgba(192,57,43,0.45); }
+.groupTitle { font-family:var(--font-display); font-size:26px; font-weight:700; text-transform:uppercase; line-height:1; margin-top:4px; letter-spacing:0.01em; position:relative; width:max-content; max-width:100%; }
+/* misregistration is rationed: only the you-are-here band title (the real "now" headliner) */
+.youAreHere.band .groupTitle::before { content:attr(data-text); position:absolute; left:0; top:0; color:var(--accent);
+  transform:translate(var(--misreg-x),var(--misreg-y)); z-index:-1; opacity:0.85; }
+body.no-grit .youAreHere.band .groupTitle::before { opacity:0; }
+.groupSubtitle { margin:5px 0 0; color:var(--text-muted); font-family:var(--font-mono); font-size:11px; line-height:1.35; text-transform:uppercase; letter-spacing:0.04em; }
+.groupNextUp { margin:6px 0 0; color:var(--accent); font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; }
+
+.clusterRow { display:flex; align-items:center; gap:8px; margin-top:8px; }
+.clusterAvatars { display:flex; }
+.clusterAvatar { width:24px; height:24px; font-size:11px; margin-left:-8px; border:2px solid var(--bg-surface); }
+.clusterAvatar:first-child { margin-left:0; }
+.clusterOverflow { font-size:11px; color:var(--text-muted); margin-left:4px; }
+.clusterCount { font-size:12px; color:var(--text-muted); margin-left:auto; font-family:var(--font-mono); }
+.groupEmpty { margin:var(--s-3) 0 0; color:var(--text-faint); font-family:var(--font-mono); font-size:11px; font-style:italic; line-height:1.4; }
+
+.groupCountCol { display:flex; flex-direction:column; align-items:stretch; gap:6px; flex-shrink:0; }
+.groupCount { background:rgba(255,255,255,0.02); color:var(--text); font-family:var(--font-display); font-size:22px; font-weight:700; line-height:1;
+  padding:6px 10px; border-radius:var(--r-1); border:1px solid rgba(255,255,255,0.08); font-variant-numeric:tabular-nums; text-align:center; }
+.locCountLabel { display:block; font-family:var(--font-mono); font-size:8px; font-weight:500; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; margin-top:4px; white-space:nowrap; }
+
+.groupActions { border-top:1px solid var(--border); margin-top:var(--s-3); padding-top:var(--s-3); }
+.skipButton { display:inline-flex; align-items:center; gap:6px; padding:2px 0; background:transparent; border:none; border-bottom:1px solid transparent;
+  color:var(--text-faint); font-family:var(--font-mono); font-size:10px; font-weight:600; letter-spacing:0.16em; text-transform:uppercase; cursor:pointer; transition:color .16s, border-color .16s; }
+.skipButton:hover { color:var(--text-muted); border-bottom-color:var(--border-strong); }
+
+/* QuackStrip */
+.strip { display:flex; align-items:center; gap:10px; height:34px; width:100%; padding:0 14px 0 24px;
+  border:1px solid var(--border); border-top:none; border-radius:0 0 var(--r-2) var(--r-2); background:var(--bg-sunken); cursor:pointer; position:relative; overflow:hidden; text-align:left; }
+.strip:disabled { cursor:default; }
+.strip .fill { position:absolute; inset:0; background:rgba(255,215,0,0.055); transform-origin:left; pointer-events:none; }
+.strip .duck { width:16px; height:16px; object-fit:contain; flex-shrink:0; position:relative; pointer-events:none; }
+.strip .duck.cool { filter:grayscale(0.7); }
+.strip .label { font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.1em; color:var(--text-faint); flex:1; position:relative; }
+.strip .countdown { font-family:var(--font-mono); font-size:11px; letter-spacing:0.06em; color:var(--text-faint); position:relative; min-width:32px; text-align:right; }
+
+/* variant: band you-are-here (rail = accent) */
+.band.youAreHere .locStrip { background:var(--accent) !important; }
+/* variant: metal_place */
+.metal_place { border-color:rgba(217,119,6,0.55); background:linear-gradient(135deg, rgba(217,119,6,0.14) 0%, transparent 65%), var(--bg-surface); }
+.metal_place .locStrip { background:rgba(217,119,6,1); }
+.metal_place .groupKicker { color:rgba(253,224,71,0.7); }
+.metal_place .groupTitle { color:rgba(253,224,71,0.95); }
+.metal_place .groupSubtitle { color:rgba(253,224,71,0.45); }
+.metal_place .groupCount { background:rgba(217,119,6,0.12); color:rgba(253,224,71,0.95); border-color:rgba(217,119,6,0.3); }
+.metal_place .clusterAvatar { background:rgba(217,119,6,0.55); }
+/* variant: camping */
+.camping { border-color:rgba(22,160,133,0.45); background:linear-gradient(135deg, rgba(22,160,133,0.14) 0%, transparent 70%), var(--bg-surface); }
+.camping .locStrip { background:var(--signal-ok); }
+.camping .groupKicker { color:rgba(95,208,187,0.7); }
+.camping .groupTitle { color:#fff; }
+.camping .groupSubtitle { color:rgba(95,208,187,0.55); }
+.camping .groupCount { background:rgba(22,160,133,0.15); color:#5fd0bb; border-color:rgba(22,160,133,0.3); }
+.camping .clusterAvatar { background:rgba(22,160,133,0.4); }
+/* variant: lost */
+.lost { border-color:rgba(168,85,247,0.5); background:linear-gradient(135deg, rgba(88,28,135,0.32) 0%, rgba(168,85,247,0.06) 60%, transparent), var(--bg-surface); box-shadow:0 0 18px rgba(168,85,247,0.12); }
+.lost .locStrip { background:var(--signal-lost); }
+.lost .groupKicker { color:rgba(196,148,255,0.7); }
+.lost .groupTitle { color:rgba(233,213,255,0.95); text-shadow:0 0 12px rgba(168,85,247,0.5); letter-spacing:0.04em; }
+.lost .groupSubtitle { color:rgba(196,148,255,0.55); }
+.lost .groupCount { background:rgba(88,28,135,0.35); color:rgba(196,148,255,0.95); border-color:rgba(168,85,247,0.35); }
+.lost .clusterAvatar { background:rgba(88,28,135,0.6); color:rgba(233,213,255,1); }
+
+/* ============================================================
+   03  ANNOUNCEMENTS MURAL  (mirrors AnnouncementsPage + AnnouncementCard)
+   ============================================================ */
+.mural { background:var(--bg-sunken); border:1px solid var(--border); border-radius:var(--r-2); padding:var(--s-5); }
+
+/* composer */
+.postBox { display:flex; flex-direction:column; gap:var(--s-2); background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--r-2); padding:var(--s-4); }
+.textarea { width:100%; min-height:74px; background:transparent; border:none; color:var(--text); font-family:inherit; font-size:14px; line-height:1.5; resize:none; outline:none; }
+.textarea::placeholder { color:var(--text-muted); }
+.postBtn { align-self:flex-end; padding:6px 16px; background:var(--accent); color:#fff; border:none; border-radius:var(--r-1);
+  font-family:var(--font-mono); font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.06em; cursor:pointer; transition:background .15s; }
+.postBtn:disabled { opacity:0.45; cursor:not-allowed; }
+.blockedMsg { text-align:center; color:var(--text-muted); font-size:14px; padding:var(--s-3); background:var(--bg-surface); border-radius:var(--r-2); border:1px solid var(--border); }
+
+/* card = a flyer pinned to the board */
+.feed { list-style:none; margin:var(--s-6) 0 0; padding:0; }
+.card { position:relative; background:var(--bg-surface); border:1px solid var(--border); border-radius:var(--r-1);
+  padding:var(--s-4); display:grid; grid-template-columns:40px 1fr; gap:var(--s-3); box-shadow:0 6px 18px rgba(0,0,0,0.35); }
+.card + .card { margin-top:var(--s-6); }
+.feed .card:nth-child(odd) { transform:rotate(-0.9deg); }
+.feed .card:nth-child(even) { transform:rotate(0.7deg); }
+body.no-grit .card { transform:none; box-shadow:none; }
+.tapeCorner { position:absolute; top:-9px; left:50%; transform:translateX(-50%) rotate(-3deg); width:54px; height:18px; background:var(--tape); border:1px solid rgba(255,255,255,0.05); box-shadow:0 2px 5px rgba(0,0,0,0.4); }
+body.no-grit .tapeCorner { display:none; }
+
+.card .av40 { width:40px; height:40px; font-size:16px; border:2px solid var(--bg); grid-column:1; grid-row:1; }
+.head-row { grid-column:2; display:flex; align-items:baseline; gap:var(--s-2); min-width:0; flex-wrap:wrap; }
+.name { font-weight:700; font-size:14px; }
+.ts { font-family:var(--font-mono); font-size:11px; color:var(--text-muted); margin-left:auto; flex-shrink:0; }
+.body-txt { grid-column:2; font-size:14px; line-height:1.5; margin:0; }
+
+.cardPinned { border-color:var(--accent); border-left-width:3px; background:color-mix(in srgb, var(--bg-surface) 90%, var(--accent) 10%); }
+.pinnedChip { font-family:var(--font-mono); font-size:9px; padding:1px 5px; border-radius:2px; text-transform:uppercase; letter-spacing:0.08em; flex-shrink:0;
+  background:color-mix(in srgb, var(--accent) 15%, transparent); color:var(--accent); border:1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
+
+/* role chips */
+.chip { font-family:var(--font-mono); font-size:10px; font-weight:600; padding:1px 7px; border-radius:var(--r-pill); text-transform:uppercase; letter-spacing:0.06em; border:1px solid var(--border); color:var(--text-muted); flex-shrink:0; }
+.chip.godlike { color:var(--role-godlike); background:var(--role-godlike-bg); border-color:var(--role-godlike-border); }
+.chip.manager { color:var(--role-manager); background:var(--role-manager-bg); border-color:var(--role-manager-border); }
+
+/* pending-sync chip (global pattern) */
+.pending-chip { display:inline-flex; align-items:center; gap:4px; margin-left:8px; background:rgba(243,156,18,0.12); color:var(--signal-warn);
+  border:1px solid rgba(243,156,18,0.3); border-radius:var(--r-pill); padding:2px 8px; font-family:var(--font-mono); font-size:10px; text-transform:uppercase; letter-spacing:0.06em; }
+.pending-chip::before { content:""; width:6px; height:6px; border-radius:50%; background:var(--signal-warn); animation:pending-pulse 1.4s ease-in-out infinite; }
+
+/* moderation actions */
+.cardActions { grid-column:2; display:flex; gap:var(--s-3); }
+.actionBtn { background:transparent; border:0; padding:0; font-family:var(--font-mono); font-size:11px; color:var(--text-muted); cursor:pointer; text-transform:uppercase; letter-spacing:0.06em; transition:color .15s; }
+.actionBtn:hover:not(:disabled) { color:var(--text); }
+.actionBtn:disabled { opacity:0.45; cursor:not-allowed; }
+.actionBtnDanger:hover:not(:disabled) { color:var(--signal-warn); }
+.actionBtnActive { color:var(--accent); }
+
+.note { font-family:var(--font-mono); font-size:10px; color:var(--text-faint); line-height:1.6; margin-top:var(--s-4); text-transform:uppercase; letter-spacing:0.05em; }
+
+@keyframes pending-pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+@media (prefers-reduced-motion:reduce) { .pending-chip::before { animation:none; } }
+</style>
+</head>
+
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="head">
+  <div>
+    <h1>Flyer-Grit</h1>
+    <p>Subtle / surfaces 02 + 03</p>
+  </div>
+  <label class="grit-toggle">
+    <span>Grit</span>
+    <span class="box" aria-hidden="true"></span>
+    <input type="checkbox" id="gritToggle" checked hidden />
+  </label>
+</header>
+
+<!-- ========================= 02 ========================= -->
+<div class="section-label">02 /now crew live-group card</div>
+
+<p class="variant-tag">band / you-are-here (live dot, next-up, "sou fraco", quack strip)</p>
+<div class="groupCard band youAreHere groupCardAboveStrip toner" role="button">
+  <div class="locStrip"></div>
+  <div class="groupBody">
+    <div class="groupMain">
+      <div class="groupLeft">
+        <span class="groupKicker"><span class="liveDot" aria-hidden="true"></span> Você está aqui</span>
+        <h3 class="groupTitle" data-text="Sepultura">Sepultura</h3>
+        <p class="groupSubtitle">W.E.T. STAGE / 21:30 - 22:40</p>
+        <p class="groupNextUp">Depois &rarr; Krisiun</p>
+        <div class="clusterRow">
+          <div class="clusterAvatars">
+            <span class="avatar clusterAvatar">P</span>
+            <span class="avatar clusterAvatar">B</span>
+            <span class="avatar clusterAvatar">Z</span>
+            <span class="avatar clusterAvatar">L</span>
+            <span class="avatar clusterAvatar">T</span>
+          </div>
+          <span class="clusterOverflow">+9</span>
+          <span class="clusterCount">14 indo</span>
+        </div>
+      </div>
+      <div class="groupCountCol">
+        <div class="groupCount">14<small class="locCountLabel">indo</small></div>
+      </div>
+    </div>
+    <div class="groupActions">
+      <button class="skipButton">Sou fraco &#129305;</button>
+    </div>
+  </div>
+</div>
+<button class="strip" aria-label="Quack">
+  <span class="fill" style="transform:scaleX(0)"></span>
+  <img class="duck" src="/rubber-duck.png" alt="" />
+  <span class="label">Quack</span>
+</button>
+
+<p class="variant-tag">quack strip / cooldown state</p>
+<button class="strip" style="border-radius:var(--r-2)" disabled aria-label="Cooldown">
+  <span class="fill" style="transform:scaleX(0.62)"></span>
+  <img class="duck cool" src="/rubber-duck.png" alt="" />
+  <span class="label">Cooldown</span>
+  <span class="countdown">0:42</span>
+</button>
+
+<p class="variant-tag">band / not here (info only, no buttons)</p>
+<div class="groupCard band toner" role="button">
+  <div class="locStrip" style="background:var(--stage-harder)"></div>
+  <div class="groupBody">
+    <div class="groupMain">
+      <div class="groupLeft">
+        <span class="groupKicker">Assistindo agora</span>
+        <h3 class="groupTitle">Nervosa</h3>
+        <p class="groupSubtitle">HARDER STAGE / 18:00 - 18:40</p>
+        <div class="clusterRow">
+          <div class="clusterAvatars">
+            <span class="avatar clusterAvatar">M</span>
+            <span class="avatar clusterAvatar">R</span>
+            <span class="avatar clusterAvatar">C</span>
+          </div>
+          <span class="clusterCount">3 indo</span>
+        </div>
+      </div>
+      <div class="groupCountCol"><div class="groupCount">3<small class="locCountLabel">indo</small></div></div>
+    </div>
+  </div>
+</div>
+
+<p class="variant-tag">metal_place variant</p>
+<div class="groupCard metal_place toner" role="button">
+  <div class="locStrip"></div>
+  <div class="groupBody">
+    <div class="groupMain">
+      <div class="groupLeft">
+        <span class="groupKicker">No ponto</span>
+        <h3 class="groupTitle">Metal Place</h3>
+        <p class="groupSubtitle">Aberto 14:00 - 02:00</p>
+        <div class="clusterRow">
+          <div class="clusterAvatars">
+            <span class="avatar clusterAvatar">P</span>
+            <span class="avatar clusterAvatar">Z</span>
+            <span class="avatar clusterAvatar">A</span>
+            <span class="avatar clusterAvatar">L</span>
+          </div>
+          <span class="clusterCount">4 no ponto</span>
+        </div>
+      </div>
+      <div class="groupCountCol"><div class="groupCount">4<small class="locCountLabel">no ponto</small></div></div>
+    </div>
+  </div>
+</div>
+
+<p class="variant-tag">camping variant</p>
+<div class="groupCard camping toner" role="button">
+  <div class="locStrip"></div>
+  <div class="groupBody">
+    <div class="groupMain">
+      <div class="groupLeft">
+        <span class="groupKicker">No camping</span>
+        <h3 class="groupTitle">Camping</h3>
+        <p class="groupSubtitle">Acampados / descansando</p>
+        <div class="clusterRow">
+          <div class="clusterAvatars">
+            <span class="avatar clusterAvatar">G</span>
+            <span class="avatar clusterAvatar">F</span>
+            <span class="avatar clusterAvatar">D</span>
+            <span class="avatar clusterAvatar">N</span>
+            <span class="avatar clusterAvatar">S</span>
+          </div>
+          <span class="clusterOverflow">+1</span>
+          <span class="clusterCount">6 no camping</span>
+        </div>
+      </div>
+      <div class="groupCountCol"><div class="groupCount">6<small class="locCountLabel">no camping</small></div></div>
+    </div>
+  </div>
+</div>
+
+<p class="variant-tag">lost variant / empty group condition</p>
+<div class="groupCard lost toner" role="button">
+  <div class="locStrip"></div>
+  <div class="groupBody">
+    <div class="groupMain">
+      <div class="groupLeft">
+        <span class="groupKicker">Perdido no Wacken</span>
+        <h3 class="groupTitle">Lost</h3>
+        <p class="groupSubtitle">Sem sinal / paradeiro desconhecido</p>
+        <p class="groupEmpty">Ninguém perdido. Por enquanto.</p>
+      </div>
+      <div class="groupCountCol"><div class="groupCount">0<small class="locCountLabel">perdidos</small></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================= 03 ========================= -->
+<div class="section-label">03 Announcements mural</div>
+
+<div class="mural">
+  <p class="variant-tag" style="margin-top:0">composer (textarea + post)</p>
+  <form class="postBox toner" onsubmit="return false">
+    <textarea class="textarea" placeholder="Write a message for the vira-latas..."></textarea>
+    <button class="postBtn" type="submit">Post</button>
+  </form>
+
+  <ul class="feed">
+    <!-- pinned + godlike author: Unpin + Delete (no Block for godlike) -->
+    <li class="card cardPinned toner">
+      <span class="tapeCorner" aria-hidden="true"></span>
+      <span class="avatar av40">F</span>
+      <div class="head-row">
+        <span class="name">Filizzola</span>
+        <span class="chip godlike">Godlike</span>
+        <span class="pinnedChip">Pinned</span>
+        <span class="ts">2h</span>
+      </div>
+      <p class="body-txt">Official meet point at the W.E.T. stage, 9pm for Sepultura. If you are still at camping, leave now.</p>
+      <div class="cardActions">
+        <button class="actionBtn actionBtnActive" type="button">Unpin</button>
+        <button class="actionBtn actionBtnDanger" type="button">&#9872; Delete</button>
+      </div>
+    </li>
+
+    <!-- manager author: Pin + Block + Delete -->
+    <li class="card toner">
+      <span class="tapeCorner" aria-hidden="true"></span>
+      <span class="avatar av40" style="background:var(--role-manager)">P</span>
+      <div class="head-row">
+        <span class="name">Pádua</span>
+        <span class="chip manager">Manager</span>
+        <span class="ts">38 min</span>
+      </div>
+      <p class="body-txt">Found a pastel stand behind the Wasteland stage. Absolute lifesaver. Going back tomorrow morning.</p>
+      <div class="cardActions">
+        <button class="actionBtn" type="button">Pin</button>
+        <button class="actionBtn actionBtnDanger" type="button">Block</button>
+        <button class="actionBtn actionBtnDanger" type="button">&#9872; Delete</button>
+      </div>
+    </li>
+
+    <!-- normal author + pending sync: Pin + Block + Delete -->
+    <li class="card toner">
+      <span class="tapeCorner" aria-hidden="true"></span>
+      <span class="avatar av40">B</span>
+      <div class="head-row">
+        <span class="name">Biro</span>
+        <span class="chip">Vira-latas</span>
+        <span class="ts">now</span>
+      </div>
+      <p class="body-txt">Lost the crew in the Krisiun pit. I am at the back near the bar.<span class="pending-chip">Pending sync</span></p>
+      <div class="cardActions">
+        <button class="actionBtn" type="button">Pin</button>
+        <button class="actionBtn actionBtnDanger" type="button">Block</button>
+        <button class="actionBtn actionBtnDanger" type="button">&#9872; Delete</button>
+      </div>
+    </li>
+
+    <!-- normal author already blocked: Block disabled -->
+    <li class="card toner">
+      <span class="tapeCorner" aria-hidden="true"></span>
+      <span class="avatar av40">L</span>
+      <div class="head-row">
+        <span class="name">Lalá</span>
+        <span class="chip">Vira-latas</span>
+        <span class="ts">1h</span>
+      </div>
+      <p class="body-txt">spam spam spam buy my t-shirt</p>
+      <div class="cardActions">
+        <button class="actionBtn" type="button">Pin</button>
+        <button class="actionBtn" type="button" disabled>Blocked</button>
+        <button class="actionBtn actionBtnDanger" type="button">&#9872; Delete</button>
+      </div>
+    </li>
+  </ul>
+
+  <p class="variant-tag">blocked-user variant (composer hidden)</p>
+  <p class="blockedMsg">You've said enough for today, buddy... &#129305;</p>
+</div>
+
+<p class="note">Real component states only. Toggle GRIT off (top right) for the clean<br/>night / low-power fallback. Texture auto-disables under<br/>prefers-reduced-transparency and prefers-contrast.</p>
+
+<script>
+  var t = document.getElementById('gritToggle');
+  t.addEventListener('change', function () {
+    document.body.classList.toggle('no-grit', !t.checked);
+  });
+</script>
+</body>
+</html>

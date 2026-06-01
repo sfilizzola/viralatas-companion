@@ -249,7 +249,7 @@
 .logoutBtn {
   background: none;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   color: var(--text-muted);
   padding: 0.4rem 0.75rem;
   font-size: 0.875rem;
@@ -320,7 +320,7 @@
 .input {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   color: var(--text);
   padding: 0.65rem 0.75rem;
   font-size: 1rem;
@@ -343,7 +343,7 @@
   justify-content: center;
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   color: var(--text);
   padding: 0.65rem 0.75rem;
   font-weight: 600;
@@ -366,7 +366,7 @@
   background: var(--accent);
   color: #fff;
   border: none;
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   padding: 0.75rem;
   font-size: 1rem;
   font-weight: 600;
@@ -747,7 +747,7 @@
   background: #dc2626;
   color: #fff;
   border: none;
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   padding: 0.75rem 1.5rem;
   font-size: 0.95rem;
   font-weight: 600;
@@ -775,7 +775,7 @@
   text-align: center;
   margin: 0;
   padding: 0.75rem;
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   background: var(--bg-elevated);
   color: var(--text);
 }
@@ -799,7 +799,7 @@
 .registrationToggleButton {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   color: var(--text);
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
@@ -844,7 +844,7 @@
   width: 100%;
   padding: 1rem;
   border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   background: rgba(239, 68, 68, 0.06);
 }
 
@@ -867,7 +867,7 @@
   padding: 0.75rem;
   font-size: 0.875rem;
   text-align: center;
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   background: rgba(16, 185, 129, 0.1);
   color: #10b981;
   border: 1px solid rgba(16, 185, 129, 0.3);
@@ -878,7 +878,7 @@
   padding: 0.75rem 1rem;
   background: rgba(239, 68, 68, 0.2);
   border: 1px solid rgba(239, 68, 68, 0.5);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   color: rgba(239, 68, 68, 0.95);
   font-weight: 600;
   cursor: pointer;
@@ -900,7 +900,7 @@
   width: 100%;
   padding: 1rem;
   border: 1px solid rgba(59, 130, 246, 0.3);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   background: rgba(59, 130, 246, 0.06);
 }
 
@@ -935,7 +935,7 @@
   width: 100%;
   padding: 1rem;
   border: 1px solid rgba(184, 134, 11, 0.3);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   background: rgba(184, 134, 11, 0.06);
 }
 
@@ -1035,7 +1035,7 @@
   margin-top: 1rem;
   padding: 1rem;
   border: 1px solid rgba(217, 119, 6, 0.35);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   background: rgba(217, 119, 6, 0.06);
 }
 
@@ -1127,7 +1127,7 @@
 
 .timeTravelChip strong {
   font-size: 0.85rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: 0.04em;
 }
 
@@ -1743,7 +1743,7 @@
 .blockedUsersSection {
   width: 100%;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   overflow: hidden;
 }
 
@@ -1793,7 +1793,7 @@
   color: var(--text-muted);
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   white-space: nowrap;
 }
 
@@ -1802,7 +1802,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   overflow: hidden;
   margin-top: 4px;
 }
@@ -1981,7 +1981,7 @@
 
 .consolidateSelect {
   padding: 8px 10px;
-  border-radius: var(--radius);
+  border-radius: var(--r-2);
   border: 1px solid var(--border);
   background: var(--bg-elevated);
   color: var(--text);

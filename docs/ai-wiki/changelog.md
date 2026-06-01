@@ -4,6 +4,21 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-01 (Design-system consistency pass)
+
+### Changed
+- **`font-weight: 800` → `700`** across `RightNowPage`, `ProfilePage`, `LiveCardSheet`, and `BandDetailModal` module CSS. Only 400/500/600/700 are loaded for IBM Plex Sans (400/600/700 for Oswald), so every `800` was triggering synthetic faux-bold; `700` is the heaviest real weight.
+- **Off-palette red removed (`RightNowPage.module.css`)** — the 4 `rgba(229, 85, 85, …)` (#e55555) values (`.latestSignalClickable:active`, `.liveDot` glow, `.memberPill.me` border/bg) now use `rgba(192, 57, 43, …)` = `--accent` (#c0392b), matching the convention already used in `BandCard`. The `:active` tint alpha was nudged 0.06 → 0.08 to stay perceptible at the darker hue.
+- **Legacy token aliases retired** — migrated all 19 `var(--radius)` references (`ProfilePage` ×17, `RightNowPage` ×2) to `var(--r-2)`, then deleted `--radius` and the unused `--font` from `:root` in `index.css`.
+- **`/now` font sizes onto the type scale** — converted 16 ad-hoc `rem` font-sizes in `RightNowPage.module.css` to px snapped to existing scale steps (e.g. band name 1.55rem→24px, eyebrow/stage/time 0.72rem→11px, body copy 0.9rem→14px). Spacing `rem` values left untouched to keep the change low-risk.
+- **`prefers-reduced-motion` coverage** — added guards for `RightNowPage`'s `slideUp` (undo toast) and `latestPulse` (signal dot), and the global `pending-pulse` chip in `index.css`.
+- **`public/vira-lata-ds.html`** — updated the location "me" chip (`.loc-chip.me`) and its annotation to the on-palette `rgba(192,57,43,…)` so the design system mirrors the corrected code.
+
+### Architectural Notes
+- Pure consistency/maintenance pass: no behavioral or layout changes, no new components. Brings the older pages (`/now`, `/profile`) into line with the token discipline the newer components already follow. Build green; 716/716 unit tests pass.
+
+---
+
 ## 2026-06-01 (Metal Battle country flags)
 
 ### Added
