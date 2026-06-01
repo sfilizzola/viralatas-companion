@@ -143,7 +143,7 @@ Use the same `<feature-slug>` across specs, plans, and prototypes when they belo
 
 **`public/` rule** — shippable assets only (DS, badges, fonts, maps, manifest). Do **not** add exploration HTML under `public/`; prototypes live in `docs/superpowers/prototypes/`. Prototype HTML may reference fonts via relative paths (e.g. `../../../../public/fonts/…`).
 
-**Deprecated scratch locations** — repo-root `_*.html`, `docs/design/`, `docs/wireframes/`, `_temp/design-demos/`. Throwaway **code** prototypes (`prototype` skill) stay next to target modules in `src/` with clear naming.
+**Deprecated scratch locations** — repo-root `_*.html`, `docs/design/`, `docs/wireframes/`, `_temp/` (removed). Throwaway **code** prototypes (`prototype` skill) stay next to target modules in `src/` with clear naming.
 
 ---
 

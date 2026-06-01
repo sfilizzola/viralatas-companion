@@ -4332,7 +4332,7 @@
             <tr><td class="dstbl-cell">1 Hero</td><td class="dstbl-cell">Giant bands seen; row: picked · skipped · stages</td></tr>
             <tr><td class="dstbl-cell">2 Personality</td><td class="dstbl-cell">Top genre + stage; stage pill with visit count</td></tr>
             <tr><td class="dstbl-cell">3 Chaos</td><td class="dstbl-cell">Horizontal meters: weak skips, hard conflicts, badges</td></tr>
-            <tr><td class="dstbl-cell">4 Ratings (conditional)</td><td class="dstbl-cell"><strong>C · Popular Echo</strong> — personal strip (or zero copy); nested crew top/low cards (paw + avg hero + count footer); your top score row. Hidden when zero crew ratings or <code>!hasPicks</code>. Prototype: <code>_temp/wrap-ratings-proposals/index.html</code> § C</td></tr>
+            <tr><td class="dstbl-cell">4 Ratings (conditional)</td><td class="dstbl-cell"><strong>C · Popular Echo</strong> — personal strip (or zero copy); nested crew top/low cards (paw + avg hero + count footer); your top score row. Hidden when zero crew ratings or <code>!hasPicks</code>. Prototype: <code>docs/superpowers/prototypes/wrap-ratings/index.html</code> § C</td></tr>
             <tr><td class="dstbl-cell">4/5 Vira-latas</td><td class="dstbl-cell">Pick-twin spotlight portrait (twin only, name below); stats in card</td></tr>
             <tr><td class="dstbl-cell">5/6 Assigned (conditional)</td><td class="dstbl-cell">Godlike hand-picked patches grid; only when <code>assignedBadgeSlugs.length &gt; 0</code></td></tr>
             <tr><td class="dstbl-cell">6–7/7–8 Patches</td><td class="dstbl-cell">Decorative <code>buildStackPoses</code> pile; CTA Open vest → /profile?vest=open#vest</td></tr>
@@ -4433,7 +4433,7 @@
         </div>
 
       <div class="subhead">Previously Achieved + Consolidation <span class="mono-11">Phase 29 · U2</span></div>
-        <p><strong>Previously Achieved</strong> (<code>BadgeHistorySection.tsx</code>) — collapsible archive below live vest on <code>/profile</code>. Hidden when IndexedDB history empty. Locked layout: <strong>U2</strong> from <code>_temp/badge-history-proposals/index.html</code> — flat 4×48 px grid per year (no denim vest shell), Oswald year headings, mono section title, muted patch opacity. Tap → overlay <code>BadgeDetailModal</code> (M2: label + year chip only; no description; no zoom).</p>
+        <p><strong>Previously Achieved</strong> (<code>BadgeHistorySection.tsx</code>) — collapsible archive below live vest on <code>/profile</code>. Hidden when IndexedDB history empty. Locked layout: <strong>U2</strong> from <code>docs/superpowers/prototypes/badge-history/index.html</code> (local) — flat 4×48 px grid per year (no denim vest shell), Oswald year headings, mono section title, muted patch opacity. Tap → overlay <code>BadgeDetailModal</code> (M2: label + year chip only; no description; no zoom).</p>
         <p><strong>Live vest filter</strong> — <code>isLiveVestBadge()</code>: evergreen + <code>year === getCurrentFestivalYear()</code> only. After reset, year-badges live in archive only.</p>
         <p><strong>Godlike consolidate</strong> (<code>ConsolidateBadgesSection</code>) — year selector, force checkbox, gate until <code>isFestivalEnded()</code>, confirm modal, inline result. <strong>Archive preview (dev)</strong> — Test Badges panel seeds local IDB without Supabase.</p>
         <table class="dstbl">

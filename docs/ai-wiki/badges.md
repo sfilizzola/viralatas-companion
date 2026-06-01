@@ -117,7 +117,7 @@ Count suffix: `· {earned.length}` inline in kicker. Toggle exposes `aria-expand
 
 ### Design comparison canvas
 
-Layout variants A–D were compared in `_temp/patches-layout-variants/index.html` before shipping Variant C. Not shipped to production; kept for reference only.
+Layout variants A–D were compared in a local HTML canvas before shipping Variant C (pre–artifact-layout; not retained in prototype archive).
 
 ---
 
@@ -182,7 +182,7 @@ Run after `isFestivalEnded()` and before the next `npm run festival:reset`. Godl
 
 `/profile` → `useUserBadgeHistory` → IDB first → Supabase pull when online → `BadgeHistorySection` (hidden when empty). Tap archive patch → `BadgeDetailModal` with `showDescription={false}` `showZoom={false}`.
 
-**U2 layout (locked):** Flat `repeat(4, 48px)` grid per year — no denim vest shell. Mono collapsible header + Oswald `Wacken {year}` headings. Patches at 88% opacity (trophy shelf, not live vest). Year chip: red enamel diamond (24 px @ 48 px patch), same language as live `.yearChip`. Reference: `_temp/badge-history-proposals/index.html` scenario U2.
+**U2 layout (locked):** Flat `repeat(4, 48px)` grid per year — no denim vest shell. Mono collapsible header + Oswald `Wacken {year}` headings. Patches at 88% opacity (trophy shelf, not live vest). Year chip: red enamel diamond (24 px @ 48 px patch), same language as live `.yearChip`. Reference: `docs/superpowers/prototypes/badge-history/index.html` scenario U2 (local).
 
 **Godlike archive preview (dev):** Godlike Powers → Test Badges → *Archive preview (local)*. Seeds IndexedDB only; per-device flag pauses history sync until *Clear preview*.
 
