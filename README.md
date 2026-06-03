@@ -1,201 +1,244 @@
-# Viralatas Companion
+# Viralatas Metaleiros 🤘
 
-Festival companion PWA for the Viralatas Metaleiros crew at Wacken Open Air.
+Festival companion **PWA** for **vira-latas** at **Wacken Open Air 2026**.
 
-The app lets crew members log in, browse the Wacken schedule, pick bands, see who else is going, and check what they or the crew should be watching right now. It is built offline-first so the schedule and picks keep working after the first sync, even with bad festival signal.
+Each vira-lata logs in, browses the lineup, picks bands, sees live attendance and who is going where, posts on the announcements mural, earns badges, and gets a private festival recap on `/wrap`. The app is **offline-first**: after the first sync, schedule and picks work with bad or no signal at the festival.
+
+**Deep architecture** → [`docs/ai-wiki/`](docs/ai-wiki/) · **Agent rules** → [`CLAUDE.md`](CLAUDE.md)
+
+---
 
 ## Features
 
-- Supabase email/password authentication with profile data.
-- Offline-first schedule browsing from IndexedDB.
-- Wacken 2026 band schedule seed data.
-- Stage, day, and time-window filters for the schedule.
-- Optimistic band picks saved locally immediately.
-- Offline pick queue that flushes to Supabase when the browser reconnects.
-- Crew-wide pick counts and popular bands view.
-- Personal "My picks" view.
-- "Right now" view that shows the current or next band for the user and crew.
-- PWA service worker for app shell and image caching.
-- Mandatory dark UI theme.
+### Core
 
-## Tech Stack
+- Email/password auth (Supabase) with roles: normal, manager, godlike.
+- Full Wacken 2026 lineup in IndexedDB (8 stages × 4 days).
+- **Lineup** (`/schedule`) — stage, day, time filters; genre guide; Metal Battle country flags on band cards.
+- **My Wacken** (`/my-picks`) — picks grouped by festival day; inline Attended / Missed on ended sets.
+- Optimistic picks: write locally first, sync to Supabase when online; offline queue flushes on reconnect.
+- **Popular** (`/popular`) — sort by pick count or crew average rating.
+- **Right now** (`/now`) — live / next band, vira-lata groups, camping & lost cards, upcoming-band banner, festival map entry.
+- **Map** (`/map`) — live vira-lata positions on the festival minimap (from presence + picks, no extra schema).
+- PWA service worker (app shell, assets, API caching).
+- Dark UI only (metal app).
+
+### Social & content
+
+- **Announcements** (`/announcements`) — mural board; offline post queue; manager block list; godlike pin/delete.
+- **The Duck** — quacks, push subscriptions, killswitch (godlike).
+- **Metal Place** — festival-day check-in window on `/now`.
+- Realtime updates for picks, announcements, presence, and config tables.
+
+### Profile & festival extras
+
+- Client-side **badge** engine (vest stack, history by year, godlike assign).
+- **MoshSplit** balance section (optional `VITE_MOSHSPLIT_TOKEN`).
+- **Band ratings** (1–5 after sets end) with sync and aggregates.
+- **Festival wrap** (`/wrap`) — offline recap: stats, personality, chaos, crew, ratings, patches.
+- i18n: Brazilian Portuguese, English, Spanish, German.
+
+### Planned / partial
+
+- **LLM proactive alerts** — types and queue stub only; Edge Function not wired to UI yet. See [`FUTURE_IDEAS.md`](FUTURE_IDEAS.md).
+
+---
+
+## Tech stack
 
 | Layer | Technology |
-|---|---|
-| Frontend | React, TypeScript, Vite |
-| Routing | React Router |
+|-------|------------|
+| Frontend | React 19, TypeScript, Vite |
+| Routing | React Router 7 |
 | PWA | vite-plugin-pwa, Workbox |
-| Offline data | IndexedDB via `idb` |
+| Offline data | IndexedDB (`idb`), domain modules under `src/lib/db/` |
 | Backend | Supabase Auth, PostgreSQL, Realtime |
-| Database changes | Supabase migrations |
+| Edge | Supabase Edge Functions (Deno) — alerts, no API keys in client |
+| Tests | Vitest, Testing Library, `fake-indexeddb` |
+| Schema | `supabase/migrations/` |
 
-## Project Structure
+---
+
+## Project structure
 
 ```text
 .
 ├── src/
-│   ├── components/       # Shared UI components and navigation
-│   ├── hooks/            # Auth, picks, and attendance hooks
-│   ├── lib/              # Supabase client, IndexedDB, sync, picks, live preview logic
-│   ├── pages/            # Route-level screens
-│   ├── types/            # Shared TypeScript app types
-│   ├── App.tsx           # App routes and startup sync hooks
-│   └── main.tsx          # React entrypoint
+│   ├── components/       # UI + sync/ (SyncOrchestration, BandSync, PickSync, …)
+│   ├── pages/            # Route screens (Lineup, My Wacken, Now, Map, Wrap, …)
+│   ├── hooks/            # Auth, picks, now data, badges, announcements, …
+│   ├── repositories/     # Data access (IndexedDB-first)
+│   ├── services/         # Domain logic (badges, live preview, wrap, ratings, …)
+│   ├── lib/              # Supabase, db/, sync, realtime, i18n bootstrap
+│   ├── workers/sw.ts     # Service worker
+│   └── __tests__/        # Vitest unit/integration tests
 ├── supabase/
-│   ├── migrations/       # Database schema and policy migrations
-│   └── seed/             # Band lineup and disposable test-user seed scripts
-├── CLAUDE.md             # LLM/agent context and project guidelines
-├── PHASES.md             # Remaining development phases 5–7
-└── vite.config.ts        # Vite and PWA configuration
+│   ├── migrations/       # Schema source of truth
+│   ├── functions/        # Edge Functions
+│   └── seed/             # Lineup and test-user scripts
+├── public/               # DS (vira-lata-ds.html), badges, fonts, map assets
+├── docs/ai-wiki/         # Architecture wiki (flows, decisions, schema)
+├── CLAUDE.md             # Agent context and constraints
+├── PHASES.md             # Active phase (if any) and completion checklist
+└── FUTURE_IDEAS.md       # Backlog ideas
 ```
+
+Local design scratch (gitignored): `docs/superpowers/{specs,plans,prototypes}/` — never committed.
+
+---
 
 ## Requirements
 
-- Node.js 20 or newer is recommended.
-- npm.
-- A Supabase project.
-- Supabase CLI if you want to run migrations locally or manage Supabase from the terminal.
+- **Node.js 20+** recommended
+- **npm**
+- A **Supabase** project
+- **Supabase CLI** for local migrations / `supabase functions serve` (optional but useful)
 
-## Environment Setup
+---
 
-Copy the example environment file:
+## Environment setup
 
 ```sh
 cp .env.local.example .env.local
 ```
 
-Fill in the client-safe Supabase values:
+Client-safe values:
 
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-key-here
 ```
 
-To enable the MoshSplit balance section on the Profile page, add the app token:
+Optional — MoshSplit balance on Profile (read-only external API):
 
 ```env
 VITE_MOSHSPLIT_TOKEN=sat_...
 ```
 
-This token is used client-side to call the MoshSplit external summary API (`POST /pitboss/v1/balances/external-summary`). It grants read-only access to event balances by email. Without it the section will show an error state but remain visible. Obtain the token from the MoshSplit admin panel at `split.viralatas.org`.
+Obtain from the MoshSplit admin at `split.viralatas.org`. Without it, the section shows an error but stays visible.
 
-To run the band seed script, also add a service role key locally:
+For **seed scripts** locally (never commit):
 
 ```env
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key-here
 ```
 
-Never commit `.env.local` or service role keys.
+Never commit `.env.local` or service role keys. Claude/Anthropic keys belong only in Edge Functions — not in `src/`.
 
-## Run Locally
+---
 
-Install dependencies:
+## Run locally
 
 ```sh
 npm install
-```
-
-Start the Vite dev server:
-
-```sh
 npm run dev
 ```
 
-Open the local URL Vite prints, usually:
+Open the URL Vite prints (usually `http://localhost:5173`).
 
-```text
-http://localhost:5173
-```
-
-## Database Setup
-
-Apply the migrations to your Supabase project using the Supabase CLI workflow you use for the project. The migrations create:
-
-- `users`
-- `bands`
-- `user_picks`
-- `band_attendance` view
-- RLS policies
-- Auth trigger for profile creation
-- Realtime publication for `user_picks`
-
-## Seed Bands
-
-The schedule seed lives in `supabase/seed/bands.ts`.
-
-Run it after migrations and after adding `SUPABASE_SERVICE_ROLE_KEY` to `.env.local`:
+**Build & test:**
 
 ```sh
+npm run build
+npm test
+```
+
+---
+
+## Database setup
+
+Apply migrations to your Supabase project (CLI or dashboard). Full DDL, RLS, and Realtime tables → [`docs/ai-wiki/supabase-schema.md`](docs/ai-wiki/supabase-schema.md).
+
+Core entities include `users`, `bands`, `user_picks`, `announcements`, `user_presence`, `user_band_ratings`, `user_badge_history`, duck/push tables, and config tables for Metal Place and live preview testing.
+
+---
+
+## Seed scripts
+
+| Script | Purpose |
+|--------|---------|
+| `npm run seed:bands` | **Destructive** full lineup replace — **deletes all bands and picks**. Dev/staging reset only. |
+| `npm run seed:bands:sync` | Non-destructive lineup sync (dry-run by default; `--apply` to write, preserves picks on UPDATE) |
+| `npm run seed:bands:backfill-slot-id -- --apply` | One-time `slot_id` bootstrap (UPDATE only) |
+| `npm run seed:bands:move -- --from FAS1 --to LOU3 [--apply]` | Move picks when a band changes slot |
+| `npm run seed:test-users` | Disposable test vira-latas + random picks/presence |
+| `npm run seed:test-users:delete` | Remove only `viralatas-test.example.com` users |
+| `npm run seed:live-now` | Time-shift bands for `/now` testing (reseeds bands → wipes picks) |
+| `npm run festival:reset` | Wipes social state; `--with-bands` also nukes lineup/picks |
+
+**Production:** this Supabase project has **no point-in-time restore**. Prefer `seed:bands:sync` for lineup edits. Do not run destructive seeds on prod without explicit intent.
+
+Test users use `users.is_test_user = true` and `@viralatas-test.example.com` emails.
+
+---
+
+## NPM scripts
+
+```sh
+npm run dev              # Vite dev server
+npm run build            # Typecheck + production build
+npm run preview          # Preview production build
+npm run lint             # ESLint
+npm test                 # Vitest
+npm run test:coverage    # Coverage report
 npm run seed:bands
-```
-
-Warning: the seed script deletes existing bands before inserting the lineup, which cascades to `user_picks`. Use it only for dev or staging data unless you are intentionally resetting picks.
-
-## Disposable Test Users
-
-Test crew users are marked with `users.is_test_user = true` and use emails at `viralatas-test.example.com`, so they are easy to remove from Auth and public tables.
-
-Create or recreate the fixed test crew with random band picks and random camping states:
-
-```sh
-npm run seed:test-users
-```
-
-Delete only those disposable users:
-
-```sh
-npm run seed:test-users:delete
-```
-
-## Live Preview Fixture
-
-To test the "Right now" screen with the real lineup while the festival is not actually happening, shift a handful of bands around the current device time:
-
-```sh
-npm run seed:live-now
-```
-
-This reseeds `bands`, which cascades and replaces `user_picks`. If disposable test users already exist, it also gives them deterministic current, next, camping, and lost states for the live crew view.
-
-## Available Scripts
-
-```sh
-npm run dev      # Start local dev server
-npm run build    # Type-check and build production assets
-npm run preview  # Preview the production build locally
-npm run lint     # Run ESLint
-npm run seed:bands
+npm run seed:bands:sync
 npm run seed:live-now
 npm run seed:test-users
 npm run seed:test-users:delete
 ```
 
-## Offline Behavior
+---
 
-The UI reads from IndexedDB first. Supabase is the sync target.
+## Offline behavior
 
-- On authenticated load, bands are synced from Supabase into IndexedDB.
-- Picks are written to IndexedDB immediately.
-- If the browser is offline, pick changes are queued in IndexedDB.
-- When the browser reconnects, queued pick changes are flushed to Supabase.
-- The "Right now" screen uses cached bands, picks, and crew users, so it does not require network after prior sync.
+```
+UI → IndexedDB
+     ↕ sync
+Supabase
+```
 
-## App Routes
+- Bands and schedule cache on authenticated load.
+- Picks (and announcements when posted offline) write to IndexedDB immediately; flush when online.
+- `/now`, `/map`, and `/wrap` read cached bands, picks, presence, and crew users — no live network required after sync.
+- Conflict-style alerts can use cached schedule + picks only; other LLM alerts need network (when implemented).
 
-- `/login` - sign in
-- `/register` - create account
-- `/now` - current or next band for the user and crew
-- `/schedule` - full schedule and filters
-- `/my-picks` - current user's picked bands
-- `/popular` - crew popularity view
-- `/profile` - profile and logout
+---
+
+## App routes
+
+| Route | Screen | Notes |
+|-------|--------|--------|
+| `/login` | Sign in | Public |
+| `/register` | Sign up | Public |
+| `/now` | Right now | Default after auth |
+| `/schedule` | Lineup | Full schedule + filters |
+| `/my-picks` | My Wacken | Your picks + attendance |
+| `/popular` | Popular | Picks or ratings sort |
+| `/announcements` | Mural | |
+| `/map` | Festival map | From glyph on `/now` |
+| `/profile` | Profile | Badges, prefs, logout |
+| `/wrap` | Festival recap | Always available when logged in |
 
 Unknown routes redirect to `/now`.
 
-## Development Notes
+Install on iOS: Safari → **Add to Home Screen** (PWA only, no app store).
 
-- Read `CLAUDE.md` for project context and constraints.
-- Check `PHASES.md` for current phase and acceptance criteria.
-- Put Supabase schema changes in `supabase/migrations/`.
-- Keep Claude or other API keys out of the client bundle.
-- Keep offline-first behavior intact: IndexedDB is the primary UI data source, Supabase is the sync target.
+---
+
+## Development notes
+
+- **Wiki first** for features and data flow: [`docs/ai-wiki/index.md`](docs/ai-wiki/index.md).
+- **`PHASES.md`** — active phased work (currently none; history in `docs/ai-wiki/phases-history.md`).
+- Schema changes only in **`supabase/migrations/`**.
+- UI spec: **`public/vira-lata-ds.html`** (living design system).
+- Keep **offline-first** intact: UI must not depend on server reads for primary views.
+- Phases **1–37** are complete; see wiki changelog for recent ships.
+
+---
+
+## Manual checks
+
+- **Offline:** DevTools → Network → Offline → browse schedule and picks.
+- **Realtime:** Two browsers, pick a band in one, count updates in the other within a few seconds.
+- **Announcements:** Post online, go offline, refresh — post still visible from IndexedDB.
