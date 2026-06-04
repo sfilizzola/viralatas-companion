@@ -15,14 +15,36 @@ const corsHeaders = {
 type ConsolidateRequest = {
   year?: number;
   force?: boolean;
+  dryRun?: boolean;
 };
 
 type ConsolidateResponse = {
+  dryRun: false;
   processedUsers: number;
   savedBadges: number;
   skipped: number;
   errors: string[];
 };
+
+interface DryRunBadgeEntry {
+  slug: string;
+  imagePath: string;
+  labelKey: string;
+}
+
+interface DryRunUserEntry {
+  userId: string;
+  displayName: string;
+  badges: DryRunBadgeEntry[];
+}
+
+interface DryRunResponse {
+  dryRun: true;
+  totalBadges: number;
+  processedUsers: number;
+  skipped: number;
+  users: DryRunUserEntry[];
+}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -95,6 +117,7 @@ Deno.serve(async (req) => {
   }
 
   const force = body.force === true;
+  const dryRun = body.dryRun === true;
   const at = new Date();
 
   const [
@@ -143,7 +166,11 @@ Deno.serve(async (req) => {
     })),
   };
 
+  const dryRunUsers: DryRunUserEntry[] = [];
+  let dryRunTotalBadges = 0;
+
   const result: ConsolidateResponse = {
+    dryRun: false,
     processedUsers: 0,
     savedBadges: 0,
     skipped: 0,
@@ -166,6 +193,20 @@ Deno.serve(async (req) => {
 
       if (earned.length === 0) {
         result.skipped += 1;
+        continue;
+      }
+
+      if (dryRun) {
+        dryRunUsers.push({
+          userId: row.id,
+          displayName: authData.user.email?.split('@')[0] ?? row.id,
+          badges: earned.map((b) => ({
+            slug: b.slug,
+            imagePath: b.imagePath,
+            labelKey: b.labelKey,
+          })),
+        });
+        dryRunTotalBadges += earned.length;
         continue;
       }
 
@@ -192,7 +233,21 @@ Deno.serve(async (req) => {
     }
   }
 
-  return new Response(JSON.stringify(result), {
+  if (dryRun) {
+    const dryRunResult: DryRunResponse = {
+      dryRun: true,
+      totalBadges: dryRunTotalBadges,
+      processedUsers: result.processedUsers,
+      skipped: result.skipped,
+      users: dryRunUsers,
+    };
+    return new Response(JSON.stringify(dryRunResult), {
+      status: 200,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  return new Response(JSON.stringify({ ...result, dryRun: false }), {
     status: 200,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   });
