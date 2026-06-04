@@ -1,13 +1,17 @@
 /**
  * send-test-push
  *
- * Sends a test Web Push notification directly to the calling user's own
- * registered push subscription(s). Useful for admins to verify that the
- * full push stack (VAPID keys, push_subscriptions table, Service Worker
- * push handler) is working end-to-end without needing a second user.
+ * Sends a test Web Push notification. Two modes:
  *
- * Auth: Bearer JWT (Supabase user token). Only a logged-in user can
- * request a test push to themselves — no privileged role required.
+ * 1. Self-test (no body / no targetUserId):
+ *    Sends to the calling user's own push subscription(s). Available to any
+ *    logged-in user. Useful for verifying the full push stack end-to-end.
+ *
+ * 2. Targeted test (body: { targetUserId: string }):
+ *    Sends to a specific user's push subscription(s). Godlike only.
+ *    Used by the admin app's Test Push card.
+ *
+ * Auth: Bearer JWT (Supabase user token).
  *
  * Required Supabase secrets:
  *   VAPID_PUBLIC_KEY   — same key used by send-duck-push
@@ -34,70 +38,81 @@ try {
   console.error('Failed to set VAPID details:', e);
 }
 
+const CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
+  });
+}
+
 Deno.serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 200,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': req.headers.get('Access-Control-Request-Headers') || '*',
-        'Access-Control-Max-Age': '86400',
-      },
-    });
+    return new Response(null, { status: 200, headers: { ...CORS_HEADERS, 'Access-Control-Max-Age': '86400' } });
   }
 
   try {
-    // Extract the caller's JWT to identify them
     const authHeader = req.headers.get('Authorization');
     if (!authHeader?.startsWith('Bearer ')) {
-      return new Response(JSON.stringify({ error: 'Missing auth' }), { status: 401, headers: { 'Access-Control-Allow-Origin': '*' } });
+      return json({ error: 'Missing auth' }, 401);
     }
     const jwt = authHeader.slice(7);
 
-    // Use service role client for DB queries, but verify JWT first
     if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-      console.error('Missing Supabase config');
-      return new Response(JSON.stringify({ error: 'Server misconfigured' }), {
-        status: 500,
-        headers: { 'Access-Control-Allow-Origin': '*' },
-      });
+      return json({ error: 'Server misconfigured' }, 500);
     }
 
     const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
 
     const { data: { user }, error: authError } = await serviceClient.auth.getUser(jwt);
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Invalid token' }), {
-        status: 401,
-        headers: { 'Access-Control-Allow-Origin': '*' },
-      });
+      return json({ error: 'Invalid token' }, 401);
     }
 
-    // Look up this user's push subscription(s)
+    // Parse optional targetUserId from body
+    let targetUserId: string | null = null;
+    try {
+      const body = await req.json();
+      if (body?.targetUserId && typeof body.targetUserId === 'string') {
+        targetUserId = body.targetUserId;
+      }
+    } catch {
+      // No body or invalid JSON — self-test mode
+    }
+
+    // Targeted mode: godlike-only check
+    if (targetUserId) {
+      const { data: callerRow, error: roleError } = await serviceClient
+        .from('users')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      if (roleError || callerRow?.role !== 'godlike') {
+        return json({ error: 'Forbidden — godlike only' }, 403);
+      }
+    }
+
+    const recipientId = targetUserId ?? user.id;
+
     const { data: subscriptions, error: subError } = await serviceClient
       .from('push_subscriptions')
       .select('endpoint, p256dh, auth')
-      .eq('user_id', user.id);
+      .eq('user_id', recipientId);
 
     if (subError) {
-      return new Response(JSON.stringify({ error: 'DB error', detail: subError.message }), {
-        status: 500,
-        headers: { 'Access-Control-Allow-Origin': '*' },
-      });
+      return json({ error: 'DB error', detail: subError.message }, 500);
     }
 
     if (!subscriptions?.length) {
-      return new Response(
-        JSON.stringify({
-          error: 'no_subscription',
-          message: 'No push subscription found for this user. Make sure push permission was granted.',
-        }),
-        {
-          status: 404,
-          headers: { 'Access-Control-Allow-Origin': '*' },
-        },
+      return json(
+        { error: 'no_subscription', message: 'No push subscription found for this user.' },
+        404,
       );
     }
 
@@ -109,36 +124,21 @@ Deno.serve(async (req) => {
     const results = await Promise.allSettled(
       subscriptions.map((sub: { endpoint: string; p256dh: string; auth: string }) =>
         webpush.sendNotification(
-          {
-            endpoint: sub.endpoint,
-            keys: { p256dh: sub.p256dh, auth: sub.auth },
-          },
+          { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
           payload,
         ),
       ),
     );
 
-    const sent = results.filter((r) => r.status === 'fulfilled').length;
-    const failed = results.filter((r) => r.status === 'rejected').length;
+    const sent   = results.filter(r => r.status === 'fulfilled').length;
+    const failed = results.filter(r => r.status === 'rejected').length;
     const errors = results
-      .filter((r) => r.status === 'rejected')
-      .map((r) => (r as PromiseRejectedResult).reason?.message ?? 'unknown');
+      .filter(r => r.status === 'rejected')
+      .map(r => (r as PromiseRejectedResult).reason?.message ?? 'unknown');
 
-    return new Response(JSON.stringify({ sent, failed, errors }), {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
+    return json({ sent, failed, errors });
   } catch (err) {
     console.error('send-test-push error:', err);
-    return new Response(JSON.stringify({ error: 'Server error', detail: String(err) }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-      },
-    });
+    return json({ error: 'Server error', detail: String(err) }, 500);
   }
 });
