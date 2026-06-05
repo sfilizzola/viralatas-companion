@@ -75,7 +75,7 @@ Components are organized by concern:
 
 **Key Pages:**
 - `/now` (RightNowPage) — Live band display, crew attendance, conflict detection; shows `UpcomingBandCard` (15-min pre-show banner) when user's next picked band is within window (Phase 37)
-- `/schedule` (SchedulePage) — Full lineup with filters (stage, genre, day, time)
+- `/schedule` (LineupPage) — Full lineup with filters (stage, genre, day, time); Phase 38.A adds per-crew-member filter: `BandFilterValue.userId` drives `filterBands` with a `userPickIds` set, a "Vira-lata" avatar pill row in the drawer, a viewing banner, and shared-pick markers on `BandCard`
 - `/my-picks` (MyWackenPage) — User's picks by festival day (upcoming → divider → ended inline); Attended/Missed chips on ended rows; upcoming-only conflict counts; one-time coach banner (`localStorage` dismiss)
 - `/popular` (PopularPage) — Bands sorted by total pick count, avatar clusters
 - `/announcements` (AnnouncementsPage) — Mural-style announcements board
@@ -482,8 +482,8 @@ INSERT into user_picks
 | `alerts.ts` | Queue alerts for Edge Function | Calls Supabase Edge Function |
 | `livePreview.ts` | Live plan grouping helpers (`mapCrewLivePlans`, `groupCrewLivePlans`, `deriveUserBadgeLocation`) — consumed by `buildSocialSnapshot()` | Reads/writes test config in IDB |
 | `socialSnapshot.ts` | Pure `buildSocialSnapshot()` — **social snapshot** shared by `/now` and live vest | ✅ Yes (IDB inputs only) |
-| `bandFilter.ts` | `filterBands(bands, filters, now)` — pure filter predicate extracted from `SchedulePage`; testable without mounting any component | ✅ Yes |
-| `scheduleFilterStorage.ts` | `loadStoredFilters()` / `saveStoredFilters()` — localStorage persistence for schedule filter state; extracted from `SchedulePage` | ✅ Yes |
+| `bandFilter.ts` | `filterBands(bands, filters, now, userPickIds?)` — pure filter predicate; optional 4th param restricts to a user's picked band IDs (Phase 38.A) | ✅ Yes |
+| `scheduleFilterStorage.ts` | `loadStoredFilters()` / `saveStoredFilters()` — localStorage persistence for schedule filter state; strips `userId` before write (never persisted) | ✅ Yes |
 | `attendees.ts` | `computeAttendees(picks, crewUsers)` — maps raw picks to hydrated `BandAttendee[]` per band; exports `BandAttendee` and `AttendeeMap` types | ✅ Yes |
 | `weakSkips.ts` | `getWeakSkipCount()`, `recordCommittedSkip()` — committed “I am weak” skips in `user_metadata.weak_skips_2026` via best-effort `auth.updateUser` (same pattern as `location_visits` in `presenceRepository`) | Auth metadata only |
 | `badges/currentFestivalYear.ts` | `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()` — live vest year filter + consolidation gate | ✅ Yes |
@@ -637,4 +637,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-05-31 — Phase 37 Upcoming Band Card: `nextBand` derivation in `useNowData`; `UpcomingBandCard` component on `/now`.
+**Last updated:** 2026-06-05 — Phase 38.A Crew Picks Browser: `userId` filter on `/schedule`; `BandFilters` vira-lata section + viewing banner; `BandCard.sharedPick`; `LineupPage` `picksByUserId` inversion.

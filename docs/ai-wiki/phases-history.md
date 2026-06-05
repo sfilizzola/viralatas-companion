@@ -897,3 +897,39 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - Crew list derived from existing `crewPlans` memo — zero new DB queries
 - QuackStrip below card is a separate duck instance with its own cooldown, not shared with group cards
 - Card slot priority: UpcomingBandCard > LatestAnnouncementBanner (only one renders at a time)
+
+---
+
+### Phase 38.A — Crew Picks Browser
+**Status:** ✅ Complete
+
+**Goal:** Let any vira-lata browse another crew member's picked bands from the schedule page, with a shared-pick comparison layer.
+
+**Key deliverables:**
+- `src/components/bandFilterValue.ts` — added `userId: string | null` to `BandFilterValue` type and `EMPTY_FILTERS`
+- `src/services/scheduleFilterStorage.ts` — strips `userId` before `localStorage.setItem`; injects `userId: null` on load (never persisted)
+- `src/services/bandFilter.ts` — optional 4th param `userPickIds?: Set<string>`; when present, keeps only bands in that set (composable with day/stage/genre filters)
+- `src/__tests__/bandFilter.test.ts` — 3 new TDD cases (filter by user, user + day combo, no picks → empty result)
+- `src/components/BandFilters.tsx` + `.module.css` — "Vira-lata" section placed first in drawer: horizontal-scroll avatar pill row, single-select toggle, 32px Avatar + truncated name (`max-width: 15ch`); viewing banner between controls row and day tabs showing crew member name + total pick count
+- `src/components/BandCard.tsx` + `.module.css` — `sharedPick?: boolean` prop; when true: teal border tint (`.cardSharedPick`) + mono 9px teal badge (`.sharedPickBadge`) via `--signal-ok` + `color-mix()`
+- `src/pages/LineupPage.tsx` — inverts `AttendeeMap` → `picksByUserId: Map<string, Set<string>>`; derives `crewWithPicks` (excluding self); passes `userPickIds`, `crewWithPicks`, `viewedUserPickCount`, and per-band `sharedPick` down to BandFilters + DuckableBandCard; custom empty state when userId filter active
+- i18n: `viraLata`, `viewingPicksOf`, `youAlsoPicked`, `noPicksForUser` in all 4 locales (br, en, es, de) under `SchedulePage` namespace
+
+**Acceptance criteria (all met):**
+- [x] Selecting a user in the drawer shows only their picked bands
+- [x] Viewing banner appears while filter is active; global LIMPAR clears it
+- [x] Day/stage/genre/upcoming filters still compose on top of the user filter
+- [x] `userId` is never written to localStorage — clears on page reload
+- [x] Shared bands show teal `youAlsoPicked` badge + teal card border tint
+- [x] Crew members with 0 picks do not appear in the picker
+- [x] Current user does not appear in the picker
+- [x] Works fully offline (all data from IndexedDB via `useBandAttendees`)
+- [x] Build green · Tests green (719 tests)
+
+**Wiki:** `docs/ai-wiki/architecture.md` · `docs/ai-wiki/changelog.md` · `public/vira-lata-ds.html` (§08 BandFilters user pill + viewing banner; §04 BandCard shared pick marker)
+
+**Architectural notes:**
+- `userId` filter is ephemeral (session-only). `scheduleFilterStorage` explicitly strips it before writing localStorage — no persistence contract needed.
+- `AttendeeMap` inversion in `LineupPage` (`picksByUserId`) is a pure `useMemo` derived from the already-loaded attendee data — zero new IDB queries.
+- `sharedPick` is derived inline per band: `filters.userId != null && pickedIds.has(band.id)` — no secondary lookup map needed.
+- `crewWithPicks` excludes the current user and users with 0 picks; computed once per attendee map update.

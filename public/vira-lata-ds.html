@@ -6689,6 +6689,16 @@ export const MINIMAP_ZONES: Record&lt;ZoneId, FractionalBox&gt; = {
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.2 — Phase 38.A Crew Picks Browser · Jun 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§08 BandFilters</b> — documented User Pill (<code>.userPill</code> / <code>.userPillActive</code>): horizontal-scroll avatar pill row, first section in drawer, 32 px Avatar + 15ch truncated name, single-select toggle, <code>--signal-ok</code> active state.</li>
+          <li><b>§08 BandFilters</b> — documented Viewing Banner (<code>.viewingBanner</code>): renders between controls row and day tabs when <code>value.userId != null</code>; teal name + muted count; background <code>color-mix(--signal-ok 8%, transparent)</code>.</li>
+          <li><b>§04 BandCard</b> — documented Shared Pick marker (<code>sharedPick</code>): teal border tint (<code>.cardSharedPick</code>) + mono 9 px teal badge (<code>.sharedPickBadge</code>), i18n key <code>youAlsoPicked</code>, shown in crew-picks-browser mode only.</li>
+          <li>DS manifest updated: <code>UserPill</code>, <code>ViewingBanner</code>, <code>SharedPickBadge</code> components registered → <code>additional</code> / <code>components</code> sections respectively.</li>
+        </ul>
+      </div>
+
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.1 — Readability pass · Jun 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
           <li><b>2026-06-01</b> — Readability pass: added <code>#ds-manifest</code> agent table of contents; extracted all inline styles into reusable classes; rebuilt nav (ordered + mobile-collapsible); reordered DOM so §12 precedes §13; fixed broken <code>--metal-place*</code> tokens. No intentional visual change except the corrected Metal Place amber.</li>

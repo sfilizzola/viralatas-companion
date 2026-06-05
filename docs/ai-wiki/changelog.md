@@ -4,6 +4,29 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-05 (Phase 38.A — Crew Picks Browser)
+
+### Added
+- **`BandFilterValue.userId`** — new `string | null` field on the filter type; ephemeral (session-only, never written to localStorage). `EMPTY_FILTERS` defaults to `null`.
+- **`filterBands` extension** — optional 4th param `userPickIds?: Set<string>`; when present, keeps only bands in that set. Composes cleanly with all existing predicates (day, stage, genre, upcoming).
+- **`BandFilters` — Vira-lata section + Viewing Banner** — "Vira-lata" section is the first group in the filter drawer: horizontal-scroll avatar pill row (32px Avatar, truncated name, single-select, tap-to-deselect). Viewing banner renders between the controls row and day tabs while `value.userId != null`, showing the crew member name and their total pick count (independent of other active filters). Both `clearDrawer` and `clearAll` reset `userId: null`.
+- **`BandCard.sharedPick`** — `boolean` prop; when true, adds `.cardSharedPick` (teal border tint via `color-mix(--signal-ok, …)`) and `.sharedPickBadge` (mono 9px teal pill, i18n `youAlsoPicked`).
+- **`LineupPage` wiring** — inverts `AttendeeMap` → `picksByUserId: Map<string, Set<string>>`; derives `crewWithPicks` (non-self users with ≥1 pick, sorted by name); passes `userPickIds`, `crewWithPicks`, `viewedUserPickCount`, and per-band `sharedPick` to child components. Custom `noPicksForUser` empty state when a userId filter is active and returns 0 results.
+- **i18n** — 4 keys added to `SchedulePage` namespace in all 4 locales: `viraLata`, `viewingPicksOf`, `youAlsoPicked`, `noPicksForUser`.
+
+### Changed
+- `docs/ai-wiki/architecture.md` — updated `/schedule` page note; updated `bandFilter.ts` and `scheduleFilterStorage.ts` service entries; added `LineupPage.tsx` Phase 38.A note.
+- `public/vira-lata-ds.html` — §08 BandFilters: User Pill + Viewing Banner spec; §04 BandCard: shared pick marker paragraph; DS changelog v3.2 entry.
+- `PHASES.md` — Phase 38.A removed (closed); Phase 38.B promoted as the next planned phase.
+- `docs/ai-wiki/phases-history.md` — Phase 38.A entry appended.
+
+### Architectural Notes
+- `userId` is intentionally ephemeral. `scheduleFilterStorage` strips it before any localStorage write — no migration, no stored-state cleanup needed.
+- The `AttendeeMap` → `picksByUserId` inversion is a pure `useMemo` in `LineupPage` with zero new IDB calls.
+- `sharedPick` requires no extra lookup: `filters.userId != null && pickedIds.has(band.id)` where `pickedIds` is the current user's already-loaded picks.
+
+---
+
 ## 2026-06-01
 
 ### Added
