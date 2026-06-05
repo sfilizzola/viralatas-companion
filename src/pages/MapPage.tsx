@@ -4,9 +4,11 @@ import { useI18n } from '../lib/i18n';
 import { useNow } from '../hooks/useNow';
 import { useAuth } from '../hooks/useAuth';
 import { useSocialSnapshot } from '../hooks/useSocialSnapshot';
+import { useTimelineGate } from '../hooks/useTimelineGate';
 import { buildPlacements } from '../services/minimapPlacement';
 import { MINIMAP_ZONES } from '../components/map/minimapZones';
 import MinimapOverlay from '../components/map/MinimapOverlay';
+import TimelineScrubber from '../components/map/TimelineScrubber';
 import OfflineBanner from '../components/OfflineBanner';
 import styles from './MapPage.module.css';
 
@@ -44,10 +46,17 @@ function BackArrow() {
 export default function MapPage() {
   const { t } = useI18n('MapPage');
   const now = useNow(30_000);
-  const { snapshot, loading } = useSocialSnapshot(now);
   const { user } = useAuth();
   const selfUserId = user?.id ?? null;
   const offline = useOffline();
+
+  // Timeline preview state — ephemeral, never persisted
+  const [previewTime, setPreviewTime] = useState<Date | null>(null);
+  const gate = useTimelineGate(now);
+
+  // effectiveTime: use previewTime when scrubbing, otherwise live now
+  const effectiveTime = previewTime ?? now;
+  const { snapshot, loading } = useSocialSnapshot(effectiveTime);
 
   const placements = useMemo(
     () => (snapshot ? buildPlacements(snapshot.crewGroups, MINIMAP_ZONES, selfUserId) : []),
@@ -83,6 +92,15 @@ export default function MapPage() {
             {placements.length === 0 && <p className={styles.empty}>{t('empty')}</p>}
           </>
         )}
+        <TimelineScrubber
+          now={now}
+          previewTime={previewTime}
+          windowStart={gate.windowStart ?? new Date('2026-07-29T10:00:00+02:00')}
+          windowEnd={gate.windowEnd ?? new Date('2026-07-30T03:00:00+02:00')}
+          isActive={gate.isActive}
+          onPreview={setPreviewTime}
+          onClear={() => setPreviewTime(null)}
+        />
       </main>
     </div>
   );
