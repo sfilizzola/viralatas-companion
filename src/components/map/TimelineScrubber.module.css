@@ -1,0 +1,254 @@
+/* src/components/map/TimelineScrubber.module.css */
+
+/* ── Outer wrapper — flat strip docked at map bottom ── */
+.wrap {
+  padding: 14px 16px 18px;
+  background: #09080a;
+  border-top: 1px solid #1a1620;
+}
+
+/* ── Row 1: component label left, back button right ── */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  min-height: 20px;
+}
+
+.label {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: #6a5840;
+  text-transform: uppercase;
+}
+
+.backBtn {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: #7a1a1a;
+  background: transparent;
+  border: 1px solid #2a0a0a;
+  border-radius: 2px;
+  padding: 2px 7px;
+  cursor: pointer;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.backBtn:active {
+  transform: translateY(1px);
+}
+
+/* ── Row 2: now-time left, large preview time right ── */
+.times {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 10px;
+}
+
+.timeNow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #6a5840;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+.previewBlock {
+  text-align: right;
+  line-height: 1;
+}
+
+/* THE visual anchor — 26px mono, right-aligned */
+.previewTime {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 500;
+  color: #d8c88a;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 0 #000;
+  line-height: 1;
+}
+
+.previewTag {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #5a4010;
+  margin-top: 3px;
+}
+
+.previewTagLive {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #2a2018;
+  margin-top: 3px;
+}
+
+/* ── Row 3: track ── */
+.trackWrap {
+  position: relative;
+  height: 44px;
+  margin-bottom: 5px;
+}
+
+.track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 7px;
+  bottom: 7px;
+  background: #080608;
+  border: 1.5px solid #160e18;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+/* crosshatch texture on empty track */
+.track::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 5px,
+    rgba(255, 255, 255, 0.016) 5px,
+    rgba(255, 255, 255, 0.016) 6px
+  );
+  pointer-events: none;
+}
+
+/* Past fill — dark blood red */
+.fillPast {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: #3d0a0a;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 3px,
+    rgba(255, 255, 255, 0.04) 3px,
+    rgba(255, 255, 255, 0.04) 4px
+  );
+  border-right: 2px solid #7a1a1a;
+}
+
+/* Blood drip at past-fill boundary */
+.fillPast::after {
+  content: '';
+  position: absolute;
+  right: -5px;
+  bottom: -1px;
+  width: 5px;
+  height: 9px;
+  background: #7a1a1a;
+  clip-path: polygon(0 0, 100% 0, 75% 100%, 25% 100%);
+}
+
+/* Preview fill — dark amber */
+.fillPreview {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: #302008;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 4px,
+    rgba(200, 160, 20, 0.09) 4px,
+    rgba(200, 160, 20, 0.09) 5px
+  );
+  border-right: 2px solid #8a6010;
+}
+
+/* ── Handle — grip disc ── */
+.handle {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  cursor: grab;
+  user-select: none;
+}
+
+.handle:active {
+  cursor: grabbing;
+  transform: translateY(calc(-50% + 1px));
+}
+
+/* ── Row 4: axis labels ── */
+.axis {
+  display: flex;
+  justify-content: space-between;
+}
+
+.axisLabel {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: #1e1820;
+  letter-spacing: 1px;
+}
+
+/* ── Locked state ── */
+.lockedWrap {
+  padding: 14px 16px 16px;
+  background: #09080a;
+  border-top: 1px solid #120e14;
+  opacity: 0.4;
+  filter: grayscale(0.9);
+}
+
+.lockedHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.lockedLabel {
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  color: #1e1620;
+  text-transform: uppercase;
+}
+
+.lockedInner {
+  border: 1.5px solid #160e18;
+  border-radius: 3px;
+  padding: 12px 14px;
+}
+
+.lockedBar {
+  height: 20px;
+  background: #080608;
+  border: 1.5px solid #120a12;
+  border-radius: 2px;
+  margin-bottom: 10px;
+}
+
+.lockedText {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: #1e1620;
+  text-align: center;
+  text-transform: uppercase;
+}
