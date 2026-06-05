@@ -158,13 +158,13 @@ export default function TimelineScrubber({
       </div>
 
       {/* Row 3: track */}
-      <div className={styles.trackWrap}>
-        <div
-          ref={trackRef}
-          className={styles.track}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-        >
+      <div
+        ref={trackRef}
+        className={styles.trackWrap}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+      >
+        <div className={styles.track}>
           {/* Past fill — windowStart to now */}
           <div
             className={styles.fillPast}
@@ -182,7 +182,7 @@ export default function TimelineScrubber({
           )}
         </div>
 
-        {/* Grip disc handle */}
+        {/* Bullhead handle */}
         <div
           className={styles.handle}
           style={{ left: `calc(${handleFraction * 100}% - 26px)` }}

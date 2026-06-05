@@ -104,6 +104,11 @@
   position: relative;
   height: 60px;
   margin-bottom: 5px;
+  cursor: grab;
+}
+
+.trackWrap:active {
+  cursor: grabbing;
 }
 
 .track {
@@ -187,6 +192,7 @@
   cursor: grab;
   user-select: none;
   mix-blend-mode: screen;
+  pointer-events: none;
 }
 
 .handle:active {
