@@ -25,6 +25,7 @@ export const EMPTY_BADGE_CONTEXT: BadgeContext = {
   maxAttendanceInPicks: 0,
   pickedBands: [],
   seenBands: [],
+  missedBands: [],
   missedBandIds: new Set(),
   locationVisits: {},
   weakSkipCount: 0,
