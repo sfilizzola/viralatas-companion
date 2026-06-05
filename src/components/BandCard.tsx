@@ -249,9 +249,6 @@ export default function BandCard({
           />
         )}
         {children}
-        {sharedPick && (
-          <span className={styles.sharedPickBadge}>{t('youAlsoPicked')}</span>
-        )}
         {showDuck && onDuck && (
           <QuackGhostRow onDuck={onDuck} cooldownUntil={duckCooldownUntil ?? null} />
         )}

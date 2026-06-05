@@ -302,7 +302,7 @@ export default function BandFilters({
                           aria-pressed={active}
                         >
                           <Avatar
-                            size={32}
+                            size={24}
                             src={user.avatar_url}
                             initial={(user.label[0] ?? '?').toUpperCase()}
                           />

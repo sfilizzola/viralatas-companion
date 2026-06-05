@@ -357,29 +357,28 @@
 }
 
 .userPill {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  flex-direction: row;
   align-items: center;
-  gap: var(--s-1);
-  padding: var(--s-2) var(--s-2);
+  gap: var(--s-2);
+  padding: 5px 10px 5px 5px;
   background: transparent;
-  border: 1px solid var(--border);
-  border-radius: var(--r-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-pill);
   cursor: pointer;
   flex-shrink: 0;
+  white-space: nowrap;
   transition: border-color 0.15s, background 0.15s;
-  min-width: 60px;
 }
 
 .userPill:hover {
-  border-color: var(--border-strong);
+  border-color: var(--text-muted);
   background: var(--bg-elevated);
 }
 
 .userPillActive {
   border-color: var(--signal-ok);
   background: color-mix(in srgb, var(--signal-ok) 10%, transparent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--signal-ok) 30%, transparent);
 }
 
 .userPillName {
@@ -388,7 +387,7 @@
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   max-width: 15ch;
   overflow: hidden;
   text-overflow: ellipsis;
