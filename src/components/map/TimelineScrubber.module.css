@@ -101,7 +101,7 @@
 /* ── Row 3: track ── */
 .trackWrap {
   position: relative;
-  height: 44px;
+  height: 56px;
   margin-bottom: 5px;
 }
 
@@ -109,8 +109,8 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: 7px;
-  bottom: 7px;
+  top: 13px;
+  bottom: 13px;
   background: #080608;
   border: 1.5px solid #160e18;
   border-radius: 2px;

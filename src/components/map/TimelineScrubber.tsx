@@ -41,27 +41,60 @@ function fractionFromTime(date: Date, windowStart: Date, windowEnd: Date): numbe
 }
 
 /**
- * GripDisc — 28px circular handle.
- * Three horizontal grooves communicate "drag me".
- * Small skull mark is the aesthetic, not the affordance.
+ * VikingSkull — 40×46px carved-bone skull handle.
+ * Anatomically grounded: cranium, hollow eye sockets, nasal aperture,
+ * visible jaw with 4 teeth, brow ridge, cheekbone shading, battle crack.
+ * Bone-gold palette — the drag affordance.
  */
-function GripDisc() {
+function VikingSkull() {
   return (
-    <svg width="28" height="28" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-      {/* Outer disc */}
-      <circle cx="14" cy="14" r="13" fill="#280606" stroke="#080408" strokeWidth="2" />
-      <circle cx="14" cy="14" r="11" fill="#200404" stroke="#5a1010" strokeWidth="1.2" />
-      {/* Three grip grooves — drag affordance */}
-      <line x1="8"  y1="11.5" x2="20" y2="11.5" stroke="#4a0e0e" strokeWidth="0.8" />
-      <line x1="6"  y1="14"   x2="22" y2="14"   stroke="#4a0e0e" strokeWidth="1.2" />
-      <line x1="8"  y1="16.5" x2="20" y2="16.5" stroke="#4a0e0e" strokeWidth="0.8" />
-      {/* Small skull badge — embedded, not dominant */}
-      <circle cx="14" cy="12" r="4.5" fill="#c8b880" stroke="#080408" strokeWidth="1.5" />
-      <ellipse cx="12" cy="11.5" rx="1.3" ry="1.5" fill="#080408" />
-      <ellipse cx="16" cy="11.5" rx="1.3" ry="1.5" fill="#080408" />
-      <path d="M11.5 14 L16.5 14 Q16.5 17 14 17 Q11.5 17 11.5 14Z" fill="#b0a070" stroke="#080408" strokeWidth="1" />
-      <rect x="12"   y="14" width="1.5" height="2" rx="0.4" fill="#c8b880" stroke="#080408" strokeWidth="1" />
-      <rect x="14.5" y="14" width="1.5" height="2" rx="0.4" fill="#c8b880" stroke="#080408" strokeWidth="1" />
+    <svg width="40" height="46" viewBox="0 0 40 46" fill="none" aria-hidden="true">
+      {/* ── Main skull silhouette: cranium + jaw fused ── */}
+      <path
+        d="M20 1.5 C10.5 1.5 4 8 4 16.5 C4 22 6.5 26.5 10.5 29
+           L10.5 31 C10.5 32 11.5 32.5 12.5 32.5
+           L12.5 33 L13.5 33
+           L13.5 38.5 L14 44.5 L26 44.5 L26.5 38.5 L26.5 33
+           L27.5 33 L27.5 32.5 C28.5 32.5 29.5 32 29.5 31
+           L29.5 29 C33.5 26.5 36 22 36 16.5
+           C36 8 29.5 1.5 20 1.5Z"
+        fill="#c8b880"
+        stroke="#1a0b05"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      {/* ── Jaw suture line ── */}
+      <path d="M10.5 30 Q20 32 29.5 30" stroke="#8a6820" strokeWidth="0.8" fill="none" opacity="0.7" />
+      {/* ── Tooth separators ── */}
+      <line x1="17" y1="33" x2="16.5" y2="44" stroke="#7a5e18" strokeWidth="1" />
+      <line x1="20" y1="33" x2="20"   y2="44.5" stroke="#7a5e18" strokeWidth="1" />
+      <line x1="23" y1="33" x2="23.5" y2="44" stroke="#7a5e18" strokeWidth="1" />
+      {/* ── Left eye socket ── */}
+      <ellipse cx="14" cy="17" rx="5.5" ry="6.5" fill="#0e0806" stroke="#1a0b05" strokeWidth="0.6" />
+      {/* Subtle bone rim highlight inside left socket */}
+      <path d="M10.5 14 Q12 12 15 12.5" stroke="#d8c070" strokeWidth="0.6" strokeLinecap="round" opacity="0.2" />
+      {/* ── Right eye socket ── */}
+      <ellipse cx="26" cy="17" rx="5.5" ry="6.5" fill="#0e0806" stroke="#1a0b05" strokeWidth="0.6" />
+      <path d="M22.5 14 Q24 12 27 12.5" stroke="#d8c070" strokeWidth="0.6" strokeLinecap="round" opacity="0.2" />
+      {/* ── Nasal aperture (inverted pear) ── */}
+      <path
+        d="M18.2 25 Q18 22.5 20 22.5 Q22 22.5 21.8 25
+           Q22 28 20 28 Q18 28 18.2 25Z"
+        fill="#0e0806"
+        stroke="#1a0b05"
+        strokeWidth="0.5"
+      />
+      {/* Nasal spine divider */}
+      <line x1="20" y1="25" x2="20" y2="27.5" stroke="#c8b880" strokeWidth="0.5" opacity="0.25" />
+      {/* ── Brow ridge ── */}
+      <path d="M8 14 Q14 11.5 20 12 Q26 11.5 32 14" stroke="#9a7830" strokeWidth="0.9" fill="none" opacity="0.55" />
+      {/* ── Temporal/cheekbone shading ── */}
+      <path d="M5 17 Q6 22 9 26.5" stroke="#906820" strokeWidth="0.8" opacity="0.45" />
+      <path d="M35 17 Q34 22 31 26.5" stroke="#906820" strokeWidth="0.8" opacity="0.45" />
+      {/* ── Battle crack across forehead ── */}
+      <path d="M23.5 2.5 L25.5 6 L23 10.5 L24.5 15" stroke="#785020" strokeWidth="0.75" strokeLinecap="round" opacity="0.6" />
+      {/* ── Cranial highlight (top-left specular) ── */}
+      <path d="M10 8 Q12.5 5 18 4" stroke="#e8d8a0" strokeWidth="1.1" strokeLinecap="round" opacity="0.28" />
     </svg>
   );
 }
@@ -195,14 +228,14 @@ export default function TimelineScrubber({
         {/* Grip disc handle */}
         <div
           className={styles.handle}
-          style={{ left: `calc(${handleFraction * 100}% - 14px)` }}
+          style={{ left: `calc(${handleFraction * 100}% - 20px)` }}
           role="slider"
           aria-label={t('handleAriaLabel')}
           aria-valuenow={Math.round(handleFraction * 100)}
           aria-valuemin={Math.round(nowFraction * 100)}
           aria-valuemax={100}
         >
-          <GripDisc />
+          <VikingSkull />
         </div>
       </div>
 
