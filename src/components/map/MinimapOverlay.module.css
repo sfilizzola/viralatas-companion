@@ -39,6 +39,7 @@
   cursor: pointer;
   z-index: 15;
   line-height: 0;
+  transition: left 200ms ease, top 200ms ease;
 }
 
 .dot:focus-visible {
