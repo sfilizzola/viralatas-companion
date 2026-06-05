@@ -444,6 +444,31 @@ export const BADGES: BadgeConfig[] = [
     year: 2026,
     persist: true,
   },
+  // Festival 2026 — missed bands (opted out via "didn't see"; no persist — live on missedBandIds)
+  {
+    slug: 'ghost-in-the-crowd',
+    imagePath: '/badges/badge_ghost-in-the-crowd.png',
+    labelKey: 'badgeGhostInTheCrowd',
+    descriptionKey: 'badgeGhostInTheCrowdDescription',
+    condition: { type: 'bands_missed_min', count: 3 },
+    year: 2026,
+  },
+  {
+    slug: 'full-apparition',
+    imagePath: '/badges/badge_full-apparition.png',
+    labelKey: 'badgeFullApparition',
+    descriptionKey: 'badgeFullApparitionDescription',
+    condition: { type: 'bands_missed_min', count: 7 },
+    year: 2026,
+  },
+  {
+    slug: 'the-poltergeist',
+    imagePath: '/badges/badge_the-poltergeist.png',
+    labelKey: 'badgeThePoltergeist',
+    descriptionKey: 'badgeThePoltergeistDescription',
+    condition: { type: 'bands_missed_min', count: 12 },
+    year: 2026,
+  },
   // Festival 2026 — committed weak skips on /now ("I am weak"; no persist — live on weak_skips_2026)
   {
     slug: 'weak',

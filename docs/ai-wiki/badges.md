@@ -672,7 +672,7 @@ Strict `(ratedSeen × 100) / seenCount >= pct`; **false** when `seenCount === 0`
 
 ---
 
-## Current Badges Inventory (71 Total)
+## Current Badges Inventory (74 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -718,6 +718,14 @@ Strict `(ratedSeen × 100) / seenCount >= pct`; **false** when `seenCount === 0`
 - `judas-witness` — "Testemunha de Judas". Saw *Judas Priest* (band_seen_named). You stood before the metal gods themselves.
 - `stage-hopper` — "Nômade dos Palcos". Saw bands on 4+ distinct stages (`stage_diversity_min`, count: 4). Four stages, four vibes, zero loyalty.
 - `octopus` — "Polvo". Saw bands on all 8 distinct stages (`stage_diversity_min`, count: 8; persist: true). All 8 stages conquered — you have no favorites, only victims.
+
+### Missed Bands 2026 (3) — `bands_missed_min`, no persist
+
+Bands the user explicitly marked as "didn't see" (`user_missed_bands`). Tiers reward escalating ghosts.
+
+- `ghost-in-the-crowd` — "Fantasma da Galera". 3+ missed bands. You were there. Just… not really.
+- `full-apparition` — "Aparição Completa". 7+ missed bands. At this point you haunt the stages you skip.
+- `the-poltergeist` — "O Poltergeist". 12+ missed bands. No one saw you. No one heard you. Bands ended.
 
 ### Weak Skip 2026 (2) — `weak_skips_min`, no persist
 

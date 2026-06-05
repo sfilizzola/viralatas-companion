@@ -4,6 +4,17 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-05 (Badges — Missed Bands tier)
+
+### Added
+- Badge `ghost-in-the-crowd`: 3+ opted-out bands (`bands_missed_min`, count: 3). "Fantasma da Galera / Ghost in the Crowd."
+- Badge `full-apparition`: 7+ opted-out bands (`bands_missed_min`, count: 7). "Aparição Completa / Full Apparition."
+- Badge `the-poltergeist`: 12+ opted-out bands (`bands_missed_min`, count: 12). "O Poltergeist / The Poltergeist."
+- All 4 locales (br, en, es, de) updated.
+- PNG assets optimized: downscaled 512→256 px, pngquant + oxipng, ~34–40 KB each.
+
+---
+
 ## 2026-06-05 (Phase 38.A — Crew Picks Browser)
 
 ### Added
