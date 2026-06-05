@@ -10,6 +10,7 @@ import { useNow } from '../hooks/useNow';
 import { usePickCounts } from '../hooks/usePickCounts';
 import { useDuckQuack } from '../hooks/useDuckQuack';
 import { useDuckEnabled } from '../contexts/DuckEnabledContext';
+import { useBandAttendees } from '../hooks/useBandAttendees';
 import { useI18n } from '../lib/i18n';
 import { useOfflinePendingBandIds } from '../hooks/useOfflinePendingBandIds';
 import BottomNav from '../components/BottomNav';
@@ -18,6 +19,7 @@ import BandCard from '../components/BandCard';
 import BandFilters from '../components/BandFilters';
 import Icon from '../components/icons/Icon';
 import type { BandFilterValue } from '../components/bandFilterValue';
+import type { BandAttendee } from '../hooks/useBandAttendees';
 import styles from './SchedulePage.module.css';
 
 /**
@@ -30,6 +32,7 @@ function DuckableBandCard({
   isPicked,
   isLive,
   userId,
+  sharedPick,
   ...rest
 }: {
   band: Band;
@@ -42,6 +45,7 @@ function DuckableBandCard({
   pending: boolean;
   isBandEnded: boolean;
   showDayLabel?: boolean;
+  sharedPick?: boolean;
 }) {
   const duckEnabled = useDuckEnabled();
   const canDuck = duckEnabled && isLive && isPicked && band.category !== 'ceremony';
@@ -56,6 +60,7 @@ function DuckableBandCard({
       isPicked={isPicked}
       onDuck={canDuck ? quack : undefined}
       duckCooldownUntil={isOnCooldown && cooldownUntil ? cooldownUntil : undefined}
+      sharedPick={sharedPick}
       {...rest}
     />
   );
@@ -74,6 +79,7 @@ export default function LineupPage() {
   const pickCounts = usePickCounts();
   const currentTime = useNow();
   const pendingBandIds = useOfflinePendingBandIds();
+  const attendeeMap = useBandAttendees();
 
   useEffect(() => {
     if (loading || hashRestoredRef.current) return;
@@ -115,9 +121,40 @@ export default function LineupPage() {
     [bands],
   );
 
+  const picksByUserId = useMemo(() => {
+    const map = new Map<string, Set<string>>();
+    for (const [bandId, attendees] of Object.entries(attendeeMap)) {
+      for (const attendee of attendees as BandAttendee[]) {
+        if (!map.has(attendee.id)) map.set(attendee.id, new Set());
+        map.get(attendee.id)!.add(bandId);
+      }
+    }
+    return map;
+  }, [attendeeMap]);
+
+  const crewWithPicks = useMemo(() => {
+    const seen = new Set<string>();
+    const result: BandAttendee[] = [];
+    for (const attendees of Object.values(attendeeMap)) {
+      for (const attendee of attendees as BandAttendee[]) {
+        if (attendee.id !== userId && !seen.has(attendee.id)) {
+          seen.add(attendee.id);
+          result.push(attendee);
+        }
+      }
+    }
+    return result.sort((a, b) => a.label.localeCompare(b.label));
+  }, [attendeeMap, userId]);
+
+  const viewedUserPickIds = filters.userId ? (picksByUserId.get(filters.userId) ?? null) : null;
+
+  const viewedUserPickCount = filters.userId
+    ? (picksByUserId.get(filters.userId)?.size ?? 0)
+    : 0;
+
   const filtered = useMemo(
-    () => filterBands(bands, filters, currentTime),
-    [bands, filters, currentTime],
+    () => filterBands(bands, filters, currentTime, viewedUserPickIds ?? undefined),
+    [bands, filters, currentTime, viewedUserPickIds],
   );
 
   return (
@@ -138,6 +175,8 @@ export default function LineupPage() {
         stages={stages}
         genres={genres}
         filteredCount={filtered.length}
+        crewWithPicks={crewWithPicks}
+        viewedUserPickCount={viewedUserPickCount}
       />
 
       <main className={`${styles.list} ${styles.scheduleList}`}>
@@ -145,13 +184,15 @@ export default function LineupPage() {
         {!loading && filtered.length === 0 && (
           <div className={styles.emptyState}>
             <Icon name="search" size={24} aria-hidden />
-            {t('emptySchedule')}
+            {filters.userId ? t('noPicksForUser') : t('emptySchedule')}
           </div>
         )}
         {filtered.map((band) => {
           const isLive =
             new Date(band.start_time) <= currentTime &&
             currentTime < new Date(band.end_time);
+          const sharedPick =
+            filters.userId != null && pickedIds.has(band.id);
           return (
             <DuckableBandCard
               key={band.id}
@@ -165,6 +206,7 @@ export default function LineupPage() {
               pending={pendingBandIds.has(band.id)}
               isBandEnded={new Date(band.end_time) < currentTime}
               showDayLabel={filters.day === null}
+              sharedPick={sharedPick}
             />
           );
         })}
