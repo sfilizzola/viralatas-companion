@@ -92,16 +92,17 @@ export default function MapPage() {
             {placements.length === 0 && <p className={styles.empty}>{t('empty')}</p>}
           </>
         )}
-        <TimelineScrubber
-          now={now}
-          previewTime={previewTime}
-          windowStart={gate.windowStart ?? new Date('2026-07-29T10:00:00+02:00')}
-          windowEnd={gate.windowEnd ?? new Date('2026-07-30T03:00:00+02:00')}
-          isActive={gate.isActive}
-          onPreview={setPreviewTime}
-          onClear={() => setPreviewTime(null)}
-        />
       </main>
+
+      <TimelineScrubber
+        now={now}
+        previewTime={previewTime}
+        windowStart={gate.windowStart ?? new Date('2026-07-29T10:00:00+02:00')}
+        windowEnd={gate.windowEnd ?? new Date('2026-07-30T03:00:00+02:00')}
+        isActive={gate.isActive}
+        onPreview={setPreviewTime}
+        onClear={() => setPreviewTime(null)}
+      />
     </div>
   );
 }

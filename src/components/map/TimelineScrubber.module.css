@@ -201,7 +201,7 @@
 .axisLabel {
   font-family: var(--font-mono);
   font-size: 8px;
-  color: #1e1820;
+  color: #3a2e40;
   letter-spacing: 1px;
 }
 
@@ -209,9 +209,9 @@
 .lockedWrap {
   padding: 14px 16px 16px;
   background: #09080a;
-  border-top: 1px solid #120e14;
-  opacity: 0.4;
-  filter: grayscale(0.9);
+  border-top: 1px solid #2a2030;
+  opacity: 0.55;
+  filter: grayscale(0.7);
 }
 
 .lockedHeader {
@@ -226,20 +226,20 @@
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 4px;
-  color: #1e1620;
+  color: #5a4860;
   text-transform: uppercase;
 }
 
 .lockedInner {
-  border: 1.5px solid #160e18;
+  border: 1.5px solid #2a1e30;
   border-radius: 3px;
   padding: 12px 14px;
 }
 
 .lockedBar {
   height: 20px;
-  background: #080608;
-  border: 1.5px solid #120a12;
+  background: #100c14;
+  border: 1.5px solid #201828;
   border-radius: 2px;
   margin-bottom: 10px;
 }
@@ -248,7 +248,7 @@
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 1.5px;
-  color: #1e1620;
+  color: #4a3858;
   text-align: center;
   text-transform: uppercase;
 }
