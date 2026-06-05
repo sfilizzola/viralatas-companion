@@ -35,6 +35,8 @@ export type BadgeCondition =
   | { type: 'bands_seen_genres_min'; genres: string[]; count: number }
   | { type: 'bands_seen_before_hour_min'; hour: number; count: number }
   | { type: 'band_seen_named'; name: string }
+  // Missed-based conditions: bands user explicitly marked as "didn't watch" (picked ∩ missedBandIds)
+  | { type: 'bands_missed_min'; count: number }
   // Arrival day: earned when arrival day sorts before condition.day
   | { type: 'wacken_arrived_before'; day: string }
   // Arrival day: earned when arrival day matches condition.day exactly
@@ -89,6 +91,7 @@ export type BadgeContext = {
   maxAttendanceInPicks: number;
   pickedBands: BadgeBand[];
   seenBands: BadgeBand[];
+  missedBands: BadgeBand[];
   missedBandIds: Set<string>;
   locationVisits: Record<string, number>;
   weakSkipCount: number;
