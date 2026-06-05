@@ -63,5 +63,9 @@
   "ratingSectionTitle": "Wie geil war die Band?",
   "ratingClear": "Löschen",
   "ratingClearHint": "Gleiche Pfote nochmal tippen zum Löschen",
-  "ratingScoreLabel": "Bewertung {score} von 5"
+  "ratingScoreLabel": "Bewertung {score} von 5",
+  "viraLata": "Vira-lata",
+  "viewingPicksOf": "Picks von {name}",
+  "youAlsoPicked": "Du ✓",
+  "noPicksForUser": "Dieser Vira-lata hat keine Bands gewählt."
 }

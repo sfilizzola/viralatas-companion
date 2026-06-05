@@ -63,5 +63,9 @@
   "ratingSectionTitle": "¿Qué tan brutal fue esta banda?",
   "ratingClear": "Borrar",
   "ratingClearHint": "Toca la misma pata otra vez para borrar",
-  "ratingScoreLabel": "Nota {score} de 5"
+  "ratingScoreLabel": "Nota {score} de 5",
+  "viraLata": "Vira-lata",
+  "viewingPicksOf": "Picks de {name}",
+  "youAlsoPicked": "Tú ✓",
+  "noPicksForUser": "Este vira-lata no eligió ninguna banda."
 }

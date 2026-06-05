@@ -63,5 +63,9 @@
   "ratingSectionTitle": "How awesome was this band?",
   "ratingClear": "Clear",
   "ratingClearHint": "Tap same paw again to clear",
-  "ratingScoreLabel": "Rate {score} out of 5"
+  "ratingScoreLabel": "Rate {score} out of 5",
+  "viraLata": "Vira-lata",
+  "viewingPicksOf": "{name}'s picks",
+  "youAlsoPicked": "You ✓",
+  "noPicksForUser": "This vira-lata hasn't picked any bands."
 }
