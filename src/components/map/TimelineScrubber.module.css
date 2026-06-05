@@ -186,6 +186,7 @@
   z-index: 20;
   cursor: grab;
   user-select: none;
+  mix-blend-mode: screen;
 }
 
 .handle:active {

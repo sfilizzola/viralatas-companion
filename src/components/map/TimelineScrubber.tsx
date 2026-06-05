@@ -51,7 +51,7 @@ function WackenBull() {
       aria-hidden="true"
       width={52}
       height={43}
-      style={{ display: 'block', objectFit: 'contain', mixBlendMode: 'screen' }}
+      style={{ display: 'block', objectFit: 'contain' }}
     />
   );
 }
