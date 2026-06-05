@@ -41,60 +41,118 @@ function fractionFromTime(date: Date, windowStart: Date, windowEnd: Date): numbe
 }
 
 /**
- * VikingSkull — 40×46px carved-bone skull handle.
- * Anatomically grounded: cranium, hollow eye sockets, nasal aperture,
- * visible jaw with 4 teeth, brow ridge, cheekbone shading, battle crack.
- * Bone-gold palette — the drag affordance.
+ * VikingSkull — 44×50px evil carved-bone skull handle.
+ *
+ * The "evil" comes from anatomy, not decoration:
+ * - Angular eye sockets where inner corners angle DOWN (furrowed brow effect)
+ * - Heavy brow ridge overlay pressing toward center
+ * - Irregular, damaged teeth (not uniform lines)
+ * - Multiple battle cracks
+ * - Weathered bone palette, no golden softness
  */
 function VikingSkull() {
   return (
-    <svg width="40" height="46" viewBox="0 0 40 46" fill="none" aria-hidden="true">
-      {/* ── Main skull silhouette: cranium + jaw fused ── */}
+    <svg width="44" height="50" viewBox="0 0 44 50" fill="none" aria-hidden="true">
+      {/* ── Main skull silhouette ── */}
       <path
-        d="M20 1.5 C10.5 1.5 4 8 4 16.5 C4 22 6.5 26.5 10.5 29
-           L10.5 31 C10.5 32 11.5 32.5 12.5 32.5
-           L12.5 33 L13.5 33
-           L13.5 38.5 L14 44.5 L26 44.5 L26.5 38.5 L26.5 33
-           L27.5 33 L27.5 32.5 C28.5 32.5 29.5 32 29.5 31
-           L29.5 29 C33.5 26.5 36 22 36 16.5
-           C36 8 29.5 1.5 20 1.5Z"
-        fill="#c8b880"
-        stroke="#1a0b05"
-        strokeWidth="1.5"
+        d="M22 1.5 C11 1.5 3.5 9.5 3.5 18.5
+           C3.5 25 6.5 30 11.5 32.5
+           L11.5 35.5 C11.5 36.5 12.5 37 13.5 37
+           L13.5 38 L14.5 38
+           L14.5 46 L29.5 46
+           L29.5 38 L30.5 38 L30.5 37
+           C31.5 37 32.5 36.5 32.5 35.5
+           L32.5 32.5 C37.5 30 40.5 25 40.5 18.5
+           C40.5 9.5 33 1.5 22 1.5Z"
+        fill="#9e8a4e"
+        stroke="#0c0704"
+        strokeWidth="1.6"
         strokeLinejoin="round"
       />
-      {/* ── Jaw suture line ── */}
-      <path d="M10.5 30 Q20 32 29.5 30" stroke="#8a6820" strokeWidth="0.8" fill="none" opacity="0.7" />
-      {/* ── Tooth separators ── */}
-      <line x1="17" y1="33" x2="16.5" y2="44" stroke="#7a5e18" strokeWidth="1" />
-      <line x1="20" y1="33" x2="20"   y2="44.5" stroke="#7a5e18" strokeWidth="1" />
-      <line x1="23" y1="33" x2="23.5" y2="44" stroke="#7a5e18" strokeWidth="1" />
-      {/* ── Left eye socket ── */}
-      <ellipse cx="14" cy="17" rx="5.5" ry="6.5" fill="#0e0806" stroke="#1a0b05" strokeWidth="0.6" />
-      {/* Subtle bone rim highlight inside left socket */}
-      <path d="M10.5 14 Q12 12 15 12.5" stroke="#d8c070" strokeWidth="0.6" strokeLinecap="round" opacity="0.2" />
-      {/* ── Right eye socket ── */}
-      <ellipse cx="26" cy="17" rx="5.5" ry="6.5" fill="#0e0806" stroke="#1a0b05" strokeWidth="0.6" />
-      <path d="M22.5 14 Q24 12 27 12.5" stroke="#d8c070" strokeWidth="0.6" strokeLinecap="round" opacity="0.2" />
-      {/* ── Nasal aperture (inverted pear) ── */}
+
+      {/* ── Temporal shadow — depth on sides ── */}
+      <path d="M4.5 19 Q5.5 26 9.5 31 Q11 27.5 10.5 22Z" fill="#6e5420" opacity="0.4" />
+      <path d="M39.5 19 Q38.5 26 34.5 31 Q33 27.5 33.5 22Z" fill="#6e5420" opacity="0.4" />
+
+      {/* ── Brow ridge — the evil overhang ── */}
+      {/* Dips to its lowest point at center (glabella), creating the angry V */}
       <path
-        d="M18.2 25 Q18 22.5 20 22.5 Q22 22.5 21.8 25
-           Q22 28 20 28 Q18 28 18.2 25Z"
-        fill="#0e0806"
-        stroke="#1a0b05"
-        strokeWidth="0.5"
+        d="M5.5 18 Q8.5 13 15 13.5 Q18.5 14 19.5 16.5
+           Q21 12.5 22 13 Q23 12.5 24.5 16.5
+           Q25.5 14 29 13.5 Q35.5 13 38.5 18
+           Q36 11.5 29.5 10.5 Q25.5 10 22 10.5
+           Q18.5 10 14.5 10.5 Q8 11.5 5.5 18Z"
+        fill="#6a4a1c"
+        opacity="0.6"
       />
-      {/* Nasal spine divider */}
-      <line x1="20" y1="25" x2="20" y2="27.5" stroke="#c8b880" strokeWidth="0.5" opacity="0.25" />
-      {/* ── Brow ridge ── */}
-      <path d="M8 14 Q14 11.5 20 12 Q26 11.5 32 14" stroke="#9a7830" strokeWidth="0.9" fill="none" opacity="0.55" />
-      {/* ── Temporal/cheekbone shading ── */}
-      <path d="M5 17 Q6 22 9 26.5" stroke="#906820" strokeWidth="0.8" opacity="0.45" />
-      <path d="M35 17 Q34 22 31 26.5" stroke="#906820" strokeWidth="0.8" opacity="0.45" />
-      {/* ── Battle crack across forehead ── */}
-      <path d="M23.5 2.5 L25.5 6 L23 10.5 L24.5 15" stroke="#785020" strokeWidth="0.75" strokeLinecap="round" opacity="0.6" />
-      {/* ── Cranial highlight (top-left specular) ── */}
-      <path d="M10 8 Q12.5 5 18 4" stroke="#e8d8a0" strokeWidth="1.1" strokeLinecap="round" opacity="0.28" />
+
+      {/* ── Left eye socket ── */}
+      {/* Inner top corner (right side) is LOWER — the angry brow angle */}
+      <path
+        d="M9 18
+           Q8.5 13.5 13.5 12.5
+           Q17 12 19 15.5
+           Q19.5 17.5 18.5 21
+           Q17 24 12.5 23.5
+           Q8.5 22.5 8.5 19.5
+           Q8.8 18.5 9 18Z"
+        fill="#060302"
+      />
+      {/* Left socket deep rim */}
+      <path d="M9.5 15.5 Q13.5 13 18 14.5" stroke="#1a0c04" strokeWidth="1.5" fill="none" opacity="0.7" />
+
+      {/* ── Right eye socket ── */}
+      {/* Mirror: inner top corner (left side) is also LOWER */}
+      <path
+        d="M25 15.5
+           Q27 12 30.5 12.5
+           Q35.5 13 35.5 18
+           Q35.5 18.5 35.5 19.5
+           Q35 22.5 31.5 23.5
+           Q27 24 25.5 21
+           Q24.5 17.5 25 15.5Z"
+        fill="#060302"
+      />
+      <path d="M26 14.5 Q30 13 34.5 14.5" stroke="#1a0c04" strokeWidth="1.5" fill="none" opacity="0.7" />
+
+      {/* ── Nasal aperture — slightly asymmetric, more menacing ── */}
+      <path
+        d="M19.5 27 Q19 24 22 23.5 Q25 24 24.5 27
+           Q24.5 30.5 22 31 Q19.5 30.5 19.5 27Z"
+        fill="#060302"
+      />
+      {/* Nasal spine */}
+      <line x1="22" y1="25.5" x2="22" y2="30" stroke="#9e8a4e" strokeWidth="0.6" opacity="0.3" />
+
+      {/* ── Jaw suture ── */}
+      <path d="M11.5 33 Q22 36 32.5 33" stroke="#6a4418" strokeWidth="0.9" fill="none" />
+
+      {/* ── Teeth — irregular, some broken/missing chip ── */}
+      {/* Outer left — short, chipped */}
+      <line x1="15.5" y1="35" x2="14.5" y2="40.5" stroke="#5a3810" strokeWidth="1.4" strokeLinecap="round" />
+      {/* Left center — tall */}
+      <line x1="18.5" y1="35.5" x2="18" y2="46" stroke="#5a3810" strokeWidth="1.4" strokeLinecap="round" />
+      {/* Center — dominant, slightly wider */}
+      <line x1="22" y1="36" x2="22" y2="46" stroke="#5a3810" strokeWidth="1.8" strokeLinecap="round" />
+      {/* Right center */}
+      <line x1="25.5" y1="35.5" x2="26" y2="46" stroke="#5a3810" strokeWidth="1.4" strokeLinecap="round" />
+      {/* Outer right — short, broken at angle */}
+      <line x1="28.5" y1="35" x2="29.5" y2="40" stroke="#5a3810" strokeWidth="1.4" strokeLinecap="round" />
+
+      {/* ── Battle damage — 3 cracks ── */}
+      {/* Primary diagonal crack across forehead */}
+      <path d="M20.5 2 L24 7.5 L21 13 L23.5 17.5" stroke="#4a2c08" strokeWidth="1" strokeLinecap="round" opacity="0.8" />
+      {/* Left temporal crack */}
+      <path d="M7 13 L9.5 18 L7.5 22" stroke="#4a2c08" strokeWidth="0.7" strokeLinecap="round" opacity="0.6" />
+      {/* Small chip — right parietal */}
+      <path d="M33 8 L31 12 L33.5 16" stroke="#4a2c08" strokeWidth="0.6" strokeLinecap="round" opacity="0.5" />
+
+      {/* ── Zygomatic arch lines (cheekbones) ── */}
+      <path d="M5.5 21 Q7 27 10.5 30.5" stroke="#7a5820" strokeWidth="0.8" opacity="0.55" />
+      <path d="M38.5 21 Q37 27 33.5 30.5" stroke="#7a5820" strokeWidth="0.8" opacity="0.55" />
+
+      {/* ── Specular — top-left cranial */}
+      <path d="M9.5 8 Q13 5 19.5 3.5" stroke="#d0be78" strokeWidth="1.1" strokeLinecap="round" opacity="0.22" />
     </svg>
   );
 }
@@ -228,7 +286,7 @@ export default function TimelineScrubber({
         {/* Grip disc handle */}
         <div
           className={styles.handle}
-          style={{ left: `calc(${handleFraction * 100}% - 20px)` }}
+          style={{ left: `calc(${handleFraction * 100}% - 22px)` }}
           role="slider"
           aria-label={t('handleAriaLabel')}
           aria-valuenow={Math.round(handleFraction * 100)}
