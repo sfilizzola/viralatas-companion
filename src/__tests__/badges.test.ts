@@ -1598,7 +1598,7 @@ describe('missedBands derivation', () => {
   ]);
   const now = new Date('2026-07-28T12:00:00.000Z');
 
-  it('includes picked bands in missedBandIds', () => {
+  it('includes only picked bands found in missedBandIds', () => {
     const ctx = buildBadgeContext(
       authUser(),
       ['mb1', 'mb2'],
