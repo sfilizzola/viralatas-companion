@@ -309,6 +309,97 @@
 }
 
 /* ============================================================
+   VIEWING BANNER — between controls and day tabs
+   ============================================================ */
+.viewingBanner {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  padding: var(--s-2) var(--s-3);
+  background: color-mix(in srgb, var(--signal-ok) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--signal-ok) 28%, transparent);
+  border-radius: var(--r-1);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+.viewingBannerName {
+  color: var(--signal-ok);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 18ch;
+}
+
+.viewingBannerCount {
+  color: var(--text-faint);
+  white-space: nowrap;
+}
+
+/* ============================================================
+   USER PILLS — vira-lata section in drawer
+   ============================================================ */
+.userPillRow {
+  display: flex;
+  flex-direction: row;
+  gap: var(--s-2);
+  overflow-x: auto;
+  padding-bottom: var(--s-1);
+  scrollbar-width: none;
+}
+
+.userPillRow::-webkit-scrollbar {
+  display: none;
+}
+
+.userPill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s-1);
+  padding: var(--s-2) var(--s-2);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--r-1);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s, background 0.15s;
+  min-width: 60px;
+}
+
+.userPill:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-elevated);
+}
+
+.userPillActive {
+  border-color: var(--signal-ok);
+  background: color-mix(in srgb, var(--signal-ok) 10%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--signal-ok) 30%, transparent);
+}
+
+.userPillName {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  max-width: 15ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.userPillActive .userPillName {
+  color: var(--signal-ok);
+}
+
+/* ============================================================
    DRAWER (bottom sheet)
    ============================================================ */
 .backdrop {

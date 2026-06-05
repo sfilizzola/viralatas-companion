@@ -4,7 +4,9 @@ import { sortFilterGenres } from '../services/genreGuide';
 import { stageColor } from '../services/stageColors';
 import GenreGuideCollapsible from './GenreGuideCollapsible';
 import Icon, { type IconName } from './icons/Icon';
+import { Avatar } from '../ui';
 import type { BandFilterValue } from './bandFilterValue';
+import type { BandAttendee } from '../hooks/useBandAttendees';
 import styles from './BandFilters.module.css';
 
 type DayOption = { date: string; label: string };
@@ -16,6 +18,8 @@ type Props = {
   stages: string[];
   genres: string[];
   filteredCount: number;
+  crewWithPicks: BandAttendee[];
+  viewedUserPickCount: number;
 };
 
 const SORT_ICONS: Record<BandFilterValue['sortOrder'], IconName> = {
@@ -31,6 +35,8 @@ export default function BandFilters({
   stages,
   genres,
   filteredCount,
+  crewWithPicks,
+  viewedUserPickCount,
 }: Props) {
   const { t } = useI18n('SchedulePage');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -40,7 +46,7 @@ export default function BandFilters({
   const touchStartY = useRef<number>(0);
 
   const activeDrawerCount =
-    value.stage.length + (value.genre ? 1 : 0) + (value.upcoming ? 1 : 0);
+    value.stage.length + (value.genre ? 1 : 0) + (value.upcoming ? 1 : 0) + (value.userId ? 1 : 0);
   const hasAnyActive =
     activeDrawerCount > 0 || value.day !== null || value.query.trim().length > 0;
   const hasNonDefaultSort = value.sortOrder !== 'time-asc';
@@ -100,11 +106,16 @@ export default function BandFilters({
       genre: null,
       upcoming: false,
       sortOrder: value.sortOrder,
+      userId: null,
     });
   }
 
   function clearDrawer() {
-    onChange({ ...value, stage: [], genre: null, upcoming: false });
+    onChange({ ...value, stage: [], genre: null, upcoming: false, userId: null });
+  }
+
+  function toggleUser(userId: string) {
+    update('userId', value.userId === userId ? null : userId);
   }
 
   function selectSort(order: BandFilterValue['sortOrder']) {
@@ -124,6 +135,8 @@ export default function BandFilters({
     const endY = e.changedTouches[0].clientY;
     if (endY > touchStartY.current + 50) setSheetOpen(false);
   }
+
+  const viewedUser = crewWithPicks.find((u) => u.id === value.userId);
 
   return (
     <>
@@ -168,6 +181,15 @@ export default function BandFilters({
             </button>
           )}
         </div>
+
+        {viewedUser && (
+          <div className={styles.viewingBanner}>
+            <span className={styles.viewingBannerName}>
+              {t('viewingPicksOf', { name: viewedUser.label })}
+            </span>
+            <span className={styles.viewingBannerCount}>{viewedUserPickCount} bandas</span>
+          </div>
+        )}
 
         {days.length > 0 && (
           <div className={styles.dayTabsRow}>
@@ -256,6 +278,42 @@ export default function BandFilters({
             <div className={styles.grab} />
 
             <div className={styles.drawerContent}>
+              {crewWithPicks.length > 0 && (
+                <>
+                  <div className={styles.sectionHead}>
+                    <h4 className={styles.sectionTitle}>{t('viraLata')}</h4>
+                    {value.userId && (
+                      <button
+                        className={styles.sectionClear}
+                        onClick={() => update('userId', null)}
+                      >
+                        {t('limpar')}
+                      </button>
+                    )}
+                  </div>
+                  <div className={styles.userPillRow}>
+                    {crewWithPicks.map((user) => {
+                      const active = value.userId === user.id;
+                      return (
+                        <button
+                          key={user.id}
+                          className={`${styles.userPill} ${active ? styles.userPillActive : ''}`}
+                          onClick={() => toggleUser(user.id)}
+                          aria-pressed={active}
+                        >
+                          <Avatar
+                            size={32}
+                            src={user.avatar_url}
+                            initial={(user.label[0] ?? '?').toUpperCase()}
+                          />
+                          <span className={styles.userPillName}>{user.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+
               <div className={styles.sectionHead}>
                 <h4 className={styles.sectionTitle}>{t('palco')}</h4>
                 {value.stage.length > 0 && (
