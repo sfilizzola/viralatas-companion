@@ -37,12 +37,17 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Files:** `src/components/BandFilters.tsx`, `src/components/BandFilters.module.css`
 
-- [ ] Add `crewWithPicks: CrewUser[]` prop
-- [ ] `activeDrawerCount` and `clearAll` / `clearDrawer` account for `userId`
-- [ ] New drawer section: horizontal-scroll avatar pill row, single-select, name trimmed to 15ch with ellipsis
+- [ ] Add `crewWithPicks: BandAttendee[]` prop (no `useCrewUsersCache` needed — derived from `useBandAttendees` in LineupPage)
+- [ ] `activeDrawerCount` includes `userId` (`+ (value.userId ? 1 : 0)`)
+- [ ] `clearAll` resets `userId: null`
+- [ ] `clearDrawer` resets `userId: null` alongside stage/genre/upcoming
+- [ ] "Vira-lata" section placed **first** in drawer (before Stage)
+- [ ] Horizontal-scroll avatar pill row, single-select; second tap on active pill deselects (same behavior as genre)
+- [ ] `Avatar` size 32px; fallback `initial={name[0].toUpperCase() ?? '?'}`
+- [ ] Name truncated via CSS: `max-width: 15ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap`
 - [ ] CSS: `.userPillRow`, `.userPill`, `.userPillName`, `.userPillActive`
 
-**Acceptance:** Drawer shows vira-latas with picks; selecting one sets `value.userId`; deselecting clears it; global LIMPAR clears it.
+**Acceptance:** Drawer shows vira-latas with picks; selecting one sets `value.userId`; tapping again deselects; `clearDrawer` and `clearAll` both reset it.
 
 ---
 
@@ -50,11 +55,12 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Files:** `src/components/BandFilters.tsx`, `src/components/BandFilters.module.css`
 
+- [ ] Add `viewedUserPickCount: number` prop (passed from LineupPage as `picksByUserId.get(filters.userId)?.size ?? 0` — total picks by that user, independent of other active filters)
 - [ ] Banner renders between controls row and day-tab row when `value.userId != null`
-- [ ] Text: "Vendo picks de NAME · N bandas" (no inline clear button)
+- [ ] Text: `t('viewingPicksOf', { name })` · `viewedUserPickCount` bandas — no inline clear button (global LIMPAR handles it)
 - [ ] CSS: `.viewingBanner`, `.viewingBannerName`, `.viewingBannerCount`
 
-**Acceptance:** Banner appears/disappears correctly; clears when global LIMPAR is tapped.
+**Acceptance:** Banner shows correct total pick count regardless of other active filters; disappears when `userId` is cleared.
 
 ---
 
@@ -63,10 +69,10 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 **Files:** `src/components/BandCard.tsx`, `src/components/BandCard.module.css`
 
 - [ ] Add `sharedPick?: boolean` prop
-- [ ] When true: teal border (`--color-success` tint) + teal "Você ✓" badge below the star
+- [ ] When true: teal border (`--color-success` tint) + teal badge below the star using `t('youAlsoPicked')` from existing `SchedulePage` namespace (BandCard already uses `useI18n('SchedulePage')`)
 - [ ] CSS: `.cardSharedPick`, `.sharedPickBadge`
 
-**Acceptance:** Badge and border appear only when both the current user and the viewed user picked the band.
+**Acceptance:** Badge and border appear only when `sharedPick` is true; no hardcoded strings.
 
 ---
 
@@ -74,14 +80,17 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 **Files:** `src/pages/LineupPage.tsx`
 
-- [ ] Import `useBandAttendees`, `useCrewUsersCache`, current `useAuth` user id
-- [ ] `useMemo`: derive `picksByUserId: Map<string, Set<string>>` from attendee map
-- [ ] `useMemo`: derive `crewWithPicks: CrewUser[]` (exclude current user, exclude 0-pick members)
-- [ ] Pass `crewWithPicks` to `<BandFilters>`
-- [ ] Pass `picksByUserId.get(filters.userId)` as `userPickIds` to `filterBands`
-- [ ] Derive `sharedPick` per band and pass to `DuckableBandCard`
+- [ ] Import `useBandAttendees` (no `useCrewUsersCache` needed)
+- [ ] `useMemo`: invert `AttendeeMap` → `picksByUserId: Map<string, Set<string>>` (bandId sets keyed by userId)
+- [ ] `useMemo`: derive `crewWithPicks: BandAttendee[]` — unique users from attendee map, excluding current `userId`, sorted by name
+- [ ] `useMemo`: `viewedUserPickCount = picksByUserId.get(filters.userId ?? '')?.size ?? 0`
+- [ ] Pass `crewWithPicks`, `viewedUserPickCount` to `<BandFilters>`
+- [ ] Pass `picksByUserId.get(filters.userId ?? '')` as `userPickIds` to `filterBands`
+- [ ] `sharedPick` per band: `filters.userId != null && pickedIds.has(band.id)` — no extra map lookup needed
+- [ ] Pass `sharedPick` to `DuckableBandCard`
+- [ ] Empty state: when `filters.userId != null && filtered.length === 0`, show `t('noPicksForUser')` instead of generic `emptySchedule` (message only, no CTA — global LIMPAR handles clearing)
 
-**Acceptance:** Full feature works end-to-end; other filters still compose correctly on top of user filter.
+**Acceptance:** Full feature works end-to-end; filters compose correctly; banner count reflects total user picks not current filtered count.
 
 ---
 
