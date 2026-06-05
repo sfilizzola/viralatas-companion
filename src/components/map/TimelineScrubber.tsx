@@ -49,8 +49,8 @@ function WackenBull() {
       src="/bullhead.png"
       alt=""
       aria-hidden="true"
-      width={56}
-      height={50}
+      width={52}
+      height={43}
       style={{ display: 'block', objectFit: 'contain', mixBlendMode: 'screen' }}
     />
   );
@@ -185,7 +185,7 @@ export default function TimelineScrubber({
         {/* Grip disc handle */}
         <div
           className={styles.handle}
-          style={{ left: `calc(${handleFraction * 100}% - 28px)` }}
+          style={{ left: `calc(${handleFraction * 100}% - 26px)` }}
           role="slider"
           aria-label={t('handleAriaLabel')}
           aria-valuenow={Math.round(handleFraction * 100)}
