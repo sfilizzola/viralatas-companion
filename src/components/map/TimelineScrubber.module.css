@@ -3,8 +3,8 @@
 /* ── Outer wrapper — flat strip docked at map bottom ── */
 .wrap {
   padding: 14px 16px 18px;
-  background: #09080a;
-  border-top: 1px solid #1a1620;
+  background: var(--bg);
+  border-top: 1px solid var(--border);
 }
 
 /* ── Row 1: component label left, back button right ── */
@@ -21,7 +21,7 @@
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 4px;
-  color: #6a5840;
+  color: var(--text-faint);
   text-transform: uppercase;
 }
 
@@ -29,9 +29,9 @@
   font-family: var(--font-mono);
   font-size: 8px;
   letter-spacing: 1px;
-  color: #7a1a1a;
+  color: var(--accent-hover);
   background: transparent;
-  border: 1px solid #2a0a0a;
+  border: 1px solid rgba(192, 57, 43, 0.3);
   border-radius: 2px;
   padding: 2px 7px;
   cursor: pointer;
@@ -54,7 +54,7 @@
 .timeNow {
   font-family: var(--font-mono);
   font-size: 10px;
-  color: #6a5840;
+  color: var(--text-muted);
   letter-spacing: 1px;
   line-height: 1;
 }
@@ -70,9 +70,9 @@
   font-family: var(--font-mono);
   font-size: 26px;
   font-weight: 500;
-  color: #d8c88a;
+  color: var(--text);
   letter-spacing: 1px;
-  text-shadow: 2px 2px 0 #000;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
   line-height: 1;
 }
 
@@ -83,10 +83,11 @@
   font-weight: 600;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: #5a4010;
+  color: var(--text-faint);
   margin-top: 3px;
 }
 
+/* LIVE state — uses the app's semantic live/accent red */
 .previewTagLive {
   display: block;
   font-family: var(--font-display);
@@ -94,7 +95,7 @@
   font-weight: 600;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: #2a2018;
+  color: var(--signal-live);
   margin-top: 3px;
 }
 
@@ -111,8 +112,8 @@
   right: 0;
   top: 13px;
   bottom: 13px;
-  background: #080608;
-  border: 1.5px solid #160e18;
+  background: var(--bg-sunken);
+  border: 1.5px solid var(--border);
   border-radius: 2px;
   overflow: hidden;
 }
@@ -146,7 +147,7 @@
     rgba(255, 255, 255, 0.04) 3px,
     rgba(255, 255, 255, 0.04) 4px
   );
-  border-right: 2px solid #7a1a1a;
+  border-right: 2px solid var(--accent);
 }
 
 /* Blood drip at past-fill boundary */
@@ -157,27 +158,27 @@
   bottom: -1px;
   width: 5px;
   height: 9px;
-  background: #7a1a1a;
+  background: var(--accent);
   clip-path: polygon(0 0, 100% 0, 75% 100%, 25% 100%);
 }
 
-/* Preview fill — dark amber */
+/* Preview fill — dark elevated */
 .fillPreview {
   position: absolute;
   top: 0;
   bottom: 0;
-  background: #302008;
+  background: var(--bg-elevated);
   background-image: repeating-linear-gradient(
     45deg,
     transparent,
     transparent 4px,
-    rgba(200, 160, 20, 0.09) 4px,
-    rgba(200, 160, 20, 0.09) 5px
+    rgba(255, 255, 255, 0.03) 4px,
+    rgba(255, 255, 255, 0.03) 5px
   );
-  border-right: 2px solid #8a6010;
+  border-right: 2px solid var(--border-strong);
 }
 
-/* ── Handle — grip disc ── */
+/* ── Handle ── */
 .handle {
   position: absolute;
   top: 50%;
@@ -201,17 +202,16 @@
 .axisLabel {
   font-family: var(--font-mono);
   font-size: 8px;
-  color: #3a2e40;
+  color: var(--text-faint);
   letter-spacing: 1px;
 }
 
 /* ── Locked state ── */
 .lockedWrap {
   padding: 14px 16px 16px;
-  background: #09080a;
-  border-top: 1px solid #2a2030;
-  opacity: 0.55;
-  filter: grayscale(0.7);
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  opacity: 0.45;
 }
 
 .lockedHeader {
@@ -226,20 +226,20 @@
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 4px;
-  color: #5a4860;
+  color: var(--text-faint);
   text-transform: uppercase;
 }
 
 .lockedInner {
-  border: 1.5px solid #2a1e30;
+  border: 1.5px solid var(--border);
   border-radius: 3px;
   padding: 12px 14px;
 }
 
 .lockedBar {
   height: 20px;
-  background: #100c14;
-  border: 1.5px solid #201828;
+  background: var(--bg-sunken);
+  border: 1.5px solid var(--border);
   border-radius: 2px;
   margin-bottom: 10px;
 }
@@ -248,7 +248,7 @@
   font-family: var(--font-mono);
   font-size: 9px;
   letter-spacing: 1.5px;
-  color: #4a3858;
+  color: var(--text-faint);
   text-align: center;
   text-transform: uppercase;
 }
