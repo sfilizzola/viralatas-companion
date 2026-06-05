@@ -400,6 +400,32 @@
 }
 
 /* ============================================================
+   SHARED PICK — crew picks browser: current user also picked
+   ============================================================ */
+.cardSharedPick {
+  border-color: color-mix(in srgb, var(--signal-ok) 50%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--signal-ok) 20%, transparent);
+}
+
+.sharedPickBadge {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  margin-top: var(--s-2);
+  padding: 3px 8px;
+  background: color-mix(in srgb, var(--signal-ok) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--signal-ok) 40%, transparent);
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--signal-ok);
+  white-space: nowrap;
+}
+
+/* ============================================================
    CEREMONY VARIANT — gold border, warm tint, no stage chip
    ============================================================ */
 .cardCeremony {

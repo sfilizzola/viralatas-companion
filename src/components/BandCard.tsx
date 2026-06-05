@@ -43,6 +43,8 @@ type BandCardProps = {
     count: number;
     userScore?: BandRatingScore;
   };
+  /** Crew picks browser: current user also picked this band */
+  sharedPick?: boolean;
 };
 
 function getVariantClass(variant: BandCardVariant): string {
@@ -84,6 +86,7 @@ export default function BandCard({
   duckCooldownUntil,
   showDayLabel = false,
   ratingStats,
+  sharedPick = false,
 }: Readonly<BandCardProps>) {
   const { t } = useI18n('SchedulePage');
   const { t: tPopular } = useI18n('PopularPage');
@@ -129,6 +132,7 @@ export default function BandCard({
     showAttendanceChip && attendanceChip === 'attended' ? styles.cardAttended : '',
     showAttendanceChip && attendanceChip === 'missed' ? styles.cardMissed : '',
     variant === 'timeline' && isBandEnded && !showAttendanceChip ? styles.cardEnded : '',
+    sharedPick ? styles.cardSharedPick : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -245,6 +249,9 @@ export default function BandCard({
           />
         )}
         {children}
+        {sharedPick && (
+          <span className={styles.sharedPickBadge}>{t('youAlsoPicked')}</span>
+        )}
         {showDuck && onDuck && (
           <QuackGhostRow onDuck={onDuck} cooldownUntil={duckCooldownUntil ?? null} />
         )}
