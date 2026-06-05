@@ -5,5 +5,7 @@
   "handleAriaLabel": "Ziehen fur Vorschau",
   "nowLabel": "Jetzt",
   "live": "Live",
-  "previewing": "Vorschau"
+  "previewing": "Vorschau",
+  "awakensIn": "Aktiviert In",
+  "soon": "Bald"
 }

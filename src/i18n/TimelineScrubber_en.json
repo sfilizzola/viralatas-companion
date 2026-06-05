@@ -5,5 +5,7 @@
   "handleAriaLabel": "Scrub to preview time",
   "nowLabel": "Now",
   "live": "Live",
-  "previewing": "Previewing"
+  "previewing": "Previewing",
+  "awakensIn": "Awakens In",
+  "soon": "Soon"
 }

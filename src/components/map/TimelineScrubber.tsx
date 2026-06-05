@@ -118,16 +118,48 @@ export default function TimelineScrubber({
   const isAtNow = previewTime === null;
 
   if (!isActive) {
+    const festivalStart = new Date('2026-07-29T10:00:00+02:00');
+    const diff = festivalStart.getTime() - now.getTime();
+    const isSoon = diff <= 0;
+    const days = isSoon ? 0 : Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = isSoon ? 0 : Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const mins = isSoon ? 0 : Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const pad = (n: number) => String(n).padStart(2, '0');
+
     return (
       <div className={styles.lockedWrap}>
         <div className={styles.lockedHeader}>
           <span className={styles.lockedLabel}>{t('label')}</span>
           <Padlock />
         </div>
-        <div className={styles.lockedInner}>
-          <div className={styles.lockedBar} />
-          <p className={styles.lockedText}>{t('locked')}</p>
+
+        {isSoon ? (
+          <p className={styles.awaitSoonText}>{t('soon')}</p>
+        ) : (
+          <div className={styles.awaitBlock}>
+            <span className={styles.awaitTitle}>{t('awakensIn')}</span>
+            <div className={styles.awaitCount}>
+              <span className={styles.awaitNum}>{pad(days)}</span>
+              <span className={styles.awaitSep}>·</span>
+              <span className={styles.awaitNum}>{pad(hours)}</span>
+              <span className={styles.awaitSep}>·</span>
+              <span className={styles.awaitNum}>{pad(mins)}</span>
+            </div>
+            <div className={styles.awaitUnits}>
+              <span>DAYS</span>
+              <span>HRS</span>
+              <span>MIN</span>
+            </div>
+          </div>
+        )}
+
+        <div className={styles.sealBar}>
+          <div className={styles.sealHandle}>
+            <WackenBull />
+          </div>
         </div>
+
+        <p className={styles.sealNote}>{t('locked')}</p>
       </div>
     );
   }
