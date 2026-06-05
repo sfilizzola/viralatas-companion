@@ -1586,3 +1586,110 @@ describe('evaluateBadge — rating predicates (Phase 34)', () => {
     ).toBe(false);
   });
 });
+
+describe('missedBands derivation', () => {
+  const pastBand1 = band({ id: 'mb1', end_time: '2026-07-28T11:00:00.000Z' });
+  const pastBand2 = band({ id: 'mb2', end_time: '2026-07-28T11:00:00.000Z' });
+  const futureBand = band({ id: 'mb3', end_time: '2026-07-29T12:00:00.000Z' });
+  const bandsById = new Map<string, BadgeBand>([
+    ['mb1', pastBand1],
+    ['mb2', pastBand2],
+    ['mb3', futureBand],
+  ]);
+  const now = new Date('2026-07-28T12:00:00.000Z');
+
+  it('includes picked bands in missedBandIds', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['mb1', 'mb2'],
+      new Map(),
+      bandsById,
+      new Set(['mb1']),
+      now,
+    );
+    expect(ctx.missedBands).toHaveLength(1);
+    expect(ctx.missedBands[0]?.id).toBe('mb1');
+  });
+
+  it('excludes non-picked bands from missedBands even if in missedBandIds', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['mb1'],
+      new Map(),
+      bandsById,
+      new Set(['mb3']), // not in picks
+      now,
+    );
+    expect(ctx.missedBands).toHaveLength(0);
+  });
+
+  it('is empty when missedBandIds is empty', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['mb1', 'mb2'],
+      new Map(),
+      bandsById,
+      new Set(),
+      now,
+    );
+    expect(ctx.missedBands).toHaveLength(0);
+  });
+
+  it('includes future bands if picked and missed (no end_time filter)', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['mb3'],
+      new Map(),
+      bandsById,
+      new Set(['mb3']),
+      now,
+    );
+    expect(ctx.missedBands).toHaveLength(1);
+    expect(ctx.missedBands[0]?.id).toBe('mb3');
+  });
+});
+
+describe('bands_missed_min condition', () => {
+  const b1 = band({ id: 'bm1' });
+  const b2 = band({ id: 'bm2' });
+  const b3 = band({ id: 'bm3' });
+  const bandsById = new Map<string, BadgeBand>([
+    ['bm1', b1],
+    ['bm2', b2],
+    ['bm3', b3],
+  ]);
+
+  it('returns true when missedBands.length >= count', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['bm1', 'bm2', 'bm3'],
+      new Map(),
+      bandsById,
+      new Set(['bm1', 'bm2']),
+    );
+    expect(evaluateBadge(badge({ type: 'bands_missed_min', count: 2 }), ctx)).toBe(true);
+    expect(evaluateBadge(badge({ type: 'bands_missed_min', count: 1 }), ctx)).toBe(true);
+  });
+
+  it('returns false when missedBands.length < count', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['bm1'],
+      new Map(),
+      bandsById,
+      new Set(['bm1']),
+    );
+    expect(evaluateBadge(badge({ type: 'bands_missed_min', count: 2 }), ctx)).toBe(false);
+  });
+
+  it('returns false when no bands missed', () => {
+    const ctx = buildBadgeContext(
+      authUser(),
+      ['bm1', 'bm2'],
+      new Map(),
+      bandsById,
+      new Set(),
+    );
+    expect(evaluateBadge(badge({ type: 'bands_missed_min', count: 1 }), ctx)).toBe(false);
+  });
+});
