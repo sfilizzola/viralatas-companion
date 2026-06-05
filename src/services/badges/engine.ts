@@ -36,6 +36,7 @@ export function buildBadgeContext(
   const seenBands = pickedBands.filter(
     (b) => new Date(b.end_time) < now && !missedBandIds.has(b.id),
   );
+  const missedBands = pickedBands.filter((b) => missedBandIds.has(b.id));
   return {
     wacken_years: Array.isArray(meta?.['wacken_years']) ? (meta['wacken_years'] as number[]) : [],
     country: (meta?.['country'] as string | undefined) ?? null,
@@ -45,6 +46,7 @@ export function buildBadgeContext(
     maxAttendanceInPicks: maxAttendance,
     pickedBands,
     seenBands,
+    missedBands,
     missedBandIds,
     locationVisits,
     weakSkipCount,
@@ -127,6 +129,8 @@ export function evaluateBadge(badge: BadgeConfig, ctx: BadgeContext): boolean {
       );
     case 'band_seen_named':
       return ctx.seenBands.some((b) => b.name === condition.name);
+    case 'bands_missed_min':
+      return ctx.missedBands.length >= condition.count;
     case 'wacken_arrived_before': {
       if (!ctx.wacken_arrival_day) return false;
       const arrivalDayOrder = ['sun-jul26', 'mon-jul27', 'tue-jul28', 'wed-jul29', 'thu-plus'];
