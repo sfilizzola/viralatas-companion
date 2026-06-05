@@ -41,96 +41,18 @@ function fractionFromTime(date: Date, windowStart: Date, windowEnd: Date): numbe
 }
 
 /**
- * WackenBull — 52×50px W:O:A-style bullhead handle.
- * Horns + broad face + angular eyes + nostrils + iconic nose ring.
+ * WackenBull — actual bullhead PNG as the drag handle.
  */
 function WackenBull() {
   return (
-    <svg width="52" height="50" viewBox="0 0 52 50" fill="none" aria-hidden="true">
-      {/* ── Left horn — thick, sweeping up ── */}
-      <path
-        d="M15 22 Q11 17 8 10 Q6 5 8.5 3 Q11 1 13.5 4.5 Q16 9 18 17 Q19 20 20.5 22"
-        fill="#c8a830"
-        stroke="#0a0604"
-        strokeWidth="2"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-      {/* ── Right horn ── */}
-      <path
-        d="M37 22 Q41 17 44 10 Q46 5 43.5 3 Q41 1 38.5 4.5 Q36 9 34 17 Q33 20 31.5 22"
-        fill="#c8a830"
-        stroke="#0a0604"
-        strokeWidth="2"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-      />
-      {/* ── Main bull head — wide, squat, aggressive ── */}
-      <path
-        d="M10 23 Q7 26 7 30 Q7 34 10.5 37
-           L13 39.5 Q15 43 17 46
-           Q20 50 26 50 Q32 50 35 46
-           Q37 43 39 39.5 L41.5 37
-           Q45 34 45 30 Q45 26 42 23
-           Q38 18.5 34 18 L26 17.5 L18 18
-           Q14 18.5 10 23Z"
-        fill="#c8a830"
-        stroke="#0a0604"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      {/* ── Forehead crown ridge ── */}
-      <path d="M17 19.5 Q26 17 35 19.5" stroke="#7a5410" strokeWidth="1.1" fill="none" opacity="0.6" />
-      {/* ── Left ear ── */}
-      <path
-        d="M8.5 25 Q4 23 4.5 29 Q6.5 33 11 31.5"
-        fill="#c8a830"
-        stroke="#0a0604"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      {/* ── Right ear ── */}
-      <path
-        d="M43.5 25 Q48 23 47.5 29 Q45.5 33 41 31.5"
-        fill="#c8a830"
-        stroke="#0a0604"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      {/* ── Left eye — angular, mean ── */}
-      <path
-        d="M13 27.5 Q13.5 23.5 17.5 23 Q21.5 23 22 27
-           Q21.5 30 17.5 30.5 Q13.5 30 13 27.5Z"
-        fill="#0a0604"
-      />
-      <circle cx="15" cy="26" r="1" fill="#c8a830" opacity="0.35" />
-      {/* ── Right eye ── */}
-      <path
-        d="M30 27 Q30.5 23 34.5 23 Q38.5 23.5 39 27.5
-           Q38.5 30 34.5 30.5 Q30.5 30 30 27Z"
-        fill="#0a0604"
-      />
-      <circle cx="32" cy="26" r="1" fill="#c8a830" opacity="0.35" />
-      {/* ── Muzzle ── */}
-      <path
-        d="M18 36 Q26 34 34 36 Q37.5 40.5 34 45.5 Q26 49 18 45.5 Q14.5 40.5 18 36Z"
-        fill="#b09228"
-        stroke="#0a0604"
-        strokeWidth="1.2"
-      />
-      {/* ── Left nostril ── */}
-      <ellipse cx="21.5" cy="41.5" rx="3.2" ry="2.6" fill="#0a0604" />
-      {/* ── Right nostril ── */}
-      <ellipse cx="30.5" cy="41.5" rx="3.2" ry="2.6" fill="#0a0604" />
-      {/* ── Nose ring — the W:O:A signature detail ── */}
-      <path
-        d="M22 47 Q26 50 30 47"
-        fill="none"
-        stroke="#e8d060"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      />
-    </svg>
+    <img
+      src="/bullhead.png"
+      alt=""
+      aria-hidden="true"
+      width={56}
+      height={50}
+      style={{ display: 'block', objectFit: 'contain' }}
+    />
   );
 }
 
@@ -263,7 +185,7 @@ export default function TimelineScrubber({
         {/* Grip disc handle */}
         <div
           className={styles.handle}
-          style={{ left: `calc(${handleFraction * 100}% - 26px)` }}
+          style={{ left: `calc(${handleFraction * 100}% - 28px)` }}
           role="slider"
           aria-label={t('handleAriaLabel')}
           aria-valuenow={Math.round(handleFraction * 100)}
