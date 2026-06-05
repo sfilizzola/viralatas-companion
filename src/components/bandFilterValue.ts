@@ -5,6 +5,7 @@ export type BandFilterValue = {
   genre: string | null;
   upcoming: boolean;
   sortOrder: 'time-asc' | 'time-desc' | 'alpha';
+  userId: string | null;
 };
 
 export const EMPTY_FILTERS: BandFilterValue = {
@@ -14,4 +15,5 @@ export const EMPTY_FILTERS: BandFilterValue = {
   genre: null,
   upcoming: false,
   sortOrder: 'time-asc',
+  userId: null,
 };

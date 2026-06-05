@@ -2,7 +2,12 @@ import type { Band } from '../types';
 import type { BandFilterValue } from '../components/bandFilterValue';
 import { bandDay } from './bandTime';
 
-export function filterBands(bands: Band[], filters: BandFilterValue, now: Date): Band[] {
+export function filterBands(
+  bands: Band[],
+  filters: BandFilterValue,
+  now: Date,
+  userPickIds?: Set<string>,
+): Band[] {
   const q = filters.query.trim().toLowerCase();
   const result = bands.filter((b) => {
     if (filters.day && bandDay(b) !== filters.day) return false;
@@ -10,6 +15,7 @@ export function filterBands(bands: Band[], filters: BandFilterValue, now: Date):
     if (filters.genre && b.genre !== filters.genre) return false;
     if (filters.upcoming && new Date(b.end_time) <= now) return false;
     if (q && !b.name.toLowerCase().includes(q)) return false;
+    if (userPickIds && !userPickIds.has(b.id)) return false;
     return true;
   });
 

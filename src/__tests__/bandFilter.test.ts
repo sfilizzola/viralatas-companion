@@ -137,4 +137,28 @@ describe('filterBands', () => {
     const filters: BandFilterValue = { ...EMPTY_FILTERS, day: '2026-07-29', stage: ['Faster'] };
     expect(filterBands([], filters, NOW)).toHaveLength(0);
   });
+
+  it('filters by userPickIds — keeps only bands in the set', () => {
+    const userPickIds = new Set(['b1', 'b3']);
+    const result = filterBands(BANDS, EMPTY_FILTERS, NOW, userPickIds);
+    const ids = result.map((b) => b.id);
+    expect(ids).toContain('b1');
+    expect(ids).toContain('b3');
+    expect(ids).not.toContain('b2');
+    expect(ids).not.toContain('b4');
+    expect(ids).not.toContain('b5');
+  });
+
+  it('composes userPickIds with day filter', () => {
+    const userPickIds = new Set(['b1', 'b2']);
+    const result = filterBands(BANDS, { ...EMPTY_FILTERS, day: '2026-07-29' }, NOW, userPickIds);
+    const ids = result.map((b) => b.id);
+    expect(ids).toEqual(['b1']);
+  });
+
+  it('returns empty array when user has no picks that match', () => {
+    const userPickIds = new Set<string>();
+    const result = filterBands(BANDS, EMPTY_FILTERS, NOW, userPickIds);
+    expect(result).toHaveLength(0);
+  });
 });
