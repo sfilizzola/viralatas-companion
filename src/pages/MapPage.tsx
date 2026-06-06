@@ -86,11 +86,12 @@ export default function MapPage() {
           aria-label={t('stagesButton')}
           onClick={() => setShowStageSheet(true)}
         >
-          <span className={styles.stageDots} aria-hidden="true">
-            <span className={styles.stageDot} style={{ background: '#e74c3c' }} />
-            <span className={styles.stageDot} style={{ background: '#6366f1' }} />
-            <span className={styles.stageDot} style={{ background: '#f59e0b' }} />
-          </span>
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <rect x="1" y="1" width="7" height="7" rx="1" />
+            <rect x="10" y="1" width="7" height="7" rx="1" />
+            <rect x="1" y="10" width="7" height="7" rx="1" />
+            <rect x="10" y="10" width="7" height="7" rx="1" />
+          </svg>
           <span>{t('stagesButton')}</span>
         </button>
       </header>
