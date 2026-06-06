@@ -102,7 +102,7 @@ export default function RightNowPage() {
         <span className={styles.title}>{t('title')}</span>
         <div className={styles.headerRight}>
           <button
-            className={styles.stagesBtn}
+            className={styles.chip}
             type="button"
             aria-label={t('stagesButton')}
             onClick={() => setShowStageSheet(true)}
@@ -122,9 +122,10 @@ export default function RightNowPage() {
             </svg>
             <span>{t('mapButton')}</span>
           </Link>
+          <div className={styles.headerDivider} aria-hidden="true" />
           <span className={styles.timestamp}>
-            <span>{nowLabel(now, language)}</span>
-            <span>{t('wackenTime')}</span>
+            <span className={styles.timestampValue}>{nowLabel(now, language)}</span>
+            <span className={styles.timestampLabel}>{t('wackenTime')}</span>
           </span>
         </div>
       </header>
