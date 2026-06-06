@@ -8,7 +8,7 @@ import {
 
 export function useStageSchedule(): StageScheduleEntry[] {
   const { bands } = useBands();
-  const now = useNow();
+  const now = useNow(30_000);
   return useMemo(
     () => buildStageScheduleSnapshot(bands ?? [], now),
     [bands, now],
