@@ -196,20 +196,8 @@
 
 /* ── NEXT tile ── */
 
-.tileNext {
-  opacity: 0.72;
-}
-
 .tileNext .tileBar {
-  opacity: 0.3;
-}
-
-.tileNext .stageName {
-  opacity: 0.6;
-}
-
-.tileNext .bandName {
-  color: var(--text-muted);
+  opacity: 0.5;
 }
 
 /* ── Live dot ── */
