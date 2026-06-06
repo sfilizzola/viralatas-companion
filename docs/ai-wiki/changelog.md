@@ -4,6 +4,25 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-06 (Phase 39 — Stage Schedule Bottom Sheet)
+
+### Added
+- **`src/components/StageScheduleSheet.tsx`** — bottom sheet showing all 8 Wacken stages in a 2×4 grid (current/next band per stage). Props: `bands: Band[]`, `now: Date`, `onClose: () => void`, `onBandSelect: (bandId: string) => void`. Data-agnostic: no internal IDB reads; calls `buildStageScheduleSnapshot(bands, now)` from `stageSchedule.ts` with the caller-supplied inputs.
+- **`src/components/StageScheduleSheet.module.css`** — CSS module for the sheet.
+- **`src/i18n/StageScheduleSheet_{en,br,es,de}.json`** — 4 locale files, namespace `StageScheduleSheet`.
+- **`StageScheduleSheet` namespace in `src/lib/i18n.ts`** — added to `TranslationFile` union and all 4 language maps.
+
+### Changed
+- `docs/ai-wiki/architecture.md` — added `StageScheduleSheet.tsx` and `stageSchedule.ts` to Relevant Source Files; added `stageSchedule.ts` to Services table.
+- `public/vira-lata-ds.html` — §14 Stage Schedule Sheet: LIVE/NEXT tile states, `--tile-color` CSS custom prop, ribbon Variant D, pulsing dot, sheet animation, accessibility attributes; manifest updated.
+
+### Architectural Notes
+- `StageScheduleSheet` is intentionally **data-agnostic**: it accepts `bands` and `now` from the caller, never fetches from IDB or Supabase directly. All derivation is delegated to the pure `buildStageScheduleSnapshot()` service.
+- Stage color per tile is injected via the `--tile-color` CSS custom property set inline per tile using `stageColor(stage)` from `src/services/stageColors.ts`. This keeps color coupling to one call site and makes tile theming composable without prop drilling.
+- Ribbon text contrast is hard-coded per stage (white on dark stages; `#111` on Harder, Wackinger, Welcome to the Jungle) — matches the existing `stageColors.ts` bright-stage convention.
+
+---
+
 ## 2026-06-05 (Badges — Missed Bands tier)
 
 ### Added

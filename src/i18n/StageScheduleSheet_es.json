@@ -1,0 +1,10 @@
+{
+  "sheetTitle": "Todos los Escenarios",
+  "sheetSubtitle": "Ahora & próximo",
+  "close": "Cerrar",
+  "live": "EN VIVO",
+  "next": "Próx. ·",
+  "triggerButton": "Escenarios",
+  "tileAriaLive": "En vivo en {stage}: {band}, {start}–{end}",
+  "tileAriaNext": "Próximo en {stage}: {band} a las {start}"
+}

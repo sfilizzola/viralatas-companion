@@ -1,0 +1,10 @@
+{
+  "sheetTitle": "Todos os Palcos",
+  "sheetSubtitle": "Agora & próximo",
+  "close": "Fechar",
+  "live": "AO VIVO",
+  "next": "Próx. ·",
+  "triggerButton": "Palcos",
+  "tileAriaLive": "Ao vivo em {stage}: {band}, {start}–{end}",
+  "tileAriaNext": "Próximo em {stage}: {band} às {start}"
+}

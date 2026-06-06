@@ -2591,8 +2591,9 @@
     { "num": "10", "id": "empty-states", "title": "Empty & Error States", "purpose": "Canonical empty states and ErrorState variants" },
     { "num": "11", "id": "duck",         "title": "The Duck",           "purpose": "Duck feature: QuackStrip, QuackGhostRow, DuckToast, /now Monument live cards" },
     { "num": "12", "id": "governance",   "title": "Governance",         "purpose": "DS audit score, implementation checklist, best practices" },
-    { "num": "13", "id": "minimap",      "title": "Festival Minimap",   "purpose": "Minimap zones, avatar dots, entry button" },
-    { "num": null, "id": "changelog",    "title": "Changelog",          "purpose": "Dated revision history of the design system" }
+    { "num": "13", "id": "minimap",               "title": "Festival Minimap",        "purpose": "Minimap zones, avatar dots, entry button" },
+    { "num": "14", "id": "stage-schedule-sheet", "title": "Stage Schedule Sheet",    "purpose": "Bottom sheet showing current/next band per stage in a 2×4 grid; LIVE ribbon + pulsing dot; NEXT dimmed tile; --tile-color CSS custom prop per tile" },
+    { "num": null, "id": "changelog",             "title": "Changelog",               "purpose": "Dated revision history of the design system" }
   ],
   "tokens": {
     "neutrals": ["--bg","--bg-surface","--bg-elevated","--bg-sunken","--border","--border-strong","--text","--text-muted","--text-faint","--white"],
@@ -2646,7 +2647,8 @@
     { "name": "QuackStrip",            "sectionId": "duck" },
     { "name": "QuackGhostRow",         "sectionId": "duck" },
     { "name": "DuckToast",             "sectionId": "duck" },
-    { "name": "MinimapOverlay",        "sectionId": "minimap" }
+    { "name": "MinimapOverlay",        "sectionId": "minimap" },
+    { "name": "StageScheduleSheet",    "sectionId": "stage-schedule-sheet" }
   ]
 }
 </script>
@@ -2664,6 +2666,7 @@
   <a href="#duck">11 Duck 🦆</a>
   <a href="#governance">12 Governance</a>
   <a href="#minimap">13 Minimap</a>
+  <a href="#stage-schedule-sheet">14 Stage Schedule Sheet</a>
   <a href="#changelog">Changelog</a>
 </nav>
 <div class="page">
@@ -6676,6 +6679,130 @@ export const MINIMAP_ZONES: Record&lt;ZoneId, FractionalBox&gt; = {
 
 
   <!-- ============================================================
+       14. PHASE 39 — STAGE SCHEDULE SHEET
+       ============================================================ -->
+  <section class="section" id="stage-schedule-sheet">
+    <div class="section-head">
+      <div class="num">14</div>
+      <div>
+        <h2>Stage Schedule Sheet</h2>
+        <p class="desc">Phase 39 feature: a bottom sheet showing the current or next band for all 8 Wacken stages in a 2×4 grid. Each tile is themed with the stage color via <code>--tile-color</code>. LIVE tiles carry a diagonal ribbon and pulsing dot; NEXT tiles are dimmed with a time label.</p>
+      </div>
+    </div>
+
+    <div class="subhead">Component · <code>src/components/StageScheduleSheet.tsx</code></div>
+    <div class="demo-notes ds-x-c6fca1f6">
+      <p class="ds-x-da48f94d"><strong>Props:</strong> <code>bands: Band[]</code>, <code>now: Date</code>, <code>onClose: () => void</code>, <code>onBandSelect: (bandId: string) => void</code>. The component calls <code>buildStageScheduleSnapshot(bands, now)</code> from <code>src/services/stageSchedule.ts</code> — no internal IDB reads. All data flows in from the parent.</p>
+      <pre class="ds-x-e16d999f">// Data service (pure, no IDB)
+// src/services/stageSchedule.ts
+export type StageScheduleEntry = {
+  stage: string;
+  band: Band | null;
+  status: 'current' | 'next';
+};
+
+buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
+// Returns one entry per stage (8 total)</pre>
+    </div>
+
+    <div class="subhead">Grid layout · 2 columns × 4 rows</div>
+    <div class="demo-notes ds-x-c6fca1f6">
+      <ul class="ds-x-5b5bc1a9">
+        <li>CSS Grid: <code>grid-template-columns: 1fr 1fr</code>; up to 4 rows (one per pair of stages)</li>
+        <li>Each tile: <code>--tile-color</code> CSS custom property set inline via <code>stageColor(stage)</code> from <code>src/services/stageColors.ts</code></li>
+        <li>Stage color top bar: full-opacity (<code>background: var(--tile-color)</code>) for LIVE tiles; 30% opacity for NEXT tiles</li>
+        <li>LIVE tile border: <code>border-color: color-mix(in srgb, var(--tile-color) 25%, var(--border))</code></li>
+      </ul>
+    </div>
+
+    <div class="subhead">LIVE tile state · <code>status === 'current'</code></div>
+    <div class="demo-notes ds-x-c6fca1f6">
+      <ul class="ds-x-5b5bc1a9">
+        <li><strong>Top bar:</strong> full-opacity stage-colored stripe</li>
+        <li><strong>Corner ribbon (Variant D):</strong> <code>64×64px</code> overflow-hidden wrapper in the top-right corner; inner ribbon band rotated <code>45deg</code>, stage color background, white text <code>"LIVE"</code> (or <code>#111</code> on bright stages: Harder, Wackinger, Welcome to the Jungle)</li>
+        <li><strong>Pulsing dot:</strong> stage-colored circle, animation <code>livePulse 1.6s ease-in-out infinite</code> (scale 1→1.35→1, opacity 1→0.55→1)</li>
+        <li><strong>Tile opacity:</strong> 1.0 (full)</li>
+      </ul>
+      <pre class="ds-x-e16d999f">/* Ribbon Variant D — corner overflow clip */
+.ribbonWrapper {
+  position: absolute;
+  top: 0; right: 0;
+  width: 64px; height: 64px;
+  overflow: hidden;
+}
+.ribbon {
+  position: absolute;
+  top: 14px; right: -18px;
+  width: 80px;
+  transform: rotate(45deg);
+  background: var(--tile-color);
+  color: /* white or #111 per stage */;
+  font-size: 9px; font-weight: 700;
+  text-align: center;
+  letter-spacing: 0.08em;
+  padding: 2px 0;
+}
+
+/* Pulsing dot */
+@keyframes livePulse {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%       { transform: scale(1.35); opacity: 0.55; }
+}
+.liveDot {
+  animation: livePulse 1.6s ease-in-out infinite;
+  background: var(--tile-color);
+}</pre>
+    </div>
+
+    <div class="subhead">NEXT tile state · <code>status === 'next'</code></div>
+    <div class="demo-notes ds-x-c6fca1f6">
+      <ul class="ds-x-5b5bc1a9">
+        <li><strong>Top bar:</strong> 30% opacity stage color strip</li>
+        <li><strong>No ribbon</strong> — corner area is empty</li>
+        <li><strong>Label:</strong> <code>"Next · HH:MM"</code> — muted, small, shows the band start time</li>
+        <li><strong>Tile opacity:</strong> <code>0.72</code></li>
+      </ul>
+    </div>
+
+    <div class="subhead">Sheet animation &amp; backdrop</div>
+    <div class="demo-notes ds-x-c6fca1f6">
+      <ul class="ds-x-5b5bc1a9">
+        <li>Sheet slides up from bottom: <code>@keyframes sheetUp</code>, duration <code>280ms</code>, easing <code>cubic-bezier(0.32, 0.72, 0, 1)</code></li>
+        <li>Backdrop: semi-opaque overlay; click closes the sheet</li>
+        <li>Close button in header also dismisses the sheet</li>
+        <li><code>@media (prefers-reduced-motion: reduce)</code> — all animations disabled</li>
+      </ul>
+      <pre class="ds-x-e16d999f">@keyframes sheetUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+.sheet {
+  animation: sheetUp 280ms cubic-bezier(0.32, 0.72, 0, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet { animation: none; }
+  .liveDot { animation: none; }
+}</pre>
+    </div>
+
+    <div class="subhead">Accessibility</div>
+    <div class="demo-notes ds-x-c6fca1f6">
+      <ul class="ds-x-5b5bc1a9">
+        <li>Sheet root: <code>role="dialog"</code>, <code>aria-modal="true"</code></li>
+        <li>Each tile: descriptive <code>aria-label</code> (e.g. <code>"Faster stage — Iron Maiden — LIVE"</code>)</li>
+        <li>Close button: labelled with i18n key <code>close</code></li>
+        <li>Backdrop click and close button both call <code>onClose()</code></li>
+      </ul>
+    </div>
+
+    <div class="subhead">i18n</div>
+    <div class="demo-notes ds-x-c6fca1f6">
+      <p class="ds-x-da48f94d">Namespace: <code>StageScheduleSheet</code> — 4 locale files (<code>en</code>, <code>br</code>, <code>es</code>, <code>de</code>). Registered in <code>src/lib/i18n.ts</code> <code>TranslationFile</code> union and all 4 language maps.</p>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
        CHANGELOG
        ============================================================ -->
   <section class="section" id="changelog">
@@ -6688,6 +6815,15 @@ export const MINIMAP_ZONES: Record&lt;ZoneId, FractionalBox&gt; = {
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.3 — Phase 39 Stage Schedule Sheet · Jun 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§14 Stage Schedule Sheet</b> — new section documenting <code>StageScheduleSheet</code>: 2×4 grid layout, LIVE tile (ribbon Variant D + pulsing dot + full-opacity top bar + tinted border) and NEXT tile (dimmed, no ribbon, "Next · HH:MM" label). Includes <code>--tile-color</code> CSS custom prop pattern, <code>livePulse</code> and <code>sheetUp</code> keyframe specs, <code>prefers-reduced-motion</code> guard, and accessibility attributes.</li>
+          <li>DS manifest updated: §14 section registered (<code>stage-schedule-sheet</code>); <code>StageScheduleSheet</code> component added to components index.</li>
+          <li>Sidenav: "14 Stage Schedule Sheet" link added.</li>
+        </ul>
+      </div>
+
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.2 — Phase 38.A Crew Picks Browser · Jun 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">

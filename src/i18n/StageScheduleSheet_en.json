@@ -1,0 +1,10 @@
+{
+  "sheetTitle": "All Stages",
+  "sheetSubtitle": "Now & up next",
+  "close": "Close",
+  "live": "LIVE",
+  "next": "Next ·",
+  "triggerButton": "Stages",
+  "tileAriaLive": "Live at {stage}: {band}, {start}–{end}",
+  "tileAriaNext": "Up next at {stage}: {band} at {start}"
+}

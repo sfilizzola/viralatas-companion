@@ -1,0 +1,10 @@
+{
+  "sheetTitle": "Alle Bühnen",
+  "sheetSubtitle": "Jetzt & als nächstes",
+  "close": "Schließen",
+  "live": "LIVE",
+  "next": "Nächste ·",
+  "triggerButton": "Bühnen",
+  "tileAriaLive": "Live auf {stage}: {band}, {start}–{end}",
+  "tileAriaNext": "Als nächstes auf {stage}: {band} um {start}"
+}
