@@ -15,6 +15,32 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
+## Phase 39 — Stage Schedule Bottom Sheet
+
+**Status:** Planned (not yet started)
+
+**Goal:** A bottom sheet component showing all 8 Wacken stages at a glance — current or next band per stage — so a vira-lata can decide in seconds where to go next.
+
+**Design:** Locked in `docs/superpowers/prototypes/stage-schedule-bottom-sheet/stage-grid-final.html`.
+- **Layout:** 2×4 Stage Grid (one tile per stage)
+- **Live indicator:** Corner ribbon (Variant D) — diagonal "LIVE" flag in stage color, top-right corner
+- **LIVE tiles:** ribbon + pulsing stage-colored dot + full-opacity top bar + slightly elevated border
+- **NEXT tiles:** no ribbon, "Next ·" label + time, `opacity: 0.72`, dimmed top bar
+- **Tap:** opens `BandDetailModal` for that band
+
+**Data:** `buildStageScheduleSnapshot(bands, now)` from `src/services/stageSchedule.ts` — already exists, no new service logic needed. Map `status === 'current'` → LIVE treatment, `status === 'next'` → NEXT treatment.
+
+**Trigger placement:** TBD — candidate: floating button or entry point on `/now`.
+
+**Deliverables:**
+- [ ] `src/components/StageScheduleSheet.tsx` — bottom sheet + stage grid + ribbon tile
+- [ ] Trigger wired from at least one entry point in the app
+- [ ] Accessible (keyboard/screen reader: sheet role, tile aria-labels)
+- [ ] Design System updated (`public/vira-lata-ds.html`)
+- [ ] Wiki updated
+
+---
+
 ## When completing a phase
 
 1. Append the phase entry to `docs/ai-wiki/phases-history.md` (not here, not in CLAUDE.md).
