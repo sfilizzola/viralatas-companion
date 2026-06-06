@@ -4,6 +4,25 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-06 (Phase 40 — StageScheduleSheet Entry Points)
+
+### Added
+- **`StageScheduleSheet` entry point on `/now`** — red-tinted icon+label button (2×4 grid icon + "Stages") in the header right section, inserted before the map button. Opens `StageScheduleSheet` with `bands` and `now` from `useNowData()`. `onBandSelect` navigates to `/schedule`.
+- **`StageScheduleSheet` entry point on `/map`** — secondary pill button (3 stage-color dots + "Stages") right-aligned in the header. Opens `StageScheduleSheet` with `bands` from `useBands()` and `effectiveTime` (scrubber-aware) as `now`. `onBandSelect` navigates to `/schedule`.
+- **i18n keys** — `stagesButton` added to all 4 locales for both `RightNowPage` and `MapPage` namespaces (en/br/de/es).
+
+### Changed
+- `src/pages/RightNowPage.tsx` — added `useNavigate`, `StageScheduleSheet` import, `showStageSheet` state, `bands` from `useNowData()`, header button, and sheet render.
+- `src/pages/MapPage.tsx` — added `useNavigate`, `useBands`, `StageScheduleSheet` imports, `showStageSheet` state, `bands` from `useBands()`, header button, and sheet render with `effectiveTime`.
+- `src/pages/RightNowPage.module.css` — added `.stagesBtn` styles (red-tinted, mono font, 2×4 grid icon).
+- `src/pages/MapPage.module.css` — added `.stagesBtn`, `.stageDots`, `.stageDot` styles (muted pill, 3 colored dots).
+
+### Architectural Notes
+- `onBandSelect` navigates to `/schedule` rather than opening `BandDetailModal` — zero new hook dependencies on both pages.
+- `/map` sheet intentionally reflects `effectiveTime` (scrubbed time) so users see what's playing at the time they're exploring on the timeline — natural extension of the scrubber UX.
+
+---
+
 ## 2026-06-06 (Phase 39 — Stage Schedule Bottom Sheet)
 
 ### Added

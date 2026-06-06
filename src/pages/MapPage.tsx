@@ -1,15 +1,17 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useI18n } from '../lib/i18n';
 import { useNow } from '../hooks/useNow';
 import { useAuth } from '../hooks/useAuth';
 import { useSocialSnapshot } from '../hooks/useSocialSnapshot';
 import { useTimelineGate } from '../hooks/useTimelineGate';
+import { useBands } from '../hooks/useBands';
 import { buildPlacements } from '../services/minimapPlacement';
 import { MINIMAP_ZONES } from '../components/map/minimapZones';
 import MinimapOverlay from '../components/map/MinimapOverlay';
 import TimelineScrubber from '../components/map/TimelineScrubber';
 import OfflineBanner from '../components/OfflineBanner';
+import StageScheduleSheet from '../components/StageScheduleSheet';
 import styles from './MapPage.module.css';
 
 function useOffline(): boolean {
@@ -49,6 +51,9 @@ export default function MapPage() {
   const { user } = useAuth();
   const selfUserId = user?.id ?? null;
   const offline = useOffline();
+  const navigate = useNavigate();
+  const [showStageSheet, setShowStageSheet] = useState(false);
+  const { bands } = useBands();
 
   // Timeline preview state — ephemeral, never persisted
   const [previewTime, setPreviewTime] = useState<Date | null>(null);
@@ -75,6 +80,19 @@ export default function MapPage() {
           <h1 className={styles.title}>{t('title')}</h1>
           <span className={styles.subtitle}>{t('subtitle')}</span>
         </div>
+        <button
+          className={styles.stagesBtn}
+          type="button"
+          aria-label={t('stagesButton')}
+          onClick={() => setShowStageSheet(true)}
+        >
+          <span className={styles.stageDots} aria-hidden="true">
+            <span className={styles.stageDot} style={{ background: '#e74c3c' }} />
+            <span className={styles.stageDot} style={{ background: '#6366f1' }} />
+            <span className={styles.stageDot} style={{ background: '#f59e0b' }} />
+          </span>
+          <span>{t('stagesButton')}</span>
+        </button>
       </header>
 
       {offline && (
@@ -103,6 +121,15 @@ export default function MapPage() {
         onPreview={setPreviewTime}
         onClear={() => setPreviewTime(null)}
       />
+
+      {showStageSheet && (
+        <StageScheduleSheet
+          bands={bands}
+          now={effectiveTime}
+          onClose={() => setShowStageSheet(false)}
+          onBandSelect={() => navigate('/schedule')}
+        />
+      )}
     </div>
   );
 }

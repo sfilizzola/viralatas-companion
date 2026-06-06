@@ -933,3 +933,32 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `AttendeeMap` inversion in `LineupPage` (`picksByUserId`) is a pure `useMemo` derived from the already-loaded attendee data — zero new IDB queries.
 - `sharedPick` is derived inline per band: `filters.userId != null && pickedIds.has(band.id)` — no secondary lookup map needed.
 - `crewWithPicks` excludes the current user and users with 0 picks; computed once per attendee map update.
+
+---
+
+## Phase 40 — StageScheduleSheet Entry Points
+
+**Completed:** 2026-06-06
+
+**Goal:** Wire the existing `StageScheduleSheet` component into `/now` and `/map` via compact header buttons. Tapping a stage tile navigates to `/schedule`.
+
+**Deliverables shipped:**
+- `src/i18n/RightNowPage_{en,br,de,es}.json` — `stagesButton` key added
+- `src/i18n/MapPage_{en,br,de,es}.json` — `stagesButton` key added
+- `src/pages/RightNowPage.tsx` — `showStageSheet` state, `bands` from `useNowData()`, red-tinted grid-icon button in header right, `StageScheduleSheet` render
+- `src/pages/RightNowPage.module.css` — `.stagesBtn` (red-tinted, mono font, svg grid icon)
+- `src/pages/MapPage.tsx` — `showStageSheet` state, `useBands()` call, pill button with 3 stage-color dots in header, `StageScheduleSheet` render with `effectiveTime`
+- `src/pages/MapPage.module.css` — `.stagesBtn`, `.stageDots`, `.stageDot`
+
+**Acceptance criteria (all met):**
+- [x] `/now` header shows Stages button (red-tinted, between map button and timestamp)
+- [x] `/map` header shows Stages button (muted pill, right-aligned)
+- [x] Both buttons open `StageScheduleSheet` on tap
+- [x] Tapping a stage tile navigates to `/schedule`
+- [x] `/map` sheet reflects scrubbed `effectiveTime`
+- [x] i18n in all 4 languages (en/br/de/es)
+- [x] Build green · Tests green (742 tests)
+
+**Architectural notes:**
+- `onBandSelect` navigates to `/schedule` rather than opening `BandDetailModal` — zero new hook dependencies on both pages.
+- `/map` passes `effectiveTime` (`previewTime ?? now`) so the sheet reflects the timeline scrubber position.

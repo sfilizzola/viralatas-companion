@@ -4,7 +4,7 @@ import { useDuckEnabled } from '../contexts/DuckEnabledContext';
 import { useDuckQuack } from '../hooks/useDuckQuack';
 import type { CrewLiveGroup } from '../services/livePreview';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BadgesDisplay from '../components/BadgesDisplay';
@@ -15,6 +15,7 @@ import WrapTeaserBanner from '../components/wrap/WrapTeaserBanner';
 import { useWrapTeaserVisible } from '../hooks/useWrapTeaserVisible';
 import CrewGroupsSection from '../components/now/CrewGroupsSection';
 import LiveCardSheet from '../components/now/LiveCardSheet';
+import StageScheduleSheet from '../components/StageScheduleSheet';
 import styles from './RightNowPage.module.css';
 
 const DATE_LOCALES: Record<Language, string> = {
@@ -36,12 +37,15 @@ function nowLabel(date: Date, language: Language) {
 export default function RightNowPage() {
   const { language, t } = useI18n('RightNowPage');
   const duckEnabled = useDuckEnabled();
+  const navigate = useNavigate();
   const [activeGroup, setActiveGroup] = useState<CrewLiveGroup | null>(null);
+  const [showStageSheet, setShowStageSheet] = useState(false);
   const [dismissedBandIds, setDismissedBandIds] = useState<Set<string>>(new Set());
   const {
     user,
     userId,
     isFriend,
+    bands,
     crewUsers,
     latestAnnouncement,
     now,
@@ -97,6 +101,20 @@ export default function RightNowPage() {
       <header className={styles.header}>
         <span className={styles.title}>{t('title')}</span>
         <div className={styles.headerRight}>
+          <button
+            className={styles.stagesBtn}
+            type="button"
+            aria-label={t('stagesButton')}
+            onClick={() => setShowStageSheet(true)}
+          >
+            <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+              <rect x="1" y="1" width="7" height="7" rx="1" />
+              <rect x="10" y="1" width="7" height="7" rx="1" />
+              <rect x="1" y="10" width="7" height="7" rx="1" />
+              <rect x="10" y="10" width="7" height="7" rx="1" />
+            </svg>
+            <span>{t('stagesButton')}</span>
+          </button>
           <Link to="/map" className={styles.mapButton} aria-label={t('mapButton')}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11Z"/>
@@ -195,6 +213,15 @@ export default function RightNowPage() {
           metalPlaceConfig={metalPlaceConfig}
           onClose={() => setActiveGroup(null)}
           t={t}
+        />
+      )}
+
+      {showStageSheet && (
+        <StageScheduleSheet
+          bands={bands}
+          now={now}
+          onClose={() => setShowStageSheet(false)}
+          onBandSelect={() => navigate('/schedule')}
         />
       )}
     </div>

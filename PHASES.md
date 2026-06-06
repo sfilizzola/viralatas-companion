@@ -43,31 +43,19 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## Phase 40 — StageScheduleSheet Entry Points
 
-**Status:** Planned (not yet started)
+**Status:** Complete (2026-06-06)
 
 **Goal:** Wire the existing `StageScheduleSheet` component into `/now` and `/map` via compact header buttons (Option A on both). Tapping a stage tile navigates to `/schedule`.
 
-**Design:** Locked in `docs/superpowers/prototypes/stage-schedule-entry/options.html`. Plan in `docs/superpowers/plans/2026-06-06-stage-schedule-entry-points.md`.
-
-**Entry points:**
-- **`/now` header:** small icon+label button (2×2 grid icon + "Stages"), red-tinted (`rgba(192,57,43,0.12)` bg, accent border), inserted between map button and timestamp
-- **`/map` header:** secondary pill button (3 stage-color dots + "Stages"), right-aligned after title block, muted style matching the page's secondary controls
-
-**Data:**
-- `/now`: uses `bands` already returned by `useNowData()` + `now` from same hook
-- `/map`: adds `useBands()` call; passes `effectiveTime` (scrubber-aware `previewTime ?? now`) as `now` — so the sheet reflects the scrubbed time
-
-**`onBandSelect`:** calls `navigate('/schedule')` on both pages — no new hook dependencies.
-
 **Deliverables:**
-- [ ] `src/i18n/RightNowPage_{en,br,de,es}.json` — add `stagesButton` key
-- [ ] `src/i18n/MapPage_{en,br,de,es}.json` — add `stagesButton` key
-- [ ] `src/pages/RightNowPage.tsx` — state + header button + sheet render
-- [ ] `src/pages/RightNowPage.module.css` — `.stagesBtn`
-- [ ] `src/pages/MapPage.tsx` — state + `useBands()` + header button + sheet render with `effectiveTime`
-- [ ] `src/pages/MapPage.module.css` — `.stagesBtn`, `.stageDots`, `.stageDot`
-- [ ] Build passes, tests green
-- [ ] Wiki + changelog updated
+- [x] `src/i18n/RightNowPage_{en,br,de,es}.json` — `stagesButton` key added
+- [x] `src/i18n/MapPage_{en,br,de,es}.json` — `stagesButton` key added
+- [x] `src/pages/RightNowPage.tsx` — state + header button + sheet render
+- [x] `src/pages/RightNowPage.module.css` — `.stagesBtn`
+- [x] `src/pages/MapPage.tsx` — state + `useBands()` + header button + sheet render with `effectiveTime`
+- [x] `src/pages/MapPage.module.css` — `.stagesBtn`, `.stageDots`, `.stageDot`
+- [x] Build passes, tests green (742)
+- [x] Wiki + changelog updated
 
 ---
 

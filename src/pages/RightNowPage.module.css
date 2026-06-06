@@ -950,6 +950,34 @@
   }
 }
 
+.stagesBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: rgba(192, 57, 43, 0.12);
+  border: 1px solid rgba(192, 57, 43, 0.35);
+  border-radius: 5px;
+  padding: 3px 5px;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  line-height: 1.25;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease;
+}
+
+.stagesBtn:hover {
+  background: rgba(192, 57, 43, 0.2);
+  border-color: rgba(192, 57, 43, 0.55);
+}
+
+.stagesBtn svg {
+  width: 16px;
+  height: 16px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .undoToast {
     animation: none;
