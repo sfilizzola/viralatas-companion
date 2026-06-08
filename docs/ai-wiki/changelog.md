@@ -4,6 +4,26 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-08 (Phase 41 — Map Preview Awareness B3 + S4)
+
+### Added
+- **`previewTime?: Date | null` prop on `StageScheduleSheet`** — when set, the sheet header gains a 3px amber left border + faint amber tint (`.headerPreview`), and the subtitle switches to an amber mono uppercase label `⏱ Preview · HH:MM` (`.subtitlePreview`). Live mode (prop absent or null) is fully unchanged.
+- **B3 stacked button in `MapPage`** — when `previewTime` is active, the Stages button replaces its grid icon with two stacked text lines: `HH:MM` (amber, larger, mono) over `STAGES` (amber, faded, tiny). Live mode renders the original grid icon + "Stages" unchanged.
+- **CSS classes** — `StageScheduleSheet.module.css`: `.headerPreview`, `.subtitlePreview`; `MapPage.module.css`: `.stagesBtnPreview`, `.stagesBtnPreviewTime`, `.stagesBtnPreviewLabel`.
+- **i18n keys** — `stagesButtonPreview` (aria-label) added to `MapPage_{en,br,de,es}.json`; `sheetSubtitlePreview` added to `StageScheduleSheet_{en,br,de,es}.json`.
+- **Unit tests** — `src/__tests__/StageScheduleSheet.previewTime.test.tsx`: live mode (no border, normal subtitle) + preview mode (amber header class, ⏱ subtitle).
+
+### Changed
+- `src/pages/MapPage.tsx` — added `formatTime` import; `isPreview` derived flag; conditional `btnClass`; B3 stacked button render; `previewTime` passed to `StageScheduleSheet`.
+- `src/components/StageScheduleSheet.tsx` — added `previewTime?: Date | null` to `Props`; conditional header/subtitle classes.
+
+### Architectural Notes
+- `previewTime` is purely ephemeral `useState` in `MapPage` — never persisted to IndexedDB or Supabase. The admin tables (`live_band_test_config`, `metal_place_config`) remain the sole source of truth for the authoritative time reference.
+- `RightNowPage.tsx` callsite is unaffected — TypeScript accepts the omission (`undefined != null → false`).
+- `formatTime` takes an ISO string; `previewTime.toISOString()` converts the `Date` at the callsite.
+
+---
+
 ## 2026-06-06 (Phase 40 — StageScheduleSheet Entry Points)
 
 ### Added

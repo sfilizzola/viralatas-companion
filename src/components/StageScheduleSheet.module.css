@@ -267,6 +267,23 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
 }
 
+/* ── Preview mode: S4 left-border accent header ── */
+
+.headerPreview {
+  border-left: 3px solid var(--signal-warn);
+  background: rgba(243, 156, 18, 0.06);
+  padding-left: 13px; /* 16px - 3px border */
+}
+
+.subtitlePreview {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--signal-warn);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sheet { animation: none; }
   .backdrop { animation: none; }

@@ -1,6 +1,7 @@
 {
   "sheetTitle": "Todos os Palcos",
   "sheetSubtitle": "Agora & próximo",
+  "sheetSubtitlePreview": "⏱ Prévia · {time}",
   "close": "Fechar",
   "live": "AO VIVO",
   "next": "Próx. ·",

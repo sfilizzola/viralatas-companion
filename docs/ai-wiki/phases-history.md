@@ -992,3 +992,35 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 **Architectural notes:**
 - `onBandSelect` navigates to `/schedule` rather than opening `BandDetailModal` — zero new hook dependencies on both pages.
 - `/map` passes `effectiveTime` (`previewTime ?? now`) so the sheet reflects the timeline scrubber position.
+
+---
+
+### Phase 41 — Map Preview Awareness (B3 + S4)
+**Status:** ✅ Complete
+
+**Completed:** 2026-06-08
+
+**Goal:** Make the Stages button and StageScheduleSheet visibly react to the timeline scrubber's preview time, closing the feedback loop so users know the sheet is showing a future lineup.
+
+**Design variant:** B3 (stacked time readout button) + S4 (left-border accent header).
+
+**Deliverables shipped:**
+- `src/i18n/MapPage_{en,br,de,es}.json` — `stagesButtonPreview` aria-label key added
+- `src/i18n/StageScheduleSheet_{en,br,de,es}.json` — `sheetSubtitlePreview` key added
+- `src/components/StageScheduleSheet.tsx` — `previewTime?: Date | null` prop; conditional `.headerPreview` + `.subtitlePreview` classes
+- `src/components/StageScheduleSheet.module.css` — `.headerPreview` (amber left border + tint), `.subtitlePreview` (amber mono uppercase)
+- `src/pages/MapPage.tsx` — B3 stacked button in preview mode; `previewTime` passed to sheet; `formatTime` import
+- `src/pages/MapPage.module.css` — `.stagesBtnPreview`, `.stagesBtnPreviewTime`, `.stagesBtnPreviewLabel`
+- `src/__tests__/StageScheduleSheet.previewTime.test.tsx` — live mode + preview mode unit tests
+
+**Acceptance criteria (all met):**
+- [x] Live mode: button shows grid icon + "Stages" unchanged; sheet header has no border, subtitle reads "Now & up next"
+- [x] Preview mode: button shows `HH:MM` (amber, larger) stacked over "STAGES" (amber, faded); sheet header gains 3px amber left border + faint tint, subtitle shows "⏱ Preview · HH:MM" in amber mono
+- [x] Back to Now: both revert instantly (live React re-render via prop)
+- [x] All 4 locales correct (en/br/de/es)
+- [x] Build green · Tests green (744 tests)
+
+**Architectural notes:**
+- `previewTime` is purely ephemeral `useState` — never persisted to IndexedDB or Supabase.
+- `RightNowPage.tsx` callsite unaffected — prop is optional (`undefined != null → false`).
+- `formatTime` takes an ISO string; `previewTime.toISOString()` converts the `Date` at the callsite.

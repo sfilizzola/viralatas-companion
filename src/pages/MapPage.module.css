@@ -122,3 +122,42 @@
   color: var(--text);
   border-color: var(--border-strong);
 }
+
+/* ── B3: stacked time/label in preview mode ── */
+
+.stagesBtnPreview {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 34px;
+  padding: 0 10px;
+  border-color: rgba(243, 156, 18, 0.45);
+  background: rgba(243, 156, 18, 0.06);
+  color: var(--signal-warn);
+}
+
+.stagesBtnPreview:hover {
+  color: var(--signal-warn-light);
+  border-color: rgba(243, 156, 18, 0.7);
+  background: rgba(243, 156, 18, 0.10);
+}
+
+.stagesBtnPreviewTime {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--signal-warn-light);
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.stagesBtnPreviewLabel {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--signal-warn);
+  opacity: 0.6;
+  line-height: 1;
+}
