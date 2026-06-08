@@ -162,3 +162,58 @@ export async function setPlaylistTesting(testing: boolean): Promise<boolean> {
     throw err;
   }
 }
+
+// Defaults to false on any error so a network failure keeps MoshSplit hidden
+// rather than accidentally showing a broken component to all users.
+export async function getMoshSplitEnabled(): Promise<boolean> {
+  try {
+    const { data, error } = await supabase
+      .from('app_settings')
+      .select('moshsplit_enabled')
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.error('Failed to fetch moshsplit_enabled flag:', error);
+      return false;
+    }
+
+    return data?.moshsplit_enabled ?? false;
+  } catch (err) {
+    console.error('Error fetching moshsplit_enabled flag:', err);
+    return false;
+  }
+}
+
+export async function setMoshSplitEnabled(enabled: boolean): Promise<boolean> {
+  try {
+    const { data: settings, error: fetchError } = await supabase
+      .from('app_settings')
+      .select('id')
+      .limit(1)
+      .single();
+
+    if (fetchError || !settings) {
+      console.error('Failed to fetch app settings row:', fetchError);
+      throw fetchError ?? new Error('App settings row not found');
+    }
+
+    const { error } = await supabase
+      .from('app_settings')
+      .update({
+        moshsplit_enabled: enabled,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', settings.id);
+
+    if (error) {
+      console.error('Failed to update moshsplit_enabled flag:', error);
+      throw error;
+    }
+
+    return true;
+  } catch (err) {
+    console.error('Error updating moshsplit_enabled flag:', err);
+    throw err;
+  }
+}
