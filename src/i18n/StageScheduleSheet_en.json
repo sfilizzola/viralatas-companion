@@ -1,6 +1,7 @@
 {
   "sheetTitle": "All Stages",
   "sheetSubtitle": "Now & up next",
+  "sheetSubtitlePreview": "⏱ Preview · {time}",
   "close": "Close",
   "live": "LIVE",
   "next": "Next ·",

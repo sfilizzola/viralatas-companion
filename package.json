@@ -21,7 +21,7 @@
     "festival:reset": "tsx supabase/seed/festival-reset.ts"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.105.1",
+    "@supabase/supabase-js": "^2.107.0",
     "@vercel/speed-insights": "^2.0.0",
     "idb": "^8.0.3",
     "react": "^19.2.5",

@@ -1,6 +1,7 @@
 {
   "sheetTitle": "Alle Bühnen",
   "sheetSubtitle": "Jetzt & als nächstes",
+  "sheetSubtitlePreview": "⏱ Vorschau · {time}",
   "close": "Schließen",
   "live": "LIVE",
   "next": "Nächste ·",

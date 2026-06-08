@@ -1,6 +1,7 @@
 {
   "sheetTitle": "Todos los Escenarios",
   "sheetSubtitle": "Ahora & próximo",
+  "sheetSubtitlePreview": "⏱ Vista previa · {time}",
   "close": "Cerrar",
   "live": "EN VIVO",
   "next": "Próx. ·",

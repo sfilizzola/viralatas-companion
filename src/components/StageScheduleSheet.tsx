@@ -8,6 +8,7 @@ import styles from './StageScheduleSheet.module.css';
 type Props = {
   bands: Band[];
   now: Date;
+  previewTime?: Date | null;
   onClose: () => void;
   onBandSelect: (bandId: string) => void;
 };
@@ -19,9 +20,10 @@ function ribbonTextColor(stage: string): string {
   return DARK_RIBBON_TEXT.has(stage) ? '#111' : '#fff';
 }
 
-export default function StageScheduleSheet({ bands, now, onClose, onBandSelect }: Props) {
+export default function StageScheduleSheet({ bands, now, previewTime, onClose, onBandSelect }: Props) {
   const { t } = useI18n('StageScheduleSheet');
   const entries = buildStageScheduleSnapshot(bands, now);
+  const isPreview = previewTime != null;
 
   function handleTileClick(bandId: string) {
     onBandSelect(bandId);
@@ -41,10 +43,14 @@ export default function StageScheduleSheet({ bands, now, onClose, onBandSelect }
           <div className={styles.handle} />
         </div>
 
-        <div className={styles.header}>
+        <div className={isPreview ? `${styles.header} ${styles.headerPreview}` : styles.header}>
           <div>
             <div className={styles.title}>{t('sheetTitle')}</div>
-            <div className={styles.subtitle}>{t('sheetSubtitle')}</div>
+            <div className={isPreview ? `${styles.subtitle} ${styles.subtitlePreview}` : styles.subtitle}>
+              {isPreview
+                ? t('sheetSubtitlePreview', { time: formatTime(previewTime.toISOString()) })
+                : t('sheetSubtitle')}
+            </div>
           </div>
           <button
             className={styles.closeBtn}

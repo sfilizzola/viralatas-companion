@@ -936,6 +936,36 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 
 ---
 
+### Phase 39 — Stage Schedule Bottom Sheet
+**Status:** ✅ Complete
+
+**Goal:** A bottom sheet component showing all 8 Wacken stages at a glance — current or next band per stage — so a vira-lata can decide in seconds where to go next.
+
+**Design:** 2×4 Stage Grid; LIVE tiles get a corner diagonal ribbon in stage color (Variant D) + pulsing dot + full-opacity top bar; NEXT tiles get dimmed opacity + "Next ·" label + time. Tap opens `BandDetailModal` for that band.
+
+**Key deliverables:**
+- `src/components/StageScheduleSheet.tsx` — bottom sheet + 2×4 stage grid + LIVE/NEXT tile treatment with animated ribbon, pulsing dot, and `BandDetailModal` tap-through
+- `src/components/StageScheduleSheet.module.css` — full sheet styling, tile variants, ribbon animation
+- `src/hooks/useStageSchedule.ts` — thin hook wrapping `buildStageScheduleSnapshot()` with live `now` tick
+- `src/services/stageSchedule.ts` — `buildStageScheduleSnapshot(bands, now)` pure service; derives `status: 'current' | 'next' | 'empty'` per stage
+- `src/__tests__/stageSchedule.test.ts` — service unit tests (current, next, empty, multi-stage, day boundaries)
+- `src/lib/i18n.ts` — `StageScheduleSheet` namespace registered
+- `src/i18n/StageScheduleSheet_{en,br,de,es}.json` — all 4 locales
+- `public/vira-lata-ds.html` — StageScheduleSheet component documented
+
+**Acceptance criteria (all met):**
+- [x] Sheet shows all 8 stages; LIVE tiles have ribbon + pulse; NEXT tiles are dimmed
+- [x] Tapping a tile opens `BandDetailModal`
+- [x] Pure service `buildStageScheduleSnapshot` tested for all status transitions
+- [x] i18n in all 4 languages
+- [x] Build green · Tests green (742 tests)
+
+**Architectural notes:**
+- `buildStageScheduleSnapshot` is a pure function — no side effects, no IDB reads; snapshot is derived from the already-loaded `bands` array. Entry points pass their own `effectiveTime`.
+- Hook `useStageSchedule` ticks via the existing `useNow()` interval — zero new timers.
+
+---
+
 ## Phase 40 — StageScheduleSheet Entry Points
 
 **Completed:** 2026-06-06
@@ -962,3 +992,35 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 **Architectural notes:**
 - `onBandSelect` navigates to `/schedule` rather than opening `BandDetailModal` — zero new hook dependencies on both pages.
 - `/map` passes `effectiveTime` (`previewTime ?? now`) so the sheet reflects the timeline scrubber position.
+
+---
+
+### Phase 41 — Map Preview Awareness (B3 + S4)
+**Status:** ✅ Complete
+
+**Completed:** 2026-06-08
+
+**Goal:** Make the Stages button and StageScheduleSheet visibly react to the timeline scrubber's preview time, closing the feedback loop so users know the sheet is showing a future lineup.
+
+**Design variant:** B3 (stacked time readout button) + S4 (left-border accent header).
+
+**Deliverables shipped:**
+- `src/i18n/MapPage_{en,br,de,es}.json` — `stagesButtonPreview` aria-label key added
+- `src/i18n/StageScheduleSheet_{en,br,de,es}.json` — `sheetSubtitlePreview` key added
+- `src/components/StageScheduleSheet.tsx` — `previewTime?: Date | null` prop; conditional `.headerPreview` + `.subtitlePreview` classes
+- `src/components/StageScheduleSheet.module.css` — `.headerPreview` (amber left border + tint), `.subtitlePreview` (amber mono uppercase)
+- `src/pages/MapPage.tsx` — B3 stacked button in preview mode; `previewTime` passed to sheet; `formatTime` import
+- `src/pages/MapPage.module.css` — `.stagesBtnPreview`, `.stagesBtnPreviewTime`, `.stagesBtnPreviewLabel`
+- `src/__tests__/StageScheduleSheet.previewTime.test.tsx` — live mode + preview mode unit tests
+
+**Acceptance criteria (all met):**
+- [x] Live mode: button shows grid icon + "Stages" unchanged; sheet header has no border, subtitle reads "Now & up next"
+- [x] Preview mode: button shows `HH:MM` (amber, larger) stacked over "STAGES" (amber, faded); sheet header gains 3px amber left border + faint tint, subtitle shows "⏱ Preview · HH:MM" in amber mono
+- [x] Back to Now: both revert instantly (live React re-render via prop)
+- [x] All 4 locales correct (en/br/de/es)
+- [x] Build green · Tests green (744 tests)
+
+**Architectural notes:**
+- `previewTime` is purely ephemeral `useState` — never persisted to IndexedDB or Supabase.
+- `RightNowPage.tsx` callsite unaffected — prop is optional (`undefined != null → false`).
+- `formatTime` takes an ISO string; `previewTime.toISOString()` converts the `Date` at the callsite.

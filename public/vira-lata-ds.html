@@ -6675,6 +6675,35 @@ export const MINIMAP_ZONES: Record&lt;ZoneId, FractionalBox&gt; = {
         <li>Image-load failure → flat <code>&lt;div role="img"&gt;</code> fallback backdrop; dots still render over it</li>
       </ul>
     </div>
+
+    <div class="subhead">Stages button · B3 preview mode (Phase 41) · <code>src/pages/MapPage.tsx</code></div>
+    <div class="demo-notes ds-x-c6fca1f6">
+      <p>The Stages header button has two visual states driven by <code>previewTime: Date | null</code>.</p>
+      <ul class="ds-x-5b5bc1a9">
+        <li><strong>Live mode (<code>previewTime === null</code>):</strong> 2×2 grid icon (SVG, 13×13px) + localized "Stages" label. Muted color (<code>var(--text-muted)</code>), neutral border.</li>
+        <li><strong>B3 preview mode (<code>previewTime != null</code>):</strong> icon hidden; two stacked text lines replace it:
+          <ul style="margin-top:4px;margin-left:16px;list-style:disc">
+            <li>Top — <code>HH:MM</code> in <code>var(--signal-warn-light)</code>, 12px mono, weight 500 — the hero readout</li>
+            <li>Bottom — localized "Stages" label in <code>var(--signal-warn)</code>, 8px mono, uppercase, 0.12em tracking, 60% opacity</li>
+          </ul>
+        </li>
+        <li>Button height grows from 26px → 34px in preview mode to accommodate two lines</li>
+        <li>Preview button border: <code>rgba(243,156,18,0.45)</code>; background: <code>rgba(243,156,18,0.06)</code></li>
+        <li>Aria-label switches to i18n key <code>stagesButtonPreview</code> (e.g. <code>"Stages preview at 21:30"</code>) in preview mode</li>
+        <li>Reverts instantly to live mode when the scrubber is cleared (<code>previewTime</code> set back to <code>null</code>)</li>
+      </ul>
+      <pre class="ds-x-e16d999f">/* B3 preview overrides (MapPage.module.css) */
+.stagesBtnPreview {
+  flex-direction: column;
+  gap: 2px;
+  height: 34px;
+  padding: 0 10px;
+  border-color: rgba(243, 156, 18, 0.45);
+  background: rgba(243, 156, 18, 0.06);
+}
+.stagesBtnPreviewTime  { color: var(--signal-warn-light); font-size: 12px; }
+.stagesBtnPreviewLabel { color: var(--signal-warn); font-size: 8px; opacity: 0.6; }</pre>
+    </div>
   </section>
 
 
@@ -6692,7 +6721,7 @@ export const MINIMAP_ZONES: Record&lt;ZoneId, FractionalBox&gt; = {
 
     <div class="subhead">Component · <code>src/components/StageScheduleSheet.tsx</code></div>
     <div class="demo-notes ds-x-c6fca1f6">
-      <p class="ds-x-da48f94d"><strong>Props:</strong> <code>bands: Band[]</code>, <code>now: Date</code>, <code>onClose: () => void</code>, <code>onBandSelect: (bandId: string) => void</code>. The component calls <code>buildStageScheduleSnapshot(bands, now)</code> from <code>src/services/stageSchedule.ts</code> — no internal IDB reads. All data flows in from the parent.</p>
+      <p class="ds-x-da48f94d"><strong>Props:</strong> <code>bands: Band[]</code>, <code>now: Date</code>, <code>previewTime?: Date | null</code>, <code>onClose: () => void</code>, <code>onBandSelect: (bandId: string) => void</code>. The component calls <code>buildStageScheduleSnapshot(bands, now)</code> from <code>src/services/stageSchedule.ts</code> — no internal IDB reads. All data flows in from the parent. When <code>previewTime</code> is set the header enters S4 preview mode (see below); when absent or null the component renders in live mode — the <code>RightNowPage</code> callsite omits this prop and is unaffected.</p>
       <pre class="ds-x-e16d999f">// Data service (pure, no IDB)
 // src/services/stageSchedule.ts
 export type StageScheduleEntry = {
@@ -6795,9 +6824,33 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
       </ul>
     </div>
 
+    <div class="subhead">S4 — Preview mode header (Phase 41)</div>
+    <div class="demo-notes ds-x-c6fca1f6">
+      <p>When <code>previewTime != null</code>, the header div gains <code>.headerPreview</code> and the subtitle gains <code>.subtitlePreview</code>. Live mode is fully unchanged.</p>
+      <ul class="ds-x-5b5bc1a9">
+        <li><strong>Header:</strong> 3px amber left border (<code>var(--signal-warn)</code>) + faint amber background tint (<code>rgba(243,156,18,0.06)</code>); left padding adjusted to <code>13px</code> to compensate for the border</li>
+        <li><strong>Subtitle:</strong> <code>var(--font-mono)</code>, 10px, 500 weight, uppercase, <code>letter-spacing: 0.08em</code>, color <code>var(--signal-warn)</code>; text pattern <code>⏱ Preview · HH:MM</code> (locale key <code>sheetSubtitlePreview</code>)</li>
+        <li>Both classes are absent from the DOM in live mode — no conditional visibility hack</li>
+      </ul>
+      <pre class="ds-x-e16d999f">/* S4 preview header */
+.headerPreview {
+  border-left: 3px solid var(--signal-warn);
+  background: rgba(243, 156, 18, 0.06);
+  padding-left: 13px;
+}
+.subtitlePreview {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--signal-warn);
+}</pre>
+    </div>
+
     <div class="subhead">i18n</div>
     <div class="demo-notes ds-x-c6fca1f6">
-      <p class="ds-x-da48f94d">Namespace: <code>StageScheduleSheet</code> — 4 locale files (<code>en</code>, <code>br</code>, <code>es</code>, <code>de</code>). Registered in <code>src/lib/i18n.ts</code> <code>TranslationFile</code> union and all 4 language maps.</p>
+      <p class="ds-x-da48f94d">Namespace: <code>StageScheduleSheet</code> — 4 locale files (<code>en</code>, <code>br</code>, <code>es</code>, <code>de</code>). Registered in <code>src/lib/i18n.ts</code> <code>TranslationFile</code> union and all 4 language maps. Phase 41 added key <code>sheetSubtitlePreview</code> (amber ⏱ preview label with <code>{time}</code> interpolation).</p>
     </div>
   </section>
 
@@ -6815,6 +6868,13 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.4 — Phase 41 Map Preview Awareness · Jun 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§13 Minimap</b> — added "Stages button B3 preview mode" subhead: live vs. preview visual states, stacked HH:MM / STAGES amber lines, size change (26→34px), amber border + tint, aria-label switch, CSS class specs.</li>
+          <li><b>§14 Stage Schedule Sheet</b> — added <code>previewTime?: Date | null</code> to Props spec; added "S4 — Preview mode header" subhead: 3px amber left border, faint tint, amber mono subtitle (<code>⏱ Preview · HH:MM</code>); updated i18n note with new <code>sheetSubtitlePreview</code> key.</li>
+        </ul>
+      </div>
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.3 — Phase 39 Stage Schedule Sheet · Jun 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">

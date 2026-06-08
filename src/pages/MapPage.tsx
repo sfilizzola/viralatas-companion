@@ -7,6 +7,7 @@ import { useSocialSnapshot } from '../hooks/useSocialSnapshot';
 import { useTimelineGate } from '../hooks/useTimelineGate';
 import { useBands } from '../hooks/useBands';
 import { buildPlacements } from '../services/minimapPlacement';
+import { formatTime } from '../services/bandTime';
 import { MINIMAP_ZONES } from '../components/map/minimapZones';
 import MinimapOverlay from '../components/map/MinimapOverlay';
 import TimelineScrubber from '../components/map/TimelineScrubber';
@@ -68,6 +69,9 @@ export default function MapPage() {
     [snapshot, selfUserId],
   );
 
+  const isPreview = previewTime !== null;
+  const btnClass = [styles.stagesBtn, isPreview ? styles.stagesBtnPreview : ''].filter(Boolean).join(' ');
+
   return (
     <div className={styles.page}>
       <OfflineBanner />
@@ -81,18 +85,31 @@ export default function MapPage() {
           <span className={styles.subtitle}>{t('subtitle')}</span>
         </div>
         <button
-          className={styles.stagesBtn}
+          className={btnClass}
           type="button"
-          aria-label={t('stagesButton')}
+          aria-label={
+            isPreview
+              ? t('stagesButtonPreview', { time: formatTime(previewTime.toISOString()) })
+              : t('stagesButton')
+          }
           onClick={() => setShowStageSheet(true)}
         >
-          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-            <rect x="1" y="1" width="7" height="7" rx="1" />
-            <rect x="10" y="1" width="7" height="7" rx="1" />
-            <rect x="1" y="10" width="7" height="7" rx="1" />
-            <rect x="10" y="10" width="7" height="7" rx="1" />
-          </svg>
-          <span>{t('stagesButton')}</span>
+          {isPreview ? (
+            <>
+              <span className={styles.stagesBtnPreviewTime}>{formatTime(previewTime.toISOString())}</span>
+              <span className={styles.stagesBtnPreviewLabel}>{t('stagesButton')}</span>
+            </>
+          ) : (
+            <>
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <rect x="1" y="1" width="7" height="7" rx="1" />
+                <rect x="10" y="1" width="7" height="7" rx="1" />
+                <rect x="1" y="10" width="7" height="7" rx="1" />
+                <rect x="10" y="10" width="7" height="7" rx="1" />
+              </svg>
+              <span>{t('stagesButton')}</span>
+            </>
+          )}
         </button>
       </header>
 
@@ -127,6 +144,7 @@ export default function MapPage() {
         <StageScheduleSheet
           bands={bands}
           now={effectiveTime}
+          previewTime={previewTime}
           onClose={() => setShowStageSheet(false)}
           onBandSelect={() => navigate('/schedule')}
         />

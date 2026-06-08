@@ -6,5 +6,6 @@
   "empty": "Noch keine Vira-latas für die Karte.",
   "loading": "Gelände wird gelesen…",
   "mapAlt": "Cartoon-Karte des Wacken-Festivalgeländes",
-  "stagesButton": "Bühnen"
+  "stagesButton": "Bühnen",
+  "stagesButtonPreview": "Bühnenvorschau um {time}"
 }
