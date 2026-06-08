@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';
 import { announcementsRepository } from '../repositories';
+import { getMoshSplitEnabled } from '../lib/appSettings';
 import { VERSION } from '../version';
 import BadgeHistorySection from '../components/BadgeHistorySection';
 import BottomNav from '../components/BottomNav';
@@ -87,6 +88,12 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
 
   const showWrapTeaser = useWrapTeaserVisible();
 
+  const [moshSplitEnabled, setMoshSplitEnabledState] = useState(false);
+
+  useEffect(() => {
+    getMoshSplitEnabled().then(setMoshSplitEnabledState);
+  }, []);
+
   return (
     <main className={styles.main}>
       <ProfileHeader
@@ -109,7 +116,7 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
       <BadgeHistorySection userId={user.id} />
 
       <ConflictSection userId={user.id} t={t} />
-      <MoshSplitSection userEmail={user.email ?? ''} />
+      {moshSplitEnabled && <MoshSplitSection userEmail={user.email ?? ''} />}
 
       <EditProfileForm
         user={user}
