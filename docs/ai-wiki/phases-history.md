@@ -936,6 +936,36 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 
 ---
 
+### Phase 39 — Stage Schedule Bottom Sheet
+**Status:** ✅ Complete
+
+**Goal:** A bottom sheet component showing all 8 Wacken stages at a glance — current or next band per stage — so a vira-lata can decide in seconds where to go next.
+
+**Design:** 2×4 Stage Grid; LIVE tiles get a corner diagonal ribbon in stage color (Variant D) + pulsing dot + full-opacity top bar; NEXT tiles get dimmed opacity + "Next ·" label + time. Tap opens `BandDetailModal` for that band.
+
+**Key deliverables:**
+- `src/components/StageScheduleSheet.tsx` — bottom sheet + 2×4 stage grid + LIVE/NEXT tile treatment with animated ribbon, pulsing dot, and `BandDetailModal` tap-through
+- `src/components/StageScheduleSheet.module.css` — full sheet styling, tile variants, ribbon animation
+- `src/hooks/useStageSchedule.ts` — thin hook wrapping `buildStageScheduleSnapshot()` with live `now` tick
+- `src/services/stageSchedule.ts` — `buildStageScheduleSnapshot(bands, now)` pure service; derives `status: 'current' | 'next' | 'empty'` per stage
+- `src/__tests__/stageSchedule.test.ts` — service unit tests (current, next, empty, multi-stage, day boundaries)
+- `src/lib/i18n.ts` — `StageScheduleSheet` namespace registered
+- `src/i18n/StageScheduleSheet_{en,br,de,es}.json` — all 4 locales
+- `public/vira-lata-ds.html` — StageScheduleSheet component documented
+
+**Acceptance criteria (all met):**
+- [x] Sheet shows all 8 stages; LIVE tiles have ribbon + pulse; NEXT tiles are dimmed
+- [x] Tapping a tile opens `BandDetailModal`
+- [x] Pure service `buildStageScheduleSnapshot` tested for all status transitions
+- [x] i18n in all 4 languages
+- [x] Build green · Tests green (742 tests)
+
+**Architectural notes:**
+- `buildStageScheduleSnapshot` is a pure function — no side effects, no IDB reads; snapshot is derived from the already-loaded `bands` array. Entry points pass their own `effectiveTime`.
+- Hook `useStageSchedule` ticks via the existing `useNow()` interval — zero new timers.
+
+---
+
 ## Phase 40 — StageScheduleSheet Entry Points
 
 **Completed:** 2026-06-06
