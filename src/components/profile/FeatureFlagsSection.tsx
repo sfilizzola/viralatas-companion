@@ -6,6 +6,8 @@ import {
   setDuckEnabled,
   getPlaylistTesting,
   setPlaylistTesting,
+  getMoshSplitEnabled,
+  setMoshSplitEnabled,
 } from '../../lib/appSettings';
 import { useRefreshDuckEnabled } from '../../contexts/DuckEnabledContext';
 import styles from '../../pages/ProfilePage.module.css';
@@ -26,6 +28,9 @@ export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureF
   const [playlistTestingEnabled, setPlaylistTestingEnabledState] = useState(true);
   const [playlistTestingLoading, setPlaylistTestingLoading] = useState(false);
   const [playlistTestingError, setPlaylistTestingError] = useState<string | null>(null);
+  const [moshSplitFeatureEnabled, setMoshSplitFeatureEnabledState] = useState(false);
+  const [moshSplitFeatureLoading, setMoshSplitFeatureLoading] = useState(false);
+  const [moshSplitFeatureError, setMoshSplitFeatureError] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadRegistrationStatus() {
@@ -62,6 +67,18 @@ export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureF
       }
     }
     loadPlaylistTestingStatus();
+  }, []);
+
+  useEffect(() => {
+    async function loadMoshSplitFeatureStatus() {
+      try {
+        const enabled = await getMoshSplitEnabled();
+        setMoshSplitFeatureEnabledState(enabled);
+      } catch (error) {
+        console.error('Failed to load moshsplit_enabled flag:', error);
+      }
+    }
+    loadMoshSplitFeatureStatus();
   }, []);
 
   const handleToggleRegistration = useCallback(async () => {
@@ -113,6 +130,22 @@ export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureF
       setPlaylistTestingLoading(false);
     }
   }, [playlistTestingEnabled, t]);
+
+  const handleToggleMoshSplitFeature = useCallback(async () => {
+    setMoshSplitFeatureLoading(true);
+    setMoshSplitFeatureError(null);
+    try {
+      const newValue = !moshSplitFeatureEnabled;
+      await setMoshSplitEnabled(newValue);
+      setMoshSplitFeatureEnabledState(newValue);
+    } catch (error) {
+      console.error('Failed to toggle moshsplit_enabled flag:', error);
+      setMoshSplitFeatureError(t('moshsplitToggleError'));
+      setTimeout(() => setMoshSplitFeatureError(null), 3000);
+    } finally {
+      setMoshSplitFeatureLoading(false);
+    }
+  }, [moshSplitFeatureEnabled, t]);
 
   return (
     <>
@@ -180,6 +213,29 @@ export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureF
           </button>
           <span className={styles.registrationStatus}>
             {playlistTestingEnabled ? '🧪' : '🟢'}
+          </span>
+        </div>
+      </div>
+
+      <div className={styles.registrationSection}>
+        <h4 className={styles.registrationSectionTitle}>{t('moshsplitToggle')}</h4>
+        <p className={styles.registrationSectionDescription}>{t('moshsplitToggleDescription')}</p>
+        {moshSplitFeatureError && <p className={styles.registrationError}>{moshSplitFeatureError}</p>}
+        <div className={styles.registrationControlRow}>
+          <button
+            className={`${styles.registrationToggleButton} ${moshSplitFeatureEnabled ? styles.enabled : styles.disabled}`}
+            onClick={handleToggleMoshSplitFeature}
+            disabled={moshSplitFeatureLoading}
+            type="button"
+          >
+            {moshSplitFeatureLoading
+              ? t('moshsplitLoading')
+              : moshSplitFeatureEnabled
+                ? t('moshsplitEnabled')
+                : t('moshsplitDisabled')}
+          </button>
+          <span className={styles.registrationStatus}>
+            {moshSplitFeatureEnabled ? '🟢' : '🔴'}
           </span>
         </div>
       </div>
