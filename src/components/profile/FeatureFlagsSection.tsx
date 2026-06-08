@@ -6,6 +6,8 @@ import {
   setDuckEnabled,
   getPlaylistTesting,
   setPlaylistTesting,
+  getMoshSplitEnabled,
+  setMoshSplitEnabled,
 } from '../../lib/appSettings';
 import { useRefreshDuckEnabled } from '../../contexts/DuckEnabledContext';
 import styles from '../../pages/ProfilePage.module.css';
@@ -15,53 +17,80 @@ type FeatureFlagsSectionProps = {
   onDuckEnabledChange?: (enabled: boolean) => void;
 };
 
+type FlagRowProps = {
+  label: string;
+  hint: string;
+  isOn: boolean;
+  isLoading: boolean;
+  error: string | null;
+  onToggle: () => void;
+};
+
+function FlagRow({ label, hint, isOn, isLoading, error, onToggle }: FlagRowProps) {
+  return (
+    <div className={styles.ffRow}>
+      <div className={styles.ffRowLeft}>
+        <span className={styles.ffLabel}>{label}</span>
+        <button
+          className={styles.ffHintBtn}
+          type="button"
+          aria-label="Info"
+          tabIndex={0}
+          data-hint={hint}
+        >
+          ?
+        </button>
+      </div>
+      <button
+        className={`${styles.ffPill} ${isOn ? styles.ffOn : styles.ffOff}`}
+        onClick={onToggle}
+        disabled={isLoading}
+        type="button"
+        aria-pressed={isOn}
+        aria-label={label}
+      />
+      {error && <span className={styles.ffRowError}>{error}</span>}
+    </div>
+  );
+}
+
 export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureFlagsSectionProps) {
   const [registrationEnabled, setRegistrationEnabledState] = useState(true);
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
+
   const [duckFeatureEnabled, setDuckFeatureEnabledState] = useState(true);
   const [duckFeatureLoading, setDuckFeatureLoading] = useState(false);
   const [duckFeatureError, setDuckFeatureError] = useState<string | null>(null);
   const refreshDuckEnabled = useRefreshDuckEnabled();
+
   const [playlistTestingEnabled, setPlaylistTestingEnabledState] = useState(true);
   const [playlistTestingLoading, setPlaylistTestingLoading] = useState(false);
   const [playlistTestingError, setPlaylistTestingError] = useState<string | null>(null);
 
+  const [moshSplitFeatureEnabled, setMoshSplitFeatureEnabledState] = useState(false);
+  const [moshSplitFeatureLoading, setMoshSplitFeatureLoading] = useState(false);
+  const [moshSplitFeatureError, setMoshSplitFeatureError] = useState<string | null>(null);
+
   useEffect(() => {
-    async function loadRegistrationStatus() {
-      try {
-        const enabled = await getRegistrationEnabled();
-        setRegistrationEnabledState(enabled);
-      } catch (error) {
-        console.error('Failed to load registration status:', error);
-      }
-    }
-    loadRegistrationStatus();
+    getRegistrationEnabled().then(setRegistrationEnabledState).catch(console.error);
   }, []);
 
   useEffect(() => {
-    async function loadDuckFeatureStatus() {
-      try {
-        const enabled = await getDuckEnabled();
+    getDuckEnabled()
+      .then((enabled) => {
         setDuckFeatureEnabledState(enabled);
         onDuckEnabledChange?.(enabled);
-      } catch (error) {
-        console.error('Failed to load duck killswitch status:', error);
-      }
-    }
-    loadDuckFeatureStatus();
+      })
+      .catch(console.error);
   }, [onDuckEnabledChange]);
 
   useEffect(() => {
-    async function loadPlaylistTestingStatus() {
-      try {
-        const testing = await getPlaylistTesting();
-        setPlaylistTestingEnabledState(testing);
-      } catch (error) {
-        console.error('Failed to load playlist_testing flag:', error);
-      }
-    }
-    loadPlaylistTestingStatus();
+    getPlaylistTesting().then(setPlaylistTestingEnabledState).catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    getMoshSplitEnabled().then(setMoshSplitFeatureEnabledState).catch(console.error);
   }, []);
 
   const handleToggleRegistration = useCallback(async () => {
@@ -71,8 +100,7 @@ export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureF
       const newValue = !registrationEnabled;
       await setRegistrationEnabled(newValue);
       setRegistrationEnabledState(newValue);
-    } catch (error) {
-      console.error('Failed to toggle registration:', error);
+    } catch {
       setRegistrationError(t('registrationToggleError'));
       setTimeout(() => setRegistrationError(null), 3000);
     } finally {
@@ -89,8 +117,7 @@ export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureF
       setDuckFeatureEnabledState(newValue);
       onDuckEnabledChange?.(newValue);
       await refreshDuckEnabled();
-    } catch (error) {
-      console.error('Failed to toggle duck killswitch:', error);
+    } catch {
       setDuckFeatureError(t('duckToggleError'));
       setTimeout(() => setDuckFeatureError(null), 3000);
     } finally {
@@ -105,8 +132,7 @@ export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureF
       const newValue = !playlistTestingEnabled;
       await setPlaylistTesting(newValue);
       setPlaylistTestingEnabledState(newValue);
-    } catch (error) {
-      console.error('Failed to toggle playlist_testing flag:', error);
+    } catch {
       setPlaylistTestingError(t('playlistToggleError'));
       setTimeout(() => setPlaylistTestingError(null), 3000);
     } finally {
@@ -114,75 +140,58 @@ export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureF
     }
   }, [playlistTestingEnabled, t]);
 
+  const handleToggleMoshSplitFeature = useCallback(async () => {
+    setMoshSplitFeatureLoading(true);
+    setMoshSplitFeatureError(null);
+    try {
+      const newValue = !moshSplitFeatureEnabled;
+      await setMoshSplitEnabled(newValue);
+      setMoshSplitFeatureEnabledState(newValue);
+    } catch {
+      setMoshSplitFeatureError(t('moshsplitToggleError'));
+      setTimeout(() => setMoshSplitFeatureError(null), 3000);
+    } finally {
+      setMoshSplitFeatureLoading(false);
+    }
+  }, [moshSplitFeatureEnabled, t]);
+
   return (
-    <>
-      <div className={styles.registrationSection}>
-        <h4 className={styles.registrationSectionTitle}>{t('registrationToggle')}</h4>
-        <p className={styles.registrationSectionDescription}>{t('registrationToggleDescription')}</p>
-        {registrationError && <p className={styles.registrationError}>{registrationError}</p>}
-        <div className={styles.registrationControlRow}>
-          <button
-            className={`${styles.registrationToggleButton} ${registrationEnabled ? styles.enabled : styles.disabled}`}
-            onClick={handleToggleRegistration}
-            disabled={registrationLoading}
-            type="button"
-          >
-            {registrationLoading
-              ? t('registrationLoading')
-              : registrationEnabled
-                ? t('registrationEnabled')
-                : t('registrationDisabled')}
-          </button>
-          <span className={styles.registrationStatus}>
-            {registrationEnabled ? '🟢' : '🔴'}
-          </span>
-        </div>
+    <div className={styles.ffCard}>
+      <p className={styles.ffCardTitle}>{t('featureFlagsTitle')}</p>
+      <div className={styles.ffList}>
+        <FlagRow
+          label={t('registrationToggle')}
+          hint={t('registrationToggleDescription')}
+          isOn={registrationEnabled}
+          isLoading={registrationLoading}
+          error={registrationError}
+          onToggle={handleToggleRegistration}
+        />
+        <FlagRow
+          label={t('duckToggle')}
+          hint={t('duckToggleDescription')}
+          isOn={duckFeatureEnabled}
+          isLoading={duckFeatureLoading}
+          error={duckFeatureError}
+          onToggle={handleToggleDuckFeature}
+        />
+        <FlagRow
+          label={t('playlistToggle')}
+          hint={t('playlistToggleDescription')}
+          isOn={!playlistTestingEnabled}
+          isLoading={playlistTestingLoading}
+          error={playlistTestingError}
+          onToggle={handleTogglePlaylistTesting}
+        />
+        <FlagRow
+          label={t('moshsplitToggle')}
+          hint={t('moshsplitToggleDescription')}
+          isOn={moshSplitFeatureEnabled}
+          isLoading={moshSplitFeatureLoading}
+          error={moshSplitFeatureError}
+          onToggle={handleToggleMoshSplitFeature}
+        />
       </div>
-
-      <div className={styles.registrationSection}>
-        <h4 className={styles.registrationSectionTitle}>{t('duckToggle')}</h4>
-        <p className={styles.registrationSectionDescription}>{t('duckToggleDescription')}</p>
-        {duckFeatureError && <p className={styles.registrationError}>{duckFeatureError}</p>}
-        <div className={styles.registrationControlRow}>
-          <button
-            className={`${styles.registrationToggleButton} ${duckFeatureEnabled ? styles.enabled : styles.disabled}`}
-            onClick={handleToggleDuckFeature}
-            disabled={duckFeatureLoading}
-            type="button"
-          >
-            {duckFeatureLoading
-              ? t('duckLoading')
-              : duckFeatureEnabled
-                ? t('duckEnabled')
-                : t('duckDisabled')}
-          </button>
-          <span className={styles.registrationStatus}>
-            {duckFeatureEnabled ? '🟢' : '🔴'}
-          </span>
-        </div>
-      </div>
-
-      <div className={styles.registrationSection}>
-        <h4 className={styles.registrationSectionTitle}>{t('playlistToggle')}</h4>
-        {playlistTestingError && <p className={styles.registrationError}>{playlistTestingError}</p>}
-        <div className={styles.registrationControlRow}>
-          <button
-            className={`${styles.registrationToggleButton} ${playlistTestingEnabled ? styles.disabled : styles.enabled}`}
-            onClick={handleTogglePlaylistTesting}
-            disabled={playlistTestingLoading}
-            type="button"
-          >
-            {playlistTestingLoading
-              ? t('duckLoading')
-              : playlistTestingEnabled
-                ? t('playlistTesting')
-                : t('playlistLive')}
-          </button>
-          <span className={styles.registrationStatus}>
-            {playlistTestingEnabled ? '🧪' : '🟢'}
-          </span>
-        </div>
-      </div>
-    </>
+    </div>
   );
 }

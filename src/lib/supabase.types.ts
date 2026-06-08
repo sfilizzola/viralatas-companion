@@ -228,6 +228,7 @@ export type Database = {
           registration_enabled: boolean;
           duck_enabled: boolean;
           playlist_testing: boolean;
+          moshsplit_enabled: boolean;
           updated_at: string;
         };
         Insert: {
@@ -235,6 +236,7 @@ export type Database = {
           registration_enabled?: boolean;
           duck_enabled?: boolean;
           playlist_testing?: boolean;
+          moshsplit_enabled?: boolean;
           updated_at?: string;
         };
         Update: {
@@ -242,6 +244,7 @@ export type Database = {
           registration_enabled?: boolean;
           duck_enabled?: boolean;
           playlist_testing?: boolean;
+          moshsplit_enabled?: boolean;
           updated_at?: string;
         };
         Relationships: [];

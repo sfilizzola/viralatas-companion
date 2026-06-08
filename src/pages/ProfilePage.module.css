@@ -931,6 +931,164 @@
   line-height: 1;
 }
 
+/* ── Feature Flags consolidated card ── */
+.ffCard {
+  width: 100%;
+  padding: 0.875rem 1rem 0.5rem;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: var(--r-2);
+  background: rgba(59, 130, 246, 0.06);
+}
+
+.ffCardTitle {
+  margin: 0 0 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: rgba(59, 130, 246, 0.85);
+}
+
+.ffList {
+  display: flex;
+  flex-direction: column;
+}
+
+.ffRow {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  flex-wrap: wrap;
+}
+
+.ffRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0.25rem;
+}
+
+.ffRowLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.ffLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.ffHintBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid var(--text-muted);
+  color: var(--text-muted);
+  font-size: 8px;
+  font-weight: 700;
+  cursor: help;
+  position: relative;
+  flex-shrink: 0;
+  padding: 0;
+  font-family: var(--font-mono);
+  line-height: 1;
+}
+
+.ffHintBtn::after {
+  content: attr(data-hint);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-2);
+  padding: 0.5rem 0.625rem;
+  font-size: 0.72rem;
+  width: 230px;
+  text-align: left;
+  white-space: normal;
+  line-height: 1.45;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 20;
+  color: var(--text-muted);
+  font-family: inherit;
+  font-weight: 400;
+}
+
+.ffHintBtn:hover::after,
+.ffHintBtn:focus-visible::after {
+  opacity: 1;
+}
+
+.ffPill {
+  position: relative;
+  width: 38px;
+  height: 21px;
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.ffPill::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  transition: transform 0.18s ease, background 0.18s;
+}
+
+.ffPill.ffOn {
+  background: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.55);
+}
+
+.ffPill.ffOn::after {
+  transform: translateX(17px);
+  background: #10b981;
+}
+
+.ffPill.ffOff {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.ffPill.ffOff::after {
+  background: rgba(239, 68, 68, 0.65);
+}
+
+.ffPill:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ffRowError {
+  width: 100%;
+  font-size: 0.7rem;
+  color: #ef4444;
+  padding: 0 0 0.25rem;
+  margin: 0;
+}
+
 .metalPlaceSection {
   width: 100%;
   padding: 1rem;
