@@ -60,10 +60,12 @@ async function queuePresence(presence: UserPresence) {
   await enqueueOfflinePresence({ ...presence, id: presenceOpId(presence.user_id) });
 }
 
-async function setCampingStatus(userId: string, isCamping: boolean): Promise<void> {
+async function setCampingStatus(
+  userId: string,
+  isCamping: boolean,
+): Promise<{ entered: boolean }> {
   const existing = await loadUserPresence(userId);
-  const wasNotCamping = !existing?.is_camping;
-  const isEnteringCamping = isCamping && wasNotCamping;
+  const entered = isCamping && !existing?.is_camping;
 
   const presence: UserPresence = {
     user_id: userId,
@@ -74,25 +76,25 @@ async function setCampingStatus(userId: string, isCamping: boolean): Promise<voi
 
   await saveUserPresence(presence);
 
-  if (isEnteringCamping) {
-    await incrementLocationVisit('camping');
-  }
-
   if (!navigator.onLine) {
     await queuePresence(presence);
-    return;
+    return { entered };
   }
 
   const { error } = await supabase.from('user_presence').upsert(presence);
   if (error) {
     await queuePresence(presence);
   }
+
+  return { entered };
 }
 
-async function setMetalPlaceStatus(userId: string, isAtMetalPlace: boolean): Promise<void> {
+async function setMetalPlaceStatus(
+  userId: string,
+  isAtMetalPlace: boolean,
+): Promise<{ entered: boolean }> {
   const existing = await loadUserPresence(userId);
-  const wasNotAtMetalPlace = !existing?.is_at_metal_place;
-  const isEnteringMetalPlace = isAtMetalPlace && wasNotAtMetalPlace;
+  const entered = isAtMetalPlace && !existing?.is_at_metal_place;
 
   const presence: UserPresence = {
     user_id: userId,
@@ -103,19 +105,17 @@ async function setMetalPlaceStatus(userId: string, isAtMetalPlace: boolean): Pro
 
   await saveUserPresence(presence);
 
-  if (isEnteringMetalPlace) {
-    await incrementLocationVisit('metal_place');
-  }
-
   if (!navigator.onLine) {
     await queuePresence(presence);
-    return;
+    return { entered };
   }
 
   const { error } = await supabase.from('user_presence').upsert(presence);
   if (error) {
     await queuePresence(presence);
   }
+
+  return { entered };
 }
 
 async function syncCrewFromRemote(): Promise<void> {
@@ -174,6 +174,7 @@ function subscribeToMetalPlaceConfigRealtime(): () => void {
 export const presenceRepository = {
   setCampingStatus,
   setMetalPlaceStatus,
+  incrementLocationVisit,
   syncCrewFromRemote,
   flushOfflineQueue,
   saveMetalPlaceConfigRemote,
