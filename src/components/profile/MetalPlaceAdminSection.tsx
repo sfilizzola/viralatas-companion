@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, type MutableRefObject } from 'react';
 import { loadMetalPlaceConfig } from '../../lib/db';
 import { presenceRepository } from '../../repositories';
+import { presenceService } from '../../services/presenceService';
 import { saveLiveBandTestConfigRemote } from '../../services/liveBandTest';
 import { Select } from '../../ui';
 import styles from '../../pages/ProfilePage.module.css';
@@ -90,7 +91,7 @@ export default function MetalPlaceAdminSection({
       });
 
       if (isTestModeNowOff) {
-        await presenceRepository.autoCheckoutAllUsers();
+        await presenceService.autoCheckoutAllUsers();
       }
 
       previousTestModeRef.current = testModeEnabled;

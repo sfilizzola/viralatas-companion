@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, type MutableRefObject } from 'react';
 import type { Band, LiveBandTestConfig } from '../../types';
 import { loadBands, loadAllUserPicks, loadLiveBandTestConfig } from '../../lib/db';
 import { presenceRepository } from '../../repositories';
+import { presenceService } from '../../services/presenceService';
 import { saveLiveBandTestConfigRemote } from '../../services/liveBandTest';
 import { Select } from '../../ui';
 import type { MetalPlaceBridge } from './MetalPlaceAdminSection';
@@ -101,7 +102,7 @@ export default function LiveBandTestAdminSection({
         });
         bridge?.setTestModeEnabled(false);
         previousTestModeRef.current = false;
-        await presenceRepository.autoCheckoutAllUsers();
+        await presenceService.autoCheckoutAllUsers();
       }
 
       const config: LiveBandTestConfig = {

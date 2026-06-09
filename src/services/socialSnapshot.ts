@@ -7,7 +7,7 @@ import {
   type CrewLiveGroup,
   type CrewLivePlan,
 } from './livePreview';
-import { presenceRepository } from '../repositories';
+import { isMetalPlaceWindowActive } from './presencePolicy';
 
 export type SocialSnapshotInput = {
   bands: Band[];
@@ -28,10 +28,7 @@ export type SocialSnapshot = {
 };
 
 export function buildSocialSnapshot(input: SocialSnapshotInput): SocialSnapshot {
-  const metalPlaceWindowActive = presenceRepository.isTimeWithinMetalPlaceWindow(
-    input.metalPlaceConfig,
-    input.now,
-  );
+  const metalPlaceWindowActive = isMetalPlaceWindowActive(input.metalPlaceConfig, input.now);
   const liveTestBandId = resolveLiveTestBandId(input.liveBandTestConfig);
   const crewPlans = mapCrewLivePlans(
     input.bands,

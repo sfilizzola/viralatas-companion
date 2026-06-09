@@ -147,15 +147,19 @@ vi.mock('../repositories', async (importOriginal) => {
       ...actual.presenceRepository,
       setCampingStatus,
       setMetalPlaceStatus,
-      applyPresenceToggle,
-      autoClearCampingOnCurrentBand,
-      validateAndAutoCheckout,
-      isTimeWithinMetalPlaceWindow,
       syncCrewFromRemote: vi.fn().mockResolvedValue(undefined),
       syncMetalPlaceConfig: vi.fn().mockResolvedValue(undefined),
     },
   };
 });
+
+vi.mock('../services/presenceService', () => ({
+  presenceService: {
+    applyPresenceToggle,
+    autoClearCampingOnCurrentBand,
+    validateAndAutoCheckout,
+  },
+}));
 
 import {
   PRESENCE_CHANGED_EVENT,

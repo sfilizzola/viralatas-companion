@@ -1,4 +1,3 @@
-import type { LivePlanStatus, PresenceLocation } from '../services/livePreview';
 import type { MetalPlaceConfig, UserPresence } from '../types';
 import {
   enqueueOfflinePresence,
@@ -13,7 +12,6 @@ import { createOptimisticQueue } from '../lib/optimisticQueue';
 import type { OfflinePresenceOp } from '../lib/db';
 import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { supabase } from '../lib/supabase';
-import { getFestivalDay, now } from '../services/time';
 
 function presenceOpId(userId: string) {
   const unique = crypto.randomUUID?.() ?? `${Date.now()}:${Math.random()}`;
@@ -91,32 +89,6 @@ async function setCampingStatus(userId: string, isCamping: boolean): Promise<voi
   }
 }
 
-async function syncCrewFromRemote(): Promise<void> {
-  const { data, error } = await supabase.from('user_presence').select('*');
-  if (error || !data) return;
-
-  await replaceUserPresence(data as UserPresence[]);
-}
-
-async function flushOfflineQueue(): Promise<number> {
-  return presenceOfflineQueue.flush();
-}
-
-async function saveMetalPlaceConfigRemote(config: MetalPlaceConfig): Promise<void> {
-  if (!navigator.onLine) {
-    await saveMetalPlaceConfig(config);
-    return;
-  }
-
-  const { error } = await supabase.from('metal_place_config').upsert(config);
-  if (error) {
-    console.error('Failed to save Metal Place config remotely:', error);
-    throw error;
-  }
-
-  await saveMetalPlaceConfig(config);
-}
-
 async function setMetalPlaceStatus(userId: string, isAtMetalPlace: boolean): Promise<void> {
   const existing = await loadUserPresence(userId);
   const wasNotAtMetalPlace = !existing?.is_at_metal_place;
@@ -146,132 +118,37 @@ async function setMetalPlaceStatus(userId: string, isAtMetalPlace: boolean): Pro
   }
 }
 
+async function syncCrewFromRemote(): Promise<void> {
+  const { data, error } = await supabase.from('user_presence').select('*');
+  if (error || !data) return;
+
+  await replaceUserPresence(data as UserPresence[]);
+}
+
+async function flushOfflineQueue(): Promise<number> {
+  return presenceOfflineQueue.flush();
+}
+
+async function saveMetalPlaceConfigRemote(config: MetalPlaceConfig): Promise<void> {
+  if (!navigator.onLine) {
+    await saveMetalPlaceConfig(config);
+    return;
+  }
+
+  const { error } = await supabase.from('metal_place_config').upsert(config);
+  if (error) {
+    console.error('Failed to save Metal Place config remotely:', error);
+    throw error;
+  }
+
+  await saveMetalPlaceConfig(config);
+}
+
 async function syncMetalPlaceConfig(): Promise<void> {
   const { data, error } = await supabase.from('metal_place_config').select('*').single();
   if (error || !data) return;
 
   await saveMetalPlaceConfig(data as MetalPlaceConfig);
-}
-
-function isTimeWithinMetalPlaceWindow(config: MetalPlaceConfig | null, nowDate: Date): boolean {
-  if (!config || !config.start_time || !config.end_time) {
-    return false;
-  }
-
-  const isTestMode = config.test_override_day !== null && config.test_override_day !== undefined;
-
-  if (!isTestMode) {
-    if (config.festival_day === null || config.festival_day === undefined) {
-      return false;
-    }
-    const currentFestivalDay = getFestivalDay(nowDate);
-    if (currentFestivalDay !== config.festival_day) {
-      return false;
-    }
-  }
-
-  const [startHour, startMin] = config.start_time.split(':').map(Number);
-  const [endHour, endMin] = config.end_time.split(':').map(Number);
-
-  const wallClock = new Intl.DateTimeFormat('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    timeZone: 'Europe/Berlin',
-  }).format(nowDate);
-  const [nowHourStr, nowMinStr] = wallClock.split(':');
-  const nowTotalMinutes = parseInt(nowHourStr, 10) * 60 + parseInt(nowMinStr, 10);
-
-  const startTotalMinutes = startHour * 60 + startMin;
-  const endTotalMinutes = endHour * 60 + endMin;
-
-  return nowTotalMinutes >= startTotalMinutes && nowTotalMinutes < endTotalMinutes;
-}
-
-async function autoCheckoutAllUsers(): Promise<void> {
-  try {
-    const { data, error } = await supabase.from('user_presence').select('*');
-    if (error || !data) return;
-
-    const usersAtMetalPlace = (data as UserPresence[]).filter((p) => p.is_at_metal_place);
-
-    for (const presence of usersAtMetalPlace) {
-      try {
-        await setMetalPlaceStatus(presence.user_id, false);
-      } catch (err) {
-        if (err instanceof Error && err.name !== 'InvalidStateError') {
-          console.error(`Failed to checkout user ${presence.user_id}:`, err);
-        }
-      }
-    }
-  } catch (error) {
-    if (error instanceof Error && error.name === 'InvalidStateError') {
-      console.debug('[Metal Place] Auto-checkout skipped due to DB connection closing');
-      return;
-    }
-    throw error;
-  }
-}
-
-export type PresenceToggleContext = {
-  myRawPlanStatus: LivePlanStatus;
-  isAtMetalPlace: boolean;
-  isCamping: boolean;
-};
-
-async function applyPresenceToggle(
-  userId: string,
-  nextValue: PresenceLocation,
-  context: PresenceToggleContext,
-): Promise<void> {
-  if (nextValue === 'camping') {
-    if (context.myRawPlanStatus === 'current') {
-      await setCampingStatus(userId, false);
-      return;
-    }
-    await setCampingStatus(userId, true);
-    return;
-  }
-  if (nextValue === 'metal_place') {
-    await setMetalPlaceStatus(userId, true);
-    return;
-  }
-  if (context.isAtMetalPlace) await setMetalPlaceStatus(userId, false);
-  if (context.isCamping) await setCampingStatus(userId, false);
-}
-
-async function autoClearCampingOnCurrentBand(
-  userId: string,
-  isCamping: boolean,
-  myRawPlanStatus: LivePlanStatus,
-): Promise<void> {
-  if (!isCamping || myRawPlanStatus !== 'current') return;
-  await setCampingStatus(userId, false);
-}
-
-async function validateAndAutoCheckout(
-  config: MetalPlaceConfig | null,
-  userId: string | null,
-): Promise<void> {
-  if (!userId || !config) return;
-
-  const hasDay = config.festival_day != null || config.test_override_day != null;
-  if (!hasDay || !config.start_time || !config.end_time) return;
-
-  if (isTimeWithinMetalPlaceWindow(config, now())) return;
-
-  try {
-    const presence = await loadUserPresence(userId);
-    if (presence?.is_at_metal_place) {
-      await setMetalPlaceStatus(userId, false);
-    }
-  } catch (error) {
-    if (error instanceof Error && error.name === 'InvalidStateError') {
-      console.debug('[Metal Place] Skipping auto-checkout due to DB connection closing', error);
-      return;
-    }
-    throw error;
-  }
 }
 
 function subscribeToRealtime(): () => void {
@@ -297,15 +174,10 @@ function subscribeToMetalPlaceConfigRealtime(): () => void {
 export const presenceRepository = {
   setCampingStatus,
   setMetalPlaceStatus,
-  applyPresenceToggle,
-  autoClearCampingOnCurrentBand,
   syncCrewFromRemote,
   flushOfflineQueue,
   saveMetalPlaceConfigRemote,
   syncMetalPlaceConfig,
-  isTimeWithinMetalPlaceWindow,
-  autoCheckoutAllUsers,
-  validateAndAutoCheckout,
   subscribeToRealtime,
   subscribeToMetalPlaceConfigRealtime,
 };

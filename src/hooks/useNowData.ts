@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Announcement, Band, LiveBandTestConfig, MetalPlaceConfig, UserPick } from '../types';
 import type { CrewLiveGroup, CrewLivePlan, LivePlan, PresenceLocation } from '../services/livePreview';
 import { loadUserPicks } from '../lib/db';
-import { presenceRepository } from '../repositories';
+import { presenceService } from '../services/presenceService';
 import { WEAK_SKIP_UNDO_MS, recordCommittedSkip } from '../services/weakSkips';
 import { usePickActions } from './usePickActions';
 import { useDuckQuack } from './useDuckQuack';
@@ -111,12 +111,12 @@ export function useNowData(): NowData {
 
   useEffect(() => {
     if (!metalPlaceConfig || !userId) return;
-    presenceRepository.validateAndAutoCheckout(metalPlaceConfig, userId).catch(() => {});
+    presenceService.validateAndAutoCheckout(metalPlaceConfig, userId).catch(() => {});
   }, [metalPlaceConfig, userId, isMetalPlaceWindowActive]);
 
   useEffect(() => {
     if (!userId) return;
-    presenceRepository
+    presenceService
       .autoClearCampingOnCurrentBand(userId, isCamping, myRawPlan.status)
       .catch(() => {});
   }, [userId, isCamping, myRawPlan.status]);
@@ -184,7 +184,7 @@ export function useNowData(): NowData {
 
   const handlePresenceChange = useCallback(async (nextValue: PresenceLocation) => {
     if (!userId) return;
-    await presenceRepository.applyPresenceToggle(userId, nextValue, {
+    await presenceService.applyPresenceToggle(userId, nextValue, {
       myRawPlanStatus: myRawPlan.status,
       isAtMetalPlace,
       isCamping,

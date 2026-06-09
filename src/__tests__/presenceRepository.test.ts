@@ -32,6 +32,7 @@ import { supabase } from '../lib/supabase';
 import * as db from '../lib/db';
 import { now } from '../services/time';
 import { presenceRepository } from '../repositories/presence';
+import { presenceService } from '../services/presenceService';
 import type { MetalPlaceConfig, UserPresence } from '../types';
 
 beforeEach(() => {
@@ -101,60 +102,9 @@ describe('presenceRepository.setCampingStatus', () => {
   });
 });
 
-describe('presenceRepository.isTimeWithinMetalPlaceWindow', () => {
-  it('returns true when current Berlin wall-clock time is within the configured window', () => {
-    // test_override_day skips festival-day matching so only time range is checked
-    const config: MetalPlaceConfig = {
-      festival_day: 1,
-      test_override_day: 1,
-      start_time: '14:00',
-      end_time: '18:00',
-    };
-    // 15:00 CEST (Berlin summer) = 13:00 UTC — inside [14:00, 18:00)
-    const withinWindow = new Date('2026-07-29T13:00:00Z');
-    expect(presenceRepository.isTimeWithinMetalPlaceWindow(config, withinWindow)).toBe(true);
-  });
+// isMetalPlaceWindowActive pure-function tests live in presencePolicy.test.ts
 
-  it('returns false when current Berlin wall-clock time is outside the configured window', () => {
-    const config: MetalPlaceConfig = {
-      festival_day: 1,
-      test_override_day: 1,
-      start_time: '14:00',
-      end_time: '18:00',
-    };
-    // 12:00 CEST = 10:00 UTC — before 14:00
-    const outsideWindow = new Date('2026-07-29T10:00:00Z');
-    expect(presenceRepository.isTimeWithinMetalPlaceWindow(config, outsideWindow)).toBe(false);
-  });
-
-  it('returns false when config is null', () => {
-    expect(presenceRepository.isTimeWithinMetalPlaceWindow(null, new Date())).toBe(false);
-  });
-
-  it('returns false when start_time or end_time is missing', () => {
-    const config: MetalPlaceConfig = {
-      festival_day: 1,
-      test_override_day: 1,
-      start_time: undefined,
-      end_time: '18:00',
-    };
-    expect(presenceRepository.isTimeWithinMetalPlaceWindow(config, new Date())).toBe(false);
-  });
-
-  it('returns false when current festival day does not match configured day (no test_override)', () => {
-    const config: MetalPlaceConfig = {
-      festival_day: 1,
-      test_override_day: null,
-      start_time: '14:00',
-      end_time: '18:00',
-    };
-    // Current time is well after Day 1 (2026-07-29), so day won't match
-    const futureDay = new Date('2026-07-30T13:00:00Z'); // Day 2, 15:00 CEST
-    expect(presenceRepository.isTimeWithinMetalPlaceWindow(config, futureDay)).toBe(false);
-  });
-});
-
-describe('presenceRepository.applyPresenceToggle', () => {
+describe('presenceService.applyPresenceToggle', () => {
   const baseContext = {
     myRawPlanStatus: 'empty' as const,
     isAtMetalPlace: false,
@@ -164,7 +114,7 @@ describe('presenceRepository.applyPresenceToggle', () => {
   it('blocks camping when myRawPlanStatus is current (sets false, never true)', async () => {
     vi.mocked(db.loadUserPresence).mockResolvedValue(undefined);
 
-    await presenceRepository.applyPresenceToggle('user1', 'camping', {
+    await presenceService.applyPresenceToggle('user1', 'camping', {
       ...baseContext,
       myRawPlanStatus: 'current',
     });
@@ -180,7 +130,7 @@ describe('presenceRepository.applyPresenceToggle', () => {
   it('sets camping true when not on a current band', async () => {
     vi.mocked(db.loadUserPresence).mockResolvedValue(undefined);
 
-    await presenceRepository.applyPresenceToggle('user1', 'camping', baseContext);
+    await presenceService.applyPresenceToggle('user1', 'camping', baseContext);
 
     expect(db.saveUserPresence).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: 'user1', is_camping: true }),
@@ -190,7 +140,7 @@ describe('presenceRepository.applyPresenceToggle', () => {
   it('sets metal place true for metal_place toggle', async () => {
     vi.mocked(db.loadUserPresence).mockResolvedValue(undefined);
 
-    await presenceRepository.applyPresenceToggle('user1', 'metal_place', baseContext);
+    await presenceService.applyPresenceToggle('user1', 'metal_place', baseContext);
 
     expect(db.saveUserPresence).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: 'user1', is_at_metal_place: true }),
@@ -207,7 +157,7 @@ describe('presenceRepository.applyPresenceToggle', () => {
       updated_at: '2026-07-29T10:00:00Z',
     });
 
-    await presenceRepository.applyPresenceToggle('user1', 'auto', {
+    await presenceService.applyPresenceToggle('user1', 'auto', {
       ...baseContext,
       isCamping: true,
       isAtMetalPlace: true,
@@ -223,7 +173,7 @@ describe('presenceRepository.applyPresenceToggle', () => {
   });
 });
 
-describe('presenceRepository.autoClearCampingOnCurrentBand', () => {
+describe('presenceService.autoClearCampingOnCurrentBand', () => {
   it('clears camping when is_camping and user has a current band', async () => {
     vi.mocked(db.loadUserPresence).mockResolvedValue({
       user_id: 'user1',
@@ -232,7 +182,7 @@ describe('presenceRepository.autoClearCampingOnCurrentBand', () => {
       updated_at: '2026-07-29T10:00:00Z',
     });
 
-    await presenceRepository.autoClearCampingOnCurrentBand('user1', true, 'current');
+    await presenceService.autoClearCampingOnCurrentBand('user1', true, 'current');
 
     expect(db.saveUserPresence).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: 'user1', is_camping: false }),
@@ -240,19 +190,19 @@ describe('presenceRepository.autoClearCampingOnCurrentBand', () => {
   });
 
   it('does nothing when not camping', async () => {
-    await presenceRepository.autoClearCampingOnCurrentBand('user1', false, 'current');
+    await presenceService.autoClearCampingOnCurrentBand('user1', false, 'current');
 
     expect(db.saveUserPresence).not.toHaveBeenCalled();
   });
 
   it('does nothing when plan status is not current', async () => {
-    await presenceRepository.autoClearCampingOnCurrentBand('user1', true, 'next');
+    await presenceService.autoClearCampingOnCurrentBand('user1', true, 'next');
 
     expect(db.saveUserPresence).not.toHaveBeenCalled();
   });
 });
 
-describe('presenceRepository.validateAndAutoCheckout', () => {
+describe('presenceService.validateAndAutoCheckout', () => {
   it('sets is_at_metal_place to false and syncs when time is outside the metal-place window', async () => {
     const config: MetalPlaceConfig = {
       festival_day: 1,
@@ -275,7 +225,7 @@ describe('presenceRepository.validateAndAutoCheckout', () => {
     const mockUpsert = vi.fn().mockResolvedValue({ error: null });
     vi.mocked(supabase.from).mockReturnValue({ upsert: mockUpsert } as any);
 
-    await presenceRepository.validateAndAutoCheckout(config, userId);
+    await presenceService.validateAndAutoCheckout(config, userId);
 
     expect(db.saveUserPresence).toHaveBeenCalledWith(
       expect.objectContaining({ user_id: userId, is_at_metal_place: false }),
@@ -293,7 +243,7 @@ describe('presenceRepository.validateAndAutoCheckout', () => {
     // 15:00 CEST = 13:00 UTC — within window
     vi.mocked(now).mockReturnValue(new Date('2026-07-29T13:00:00Z'));
 
-    await presenceRepository.validateAndAutoCheckout(config, 'user1');
+    await presenceService.validateAndAutoCheckout(config, 'user1');
 
     expect(db.saveUserPresence).not.toHaveBeenCalled();
     expect(db.loadUserPresence).not.toHaveBeenCalled();
@@ -307,7 +257,7 @@ describe('presenceRepository.validateAndAutoCheckout', () => {
       end_time: '18:00',
     };
 
-    await presenceRepository.validateAndAutoCheckout(config, null);
+    await presenceService.validateAndAutoCheckout(config, null);
 
     expect(db.saveUserPresence).not.toHaveBeenCalled();
   });
@@ -330,7 +280,7 @@ describe('presenceRepository.validateAndAutoCheckout', () => {
     vi.mocked(now).mockReturnValue(new Date('2026-07-29T10:00:00Z'));
     vi.mocked(db.loadUserPresence).mockResolvedValue(notAtMetalPlace);
 
-    await presenceRepository.validateAndAutoCheckout(config, 'user1');
+    await presenceService.validateAndAutoCheckout(config, 'user1');
 
     expect(db.saveUserPresence).not.toHaveBeenCalled();
   });
