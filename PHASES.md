@@ -18,6 +18,8 @@ See `FUTURE_IDEAS.md` for upcoming ideas.
 ## When completing a phase
 
 1. Append the phase entry to `docs/ai-wiki/phases-history.md` (not here, not in CLAUDE.md).
-2. Update this file so the active section points at the next phase with the next phase number (or "no active phased work" when the backlog is empty).
+2. **Remove all completed phase content from this file.** Replace it with either:
+   - The next phase spec (if one is ready), OR
+   - `## No active phased work` with `**Next phase:** N+1` — where N+1 is the completed phase number + 1. This line is mandatory so agents always know the next phase number.
 3. Update `docs/ai-wiki/changelog.md` with a dated entry.
 4. Commit all phase changes in a single commit; push to the active branch.
