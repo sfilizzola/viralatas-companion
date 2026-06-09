@@ -9,7 +9,9 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## No active phased work
 
-All phases complete. See `FUTURE_IDEAS.md` for upcoming ideas.
+**Next phase:** 43
+
+See `FUTURE_IDEAS.md` for upcoming ideas.
 
 ---
 
