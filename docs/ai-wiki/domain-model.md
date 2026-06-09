@@ -281,14 +281,16 @@ type UserPresence = {
 
 **Business Rules:**
 - Camping status is user-set (PresenceToggle component)
-- Metal Place status is godlike-controlled per day/time
+- Metal Place status is godlike-controlled per day/time window
 - Presence is visible to all crew (for "where is everyone?" context)
+- All decision logic lives in `src/services/presencePolicy.ts` (pure, no I/O): window check, toggle resolution, auto-clear camping, auto-checkout. Orchestration (policy → repo) lives in `src/services/presenceService.ts`. `presenceRepository` is pure I/O only. (Phase 42.A)
 
 **Lifecycle:**
 1. User checks in to camping/Metal Place
-2. Presence updates immediately in IndexedDB
-3. Async write to Supabase; if offline, queued
-4. Other crew see the change via Realtime
+2. `presenceService` evaluates policy, then calls `presenceRepository`
+3. Presence updates immediately in IndexedDB
+4. Async write to Supabase; if offline, queued
+5. Other crew see the change via Realtime
 
 **Derived minimap placement (Phase 35):** The `/map` route derives a user's stage position from `UserPick` + `Band.stage` rather than storing a `current_stage` field on `UserPresence`. A dot appears at a stage zone only when that user has a picked band that is live now. `UserPresence` (`is_camping`, `is_at_metal_place`) accounts for the Camping and Metal Place zones. Users with no live pick and no camping/Metal Place presence appear in the `elsewhere` (lost) zone. This is a pure client-side derivation via `buildPlacements()` (`src/services/minimapPlacement.ts`) over the same `crewGroups` used by `/now` — no new schema column exists.
 
@@ -709,4 +711,4 @@ Computed in `useNowData()` using current time + user picks.
 
 ---
 
-**Last updated:** 2026-05-28 — Phase 31 `CrewUser` crew profile cache (`special_badges`); Phase 29 `UserBadgeHistory`.
+**Last updated:** 2026-06-09 — Phase 42.A `UserPresence` business rules section updated to reflect 3-layer seam: `presencePolicy.ts` (pure rules), `presenceService.ts` (orchestration), `presenceRepository.ts` (pure I/O).

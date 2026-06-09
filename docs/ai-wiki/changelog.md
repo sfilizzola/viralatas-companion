@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-09 (Phase 42.A — Presence Layer Refactor)
+
+### Added
+- **`src/services/presencePolicy.ts`** — 4 pure exported functions with no I/O: `isMetalPlaceWindowActive(config, nowDate)` (renamed from `isTimeWithinMetalPlaceWindow`), `resolvePresenceToggle(nextValue, context) → PresenceDecision`, `shouldAutoClearCamping(isCamping, planStatus)`, `shouldAutoCheckout(config, nowDate, presence)`. Exports `PresenceDecision` and `PresenceToggleContext` types.
+- **`src/services/presenceService.ts`** — 4 orchestration methods: `applyPresenceToggle`, `autoClearCampingOnCurrentBand`, `validateAndAutoCheckout`, `autoCheckoutAllUsers`. Each calls policy functions then delegates to `presenceRepository`.
+- **`src/__tests__/presencePolicy.test.ts`** — 30 pure unit tests covering all 4 policy functions and edge cases (null config, boundary times, plan status variants).
+
+### Changed
+- `src/repositories/presence.ts` — Stripped of all business logic; now has 8 pure I/O methods: `setCampingStatus`, `setMetalPlaceStatus`, `syncCrewFromRemote`, `flushOfflineQueue`, `saveMetalPlaceConfigRemote`, `syncMetalPlaceConfig`, `subscribeToRealtime`, `subscribeToMetalPlaceConfigRealtime`. Removed `PresenceToggleContext` type export and unused imports (`LivePlanStatus`, `PresenceLocation`, `getFestivalDay`, `now`).
+- `src/services/socialSnapshot.ts` — Replaced `presenceRepository.isTimeWithinMetalPlaceWindow(...)` with direct import from `presencePolicy.isMetalPlaceWindowActive(...)` (eliminates service→repository inversion).
+- `src/hooks/useNowData.ts` — Imports changed from `presenceRepository` to `presenceService` for `validateAndAutoCheckout`, `autoClearCampingOnCurrentBand`, `applyPresenceToggle`.
+- `src/components/profile/MetalPlaceAdminSection.tsx` and `LiveBandTestAdminSection.tsx` — `autoCheckoutAllUsers` call moved from repository to service.
+- `src/__tests__/presenceRepository.test.ts` — Removed `isTimeWithinMetalPlaceWindow` tests (now in `presencePolicy.test.ts`); orchestration tests updated to import from `presenceService`.
+
+### Architectural Notes
+- Presence management now enforces a strict 3-layer seam: **policy** (`presencePolicy.ts`, pure rules) → **service** (`presenceService.ts`, orchestration) → **repository** (`presenceRepository.ts`, pure I/O). This eliminates business logic from the data layer and enables pure unit testing of all Metal Place decisions without any IDB or Supabase setup.
+- `socialSnapshot.ts` now imports `isMetalPlaceWindowActive` directly from the policy layer — correct dependency direction for a pure service importing pure rules.
+- `PresenceToggleContext` type is exported from `presencePolicy.ts`; consumers that previously imported it from the repository must update their import paths.
+
+---
+
 ## 2026-06-08 (Phase 41 — Map Preview Awareness B3 + S4)
 
 ### Added

@@ -16,6 +16,8 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/lib/supabase.ts` — Supabase client + custom auth storage
 - `src/repositories/bands.ts` — Band sync (`sync()`), cache version check, godlike cache invalidation (Phase 27.H)
 - `src/repositories/` — Data access layer (picks, announcements, users, presence, missed, bands)
+- `src/services/presencePolicy.ts` — Pure presence business rules: `isMetalPlaceWindowActive`, `resolvePresenceToggle`, `shouldAutoClearCamping`, `shouldAutoCheckout`; no I/O (Phase 42.A)
+- `src/services/presenceService.ts` — Presence orchestration: `applyPresenceToggle`, `autoClearCampingOnCurrentBand`, `validateAndAutoCheckout`, `autoCheckoutAllUsers`; calls policy → repository (Phase 42.A)
 - `src/hooks/` — Custom hooks for state management
 - `src/pages/` — Route-level page components
 - `src/components/` — Shared UI components, modals, sections
@@ -181,12 +183,22 @@ export function usePickCounts(): Record<string, number> {
 **Repositories** handle CRUD + sync logic:
 - `picksRepository` — Toggle picks, sync with Supabase, flush offline queue
 - `announcementsRepository` — Post, sync, delete, pin/unpin; current-user role/block checks for mural permissions
-- `presenceRepository` — Update camping/Metal Place status
+- `presenceRepository` — Pure I/O: 8 methods (`setCampingStatus`, `setMetalPlaceStatus`, `syncCrewFromRemote`, `flushOfflineQueue`, `saveMetalPlaceConfigRemote`, `syncMetalPlaceConfig`, `subscribeToRealtime`, `subscribeToMetalPlaceConfigRealtime`). No business logic. (Phase 42.A)
 - `usersRepository` — Sync crew to IndexedDB; admin user ops (roles, block list, role map)
 - `missedRepository` — Mark bands as "didn't watch"
 - `bandsRepository` — Fetch bands, check cache version
 
 **Services** are utility/business logic:
+
+**Presence management uses a strict 3-layer seam (Phase 42.A):**
+```
+presencePolicy.ts  ← pure rules (no I/O, fully unit-testable)
+       ↓
+presenceService.ts ← orchestration (calls policy → repository)
+       ↓
+presenceRepository.ts ← pure I/O (IDB + Supabase writes)
+```
+Hooks (`useNowData`) and admin components call `presenceService`; `socialSnapshot.ts` imports `presencePolicy` directly for the Metal Place window check.
 - `time.ts` — Festival day calculation, date utilities
 - `bandTime.ts` — Band conflict logic, current/next band
 - `badges.ts` — Badge condition evaluation (all client-side)
@@ -467,7 +479,7 @@ INSERT into user_picks
 |------------|-------------|--------------|
 | `picksRepository` | `toggle()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues offline, calls Supabase |
 | `announcementsRepository` | `post()`, `sync()`, `delete()`, `flushPending()`, `pinAnnouncement()`, `unpinAnnouncement()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues pending |
-| `presenceRepository` | `update()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `subscribeToRealtime()`, `subscribeToMetalPlaceConfigRealtime()` | Writes IndexedDB, enqueues offline |
+| `presenceRepository` | `setCampingStatus()`, `setMetalPlaceStatus()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `saveMetalPlaceConfigRemote()`, `syncMetalPlaceConfig()`, `subscribeToRealtime()`, `subscribeToMetalPlaceConfigRealtime()` | Pure I/O: writes IndexedDB, enqueues offline — no business logic (Phase 42.A) |
 | `usersRepository` | `syncCrew()`, `fetchUserRolesMap()`, `fetchAllUsers()`, `setUserRole()`, `fetchBlockedPosters*()`, `blockUser()`, `unblockUser()`, `subscribeToRealtime()` | Writes `crew_users` IDB incl. `special_badges`; hydrates auth metadata on reconnect; admin ops network-only |
 | `missedRepository` | `toggle()`, `flushOfflineQueue()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues offline |
 | `bandsRepository` | `checkAndApplyCacheVersion()`, `loadBands()` | Wipes IDB if cache version changes |
@@ -491,6 +503,8 @@ INSERT into user_picks
 | `badges/currentFestivalYear.ts` | `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()` — live vest year filter + consolidation gate | ✅ Yes |
 | `metalBattle.ts` | `getMetalBattleCountryFlag(slotId)` — static `slot_id`→country map → ISO2 flag emoji (or regional 🌍); prefixes the `Metal Battle` genre label on `BandCard` | ✅ Yes (static data, no IDB) |
 | `stageSchedule.ts` | `buildStageScheduleSnapshot(bands, now)` — pure fn; returns `StageScheduleEntry[]` (one per stage: `{ stage, band, status: 'current' \| 'next' }`); consumed by `StageScheduleSheet` | ✅ Yes (no IDB) |
+| `presencePolicy.ts` | Pure presence rules (no I/O): `isMetalPlaceWindowActive(config, nowDate)`, `resolvePresenceToggle(nextValue, context) → PresenceDecision`, `shouldAutoClearCamping(isCamping, planStatus)`, `shouldAutoCheckout(config, nowDate, presence)`; exports `PresenceDecision`, `PresenceToggleContext` types (Phase 42.A) | ✅ Yes |
+| `presenceService.ts` | Presence orchestration: `applyPresenceToggle`, `autoClearCampingOnCurrentBand`, `validateAndAutoCheckout`, `autoCheckoutAllUsers` — calls policy then repository; consumed by `useNowData`, admin sections (Phase 42.A) | Calls IDB + Supabase via repository |
 
 ### Badge archive flow (Phase 29)
 
@@ -640,4 +654,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-06-06 — Phase 39 Stage Schedule Bottom Sheet: `StageScheduleSheet` component (2×4 grid, LIVE/NEXT tile states, stage-color `--tile-color` CSS prop); `stageSchedule.ts` pure service added to Relevant Source Files and Services table.
+**Last updated:** 2026-06-09 — Phase 42.A Presence layer refactor: `presencePolicy.ts` (pure rules) and `presenceService.ts` (orchestration) added to Relevant Source Files and Services table; `presenceRepository` updated to pure I/O (8 methods); 3-layer seam documented in Layer 3 section and Repositories table.
