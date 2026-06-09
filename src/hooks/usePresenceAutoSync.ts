@@ -19,6 +19,8 @@ export function usePresenceAutoSync({
   myRawPlanStatus,
   isMetalPlaceWindowActive,
 }: UsePresenceAutoSyncParams): void {
+  // isMetalPlaceWindowActive is a re-run trigger: when the window opens/closes,
+  // re-validate checkout even if metalPlaceConfig and userId haven't changed.
   useEffect(() => {
     if (!metalPlaceConfig || !userId) return;
     presenceService.validateAndAutoCheckout(metalPlaceConfig, userId).catch(() => {});
