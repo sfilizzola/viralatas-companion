@@ -1,13 +1,14 @@
 // src/hooks/usePresenceAutoSync.ts
 import { useEffect } from 'react';
 import type { MetalPlaceConfig } from '../types';
+import type { LivePlanStatus } from '../services/livePreview';
 import { presenceService } from '../services/presenceService';
 
 interface UsePresenceAutoSyncParams {
   userId: string | null;
   metalPlaceConfig: MetalPlaceConfig | null;
   isCamping: boolean;
-  myRawPlanStatus: string;
+  myRawPlanStatus: LivePlanStatus;
   isMetalPlaceWindowActive: boolean;
 }
 

@@ -1,11 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+// src/hooks/useNowData.ts
+import { useCallback, useMemo } from 'react';
 import type { Announcement, Band, LiveBandTestConfig, MetalPlaceConfig, UserPick } from '../types';
 import type { CrewLiveGroup, CrewLivePlan, LivePlan, PresenceLocation } from '../services/livePreview';
-import { loadUserPicks } from '../lib/db';
 import { presenceService } from '../services/presenceService';
-import { WEAK_SKIP_UNDO_MS, recordCommittedSkip } from '../services/weakSkips';
-import { usePickActions } from './usePickActions';
-import { useDuckQuack } from './useDuckQuack';
 import { useAuth } from './useAuth';
 import { useLiveBandTestConfig } from './useLiveBandTestConfig';
 import { useMetalPlaceConfig } from './useMetalPlaceConfig';
@@ -13,6 +10,9 @@ import { useNowCache } from './useNowCache';
 import { useNowPlans } from './useNowPlans';
 import { useNow } from './useNow';
 import { useSocialSnapshot } from './useSocialSnapshot';
+import { useSkipUndo } from './useSkipUndo';
+import { usePresenceAutoSync } from './usePresenceAutoSync';
+import { useDuckQuack } from './useDuckQuack';
 
 export type NowData = {
   userId: string | null;
@@ -63,14 +63,8 @@ export function useNowData(): NowData {
     () => rawBands.slice().sort((a, b) => a.start_time.localeCompare(b.start_time)),
     [rawBands],
   );
-  const { unpickBand, pickBand } = usePickActions(userId);
-  const [undoState, setUndoState] = useState<{ bandId: string; bandName: string } | null>(null);
-  const [undoTimerId, setUndoTimerId] = useState<ReturnType<typeof setTimeout> | null>(null);
-  const pendingWeakSkipRef = useRef<{ bandId: string } | null>(null);
-  const commitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const metalPlaceConfig = useMetalPlaceConfig();
   const liveBandTestConfig = useLiveBandTestConfig();
-
   const { latestAnnouncement, cacheLoading: announcementLoading } = useNowCache();
   const loading = socialLoading || announcementLoading || social === null;
 
@@ -103,93 +97,27 @@ export function useNowData(): NowData {
     now,
   });
 
-  useEffect(() => {
-    return () => {
-      if (undoTimerId) clearTimeout(undoTimerId);
-    };
-  }, [undoTimerId]);
+  const { undoState, handleSkip, handleUndo } = useSkipUndo(myPlan, userId);
 
-  useEffect(() => {
-    if (!metalPlaceConfig || !userId) return;
-    presenceService.validateAndAutoCheckout(metalPlaceConfig, userId).catch(() => {});
-  }, [metalPlaceConfig, userId, isMetalPlaceWindowActive]);
+  usePresenceAutoSync({
+    userId,
+    metalPlaceConfig,
+    isCamping,
+    myRawPlanStatus: myRawPlan.status,
+    isMetalPlaceWindowActive,
+  });
 
-  useEffect(() => {
-    if (!userId) return;
-    presenceService
-      .autoClearCampingOnCurrentBand(userId, isCamping, myRawPlan.status)
-      .catch(() => {});
-  }, [userId, isCamping, myRawPlan.status]);
-
-  useEffect(() => {
-    return () => {
-      if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
-    };
-  }, []);
-
-  const commitWeakSkip = useCallback(
-    async (bandId: string) => {
+  const handlePresenceChange = useCallback(
+    async (nextValue: PresenceLocation) => {
       if (!userId) return;
-      const userPicks = await loadUserPicks(userId);
-      if (userPicks.some((pick) => pick.band_id === bandId)) return;
-      await recordCommittedSkip(userId, bandId);
-    },
-    [userId],
-  );
-
-  const clearSkipTimers = useCallback(() => {
-    if (undoTimerId) clearTimeout(undoTimerId);
-    if (commitTimerRef.current) clearTimeout(commitTimerRef.current);
-    commitTimerRef.current = null;
-    setUndoTimerId(null);
-  }, [undoTimerId]);
-
-  const handleSkip = useCallback(async () => {
-    if (!myPlan.band || !userId) return;
-    const bandId = myPlan.band.id;
-    const bandName = myPlan.band.name;
-
-    if (pendingWeakSkipRef.current) {
-      await commitWeakSkip(pendingWeakSkipRef.current.bandId);
-      pendingWeakSkipRef.current = null;
-    }
-
-    clearSkipTimers();
-    await unpickBand(bandId);
-    pendingWeakSkipRef.current = { bandId };
-    setUndoState({ bandId, bandName });
-
-    const nextUndoTimerId = setTimeout(() => {
-      setUndoState(null);
-    }, WEAK_SKIP_UNDO_MS);
-    setUndoTimerId(nextUndoTimerId);
-
-    commitTimerRef.current = setTimeout(() => {
-      void commitWeakSkip(bandId).finally(() => {
-        pendingWeakSkipRef.current = null;
-        commitTimerRef.current = null;
+      await presenceService.applyPresenceToggle(userId, nextValue, {
+        myRawPlanStatus: myRawPlan.status,
+        isAtMetalPlace,
+        isCamping,
       });
-    }, WEAK_SKIP_UNDO_MS);
-  }, [myPlan, userId, clearSkipTimers, unpickBand, commitWeakSkip]);
-
-  const handleUndo = useCallback(async () => {
-    if (!undoState || !userId) return;
-    clearSkipTimers();
-    pendingWeakSkipRef.current = null;
-    await pickBand(undoState.bandId);
-    setUndoState(null);
-  }, [undoState, userId, clearSkipTimers, pickBand]);
-
-  const { quack: duckQuack, cooldownUntil: duckCooldownUntil } = useDuckQuack(userId, duckBandId);
-
-  const handlePresenceChange = useCallback(async (nextValue: PresenceLocation) => {
-    if (!userId) return;
-    await presenceService.applyPresenceToggle(userId, nextValue, {
-      myRawPlanStatus: myRawPlan.status,
-      isAtMetalPlace,
-      isCamping,
-    });
-  }, [userId, myRawPlan.status, isAtMetalPlace, isCamping]);
+    },
+    [userId, myRawPlan.status, isAtMetalPlace, isCamping],
+  );
 
   const nextBand = useMemo(() => {
     if (myPlan.status === 'current' || !userId) return null;
@@ -200,6 +128,8 @@ export function useNowData(): NowData {
       .sort((a, b) => a.start_time.localeCompare(b.start_time));
     return upcomingBands[0] ?? null;
   }, [picks, bands, myPlan.status, userId, now]);
+
+  const { quack: duckQuack, cooldownUntil: duckCooldownUntil } = useDuckQuack(userId, duckBandId);
 
   return {
     userId,
