@@ -1,5 +1,6 @@
 // src/lib/featureFlags.ts
 import { supabase } from './supabase';
+import type { Database } from './supabase.types';
 
 export type FlagKey =
   | 'registration_enabled'
@@ -40,9 +41,14 @@ async function set(key: FlagKey, value: boolean): Promise<void> {
     throw fetchError ?? new Error('App settings row not found');
   }
 
+  const payload = {
+    [key]: value,
+    updated_at: new Date().toISOString(),
+  } as Database['public']['Tables']['app_settings']['Update'];
+
   const { error } = await supabase
     .from('app_settings')
-    .update({ [key]: value, updated_at: new Date().toISOString() })
+    .update(payload)
     .eq('id', settings.id);
 
   if (error) throw error;

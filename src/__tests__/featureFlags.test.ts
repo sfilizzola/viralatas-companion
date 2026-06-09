@@ -62,7 +62,7 @@ describe('featureFlags.set()', () => {
     await featureFlags.set('duck_enabled', false);
 
     expect(mocks.mockUpdate).toHaveBeenCalledTimes(1);
-    const payload = (mocks.mockUpdate.mock.calls[0] as [Record<string, unknown>])[0];
+    const payload = (mocks.mockUpdate.mock.calls[0] as unknown as [Record<string, unknown>])[0];
     expect(payload.duck_enabled).toBe(false);
     expect(typeof payload.updated_at).toBe('string');
     expect(new Date(payload.updated_at as string).toString()).not.toBe('Invalid Date');
