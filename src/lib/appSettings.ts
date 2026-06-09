@@ -4,6 +4,9 @@
 import { featureFlags } from './featureFlags';
 
 export const getRegistrationEnabled = () => featureFlags.get('registration_enabled');
+// Setters return Promise<true> (not void) to preserve backward compat with callers
+// that assert the resolved value (e.g. duckKillswitch.test.tsx:79).
+// Remove this shim when Phase 2 migrates callers to featureFlags directly.
 export const setRegistrationEnabled  = (v: boolean) =>
   featureFlags.set('registration_enabled', v).then(() => true as const);
 
