@@ -311,6 +311,15 @@ export const BADGES: BadgeConfig[] = [
     year: 2026,
     persist: true,
   },
+  {
+    slug: 'metal-place-mob',
+    imagePath: '/badges/badge_metal-place-mob.png',
+    labelKey: 'badgeMetalPlaceMob',
+    descriptionKey: 'badgeMetalPlaceMobDescription',
+    condition: { type: 'crew_at_location_min', location: 'metal_place', count: 10 },
+    year: 2026,
+    persist: true,
+  },
   // Festival 2026 — band-named witness badges
   {
     slug: 'wacken-firefighters',

@@ -581,7 +581,7 @@ Earned when user **is at a location AND N+ crew members are there** (permanent o
 ```typescript
 { type: 'crew_at_location_min', location: 'camping', count: 15 }
 ```
-**Locations**: `'camping'` or `'lost'` only (not `'metal_place'`)
+**Locations**: `'camping'`, `'lost'`, or `'metal_place'`
 
 **Permanent**: Badge slug stored in `user_metadata.crew_earned_badge_slugs` once earned
 
@@ -672,7 +672,7 @@ Strict `(ratedSeen × 100) / seenCount >= pct`; **false** when `seenCount === 0`
 
 ---
 
-## Current Badges Inventory (74 Total)
+## Current Badges Inventory (75 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -779,10 +779,11 @@ Pre-collapse subgenre strings (Goregrind, Humppa, Horror Punk, Melodic Death Met
 - `patient-zero` — "Paciente Zero" / "Patient Zero". One minute dancing, next minute pupil check — time is a flat circle (godlike-assigned).
 - `alemao-mode` — "Alemão Mode". One song, one announcement, one trembling lip — Alemão would be proud (godlike-assigned).
 
-### Location Presence (5)
+### Location Presence (6)
 - `metal-place-2026` — Visited Metal Place (persist: true)
 - `bbq-crew` — 15+ crew camping together (persist: true)
 - `lost-together` — 15+ crew lost together (persist: true)
+- `metal-place-mob` — 10+ crew at Metal Place simultaneously (`crew_at_location_min`, location: metal_place, count: 10; persist: true). "Brothers everywhere, raise your hands into the air."
 - `full-pack` — All 21 vira-latas in camping at the same time (`crew_at_location_min`, location: camping, count: 21; persist: true). The "everyone showed up" miracle badge.
 - `mass-lost` — All 21 vira-latas lost in the infield at the same time (`crew_at_location_min`, location: lost, count: 21; persist: true). Counterpart to `full-pack`.
 

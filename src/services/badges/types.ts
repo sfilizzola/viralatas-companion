@@ -46,7 +46,7 @@ export type BadgeCondition =
   // Committed weak skips on /now ("I am weak"): count from user_metadata.weak_skips_2026
   | { type: 'weak_skips_min'; count: number }
   // Crew at location: earned when user is at a location AND N+ crew are there; permanent once earned
-  | { type: 'crew_at_location_min'; location: 'camping' | 'lost'; count: number }
+  | { type: 'crew_at_location_min'; location: 'camping' | 'lost' | 'metal_place'; count: number }
   // Time-based: count bands whose CEST start_time >= hour (symmetric to `before` variants)
   | { type: 'bands_picked_after_hour_min'; hour: number; count: number }
   | { type: 'bands_seen_after_hour_min'; hour: number; count: number }

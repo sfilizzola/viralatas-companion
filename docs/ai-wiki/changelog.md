@@ -4,6 +4,18 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-09 (badge: metal-place-mob)
+
+### Added
+- Badge `metal-place-mob`: "Brothers Everywhere" — earned when user is at Metal Place AND 10+ crew are there simultaneously (`crew_at_location_min`, location: `metal_place`, count: 10; persist: true). All 4 locales added (en, br, de, es).
+- Extended `crew_at_location_min` location union in `types.ts` to include `'metal_place'` (previously only `'camping' | 'lost'`). Wiki `badges.md` updated to reflect new allowed locations.
+- Updated `docs/ai-wiki/badges.md`: Location Presence group (5→6), total badge count (74→75), corrected `crew_at_location_min` location constraint note.
+
+### Architectural Notes
+- `crew_at_location_min` engine case already handled any location string generically — only the TypeScript type union and the registry needed updating; no evaluator logic changed.
+
+---
+
 ## 2026-06-09 (Phase 42.B — incrementLocationVisit extraction)
 
 ### Added
