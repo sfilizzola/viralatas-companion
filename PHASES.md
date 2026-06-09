@@ -7,17 +7,15 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-## Phase 42 — Presence Architecture Deepening
+## No active phased work
 
-**Status:** 🔄 In progress  
-**Branch:** `main` (or a dedicated feature branch)
+All phases complete. See `FUTURE_IDEAS.md` for upcoming ideas.
 
-**Goal:** Split `presenceRepository.ts` into three distinct modules following a full three-layer seam:
-- `presencePolicy.ts` — pure rules, no I/O
-- `presenceRepository.ts` — pure I/O, no rules
-- `presenceService.ts` — orchestration (calls policy → calls repo)
+---
 
-This eliminates Metal Place business logic embedded in the data layer, making every decision rule unit-testable with plain `Date` objects (no IndexedDB, no Supabase).
+## Phase 42 — Presence Architecture Deepening ✅
+
+**Status:** ✅ Complete (2026-06-09) → `docs/ai-wiki/phases-history.md`
 
 ---
 
@@ -83,17 +81,15 @@ presenceService.ts  (orchestration — calls policy → calls repo)
 
 ---
 
-### Phase 42.B — incrementLocationVisit extraction (follow-up)
+### Phase 42.B — incrementLocationVisit extraction ✅
 
-**Goal:** Move `incrementLocationVisit('camping' | 'metal_place')` from inside `presenceRepository.setCampingStatus` / `setMetalPlaceStatus` to `presenceService` — making location-visit tracking an explicit part of the location-entry orchestration. This sets the pattern for any future location types (new location = add key to `PresenceLocation`, add predicate to policy, add I/O to repo, add visit tracking in service).
-
-**Pending:** Implement after 42.A is shipped and green.
+**Status:** ✅ Complete (2026-06-09)
 
 ---
 
 ## When completing a phase
 
 1. Append the phase entry to `docs/ai-wiki/phases-history.md` (not here, not in CLAUDE.md).
-2. Update this file so the active section points at the next phase (or "no active phased work" when the backlog is empty).
+2. Update this file so the active section points at the next phase with the next phase number (or "no active phased work" when the backlog is empty).
 3. Update `docs/ai-wiki/changelog.md` with a dated entry.
 4. Commit all phase changes in a single commit; push to the active branch.

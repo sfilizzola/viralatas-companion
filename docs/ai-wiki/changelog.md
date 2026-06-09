@@ -4,6 +4,23 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-09 (Phase 42.B — incrementLocationVisit extraction)
+
+### Added
+- **`presenceService.setCampingStatus(userId, isCamping)`** — service-level wrapper that calls the repo, then calls `incrementLocationVisit('camping')` when `entered: true`.
+- **`presenceService.setMetalPlaceStatus(userId, isAtMetalPlace)`** — same pattern for metal place. Both are now exported on `presenceService`.
+- **10 new tests** in `presenceRepository.test.ts`: `{ entered }` return-value coverage for both repo methods, plus 6 service-level visit-tracking assertions (entry → tracks, re-entry → no-op, exit → no-op).
+
+### Changed
+- `src/repositories/presence.ts` — `setCampingStatus` and `setMetalPlaceStatus` return `{ entered: boolean }` instead of `void`; internal `incrementLocationVisit` calls removed; `incrementLocationVisit` added to the public `presenceRepository` export.
+- `src/services/presenceService.ts` — all four orchestration methods (`applyPresenceToggle`, `autoClearCampingOnCurrentBand`, `validateAndAutoCheckout`, `autoCheckoutAllUsers`) now route through the new `setCampingStatus` / `setMetalPlaceStatus` wrappers instead of calling the repository directly, ensuring visit tracking fires at every entry path.
+
+### Architectural Notes
+- Visit tracking is now an explicit orchestration concern owned by the service layer, not a side effect hidden inside I/O methods. The repository is pure data access; the service decides when to count a location entry.
+- Pattern for future location types: add predicate to `presencePolicy.ts`, add I/O method to `presenceRepository.ts`, add a wrapper in `presenceService.ts` that fires `incrementLocationVisit` on entry.
+
+---
+
 ## 2026-06-09 (Phase 42.A — Presence Layer Refactor)
 
 ### Added

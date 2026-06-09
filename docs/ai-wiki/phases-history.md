@@ -995,6 +995,44 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 
 ---
 
+### Phase 42 — Presence Architecture Deepening
+**Status:** ✅ Complete
+
+**Completed:** 2026-06-09
+
+**Goal:** Split `presenceRepository.ts` into a strict three-layer seam — pure policy rules, pure I/O, and orchestration — eliminating business logic from the data layer and making every Metal Place decision unit-testable with plain `Date` objects.
+
+**Deliverables shipped:**
+
+_Phase 42.A — Policy + Service Seam_
+- `src/services/presencePolicy.ts` — 4 pure exported functions (`isMetalPlaceWindowActive`, `resolvePresenceToggle`, `shouldAutoClearCamping`, `shouldAutoCheckout`) + `PresenceDecision` / `PresenceToggleContext` types; zero I/O
+- `src/services/presenceService.ts` — 4 orchestration methods (`applyPresenceToggle`, `autoClearCampingOnCurrentBand`, `validateAndAutoCheckout`, `autoCheckoutAllUsers`) calling policy → repo
+- `src/repositories/presence.ts` — stripped to 8 pure I/O methods; all date/time logic removed
+- `src/services/socialSnapshot.ts` — import `isMetalPlaceWindowActive` from policy directly (eliminates service→repository inversion)
+- `src/hooks/useNowData.ts` — updated 3 call sites to `presenceService`
+- `src/components/profile/MetalPlaceAdminSection.tsx`, `LiveBandTestAdminSection.tsx` — `autoCheckoutAllUsers` moved to service
+- `src/__tests__/presencePolicy.test.ts` — 30 pure unit tests; no mocks
+- `src/__tests__/presenceRepository.test.ts`, `useNowData.test.ts` — updated to reflect new module boundaries
+
+_Phase 42.B — incrementLocationVisit extraction_
+- `src/repositories/presence.ts` — `setCampingStatus` / `setMetalPlaceStatus` return `{ entered: boolean }`; `incrementLocationVisit` becomes public; internal visit tracking removed
+- `src/services/presenceService.ts` — new `setCampingStatus` / `setMetalPlaceStatus` wrappers trigger `incrementLocationVisit` on first entry; all 4 orchestration methods route through them
+- 10 new tests verifying the tracking contract
+
+**Acceptance criteria (all met):**
+- [x] All existing Metal Place behaviour unchanged end-to-end
+- [x] `presenceRepository.ts` exports no functions containing date/time comparison logic
+- [x] `presencePolicy.ts` imports nothing from `../lib/db`, `../lib/supabase`, or `../repositories`
+- [x] `presenceService.ts` calls `presencePolicy` for every decision before calling `presenceRepository` for I/O
+- [x] Visit tracking is explicit orchestration, not a hidden side effect in the data layer
+- [x] Build green · 781 tests green
+
+**Architectural notes:**
+- Full three-layer seam: `presencePolicy.ts` (rules) → `presenceService.ts` (orchestration) → `presenceRepository.ts` (I/O). Each layer has a single responsibility and is independently testable.
+- Pattern for future locations: add predicate to policy, add I/O to repo, add wrapper to service.
+
+---
+
 ### Phase 41 — Map Preview Awareness (B3 + S4)
 **Status:** ✅ Complete
 
