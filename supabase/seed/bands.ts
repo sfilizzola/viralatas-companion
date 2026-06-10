@@ -233,7 +233,7 @@ export const bands: BandSeed[] = [
   { slot_id: 'LOU9', name: 'Therapy?',       stage: STAGES.LOUDER, start_time: t(D2,15,30), end_time: t(D2,16,30),  genre: 'Hard Rock', image_url: `${WOA}/fileadmin/_processed_/8/5/csm_therapy26_acbd2ac94b.jpg` },         
   { slot_id: 'LOU10', name: 'Life of Agony',  stage: STAGES.LOUDER, start_time: t(D2,17,30), end_time: t(D2,18,45),  genre: 'Metal',image_url: `${WOA}/fileadmin/_processed_/9/4/csm_life_of_agony26_68ef27b061.jpg` },  
   { slot_id: 'LOU11', name: 'P.O.D.',         stage: STAGES.LOUDER, start_time: t(D2,19,45), end_time: t(D2,21, 0),  genre: 'Metal',         image_url: `${WOA}/fileadmin/_processed_/f/0/csm_POD_26_52d8ce1512.jpg` },          
-  { slot_id: 'LOU12', name: 'Turbonegro',     stage: STAGES.LOUDER, start_time: t(D2,22, 0), end_time: t(D2,22,30),  genre: 'Punk',        image_url: `${WOA}/fileadmin/_processed_/1/b/csm_turbonegro26_2118d824cd.jpg` },     
+  { slot_id: 'LOU12', name: 'Turbonegro',     stage: STAGES.LOUDER, start_time: t(D2,22, 0), end_time: t(D2,23,30),  genre: 'Punk',        image_url: `${WOA}/fileadmin/_processed_/1/b/csm_turbonegro26_2118d824cd.jpg` },     
 
   // W.E.T. STAGE — Day 2
   { slot_id: 'WET13', name: 'E.N.D.',                stage: STAGES.WET, start_time: t(D2,11, 0), end_time: t(D2,11,20),  genre: 'Metal Battle', image_url: PLACEHOLDER }, 
@@ -312,8 +312,8 @@ export const bands: BandSeed[] = [
   // W.E.T. STAGE — Day 3
   { slot_id: 'WET23', name: MTB,                  stage: STAGES.WET, start_time: t(D3,11, 0), end_time: t(D3,11,45),  genre: 'Metal Battle', image_url: PLACEHOLDER },                                                                  
   { slot_id: 'WET24', name: 'Employed to Serve',  stage: STAGES.WET, start_time: t(D3,13, 0), end_time: t(D3,13,45),  genre: 'Metalcore',                   image_url: `${WOA}/fileadmin/_processed_/a/a/csm_employed_to_serve26_631874c4dd.jpg` }, 
-  { slot_id: 'WET25', name: 'Deafheaven',         stage: STAGES.WET, start_time: t(D3,15, 0), end_time: t(D3,15,45),  genre: 'Black Metal',                   image_url: `${WOA}/fileadmin/_processed_/1/0/csm_deafheaven_26_4d801d532f.jpg` },        
-  { slot_id: 'WET26', name: 'The Haunted',        stage: STAGES.WET, start_time: t(D3,17, 0), end_time: t(D3,17,45),  genre: 'Death Metal',         image_url: `${WOA}/fileadmin/_processed_/d/3/csm_The_Haunted-WOA26_849d3b2a7e.jpg` },    
+  { slot_id: 'WET25', name: 'Dead by April',      stage: STAGES.WET, start_time: t(D3,15, 0), end_time: t(D3,15,45),  genre: 'Metalcore',                     image_url: `${WOA}/fileadmin/_processed_/9/4/csm_dead_by_april_26_b9b9c21441.jpg` },     
+  { slot_id: 'WET26', name: 'Deafheaven',         stage: STAGES.WET, start_time: t(D3,17, 0), end_time: t(D3,17,45),  genre: 'Black Metal',                   image_url: `${WOA}/fileadmin/_processed_/1/0/csm_deafheaven_26_4d801d532f.jpg` },        
   { slot_id: 'WET27', name: 'Animals as Leaders', stage: STAGES.WET, start_time: t(D3,19, 0), end_time: t(D3,19,45),  genre: 'Metal',           image_url: `${WOA}/fileadmin/_processed_/2/b/csm_animals_as_leaders26_0a9b3dfbf5.jpg` }, 
   { slot_id: 'WET28', name: 'Crematory',          stage: STAGES.WET, start_time: t(D3,21,15), end_time: t(D3,22,15),  genre: 'Doom Metal',   image_url: `${WOA}/fileadmin/_processed_/7/c/csm_crematory_26_8ae2e22d82.jpg` },         
   { slot_id: 'WET29', name: 'Skynd',              stage: STAGES.WET, start_time: t(D3,23,45), end_time: t(D3n, 0,45), genre: 'Metal',             image_url: `${WOA}/fileadmin/_processed_/7/3/csm_skynd26_fdaccaa45e.jpg` },              
@@ -324,7 +324,7 @@ export const bands: BandSeed[] = [
   { slot_id: 'HBA25', name: 'Any Given Day',    stage: STAGES.HEADBANGERS, start_time: t(D3,16, 0), end_time: t(D3,16,45),  genre: 'Metalcore',              image_url: `${WOA}/fileadmin/_processed_/d/f/csm_Any_given_Day-WOA26_45b0bb14e2.jpg` },    
   { slot_id: 'HBA26', name: 'Pig Destroyer',    stage: STAGES.HEADBANGERS, start_time: t(D3,18, 0), end_time: t(D3,18,45),  genre: 'Death Metal',              image_url: `${WOA}/fileadmin/_processed_/7/9/csm_Pig_Destroyer-WOA26_111d076650.jpg` },    
   { slot_id: 'HBA27', name: 'Bear McCreary',    stage: STAGES.HEADBANGERS, start_time: t(D3,20, 0), end_time: t(D3,21, 0),  genre: 'Metal',image_url: `${WOA}/fileadmin/_processed_/a/e/csm_bear_mccreary_26b_802dfd47bf.jpg` },     
-  { slot_id: 'HBA28', name: 'Bleed from Within',stage: STAGES.HEADBANGERS, start_time: t(D3,22,30), end_time: t(D3,23,30),  genre: 'Metalcore',              image_url: `${WOA}/fileadmin/_processed_/c/6/csm_bleed_from_within_26_c38f26c402.jpg` },  
+  { slot_id: 'HBA28', name: 'The Haunted',      stage: STAGES.HEADBANGERS, start_time: t(D3,22,30), end_time: t(D3,23,30),  genre: 'Death Metal',            image_url: `${WOA}/fileadmin/_processed_/d/3/csm_The_Haunted-WOA26_849d3b2a7e.jpg` },    
   { slot_id: 'HBA29', name: 'Alcest',           stage: STAGES.HEADBANGERS, start_time: t(D3n, 1, 0), end_time: t(D3n, 2, 0), genre: 'Black Metal',      image_url: `${WOA}/fileadmin/_processed_/d/2/csm_alcest_26_ca67b9d832.jpg` },              
 
   // WASTELAND STAGE — Day 3
@@ -386,7 +386,7 @@ export const bands: BandSeed[] = [
   // LOU21 — dropped (Name = TBD in lineup.md)
   { slot_id: 'LOU22', name: 'Kittie',             stage: STAGES.LOUDER, start_time: t(D4,13,45), end_time: t(D4,14,45),  genre: 'Heavy Metal',         image_url: `${WOA}/fileadmin/_processed_/d/6/csm_kittie_26_31697daab6.jpg` },              
   { slot_id: 'LOU23', name: 'Thrown',             stage: STAGES.LOUDER, start_time: t(D4,15,30), end_time: t(D4,16,30),  genre: 'Doom Metal',          image_url: `${WOA}/fileadmin/_processed_/4/9/csm_Thrown-WOA26_f70cc40622.jpg` },           
-  { slot_id: 'LOU24', name: 'Of Mice and Men',    stage: STAGES.LOUDER, start_time: t(D4,17,15), end_time: t(D4,18,15),  genre: 'Metalcore',           image_url: `${WOA}/fileadmin/_processed_/5/2/csm_of_mice_and_men_26_26aab5f25c.jpg` },     
+  { slot_id: 'LOU24', name: 'Bleed from Within',  stage: STAGES.LOUDER, start_time: t(D4,17,15), end_time: t(D4,18,15),  genre: 'Metalcore',           image_url: `${WOA}/fileadmin/_processed_/c/6/csm_bleed_from_within_26_c38f26c402.jpg` },  
   { slot_id: 'LOU25', name: 'Kärbholz',           stage: STAGES.LOUDER, start_time: t(D4,19, 0), end_time: t(D4,20, 0),  genre: 'Punk',           image_url: `${WOA}/fileadmin/_processed_/7/4/csm_kaerbholz_26_85a563b793.jpg` },           
   { slot_id: 'LOU26', name: 'Thy Art Is Murder',  stage: STAGES.LOUDER, start_time: t(D4,20,45), end_time: t(D4,21,45),  genre: 'Death Metal',           image_url: `${WOA}/fileadmin/_processed_/8/0/csm_thy_art_is_murder_26_9e88fcd95e.jpg` },   
   { slot_id: 'LOU27', name: 'Triptykon',          stage: STAGES.LOUDER, start_time: t(D4,22,45), end_time: t(D4n, 0, 0), genre: 'Black Metal',  image_url: `${WOA}/fileadmin/_processed_/3/c/csm_Triptykon-WOA26_0599ad9698.jpg` },         
