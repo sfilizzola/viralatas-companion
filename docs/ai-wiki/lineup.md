@@ -300,8 +300,8 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | ------ | ------ | ------ | ------------- | ----------- |
 | TDB MTB | Metal Battle | WET23 | TDB MTB | PLACEHOLDER |
 | Employed to Serve | Metalcore | WET24 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/a/csm_employed_to_serve26_631874c4dd.jpg |
-| Deafheaven | Black Metal | WET25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/0/csm_deafheaven_26_4d801d532f.jpg |
-| The Haunted | Death Metal | WET26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/3/csm_The_Haunted-WOA26_849d3b2a7e.jpg |
+| Dead by April | Metalcore | WET25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/4/csm_dead_by_april_26_b9b9c21441.jpg |
+| Deafheaven | Black Metal | WET26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/0/csm_deafheaven_26_4d801d532f.jpg |
 | Animals as Leaders | Metal | WET27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/b/csm_animals_as_leaders26_0a9b3dfbf5.jpg |
 | Crematory | Doom Metal | WET28 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/c/csm_crematory_26_8ae2e22d82.jpg |
 | Skynd | Metal | WET29 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/3/csm_skynd26_fdaccaa45e.jpg |
@@ -315,7 +315,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | Any Given Day | Metalcore | HBA25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/f/csm_Any_given_Day-WOA26_45b0bb14e2.jpg |
 | Pig Destroyer | Death Metal | HBA26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/9/csm_Pig_Destroyer-WOA26_111d076650.jpg |
 | Bear McCreary | Metal | HBA27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/e/csm_bear_mccreary_26b_802dfd47bf.jpg |
-| Bleed from Within | Metalcore | HBA28 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/6/csm_bleed_from_within_26_c38f26c402.jpg |
+| The Haunted | Death Metal | HBA28 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/3/csm_The_Haunted-WOA26_849d3b2a7e.jpg |
 | Alcest | Black Metal | HBA29 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/2/csm_alcest_26_ca67b9d832.jpg |
 
 ### Wasteland Stage
@@ -386,7 +386,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | TBD | Metal | LOU21 | TBD | PLACEHOLDER |
 | Kittie | Heavy Metal | LOU22 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/6/csm_kittie_26_31697daab6.jpg |
 | Thrown | Doom Metal | LOU23 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/9/csm_Thrown-WOA26_f70cc40622.jpg |
-| Of Mice and Men | Metalcore | LOU24 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/2/csm_of_mice_and_men_26_26aab5f25c.jpg |
+| Bleed from Within | Metalcore | LOU24 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/6/csm_bleed_from_within_26_c38f26c402.jpg |
 | Kärbholz | Punk | LOU25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/4/csm_kaerbholz_26_85a563b793.jpg |
 | Thy Art Is Murder | Death Metal | LOU26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/0/csm_thy_art_is_murder_26_9e88fcd95e.jpg |
 | Triptykon | Black Metal | LOU27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/3/c/csm_Triptykon-WOA26_0599ad9698.jpg |

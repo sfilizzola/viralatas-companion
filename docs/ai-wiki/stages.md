@@ -248,7 +248,7 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 | LOU9 | 15:30 | 16:30 | YES |
 | LOU10 | 17:30 | 18:45 | YES |
 | LOU11 | 19:45 | 21:00 | YES |
-| LOU12 | 22:00 | 22:30 | YES |
+| LOU12 | 22:00 | 23:30 | YES |
 
 #### Day 3 (Friday)
 
