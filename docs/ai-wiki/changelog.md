@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-12
+
+### Changed
+- **Popular `/popular` ranked card → "Refined Leaderboard" (Variant A).** Restyled the `ranked` `BandCard` variant into a leaderboard row that conveys magnitude at a glance. Grid is now `46px | 1fr | auto` (rank · body · right rail) with a **magnitude bar** absolutely positioned behind the row. No data-model or behavior change — `ratingStats` / `attendeeCluster` / `missedCount` props are reused, only re-laid-out.
+  - Picks mode: bar = stage-color gradient (opacity .16, width = `count / topCount`); rank top-3 tinted stage color; hero = pick count + cap "picks"; 3×20px attendee avatars under hero.
+  - Rating mode: bar + rank tint switch to `--accent` (opacity .14, width = `avg / 5`); hero = 🐾 avg + cap "N rated"; `You · N🐾` in the sub row; avatars hidden.
+  - Ended bands: card dims to `.72` (`cardEnded` now also applies to ranked), hero = saw count + cap "saw", `N skip` (`--signal-warn`) in the sub row.
+- **Dropped the 4px left stripe for the `ranked` variant only** — stage color now lives in the magnitude bar + a 7px stage dot in the sub row. `schedule` / `timeline` variants keep their stripe.
+
+### Added
+- `BandCard` prop `magnitude?: { value: number; max: number; tone: 'stage' | 'accent' }` driving the leaderboard bar width (guards `max <= 0` → width 0, clamps to 0–100%).
+- `PopularPage` computes `maxPickCount` from the top of the already-sorted `popularBands` list and passes `magnitude` per mode (rating uses `max: 5` with `aggregate.avg`).
+- i18n keys `capPicks` and `ratingCountCap` ("{count} rated") added to PopularPage in all 4 locales (en, br, es, de).
+
+### Architectural Notes
+- The `ranked` render path is now fully branched inside `BandCard` (`RankedRow` + `RankedHero` + `RankedAvatars` subcomponents); the old `RankBadge` / `AttendeeCluster` / `RatingStats` subcomponents and their CSS (`.rank`, `.bodyRanked`, `.attendee*`, `.rating*`) were removed as dead code. `schedule` / `timeline` markup is untouched.
+- Offline-first preserved: no new server-dependent reads; the page still reads from existing IndexedDB-backed hooks (`useBands`, `usePickCounts`, `useBandAttendees`, `useBandRatings`, `useMissedBands`).
+- DS §04 updated (`public/vira-lata-ds.html`): new ranked leaderboard demo (picks / rating / ended states) + anatomy notes; `#ds-manifest` unchanged (no section/token/component added).
+
+---
+
 ## 2026-06-09 (badge: metal-place-mob)
 
 ### Added

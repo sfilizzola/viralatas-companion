@@ -7,6 +7,8 @@
   "popularModePicks": "Picks",
   "popularModeRating": "Nota",
   "ratingCount": "{count} vira-latas",
+  "ratingCountCap": "{count} notas",
+  "capPicks": "picks",
   "ratingYouScore": "Tú · {score}",
   "loading": "Cargando popularidad...",
   "empty": "Ningún vira-lata ha elegido banda aún. El primero gana. 🤘",

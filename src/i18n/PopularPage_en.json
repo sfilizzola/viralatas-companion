@@ -7,6 +7,8 @@
   "popularModePicks": "Picks",
   "popularModeRating": "Rating",
   "ratingCount": "{count} vira-latas",
+  "ratingCountCap": "{count} rated",
+  "capPicks": "picks",
   "ratingYouScore": "You · {score}",
   "loading": "Loading popularity...",
   "empty": "No vira-lata has picked a band yet. First to save wins. 🤘",

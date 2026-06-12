@@ -457,22 +457,55 @@
   .bcard.timeline .when .h { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
   .bcard.timeline .when .end { font-family: var(--font-mono); font-size: 10px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
-  /* ---- band card variant: popular ranked ---- */
+  /* ---- band card variant: popular ranked (Refined Leaderboard) ---- */
+  /* No 4px stripe — stage color lives in the magnitude bar + stage dot. */
   .bcard.ranked {
-    grid-template-columns: 4px 56px 1fr;
+    grid-template-columns: 46px 1fr auto;
+    align-items: center;
+    gap: var(--s-3);
+    padding: var(--s-3);
+    position: relative;
+    overflow: hidden;
   }
-  .bcard.ranked .rank {
-    font-family: var(--font-display);
-    font-weight: 700;
-    font-size: 36px;
-    line-height: 1;
-    text-align: center;
-    padding: var(--s-4) 0 0;
-    color: var(--text-muted);
+  .bcard.ranked.ended { opacity: 0.72; }
+  /* Magnitude bar: width = value/max %, gradient fades to transparent. */
+  .bcard.ranked .bar {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background: linear-gradient(90deg, var(--rk-sc, var(--accent)), transparent);
+    opacity: 0.16; pointer-events: none;
+  }
+  .bcard.ranked .bar.accent {
+    background: linear-gradient(90deg, var(--accent), transparent);
+    opacity: 0.14;
+  }
+  .bcard.ranked .rk {
+    position: relative;
+    font-family: var(--font-display); font-weight: 700; font-size: 30px;
+    line-height: 1; text-align: center; color: var(--text-faint);
     font-variant-numeric: tabular-nums;
   }
-  .bcard.ranked .rank.top { color: var(--accent); }
-  .bcard.ranked .body { padding-bottom: var(--s-4); }
+  .bcard.ranked .rk.top { color: var(--rk-sc, var(--accent)); }
+  .bcard.ranked .rk.top-rating { color: var(--accent); }
+  .bcard.ranked .rk-main { position: relative; min-width: 0; display: flex; flex-direction: column; gap: var(--s-1); }
+  .bcard.ranked .rk-name {
+    font-family: var(--font-display); font-weight: 700; font-size: 18px;
+    line-height: 1.05; text-transform: uppercase;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text);
+  }
+  .bcard.ranked .rk-sub { display: flex; align-items: center; gap: var(--s-2); }
+  .bcard.ranked .rk-day { font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-faint); }
+  .bcard.ranked .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--rk-sc, var(--accent)); flex-shrink: 0; }
+  .bcard.ranked .rk-stage { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text-muted); }
+  .bcard.ranked .rk-time { font-family: var(--font-mono); font-size: 10px; color: var(--text-faint); font-variant-numeric: tabular-nums; }
+  .bcard.ranked .rk-you { font-family: var(--font-mono); font-size: 8px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.08em; }
+  .bcard.ranked .rk-skip { font-family: var(--font-mono); font-size: 9px; color: var(--signal-warn); text-transform: uppercase; letter-spacing: 0.05em; }
+  .bcard.ranked .rk-right { position: relative; display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+  .bcard.ranked .rk-hero { display: flex; align-items: baseline; gap: 3px; font-family: var(--font-display); font-weight: 700; font-size: 24px; line-height: 1; color: var(--white); font-variant-numeric: tabular-nums; }
+  .bcard.ranked .rk-hero .paw { color: var(--accent); font-size: 15px; }
+  .bcard.ranked .rk-cap { font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-top: 2px; }
+  .bcard.ranked .rk-avs { display: inline-flex; margin-top: var(--s-1); }
+  .bcard.ranked .rk-avs .av { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--bg-surface); margin-left: -7px; font-family: var(--font-display); font-size: 9px; font-weight: 700; color: #fff; display: flex; align-items: center; justify-content: center; }
+  .bcard.ranked .rk-avs .av:first-child { margin-left: 0; }
 
   /* ---- band card variant: ceremony ---- */
   .bcard.ceremony {
@@ -3022,61 +3055,70 @@
       </div>
     </div>
 
-    <!-- BAND CARD: popular -->
-    <div class="subhead">Band card &middot; popular variant</div>
+    <!-- BAND CARD: popular ranked (Refined Leaderboard) -->
+    <div class="subhead">Band card &middot; popular ranked (Refined Leaderboard)</div>
     <div class="demo">
       <div class="demo-stage">
-        <div class="bcard ranked">
-          <div class="stripe" style="background:var(--stage-louder)"></div>
-          <div class="rank top">01</div>
-          <div class="body" style="padding:var(--s-4)">
-            <div class="name">POWERWOLF</div>
-            <div class="meta">
-              <span class="stage" style="background:var(--stage-louder)">Louder</span>
-              <span class="time">D3 · 22:30</span>
-            </div>
-            <div class="pop-going">
-              <div class="cluster">
-                <span class="av s32" style="background:#c0392b">SF</span>
-                <span class="av s32" style="background:#2980b9">JP</span>
-                <span class="av s32" style="background:#16a085">LM</span>
-                <span class="av s32" style="background:#8e44ad">RC</span>
-                <span class="av s32 av-ink" style="background:#f39c12">VB</span>
-              </div>
-              <div class="t-label" style="color:var(--accent-hover)"><b class="pop-count-num">14</b>&nbsp;going</div>
+        <!-- Picks mode: magnitude bar = stage color, hero = pick count -->
+        <div class="bcard ranked" style="--rk-sc:var(--stage-louder)">
+          <div class="bar" style="width:100%"></div>
+          <div class="rk top">1</div>
+          <div class="rk-main">
+            <div class="rk-name">POWERWOLF</div>
+            <div class="rk-sub"><span class="rk-day">Sat</span><span class="dot"></span><span class="rk-stage">Louder</span><span class="rk-time">22:30</span></div>
+          </div>
+          <div class="rk-right">
+            <div class="rk-hero">14</div>
+            <div class="rk-cap">picks</div>
+            <div class="rk-avs">
+              <span class="av" style="background:#c0392b">SF</span>
+              <span class="av" style="background:#2980b9">JP</span>
+              <span class="av" style="background:#16a085">LM</span>
             </div>
           </div>
         </div>
-        <div class="bcard ranked">
-          <div class="stripe" style="background:var(--stage-faster)"></div>
-          <div class="rank">02</div>
-          <div class="body" style="padding:var(--s-4)">
-            <div class="name">BLIND GUARDIAN</div>
-            <div class="meta">
-              <span class="stage" style="background:var(--stage-faster)">Faster</span>
-              <span class="time">D2 · 22:00</span>
-            </div>
-            <div class="pop-going">
-              <div class="cluster">
-                <span class="av s32" style="background:#16a085">LM</span>
-                <span class="av s32" style="background:#8e44ad">RC</span>
-                <span class="av s32" style="background:#e67e22">DK</span>
-                <span class="av s32" style="background:#2c3e50">FF</span>
-              </div>
-              <div class="t-label"><b class="pop-count-num">11</b>&nbsp;going</div>
+        <!-- Rating mode: bar + rank tint = accent, hero = paw avg -->
+        <div class="bcard ranked" style="--rk-sc:var(--stage-faster)">
+          <div class="bar accent" style="width:92%"></div>
+          <div class="rk top-rating">2</div>
+          <div class="rk-main">
+            <div class="rk-name">BLIND GUARDIAN</div>
+            <div class="rk-sub"><span class="rk-day">Fri</span><span class="dot"></span><span class="rk-stage">Faster</span><span class="rk-time">22:00</span></div>
+            <div class="rk-you">You · 5🐾</div>
+          </div>
+          <div class="rk-right">
+            <div class="rk-hero"><span class="paw">🐾</span>4.6</div>
+            <div class="rk-cap">11 rated</div>
+          </div>
+        </div>
+        <!-- Ended (picks mode): dimmed, hero = saw, N skipped in warn -->
+        <div class="bcard ranked ended" style="--rk-sc:var(--stage-faster)">
+          <div class="bar" style="width:72%"></div>
+          <div class="rk">3</div>
+          <div class="rk-main">
+            <div class="rk-name">LOVEBITES</div>
+            <div class="rk-sub"><span class="rk-day">Thu</span><span class="dot"></span><span class="rk-stage">Faster</span><span class="rk-time">16:00</span></div>
+            <div class="rk-skip">2 skip</div>
+          </div>
+          <div class="rk-right">
+            <div class="rk-hero">11</div>
+            <div class="rk-cap">saw</div>
+            <div class="rk-avs">
+              <span class="av" style="background:#16a085">LM</span>
+              <span class="av" style="background:#8e44ad">RC</span>
             </div>
           </div>
         </div>
       </div>
       <div class="demo-notes">
-        <h4>Anatomy</h4>
+        <h4>Anatomy · Refined Leaderboard (Variant A)</h4>
         <ul>
-          <li><b>Rank</b> Oswald 36, top-3 in red</li>
-          <li><b>Picks mode</b> — avatar cluster up to 5 visible, +N overflow</li>
-          <li><b>Rating mode</b> (Phase 32) — footer strip with count, optional <code>You · N</code>, paw + avg hero; avatars hidden</li>
-          <li>Header: title + inset segmented pill (<code>Picks</code> / <code>Rating</code>) on one row</li>
-          <li>Tap → opens band detail modal</li>
-          <li>Day ghost uses weekday abbr (<code>Wed</code> etc.) via <code>showDayLabel</code></li>
+          <li>Grid <code>46px | 1fr | auto</code>, padding <code>--s-3</code>, <code>position:relative; overflow:hidden</code>. <b>No 4px stripe</b> on ranked — stage color now lives in the <b>magnitude bar</b> + <b>stage dot</b>.</li>
+          <li><b>Magnitude bar</b> (abs, behind row): <code>linear-gradient(90deg, &lt;tone&gt;, transparent)</code>, width = <code>value/max</code>. Picks/ended: stage color, opacity .16 (value=count, max=top band count). Rating: <code>--accent</code>, opacity .14 (value=avg, max=5). Driven by the <code>magnitude</code> prop on <code>BandCard</code>; max 0 → width 0.</li>
+          <li><b>Rank</b> (46px) Oswald 700 30px, muted; top-3 tinted stage color (picks) or <code>--accent</code> (rating).</li>
+          <li><b>Body</b>: name Oswald 18 uppercase ellipsis; sub row = optional day ghost + stage dot + stage + mono time. Rating adds <code>You · N🐾</code>; ended adds <code>N skip</code> (<code>--signal-warn</code>).</li>
+          <li><b>Right rail</b>: hero Oswald 700 24px white + mono 8px cap. Picks→count / "picks"; rating→🐾 avg / "N rated"; ended→saw / "saw". Below hero: 3×20px attendee avatars (picks/ended) — rating hides avatars.</li>
+          <li>Ended card dims to <code>opacity .72</code> (<code>cardEnded</code>). Header: title + inset segmented pill (<code>Picks</code> / <code>Rating</code>). Tap → band detail modal.</li>
         </ul>
       </div>
     </div>
@@ -3827,11 +3869,11 @@
         <p>Displays band information with pick toggles and attendance counts.</p>
         <p><strong>Variants:</strong> schedule, timeline, ranked, ceremony</p>
         <p><strong>Features:</strong> duck button, conflict indicators, stage badge, attendee avatars, corner weekday label (V1 ghost)</p>
-        <p><strong>Day label (<code>showDayLabel</code>):</strong> optional corner ghost — mono 9px weekday abbr in <code>--text-faint</code>, top-right of the body column (<code>.dayGhost</code>). Only on <code>schedule</code> and <code>ranked</code> variants. Weekday comes from <code>bandWeekdayKey()</code> in <code>bandTime.ts</code> (CEST, same rules as <code>bandDay()</code>) via SchedulePage i18n keys. <strong>Lineup (<code>/schedule</code>):</strong> shown when no day tab is active (<code>filters.day === null</code>). Hidden when a single day filter is selected. <strong>Popular:</strong> always shown. <strong>My Wacken:</strong> not used — festival day comes from section headers (<code>.dayHeader</code>).</p>
+        <p><strong>Day label (<code>showDayLabel</code>):</strong> optional weekday abbr in <code>--text-faint</code> (<code>.dayGhost</code>). On <code>schedule</code> it's a mono 9px corner ghost top-right of the body column; on <code>ranked</code> it's folded inline as the first token of the leaderboard sub row (position reset via <code>.rankedDay</code>). Weekday comes from <code>bandWeekdayKey()</code> in <code>bandTime.ts</code> (CEST, same rules as <code>bandDay()</code>) via SchedulePage i18n keys. <strong>Lineup (<code>/schedule</code>):</strong> shown when no day tab is active (<code>filters.day === null</code>). Hidden when a single day filter is selected. <strong>Popular:</strong> always shown. <strong>My Wacken:</strong> not used — festival day comes from section headers (<code>.dayHeader</code>).</p>
         <p><strong>Attendance chip (<code>attendanceChip</code>, Phase 33):</strong> <code>timeline</code> variant on <code>/my-picks</code> <strong>ended rows only</strong>. Values <code>attended</code> | <code>missed</code> (not “Saw”). Mono pill <code>.attendanceChipAttended</code> / <code>.attendanceChipMissed</code> in <code>.meta</code>; <code>hidePick</code> on ended rows. Card background + time column = same as upcoming; status = <strong>4px left stripe only</strong> (<code>.stripeAttended</code> → <code>--signal-ok</code>, <code>.stripeMissed</code> → <code>--signal-warn</code>). Stage color on <code>.stageBadge</code> only. Opacity: <code>.cardAttended</code> 72% · <code>.cardMissed</code> 62%. No conflict outline on ended rows. See <strong>My Wacken Page</strong> section for page-level layout.</p>
         <p><strong>Duck button visibility:</strong> only when band is currently live, the user has picked it, <code>band.category !== 'ceremony'</code>, AND the global <code>duck_enabled</code> killswitch (Phase 21) is on. The killswitch is a single boolean on <code>app_settings</code>, fetched once at app boot via <code>DuckEnabledProvider</code> and toggled from Godlike Powers → Duck feature. When off, the duck button is not rendered anywhere; offline-queued ducks still flush on reconnect.</p>
         <p><strong>Pick toggle:</strong> <code>StarIcon</code> → <code>PawIcon</code> (canine + heel, −14°) in the 64px column at <strong>28px</strong>; outline when unpicked, filled accent when picked. Bottom nav My Wacken tab stays 18px.</p>
-        <p><strong>Popular rating mode (<code>ratingStats</code>, Phase 32):</strong> when sort mode is <code>rating</code>, ranked cards pass <code>ratingStats</code> instead of <code>attendeeCluster</code>. Footer strip (border-top): left column = count + optional <code>You · {score}</code> + optional missed skip; right column = paw + large avg (<code>.ratingHero</code>). Pick avatars hidden.</p>
+        <p><strong>Popular ranked — Refined Leaderboard (2026-06-12):</strong> the <code>ranked</code> variant is a leaderboard row (grid <code>46px | 1fr | auto</code>) with a <code>magnitude</code> bar behind it (<code>{ value, max, tone }</code>, width = <code>value/max</code>, stage tone for picks/ended at opacity .16, accent tone for rating at .14). Right rail hero: picks → count + cap "picks" + 3 avatars; rating → 🐾 avg + cap "N rated" (avatars hidden, <code>You · N🐾</code> in sub); ended → saw + cap "saw" + <code>N skip</code> (warn) + avatars, card dimmed to .72. The 4px stripe is dropped for ranked only (stage color = bar + dot); schedule/timeline keep their stripe. <code>ratingStats</code> and <code>attendeeCluster</code> props unchanged — only re-laid-out.</p>
         <p><strong>Metal Battle country flag:</strong> when <code>band.genre === 'Metal Battle'</code>, the genre label (<code>.genre</code>) is prefixed with the competitor's country flag emoji — e.g. <code>🇭🇺 Metal Battle</code>. The flag comes from <code>getMetalBattleCountryFlag(band.slot_id)</code> in <code>src/services/metalBattle.ts</code> (static <code>slot_id</code>→country map; ISO2→emoji, or a regional 🌍 for multi-country entries like Sub-Saharan Africa / Balkans). Slots with no confirmed representative return <code>null</code> and the label renders as plain <code>Metal Battle</code>. All other genres render unchanged. Country flags are an allowed emoji exception in-UI (see icon language note).</p>
         <p><strong>Shared pick marker (<code>sharedPick</code>, Phase 38.A):</strong> shown in crew picks browser mode (<code>filters.userId != null</code>) when the current user has also picked the band. Adds a teal border tint (<code>.cardSharedPick</code>) and a <code>.sharedPickBadge</code> pill inside the body — mono 9px, teal, i18n key <code>youAlsoPicked</code> (SchedulePage ns). Uses <code>--signal-ok</code> via <code>color-mix()</code> for both border and badge background.</p>
         <div class="component-demo cdemo--bandcard">

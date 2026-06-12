@@ -5,7 +5,7 @@ import { stageColorVar } from '../services/stageColors';
 import { bandWeekdayKey, formatTime } from '../services/bandTime';
 import { getMetalBattleCountryFlag } from '../services/metalBattle';
 import { useI18n } from '../lib/i18n';
-import { Avatar, Chip } from '../ui';
+import { Chip } from '../ui';
 import StarIcon from './icons/StarIcon';
 import PawIcon from './icons/PawIcon';
 import QuackGhostRow from './QuackGhostRow';
@@ -43,6 +43,8 @@ type BandCardProps = {
     count: number;
     userScore?: BandRatingScore;
   };
+  /** Ranked leaderboard magnitude bar — value/max drives bar width, tone picks gradient color */
+  magnitude?: { value: number; max: number; tone: 'stage' | 'accent' };
   /** Crew picks browser: current user also picked this band */
   sharedPick?: boolean;
 };
@@ -86,10 +88,10 @@ export default function BandCard({
   duckCooldownUntil,
   showDayLabel = false,
   ratingStats,
+  magnitude,
   sharedPick = false,
 }: Readonly<BandCardProps>) {
   const { t } = useI18n('SchedulePage');
-  const { t: tPopular } = useI18n('PopularPage');
   const initial = band.name.charAt(0).toUpperCase();
   const interactive = Boolean(onClick);
   const showPick = variant !== 'ranked' && !hidePick;
@@ -132,6 +134,7 @@ export default function BandCard({
     showAttendanceChip && attendanceChip === 'attended' ? styles.cardAttended : '',
     showAttendanceChip && attendanceChip === 'missed' ? styles.cardMissed : '',
     variant === 'timeline' && isBandEnded && !showAttendanceChip ? styles.cardEnded : '',
+    variant === 'ranked' && isBandEnded ? styles.cardEnded : '',
     sharedPick ? styles.cardSharedPick : '',
   ]
     .filter(Boolean)
@@ -157,112 +160,102 @@ export default function BandCard({
       aria-pressed={interactive ? isPicked : undefined}
       style={{ '--stage-color': color } as React.CSSProperties}
     >
-      <div className={stripeClass} aria-hidden />
-
-      {variant === 'schedule' && (
-        <CardThumb imageUrl={band.image_url} fallback={thumbFallback} />
-      )}
-
-      {variant === 'timeline' && (
-        <CardWhen startTime={band.start_time} endTime={band.end_time} />
-      )}
-
-      {variant === 'ranked' && <RankBadge rank={rank} />}
-
-      <div
-        className={[
-          styles.body,
-          variant === 'ranked' ? styles.bodyRanked : '',
-          showDayGhost ? styles.bodyWithDayGhost : '',
-        ]
-          .filter(Boolean)
-          .join(' ')}
-      >
-        {showDayGhost && (
-          <span className={styles.dayGhost} aria-hidden>
-            {t(bandWeekdayKey(band))}
-          </span>
-        )}
-        <h2 className={styles.bandName}>{band.name}</h2>
-        <div
-          className={[
-            styles.meta,
-            showAttendanceChip ? styles.metaWithAttendance : '',
-          ]
-            .filter(Boolean)
-            .join(' ')}
-        >
-          {isCeremony ? (
-            <span className={styles.ceremonyLabel}>
-              ✦ {t('scheduleClosingCeremony')}
-            </span>
-          ) : (
-            <Chip className={styles.stageBadge}>{band.stage}</Chip>
-          )}
-          {variant !== 'timeline' && (
-            <span className={styles.time}>
-              {formatTime(band.start_time)} – {formatTime(band.end_time)}
-            </span>
-          )}
-          {count > 0 && variant !== 'ranked' && !showAttendanceChip && (
-            <span className={styles.going}>
-              <AttendanceText
-                count={count}
-                isBandEnded={isBandEnded}
-                missedCount={missedCount}
-              />
-            </span>
-          )}
-          {variant === 'timeline' && conflict && <ConflictChip conflict={conflict} />}
-          {showAttendanceChip && <AttendanceChip kind={attendanceChip} />}
-          {band.genre && variant === 'schedule' && (
-            <span className={styles.genre}>
-              {band.genre === 'Metal Battle'
-                ? `${getMetalBattleCountryFlag(band.slot_id) ?? ''} Metal Battle`.trim()
-                : band.genre}
-            </span>
-          )}
-          {pending && <span className="pending-chip">{t('pendingSync')}</span>}
-        </div>
-
-        {attendeeCluster && variant === 'ranked' && !ratingStats && (
-          <AttendeeCluster
-            {...attendeeCluster}
-            count={count}
-            isBandEnded={isBandEnded}
-            missedCount={missedCount}
-          />
-        )}
-        {ratingStats && variant === 'ranked' && (
-          <RatingStats
-            avgFormatted={ratingStats.avgFormatted}
-            count={ratingStats.count}
-            userScore={ratingStats.userScore}
-            countLabel={tPopular('ratingCount', { count: ratingStats.count })}
-            youLabel={
-              ratingStats.userScore !== undefined
-                ? tPopular('ratingYouScore', { score: ratingStats.userScore })
-                : undefined
-            }
-            isBandEnded={isBandEnded}
-            missedCount={missedCount}
-          />
-        )}
-        {children}
-        {showDuck && onDuck && (
-          <QuackGhostRow onDuck={onDuck} cooldownUntil={duckCooldownUntil ?? null} />
-        )}
-      </div>
-
-      {showPick && (
-        <PickButton
-          isPicked={isPicked}
-          popping={popping}
-          onToggle={() => {
-            userToggledRef.current = true;
-            onToggle();
-          }}
+      {variant === 'ranked' ? (
+        <RankedRow
+          band={band}
+          rank={rank}
+          magnitude={magnitude}
+          count={count}
+          isBandEnded={isBandEnded}
+          missedCount={missedCount}
+          attendeeCluster={attendeeCluster}
+          ratingStats={ratingStats}
+          showDayGhost={showDayGhost}
         />
+      ) : (
+        <>
+          <div className={stripeClass} aria-hidden />
+
+          {variant === 'schedule' && (
+            <CardThumb imageUrl={band.image_url} fallback={thumbFallback} />
+          )}
+
+          {variant === 'timeline' && (
+            <CardWhen startTime={band.start_time} endTime={band.end_time} />
+          )}
+
+          <div
+            className={[
+              styles.body,
+              showDayGhost ? styles.bodyWithDayGhost : '',
+            ]
+              .filter(Boolean)
+              .join(' ')}
+          >
+            {showDayGhost && (
+              <span className={styles.dayGhost} aria-hidden>
+                {t(bandWeekdayKey(band))}
+              </span>
+            )}
+            <h2 className={styles.bandName}>{band.name}</h2>
+            <div
+              className={[
+                styles.meta,
+                showAttendanceChip ? styles.metaWithAttendance : '',
+              ]
+                .filter(Boolean)
+                .join(' ')}
+            >
+              {isCeremony ? (
+                <span className={styles.ceremonyLabel}>
+                  ✦ {t('scheduleClosingCeremony')}
+                </span>
+              ) : (
+                <Chip className={styles.stageBadge}>{band.stage}</Chip>
+              )}
+              {variant !== 'timeline' && (
+                <span className={styles.time}>
+                  {formatTime(band.start_time)} – {formatTime(band.end_time)}
+                </span>
+              )}
+              {count > 0 && !showAttendanceChip && (
+                <span className={styles.going}>
+                  <AttendanceText
+                    count={count}
+                    isBandEnded={isBandEnded}
+                    missedCount={missedCount}
+                  />
+                </span>
+              )}
+              {variant === 'timeline' && conflict && <ConflictChip conflict={conflict} />}
+              {showAttendanceChip && <AttendanceChip kind={attendanceChip} />}
+              {band.genre && variant === 'schedule' && (
+                <span className={styles.genre}>
+                  {band.genre === 'Metal Battle'
+                    ? `${getMetalBattleCountryFlag(band.slot_id) ?? ''} Metal Battle`.trim()
+                    : band.genre}
+                </span>
+              )}
+              {pending && <span className="pending-chip">{t('pendingSync')}</span>}
+            </div>
+
+            {children}
+            {showDuck && onDuck && (
+              <QuackGhostRow onDuck={onDuck} cooldownUntil={duckCooldownUntil ?? null} />
+            )}
+          </div>
+
+          {showPick && (
+            <PickButton
+              isPicked={isPicked}
+              popping={popping}
+              onToggle={() => {
+                userToggledRef.current = true;
+                onToggle();
+              }}
+            />
+          )}
+        </>
       )}
     </article>
   );
@@ -295,12 +288,142 @@ function CardWhen({
   );
 }
 
-function RankBadge({ rank }: Readonly<{ rank: number | undefined }>) {
-  if (rank === undefined) return null;
-  const topClass = rank <= 3 ? styles.rankTop : '';
+function RankedRow({
+  band,
+  rank,
+  magnitude,
+  count,
+  isBandEnded,
+  missedCount,
+  attendeeCluster,
+  ratingStats,
+  showDayGhost,
+}: Readonly<{
+  band: Band;
+  rank?: number;
+  magnitude?: { value: number; max: number; tone: 'stage' | 'accent' };
+  count: number;
+  isBandEnded: boolean;
+  missedCount?: number;
+  attendeeCluster?: { attendees: BandAttendee[]; max?: number };
+  ratingStats?: { avgFormatted: string; count: number; userScore?: BandRatingScore };
+  showDayGhost: boolean;
+}>) {
+  const { t } = useI18n('SchedulePage');
+  const { t: tPopular } = useI18n('PopularPage');
+
+  const isRating = ratingStats !== undefined;
+  const barWidth =
+    magnitude && magnitude.max > 0
+      ? Math.min(100, Math.max(0, (magnitude.value / magnitude.max) * 100))
+      : 0;
+  const isTop3 = rank !== undefined && rank <= 3;
+  const rankToneClass = isTop3
+    ? isRating
+      ? styles.rankedRankTopRating
+      : styles.rankedRankTop
+    : '';
+  const showSkip =
+    isBandEnded && missedCount !== undefined && missedCount > 0;
+
   return (
-    <div className={`${styles.rank} ${topClass}`} aria-hidden>
-      {String(rank).padStart(2, '0')}
+    <>
+      <div
+        className={`${styles.rankedBar} ${magnitude?.tone === 'accent' ? styles.rankedBarAccent : ''}`}
+        style={{ width: `${barWidth}%` }}
+        aria-hidden
+      />
+      <div className={`${styles.rankedRank} ${rankToneClass}`} aria-hidden>
+        {rank ?? ''}
+      </div>
+      <div className={styles.rankedMain}>
+        <h2 className={styles.rankedName}>{band.name}</h2>
+        <div className={styles.rankedSub}>
+          {showDayGhost && (
+            <span className={`${styles.dayGhost} ${styles.rankedDay}`} aria-hidden>
+              {t(bandWeekdayKey(band))}
+            </span>
+          )}
+          <span className={styles.stageDot} aria-hidden />
+          <span className={styles.rankedStage}>{band.stage}</span>
+          <span className={styles.rankedTime}>{formatTime(band.start_time)}</span>
+        </div>
+        {isRating && ratingStats?.userScore !== undefined && (
+          <div className={styles.rankedYou}>
+            {tPopular('ratingYouScore', { score: ratingStats.userScore })}
+            <PawIcon filled size={9} />
+          </div>
+        )}
+        {showSkip && (
+          <div className={styles.rankedSkip}>
+            {missedCount} {t('skipLabel')}
+          </div>
+        )}
+      </div>
+      <div className={styles.rankedRight}>
+        <RankedHero
+          isRating={isRating}
+          isBandEnded={isBandEnded}
+          count={count}
+          missedCount={missedCount}
+          avgFormatted={ratingStats?.avgFormatted}
+        />
+        <div className={styles.rankedCap}>
+          {isRating
+            ? tPopular('ratingCountCap', { count: ratingStats?.count ?? 0 })
+            : isBandEnded
+              ? t('sawLabel')
+              : tPopular('capPicks')}
+        </div>
+        {!isRating && attendeeCluster && (
+          <RankedAvatars attendees={attendeeCluster.attendees} />
+        )}
+      </div>
+    </>
+  );
+}
+
+function RankedHero({
+  isRating,
+  isBandEnded,
+  count,
+  missedCount,
+  avgFormatted,
+}: Readonly<{
+  isRating: boolean;
+  isBandEnded: boolean;
+  count: number;
+  missedCount?: number;
+  avgFormatted?: string;
+}>) {
+  if (isRating) {
+    return (
+      <div className={styles.rankedHero} aria-label={avgFormatted}>
+        <span className={styles.rankedHeroPaw}>
+          <PawIcon filled size={16} />
+        </span>
+        {avgFormatted}
+      </div>
+    );
+  }
+  const sawCount = missedCount === undefined ? count : count - missedCount;
+  return <div className={styles.rankedHero}>{isBandEnded ? sawCount : count}</div>;
+}
+
+function RankedAvatars({ attendees }: Readonly<{ attendees: BandAttendee[] }>) {
+  if (attendees.length === 0) return null;
+  const visible = attendees.slice(0, 3);
+  return (
+    <div className={styles.rankedAvatars} aria-hidden>
+      {visible.map((a) => (
+        <span key={a.id} className={styles.rankedAvatar}>
+          {a.avatar_url ? (
+            <img src={a.avatar_url} alt="" />
+          ) : (
+            a.label.charAt(0).toUpperCase()
+          )}
+        </span>
+      ))}
     </div>
   );
 }
@@ -334,43 +457,6 @@ function AttendanceText({
     <>
       <b>{count}</b> {t('goingLabel')}
     </>
-  );
-}
-
-function RatingStats({
-  avgFormatted,
-  countLabel,
-  youLabel,
-  isBandEnded,
-  missedCount,
-}: Readonly<{
-  avgFormatted: string;
-  count: number;
-  userScore?: BandRatingScore;
-  countLabel: string;
-  youLabel?: string;
-  isBandEnded?: boolean;
-  missedCount?: number;
-}>) {
-  const { t } = useI18n('SchedulePage');
-  const showMissed = isBandEnded && missedCount !== undefined && missedCount > 0;
-
-  return (
-    <div className={styles.ratingCluster}>
-      <div className={styles.ratingDetails}>
-        <p className={styles.ratingMeta}>{countLabel}</p>
-        {youLabel && <p className={styles.ratingYou}>{youLabel}</p>}
-        {showMissed && (
-          <p className={styles.ratingMissed}>
-            <b>{missedCount}</b> {t('skipLabel')}
-          </p>
-        )}
-      </div>
-      <div className={styles.ratingHero} aria-label={avgFormatted}>
-        <PawIcon filled size={16} />
-        <span className={styles.ratingAvg}>{avgFormatted}</span>
-      </div>
-    </div>
   );
 }
 
@@ -427,63 +513,3 @@ function PickButton({
   );
 }
 
-function AttendeeCluster({
-  attendees,
-  max = 5,
-  count,
-  isBandEnded = false,
-  missedCount,
-}: Readonly<{
-  attendees: BandAttendee[];
-  max?: number;
-  count: number;
-  isBandEnded?: boolean;
-  missedCount?: number;
-}>) {
-  const { t } = useI18n('SchedulePage');
-  if (attendees.length === 0) return null;
-  const visible = attendees.slice(0, max);
-  const overflow = attendees.length - visible.length;
-  const sawCount = missedCount === undefined ? count : count - missedCount;
-
-  return (
-    <div className={styles.attendeeCluster}>
-      <div className={styles.attendeeAvatars}>
-        {visible.map((a) => (
-          <Avatar
-            key={a.id}
-            size={32}
-            src={a.avatar_url}
-            initial={a.label.charAt(0).toUpperCase()}
-            className={styles.attendeeAvatar}
-          />
-        ))}
-        {overflow > 0 && (
-          <span className={styles.attendeeOverflow}>
-            {t('attendeeOverflow', { count: overflow })}
-          </span>
-        )}
-      </div>
-      <span className={styles.attendeeCount}>
-        {isBandEnded ? (
-          <>
-            <b>{sawCount}</b>
-            {t('sawLabel')}
-            {missedCount !== undefined && missedCount > 0 && (
-              <>
-                {' · '}
-                <b>{missedCount}</b>
-                {t('skipLabel')}
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            <b>{count}</b>
-            {t('goingLabel')}
-          </>
-        )}
-      </span>
-    </div>
-  );
-}

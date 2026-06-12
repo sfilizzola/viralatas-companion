@@ -151,6 +151,88 @@ describe('BandCard', () => {
     expect(container.querySelector('span[class*="dayGhost"]')?.textContent).toBe('Wed');
   });
 
+  it('renders a magnitude bar and no stripe in the ranked variant', () => {
+    const { container } = renderWithI18n(
+      <BandCard
+        band={sampleBand}
+        isPicked={false}
+        count={9}
+        onToggle={vi.fn()}
+        onClick={vi.fn()}
+        variant="ranked"
+        rank={1}
+        magnitude={{ value: 9, max: 18, tone: 'stage' }}
+      />,
+    );
+
+    const bar = container.querySelector('[class*="rankedBar"]') as HTMLElement | null;
+    expect(bar).not.toBeNull();
+    expect(bar?.style.width).toBe('50%');
+    expect(container.querySelector('[class*="stripe"]')).toBeNull();
+  });
+
+  it('renders the pick-count hero with "picks" cap in ranked picks mode', () => {
+    const { container, getByText } = renderWithI18n(
+      <BandCard
+        band={sampleBand}
+        isPicked={false}
+        count={9}
+        onToggle={vi.fn()}
+        onClick={vi.fn()}
+        variant="ranked"
+        rank={1}
+        magnitude={{ value: 9, max: 18, tone: 'stage' }}
+      />,
+    );
+
+    expect(container.querySelector('[class*="rankedHero"]')?.textContent).toBe('9');
+    expect(getByText('picks')).toBeTruthy();
+  });
+
+  it('renders the paw average and "N rated" cap in ranked rating mode', () => {
+    const { container, getByText } = renderWithI18n(
+      <BandCard
+        band={sampleBand}
+        isPicked={false}
+        count={13}
+        onToggle={vi.fn()}
+        onClick={vi.fn()}
+        variant="ranked"
+        rank={1}
+        magnitude={{ value: 4.6, max: 5, tone: 'accent' }}
+        ratingStats={{ avgFormatted: '4.6', count: 13, userScore: 5 }}
+      />,
+    );
+
+    expect(container.querySelector('[class*="rankedHero"]')?.textContent).toContain('4.6');
+    expect(getByText('13 rated')).toBeTruthy();
+    expect(container.querySelector('[class*="rankedYou"]')?.textContent).toContain('You · 5');
+    const bar = container.querySelector('[class*="rankedBar"]') as HTMLElement | null;
+    expect(bar?.className).toMatch(/rankedBarAccent/);
+  });
+
+  it('renders the saw hero and skipped count for an ended ranked band', () => {
+    const { container, getByText } = renderWithI18n(
+      <BandCard
+        band={sampleBand}
+        isPicked={false}
+        count={11}
+        onToggle={vi.fn()}
+        onClick={vi.fn()}
+        variant="ranked"
+        rank={1}
+        isBandEnded
+        missedCount={2}
+        magnitude={{ value: 11, max: 18, tone: 'stage' }}
+      />,
+    );
+
+    expect(container.querySelector('[class*="rankedHero"]')?.textContent).toBe('9');
+    expect(getByText('saw')).toBeTruthy();
+    expect(container.querySelector('[class*="rankedSkip"]')?.textContent).toContain('2');
+    expect(container.querySelector('[class*="rankedSkip"]')?.textContent).toContain('skip');
+  });
+
   it('shows attendance chip on timeline ended rows only', () => {
     const { getByText } = renderWithI18n(
       <BandCard

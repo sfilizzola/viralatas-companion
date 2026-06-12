@@ -75,6 +75,10 @@ export default function PopularPage() {
 
   const displayBands = sortMode === 'rating' ? ratedBands : popularBands;
 
+  // Magnitude-bar scale: top band's pick count (list is sorted desc).
+  const maxPickCount =
+    popularBands.length > 0 ? (pickCounts[popularBands[0].id] ?? 0) : 0;
+
   const totalViraLatas = useMemo(() => {
     const userIds = new Set<string>();
     for (const attendees of Object.values(attendeesByBand)) {
@@ -180,6 +184,13 @@ export default function PopularPage() {
                       userScore,
                     }
                   : undefined
+              }
+              magnitude={
+                sortMode === 'rating'
+                  ? aggregate
+                    ? { value: aggregate.avg, max: 5, tone: 'accent' }
+                    : undefined
+                  : { value: count, max: maxPickCount, tone: 'stage' }
               }
             />
           );
