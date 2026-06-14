@@ -3,7 +3,9 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 56px;
+  height: var(--bottom-nav-total);
+  padding-bottom: var(--bottom-nav-inset);
+  box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(6, 1fr);
   background: var(--bg-surface);

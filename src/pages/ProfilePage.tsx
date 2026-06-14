@@ -57,7 +57,7 @@ export default function ProfilePage() {
         Caramelo Tech v{VERSION}
       </div>
 
-      <div style={{ height: 56 }} />
+      <div className={styles.navSpacer} />
       <BottomNav />
     </div>
   );

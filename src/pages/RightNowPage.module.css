@@ -1,7 +1,9 @@
 .page {
-  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
   background: var(--bg);
 }
 
@@ -129,6 +131,7 @@
 
 .main {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 1rem;
 }
@@ -927,7 +930,7 @@
 
 .undoToast {
   position: fixed;
-  bottom: 64px;
+  bottom: calc(var(--bottom-nav-total) + var(--s-2));
   left: 1rem;
   right: 1rem;
   padding: 0.75rem 1rem;
@@ -983,7 +986,7 @@
 }
 
 .navSpacer {
-  height: 56px;
+  height: var(--bottom-nav-total);
   flex-shrink: 0;
 }
 

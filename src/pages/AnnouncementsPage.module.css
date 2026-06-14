@@ -1,7 +1,9 @@
 .page {
   display: flex;
   flex-direction: column;
-  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
   background: var(--bg);
   color: var(--text);
 }
@@ -23,6 +25,8 @@
 
 .main {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: var(--s-4);
@@ -521,5 +525,5 @@
    ============================================================ */
 
 .navSpacer {
-  height: 56px;
+  height: var(--bottom-nav-total);
 }
