@@ -1,81 +1,134 @@
-.strip {
-  margin-bottom: 8px;
-  padding: var(--s-3);
-  border: 2px dashed var(--border-strong);
+.popover {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  left: auto;
+  z-index: 5;
+  width: max-content;
+  max-width: 100%;
+  padding: var(--s-2) var(--s-2) var(--s-3);
+  border: 2px solid var(--border-strong);
   border-radius: 2px;
-  background: repeating-linear-gradient(
-    -4deg,
-    var(--bg-elevated),
-    var(--bg-elevated) 6px,
-    color-mix(in srgb, var(--bg-elevated) 92%, var(--text) 8%) 6px,
-    color-mix(in srgb, var(--bg-elevated) 92%, var(--text) 8%) 12px
-  );
-  position: relative;
+  background: var(--bg-surface);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.55);
+  animation: pitPop 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.stripLabel {
+.popover::before {
+  content: '';
   position: absolute;
-  top: -8px;
-  left: 10px;
-  padding: 0 6px;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+}
+
+.popover::after {
+  content: '';
+  position: absolute;
+  bottom: -7px;
+  right: 14px;
+  width: 12px;
+  height: 12px;
   background: var(--bg-surface);
+  border-right: 2px solid var(--border-strong);
+  border-bottom: 2px solid var(--border-strong);
+  transform: rotate(45deg);
+}
+
+.label {
+  display: block;
+  padding: 0 0 var(--s-2) calc(var(--s-2) + 3px);
   font-family: var(--font-mono);
   font-size: 8px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
   text-transform: uppercase;
   color: var(--text-faint);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+.rail {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 4px;
+  padding-left: 3px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.rail::-webkit-scrollbar {
+  display: none;
 }
 
 .cell,
 .cellActive {
-  height: 40px;
-  border: 2px solid var(--border);
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border: none;
   border-radius: 2px;
-  background: var(--bg-surface);
-  font-size: 1.35rem;
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
   cursor: pointer;
-  transition: border-color 0.12s, transform 0.1s, box-shadow 0.12s;
+  position: relative;
+  transition:
+    transform 0.12s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.12s;
 }
 
-.cell:nth-child(1) { transform: rotate(-3deg); }
-.cell:nth-child(2) { transform: rotate(2deg); }
-.cell:nth-child(3) { transform: rotate(-1deg); }
-.cell:nth-child(4) { transform: rotate(3deg); }
-.cell:nth-child(5) { transform: rotate(1deg); }
-.cell:nth-child(6) { transform: rotate(-2deg); }
-.cell:nth-child(7) { transform: rotate(2deg); }
-.cell:nth-child(8) { transform: rotate(-1deg); }
+.cell::after,
+.cellActive::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 2px;
+  width: 0;
+  height: 2px;
+  background: var(--accent);
+  transform: translateX(-50%);
+  transition: width 0.14s ease;
+}
 
 .cell:hover {
-  border-color: var(--text-muted);
-  transform: rotate(0deg) scale(1.05);
+  transform: translateY(-3px) scale(1.08);
+  background: color-mix(in srgb, var(--bg-elevated) 80%, var(--text) 6%);
+}
+
+.cell:hover::after {
+  width: 14px;
 }
 
 .cellActive {
-  border-color: var(--accent);
-  box-shadow: inset 0 0 8px var(--accent-soft);
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-elevated));
 }
 
-.cellActive:nth-child(1) { transform: rotate(-3deg); }
-.cellActive:nth-child(2) { transform: rotate(2deg); }
-.cellActive:nth-child(3) { transform: rotate(-1deg); }
-.cellActive:nth-child(4) { transform: rotate(3deg); }
-.cellActive:nth-child(5) { transform: rotate(1deg); }
-.cellActive:nth-child(6) { transform: rotate(-2deg); }
-.cellActive:nth-child(7) { transform: rotate(2deg); }
-.cellActive:nth-child(8) { transform: rotate(-1deg); }
+.cellActive::after {
+  width: 18px;
+  box-shadow: 0 0 8px var(--accent-soft);
+}
 
 .cellActive:hover {
-  transform: rotate(0deg) scale(1.05);
+  transform: translateY(-3px) scale(1.08);
+}
+
+@keyframes pitPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @media (prefers-reduced-motion: reduce), (prefers-contrast: more) {
+  .popover {
+    animation: none;
+  }
+
   .cell,
   .cellActive,
   .cell:hover,

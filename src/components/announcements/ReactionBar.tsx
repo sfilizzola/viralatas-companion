@@ -41,15 +41,17 @@ export function ReactionBar({ announcementId, reactions, toggleReaction }: React
             countLabel={t('reactionCount', { count: r.count })}
           />
         ))}
-        <button
-          type="button"
-          className={styles.stampAdd}
-          aria-label={t('reactionAdd')}
-          aria-expanded={pickerOpen}
-          onClick={() => setPickerOpen((open) => !open)}
-        >
-          ＋
-        </button>
+        <div className={styles.addWrap}>
+          <button
+            type="button"
+            className={styles.stampAdd}
+            aria-label={t('reactionAdd')}
+            aria-expanded={pickerOpen}
+            onClick={() => setPickerOpen((open) => !open)}
+          >
+            ＋
+          </button>
+        </div>
       </div>
     </div>
   );

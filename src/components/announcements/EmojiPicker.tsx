@@ -10,9 +10,9 @@ type EmojiPickerProps = {
 
 export function EmojiPicker({ activeEmojis, onSelect, label }: EmojiPickerProps) {
   return (
-    <div className={styles.strip} role="group" aria-label={label}>
-      <span className={styles.stripLabel}>{label}</span>
-      <div className={styles.grid}>
+    <div className={styles.popover} role="group" aria-label={label}>
+      <span className={styles.label}>{label}</span>
+      <div className={styles.rail}>
         {REACTION_EMOJIS.map((emoji) => (
           <button
             key={emoji}
@@ -20,6 +20,7 @@ export function EmojiPicker({ activeEmojis, onSelect, label }: EmojiPickerProps)
             className={activeEmojis.has(emoji) ? styles.cellActive : styles.cell}
             onClick={() => onSelect(emoji)}
             aria-label={emoji}
+            aria-pressed={activeEmojis.has(emoji)}
           >
             {emoji}
           </button>

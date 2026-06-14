@@ -932,7 +932,8 @@
 
   /* ReactionBar (Pit stamps) + EmojiPicker — Phase 43 */
   .announce .reaction-slot { grid-column: 2; margin-top: var(--s-3); }
-  .pit-stamp-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+  .pit-stamp-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; width: 100%; }
+  .pit-stamp-row .pit-stamp-add-wrap { margin-left: auto; position: relative; display: inline-flex; }
   .pit-stamp, .pit-stamp-mine, .pit-stamp-add {
     position: relative; display: inline-flex; align-items: center; justify-content: center;
     min-width: 36px; height: 32px; padding: 0 8px;
@@ -950,20 +951,59 @@
     display: flex; align-items: center; justify-content: center;
   }
   .pit-picker {
-    margin-bottom: 8px; padding: var(--s-3);
-    border: 2px dashed var(--border-strong); border-radius: 2px;
-    background: repeating-linear-gradient(-4deg, var(--bg-elevated), var(--bg-elevated) 6px,
-      color-mix(in srgb, var(--bg-elevated) 92%, var(--text) 8%) 6px,
-      color-mix(in srgb, var(--bg-elevated) 92%, var(--text) 8%) 12px);
     position: relative;
+    min-width: 280px;
+    padding: var(--s-2) var(--s-2) var(--s-3);
+    margin-bottom: 10px;
+    border: 2px solid var(--border-strong);
+    border-radius: 2px;
+    background: var(--bg-surface);
+    box-shadow: 3px 3px 0 rgba(0,0,0,.55);
+  }
+  .pit-picker::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+  }
+  .pit-picker::after {
+    content: '';
+    position: absolute;
+    bottom: -7px; right: 14px;
+    width: 12px; height: 12px;
+    background: var(--bg-surface);
+    border-right: 2px solid var(--border-strong);
+    border-bottom: 2px solid var(--border-strong);
+    transform: rotate(45deg);
   }
   .pit-picker-label {
-    position: absolute; top: -8px; left: 10px; padding: 0 6px; background: var(--bg-surface);
-    font-family: var(--font-mono); font-size: 8px; letter-spacing: .14em; text-transform: uppercase; color: var(--text-faint);
+    display: block;
+    padding: 0 0 var(--s-2) calc(var(--s-2) + 3px);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--text-faint);
   }
-  .pit-picker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-  .pit-picker-grid button {
-    height: 40px; border: 2px solid var(--border); border-radius: 2px; background: var(--bg-surface); font-size: 1.35rem;
+  .pit-picker-rail {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 4px;
+    padding-left: 3px;
+    overflow-x: auto;
+  }
+  .pit-picker-rail button {
+    flex: 0 0 36px;
+    width: 36px; height: 36px;
+    border: none;
+    border-radius: 2px;
+    background: transparent;
+    font-size: 1.25rem;
+    cursor: pointer;
+  }
+  .pit-picker-rail button.on {
+    background: color-mix(in srgb, var(--accent) 14%, var(--bg-elevated));
   }
 
   /* ============================================================
@@ -3602,7 +3642,7 @@
             <div class="pit-stamp-row">
               <button type="button" class="pit-stamp-mine" title="Salvatore, Joana">🤘 <span class="cnt">2</span></button>
               <button type="button" class="pit-stamp" title="Pedro">🍺 <span class="cnt">1</span></button>
-              <button type="button" class="pit-stamp-add" aria-label="Add reaction">＋</button>
+              <span class="pit-stamp-add-wrap"><button type="button" class="pit-stamp-add" aria-label="Add reaction">＋</button></span>
             </div>
           </div>
           <div class="actions">
@@ -3638,31 +3678,35 @@
           <li>Soft delete only — managers never see deleted posts; godlike does</li>
           <li><b>Delete</b> shows on the user's own posts</li>
           <li><b>Block user</b> only on Manager / Godlike views — affects the poster across the crew</li>
-          <li><b>ReactionBar</b> (Pit stamps) below body: tilted stamp pills + corner count badge; tap toggles; <b>＋</b> opens perforated <b>EmojiPicker</b> (8 fixed emojis). Zero reactions → only ＋ visible. <code>reactedByMe</code> = accent border + offset shadow + inset glow.</li>
+          <li><b>ReactionBar</b> (Pit stamps) below body: tilted stamp pills + corner count badge; tap toggles; <b>＋</b> pinned right (<code>margin-left: auto</code>) opens anchored <b>EmojiPicker</b> popover (8 fixed emojis in a horizontal rail, <code>max-width: 100%</code>). Zero reactions → only ＋ visible. <code>reactedByMe</code> = accent border + offset shadow + inset glow.</li>
         </ul>
       </div>
     </div>
 
-    <div class="subhead">ReactionBar + EmojiPicker &middot; Pit stamps (Variant B)</div>
+    <div class="subhead">ReactionBar + EmojiPicker &middot; Pit stamps + Crowdsurf popover</div>
     <div class="demo">
-      <div class="demo-stage">
+      <div class="demo-stage" style="padding-top:48px">
+        <div class="pit-stamp-add-wrap" style="margin-left:auto;width:max-content">
         <div class="pit-picker">
           <span class="pit-picker-label">Pick one</span>
-          <div class="pit-picker-grid">
-            <button type="button">🤘</button><button type="button">🍺</button><button type="button">🐶</button><button type="button">💀</button>
+          <div class="pit-picker-rail">
+            <button type="button" class="on">🤘</button><button type="button">🍺</button><button type="button">🐶</button><button type="button">💀</button>
             <button type="button">🔥</button><button type="button">😂</button><button type="button">👎</button><button type="button">👍</button>
           </div>
+        </div>
+        <button type="button" class="pit-stamp-add">＋</button>
         </div>
         <div class="pit-stamp-row">
           <button type="button" class="pit-stamp-mine">🤘 <span class="cnt">3</span></button>
           <button type="button" class="pit-stamp">🍺 <span class="cnt">2</span></button>
-          <button type="button" class="pit-stamp-add">＋</button>
+          <span class="pit-stamp-add-wrap"><button type="button" class="pit-stamp-add">＋</button></span>
         </div>
       </div>
       <div class="demo-notes">
         <h4>Source</h4>
         <ul>
           <li><code>src/components/announcements/ReactionBar.tsx</code> + <code>EmojiPicker.tsx</code></li>
+          <li><b>＋</b> pinned right; popover anchors above it (<code>right: 0</code>, <code>max-width: 100%</code>); accent left rail + chevron pointer</li>
           <li>Mounted between <code>.body</code> and mod controls on <code>AnnouncementsPage</code></li>
           <li>Pill sort: count desc; ties → fixed emoji-set order</li>
         </ul>

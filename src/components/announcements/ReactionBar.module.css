@@ -9,6 +9,7 @@
   flex-wrap: wrap;
   gap: 8px;
   align-items: flex-end;
+  width: 100%;
   margin-top: var(--s-3);
 }
 
@@ -49,6 +50,11 @@
 .stampMine {
   border-color: var(--accent);
   box-shadow: 2px 2px 0 var(--accent-muted), inset 0 0 12px var(--accent-soft);
+}
+
+.addWrap {
+  display: inline-flex;
+  margin-left: auto;
 }
 
 .stampAdd {
