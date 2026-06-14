@@ -33,6 +33,7 @@ memory/
 
 # Test coverage output
 coverage/
+coverage-tmp/
 
 # Visual brainstorm sessions
 .superpowers/
