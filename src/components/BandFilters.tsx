@@ -3,8 +3,8 @@ import { useI18n } from '../lib/i18n';
 import { sortFilterGenres } from '../services/genreGuide';
 import { stageColor } from '../services/stageColors';
 import GenreGuideCollapsible from './GenreGuideCollapsible';
+import ViraLataFilterSelect from './ViraLataFilterSelect';
 import Icon, { type IconName } from './icons/Icon';
-import { Avatar } from '../ui';
 import type { BandFilterValue } from './bandFilterValue';
 import type { BandAttendee } from '../hooks/useBandAttendees';
 import styles from './BandFilters.module.css';
@@ -19,6 +19,7 @@ type Props = {
   genres: string[];
   filteredCount: number;
   crewWithPicks: BandAttendee[];
+  crewPickCounts: Record<string, number>;
   viewedUserPickCount: number;
 };
 
@@ -28,6 +29,13 @@ const SORT_ICONS: Record<BandFilterValue['sortOrder'], IconName> = {
   'alpha': 'sort-alpha',
 };
 
+const DISPLAY_NAME_MAX = 20;
+
+function trimDisplayName(name: string, maxLen = DISPLAY_NAME_MAX): string {
+  if (name.length <= maxLen) return name;
+  return `${name.slice(0, maxLen - 1)}…`;
+}
+
 export default function BandFilters({
   value,
   onChange,
@@ -36,6 +44,7 @@ export default function BandFilters({
   genres,
   filteredCount,
   crewWithPicks,
+  crewPickCounts,
   viewedUserPickCount,
 }: Props) {
   const { t } = useI18n('SchedulePage');
@@ -59,6 +68,19 @@ export default function BandFilters({
     };
     document.addEventListener('keydown', handleEsc);
     return () => document.removeEventListener('keydown', handleEsc);
+  }, [sheetOpen]);
+
+  useEffect(() => {
+    if (!sheetOpen) return;
+    const main = document.querySelector('main');
+    const prevMainOverflow = main?.style.overflow ?? '';
+    const prevBodyOverflow = document.body.style.overflow;
+    if (main) main.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    return () => {
+      if (main) main.style.overflow = prevMainOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+    };
   }, [sheetOpen]);
 
   useEffect(() => {
@@ -112,10 +134,6 @@ export default function BandFilters({
 
   function clearDrawer() {
     onChange({ ...value, stage: [], genre: null, upcoming: false, userId: null });
-  }
-
-  function toggleUser(userId: string) {
-    update('userId', value.userId === userId ? null : userId);
   }
 
   function selectSort(order: BandFilterValue['sortOrder']) {
@@ -184,10 +202,12 @@ export default function BandFilters({
 
         {viewedUser && (
           <div className={styles.viewingBanner}>
-            <span className={styles.viewingBannerName}>
-              {t('viewingPicksOf', { name: viewedUser.label })}
+            <span className={styles.viewingBannerName} title={viewedUser.label}>
+              {t('viewingPicksOf', { name: trimDisplayName(viewedUser.label) })}
             </span>
-            <span className={styles.viewingBannerCount}>{viewedUserPickCount} bandas</span>
+            <span className={styles.viewingBannerCount}>
+              {t('viraLataPickCount', { count: viewedUserPickCount })}
+            </span>
           </div>
         )}
 
@@ -270,6 +290,7 @@ export default function BandFilters({
         >
           <div
             className={styles.drawer}
+            onClick={(e) => e.stopPropagation()}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             role="dialog"
@@ -291,25 +312,13 @@ export default function BandFilters({
                       </button>
                     )}
                   </div>
-                  <div className={styles.userPillRow}>
-                    {crewWithPicks.map((user) => {
-                      const active = value.userId === user.id;
-                      return (
-                        <button
-                          key={user.id}
-                          className={`${styles.userPill} ${active ? styles.userPillActive : ''}`}
-                          onClick={() => toggleUser(user.id)}
-                          aria-pressed={active}
-                        >
-                          <Avatar
-                            size={24}
-                            src={user.avatar_url}
-                            initial={(user.label[0] ?? '?').toUpperCase()}
-                          />
-                          <span className={styles.userPillName}>{user.label}</span>
-                        </button>
-                      );
-                    })}
+                  <div className={styles.viraLataField}>
+                    <ViraLataFilterSelect
+                      value={value.userId}
+                      onChange={(userId) => update('userId', userId)}
+                      members={crewWithPicks}
+                      pickCounts={crewPickCounts}
+                    />
                   </div>
                 </>
               )}
@@ -356,7 +365,7 @@ export default function BandFilters({
                       </button>
                     )}
                   </div>
-                  <div className={styles.pillRowScroll}>
+                  <div className={styles.pillRow}>
                     {sortedGenres.map((genre) => {
                       const on = value.genre === genre;
                       return (
@@ -371,7 +380,6 @@ export default function BandFilters({
                       );
                     })}
                   </div>
-                  <GenreGuideCollapsible />
                 </>
               )}
 
@@ -386,16 +394,18 @@ export default function BandFilters({
                 {t('upcomingBands')}
               </button>
 
-              <div className={styles.drawerActions}>
-                {activeDrawerCount > 0 && (
-                  <button className={styles.resetBtn} onClick={clearDrawer}>
-                    {t('limpar')}
-                  </button>
-                )}
-                <button className={styles.applyBtn} onClick={() => setSheetOpen(false)}>
-                  {t('verBandasCount', { count: filteredCount })}
+              {genres.length > 0 && <GenreGuideCollapsible />}
+            </div>
+
+            <div className={styles.drawerActions}>
+              {activeDrawerCount > 0 && (
+                <button className={styles.resetBtn} onClick={clearDrawer}>
+                  {t('limpar')}
                 </button>
-              </div>
+              )}
+              <button className={styles.applyBtn} onClick={() => setSheetOpen(false)}>
+                {t('verBandasCount', { count: filteredCount })}
+              </button>
             </div>
           </div>
         </div>

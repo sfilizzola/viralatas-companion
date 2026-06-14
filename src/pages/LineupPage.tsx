@@ -146,6 +146,14 @@ export default function LineupPage() {
     return result.sort((a, b) => a.label.localeCompare(b.label));
   }, [attendeeMap, userId]);
 
+  const crewPickCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const [userId, pickIds] of picksByUserId) {
+      counts[userId] = pickIds.size;
+    }
+    return counts;
+  }, [picksByUserId]);
+
   const viewedUserPickIds = filters.userId ? (picksByUserId.get(filters.userId) ?? null) : null;
 
   const viewedUserPickCount = filters.userId
@@ -176,6 +184,7 @@ export default function LineupPage() {
         genres={genres}
         filteredCount={filtered.length}
         crewWithPicks={crewWithPicks}
+        crewPickCounts={crewPickCounts}
         viewedUserPickCount={viewedUserPickCount}
       />
 

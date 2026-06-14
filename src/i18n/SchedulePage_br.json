@@ -65,6 +65,11 @@
   "ratingClearHint": "Toque na mesma pata de novo para limpar",
   "ratingScoreLabel": "Nota {score} de 5",
   "viraLata": "Vira-lata",
+  "viraLataSelectPrompt": "Escolha um vira-lata…",
+  "viraLataSelectAria": "Filtrar pelos picks de um vira-lata",
+  "viraLataSearchPlaceholder": "Buscar vira-lata…",
+  "viraLataSearchEmpty": "Nenhum vira-lata encontrado.",
+  "viraLataPickCount": "{count} bandas",
   "viewingPicksOf": "Picks de {name}",
   "youAlsoPicked": "Você ✓",
   "noPicksForUser": "Esse vira-lata não escolheu nenhuma banda."

@@ -65,6 +65,11 @@
   "ratingClearHint": "Tap same paw again to clear",
   "ratingScoreLabel": "Rate {score} out of 5",
   "viraLata": "Vira-lata",
+  "viraLataSelectPrompt": "Choose a vira-lata…",
+  "viraLataSelectAria": "Filter by vira-lata picks",
+  "viraLataSearchPlaceholder": "Search vira-lata…",
+  "viraLataSearchEmpty": "No vira-lata found.",
+  "viraLataPickCount": "{count} picks",
   "viewingPicksOf": "{name}'s picks",
   "youAlsoPicked": "You ✓",
   "noPicksForUser": "This vira-lata hasn't picked any bands."

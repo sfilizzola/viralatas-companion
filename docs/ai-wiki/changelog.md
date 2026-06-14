@@ -10,6 +10,9 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - **Phase 43 — Mural reactions.** Fixed 8-emoji toggle reactions on `/announcements`: `announcement_reactions` Supabase table + IDB stores (`announcement_reactions`, `offline_announcement_reactions`, DB v12), `reactionsRepository` (toggle, offline flush, full pull, Realtime), `useAnnouncements` reaction summaries + `toggleReaction`, Pit stamps UI (`ReactionBar` + `EmojiPicker` variant B), i18n aria keys in all 4 locales.
 
 ### Changed
+- **BandFilters vira-lata row:** replaced wrapping pill grid with compact `ViraLataFilterSelect` (single-row trigger + expandable scroll list with name search; `crewPickCounts` wired from `LineupPage`).
+- **BandFilters drawer scroll:** lock `main` + `body` overflow while sheet open; `min-height: 0` + `overscroll-behavior: contain` on `.drawerContent`; Apply/Limpar bar pinned outside scroll area.
+- **BandFilters genre section:** genre pills use `.pillRow` wrap (removed nested `30dvh` scroll); genre guide accordion moved below Upcoming so pills are not clipped above it.
 - **EmojiPicker redesign:** replaced dashed perforated 4×2 grid with a compact **Crowdsurf popover** — solid panel, accent left rail, chevron pointer anchored above **＋**, horizontal emoji rail with lift + underline active state.
 - **`runReconnectSync()` ordering:** flush announcements parallel batch → flush reactions → pull announcements → pull reactions → parallel crew pulls; toast total includes `reactionsFlushed`.
 - **`announcementsRepository` delete paths:** purge local reaction rows via `removeAnnouncementReactionsForPost()` on hard delete + Realtime DELETE.

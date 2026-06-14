@@ -65,6 +65,11 @@
   "ratingClearHint": "Gleiche Pfote nochmal tippen zum Löschen",
   "ratingScoreLabel": "Bewertung {score} von 5",
   "viraLata": "Vira-lata",
+  "viraLataSelectPrompt": "Vira-lata wählen…",
+  "viraLataSelectAria": "Nach Picks eines Vira-lata filtern",
+  "viraLataSearchPlaceholder": "Vira-lata suchen…",
+  "viraLataSearchEmpty": "Kein Vira-lata gefunden.",
+  "viraLataPickCount": "{count} Bands",
   "viewingPicksOf": "Picks von {name}",
   "youAlsoPicked": "Du ✓",
   "noPicksForUser": "Dieser Vira-lata hat keine Bands gewählt."

@@ -2748,6 +2748,7 @@
     { "name": "SyncToast",             "sectionId": "additional" },
     { "name": "LatestAnnouncementBanner", "sectionId": "additional" },
     { "name": "UpcomingBandCard",      "sectionId": "additional" },
+    { "name": "ViraLataFilterSelect",  "sectionId": "additional" },
     { "name": "BandFilters",           "sectionId": "additional" },
     { "name": "UserPill",              "sectionId": "additional" },
     { "name": "ViewingBanner",         "sectionId": "additional" },
@@ -5824,15 +5825,15 @@
     <div class="subhead">BandFilters — Vira-lata section + Viewing Banner · Phase 38.A · <code>src/components/BandFilters.tsx</code></div>
     <div class="demo">
       <div class="demo-notes">
-        <h4>User Pill (<code>.userPill</code> / <code>.userPillActive</code>)</h4>
+        <h4>Vira-lata Select (<code>ViraLataFilterSelect</code>)</h4>
         <ul>
-          <li>Horizontal-scroll avatar pill row inside filter drawer — section "Vira-lata" renders <strong>first</strong> before Stage</li>
+          <li>Compact single-row trigger in filter drawer — section "Vira-lata" renders <strong>first</strong> before Stage</li>
           <li>Only shown when <code>crewWithPicks.length &gt; 0</code></li>
-          <li>Each pill: <code>Avatar</code> (32px) stacked above truncated name (<code>max-width: 15ch</code>, mono 10px uppercase)</li>
-          <li>Single-select; tapping active pill again deselects (<code>value.userId</code> toggles to <code>null</code>)</li>
-          <li>Active state: <code>--signal-ok</code> border + subtle teal background tint; name text turns <code>--signal-ok</code></li>
-          <li><code>clearDrawer</code> and <code>clearAll</code> both reset <code>userId: null</code></li>
-          <li><code>activeDrawerCount</code> includes +1 when <code>userId != null</code></li>
+          <li>Closed: 44px row — avatar (or ∅), trimmed name (20 chars), pick count, chevron</li>
+          <li>Open: search + list in <code>.expandPanel</code> — list viewport fixed at <strong>3 × 52px</strong> rows (scroll inside); panel won't shrink in drawer flex layout</li>
+          <li>Active: inset <code>--signal-ok</code> left rail + teal meta; options use left border + tint</li>
+          <li>Single-select via <code>value.userId</code>; section Limpar + "All" option both reset to <code>null</code></li>
+          <li>Styles: <code>ViraLataFilterSelect.module.css</code> · pick counts from <code>crewPickCounts</code> prop</li>
         </ul>
         <h4>Viewing Banner (<code>.viewingBanner</code>)</h4>
         <ul>
@@ -5917,9 +5918,9 @@
       <div class="demo-notes">
         <h4>Genre filter (Phase 25)</h4>
         <ul>
-          <li>Replaces native <code>&lt;select&gt;</code> — single-select pills with <code>aria-pressed</code>; reuse <code>.genrePill</code> / <code>.pillRowScroll</code> from <code>BandFilters.module.css</code></li>
+          <li>Replaces native <code>&lt;select&gt;</code> — single-select pills with <code>aria-pressed</code>; reuse <code>.genrePill</code> / <code>.pillRow</code> (flex-wrap, same as Stage) from <code>BandFilters.module.css</code></li>
           <li>13 canonical labels; alphabetical sort with <b>Metal Battle</b> pinned last</li>
-          <li><b>GenreGuideCollapsible</b> — inline <code>Collapsible</code> below pill row (not nested modal); closed by default</li>
+          <li><b>GenreGuideCollapsible</b> — inline <code>Collapsible</code> after Upcoming section (not nested modal); closed by default</li>
           <li>Row anatomy: mono 11px uppercase label + mono 10px faint secondary (<code>line-clamp: 2</code> on mobile)</li>
           <li>Exception footnotes: Party Metal, Metal Battle, Metal — not subgenre lists</li>
           <li>Static data: <code>src/services/genreGuide.ts</code> · i18n keys: <code>genreGuideTrigger</code>, <code>genreGuideIntro</code>, <code>genreGuideIncludes</code>, <code>genreGuidePartyMetalNote</code>, <code>genreGuideMetalBattleNote</code>, <code>genreGuideMetalNote</code></li>
@@ -7044,7 +7045,7 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.2 — Phase 38.A Crew Picks Browser · Jun 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
-          <li><b>§08 BandFilters</b> — documented User Pill (<code>.userPill</code> / <code>.userPillActive</code>): horizontal-scroll avatar pill row, first section in drawer, 32 px Avatar + 15ch truncated name, single-select toggle, <code>--signal-ok</code> active state.</li>
+          <li><b>§08 BandFilters</b> — documented Vira-lata Select (<code>ViraLataFilterSelect</code>): compact expandable picker, inset teal rail when active, scrollable crew list with pick counts.</li>
           <li><b>§08 BandFilters</b> — documented Viewing Banner (<code>.viewingBanner</code>): renders between controls row and day tabs when <code>value.userId != null</code>; teal name + muted count; background <code>color-mix(--signal-ok 8%, transparent)</code>.</li>
           <li><b>§04 BandCard</b> — documented Shared Pick marker (<code>sharedPick</code>): teal border tint (<code>.cardSharedPick</code>) + mono 9 px teal badge (<code>.sharedPickBadge</code>), i18n key <code>youAlsoPicked</code>, shown in crew-picks-browser mode only.</li>
           <li>DS manifest updated: <code>UserPill</code>, <code>ViewingBanner</code>, <code>SharedPickBadge</code> components registered → <code>additional</code> / <code>components</code> sections respectively.</li>
