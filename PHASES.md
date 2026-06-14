@@ -40,6 +40,7 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 | Realtime | Subscribe in `RealtimeSync.tsx` |
 | UI placement | Below `styles.body`, above mod controls |
 | Pill sort | Count descending; ties → fixed emoji-set order |
+| **UI variant** | **B · Pit stamps** (locked) — `docs/superpowers/prototypes/mural-reactions/variants.html` |
 
 ---
 
@@ -106,7 +107,9 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-### 43.D — UI components
+### 43.D — UI components (Variant B · Pit stamps — locked)
+
+**Prototype:** `docs/superpowers/prototypes/mural-reactions/variants.html` column B
 
 **Files:**
 - Create: `src/components/announcements/ReactionBar.tsx` + `.module.css`
@@ -114,9 +117,12 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 - Modify: `src/pages/AnnouncementsPage.tsx`
 - Modify: `src/i18n/{br,en,es,de}.ts`
 
-- [ ] ReactionBar: pills (count ≥ 1) + `＋`; accent if `reactedByMe`; `title` + long-press tooltip
-- [ ] EmojiPicker: 4×2 grid, active indicator for user's reactions, inline above bar
-- [ ] Mount between post body and mod controls
+- [ ] **ReactionBar (pit stamps):** square tilted stamps + corner count badge (not inline count); offset shadow; alternating ±1–2° rotation (flatten on hover + `prefers-reduced-transparency`)
+- [ ] **`reactedByMe`:** accent border + accent offset shadow + inset glow
+- [ ] **Zero reactions:** only `＋` stamp visible
+- [ ] **EmojiPicker (perforated strip):** dashed border, diagonal stripe bg, `t('reactionPicker')` micro-label, 4×2 tilted cells, active state for user's emojis
+- [ ] Mount between `styles.body` and mod controls; outside-tap closes picker
+- [ ] Tooltip: `title` + long-press for reactor names
 - [ ] i18n aria: `reactionAdd`, `reactionCount`, `reactionPicker`
 
 ---
