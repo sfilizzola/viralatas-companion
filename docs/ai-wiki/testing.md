@@ -8,7 +8,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 
 ## Relevant Source Files
 
-- `src/__tests__/` — All test files (**53 files**, **599 tests** as of Phase 31 close)
+- `src/__tests__/` — All test files (**73 files**, **812 tests** as of Phase 43 + cold-start contract tests)
 - `vitest.config.ts` — Test runner configuration
 - `package.json` — Test scripts (`test`, `test:coverage`) and seed scripts (`seed:bands`, `seed:bands:sync`, `seed:bands:backfill-slot-id`, `seed:bands:move`, `seed:test-users`, `seed:live-now`, `festival:reset`)
 - `supabase/seed/` — Seed scripts for test data and the destructive `festival-reset.ts` operator script (see `docs/ai-wiki/festival-reset.md`)
@@ -60,13 +60,15 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `picksRepository.test.ts` | `toggle()` online/offline/error, `flushOfflineQueue()` dedup/routing, `syncCrewFromRemote()` (26 tests) |
 | `presenceRepository.test.ts` | `setCampingStatus()` online/offline, `isTimeWithinMetalPlaceWindow()` boundary, `validateAndAutoCheckout()` (11 tests) |
 | `announcementsRepository.test.ts` | Online post, offline queue, `flushPendingAnnouncements()` (7 tests) |
+| `reactionsRepository.test.ts` | Toggle online/offline, dedup queue, remove path (Phase 43) |
+| `offlineColdStart.test.ts` | SW shell contract: `skipWaiting`, `clients.claim`, `NavigationRoute` → `index.html`, `injectRegister: 'inline'` (source string assertions) |
 | `usersRepository.test.ts` | Crew sync incl. `special_badges`, auth metadata hydration, role map, block/unblock (13 tests) |
 | `bandsRepository.test.ts` | `checkAndApplyCacheVersion()` match/mismatch/no-data (3 tests) |
 | `missedRepository.test.ts` | Mark/unmark missed band online and offline (4 tests) |
 | `festivalWrap.test.ts` | `buildFestivalWrapStats()` badge parity, crew Jaccard, assigned slugs, avatar URLs (Phase 30) |
 | `wrapDismiss.test.ts` | `viralatas:wrap-dismissed-2026` dismiss key round-trip (Phase 30) |
 
-**Coverage**: **599 tests** across **53** test files (Phase 31 social snapshot + Phase 30 wrap)
+**Coverage**: **812 tests** across **73** test files (Phase 43 reactions, offline cold-start SW contract, ranked leaderboard, presence refactor tests)
 
 **Run**:
 ```bash

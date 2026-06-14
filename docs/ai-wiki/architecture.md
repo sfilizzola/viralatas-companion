@@ -79,10 +79,10 @@ Components are organized by concern:
 
 **Key Pages:**
 - `/now` (RightNowPage) — Live band display, crew attendance, conflict detection; shows `UpcomingBandCard` (15-min pre-show banner) when user's next picked band is within window (Phase 37)
-- `/schedule` (LineupPage) — Full lineup with filters (stage, genre, day, time); Phase 38.A adds per-crew-member filter: `BandFilterValue.userId` drives `filterBands` with a `userPickIds` set, a "Vira-lata" avatar pill row in the drawer, a viewing banner, and shared-pick markers on `BandCard`
+- `/schedule` (LineupPage) — Full lineup with filters (stage, genre, day, time); Phase 38.A adds per-crew-member filter: `BandFilterValue.userId` drives `filterBands` with a `userPickIds` set, compact `ViraLataFilterSelect` in the drawer (searchable scroll list + pick counts), a viewing banner, and shared-pick markers on `BandCard`
 - `/my-picks` (MyWackenPage) — User's picks by festival day (upcoming → divider → ended inline); Attended/Missed chips on ended rows; upcoming-only conflict counts; one-time coach banner (`localStorage` dismiss)
-- `/popular` (PopularPage) — Bands sorted by total pick count, avatar clusters
-- `/announcements` (AnnouncementsPage) — Mural-style announcements board
+- `/popular` (PopularPage) — Bands sorted by total pick count; ranked `BandCard` leaderboard rows with magnitude bars (picks / rating / ended modes)
+- `/announcements` (AnnouncementsPage) — Mural-style announcements board; Phase 43 Pit-stamp emoji reactions (`ReactionBar` + `EmojiPicker`) per post
 - `/profile` (ProfilePage) — User info, role controls, godlike admin
 - `/wrap` (WrapPage) — Post-festival recap; IDB-only stats; scroll-snap A2 Vest Chronicle (see `flows/festival-wrap.md`)
 - `/map` (MapPage) — Live minimap; avatar dots from same `useSocialSnapshot` as `/now`; no new schema or sync; reached via glyph F on `/now` (see `flows/festival-minimap.md`)

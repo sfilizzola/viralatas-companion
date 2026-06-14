@@ -26,6 +26,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ### Architectural Notes
 - Client-side aggregation only (`buildReactionSummaries` in `announcementsDisplay.ts`); composite PK `(announcement_id, user_id, emoji)`; offline dedup `byId` on `${announcement_id}|${user_id}|${emoji}` (ratings pattern).
 - UI reads/writes IndexedDB first; Supabase is sync target; Realtime mounted in `RealtimeSync` via `reactionsRepository.subscribeToRealtime()`.
+- Wiki sync: `domain-model.md` (`AnnouncementReaction` entity), `sync-engine.md` (`runReconnectSync` reactions ordering), `architecture.md` (`ViraLataFilterSelect`, reactions on `/announcements`, ranked `/popular`), `testing.md` (73 files / 812 tests, `reactionsRepository` + `offlineColdStart` inventory).
 
 ---
 

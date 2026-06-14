@@ -449,6 +449,45 @@ type Announcement = {
 
 ---
 
+### AnnouncementReaction
+
+**Essence**: A per-user emoji stamp on a mural post (toggle semantics).
+
+```typescript
+type AnnouncementReactionRow = {
+  announcement_id: string;   // uuid, FK → announcements
+  user_id: string;           // uuid, FK → users
+  emoji: string;             // one of 8 fixed emojis (see REACTION_EMOJIS)
+  created_at: string;        // ISO 8601
+};
+```
+
+**Invariants:**
+- Composite primary key `(announcement_id, user_id, emoji)` — one row per user per emoji per post
+- `emoji` must be in `REACTION_EMOJIS`: `🤘`, `🍺`, `🐶`, `💀`, `🔥`, `😂`, `👎`, `👍`
+- `announcement_id` must exist (foreign key); server CASCADE on post delete
+
+**Business Rules:**
+- Toggle: same user + same emoji + same post → DELETE (remove stamp)
+- Users may react on their own posts
+- UI aggregates client-side via `buildReactionSummaries()` — no server-side counts
+
+**Lifecycle:**
+1. User taps stamp or picks emoji in `EmojiPicker` → `reactionsRepository.toggle()`
+2. Optimistic INSERT/DELETE in IndexedDB → `ANNOUNCEMENTS_CHANGED_EVENT` refreshes feed
+3. Online: immediate Supabase write; offline: `offline_announcement_reactions` queue (`byId` dedup)
+4. On reconnect: reactions flushed **after** announcements flush, then full pull after `announcementsRepository.sync()`
+5. Other crew see via Realtime INSERT/DELETE within ~3s
+6. Post hard-delete or Realtime DELETE → `removeAnnouncementReactionsForPost()` purges local rows
+
+**Relevant source files:**
+- `src/lib/db/reactions.ts` — IDB CRUD + offline queue
+- `src/repositories/reactions.ts` — toggle, flush, pull, Realtime
+- `src/services/announcementsDisplay.ts` — `buildReactionSummaries()`
+- `src/components/announcements/ReactionBar.tsx` — Pit stamps UI
+
+---
+
 ### BlockedPoster
 
 **Essence**: A manager has blocked a user from posting.

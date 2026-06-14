@@ -136,19 +136,24 @@ function ReconnectSync() {
 
 **Operations** (`runReconnectSync` in `src/lib/syncCoordinator.ts`):
 
-1. **Flush all offline queues** (parallel) — all repos expose `flushOfflineQueue()` backed by `OptimisticQueue`:
+1. **Flush offline queues** (parallel batch) — repos expose `flushOfflineQueue()` backed by `OptimisticQueue`:
    - **picks** — `keepLast` by `(user_id, band_id)`, sorted by `created_at`
    - **presence** — `keepLast` by `user_id`, sorted by `updated_at`
    - **missed** — `byId` (`${user_id}|${band_id}`)
    - **announcements** — `fifo` (no dedup)
    - **duck** — `fifo` (no dedup)
-2. **Pull remote crew data** (parallel):
+   - **ratings** — `byId` (`${user_id}|${band_id}`)
+2. **Flush reactions** (sequential, after step 1) — `reactionsRepository.flushOfflineQueue()` (`byId` on `${announcement_id}|${user_id}|${emoji}`); runs after announcements flush so FK targets exist on server
+3. **Pull announcements + reactions** (sequential):
+   - `announcementsRepository.sync()`
+   - `reactionsRepository.syncFromRemote()` — full pull after announcements (FK ordering)
+4. **Pull remote crew data** (parallel):
    - `picksRepository.syncCrewFromRemote()`
    - `usersRepository.syncCrew()`
    - `presenceRepository.syncCrewFromRemote()`
-   - `announcementsRepository.sync()`
    - `missedRepository.syncFromRemote(userId)`
-3. **Emit SyncToast** → `viralatas:sync-complete` once if any queue items flushed
+   - `ratingsRepository.syncCrewFromRemote()`
+5. **Return flushed count** — sum of all queue flushes (incl. reactions); `ReconnectSync` emits `viralatas:sync-complete` once if total > 0
 
 **Why one coordinator?** Previously PickSync, AnnouncementSync, and DuckSync each registered separate `online` handlers; DuckSync skipped mount flush; missed-band flush only ran when `useMissedBands` mounted. Hooks (`usePickCounts`, `usePresenceRealtime`, etc.) duplicated remote pulls on mount.
 
