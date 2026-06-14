@@ -77,6 +77,12 @@ VitePWA({
 })
 ```
 
+### Cold-Start Navigation Fallback
+
+`src/workers/sw.ts` registers an explicit `NavigationRoute` via `createHandlerBoundToURL('/index.html')` with `denylist: [/^\/api\//]`. This ensures Android PWA cold starts offline serve the precached shell for `/`, `/now`, `/schedule`, and all SPA routes instead of Chrome's native offline page.
+
+Requires at least one prior online visit so the precache installs.
+
 ---
 
 ## Rationale by Resource Type
@@ -186,8 +192,8 @@ To fully clear HTTP cache: Service Worker update (new `sw.js` version) causes Wo
 `registerType: 'autoUpdate'` means:
 1. Service Worker checks for updates in the background on app load
 2. New `sw.js` downloads silently
-3. New SW activates when all tabs using the old SW are closed (or immediately if the app uses `skipWaiting` + `clientsClaim`)
-4. `vite-plugin-pwa` injects `skipWaiting` + `clientsClaim` — new version takes effect without user action
+3. New SW activates when all tabs using the old SW are closed (or immediately via explicit `skipWaiting` + `clientsClaim` in `src/workers/sw.ts`)
+4. `injectManifest` mode with a custom `src/workers/sw.ts` does **not** auto-inject `skipWaiting` or `clientsClaim` — both are explicit in `sw.ts`. SW registration uses `injectRegister: 'inline'` so registration runs in `<head>`, not on `window.load`.
 5. Old caches are pruned by Workbox on activation
 
 **User experience**: Update is seamless. The user may briefly see old content, then the page auto-refreshes to the new version.

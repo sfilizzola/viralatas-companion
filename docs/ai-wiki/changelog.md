@@ -6,6 +6,9 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ## 2026-06-14
 
+### Fixed
+- Offline cold start on Android installed PWA — `sw.ts` now calls `skipWaiting()` + `clients.claim()` and registers an explicit `NavigationRoute` to precached `index.html`; `vite.config.ts` uses `injectRegister: 'inline'` so SW registration runs in `<head>` instead of `window.load`
+
 ### Added
 - **Phase 43 — Mural reactions.** Fixed 8-emoji toggle reactions on `/announcements`: `announcement_reactions` Supabase table + IDB stores (`announcement_reactions`, `offline_announcement_reactions`, DB v12), `reactionsRepository` (toggle, offline flush, full pull, Realtime), `useAnnouncements` reaction summaries + `toggleReaction`, Pit stamps UI (`ReactionBar` + `EmojiPicker` variant B), i18n aria keys in all 4 locales.
 
@@ -17,6 +20,8 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - **`runReconnectSync()` ordering:** flush announcements parallel batch → flush reactions → pull announcements → pull reactions → parallel crew pulls; toast total includes `reactionsFlushed`.
 - **`announcementsRepository` delete paths:** purge local reaction rows via `removeAnnouncementReactionsForPost()` on hard delete + Realtime DELETE.
 - **`public/vira-lata-ds.html`:** removed "no reactions" mural note; added Pit stamps ReactionBar + EmojiPicker anatomy.
+- `docs/ai-wiki/decisions/workbox-caching-strategy.md` — corrected `injectManifest` skipWaiting/clientsClaim claim; documented cold-start navigation fallback
+- `docs/ai-wiki/offline-first.md` — cold-start PWA scenario table
 
 ### Architectural Notes
 - Client-side aggregation only (`buildReactionSummaries` in `announcementsDisplay.ts`); composite PK `(announcement_id, user_id, emoji)`; offline dedup `byId` on `${announcement_id}|${user_id}|${emoji}` (ratings pattern).

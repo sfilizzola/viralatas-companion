@@ -27,6 +27,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      injectRegister: 'inline',
       strategies: 'injectManifest',
       srcDir: 'src/workers',
       filename: 'sw.ts',

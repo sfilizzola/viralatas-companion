@@ -1,7 +1,7 @@
 /// <reference lib="webworker" />
 
-import { precacheAndRoute } from 'workbox-precaching';
-import { registerRoute } from 'workbox-routing';
+import { precacheAndRoute, createHandlerBoundToURL } from 'workbox-precaching';
+import { NavigationRoute, registerRoute } from 'workbox-routing';
 import { NetworkFirst, CacheFirst } from 'workbox-strategies';
 import { ExpirationPlugin } from 'workbox-expiration';
 import { CacheableResponsePlugin } from 'workbox-cacheable-response';
@@ -11,6 +11,23 @@ declare const self: ServiceWorkerGlobalScope;
 // vite-plugin-pwa injects the precache manifest here at build time
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 precacheAndRoute((self as any).__WB_MANIFEST ?? []);
+
+// Explicit SPA navigation fallback — serve precached index.html for all routes
+const navigationHandler = createHandlerBoundToURL('/index.html');
+registerRoute(
+  new NavigationRoute(navigationHandler, {
+    denylist: [/^\/api\//],
+  }),
+);
+
+// Activate new SW immediately; take control of open clients on cold start
+self.addEventListener('install', () => {
+  self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
+});
 
 // NetworkFirst for all Supabase API calls
 registerRoute(

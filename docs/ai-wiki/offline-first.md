@@ -64,6 +64,15 @@ The app **must** remain fully functional offline:
 - ❌ Receive LLM alerts (requires network call)
 - ❌ See brand-new announcements (requires Realtime)
 
+### Cold Start (PWA killed → reopened offline)
+
+| Scenario | Behavior |
+|----------|----------|
+| First visit, never online | Chrome native offline page — precache not installed yet (expected) |
+| Returning user, synced before, killed app, reopen offline | Precached shell loads via SW → React boots → IDB session + data → `OfflineBanner` only |
+
+If users see Chrome's "You're Offline" page with the small app icon after a prior sync, the Service Worker failed to serve the shell — see `workbox-caching-strategy.md` cold-start section.
+
 ---
 
 ## Data Flow Layers
