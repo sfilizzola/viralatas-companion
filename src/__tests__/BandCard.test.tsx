@@ -302,6 +302,69 @@ describe('BandCard', () => {
     expect(getByText('🇨🇾 Metal Battle')).toBeInTheDocument();
   });
 
+  it('renders ranked attendee avatars in picks mode', () => {
+    const { container } = renderWithI18n(
+      <BandCard
+        band={sampleBand}
+        isPicked={false}
+        count={5}
+        onToggle={vi.fn()}
+        onClick={vi.fn()}
+        variant="ranked"
+        rank={2}
+        attendeeCluster={{
+          attendees: [
+            {
+              id: 'a1',
+              label: 'Alice',
+              display_name: 'Alice',
+              avatar_url: 'https://example.com/a.jpg',
+              wacken_arrival_day: null,
+              is_friend: false,
+            },
+            {
+              id: 'a2',
+              label: 'Bob',
+              display_name: 'Bob',
+              avatar_url: null,
+              wacken_arrival_day: null,
+              is_friend: false,
+            },
+          ],
+        }}
+      />,
+    );
+
+    expect(container.querySelector('[class*="rankedAvatars"]')?.childElementCount).toBe(2);
+  });
+
+  it('fires conflict chip handler without bubbling to card', () => {
+    const onConflictClick = vi.fn();
+    const onClick = vi.fn();
+    const { container } = renderWithI18n(
+      <BandCard
+        band={sampleBand}
+        isPicked
+        count={5}
+        onToggle={vi.fn()}
+        onClick={onClick}
+        variant="timeline"
+        hidePick
+        conflict={{
+          severity: 'soft',
+          active: false,
+          onClick: onConflictClick,
+        }}
+      />,
+    );
+
+    const chip = container.querySelector('[class*="overlapChip"]');
+    expect(chip).not.toBeNull();
+    fireEvent.click(chip!);
+    expect(onConflictClick).toHaveBeenCalledTimes(1);
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
   it('shows plain "Metal Battle" when the slot has no confirmed country (WET23)', () => {
     const unknownBand: Band = {
       id: 'mb2',

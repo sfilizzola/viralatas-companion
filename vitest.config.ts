@@ -18,6 +18,18 @@ export default defineConfig({
           functions: 95,
           statements: 95,
         },
+        'src/components/**': {
+          lines: 80,
+          branches: 75,
+          functions: 80,
+          statements: 80,
+        },
+        'src/ui/**': {
+          lines: 80,
+          branches: 75,
+          functions: 80,
+          statements: 80,
+        },
       },
     },
   },

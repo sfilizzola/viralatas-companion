@@ -11,6 +11,7 @@ import {
   METAL_PLACE_CONFIG_CHANGED_EVENT,
   MISSED_CHANGED_EVENT,
   PICKS_CHANGED_EVENT,
+  RATINGS_CHANGED_EVENT,
   PRESENCE_CHANGED_EVENT,
   clearLiveBandTestConfig,
   clearMetalPlaceConfig,
@@ -20,7 +21,15 @@ import {
   enqueueOfflineMissed,
   enqueueOfflinePick,
   enqueueOfflinePresence,
+  enqueueOfflineBandRating,
   enqueueOfflineAnnouncementReaction,
+  loadAllBandRatings,
+  loadBandRatings,
+  loadOfflineBandRatingsQueue,
+  removeBandRating,
+  removeFromOfflineBandRatingsQueue,
+  replaceAllBandRatings,
+  saveBandRating,
   loadAllAnnouncementReactions,
   loadAnnouncementReactionsByAnnouncement,
   loadAllMissedBands,
@@ -81,6 +90,7 @@ import {
 import type {
   Announcement,
   Band,
+  BandRatingScore,
   CrewUser,
   LiveBandTestConfig,
   MetalPlaceConfig,
@@ -486,6 +496,65 @@ describe('IndexedDB layer (lib/db.ts)', () => {
       await saveAnnouncementReaction(sampleReaction('ann-1', 'user-1', '🤘'));
       expect(handler).toHaveBeenCalledOnce();
       window.removeEventListener(ANNOUNCEMENTS_CHANGED_EVENT, handler);
+    });
+  });
+
+  describe('band ratings', () => {
+    const sampleRating = (userId: string, bandId: string, score: BandRatingScore = 4) => ({
+      user_id: userId,
+      band_id: bandId,
+      score,
+      rated_at: '2026-06-14T12:00:00Z',
+      created_at: '2026-06-14T12:00:00Z',
+      updated_at: '2026-06-14T12:00:00Z',
+    });
+
+    it('saveBandRating / loadBandRatings round-trip', async () => {
+      await saveBandRating(sampleRating('user-1', 'band-1'));
+      await saveBandRating(sampleRating('user-1', 'band-2'));
+      await saveBandRating(sampleRating('user-2', 'band-1'));
+
+      expect(await loadBandRatings('user-1')).toHaveLength(2);
+      expect(await loadAllBandRatings()).toHaveLength(3);
+    });
+
+    it('removeBandRating deletes one row', async () => {
+      await saveBandRating(sampleRating('user-1', 'band-1'));
+      await removeBandRating('user-1', 'band-1');
+      expect(await loadAllBandRatings()).toEqual([]);
+    });
+
+    it('replaceAllBandRatings clears and bulk puts', async () => {
+      await saveBandRating(sampleRating('user-old', 'band-old'));
+      await replaceAllBandRatings([sampleRating('user-new', 'band-new', 5)]);
+      expect(await loadAllBandRatings()).toEqual([sampleRating('user-new', 'band-new', 5)]);
+    });
+
+    it('fires RATINGS_CHANGED_EVENT after saveBandRating', async () => {
+      const handler = vi.fn();
+      window.addEventListener(RATINGS_CHANGED_EVENT, handler);
+      await saveBandRating(sampleRating('user-1', 'band-1'));
+      expect(handler).toHaveBeenCalledOnce();
+      window.removeEventListener(RATINGS_CHANGED_EVENT, handler);
+    });
+  });
+
+  describe('offline band ratings queue', () => {
+    it('enqueueOfflineBandRating / load / remove', async () => {
+      const op = {
+        id: 'user-1|band-1',
+        user_id: 'user-1',
+        band_id: 'band-1',
+        action: 'upsert' as const,
+        score: 4 as const,
+        rated_at: '2026-06-14T12:00:00Z',
+      };
+
+      await enqueueOfflineBandRating(op);
+      expect(await loadOfflineBandRatingsQueue()).toEqual([op]);
+
+      await removeFromOfflineBandRatingsQueue('user-1|band-1');
+      expect(await loadOfflineBandRatingsQueue()).toEqual([]);
     });
   });
 

@@ -8,7 +8,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 
 ## Relevant Source Files
 
-- `src/__tests__/` — All test files (**73 files**, **812 tests** as of Phase 43 + cold-start contract tests)
+- `src/__tests__/` — All test files (**78 files**, **861 tests** as of UI primitive coverage)
 - `vitest.config.ts` — Test runner configuration
 - `package.json` — Test scripts (`test`, `test:coverage`) and seed scripts (`seed:bands`, `seed:bands:sync`, `seed:bands:backfill-slot-id`, `seed:bands:move`, `seed:test-users`, `seed:live-now`, `festival:reset`)
 - `supabase/seed/` — Seed scripts for test data and the destructive `festival-reset.ts` operator script (see `docs/ai-wiki/festival-reset.md`)
@@ -49,7 +49,12 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `liveNowScenarios.test.ts` | Table-driven Live Now scenarios: multi-band crew layout, camping/Metal Place/lost transitions |
 | `badges.test.ts` | Badge condition evaluation + registry integration (incl. lost `crew_at_location_min`) |
 | `missed.test.ts` | Marking bands as seen/missed |
-| `BandCard.test.tsx` | Component rendering, user interactions |
+| `BandCard.test.tsx` | Component rendering, user interactions, ranked leaderboard, conflict chip |
+| `ReactionBar.test.tsx` | Pit stamps reaction bar + picker open/outside-click (Phase 43) |
+| `EmojiPicker.test.tsx` | Crowdsurf picker rail, `useOutsideClick`, `useLongPressTooltip` |
+| `ViraLataFilterSelect.test.tsx` | Compact vira-lata filter: open, search, select, clear |
+| `componentsShell.test.tsx` | OfflineBanner, ErrorState, SyncToast, GenreGuide, BottomNav, PrivateRoute, coach banner |
+| `ui.test.tsx` | Design-system primitives: Button, Avatar, Input, Chip, Modal, Collapsible, SectionTitle, Select, Switch, SegmentedControl |
 | `bandTime.test.ts` | Band overlap/conflict logic, current/next band calc (`bandTime.ts`) |
 | `bandFilter.test.ts` | Schedule filter predicate: stage, genre, day, time, search (`bandFilter.ts`) |
 | `scheduleFilterStorage.test.ts` | localStorage persistence for schedule filter state (`scheduleFilterStorage.ts`) |
@@ -68,7 +73,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `festivalWrap.test.ts` | `buildFestivalWrapStats()` badge parity, crew Jaccard, assigned slugs, avatar URLs (Phase 30) |
 | `wrapDismiss.test.ts` | `viralatas:wrap-dismissed-2026` dismiss key round-trip (Phase 30) |
 
-**Coverage**: **812 tests** across **73** test files (Phase 43 reactions, offline cold-start SW contract, ranked leaderboard, presence refactor tests)
+**Coverage**: **861 tests** across **78** test files. `vitest.config.ts` enforces **80%** on `src/components/**` and `src/ui/**`; **95%** on `src/lib/db/**`. UI primitives at **100%** lines/functions after `ui.test.tsx`.
 
 **Run**:
 ```bash

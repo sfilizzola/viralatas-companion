@@ -240,6 +240,25 @@ describe('UpcomingBandCard', () => {
     expect(screen.getByText('Person 9')).toBeInTheDocument();
   });
 
+  it('expands on Space key', () => {
+    const onDismiss = vi.fn();
+    const onDuck = vi.fn();
+    const { container } = render(
+      <UpcomingBandCard
+        nextBand={mockBand}
+        crewMembers={mockCrew}
+        onDismiss={onDismiss}
+        userId="test-user"
+        onDuck={onDuck}
+        duckCooldownUntil={null}
+      />,
+    );
+
+    const card = container.querySelector('[role="button"]')!;
+    fireEvent.keyDown(card, { key: ' ' });
+    expect(screen.getByText('Alice')).toBeInTheDocument();
+  });
+
   it('stops propagation on dismiss button click', () => {
     const onDismiss = vi.fn();
     const onDuck = vi.fn();
