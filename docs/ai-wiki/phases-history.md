@@ -1009,13 +1009,19 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `src/components/announcements/ReactionBar.tsx` + `EmojiPicker.tsx` (Variant B · Pit stamps)
 - `src/lib/syncCoordinator.ts` — ordered flush/pull; `RealtimeSync` subscription
 - i18n `reactionAdd`, `reactionCount`, `reactionPicker` (br/en/es/de)
+- **Post-ship polish (same phase window):**
+  - `EmojiPicker` Crowdsurf popover redesign (right-anchored rail + chevron above `＋`)
+  - `BandFilters` — `ViraLataFilterSelect` compact picker + drawer scroll/overflow fixes
+  - Android installed PWA offline cold start — `skipWaiting` + `clients.claim`, SPA `NavigationRoute`, `injectRegister: 'inline'`
+  - `offlineColdStart.test.ts` — SW shell contract assertions
+  - `BandCard.tsx` refactor — extracted subcomponents/helpers (Sonar cognitive-complexity); no behavior change
 
 **Acceptance criteria (all met):**
 - [x] Optimistic toggle < 50ms; crew sees reaction ~3s via Realtime
 - [x] Offline toggle survives reconnect flush
 - [x] Deleted posts cascade reactions (no orphans)
 - [x] Zero reactions → only `＋` stamp visible
-- [x] Build green · 810 tests green
+- [x] Build green · 812 tests green
 
 ---
 
