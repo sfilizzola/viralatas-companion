@@ -24,7 +24,7 @@ export function isMetalPlaceWindowActive(
   config: MetalPlaceConfig | null,
   nowDate: Date,
 ): boolean {
-  if (!config || !config.start_time || !config.end_time) {
+  if (!config?.start_time || !config?.end_time) {
     return false;
   }
 
@@ -50,7 +50,7 @@ export function isMetalPlaceWindowActive(
     timeZone: 'Europe/Berlin',
   }).format(nowDate);
   const [nowHourStr, nowMinStr] = wallClock.split(':');
-  const nowTotalMinutes = parseInt(nowHourStr, 10) * 60 + parseInt(nowMinStr, 10);
+  const nowTotalMinutes = Number.parseInt(nowHourStr, 10) * 60 + Number.parseInt(nowMinStr, 10);
 
   const startTotalMinutes = startHour * 60 + startMin;
   const endTotalMinutes = endHour * 60 + endMin;

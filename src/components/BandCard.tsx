@@ -68,6 +68,84 @@ function getConflictChipClass(conflict: ConflictInfo): string {
   return `${base} ${activeMod}`;
 }
 
+function getStripeClass(attendanceChip: AttendanceChipKind | undefined): string {
+  if (attendanceChip === 'attended') return styles.stripeAttended;
+  if (attendanceChip === 'missed') return styles.stripeMissed;
+  return styles.stripe;
+}
+
+type CardClassParams = {
+  variant: BandCardVariant;
+  isCeremony: boolean;
+  interactive: boolean;
+  conflict?: ConflictInfo;
+  showAttendanceChip: boolean;
+  attendanceChip?: AttendanceChipKind;
+  isBandEnded: boolean;
+  sharedPick: boolean;
+};
+
+function buildBandCardClasses(params: Readonly<CardClassParams>): string {
+  const {
+    variant,
+    isCeremony,
+    interactive,
+    conflict,
+    showAttendanceChip,
+    attendanceChip,
+    isBandEnded,
+    sharedPick,
+  } = params;
+
+  return [
+    styles.card,
+    getVariantClass(variant),
+    isCeremony ? styles.cardCeremony : '',
+    interactive ? '' : styles.cardStatic,
+    getConflictCardClass(conflict),
+    showAttendanceChip && attendanceChip === 'attended' ? styles.cardAttended : '',
+    showAttendanceChip && attendanceChip === 'missed' ? styles.cardMissed : '',
+    variant === 'timeline' && isBandEnded && !showAttendanceChip ? styles.cardEnded : '',
+    variant === 'ranked' && isBandEnded ? styles.cardEnded : '',
+    sharedPick ? styles.cardSharedPick : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+}
+
+function getBandPresentation(band: Band) {
+  const isCeremony = band.category === 'ceremony';
+  return {
+    isCeremony,
+    color: isCeremony ? 'var(--ceremony-gold)' : stageColorVar(band.stage),
+    thumbFallback: isCeremony ? '✦' : band.name.charAt(0).toUpperCase(),
+  };
+}
+
+function handleCardKeyDown(
+  onClick: (() => void) | undefined,
+  event: KeyboardEvent<HTMLElement>,
+) {
+  if (!onClick) return;
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    onClick();
+  }
+}
+
+function usePickPopAnimation(isPicked: boolean) {
+  const [popping, setPopping] = useState(false);
+  const userToggledRef = useRef(false);
+  useEffect(() => {
+    if (!userToggledRef.current) return;
+    userToggledRef.current = false;
+    setPopping(true);
+    const id = globalThis.setTimeout(() => setPopping(false), 320);
+    return () => globalThis.clearTimeout(id);
+  }, [isPicked]);
+  return { popping, markUserToggled: () => { userToggledRef.current = true; } };
+}
+
 export default function BandCard({
   band,
   isPicked,
@@ -91,61 +169,21 @@ export default function BandCard({
   magnitude,
   sharedPick = false,
 }: Readonly<BandCardProps>) {
-  const { t } = useI18n('SchedulePage');
-  const initial = band.name.charAt(0).toUpperCase();
   const interactive = Boolean(onClick);
   const showPick = variant !== 'ranked' && !hidePick;
-
-  // Pop animation only fires on user toggle, not on initial render or
-  // realtime updates from other clients.
-  const [popping, setPopping] = useState(false);
-  const userToggledRef = useRef(false);
-  useEffect(() => {
-    if (!userToggledRef.current) return;
-    userToggledRef.current = false;
-    setPopping(true);
-    const id = globalThis.setTimeout(() => setPopping(false), 320);
-    return () => globalThis.clearTimeout(id);
-  }, [isPicked]);
-
-  function handleKeyDown(event: KeyboardEvent<HTMLElement>) {
-    if (!onClick) return;
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      onClick();
-    }
-  }
-
-  const isCeremony = band.category === 'ceremony';
-  const color = isCeremony ? 'var(--ceremony-gold)' : stageColorVar(band.stage);
-  const thumbFallback = isCeremony ? '✦' : initial;
-  const showDuck = Boolean(onDuck) && !isCeremony;
-  const showDayGhost =
-    showDayLabel && (variant === 'schedule' || variant === 'ranked');
-
+  const { popping, markUserToggled } = usePickPopAnimation(isPicked);
+  const { isCeremony, color } = getBandPresentation(band);
   const showAttendanceChip = variant === 'timeline' && attendanceChip !== undefined;
-
-  const cardClasses = [
-    styles.card,
-    getVariantClass(variant),
-    isCeremony ? styles.cardCeremony : '',
-    interactive ? '' : styles.cardStatic,
-    getConflictCardClass(conflict),
-    showAttendanceChip && attendanceChip === 'attended' ? styles.cardAttended : '',
-    showAttendanceChip && attendanceChip === 'missed' ? styles.cardMissed : '',
-    variant === 'timeline' && isBandEnded && !showAttendanceChip ? styles.cardEnded : '',
-    variant === 'ranked' && isBandEnded ? styles.cardEnded : '',
-    sharedPick ? styles.cardSharedPick : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
-
-  const stripeClass =
-    attendanceChip === 'attended'
-      ? styles.stripeAttended
-      : attendanceChip === 'missed'
-        ? styles.stripeMissed
-        : styles.stripe;
+  const cardClasses = buildBandCardClasses({
+    variant,
+    isCeremony,
+    interactive,
+    conflict,
+    showAttendanceChip,
+    attendanceChip,
+    isBandEnded,
+    sharedPick,
+  });
 
   return (
     // The card-as-button pattern is intentional: nested action buttons (star,
@@ -156,7 +194,7 @@ export default function BandCard({
       role={interactive ? 'button' : undefined} // NOSONAR
       tabIndex={interactive ? 0 : undefined} // NOSONAR
       onClick={onClick}
-      onKeyDown={handleKeyDown}
+      onKeyDown={(event) => handleCardKeyDown(onClick, event)}
       aria-pressed={interactive ? isPicked : undefined}
       style={{ '--stage-color': color } as React.CSSProperties}
     >
@@ -170,95 +208,216 @@ export default function BandCard({
           missedCount={missedCount}
           attendeeCluster={attendeeCluster}
           ratingStats={ratingStats}
-          showDayGhost={showDayGhost}
+          showDayGhost={showDayLabel && variant === 'ranked'}
         />
       ) : (
-        <>
-          <div className={stripeClass} aria-hidden />
-
-          {variant === 'schedule' && (
-            <CardThumb imageUrl={band.image_url} fallback={thumbFallback} />
-          )}
-
-          {variant === 'timeline' && (
-            <CardWhen startTime={band.start_time} endTime={band.end_time} />
-          )}
-
-          <div
-            className={[
-              styles.body,
-              showDayGhost ? styles.bodyWithDayGhost : '',
-            ]
-              .filter(Boolean)
-              .join(' ')}
-          >
-            {showDayGhost && (
-              <span className={styles.dayGhost} aria-hidden>
-                {t(bandWeekdayKey(band))}
-              </span>
-            )}
-            <h2 className={styles.bandName}>{band.name}</h2>
-            <div
-              className={[
-                styles.meta,
-                showAttendanceChip ? styles.metaWithAttendance : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-            >
-              {isCeremony ? (
-                <span className={styles.ceremonyLabel}>
-                  ✦ {t('scheduleClosingCeremony')}
-                </span>
-              ) : (
-                <Chip className={styles.stageBadge}>{band.stage}</Chip>
-              )}
-              {variant !== 'timeline' && (
-                <span className={styles.time}>
-                  {formatTime(band.start_time)} – {formatTime(band.end_time)}
-                </span>
-              )}
-              {count > 0 && !showAttendanceChip && (
-                <span className={styles.going}>
-                  <AttendanceText
-                    count={count}
-                    isBandEnded={isBandEnded}
-                    missedCount={missedCount}
-                  />
-                </span>
-              )}
-              {variant === 'timeline' && conflict && <ConflictChip conflict={conflict} />}
-              {showAttendanceChip && <AttendanceChip kind={attendanceChip} />}
-              {band.genre && variant === 'schedule' && (
-                <span className={styles.genre}>
-                  {band.genre === 'Metal Battle'
-                    ? `${getMetalBattleCountryFlag(band.slot_id) ?? ''} Metal Battle`.trim()
-                    : band.genre}
-                </span>
-              )}
-              {pending && <span className="pending-chip">{t('pendingSync')}</span>}
-            </div>
-
-            {children}
-            {showDuck && onDuck && (
-              <QuackGhostRow onDuck={onDuck} cooldownUntil={duckCooldownUntil ?? null} />
-            )}
-          </div>
-
-          {showPick && (
-            <PickButton
-              isPicked={isPicked}
-              popping={popping}
-              onToggle={() => {
-                userToggledRef.current = true;
-                onToggle();
-              }}
-            />
-          )}
-        </>
+        <StandardBandCardContent
+          band={band}
+          variant={variant}
+          isPicked={isPicked}
+          count={count}
+          onToggle={onToggle}
+          conflict={conflict}
+          pending={pending}
+          isBandEnded={isBandEnded}
+          attendanceChip={attendanceChip}
+          missedCount={missedCount}
+          onDuck={onDuck}
+          duckCooldownUntil={duckCooldownUntil}
+          showDayLabel={showDayLabel}
+          showPick={showPick}
+          popping={popping}
+          markUserToggled={markUserToggled}
+          isCeremony={isCeremony}
+          showAttendanceChip={showAttendanceChip}
+        >
+          {children}
+        </StandardBandCardContent>
       )}
     </article>
   );
+}
+
+type StandardBandCardContentProps = {
+  band: Band;
+  variant: Exclude<BandCardVariant, 'ranked'>;
+  isPicked: boolean;
+  count: number;
+  onToggle: () => void;
+  conflict?: ConflictInfo;
+  pending?: boolean;
+  isBandEnded: boolean;
+  attendanceChip?: AttendanceChipKind;
+  missedCount?: number;
+  onDuck?: () => void;
+  duckCooldownUntil?: number;
+  showDayLabel: boolean;
+  showPick: boolean;
+  popping: boolean;
+  markUserToggled: () => void;
+  isCeremony: boolean;
+  showAttendanceChip: boolean;
+};
+
+function StandardBandCardContent({
+  band,
+  variant,
+  isPicked,
+  count,
+  onToggle,
+  conflict,
+  pending,
+  isBandEnded,
+  attendanceChip,
+  missedCount,
+  children,
+  onDuck,
+  duckCooldownUntil,
+  showDayLabel,
+  showPick,
+  popping,
+  markUserToggled,
+  isCeremony,
+  showAttendanceChip,
+}: Readonly<StandardBandCardContentProps & { children?: ReactNode }>) {
+  const { t } = useI18n('SchedulePage');
+  const { thumbFallback } = getBandPresentation(band);
+  const showDuck = Boolean(onDuck) && !isCeremony;
+  const showDayGhost = showDayLabel && variant === 'schedule';
+
+  return (
+    <>
+      <div className={getStripeClass(attendanceChip)} aria-hidden />
+
+      {variant === 'schedule' && (
+        <CardThumb imageUrl={band.image_url} fallback={thumbFallback} />
+      )}
+
+      {variant === 'timeline' && (
+        <CardWhen startTime={band.start_time} endTime={band.end_time} />
+      )}
+
+      <div
+        className={[styles.body, showDayGhost ? styles.bodyWithDayGhost : '']
+          .filter(Boolean)
+          .join(' ')}
+      >
+        {showDayGhost && (
+          <span className={styles.dayGhost} aria-hidden>
+            {t(bandWeekdayKey(band))}
+          </span>
+        )}
+        <h2 className={styles.bandName}>{band.name}</h2>
+        <BandCardMeta
+          band={band}
+          variant={variant}
+          isCeremony={isCeremony}
+          count={count}
+          isBandEnded={isBandEnded}
+          missedCount={missedCount}
+          conflict={conflict}
+          showAttendanceChip={showAttendanceChip}
+          attendanceChip={attendanceChip}
+          pending={pending}
+        />
+        {children}
+        {showDuck && onDuck && (
+          <QuackGhostRow onDuck={onDuck} cooldownUntil={duckCooldownUntil ?? null} />
+        )}
+      </div>
+
+      {showPick && (
+        <PickButton
+          isPicked={isPicked}
+          popping={popping}
+          onToggle={() => {
+            markUserToggled();
+            onToggle();
+          }}
+        />
+      )}
+    </>
+  );
+}
+
+type BandCardMetaProps = {
+  band: Band;
+  variant: Exclude<BandCardVariant, 'ranked'>;
+  isCeremony: boolean;
+  count: number;
+  isBandEnded: boolean;
+  missedCount?: number;
+  conflict?: ConflictInfo;
+  showAttendanceChip: boolean;
+  attendanceChip?: AttendanceChipKind;
+  pending?: boolean;
+};
+
+function BandCardMeta({
+  band,
+  variant,
+  isCeremony,
+  count,
+  isBandEnded,
+  missedCount,
+  conflict,
+  showAttendanceChip,
+  attendanceChip,
+  pending,
+}: Readonly<BandCardMetaProps>) {
+  const { t } = useI18n('SchedulePage');
+
+  return (
+    <div
+      className={[styles.meta, showAttendanceChip ? styles.metaWithAttendance : '']
+        .filter(Boolean)
+        .join(' ')}
+    >
+      {isCeremony ? (
+        <span className={styles.ceremonyLabel}>✦ {t('scheduleClosingCeremony')}</span>
+      ) : (
+        <Chip className={styles.stageBadge}>{band.stage}</Chip>
+      )}
+      {variant !== 'timeline' && (
+        <span className={styles.time}>
+          {formatTime(band.start_time)} – {formatTime(band.end_time)}
+        </span>
+      )}
+      {count > 0 && !showAttendanceChip && (
+        <span className={styles.going}>
+          <AttendanceText count={count} isBandEnded={isBandEnded} missedCount={missedCount} />
+        </span>
+      )}
+      {variant === 'timeline' && conflict && <ConflictChip conflict={conflict} />}
+      {showAttendanceChip && attendanceChip && <AttendanceChip kind={attendanceChip} />}
+      {band.genre && variant === 'schedule' && (
+        <span className={styles.genre}>
+          {band.genre === 'Metal Battle'
+            ? `${getMetalBattleCountryFlag(band.slot_id) ?? ''} Metal Battle`.trim()
+            : band.genre}
+        </span>
+      )}
+      {pending && <span className="pending-chip">{t('pendingSync')}</span>}
+    </div>
+  );
+}
+
+function getRankedRankToneClass(isTop3: boolean, isRating: boolean): string {
+  if (!isTop3) return '';
+  if (isRating) return styles.rankedRankTopRating;
+  return styles.rankedRankTop;
+}
+
+function getRankedCapLabel(
+  isRating: boolean,
+  isBandEnded: boolean,
+  ratingCount: number,
+  t: (key: string) => string,
+  tPopular: (key: string, values?: Record<string, string | number>) => string,
+): string {
+  if (isRating) return tPopular('ratingCountCap', { count: ratingCount });
+  if (isBandEnded) return t('sawLabel');
+  return tPopular('capPicks');
 }
 
 function CardThumb({
@@ -318,11 +477,14 @@ function RankedRow({
       ? Math.min(100, Math.max(0, (magnitude.value / magnitude.max) * 100))
       : 0;
   const isTop3 = rank !== undefined && rank <= 3;
-  const rankToneClass = isTop3
-    ? isRating
-      ? styles.rankedRankTopRating
-      : styles.rankedRankTop
-    : '';
+  const rankToneClass = getRankedRankToneClass(isTop3, isRating);
+  const rankedCapLabel = getRankedCapLabel(
+    isRating,
+    isBandEnded,
+    ratingStats?.count ?? 0,
+    t,
+    tPopular,
+  );
   const showSkip =
     isBandEnded && missedCount !== undefined && missedCount > 0;
 
@@ -368,13 +530,7 @@ function RankedRow({
           missedCount={missedCount}
           avgFormatted={ratingStats?.avgFormatted}
         />
-        <div className={styles.rankedCap}>
-          {isRating
-            ? tPopular('ratingCountCap', { count: ratingStats?.count ?? 0 })
-            : isBandEnded
-              ? t('sawLabel')
-              : tPopular('capPicks')}
-        </div>
+        <div className={styles.rankedCap}>{rankedCapLabel}</div>
         {!isRating && attendeeCluster && (
           <RankedAvatars attendees={attendeeCluster.attendees} />
         )}
@@ -465,9 +621,9 @@ function AttendanceChip({ kind }: Readonly<{ kind: AttendanceChipKind }>) {
   const label = kind === 'attended' ? t('chipAttended') : t('chipMissed');
   const kindClass = kind === 'attended' ? styles.attendanceChipAttended : styles.attendanceChipMissed;
   return (
-    <span className={`${styles.attendanceChip} ${kindClass}`} role="status">
+    <output className={`${styles.attendanceChip} ${kindClass}`}>
       {label}
-    </span>
+    </output>
   );
 }
 
