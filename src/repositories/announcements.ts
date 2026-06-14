@@ -3,6 +3,7 @@ import {
   enqueueOfflineAnnouncement,
   loadOfflineAnnouncementsQueue,
   removeAnnouncementFromCache,
+  removeAnnouncementReactionsForPost,
   removeFromOfflineAnnouncementsQueue,
   saveAnnouncement,
   saveAnnouncements,
@@ -97,6 +98,7 @@ async function post(userId: string, content: string): Promise<void> {
 
 async function deleteAnnouncement(id: string): Promise<void> {
   await removeAnnouncementFromCache(id);
+  await removeAnnouncementReactionsForPost(id);
 
   if (!navigator.onLine) return;
 
@@ -174,7 +176,9 @@ function subscribeToRealtime(): () => void {
     {
       filter: { event: 'DELETE', table: 'announcements' },
       handler: async (payload) => {
-        await removeAnnouncementFromCache(payload.old.id as string);
+        const id = payload.old.id as string;
+        await removeAnnouncementFromCache(id);
+        await removeAnnouncementReactionsForPost(id);
       },
     },
   ]);

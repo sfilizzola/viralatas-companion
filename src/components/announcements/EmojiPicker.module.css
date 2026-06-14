@@ -1,0 +1,85 @@
+.strip {
+  margin-bottom: 8px;
+  padding: var(--s-3);
+  border: 2px dashed var(--border-strong);
+  border-radius: 2px;
+  background: repeating-linear-gradient(
+    -4deg,
+    var(--bg-elevated),
+    var(--bg-elevated) 6px,
+    color-mix(in srgb, var(--bg-elevated) 92%, var(--text) 8%) 6px,
+    color-mix(in srgb, var(--bg-elevated) 92%, var(--text) 8%) 12px
+  );
+  position: relative;
+}
+
+.stripLabel {
+  position: absolute;
+  top: -8px;
+  left: 10px;
+  padding: 0 6px;
+  background: var(--bg-surface);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.cell,
+.cellActive {
+  height: 40px;
+  border: 2px solid var(--border);
+  border-radius: 2px;
+  background: var(--bg-surface);
+  font-size: 1.35rem;
+  cursor: pointer;
+  transition: border-color 0.12s, transform 0.1s, box-shadow 0.12s;
+}
+
+.cell:nth-child(1) { transform: rotate(-3deg); }
+.cell:nth-child(2) { transform: rotate(2deg); }
+.cell:nth-child(3) { transform: rotate(-1deg); }
+.cell:nth-child(4) { transform: rotate(3deg); }
+.cell:nth-child(5) { transform: rotate(1deg); }
+.cell:nth-child(6) { transform: rotate(-2deg); }
+.cell:nth-child(7) { transform: rotate(2deg); }
+.cell:nth-child(8) { transform: rotate(-1deg); }
+
+.cell:hover {
+  border-color: var(--text-muted);
+  transform: rotate(0deg) scale(1.05);
+}
+
+.cellActive {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 8px var(--accent-soft);
+}
+
+.cellActive:nth-child(1) { transform: rotate(-3deg); }
+.cellActive:nth-child(2) { transform: rotate(2deg); }
+.cellActive:nth-child(3) { transform: rotate(-1deg); }
+.cellActive:nth-child(4) { transform: rotate(3deg); }
+.cellActive:nth-child(5) { transform: rotate(1deg); }
+.cellActive:nth-child(6) { transform: rotate(-2deg); }
+.cellActive:nth-child(7) { transform: rotate(2deg); }
+.cellActive:nth-child(8) { transform: rotate(-1deg); }
+
+.cellActive:hover {
+  transform: rotate(0deg) scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce), (prefers-contrast: more) {
+  .cell,
+  .cellActive,
+  .cell:hover,
+  .cellActive:hover {
+    transform: none;
+  }
+}

@@ -43,6 +43,24 @@ export type OfflineDuckQuackOp = {
   quacked_at: string;
 };
 
+export const REACTION_EMOJIS = ['🤘', '🍺', '🐶', '💀', '🔥', '😂', '👎', '👍'] as const;
+export type ReactionEmoji = (typeof REACTION_EMOJIS)[number];
+
+export type AnnouncementReactionRow = {
+  announcement_id: string;
+  user_id: string;
+  emoji: string;
+  created_at: string;
+};
+
+export type OfflineAnnouncementReactionOp = {
+  id: string;
+  announcement_id: string;
+  user_id: string;
+  emoji: string;
+  op: 'add' | 'remove';
+};
+
 export type ViralatasDB = {
   session: {
     key: string;
@@ -119,5 +137,14 @@ export type ViralatasDB = {
     key: [string, number, string];
     value: UserBadgeHistory;
     indexes: { by_user: string };
+  };
+  announcement_reactions: {
+    key: [string, string, string];
+    value: AnnouncementReactionRow;
+    indexes: { by_announcement: string };
+  };
+  offline_announcement_reactions: {
+    key: string;
+    value: OfflineAnnouncementReactionOp;
   };
 };

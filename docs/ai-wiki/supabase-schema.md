@@ -278,6 +278,32 @@ USING (auth.uid() = user_id);
 
 ---
 
+### `public.announcement_reactions`
+
+**Purpose**: Per-user emoji reactions on mural posts (toggle semantics).
+
+**Migration**: `20260614000000_phase43_announcement_reactions.sql`
+
+```sql
+CREATE TABLE public.announcement_reactions (
+  announcement_id uuid NOT NULL REFERENCES public.announcements(id) ON DELETE CASCADE,
+  user_id         uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  emoji           text NOT NULL CHECK (emoji IN ('🤘', '🍺', '🐶', '💀', '🔥', '😂', '👎', '👍')),
+  created_at      timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (announcement_id, user_id, emoji)
+);
+```
+
+**IndexedDB mirror** (IDB v12): store `announcement_reactions` (key `[announcement_id, user_id, emoji]`, index `by_announcement`); offline queue `offline_announcement_reactions` (key `id` = `${announcement_id}|${user_id}|${emoji}`, `op: 'add' | 'remove'`).
+
+**Realtime**: Enabled. Subscribed in `RealtimeSync` via `reactionsRepository.subscribeToRealtime()` — INSERT saves row; DELETE removes by composite key.
+
+**RLS**: SELECT authenticated; INSERT/DELETE own `user_id` only.
+
+**Client sync**: `reactionsRepository.toggle()` — IDB optimistic INSERT/DELETE → Supabase or offline queue; `flushOfflineQueue()` after announcements flush in `runReconnectSync()`; `syncFromRemote()` full pull after `announcementsRepository.sync()`.
+
+---
+
 ### `public.announcements`
 
 **Purpose**: Mural-style posts.
@@ -571,6 +597,7 @@ INSERT INTO public.app_settings DEFAULT VALUES;
 **Enabled Tables**:
 - public.user_picks
 - public.user_band_ratings
+- public.announcement_reactions
 - public.user_presence
 - public.announcements
 - public.user_missed_bands
@@ -692,6 +719,7 @@ npm run festival:reset -- --with-bands --force
 | `bands` | All | Godlike | Godlike | Godlike |
 | `user_picks` | All | Own user | Own user | Own user |
 | `user_band_ratings` | Authenticated | Own user | Own user | Own user |
+| `announcement_reactions` | Authenticated | Own user | — | Own user |
 | `announcements` | Non-deleted | Own author | Author / Manager+ | Author / Manager+ |
 | `user_presence` | All | Own user | Own user | Own user |
 | `user_missed_bands` | All | Own user | Own user | Own user |

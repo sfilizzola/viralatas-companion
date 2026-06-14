@@ -43,5 +43,8 @@
   "offlineCannotLoadMore": "You're offline — no more messages to load",
   "pin": "Pin",
   "unpin": "Unpin",
-  "pinned": "Pinned"
+  "pinned": "Pinned",
+  "reactionAdd": "Add reaction",
+  "reactionCount": "{count} reactions",
+  "reactionPicker": "Pick one"
 }

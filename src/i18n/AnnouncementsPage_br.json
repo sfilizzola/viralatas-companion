@@ -43,5 +43,8 @@
   "offlineCannotLoadMore": "Você está offline — sem mais recados para carregar",
   "pin": "Fixar",
   "unpin": "Desfixar",
-  "pinned": "Fixado"
+  "pinned": "Fixado",
+  "reactionAdd": "Adicionar reação",
+  "reactionCount": "{count} reações",
+  "reactionPicker": "Escolhe uma"
 }

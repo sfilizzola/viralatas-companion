@@ -11,7 +11,8 @@ export {
   BLOCKED_POSTERS_CHANGED_EVENT,
   BADGE_HISTORY_CHANGED_EVENT,
 } from './events';
-export type { OfflineBandRatingOp, OfflineDuckQuackOp, OfflineMissedOp, OfflinePickOp, OfflinePresenceOp } from './types';
+export type { OfflineBandRatingOp, OfflineDuckQuackOp, OfflineMissedOp, OfflinePickOp, OfflinePresenceOp, OfflineAnnouncementReactionOp, AnnouncementReactionRow, ReactionEmoji } from './types';
+export { REACTION_EMOJIS } from './types';
 export {
   resetDbConnectionForTests,
   VIRALATAS_OBJECT_STORES,
@@ -59,6 +60,17 @@ export {
   loadOfflineMissedQueue,
   removeFromOfflineMissedQueue,
 } from './missed';
+export {
+  saveAnnouncementReaction,
+  removeAnnouncementReaction,
+  loadAllAnnouncementReactions,
+  loadAnnouncementReactionsByAnnouncement,
+  removeAnnouncementReactionsForPost,
+  replaceAllAnnouncementReactions,
+  enqueueOfflineAnnouncementReaction,
+  loadOfflineAnnouncementReactionsQueue,
+  removeFromOfflineAnnouncementReactionsQueue,
+} from './reactions';
 export {
   saveBandRating,
   removeBandRating,

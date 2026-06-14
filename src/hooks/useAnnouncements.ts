@@ -3,18 +3,26 @@ import type { Announcement, CrewUser, UserRole } from '../types';
 import {
   ANNOUNCEMENTS_CHANGED_EVENT,
   BLOCKED_POSTERS_CHANGED_EVENT,
+  loadAllAnnouncementReactions,
   loadAnnouncementsFromCache,
   loadCrewUsers,
   loadOfflineAnnouncementsQueue,
 } from '../lib/db';
-import { announcementsRepository, usersRepository } from '../repositories';
-import { applyPinSort } from '../services/announcementsDisplay';
+import { announcementsRepository, reactionsRepository, usersRepository } from '../repositories';
+import {
+  applyPinSort,
+  buildReactionSummaries,
+  type AnnouncementWithReactions,
+} from '../services/announcementsDisplay';
 
 const PAGE_SIZE = 10;
 const LOAD_MORE_SIZE = 5;
 
+export type { AnnouncementReactionSummary, AnnouncementWithReactions } from '../services/announcementsDisplay';
+
 export function useAnnouncements(userId: string | null) {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [reactionRows, setReactionRows] = useState<Awaited<ReturnType<typeof loadAllAnnouncementReactions>>>([]);
   const [crewUsers, setCrewUsers] = useState<CrewUser[]>([]);
   const [userRoles, setUserRoles] = useState<Record<string, UserRole>>({});
   const [role, setRole] = useState<UserRole>('normal');
@@ -29,19 +37,38 @@ export function useAnnouncements(userId: string | null) {
   const [pinning, setPinning] = useState<string | null>(null);
 
   const refreshFromCache = useCallback(async () => {
-    const [cached, users, pendingQueue] = await Promise.all([
+    const [cached, users, pendingQueue, reactions] = await Promise.all([
       loadAnnouncementsFromCache(),
       loadCrewUsers(),
       loadOfflineAnnouncementsQueue(),
+      loadAllAnnouncementReactions(),
     ]);
     setAnnouncements(cached);
     setCrewUsers(users);
+    setReactionRows(reactions);
     setPendingAnnouncementIds(new Set(pendingQueue.map((a) => a.id)));
     setUserRoles(await usersRepository.fetchUserRolesMap());
     setLoading(false);
   }, []);
 
-  const sortedAnnouncements = useMemo(() => applyPinSort(announcements), [announcements]);
+  const displayNameByUserId = useMemo(
+    () => new Map(crewUsers.map((u) => [u.id, u.display_name ?? u.id])),
+    [crewUsers],
+  );
+
+  const announcementsWithReactions = useMemo<AnnouncementWithReactions[]>(
+    () =>
+      announcements.map((a) => ({
+        ...a,
+        reactions: buildReactionSummaries(reactionRows, a.id, userId, displayNameByUserId),
+      })),
+    [announcements, reactionRows, userId, displayNameByUserId],
+  );
+
+  const sortedAnnouncements = useMemo(
+    () => applyPinSort(announcementsWithReactions),
+    [announcementsWithReactions],
+  );
   const visibleAnnouncements = useMemo(
     () => sortedAnnouncements.slice(0, visibleCount),
     [sortedAnnouncements, visibleCount],
@@ -90,6 +117,14 @@ export function useAnnouncements(userId: string | null) {
   const deleteAnnouncement = useCallback(async (id: string) => {
     await announcementsRepository.delete(id);
   }, []);
+
+  const toggleReaction = useCallback(
+    async (announcementId: string, emoji: string) => {
+      if (!userId) return;
+      await reactionsRepository.toggle(announcementId, userId, emoji);
+    },
+    [userId],
+  );
 
   const blockUser = useCallback(
     async (authorId: string) => {
@@ -153,7 +188,7 @@ export function useAnnouncements(userId: string | null) {
   }, []);
 
   return {
-    announcements,
+    announcements: announcementsWithReactions,
     sortedAnnouncements,
     visibleAnnouncements,
     crewUsers,
@@ -172,6 +207,7 @@ export function useAnnouncements(userId: string | null) {
     loadMore,
     post,
     deleteAnnouncement,
+    toggleReaction,
     blockUser,
     pin,
     refreshFromCache,

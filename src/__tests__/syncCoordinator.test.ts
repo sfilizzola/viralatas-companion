@@ -24,6 +24,10 @@ vi.mock('../repositories', () => ({
     flushOfflineQueue: vi.fn().mockResolvedValue(0),
     syncCrewFromRemote: vi.fn().mockResolvedValue(undefined),
   },
+  reactionsRepository: {
+    flushOfflineQueue: vi.fn().mockResolvedValue(0),
+    syncFromRemote: vi.fn().mockResolvedValue(undefined),
+  },
   usersRepository: {
     syncCrew: vi.fn().mockResolvedValue(undefined),
   },
@@ -37,6 +41,7 @@ import {
   picksRepository,
   presenceRepository,
   ratingsRepository,
+  reactionsRepository,
   usersRepository,
 } from '../repositories';
 
@@ -50,6 +55,7 @@ beforeEach(() => {
   vi.mocked(duckRepository.flushOfflineQueue).mockResolvedValue(0);
   vi.mocked(missedRepository.flushOfflineQueue).mockResolvedValue(0);
   vi.mocked(ratingsRepository.flushOfflineQueue).mockResolvedValue(0);
+  vi.mocked(reactionsRepository.flushOfflineQueue).mockResolvedValue(0);
 });
 
 describe('runReconnectSync', () => {
@@ -80,6 +86,16 @@ describe('runReconnectSync', () => {
       callOrder.push('flush-ratings');
       return 1;
     });
+    vi.mocked(reactionsRepository.flushOfflineQueue).mockImplementation(async () => {
+      callOrder.push('flush-reactions');
+      return 2;
+    });
+    vi.mocked(announcementsRepository.sync).mockImplementation(async () => {
+      callOrder.push('pull-announcements');
+    });
+    vi.mocked(reactionsRepository.syncFromRemote).mockImplementation(async () => {
+      callOrder.push('pull-reactions');
+    });
     vi.mocked(picksRepository.syncCrewFromRemote).mockImplementation(async () => {
       callOrder.push('pull-picks');
     });
@@ -88,9 +104,6 @@ describe('runReconnectSync', () => {
     });
     vi.mocked(presenceRepository.syncCrewFromRemote).mockImplementation(async () => {
       callOrder.push('pull-presence');
-    });
-    vi.mocked(announcementsRepository.sync).mockImplementation(async () => {
-      callOrder.push('pull-announcements');
     });
     vi.mocked(missedRepository.syncFromRemote).mockImplementation(async () => {
       callOrder.push('pull-missed');
@@ -101,20 +114,17 @@ describe('runReconnectSync', () => {
 
     const flushed = await runReconnectSync(userId);
 
-    expect(flushed).toBe(5);
+    expect(flushed).toBe(7);
     expect(callOrder.indexOf('flush-picks')).toBeLessThan(callOrder.indexOf('pull-picks'));
-    expect(callOrder.indexOf('flush-presence')).toBeLessThan(callOrder.indexOf('pull-presence'));
-    expect(callOrder.indexOf('flush-announcements')).toBeLessThan(callOrder.indexOf('pull-announcements'));
-    expect(callOrder.indexOf('flush-duck')).toBeLessThan(callOrder.indexOf('pull-picks'));
-    expect(callOrder.indexOf('flush-missed')).toBeLessThan(callOrder.indexOf('pull-missed'));
-    expect(callOrder.indexOf('flush-ratings')).toBeLessThan(callOrder.indexOf('pull-ratings'));
+    expect(callOrder.indexOf('flush-announcements')).toBeLessThan(callOrder.indexOf('flush-reactions'));
+    expect(callOrder.indexOf('flush-reactions')).toBeLessThan(callOrder.indexOf('pull-announcements'));
+    expect(callOrder.indexOf('pull-announcements')).toBeLessThan(callOrder.indexOf('pull-reactions'));
+    expect(callOrder.indexOf('pull-reactions')).toBeLessThan(callOrder.indexOf('pull-picks'));
   });
 
   it('calls all flush and pull repository methods', async () => {
     vi.mocked(picksRepository.flushOfflineQueue).mockResolvedValue(1);
-    vi.mocked(presenceRepository.flushOfflineQueue).mockResolvedValue(0);
-    vi.mocked(announcementsRepository.flushOfflineQueue).mockResolvedValue(2);
-    vi.mocked(duckRepository.flushOfflineQueue).mockResolvedValue(0);
+    vi.mocked(reactionsRepository.flushOfflineQueue).mockResolvedValue(1);
 
     await runReconnectSync(userId);
 
@@ -124,10 +134,12 @@ describe('runReconnectSync', () => {
     expect(duckRepository.flushOfflineQueue).toHaveBeenCalledOnce();
     expect(missedRepository.flushOfflineQueue).toHaveBeenCalledOnce();
     expect(ratingsRepository.flushOfflineQueue).toHaveBeenCalledOnce();
+    expect(reactionsRepository.flushOfflineQueue).toHaveBeenCalledOnce();
+    expect(announcementsRepository.sync).toHaveBeenCalledOnce();
+    expect(reactionsRepository.syncFromRemote).toHaveBeenCalledOnce();
     expect(picksRepository.syncCrewFromRemote).toHaveBeenCalledOnce();
     expect(usersRepository.syncCrew).toHaveBeenCalledOnce();
     expect(presenceRepository.syncCrewFromRemote).toHaveBeenCalledOnce();
-    expect(announcementsRepository.sync).toHaveBeenCalledOnce();
     expect(missedRepository.syncFromRemote).toHaveBeenCalledWith(userId);
     expect(ratingsRepository.syncCrewFromRemote).toHaveBeenCalledOnce();
   });

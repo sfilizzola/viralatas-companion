@@ -995,6 +995,30 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 
 ---
 
+### Phase 43 — Mural Reactions
+**Status:** ✅ Complete
+
+**Completed:** 2026-06-14
+
+**Goal:** Fixed-emoji toggle reactions on `/announcements` with IDB-first optimism, Supabase sync, Realtime propagation, and offline queue flush on reconnect.
+
+**Deliverables shipped:**
+- `supabase/migrations/20260614000000_phase43_announcement_reactions.sql` — table, CHECK, RLS, Realtime publication
+- `src/lib/db/reactions.ts` + IDB v12 stores; `src/repositories/reactions.ts`
+- `src/hooks/useAnnouncements.ts` + `buildReactionSummaries()` in `announcementsDisplay.ts`
+- `src/components/announcements/ReactionBar.tsx` + `EmojiPicker.tsx` (Variant B · Pit stamps)
+- `src/lib/syncCoordinator.ts` — ordered flush/pull; `RealtimeSync` subscription
+- i18n `reactionAdd`, `reactionCount`, `reactionPicker` (br/en/es/de)
+
+**Acceptance criteria (all met):**
+- [x] Optimistic toggle < 50ms; crew sees reaction ~3s via Realtime
+- [x] Offline toggle survives reconnect flush
+- [x] Deleted posts cascade reactions (no orphans)
+- [x] Zero reactions → only `＋` stamp visible
+- [x] Build green · 810 tests green
+
+---
+
 ### Phase 42 — Presence Architecture Deepening
 **Status:** ✅ Complete
 

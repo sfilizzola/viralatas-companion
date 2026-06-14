@@ -5,6 +5,7 @@ import {
   picksRepository,
   presenceRepository,
   ratingsRepository,
+  reactionsRepository,
   usersRepository,
 } from '../repositories';
 
@@ -13,23 +14,33 @@ import {
  * return total flushed item count (for sync toast).
  */
 export async function runReconnectSync(userId: string): Promise<number> {
-  const [picksFlushed, presenceFlushed, announcementsFlushed, duckFlushed, , ratingsFlushed] = await Promise.all([
-    picksRepository.flushOfflineQueue(),
-    presenceRepository.flushOfflineQueue(),
-    announcementsRepository.flushOfflineQueue(),
-    duckRepository.flushOfflineQueue(),
-    missedRepository.flushOfflineQueue(),
-    ratingsRepository.flushOfflineQueue(),
-  ]);
+  const [picksFlushed, presenceFlushed, announcementsFlushed, duckFlushed, , ratingsFlushed] =
+    await Promise.all([
+      picksRepository.flushOfflineQueue(),
+      presenceRepository.flushOfflineQueue(),
+      announcementsRepository.flushOfflineQueue(),
+      duckRepository.flushOfflineQueue(),
+      missedRepository.flushOfflineQueue(),
+      ratingsRepository.flushOfflineQueue(),
+    ]);
+  const reactionsFlushed = await reactionsRepository.flushOfflineQueue();
 
+  await announcementsRepository.sync();
+  await reactionsRepository.syncFromRemote();
   await Promise.all([
     picksRepository.syncCrewFromRemote(),
     usersRepository.syncCrew(),
     presenceRepository.syncCrewFromRemote(),
-    announcementsRepository.sync(),
     missedRepository.syncFromRemote(userId),
     ratingsRepository.syncCrewFromRemote(),
   ]);
 
-  return picksFlushed + presenceFlushed + announcementsFlushed + duckFlushed + ratingsFlushed;
+  return (
+    picksFlushed +
+    presenceFlushed +
+    announcementsFlushed +
+    duckFlushed +
+    ratingsFlushed +
+    reactionsFlushed
+  );
 }

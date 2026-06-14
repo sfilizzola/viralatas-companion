@@ -1,6 +1,49 @@
 import type { Announcement } from '../types';
+import type { AnnouncementReactionRow } from '../lib/db';
+import { REACTION_EMOJIS } from '../lib/db';
 
-export function applyPinSort(announcements: Announcement[]): Announcement[] {
+export type AnnouncementReactionSummary = {
+  emoji: string;
+  count: number;
+  reactedByMe: boolean;
+  reactors: string[];
+};
+
+export type AnnouncementWithReactions = Announcement & {
+  reactions: AnnouncementReactionSummary[];
+};
+
+export function buildReactionSummaries(
+  rows: AnnouncementReactionRow[],
+  announcementId: string,
+  currentUserId: string | null,
+  displayNameByUserId: Map<string, string>,
+): AnnouncementReactionSummary[] {
+  const forPost = rows.filter((r) => r.announcement_id === announcementId);
+  const byEmoji = new Map<string, { userIds: string[]; reactedByMe: boolean }>();
+  for (const r of forPost) {
+    const entry = byEmoji.get(r.emoji) ?? { userIds: [], reactedByMe: false };
+    entry.userIds.push(r.user_id);
+    if (r.user_id === currentUserId) entry.reactedByMe = true;
+    byEmoji.set(r.emoji, entry);
+  }
+  return Array.from(byEmoji.entries())
+    .map(([emoji, { userIds, reactedByMe }]) => ({
+      emoji,
+      count: userIds.length,
+      reactedByMe,
+      reactors: userIds
+        .map((id) => displayNameByUserId.get(id) ?? id)
+        .sort((a, b) => a.localeCompare(b)),
+    }))
+    .sort((a, b) => {
+      if (b.count !== a.count) return b.count - a.count;
+      return REACTION_EMOJIS.indexOf(a.emoji as (typeof REACTION_EMOJIS)[number])
+        - REACTION_EMOJIS.indexOf(b.emoji as (typeof REACTION_EMOJIS)[number]);
+    });
+}
+
+export function applyPinSort<T extends Announcement>(announcements: T[]): T[] {
   if (announcements.length < 2) return announcements;
   const pinnedIdx = announcements.findIndex((a) => a.is_pinned);
   if (pinnedIdx === -1) return announcements;

@@ -147,6 +147,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      announcement_reactions: {
+        Row: {
+          announcement_id: string;
+          user_id: string;
+          emoji: string;
+          created_at: string;
+        };
+        Insert: {
+          announcement_id: string;
+          user_id: string;
+          emoji: string;
+          created_at?: string;
+        };
+        Update: {
+          announcement_id?: string;
+          user_id?: string;
+          emoji?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
       blocked_posters: {
         Row: {
           user_id: string;

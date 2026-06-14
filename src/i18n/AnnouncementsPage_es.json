@@ -43,5 +43,8 @@
   "offlineCannotLoadMore": "Estás sin conexión — no hay más mensajes para cargar",
   "pin": "Fijar",
   "unpin": "Desfijar",
-  "pinned": "Fijado"
+  "pinned": "Fijado",
+  "reactionAdd": "Añadir reacción",
+  "reactionCount": "{count} reacciones",
+  "reactionPicker": "Elige una"
 }

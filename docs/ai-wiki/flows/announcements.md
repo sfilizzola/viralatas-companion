@@ -629,6 +629,7 @@ Godlike views /announcements
 3. ✅ **Realtime propagation**: ~3s latency to other users
 4. ✅ **Moderation**: Manager/godlike can delete any post; author can delete own
 5. ✅ **Offline browsing**: All announcements cached on first load
+6. ✅ **Reactions**: Toggle emoji per post; optimistic IDB; Realtime + offline flush (Phase 43)
 
 **Known Issues:**
 
@@ -644,14 +645,46 @@ Godlike views /announcements
 
 ---
 
+## Reactions (Phase 43)
+
+**Trigger:** User taps a pit-stamp emoji or picks from the perforated `EmojiPicker` strip below post body.
+
+**Semantics:** Same user + same emoji + same post → DELETE (toggle off). Fixed set of 8 emojis only. Reactions on own posts allowed.
+
+**Happy path (online):**
+```
+Tap 🤘 on post
+        │
+        ▼
+reactionsRepository.toggle(announcementId, userId, emoji)
+        │
+        ├─ saveAnnouncementReaction(row) → IDB [immediate UI via ANNOUNCEMENTS_CHANGED_EVENT]
+        └─ supabase.from('announcement_reactions').insert(...)
+                    │
+                    ▼
+        Realtime INSERT → other clients → saveAnnouncementReaction → refresh feed
+```
+
+**Offline:** IDB write + `offline_announcement_reactions` queue entry (`byId` dedup). Flushed in `runReconnectSync()` **after** announcements queue flush (FK ordering).
+
+**Delete post:** `removeAnnouncementReactionsForPost()` on local delete + Realtime DELETE; DB CASCADE on server.
+
+**UI:** Variant B · Pit stamps — `ReactionBar` + `EmojiPicker` between `.body` and mod controls. Zero reactions → only `＋` stamp.
+
+---
+
 ## Relevant Source Files
 
 | File | Role |
 |------|------|
-| `src/hooks/useAnnouncements.ts` | IDB read, Realtime subscription, pagination, moderation state, mural actions |
-| `src/pages/AnnouncementsPage.tsx` | Layout, post form, feed rendering (consumes hook) |
-| `src/services/announcementsDisplay.ts` | `applyPinSort`, `relativeTime` pure helpers |
-| `src/repositories/announcements.ts` | Post, sync, delete, pin/unpin, flush pending |
+| `src/hooks/useAnnouncements.ts` | IDB read, reaction summaries, `toggleReaction`, pagination, moderation state |
+| `src/pages/AnnouncementsPage.tsx` | Layout, post form, feed + `ReactionBar` per card |
+| `src/services/announcementsDisplay.ts` | `applyPinSort`, `relativeTime`, `buildReactionSummaries` |
+| `src/repositories/announcements.ts` | Post, sync, delete, pin/unpin, flush pending, reaction orphan purge |
+| `src/repositories/reactions.ts` | Toggle, offline flush, full pull, Realtime |
+| `src/lib/db/reactions.ts` | IDB CRUD + offline queue for reactions |
+| `src/components/announcements/ReactionBar.tsx` | Pit stamp pills + add control |
+| `src/components/announcements/EmojiPicker.tsx` | Perforated 8-emoji strip |
 | `src/repositories/users.ts` | Role map, block list, `blockUser()` |
 | `src/lib/realtimeSync.ts` | `subscribePostgresChanges()` helper (26.H) |
 | `src/lib/db.ts` | `announcements` + `pending_announcements` stores, `ANNOUNCEMENTS_CHANGED_EVENT` |

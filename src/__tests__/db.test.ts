@@ -20,6 +20,9 @@ import {
   enqueueOfflineMissed,
   enqueueOfflinePick,
   enqueueOfflinePresence,
+  enqueueOfflineAnnouncementReaction,
+  loadAllAnnouncementReactions,
+  loadAnnouncementReactionsByAnnouncement,
   loadAllMissedBands,
   loadAllUserPicks,
   loadAllUserPresence,
@@ -32,6 +35,7 @@ import {
   loadMetalPlaceConfig,
   loadMissedBands,
   loadOfflineAnnouncementsQueue,
+  loadOfflineAnnouncementReactionsQueue,
   loadOfflineDuckQuackQueue,
   loadOfflineMissedQueue,
   loadOfflinePresenceQueue,
@@ -41,7 +45,10 @@ import {
   loadUserPicks,
   loadUserPresence,
   removeAnnouncementFromCache,
+  removeAnnouncementReaction,
+  removeAnnouncementReactionsForPost,
   removeFromOfflineAnnouncementsQueue,
+  removeFromOfflineAnnouncementReactionsQueue,
   removeFromOfflineDuckQuackQueue,
   removeFromOfflineMissedQueue,
   removeFromOfflinePresenceQueue,
@@ -52,8 +59,10 @@ import {
   replaceUserBadgeHistory,
   replaceUserPicks,
   replaceUserPresence,
+  replaceAllAnnouncementReactions,
   resetDbConnectionForTests,
   saveAnnouncement,
+  saveAnnouncementReaction,
   saveAnnouncements,
   saveBands,
   saveCacheVersion,
@@ -173,7 +182,7 @@ describe('IndexedDB layer (lib/db.ts)', () => {
   });
 
   describe('connection', () => {
-    it('creates all 15 object stores on first open', async () => {
+    it('creates all object stores on first open', async () => {
       const storeNames = await getObjectStoreNames();
       expect(storeNames).toEqual([...EXPECTED_OBJECT_STORES].sort());
     });
@@ -430,6 +439,74 @@ describe('IndexedDB layer (lib/db.ts)', () => {
     });
   });
 
+  describe('announcement reactions', () => {
+    const sampleReaction = (announcementId: string, userId: string, emoji: string) => ({
+      announcement_id: announcementId,
+      user_id: userId,
+      emoji,
+      created_at: '2026-06-14T12:00:00Z',
+    });
+
+    it('saveAnnouncementReaction / loadAnnouncementReactionsByAnnouncement round-trip', async () => {
+      await saveAnnouncementReaction(sampleReaction('ann-1', 'user-1', '🤘'));
+      await saveAnnouncementReaction(sampleReaction('ann-1', 'user-2', '🍺'));
+      await saveAnnouncementReaction(sampleReaction('ann-2', 'user-1', '🤘'));
+
+      expect(await loadAnnouncementReactionsByAnnouncement('ann-1')).toHaveLength(2);
+      expect(await loadAllAnnouncementReactions()).toHaveLength(3);
+    });
+
+    it('removeAnnouncementReaction deletes one row', async () => {
+      await saveAnnouncementReaction(sampleReaction('ann-1', 'user-1', '🤘'));
+      await removeAnnouncementReaction('ann-1', 'user-1', '🤘');
+      expect(await loadAllAnnouncementReactions()).toEqual([]);
+    });
+
+    it('replaceAllAnnouncementReactions clears and bulk puts', async () => {
+      await saveAnnouncementReaction(sampleReaction('ann-old', 'user-1', '🤘'));
+      await replaceAllAnnouncementReactions([sampleReaction('ann-new', 'user-2', '🔥')]);
+      expect(await loadAllAnnouncementReactions()).toEqual([
+        sampleReaction('ann-new', 'user-2', '🔥'),
+      ]);
+    });
+
+    it('removeAnnouncementReactionsForPost purges all rows for announcement', async () => {
+      await saveAnnouncementReaction(sampleReaction('ann-1', 'user-1', '🤘'));
+      await saveAnnouncementReaction(sampleReaction('ann-1', 'user-2', '🍺'));
+      await saveAnnouncementReaction(sampleReaction('ann-2', 'user-1', '🤘'));
+      await removeAnnouncementReactionsForPost('ann-1');
+      expect(await loadAllAnnouncementReactions()).toEqual([
+        sampleReaction('ann-2', 'user-1', '🤘'),
+      ]);
+    });
+
+    it('fires ANNOUNCEMENTS_CHANGED_EVENT after saveAnnouncementReaction', async () => {
+      const handler = vi.fn();
+      window.addEventListener(ANNOUNCEMENTS_CHANGED_EVENT, handler);
+      await saveAnnouncementReaction(sampleReaction('ann-1', 'user-1', '🤘'));
+      expect(handler).toHaveBeenCalledOnce();
+      window.removeEventListener(ANNOUNCEMENTS_CHANGED_EVENT, handler);
+    });
+  });
+
+  describe('offline announcement reactions queue', () => {
+    it('enqueueOfflineAnnouncementReaction / load / remove', async () => {
+      const op = {
+        id: 'ann-1|user-1|🤘',
+        announcement_id: 'ann-1',
+        user_id: 'user-1',
+        emoji: '🤘',
+        op: 'add' as const,
+      };
+
+      await enqueueOfflineAnnouncementReaction(op);
+      expect(await loadOfflineAnnouncementReactionsQueue()).toEqual([op]);
+
+      await removeFromOfflineAnnouncementReactionsQueue('ann-1|user-1|🤘');
+      expect(await loadOfflineAnnouncementReactionsQueue()).toEqual([]);
+    });
+  });
+
   describe('metal place config', () => {
     it('saveMetalPlaceConfig / loadMetalPlaceConfig round-trip', async () => {
       const config = sampleMetalPlaceConfig();
@@ -624,6 +701,19 @@ describe('IndexedDB layer (lib/db.ts)', () => {
         }],
         'user-1',
       );
+      await saveAnnouncementReaction({
+        announcement_id: 'a-1',
+        user_id: 'user-1',
+        emoji: '🤘',
+        created_at: '2026-05-01T12:00:00Z',
+      });
+      await enqueueOfflineAnnouncementReaction({
+        id: 'a-1|user-1|🤘',
+        announcement_id: 'a-1',
+        user_id: 'user-1',
+        emoji: '🤘',
+        op: 'add',
+      });
 
       await wipeAllLocalData();
 
@@ -671,13 +761,19 @@ describe('IndexedDB layer (lib/db.ts)', () => {
           case 'user_badge_history':
             expect(await loadUserBadgeHistory('user-1'), `${store} should be cleared`).toEqual([]);
             break;
+          case 'announcement_reactions':
+            expect(await loadAllAnnouncementReactions(), `${store} should be cleared`).toEqual([]);
+            break;
+          case 'offline_announcement_reactions':
+            expect(await loadOfflineAnnouncementReactionsQueue(), `${store} should be cleared`).toEqual([]);
+            break;
         }
       }
 
       expect(await loadSession()).toEqual({ token: 'keep' });
       expect(await loadCacheVersion()).toBe('v1');
 
-      expect(WIPE_CLEARED_STORES).toHaveLength(16);
+      expect(WIPE_CLEARED_STORES).toHaveLength(18);
       expect(WIPE_PRESERVED_STORES).toHaveLength(2);
       expect(WIPE_CLEARED_STORES.length + WIPE_PRESERVED_STORES.length).toBe(
         EXPECTED_OBJECT_STORES.length,

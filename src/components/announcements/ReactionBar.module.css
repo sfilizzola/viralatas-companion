@@ -1,0 +1,98 @@
+.bar {
+  grid-column: 2;
+  position: relative;
+  z-index: 3;
+}
+
+.stampRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+  margin-top: var(--s-3);
+}
+
+.stamp,
+.stampMine,
+.stampAdd {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 32px;
+  padding: 0 8px;
+  border: 2px solid var(--border-strong);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--bg-elevated) 85%, var(--text) 5%);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transform: rotate(-2deg);
+  transition: transform 0.1s, border-color 0.15s, box-shadow 0.15s;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.45);
+}
+
+.stampAlt1 {
+  transform: rotate(1.2deg);
+}
+
+.stampAlt2 {
+  transform: rotate(-0.8deg);
+}
+
+.stamp:hover,
+.stampMine:hover,
+.stampAdd:hover {
+  transform: rotate(0deg) translateY(-1px);
+}
+
+.stampMine {
+  border-color: var(--accent);
+  box-shadow: 2px 2px 0 var(--accent-muted), inset 0 0 12px var(--accent-soft);
+}
+
+.stampAdd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  transform: rotate(1.5deg);
+}
+
+.badge {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 2px;
+  background: var(--bg);
+  border: 1px solid var(--border-strong);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stampMine .badge {
+  color: var(--accent-hover);
+  border-color: var(--accent-muted);
+}
+
+@media (prefers-reduced-motion: reduce), (prefers-contrast: more) {
+  .stamp,
+  .stampMine,
+  .stampAdd,
+  .stampAlt1,
+  .stampAlt2,
+  .stamp:hover,
+  .stampMine:hover,
+  .stampAdd:hover {
+    transform: none;
+  }
+}

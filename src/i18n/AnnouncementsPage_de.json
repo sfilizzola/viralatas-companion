@@ -43,5 +43,8 @@
   "offlineCannotLoadMore": "Du bist offline — keine weiteren Nachrichten verfügbar",
   "pin": "Anheften",
   "unpin": "Lösen",
-  "pinned": "Angeheftet"
+  "pinned": "Angeheftet",
+  "reactionAdd": "Reaktion hinzufügen",
+  "reactionCount": "{count} Reaktionen",
+  "reactionPicker": "Wähle eine"
 }

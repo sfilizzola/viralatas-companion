@@ -5,10 +5,12 @@ import { useAnnouncements } from '../hooks/useAnnouncements';
 import { useI18n } from '../lib/i18n';
 import { loadUsefulLinks } from '../services/usefulLinks';
 import { relativeTime } from '../services/announcementsDisplay';
+import type { AnnouncementWithReactions } from '../services/announcementsDisplay';
 import { isFestivalActive } from '../services/time';
 import BottomNav from '../components/BottomNav';
 import Icon from '../components/icons/Icon';
 import ArrivalMap from '../components/ArrivalMap';
+import { ReactionBar } from '../components/announcements/ReactionBar';
 import { Avatar, Chip } from '../ui';
 import { useNow } from '../hooks/useNow';
 import styles from './AnnouncementsPage.module.css';
@@ -39,6 +41,7 @@ export default function AnnouncementsPage() {
     deleteAnnouncement,
     blockUser,
     pin,
+    toggleReaction,
   } = useAnnouncements(userId);
 
   const [draft, setDraft] = useState('');
@@ -159,6 +162,7 @@ export default function AnnouncementsPage() {
                   onPin={pin}
                   onBlock={blockUser}
                   onDelete={handleDelete}
+                  onToggleReaction={toggleReaction}
                 />
               ))}
             </ul>
@@ -190,7 +194,7 @@ export default function AnnouncementsPage() {
 }
 
 type AnnouncementCardProps = {
-  announcement: Announcement;
+  announcement: AnnouncementWithReactions;
   crewUsers: ReturnType<typeof useAnnouncements>['crewUsers'];
   userRoles: ReturnType<typeof useAnnouncements>['userRoles'];
   blockedUserIds: Set<string>;
@@ -202,6 +206,7 @@ type AnnouncementCardProps = {
   onPin: (a: Announcement) => void;
   onBlock: (authorId: string) => void;
   onDelete: (id: string) => void;
+  onToggleReaction: (announcementId: string, emoji: string) => void;
 };
 
 function AnnouncementCard({
@@ -217,6 +222,7 @@ function AnnouncementCard({
   onPin,
   onBlock,
   onDelete,
+  onToggleReaction,
 }: AnnouncementCardProps) {
   const author = crewUsers.find((u) => u.id === a.author_id);
   const authorName = author?.display_name ?? t('anonymous');
@@ -259,6 +265,12 @@ function AnnouncementCard({
           </span>
         )}
       </p>
+
+      <ReactionBar
+        announcementId={a.id}
+        reactions={a.reactions}
+        toggleReaction={onToggleReaction}
+      />
 
       {(showBlock || showDelete || showPin) && (
         <div className={styles.cardActions}>

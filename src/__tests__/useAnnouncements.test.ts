@@ -54,9 +54,10 @@ vi.mock('../repositories', async (importOriginal) => {
   };
 });
 
-import { resetDbConnectionForTests, saveAnnouncement, saveCrewUsers } from '../lib/db';
+import { resetDbConnectionForTests, saveAnnouncement, saveAnnouncementReaction, saveCrewUsers } from '../lib/db';
 import { useAnnouncements } from '../hooks/useAnnouncements';
 import { ANNOUNCEMENTS_CHANGED_EVENT } from '../lib/db';
+import { buildReactionSummaries } from '../services/announcementsDisplay';
 
 const userId = 'user-test';
 
@@ -116,5 +117,48 @@ describe('useAnnouncements', () => {
 
     const { result } = renderHook(() => useAnnouncements(userId));
     await waitFor(() => expect(result.current.canModerate).toBe(true));
+  });
+
+  it('attaches reaction summaries from IDB rows', async () => {
+    await saveAnnouncement(ANNOUNCEMENT);
+    await saveCrewUsers([
+      {
+        id: userId,
+        display_name: 'Alice',
+        avatar_url: null,
+        wacken_arrival_day: null,
+        is_friend: null,
+      },
+    ]);
+    await saveAnnouncementReaction({
+      announcement_id: 'ann-1',
+      user_id: userId,
+      emoji: '🤘',
+      created_at: '2026-07-29T14:01:00Z',
+    });
+
+    const { result } = renderHook(() => useAnnouncements(userId));
+    await waitFor(() => expect(result.current.loading).toBe(false));
+    expect(result.current.announcements[0].reactions).toEqual([
+      expect.objectContaining({ emoji: '🤘', count: 1, reactedByMe: true, reactors: ['Alice'] }),
+    ]);
+  });
+});
+
+describe('buildReactionSummaries', () => {
+  it('sorts by count desc then emoji order', () => {
+    const rows = [
+      { announcement_id: 'ann-1', user_id: 'u1', emoji: '🍺', created_at: '2026-01-01T00:00:00Z' },
+      { announcement_id: 'ann-1', user_id: 'u2', emoji: '🍺', created_at: '2026-01-01T00:00:00Z' },
+      { announcement_id: 'ann-1', user_id: 'u3', emoji: '🤘', created_at: '2026-01-01T00:00:00Z' },
+    ];
+    const names = new Map([
+      ['u1', 'Bob'],
+      ['u2', 'Carol'],
+      ['u3', 'Alice'],
+    ]);
+    const summaries = buildReactionSummaries(rows, 'ann-1', null, names);
+    expect(summaries.map((s) => s.emoji)).toEqual(['🍺', '🤘']);
+    expect(summaries[0].reactors).toEqual(['Bob', 'Carol']);
   });
 });

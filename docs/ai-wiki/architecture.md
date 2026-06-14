@@ -478,7 +478,8 @@ INSERT into user_picks
 | Repository | Key Methods | Side Effects |
 |------------|-------------|--------------|
 | `picksRepository` | `toggle()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues offline, calls Supabase |
-| `announcementsRepository` | `post()`, `sync()`, `delete()`, `flushPending()`, `pinAnnouncement()`, `unpinAnnouncement()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues pending |
+| `announcementsRepository` | `post()`, `sync()`, `delete()`, `flushPending()`, `pinAnnouncement()`, `unpinAnnouncement()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues pending; purges `announcement_reactions` on delete |
+| `reactionsRepository` | `toggle()`, `flushOfflineQueue()`, `syncFromRemote()`, `subscribeToRealtime()` | Optimistic IDB toggle; offline queue; full pull after announcements sync |
 | `presenceRepository` | `setCampingStatus()`, `setMetalPlaceStatus()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `saveMetalPlaceConfigRemote()`, `syncMetalPlaceConfig()`, `subscribeToRealtime()`, `subscribeToMetalPlaceConfigRealtime()` | Pure I/O: writes IndexedDB, enqueues offline — no business logic (Phase 42.A) |
 | `usersRepository` | `syncCrew()`, `fetchUserRolesMap()`, `fetchAllUsers()`, `setUserRole()`, `fetchBlockedPosters*()`, `blockUser()`, `unblockUser()`, `subscribeToRealtime()` | Writes `crew_users` IDB incl. `special_badges`; hydrates auth metadata on reconnect; admin ops network-only |
 | `missedRepository` | `toggle()`, `flushOfflineQueue()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues offline |
