@@ -8,7 +8,7 @@ export default function PrivateRoute({ children }: Props) {
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center', overflowY: 'auto' }}>
+      <div style={{ minHeight: '100dvh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <span style={{ color: 'var(--text-muted)' }}>Carregando...</span>
       </div>
     );

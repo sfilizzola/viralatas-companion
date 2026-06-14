@@ -1,6 +1,6 @@
 .toast {
   position: fixed;
-  bottom: calc(var(--bottom-nav-total) + var(--s-4));
+  bottom: calc(56px + var(--s-4));
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-surface);
