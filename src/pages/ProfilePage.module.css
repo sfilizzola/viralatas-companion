@@ -3,11 +3,9 @@
    ============================================================ */
 
 .container {
-  height: 100dvh;
-  max-height: 100dvh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
 
 /* ── Profile head ── */
@@ -204,7 +202,6 @@
   display: flex;
   justify-content: center;
   padding: var(--s-4) var(--s-4) var(--s-2);
-  flex-shrink: 0;
 }
 
 .pfSignOutBtn {
@@ -234,12 +231,6 @@
   font-family: var(--font-mono);
   font-size: 0.7rem;
   opacity: 0.6;
-  flex-shrink: 0;
-}
-
-.navSpacer {
-  height: var(--bottom-nav-total);
-  flex-shrink: 0;
 }
 
 .header {
@@ -272,8 +263,6 @@
 
 .main {
   flex: 1;
-  min-height: 0;
-  overflow-y: auto;
   display: flex;
   flex-direction: column;
   align-items: stretch;
