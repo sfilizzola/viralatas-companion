@@ -37,12 +37,54 @@ const defaultState: AuthState = {
 
 const AuthContext = createContext<AuthState>(defaultState);
 
+function handleAuthStateChange(
+  event: AuthChangeEvent,
+  session: Session | null,
+  hadIdbSessionRef: { current: boolean },
+  setState: React.Dispatch<React.SetStateAction<AuthState>>,
+) {
+  if (event === 'SIGNED_IN') {
+    clearUserInitiatedSignOut();
+    setState({
+      session,
+      user: session?.user ?? null,
+      loading: false,
+      hadIdbSession: !!session,
+      sessionExpired: false,
+    });
+    return;
+  }
+
+  if (
+    event === 'SIGNED_OUT' &&
+    hadIdbSessionRef.current &&
+    !isUserInitiatedSignOut()
+  ) {
+    setState((prev) => ({
+      ...prev,
+      sessionExpired: true,
+      loading: false,
+    }));
+    return;
+  }
+
+  setState((prev) => ({
+    session,
+    user: session?.user ?? null,
+    loading: false,
+    hadIdbSession: prev.hadIdbSession,
+    sessionExpired: false,
+  }));
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>(defaultState);
   const hadIdbSessionRef = useRef(false);
 
   useEffect(() => {
     let active = true;
+    let unsubscribeAuth: (() => void) | undefined;
+
     clearSessionExpiredBannerDismissed();
 
     if (import.meta.env.DEV) {
@@ -50,7 +92,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     const t0 = performance.now();
 
-    readSessionFromIdb()
+    const refreshOnOnline = () => {
+      if (hadIdbSessionRef.current) {
+        void refreshAuthSessionInBackground();
+      }
+    };
+    const unwatchOnline = watchOnlineAuthRefresh(refreshOnOnline);
+
+    void readSessionFromIdb()
       .then(({ session, hadIdbSession }) => {
         if (!active) return;
         hadIdbSessionRef.current = hadIdbSession;
@@ -71,6 +120,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (hadIdbSession) {
           void refreshAuthSessionInBackground();
         }
+
+        const {
+          data: { subscription },
+        } = supabase.auth.onAuthStateChange((event, nextSession) => {
+          handleAuthStateChange(event, nextSession, hadIdbSessionRef, setState);
+        });
+        unsubscribeAuth = () => subscription.unsubscribe();
       })
       .catch(() => {
         if (!active) return;
@@ -81,56 +137,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           hadIdbSession: false,
           sessionExpired: false,
         });
-      });
 
-    const refreshOnOnline = () => {
-      if (hadIdbSessionRef.current) {
-        void refreshAuthSessionInBackground();
-      }
-    };
-    const unwatchOnline = watchOnlineAuthRefresh(refreshOnOnline);
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event: AuthChangeEvent, session) => {
-      if (event === 'SIGNED_IN') {
-        clearUserInitiatedSignOut();
-        setState({
-          session,
-          user: session?.user ?? null,
-          loading: false,
-          hadIdbSession: !!session,
-          sessionExpired: false,
+        const {
+          data: { subscription },
+        } = supabase.auth.onAuthStateChange((event, nextSession) => {
+          handleAuthStateChange(event, nextSession, hadIdbSessionRef, setState);
         });
-        return;
-      }
-
-      if (
-        event === 'SIGNED_OUT' &&
-        hadIdbSessionRef.current &&
-        !isUserInitiatedSignOut()
-      ) {
-        setState((prev) => ({
-          ...prev,
-          sessionExpired: true,
-          loading: false,
-        }));
-        return;
-      }
-
-      setState((prev) => ({
-        session,
-        user: session?.user ?? null,
-        loading: false,
-        hadIdbSession: prev.hadIdbSession,
-        sessionExpired: false,
-      }));
-    });
+        unsubscribeAuth = () => subscription.unsubscribe();
+      });
 
     return () => {
       active = false;
       unwatchOnline();
-      subscription.unsubscribe();
+      unsubscribeAuth?.();
     };
   }, []);
 

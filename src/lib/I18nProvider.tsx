@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { supabase } from './supabase';
+import { useAuth } from '../hooks/useAuth';
 import {
   I18nContext,
   LANGUAGE_STORAGE_KEY,
@@ -28,28 +28,24 @@ function applyLanguage(language: Language) {
   }[language];
 }
 
+function languageFromSession(user: { user_metadata?: Record<string, unknown> } | null): Language | null {
+  const profileLanguage = user?.user_metadata?.['preferred_language'];
+  return isLanguage(profileLanguage) ? profileLanguage : null;
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => initialLanguage());
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     applyLanguage(language);
   }, [language]);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      const profileLanguage = data.session?.user.user_metadata['preferred_language'];
-      if (isLanguage(profileLanguage)) setLanguageState(profileLanguage);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      const profileLanguage = session?.user.user_metadata['preferred_language'];
-      if (isLanguage(profileLanguage)) setLanguageState(profileLanguage);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+    if (loading) return;
+    const fromSession = languageFromSession(user);
+    if (fromSession) setLanguageState(fromSession);
+  }, [loading, user]);
 
   const value = useMemo<I18nContextValue>(
     () => ({

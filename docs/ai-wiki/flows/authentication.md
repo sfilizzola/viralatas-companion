@@ -463,6 +463,8 @@ Row Level Security enforces per-table access rules at query time:
 
 **Source files:** `src/lib/authStorage.ts`, `src/lib/backgroundAuthRefresh.ts`, `src/hooks/useAuth.tsx`, `src/components/SessionExpiredBanner.tsx`, `src/lib/signOut.ts`.
 
+**IDB session key:** Supabase `storageKey` (`viralatas-auth`) — not `viralatas-auth-token`. `readSessionFromIdb()` reads that key. `onAuthStateChange` is registered only after IDB bootstrap completes so early `SIGNED_OUT` cannot clear state. `I18nProvider` does not call `getSession()` (avoids offline refresh wiping IDB).
+
 ---
 
 ## Data Flow Diagram

@@ -8,6 +8,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ### Fixed
 - **Offline cold-start auth hang** — `AuthProvider` reads session from IndexedDB on the critical path (`readSessionFromIdb()`); `getSession()` runs only as background refresh when `navigator.onLine` (3s timeout) or on `online` event. Fixes infinite `Carregando...` on flaky/no signal.
+- **Offline reopen redirected to login** — `readSessionFromIdb()` reads Supabase's `viralatas-auth` storage key (not `viralatas-auth-token`); `onAuthStateChange` registers after IDB bootstrap; `I18nProvider` no longer calls `getSession()` on mount (prevents offline refresh from racing bootstrap).
 - **`/now` infinite loading** — IDB subscription loaders bounded to 5s with empty fallbacks; `useNowData` no longer gates on `social === null` after loaders settle.
 - **Cache version wipe offline** — `checkAndApplyCacheVersion()` returns early when `!navigator.onLine`.
 
@@ -17,13 +18,13 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - **DEV `[cold-start]` logs** in `useAuth` and `useNowData`.
 
 ### Changed
-- **`AuthProvider`** wraps app in `main.tsx`; `SyncOrchestration` deferred until auth bootstrap completes.
+- **`AuthProvider`** wraps `I18nProvider` in `main.tsx` (auth bootstrap before i18n); `SyncOrchestration` deferred until auth bootstrap completes.
 - **`PrivateRoute`** — i18n bootstrap copy; allows routes when `sessionExpired` (stale session preserved).
 - `docs/ai-wiki/flows/authentication.md` — offline cold bootstrap section + updated diagram.
 - `docs/ai-wiki/offline-first.md` — cold-start scenario table expanded.
 
 ### Architectural Notes
-- Shared auth parse contract: `src/lib/authStorage.ts` (`AUTH_STORAGE_KEY`, `AUTH_TOKEN_KEY`).
+- Shared auth parse contract: `src/lib/authStorage.ts` — session JSON lives under `AUTH_STORAGE_KEY` (`viralatas-auth`), matching Supabase `storageKey`; `AUTH_TOKEN_KEY` is legacy read-only fallback.
 - Session-expired UX: banner dismiss hides until next cold start (`sessionExpiredBannerDismissed` cleared on mount).
 
 ---
