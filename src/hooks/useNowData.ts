@@ -1,5 +1,5 @@
 // src/hooks/useNowData.ts
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Announcement, Band, LiveBandTestConfig, MetalPlaceConfig, UserPick } from '../types';
 import type { CrewLiveGroup, CrewLivePlan, LivePlan, PresenceLocation } from '../services/livePreview';
 import { presenceService } from '../services/presenceService';
@@ -66,7 +66,16 @@ export function useNowData(): NowData {
   const metalPlaceConfig = useMetalPlaceConfig();
   const liveBandTestConfig = useLiveBandTestConfig();
   const { latestAnnouncement, cacheLoading: announcementLoading } = useNowCache();
-  const loading = socialLoading || announcementLoading || social === null;
+  const loading = socialLoading || announcementLoading;
+  const wasLoadingRef = useRef(true);
+
+  useEffect(() => {
+    if (loading || !wasLoadingRef.current) return;
+    wasLoadingRef.current = false;
+    if (import.meta.env.DEV) {
+      console.info('[cold-start] /now data ready');
+    }
+  }, [loading]);
 
   const {
     isMetalPlaceWindowActive,

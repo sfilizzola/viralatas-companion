@@ -18,6 +18,8 @@ export const bandsRepository = {
   },
 
   async checkAndApplyCacheVersion(): Promise<void> {
+    if (!navigator.onLine) return;
+
     try {
       const { data } = await supabase
         .from('app_config')

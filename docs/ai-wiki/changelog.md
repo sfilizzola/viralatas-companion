@@ -4,6 +4,30 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-23
+
+### Fixed
+- **Offline cold-start auth hang** — `AuthProvider` reads session from IndexedDB on the critical path (`readSessionFromIdb()`); `getSession()` runs only as background refresh when `navigator.onLine` (3s timeout) or on `online` event. Fixes infinite `Carregando...` on flaky/no signal.
+- **`/now` infinite loading** — IDB subscription loaders bounded to 5s with empty fallbacks; `useNowData` no longer gates on `social === null` after loaders settle.
+- **Cache version wipe offline** — `checkAndApplyCacheVersion()` returns early when `!navigator.onLine`.
+
+### Added
+- **`SessionExpiredBanner`** — global dismissible alert when background `SIGNED_OUT` after IDB bootstrap; user stays in app with cached data.
+- **`signOutUser()`** — sets `userInitiatedSignOut` so explicit logout does not show session-expired banner.
+- **DEV `[cold-start]` logs** in `useAuth` and `useNowData`.
+
+### Changed
+- **`AuthProvider`** wraps app in `main.tsx`; `SyncOrchestration` deferred until auth bootstrap completes.
+- **`PrivateRoute`** — i18n bootstrap copy; allows routes when `sessionExpired` (stale session preserved).
+- `docs/ai-wiki/flows/authentication.md` — offline cold bootstrap section + updated diagram.
+- `docs/ai-wiki/offline-first.md` — cold-start scenario table expanded.
+
+### Architectural Notes
+- Shared auth parse contract: `src/lib/authStorage.ts` (`AUTH_STORAGE_KEY`, `AUTH_TOKEN_KEY`).
+- Session-expired UX: banner dismiss hides until next cold start (`sessionExpiredBannerDismissed` cleared on mount).
+
+---
+
 ## 2026-06-14
 
 ### Fixed

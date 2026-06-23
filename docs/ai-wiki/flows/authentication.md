@@ -448,10 +448,20 @@ Row Level Security enforces per-table access rules at query time:
 
 | Scenario | Behavior |
 |----------|----------|
-| User opens app offline with valid IDB session | `getSession()` reads from IDB → logged in, no network needed |
-| User opens app offline with no session | Redirected to `/login`; login requires network |
-| Token expires while offline | App still works using stale session; Supabase refreshes on reconnect |
-| User taps Sign Out offline | `signOut()` calls `removeItem()` → IDB cleared → redirected to `/login`; server-side invalidation happens on reconnect |
+| User opens app offline with valid IDB session | `readSessionFromIdb()` on critical path → logged in immediately, no `getSession()` wait |
+| User opens app offline with no IDB session | `loading: false` immediately → `/login` (login still requires network) |
+| Token expires while offline | App keeps stale session in UI; background refresh on `online` event (3s timeout) |
+| Background `SIGNED_OUT` after IDB bootstrap | Stay in app with cached data; global `SessionExpiredBanner` (dismiss until cold start) |
+| User taps Sign Out | `signOutUser()` sets `userInitiatedSignOut` → no banner → `/login` |
+
+### Offline cold bootstrap (2026-06)
+
+1. **Critical path:** `AuthProvider` → `readSessionFromIdb()` → `loading: false` (never awaits network).
+2. **Background path:** if `hadIdbSession && navigator.onLine`, `refreshAuthSessionInBackground()` (`getSession()` with 3s timeout); also on `window` `online`.
+3. **Sync deferral:** `SyncOrchestration` mounts only after auth bootstrap completes.
+4. **Session-expired banner:** `hadIdbSession` + `SIGNED_OUT` without `userInitiatedSignOut` → `SessionExpiredBanner` in `App.tsx`; `PrivateRoute` allows access when `sessionExpired`.
+
+**Source files:** `src/lib/authStorage.ts`, `src/lib/backgroundAuthRefresh.ts`, `src/hooks/useAuth.tsx`, `src/components/SessionExpiredBanner.tsx`, `src/lib/signOut.ts`.
 
 ---
 
@@ -462,11 +472,11 @@ Browser load / app start
          │
          ▼
 ┌──────────────────────────────────────────────────────┐
-│                    useAuth()                          │
-│  supabase.auth.getSession()                          │
-│  → custom storage.getItem('viralatas-auth-token')    │
-│  → loadSession() [IndexedDB 'session' store]         │
-│  → JWT found → setState({ session, user })           │
+│              AuthProvider / useAuth()                 │
+│  readSessionFromIdb() → loadSession() [IDB]          │
+│  → parse viralatas-auth-token JSON                   │
+│  → setState({ session, user, loading: false })       │
+│  → background: getSession() if onLine (3s cap)       │
 └──────────────────────────────────────────────────────┘
          │
          ├─ loading: false + session present → PrivateRoute lets through
@@ -521,7 +531,7 @@ Supabase JWTs expire every 1 hour by default. The client auto-refreshes using th
 
 **What happens**: `onAuthStateChange(TOKEN_REFRESHED)` fires → `setItem()` updates IDB → same session, new token.
 
-**If refresh fails** (offline, token revoked): `SIGNED_OUT` fires → `setState({ session: null })` → PrivateRoute redirects to `/login`.
+**If refresh fails** (offline, token revoked): background `SIGNED_OUT` may fire → `sessionExpired` banner (stay in app); explicit `signOutUser()` → `/login`.
 
 ### 4. Concurrent Sessions (Same User, Two Devices)
 

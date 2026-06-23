@@ -29,5 +29,9 @@
   "resetPasswordAction": "Ich bin sicher",
   "resetPasswordLoading": "Aktualisierung...",
   "resetPasswordSuccess": "Passwort aktualisiert! Weiterleitung...",
-  "resetPasswordNoSession": "Ungültiger oder abgelaufener Reset-Link. Bitte einen neuen anfordern."
+  "resetPasswordNoSession": "Ungültiger oder abgelaufener Reset-Link. Bitte einen neuen anfordern.",
+  "authBootstrapping": "Laden...",
+  "sessionExpired": "Sitzung abgelaufen — melde dich wieder an, wenn du Empfang hast.",
+  "sessionExpiredSignIn": "Anmelden",
+  "sessionExpiredDismiss": "Schließen"
 }

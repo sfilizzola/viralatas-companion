@@ -133,4 +133,16 @@ describe('bandsRepository.checkAndApplyCacheVersion', () => {
     expect(wipeAllLocalData).not.toHaveBeenCalled();
     expect(saveCacheVersion).not.toHaveBeenCalled();
   });
+
+  it('does nothing when navigator.onLine is false', async () => {
+    Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
+    mockAppConfigResponse('v99');
+    vi.mocked(loadCacheVersion).mockResolvedValue('v1');
+
+    await bandsRepository.checkAndApplyCacheVersion();
+
+    expect(supabase.from).not.toHaveBeenCalled();
+    expect(wipeAllLocalData).not.toHaveBeenCalled();
+    Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
+  });
 });

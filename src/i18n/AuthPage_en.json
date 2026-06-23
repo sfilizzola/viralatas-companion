@@ -29,5 +29,9 @@
   "resetPasswordAction": "I'm sure",
   "resetPasswordLoading": "Updating...",
   "resetPasswordSuccess": "Password updated! Redirecting...",
-  "resetPasswordNoSession": "Invalid or expired reset link. Please request a new one."
+  "resetPasswordNoSession": "Invalid or expired reset link. Please request a new one.",
+  "authBootstrapping": "Loading...",
+  "sessionExpired": "Session expired — sign in again when you have signal.",
+  "sessionExpiredSignIn": "Sign in",
+  "sessionExpiredDismiss": "Dismiss"
 }

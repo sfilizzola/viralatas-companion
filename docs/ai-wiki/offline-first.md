@@ -69,7 +69,10 @@ The app **must** remain fully functional offline:
 | Scenario | Behavior |
 |----------|----------|
 | First visit, never online | Chrome native offline page — precache not installed yet (expected) |
-| Returning user, synced before, killed app, reopen offline | Precached shell loads via SW → React boots → IDB session + data → `OfflineBanner` only |
+| Returning user, synced before, killed app, reopen offline | Precached shell → IDB session read (no network wait) → `/now` + `OfflineBanner` |
+| Flaky cellular (`onLine` but Supabase unreachable) | Same fast IDB path; background `getSession()` fails silently within 3s |
+| Auth bootstrap hang on `Carregando...` | Mitigated: critical path never awaits `getSession()` |
+| `/now` data loaders hang | Mitigated: 5s IDB loader timeouts + empty fallbacks |
 
 If users see Chrome's "You're Offline" page with the small app icon after a prior sync, the Service Worker failed to serve the shell — see `workbox-caching-strategy.md` cold-start section.
 

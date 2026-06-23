@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './supabase.types';
+import { AUTH_STORAGE_KEY } from './authStorage';
 import { loadSession, saveSession } from './db';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string;
@@ -12,7 +13,10 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
-    storageKey: 'viralatas-auth',
+    // Online refresh stays enabled; cold-start critical path reads IDB directly in useAuth.
+    autoRefreshToken: true,
+    detectSessionInUrl: true,
+    storageKey: AUTH_STORAGE_KEY,
     storage: {
       getItem: async (key) => {
         const session = await loadSession();
