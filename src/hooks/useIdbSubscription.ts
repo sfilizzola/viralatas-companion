@@ -1,4 +1,7 @@
 import { useSyncExternalStore } from 'react';
+import { withTimeout } from '../lib/withTimeout';
+
+const IDB_LOAD_TIMEOUT_MS = 5_000;
 
 type CacheCell<T> = {
   data: T | undefined;
@@ -10,6 +13,7 @@ export type IdbSubscriptionSpec<T> = {
   key: string;
   events: readonly string[];
   loader: () => Promise<T>;
+  fallback: T;
 };
 
 const cells = new Map<string, CacheCell<unknown>>();
@@ -28,13 +32,20 @@ function notify(cell: CacheCell<unknown>) {
   cell.listeners.forEach((listener) => listener());
 }
 
-async function loadCell<T>(key: string, loader: () => Promise<T>): Promise<void> {
-  const cell = getCell<T>(key);
+async function loadCell<T>(spec: IdbSubscriptionSpec<T>): Promise<void> {
+  const cell = getCell<T>(spec.key);
   if (cell.loadPromise) return cell.loadPromise;
 
-  cell.loadPromise = loader()
+  cell.loadPromise = withTimeout(spec.loader(), IDB_LOAD_TIMEOUT_MS)
     .then((data) => {
       cell.data = data;
+      notify(cell);
+    })
+    .catch((err) => {
+      if (import.meta.env.DEV) {
+        console.warn('[idb] loader timeout', spec.key, err);
+      }
+      cell.data = spec.fallback;
       notify(cell);
     })
     .finally(() => {
@@ -48,11 +59,11 @@ function attachListeners<T>(spec: IdbSubscriptionSpec<T>) {
   if (attachedKeys.has(spec.key)) return;
   attachedKeys.add(spec.key);
 
-  const handler = () => void loadCell(spec.key, spec.loader);
+  const handler = () => void loadCell(spec);
   for (const event of spec.events) {
     window.addEventListener(event, handler);
   }
-  void loadCell(spec.key, spec.loader);
+  void loadCell(spec);
 }
 
 /**

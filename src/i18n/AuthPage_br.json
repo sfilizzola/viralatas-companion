@@ -29,5 +29,9 @@
   "resetPasswordAction": "Tenho certeza",
   "resetPasswordLoading": "Atualizando...",
   "resetPasswordSuccess": "Senha atualizada! Redirecionando...",
-  "resetPasswordNoSession": "Link de redefinição inválido ou expirado. Solicite um novo."
+  "resetPasswordNoSession": "Link de redefinição inválido ou expirado. Solicite um novo.",
+  "authBootstrapping": "Carregando...",
+  "sessionExpired": "Sessão expirada — entre de novo quando tiver sinal.",
+  "sessionExpiredSignIn": "Entrar",
+  "sessionExpiredDismiss": "Fechar"
 }

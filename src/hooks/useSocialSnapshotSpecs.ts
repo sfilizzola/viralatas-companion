@@ -1,3 +1,4 @@
+import type { CrewUser, UserPresence } from '../types';
 import {
   CREW_USERS_CHANGED_EVENT,
   loadAllUserPresence,
@@ -14,6 +15,7 @@ export function useCrewUsersCache() {
     key: CREW_CACHE_KEY,
     events: [CREW_USERS_CHANGED_EVENT],
     loader: loadCrewUsers,
+    fallback: [] as CrewUser[],
   });
 }
 
@@ -22,5 +24,6 @@ export function usePresenceCache() {
     key: PRESENCE_CACHE_KEY,
     events: [PRESENCE_CHANGED_EVENT],
     loader: loadAllUserPresence,
+    fallback: [] as UserPresence[],
   });
 }

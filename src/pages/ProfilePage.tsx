@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
 import type { UserRole } from '../types';
-import { supabase } from '../lib/supabase';
+import { signOutUser } from '../lib/signOut';
 import { useAuth } from '../hooks/useAuth';
 import { useI18n, type Language } from '../lib/i18n';
 import { announcementsRepository } from '../repositories';
@@ -29,7 +29,7 @@ export default function ProfilePage() {
   const avatarUrl = user?.user_metadata?.['avatar_url'] as string | undefined;
 
   async function handleLogout() {
-    await supabase.auth.signOut();
+    await signOutUser();
     navigate('/login');
   }
 

@@ -9,5 +9,6 @@ export function useAllPicks(): UserPick[] | undefined {
     key: ALL_PICKS_CACHE_KEY,
     events: [PICKS_CHANGED_EVENT],
     loader: loadAllUserPicks,
+    fallback: [] as UserPick[],
   });
 }

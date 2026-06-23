@@ -12,90 +12,108 @@ import AnnouncementsPage from './pages/AnnouncementsPage';
 import WrapPage from './pages/WrapPage';
 import MapPage from './pages/MapPage';
 import PrivateRoute from './components/PrivateRoute';
+import AuthBootstrapShell from './components/AuthBootstrapShell';
+import SessionExpiredBanner from './components/SessionExpiredBanner';
 import SyncToast from './components/SyncToast';
 import DuckToast from './components/DuckToast';
 import { SyncOrchestration } from './components/sync';
 import { DuckEnabledProvider } from './contexts/DuckEnabledContext';
+import { useAuth } from './hooks/useAuth';
+
+function AppRoutes() {
+  const { loading } = useAuth();
+
+  if (loading) {
+    return <AuthBootstrapShell />;
+  }
+
+  return (
+    <>
+      <SyncOrchestration />
+      <SyncToast />
+      <DuckToast />
+      <SessionExpiredBanner />
+      <Routes>
+        <Route path="/" element={<Navigate to="/now" replace />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route
+          path="/schedule"
+          element={
+            <PrivateRoute>
+              <LineupPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/my-picks"
+          element={
+            <PrivateRoute>
+              <MyWackenPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/popular"
+          element={
+            <PrivateRoute>
+              <PopularPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/now"
+          element={
+            <PrivateRoute>
+              <RightNowPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/announcements"
+          element={
+            <PrivateRoute>
+              <AnnouncementsPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/map"
+          element={
+            <PrivateRoute>
+              <MapPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <ProfilePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/wrap"
+          element={
+            <PrivateRoute>
+              <WrapPage />
+            </PrivateRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/now" replace />} />
+      </Routes>
+    </>
+  );
+}
 
 export default function App() {
   return (
     <BrowserRouter>
       <DuckEnabledProvider>
         <SpeedInsights />
-        <SyncOrchestration />
-        <SyncToast />
-        <DuckToast />
-        <Routes>
-          <Route path="/" element={<Navigate to="/now" replace />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route
-            path="/schedule"
-            element={
-              <PrivateRoute>
-                <LineupPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/my-picks"
-            element={
-              <PrivateRoute>
-                <MyWackenPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/popular"
-            element={
-              <PrivateRoute>
-                <PopularPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/now"
-            element={
-              <PrivateRoute>
-                <RightNowPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/announcements"
-            element={
-              <PrivateRoute>
-                <AnnouncementsPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/map"
-            element={
-              <PrivateRoute>
-                <MapPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <PrivateRoute>
-                <ProfilePage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/wrap"
-            element={
-              <PrivateRoute>
-                <WrapPage />
-              </PrivateRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/now" replace />} />
-        </Routes>
+        <AppRoutes />
       </DuckEnabledProvider>
     </BrowserRouter>
   );

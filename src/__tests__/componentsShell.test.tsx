@@ -117,23 +117,30 @@ describe('PrivateRoute', () => {
   beforeEach(() => vi.mocked(useAuth).mockReset());
 
   it('shows loading state', () => {
-    vi.mocked(useAuth).mockReturnValue({ session: null, loading: true } as ReturnType<
-      typeof useAuth
-    >);
-    render(
+    vi.mocked(useAuth).mockReturnValue({
+      session: null,
+      user: null,
+      loading: true,
+      hadIdbSession: false,
+      sessionExpired: false,
+    });
+    renderWithI18n(
       <MemoryRouter>
         <PrivateRoute>
           <div>secret</div>
         </PrivateRoute>
       </MemoryRouter>,
     );
-    expect(screen.getByText('Carregando...')).toBeInTheDocument();
+    expect(screen.getByText('Loading...')).toBeInTheDocument();
   });
 
   it('renders children when session exists', () => {
     vi.mocked(useAuth).mockReturnValue({
       session: { user: { id: 'u1' } },
+      user: { id: 'u1' },
       loading: false,
+      hadIdbSession: true,
+      sessionExpired: false,
     } as ReturnType<typeof useAuth>);
     render(
       <MemoryRouter>
@@ -146,9 +153,13 @@ describe('PrivateRoute', () => {
   });
 
   it('redirects to login without session', () => {
-    vi.mocked(useAuth).mockReturnValue({ session: null, loading: false } as ReturnType<
-      typeof useAuth
-    >);
+    vi.mocked(useAuth).mockReturnValue({
+      session: null,
+      user: null,
+      loading: false,
+      hadIdbSession: false,
+      sessionExpired: false,
+    });
     render(
       <MemoryRouter initialEntries={['/now']}>
         <PrivateRoute>
