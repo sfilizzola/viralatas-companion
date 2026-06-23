@@ -50,7 +50,7 @@ vi.mock('react-router-dom', async () => {
 });
 
 import { AuthProvider, useAuth } from '../hooks/useAuth';
-import { AUTH_TOKEN_KEY } from '../lib/authStorage';
+import { AUTH_STORAGE_KEY } from '../lib/authStorage';
 import LoginPage from '../pages/LoginPage';
 import { render, screen, fireEvent, waitFor as waitForDom } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
@@ -130,7 +130,7 @@ describe('User Login', () => {
     it('hydrates session and user from IDB', async () => {
       const session = makeSession();
       mocks.loadSession.mockResolvedValue({
-        [AUTH_TOKEN_KEY]: JSON.stringify(session),
+        [AUTH_STORAGE_KEY]: JSON.stringify(session),
       });
 
       const { result } = renderHook(() => useAuth(), { wrapper: authWrapper });
@@ -175,7 +175,7 @@ describe('User Login', () => {
     it('keeps session and flags expired on background SIGNED_OUT', async () => {
       const session = makeSession();
       mocks.loadSession.mockResolvedValue({
-        [AUTH_TOKEN_KEY]: JSON.stringify(session),
+        [AUTH_STORAGE_KEY]: JSON.stringify(session),
       });
       let authListener: ((_event: string, session: Session | null) => void) | undefined;
       mocks.onAuthStateChange.mockImplementation((callback) => {
@@ -192,6 +192,27 @@ describe('User Login', () => {
         expect(result.current.sessionExpired).toBe(true);
         expect(result.current.session?.access_token).toBe('access-token');
       });
+    });
+
+    it('registers onAuthStateChange only after IDB bootstrap completes', async () => {
+      const session = makeSession();
+      let resolveSession!: (value: unknown) => void;
+      mocks.loadSession.mockReturnValue(
+        new Promise((resolve) => {
+          resolveSession = resolve;
+        }),
+      );
+
+      const { result } = renderHook(() => useAuth(), { wrapper: authWrapper });
+      expect(result.current.loading).toBe(true);
+      expect(mocks.onAuthStateChange).not.toHaveBeenCalled();
+
+      resolveSession({
+        [AUTH_STORAGE_KEY]: JSON.stringify(session),
+      });
+      await waitFor(() => expect(result.current.loading).toBe(false));
+      expect(mocks.onAuthStateChange).toHaveBeenCalled();
+      expect(result.current.session?.access_token).toBe('access-token');
     });
 
     it('unsubscribes from auth changes on unmount', async () => {

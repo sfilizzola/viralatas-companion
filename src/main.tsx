@@ -10,10 +10,10 @@ if (!rootEl) throw new Error('Root element not found');
 
 createRoot(rootEl).render(
   <StrictMode>
-    <I18nProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <I18nProvider>
         <App />
-      </AuthProvider>
-    </I18nProvider>
+      </I18nProvider>
+    </AuthProvider>
   </StrictMode>,
 );
