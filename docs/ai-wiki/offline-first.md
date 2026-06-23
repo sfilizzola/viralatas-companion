@@ -69,7 +69,8 @@ The app **must** remain fully functional offline:
 | Scenario | Behavior |
 |----------|----------|
 | First visit, never online | Chrome native offline page — precache not installed yet (expected) |
-| Returning user, synced before, killed app, reopen offline | Precached shell → IDB session read (no network wait) → `/now` + `OfflineBanner` |
+| Returning user, synced before, killed app, reopen offline | Precached shell → IDB session read at `viralatas-auth` (no network wait) → `/now` + `OfflineBanner` |
+| Reopen offline lands on `/login` despite prior session | Fixed v1.3.17: bootstrap read wrong IDB key + early `getSession()` race |
 | Flaky cellular (`onLine` but Supabase unreachable) | Same fast IDB path; background `getSession()` fails silently within 3s |
 | Auth bootstrap hang on `Carregando...` | Mitigated: critical path never awaits `getSession()` |
 | `/now` data loaders hang | Mitigated: 5s IDB loader timeouts + empty fallbacks |
