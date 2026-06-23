@@ -44,6 +44,22 @@ _Avoid_: Badge history IDB, offline badge archive
 The derived festival-social state shared by `/now` and the live vest — crew plans, crew groups (camping / Metal Place / lost / at band), Metal Place window flag, live test band id, and crew location counts. Built by `buildSocialSnapshot()` from IDB inputs.
 _Avoid_: Live preview state, crew cache DTO
 
+**Metal Place**:
+The crew’s physical meetup spot at Wacken (BBQ / hangout). Not a stage — a location vira-latas can check into when a window is open.
+_Avoid_: Venue, metal bar, BBQ zone (in user copy “Metal Place” is the product name)
+
+**Metal Place window**:
+A godlike-configured interval on one festival day (D1–D4) when check-in is allowed — same calendar day only, start before end, end by 23:59. Multiple windows may exist across the festival; at most one may be active at any instant (overlaps forbidden). Zero windows means Metal Place is off.
+_Avoid_: Slot, session, event block
+
+**Metal Place check-in**:
+A vira-lata setting `is_at_metal_place` true while a window is active. Ends on manual toggle, auto-checkout when the window closes, or camping/band rules that clear location flags.
+_Avoid_: RSVP, attendance mark
+
+**Metal Place location visit**:
+One increment to `location_visits.metal_place` per check-in session — each false→true transition on `is_at_metal_place`, including a second check-in later the same festival day after auto-checkout. Not capped per day or per window.
+_Avoid_: Window visit, daily visit
+
 **Crew profile cache**:
 The `crew_users` IndexedDB store — roster fields including `is_friend` and `special_badges`. Synced from Supabase on reconnect; UI reads this store for display, not live `users` queries.
 _Avoid_: Crew IDB, users cache
