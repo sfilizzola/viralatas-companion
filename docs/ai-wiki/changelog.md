@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-25 (Phase 44 — Metal Place Multi-Window Configuration)
+
+### Added
+- **`public.metal_place_windows`** — up to 8 same-day check-in slots (`festival_day`, `start_time`, `end_time`, `sort_order`); RLS mirrors `metal_place_config`; Realtime enabled.
+- **`MetalPlaceWindow` type** + `metalPlaceValidation.ts` — `findActiveMetalPlaceWindow`, `validateMetalPlaceWindows` (cap, time range, same-day overlap).
+- **Godlike slot-list UI** — `MetalPlaceAdminSection` batch save (replace-all upsert + stale-row delete); stable window UUIDs.
+
+### Changed
+- **`metal_place_config`** — metadata-only (`label`, `updated_by`, `updated_at`); dropped `festival_day`, `start_time`, `end_time`, `test_override_day`.
+- **`isMetalPlaceWindowActive`** — true when **any** window matches day + `[start, end)` in Europe/Berlin; false when `windows[]` empty.
+- **`presenceRepository`** — sync/save merges metadata + windows; Realtime on both tables; IDB legacy single-window read shim.
+- **Live Band Test ↔ Metal Place** — mutual exclusion removed; independent features (Time Travel covers Metal Place QA).
+- Wiki: `supabase-schema.md`, `domain-model.md`, `flows/live-now.md`, `festival-reset.md`.
+
+### Architectural Notes
+- Zero windows = Metal Place disabled (no toggle, no crew group, auto-checkout).
+- Overnight windows explicitly unsupported (`end_time ≤ 23:59`); gaps between slots = off.
+- `festival:reset` preserves `metal_place_windows` alongside `metal_place_config` (godlike ops state never wiped).
+
+---
+
 ## 2026-06-23
 
 ### Fixed

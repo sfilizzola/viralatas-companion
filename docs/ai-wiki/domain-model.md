@@ -281,7 +281,7 @@ type UserPresence = {
 
 **Business Rules:**
 - Camping status is user-set (PresenceToggle component)
-- Metal Place status is godlike-controlled per day/time window
+- Metal Place status is godlike-controlled via configurable windows (`metal_place_windows` rows)
 - Presence is visible to all crew (for "where is everyone?" context)
 - All decision logic lives in `src/services/presencePolicy.ts` (pure, no I/O): window check, toggle resolution, auto-clear camping, auto-checkout. Orchestration (policy → repo) lives in `src/services/presenceService.ts`. `presenceRepository` is pure I/O only. (Phase 42.A)
 
@@ -513,22 +513,35 @@ type BlockedPoster = {
 
 ### MetalPlaceConfig
 
-**Essence**: Godlike settings for where the crew "is" during the festival day.
+**Essence**: Godlike settings for when the Metal Place check-in is available across the festival.
 
 ```typescript
+type MetalPlaceWindow = {
+  id: string;                          // Stable UUID (client assigns on "Add window")
+  festival_day: number;                // 1, 2, 3, or 4
+  start_time: string;                  // HH:MM (Europe/Berlin wall clock)
+  end_time: string;                    // HH:MM, same day only (≤ 23:59)
+  sort_order?: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
 type MetalPlaceConfig = {
-  id?: number;
-  festival_day?: number | null;        // 1, 2, 3, or 4
-  start_time?: string | null;          // HH:MM, e.g., "18:00"
-  end_time?: string | null;            // HH:MM
-  label?: string;                      // "Metal Place", custom name
-  test_override_day?: number | null;   // For testing (bypasses current day)
-  updated_by?: string;                 // uuid of godlike user
-  updated_at?: string;                 // ISO 8601
+  id?: number;                         // Always 1 in Supabase
+  label?: string;                      // Reserved metadata; no companion UI
+  windows: MetalPlaceWindow[];         // Up to 8 slots; empty = disabled
+  updated_by?: string;
+  updated_at?: string;
 };
 ```
 
-**Purpose**: Defines when vira-latas are "at the festival" (vs. camping/exploring).
+**Purpose**: Defines when vira-latas can check in at Metal Place (vs. camping/exploring). Policy helpers (`isMetalPlaceWindowActive`, `findActiveMetalPlaceWindow`) treat the config as active when **any** window matches the current festival day and `[start, end)` in Europe/Berlin.
+
+**Invariants**:
+- Max 8 windows; same-day overlaps rejected on save
+- `start_time < end_time`; `end_time ≤ 23:59` (no overnight slots)
+- Zero windows → toggle hidden, no Metal Place crew group, auto-checkout clears stale check-ins
+- IndexedDB stores merged `{ label, windows[], … }` at key `'current'`; legacy cached single-window shape is shimmed in memory on read until online sync overwrites
 
 ---
 
@@ -750,4 +763,4 @@ Computed in `useNowData()` using current time + user picks.
 
 ---
 
-**Last updated:** 2026-06-09 — Phase 42.A `UserPresence` business rules section updated to reflect 3-layer seam: `presencePolicy.ts` (pure rules), `presenceService.ts` (orchestration), `presenceRepository.ts` (pure I/O).
+**Last updated:** 2026-06-25 — Phase 44: `MetalPlaceConfig` + `MetalPlaceWindow` multi-slot model; removed `test_override_day` and root-level day/time fields.

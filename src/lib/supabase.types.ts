@@ -188,33 +188,51 @@ export type Database = {
       };
       metal_place_config: {
         Row: {
-          id?: number;
-          festival_day?: number | null;
-          start_time?: string | null;
-          end_time?: string | null;
-          label?: string;
-          test_override_day?: number | null;
-          updated_by?: string;
-          updated_at?: string;
+          id: number;
+          label: string | null;
+          updated_by: string | null;
+          updated_at: string;
         };
         Insert: {
           id?: number;
-          festival_day?: number | null;
-          start_time?: string | null;
-          end_time?: string | null;
-          label?: string;
-          test_override_day?: number | null;
-          updated_by?: string;
+          label?: string | null;
+          updated_by?: string | null;
           updated_at?: string;
         };
         Update: {
           id?: number;
-          festival_day?: number | null;
-          start_time?: string | null;
-          end_time?: string | null;
-          label?: string;
-          test_override_day?: number | null;
-          updated_by?: string;
+          label?: string | null;
+          updated_by?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      metal_place_windows: {
+        Row: {
+          id: string;
+          festival_day: number;
+          start_time: string;
+          end_time: string;
+          sort_order: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          festival_day: number;
+          start_time: string;
+          end_time: string;
+          sort_order?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          festival_day?: number;
+          start_time?: string;
+          end_time?: string;
+          sort_order?: number;
+          created_at?: string;
           updated_at?: string;
         };
         Relationships: [];

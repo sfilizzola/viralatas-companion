@@ -42,7 +42,8 @@
  *   • auth.users rows themselves (only metadata is patched, never the row).
  *   • Every auth.users metadata key not listed above (wacken_years, wacken_arrival_day,
  *     push subscription fields, language preference, …).
- *   • public.metal_place_config, public.live_band_test_config (godlike ops state).
+ *   • public.metal_place_config, public.metal_place_windows,
+     public.live_band_test_config (godlike ops state).
  *
  * NEVER run mid-festival without coordination — wipes are immediate via realtime
  * to every connected client.

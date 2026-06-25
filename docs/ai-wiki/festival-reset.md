@@ -72,7 +72,8 @@ Flags are commutative. `--dry-run` always overrides write semantics: it shows th
 | `auth.users.raw_user_meta_data.wacken_arrival_day` | Preserved (user re-declares only if they want to) |
 | Push subscription fields in `user_metadata` | Preserved (no key on the strip list) |
 | Every other `user_metadata` key | Preserved by design — see "Positive-strip pattern" below |
-| `public.metal_place_config` | Godlike sets fresh values before festival |
+| `public.metal_place_config` | Godlike ops metadata (label, audit); window slots preserved |
+| `public.metal_place_windows` | Godlike-configured check-in slots; preserved same as `metal_place_config` |
 | `public.live_band_test_config` | Godlike sets fresh values before festival |
 | `public.bands` (without `--with-bands`) | Untouched |
 | `public.user_picks` (without `--with-bands`) | Untouched |

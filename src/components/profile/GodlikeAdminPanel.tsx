@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { UserRole } from '../../types';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
@@ -13,7 +13,7 @@ import TestBadgeSection from './TestBadgeSection';
 import ConsolidateBadgesSection from './ConsolidateBadgesSection';
 import CacheResetSection from './CacheResetSection';
 import FeatureFlagsSection from './FeatureFlagsSection';
-import MetalPlaceAdminSection, { type MetalPlaceBridge } from './MetalPlaceAdminSection';
+import MetalPlaceAdminSection from './MetalPlaceAdminSection';
 import LiveBandTestAdminSection from './LiveBandTestAdminSection';
 import UserManagementSection from './UserManagementSection';
 import styles from '../../pages/ProfilePage.module.css';
@@ -28,10 +28,6 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
   const [duckFeatureEnabled, setDuckFeatureEnabled] = useState(true);
-  const previousTestModeRef = useRef(false);
-  const [liveBandTestActiveBandId, setLiveBandTestActiveBandId] = useState<string | null>(null);
-  const metalPlaceBridgeRef = useRef<MetalPlaceBridge | null>(null);
-  const liveBandTestClearRef = useRef<(() => Promise<void>) | null>(null);
 
   const TEST_QUACK_COOLDOWN_MS = 15_000;
   const [testQuackCooldownUntil, setTestQuackCooldownUntil] = useState<number | null>(null);
@@ -117,18 +113,6 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
     }
   }, [t]);
 
-  const handleBridgeUpdate = useCallback((bridge: MetalPlaceBridge | null) => {
-    metalPlaceBridgeRef.current = bridge;
-  }, []);
-
-  const handleRegisterClear = useCallback((clear: (() => Promise<void>) | null) => {
-    liveBandTestClearRef.current = clear;
-  }, []);
-
-  const handleClearLiveBandTest = useCallback(async () => {
-    await liveBandTestClearRef.current?.();
-  }, []);
-
   if (loading || !ready || userRole !== 'godlike') return null;
 
   const toolsTrigger = (
@@ -163,20 +147,8 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
           <div className={styles.godlikeSectionContent}>
             <CacheResetSection t={t} />
             <FeatureFlagsSection t={t} onDuckEnabledChange={setDuckFeatureEnabled} />
-            <MetalPlaceAdminSection
-              t={t}
-              previousTestModeRef={previousTestModeRef}
-              liveBandTestActiveBandId={liveBandTestActiveBandId}
-              onClearLiveBandTest={handleClearLiveBandTest}
-              onBridgeUpdate={handleBridgeUpdate}
-            />
-            <LiveBandTestAdminSection
-              t={t}
-              previousTestModeRef={previousTestModeRef}
-              getMetalPlaceBridge={() => metalPlaceBridgeRef.current}
-              onActiveBandIdChange={setLiveBandTestActiveBandId}
-              onRegisterClear={handleRegisterClear}
-            />
+            <MetalPlaceAdminSection t={t} />
+            <LiveBandTestAdminSection t={t} />
 
             <div className={styles.liveBandTestSection}>
               <h4 className={styles.liveBandTestSectionTitle}>{t('testQuackTitle')}</h4>

@@ -1,4 +1,5 @@
 import type { MetalPlaceConfig } from '../../types';
+import { findActiveMetalPlaceWindow } from '../../services/metalPlaceValidation';
 import type { CrewLiveGroup, CrewLivePlan } from '../../services/livePreview';
 import { formatFestivalTime } from '../../services/livePreview';
 import { stageColor } from '../../services/stageColors';
@@ -11,6 +12,7 @@ type LiveCardSheetProps = {
   crewPlans: CrewLivePlan[];
   userId: string | null;
   metalPlaceConfig: MetalPlaceConfig | null;
+  now: Date;
   onClose: () => void;
   t: TFn;
 };
@@ -106,6 +108,7 @@ export default function LiveCardSheet({
   group,
   userId,
   metalPlaceConfig,
+  now,
   onClose,
   t,
 }: LiveCardSheetProps) {
@@ -145,17 +148,22 @@ export default function LiveCardSheet({
             </div>
           )}
 
-          {group.kind === 'metal_place' && (
+          {group.kind === 'metal_place' && (() => {
+            const active = findActiveMetalPlaceWindow(metalPlaceConfig?.windows ?? [], now);
+            const start = formatHm(active?.start_time);
+            const end = formatHm(active?.end_time);
+            return (
             <div className={styles.stageRow}>
               <div className={styles.stageDot} />
               <span className={styles.stageName}>{t('metalPlaceGroupKicker')}</span>
-              {metalPlaceConfig?.start_time && metalPlaceConfig?.end_time && (
+              {start && end && (
                 <span className={styles.stageTime}>
-                  {formatHm(metalPlaceConfig.start_time)} – {formatHm(metalPlaceConfig.end_time)}
+                  {start} – {end}
                 </span>
               )}
             </div>
-          )}
+            );
+          })()}
 
           <h2 className={styles.title}>{sheetTitle(group, t)}</h2>
           <p className={styles.count}>{sheetCountLabel(group, t)}</p>

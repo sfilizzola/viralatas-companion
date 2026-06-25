@@ -5,94 +5,91 @@ import {
   shouldAutoClearCamping,
   shouldAutoCheckout,
 } from '../services/presencePolicy';
-import type { MetalPlaceConfig, UserPresence } from '../types';
+import type { MetalPlaceConfig, MetalPlaceWindow, UserPresence } from '../types';
 
 // All tests use plain Date objects — no IDB, no Supabase mocks needed.
 
-const BASE_CONFIG: MetalPlaceConfig = {
+const DAY1_WINDOW: MetalPlaceWindow = {
+  id: 'day1-slot',
   festival_day: 1,
-  test_override_day: 1, // skip festival-day check so only time range matters
   start_time: '14:00',
   end_time: '18:00',
 };
 
-// 15:00 CEST (Berlin summer) = 13:00 UTC — inside [14:00, 18:00)
-const INSIDE_WINDOW = new Date('2026-07-29T13:00:00Z');
-// 12:00 CEST = 10:00 UTC — before 14:00
-const BEFORE_WINDOW = new Date('2026-07-29T10:00:00Z');
-// 19:00 CEST = 17:00 UTC — after 18:00
-const AFTER_WINDOW = new Date('2026-07-29T17:00:00Z');
+const DAY2_WINDOW: MetalPlaceWindow = {
+  id: 'day2-slot',
+  festival_day: 2,
+  start_time: '11:00',
+  end_time: '14:00',
+};
+
+const BASE_CONFIG: MetalPlaceConfig = {
+  windows: [DAY1_WINDOW],
+};
+
+// 15:00 CEST (Berlin summer) = 13:00 UTC — inside Day 1 [14:00, 18:00)
+const INSIDE_DAY1_WINDOW = new Date('2026-07-29T13:00:00Z');
+// 12:00 CEST = 10:00 UTC — before Day 1 window
+const BEFORE_DAY1_WINDOW = new Date('2026-07-29T10:00:00Z');
+// 19:00 CEST = 17:00 UTC — after Day 1 window
+const AFTER_DAY1_WINDOW = new Date('2026-07-29T17:00:00Z');
+// 12:00 CEST on Day 2 = 10:00 UTC — inside Day 2 [11:00, 14:00)
+const INSIDE_DAY2_WINDOW = new Date('2026-07-30T10:00:00Z');
+// 10:00 CEST on Day 2 = 08:00 UTC — gap before Day 2 window
+const GAP_BETWEEN_DAY2_SLOTS = new Date('2026-07-30T08:00:00Z');
 
 // ─── isMetalPlaceWindowActive ────────────────────────────────────────────────
 
 describe('isMetalPlaceWindowActive', () => {
-  it('returns true when wall-clock time is inside the configured window', () => {
-    expect(isMetalPlaceWindowActive(BASE_CONFIG, INSIDE_WINDOW)).toBe(true);
+  it('returns true when wall-clock time is inside a configured window', () => {
+    expect(isMetalPlaceWindowActive(BASE_CONFIG, INSIDE_DAY1_WINDOW)).toBe(true);
   });
 
   it('returns false when wall-clock time is before the window starts', () => {
-    expect(isMetalPlaceWindowActive(BASE_CONFIG, BEFORE_WINDOW)).toBe(false);
+    expect(isMetalPlaceWindowActive(BASE_CONFIG, BEFORE_DAY1_WINDOW)).toBe(false);
   });
 
   it('returns false when wall-clock time is after the window ends', () => {
-    expect(isMetalPlaceWindowActive(BASE_CONFIG, AFTER_WINDOW)).toBe(false);
+    expect(isMetalPlaceWindowActive(BASE_CONFIG, AFTER_DAY1_WINDOW)).toBe(false);
   });
 
   it('returns false when config is null', () => {
-    expect(isMetalPlaceWindowActive(null, INSIDE_WINDOW)).toBe(false);
+    expect(isMetalPlaceWindowActive(null, INSIDE_DAY1_WINDOW)).toBe(false);
   });
 
-  it('returns false when start_time is missing', () => {
-    const config: MetalPlaceConfig = { ...BASE_CONFIG, start_time: undefined };
-    expect(isMetalPlaceWindowActive(config, INSIDE_WINDOW)).toBe(false);
+  it('returns false when windows array is empty', () => {
+    expect(isMetalPlaceWindowActive({ windows: [] }, INSIDE_DAY1_WINDOW)).toBe(false);
   });
 
-  it('returns false when end_time is missing', () => {
-    const config: MetalPlaceConfig = { ...BASE_CONFIG, end_time: undefined };
-    expect(isMetalPlaceWindowActive(config, INSIDE_WINDOW)).toBe(false);
-  });
-
-  it('returns false when festival_day is null and no test_override_day', () => {
-    const config: MetalPlaceConfig = {
-      festival_day: null,
-      test_override_day: null,
-      start_time: '14:00',
-      end_time: '18:00',
-    };
-    expect(isMetalPlaceWindowActive(config, INSIDE_WINDOW)).toBe(false);
-  });
-
-  it('returns false when current festival day does not match (no test_override)', () => {
-    const config: MetalPlaceConfig = {
-      festival_day: 1,        // Day 1 = 2026-07-29
-      test_override_day: null,
-      start_time: '14:00',
-      end_time: '18:00',
-    };
-    // 15:00 CEST on Day 2 (2026-07-30) — day mismatch
+  it('returns false when current festival day does not match any window', () => {
+    // 15:00 CEST on Day 2 (2026-07-30) — Day 1 window only
     const day2 = new Date('2026-07-30T13:00:00Z');
-    expect(isMetalPlaceWindowActive(config, day2)).toBe(false);
+    expect(isMetalPlaceWindowActive(BASE_CONFIG, day2)).toBe(false);
   });
 
-  it('returns true on the correct festival day without test_override', () => {
+  it('returns true on the correct festival day for that window', () => {
     const config: MetalPlaceConfig = {
-      festival_day: 1,
-      test_override_day: null,
-      start_time: '14:00',
-      end_time: '18:00',
+      windows: [{ ...DAY1_WINDOW, festival_day: 1 }],
     };
-    // Day 1 = 2026-07-29, 15:00 CEST = 13:00 UTC
-    expect(isMetalPlaceWindowActive(config, INSIDE_WINDOW)).toBe(true);
+    expect(isMetalPlaceWindowActive(config, INSIDE_DAY1_WINDOW)).toBe(true);
   });
 
-  it('test_override_day bypasses festival-day matching', () => {
+  it('returns true when any of multiple slots is active', () => {
     const config: MetalPlaceConfig = {
-      festival_day: 99, // unreachable day
-      test_override_day: 1,
-      start_time: '14:00',
-      end_time: '18:00',
+      windows: [DAY1_WINDOW, DAY2_WINDOW],
     };
-    expect(isMetalPlaceWindowActive(config, INSIDE_WINDOW)).toBe(true);
+    expect(isMetalPlaceWindowActive(config, INSIDE_DAY1_WINDOW)).toBe(true);
+    expect(isMetalPlaceWindowActive(config, INSIDE_DAY2_WINDOW)).toBe(true);
+  });
+
+  it('returns false in the gap between same-day slots', () => {
+    const config: MetalPlaceConfig = {
+      windows: [
+        { id: 'morning', festival_day: 2, start_time: '11:00', end_time: '12:00' },
+        { id: 'afternoon', festival_day: 2, start_time: '14:00', end_time: '16:00' },
+      ],
+    };
+    expect(isMetalPlaceWindowActive(config, GAP_BETWEEN_DAY2_SLOTS)).toBe(false);
   });
 
   it('returns false exactly at window end time (exclusive upper bound)', () => {
@@ -203,27 +200,44 @@ describe('shouldAutoCheckout', () => {
   };
   const notCheckedIn: UserPresence = { ...checkedIn, is_at_metal_place: false };
 
-  it('returns true when outside window and user is checked in', () => {
-    expect(shouldAutoCheckout(BASE_CONFIG, BEFORE_WINDOW, checkedIn)).toBe(true);
+  it('returns true when outside all windows and user is checked in', () => {
+    expect(shouldAutoCheckout(BASE_CONFIG, BEFORE_DAY1_WINDOW, checkedIn)).toBe(true);
   });
 
-  it('returns false when inside window (do not checkout)', () => {
-    expect(shouldAutoCheckout(BASE_CONFIG, INSIDE_WINDOW, checkedIn)).toBe(false);
+  it('returns false when inside an active window (do not checkout)', () => {
+    expect(shouldAutoCheckout(BASE_CONFIG, INSIDE_DAY1_WINDOW, checkedIn)).toBe(false);
   });
 
-  it('returns false when outside window but user is not checked in', () => {
-    expect(shouldAutoCheckout(BASE_CONFIG, BEFORE_WINDOW, notCheckedIn)).toBe(false);
+  it('returns false when outside windows but user is not checked in', () => {
+    expect(shouldAutoCheckout(BASE_CONFIG, BEFORE_DAY1_WINDOW, notCheckedIn)).toBe(false);
   });
 
   it('returns false when config is null (cannot determine window)', () => {
-    expect(shouldAutoCheckout(null, BEFORE_WINDOW, checkedIn)).toBe(false);
+    expect(shouldAutoCheckout(null, BEFORE_DAY1_WINDOW, checkedIn)).toBe(false);
   });
 
   it('returns false when presence is null', () => {
-    expect(shouldAutoCheckout(BASE_CONFIG, BEFORE_WINDOW, null)).toBe(false);
+    expect(shouldAutoCheckout(BASE_CONFIG, BEFORE_DAY1_WINDOW, null)).toBe(false);
   });
 
   it('returns true when after window and user is checked in', () => {
-    expect(shouldAutoCheckout(BASE_CONFIG, AFTER_WINDOW, checkedIn)).toBe(true);
+    expect(shouldAutoCheckout(BASE_CONFIG, AFTER_DAY1_WINDOW, checkedIn)).toBe(true);
+  });
+
+  it('returns true in a gap between multi-slot windows on the same day', () => {
+    const config: MetalPlaceConfig = {
+      windows: [
+        { id: 'morning', festival_day: 2, start_time: '11:00', end_time: '12:00' },
+        { id: 'afternoon', festival_day: 2, start_time: '14:00', end_time: '16:00' },
+      ],
+    };
+    expect(shouldAutoCheckout(config, GAP_BETWEEN_DAY2_SLOTS, checkedIn)).toBe(true);
+  });
+
+  it('returns false when a later slot on another day is active', () => {
+    const config: MetalPlaceConfig = {
+      windows: [DAY1_WINDOW, DAY2_WINDOW],
+    };
+    expect(shouldAutoCheckout(config, INSIDE_DAY2_WINDOW, checkedIn)).toBe(false);
   });
 });

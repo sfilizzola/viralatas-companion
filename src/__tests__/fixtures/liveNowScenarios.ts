@@ -89,10 +89,15 @@ export function threeBandLiveFixture() {
 
 export const DEFAULT_METAL_PLACE_CONFIG: MetalPlaceConfig = {
   id: 1,
-  festival_day: 1,
-  start_time: '18:00',
-  end_time: '23:59',
-  test_override_day: 1,
+  windows: [
+    {
+      id: 'test-window-1',
+      festival_day: 1,
+      start_time: '18:00',
+      end_time: '23:59',
+      sort_order: 0,
+    },
+  ],
 };
 
 export type LiveNowScenarioExpect = {

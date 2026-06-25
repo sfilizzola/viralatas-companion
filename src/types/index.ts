@@ -101,13 +101,20 @@ export type UsefulLinksFile = {
   links: UsefulLink[];
 };
 
+export type MetalPlaceWindow = {
+  id: string;
+  festival_day: number;
+  start_time: string;
+  end_time: string;
+  sort_order?: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
 export type MetalPlaceConfig = {
   id?: number;
-  festival_day?: number | null;
-  start_time?: string | null;
-  end_time?: string | null;
   label?: string;
-  test_override_day?: number | null;
+  windows: MetalPlaceWindow[];
   updated_by?: string;
   updated_at?: string;
 };

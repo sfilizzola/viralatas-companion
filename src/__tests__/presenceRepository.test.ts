@@ -244,10 +244,9 @@ describe('presenceService.autoClearCampingOnCurrentBand', () => {
 describe('presenceService.validateAndAutoCheckout', () => {
   it('sets is_at_metal_place to false and syncs when time is outside the metal-place window', async () => {
     const config: MetalPlaceConfig = {
-      festival_day: 1,
-      test_override_day: 1,
-      start_time: '14:00',
-      end_time: '18:00',
+      windows: [
+        { id: 'window-1', festival_day: 1, start_time: '14:00', end_time: '18:00' },
+      ],
     };
     const userId = 'user1';
     const existingPresence: UserPresence = {
@@ -273,10 +272,9 @@ describe('presenceService.validateAndAutoCheckout', () => {
 
   it('does nothing when time is within the metal-place window', async () => {
     const config: MetalPlaceConfig = {
-      festival_day: 1,
-      test_override_day: 1,
-      start_time: '14:00',
-      end_time: '18:00',
+      windows: [
+        { id: 'window-1', festival_day: 1, start_time: '14:00', end_time: '18:00' },
+      ],
     };
 
     // 15:00 CEST = 13:00 UTC — within window
@@ -290,10 +288,9 @@ describe('presenceService.validateAndAutoCheckout', () => {
 
   it('does nothing when userId is null', async () => {
     const config: MetalPlaceConfig = {
-      festival_day: 1,
-      test_override_day: 1,
-      start_time: '14:00',
-      end_time: '18:00',
+      windows: [
+        { id: 'window-1', festival_day: 1, start_time: '14:00', end_time: '18:00' },
+      ],
     };
 
     await presenceService.validateAndAutoCheckout(config, null);
@@ -303,10 +300,9 @@ describe('presenceService.validateAndAutoCheckout', () => {
 
   it('does nothing when user is not at metal place', async () => {
     const config: MetalPlaceConfig = {
-      festival_day: 1,
-      test_override_day: 1,
-      start_time: '14:00',
-      end_time: '18:00',
+      windows: [
+        { id: 'window-1', festival_day: 1, start_time: '14:00', end_time: '18:00' },
+      ],
     };
     const notAtMetalPlace: UserPresence = {
       user_id: 'user1',

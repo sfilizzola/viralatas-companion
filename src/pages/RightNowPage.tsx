@@ -182,6 +182,7 @@ export default function RightNowPage() {
               userId={userId}
               myPlan={myPlan}
               metalPlaceConfig={metalPlaceConfig}
+              now={now}
               onSkip={handleSkip}
               onDuck={duckEnabled && duckBandId ? duckQuack : undefined}
               duckCooldownUntil={duckCooldownUntil}
@@ -212,6 +213,7 @@ export default function RightNowPage() {
           crewPlans={crewPlans}
           userId={userId}
           metalPlaceConfig={metalPlaceConfig}
+          now={now}
           onClose={() => setActiveGroup(null)}
           t={t}
         />

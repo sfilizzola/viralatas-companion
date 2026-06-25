@@ -171,7 +171,7 @@ User taps /now route
    groupCrewLivePlans():
      For each crew member:
        1. Check if at_metal_place
-          && isTimeWithinMetalPlaceWindow(config, now)
+          && isMetalPlaceWindowActive(config, now)
           → Add to metalPlaceGroup
        2. Else if status='current' && band
           → Add to bandGroups[band.id]
@@ -423,34 +423,39 @@ which clears camping when both `isCamping` and `myRawPlanStatus === 'current'`.
 
 **Manual toggle**: User taps route through `handlePresenceChange` → `presenceRepository.applyPresenceToggle(userId, nextValue, context)` with plan/presence context (`myRawPlanStatus`, `isAtMetalPlace`, `isCamping`).
 
-### Metal Place Check-In Window
+### Metal Place Check-In Windows
 
-Godlike can configure a **time window** when a special venue ("Metal Place") is open:
+Godlike configures **one or more same-day slots** (max 8) when the Metal Place venue is open:
 
 ```
-metal_place_config = {
-  festival_day: 1,        // Only on Day 1
-  start_time: "18:00",    // 6 PM CEST
-  end_time: "06:00",      // 6 AM CEST (next day)
-  test_override_day: null
-}
+metal_place_config = { label: "Metal Place", … }   // metadata row id=1
+metal_place_windows = [
+  { festival_day: 1, start_time: "14:00", end_time: "16:00" },
+  { festival_day: 2, start_time: "11:00", end_time: "14:00" },
+]
 
-isTimeWithinMetalPlaceWindow(config, now):
-  1. Check festival_day matches current day
-  2. Convert now to Wacken wall-clock time
-  3. Return: startTime <= wallClock < endTime
+isMetalPlaceWindowActive(config, now):
+  1. False if config is null or windows[] is empty (Metal Place off)
+  2. For each window: festival_day matches getFestivalDay(now)
+  3. Europe/Berlin wall clock in [start, end) — end is exclusive
+  4. True if any slot matches
+
+findActiveMetalPlaceWindow(windows, now) → active slot or null (crew subtitle)
 ```
+
+**Not supported**: overnight windows (e.g. 18:00–06:00 next day). Each slot must end by `23:59` on its festival day.
 
 **Rendering**:
-- If `is_at_metal_place && isTimeWithinMetalPlaceWindow()` → Show "Metal Place" group
-- If window closed → Auto-checkout: set `is_at_metal_place = false`
-- Group order: Bands → Camping → Metal Place (if active) → Lost
+- Toggle available only when `isMetalPlaceWindowActive(config, now)` is true
+- Crew card shown only when window active **and** ≥1 member has `is_at_metal_place`
+- If outside all slots → auto-checkout: `is_at_metal_place = false`
+- Group order: Bands → Camping → Metal Place (if active + members) → Lost
 
-**Auto-checkout Validation** (`useNowData` effect → `presenceRepository.validateAndAutoCheckout`):
+**Auto-checkout Validation** (`useNowData` effect → `presenceService.validateAndAutoCheckout`):
 ```typescript
 useEffect(() => {
   validateAndAutoCheckout(metalPlaceConfig, userId)
-    // Clears is_at_metal_place if outside window
+    // Clears is_at_metal_place if outside every configured window
 }, [metalPlaceConfig, userId, isMetalPlaceWindowActive])
 ```
 
@@ -514,7 +519,7 @@ User sees: Slipknot as CURRENT (15 min into set)
 ```
 1. Live bands (sorted by start_time, then band name)
 2. Camping (members not at any band, not at metal place)
-3. Metal Place (if isTimeWithinMetalPlaceWindow && ≥1 member checked in)
+3. Metal Place (if isMetalPlaceWindowActive && ≥1 member checked in)
 4. Lost (members not at band, not camping, not at metal place)
 ```
 
@@ -641,23 +646,22 @@ applyLiveBandTestOverride():
 Test mode silently disabled.
 ```
 
-### 6. Metal Place Window Wraps Day Boundary (18:00 - 06:00)
+### 6. Metal Place: Multi-Slot Gaps and Zero Windows
 
 ```
-metal_place_config = {
-  start_time: "18:00",  // 6 PM
-  end_time: "06:00"     // 6 AM next day
-}
+metal_place_windows = [
+  { festival_day: 1, start_time: "14:00", end_time: "16:00" },
+  { festival_day: 1, start_time: "18:00", end_time: "20:00" },
+]
 
-Now: 05:00 (5 AM, within window)
+Now: 17:00 on Day 1 → between slots → isMetalPlaceWindowActive = false
+  → toggle hidden, auto-checkout if checked in
 
-Wall-clock conversion (all in CEST):
-  05:00 >= 18:00? NO
-  05:00 < 06:00?  YES
-  
-isTimeWithinMetalPlaceWindow → true ✓
-(Time wrapping handled by numeric comparison)
+metal_place_windows = []  → zero slots
+  → Metal Place fully disabled (no toggle, no crew group)
 ```
+
+Overnight windows (end after midnight) are **not** supported — each slot must end by 23:59 on its festival day.
 
 ### 7. Crew Member Offline, Presence Stale
 
@@ -668,7 +672,7 @@ Alice still offline, didn't receive auto-checkout
 
 When Alice comes online:
   validateAndAutoCheckout() runs
-  isTimeWithinMetalPlaceWindow() = false
+  isMetalPlaceWindowActive(config, now) = false
   auto-clears is_at_metal_place = false
   
 Result: Alice moved to camping/lost group ✓
@@ -775,4 +779,4 @@ useEffect(() => {
 
 ---
 
-**Last updated:** 2026-05-31 — Phase 37 Upcoming Band Card (15-minute pre-show banner, dismiss, expand/collapse, crew going, QuackStrip attachment, slot priority with LatestAnnouncementBanner).
+**Last updated:** 2026-06-25 — Phase 44: multi-window Metal Place (`windows[]`, `isMetalPlaceWindowActive`); overnight slots documented as unsupported; removed `test_override_day`.

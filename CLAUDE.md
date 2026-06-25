@@ -191,7 +191,7 @@ user_presence, user_missed_bands, metal_place_config,
 live_band_test_config, user_badge_history, band_attendance (view)
 ```
 
-**Realtime enabled on:** `user_picks`, `announcements`, `user_presence`, `metal_place_config`, `live_band_test_config`
+**Realtime enabled on:** `user_picks`, `announcements`, `user_presence`, `metal_place_config`, `metal_place_windows`, `live_band_test_config`
 
 **Full DDL, RLS policies, and all migrations** → `docs/ai-wiki/supabase-schema.md`
 

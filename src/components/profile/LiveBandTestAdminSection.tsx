@@ -1,27 +1,16 @@
-import { useState, useEffect, useCallback, type MutableRefObject } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { Band, LiveBandTestConfig } from '../../types';
 import { loadBands, loadAllUserPicks, loadLiveBandTestConfig } from '../../lib/db';
-import { presenceRepository } from '../../repositories';
-import { presenceService } from '../../services/presenceService';
 import { saveLiveBandTestConfigRemote } from '../../services/liveBandTest';
 import { Select } from '../../ui';
-import type { MetalPlaceBridge } from './MetalPlaceAdminSection';
 import styles from '../../pages/ProfilePage.module.css';
 
 type LiveBandTestAdminSectionProps = {
   t: (key: string, values?: Record<string, string | number>) => string;
-  previousTestModeRef: MutableRefObject<boolean>;
-  getMetalPlaceBridge: () => MetalPlaceBridge | null;
-  onActiveBandIdChange: (bandId: string | null) => void;
-  onRegisterClear: (clear: (() => Promise<void>) | null) => void;
 };
 
 export default function LiveBandTestAdminSection({
   t,
-  previousTestModeRef,
-  getMetalPlaceBridge,
-  onActiveBandIdChange,
-  onRegisterClear,
 }: LiveBandTestAdminSectionProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -36,13 +25,7 @@ export default function LiveBandTestAdminSection({
     setSelectedId('');
     setEnabled(false);
     setActiveBandId(null);
-    onActiveBandIdChange(null);
-  }, [onActiveBandIdChange]);
-
-  useEffect(() => {
-    onRegisterClear(clearLiveBandTest);
-    return () => onRegisterClear(null);
-  }, [clearLiveBandTest, onRegisterClear]);
+  }, []);
 
   useEffect(() => {
     async function loadLiveBandTest() {
@@ -68,7 +51,6 @@ export default function LiveBandTestAdminSection({
           setEnabled(config.enabled ?? false);
           const activeId = config.enabled && config.band_id ? config.band_id : null;
           setActiveBandId(activeId);
-          onActiveBandIdChange(activeId);
         }
       } catch (err) {
         console.error('Failed to load Live Band Test config:', err);
@@ -77,34 +59,13 @@ export default function LiveBandTestAdminSection({
       }
     }
     loadLiveBandTest();
-  }, [onActiveBandIdChange]);
+  }, []);
 
   const handleSave = useCallback(async () => {
     setSaving(true);
     setError(null);
     try {
       const enabling = enabled && !!selectedId;
-      if (enabling && previousTestModeRef.current) {
-        const ok = window.confirm(t('liveBandTestConflictWithMetalPlace'));
-        if (!ok) {
-          setSaving(false);
-          return;
-        }
-        const bridge = getMetalPlaceBridge();
-        const fields = bridge?.getFields() ?? { day: '' as const, startTime: '12:00', endTime: '23:00' };
-        const festivalDay = fields.day === '' ? null : fields.day;
-        await presenceRepository.saveMetalPlaceConfigRemote({
-          id: 1,
-          festival_day: festivalDay,
-          start_time: fields.startTime || null,
-          end_time: fields.endTime || null,
-          test_override_day: null,
-        });
-        bridge?.setTestModeEnabled(false);
-        previousTestModeRef.current = false;
-        await presenceService.autoCheckoutAllUsers();
-      }
-
       const config: LiveBandTestConfig = {
         id: 1,
         band_id: selectedId || null,
@@ -113,20 +74,12 @@ export default function LiveBandTestAdminSection({
       await saveLiveBandTestConfigRemote(config);
       const nextActiveId = enabling ? selectedId : null;
       setActiveBandId(nextActiveId);
-      onActiveBandIdChange(nextActiveId);
     } catch (err) {
       setError(err instanceof Error ? err.message : t('liveBandTestSaveError'));
     } finally {
       setSaving(false);
     }
-  }, [
-    enabled,
-    getMetalPlaceBridge,
-    onActiveBandIdChange,
-    previousTestModeRef,
-    selectedId,
-    t,
-  ]);
+  }, [enabled, selectedId, t]);
 
   const handleClear = useCallback(async () => {
     setSaving(true);

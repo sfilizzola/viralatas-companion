@@ -1,4 +1,5 @@
 import type { MetalPlaceConfig } from '../../types';
+import { findActiveMetalPlaceWindow } from '../../services/metalPlaceValidation';
 import type {
   CrewLiveGroup,
   CrewLivePlan,
@@ -75,14 +76,20 @@ function formatHmTime(value?: string | null): string | null {
   return value.slice(0, 5);
 }
 
-function metalPlaceSubtitle(config: MetalPlaceConfig | null, t: TFn): string {
-  const start = formatHmTime(config?.start_time);
-  const end = formatHmTime(config?.end_time);
+function metalPlaceSubtitle(config: MetalPlaceConfig | null, now: Date, t: TFn): string {
+  const active = findActiveMetalPlaceWindow(config?.windows ?? [], now);
+  const start = formatHmTime(active?.start_time);
+  const end = formatHmTime(active?.end_time);
   if (start && end) return t('metalPlaceGroupSubtitleWithTime', { start, end });
   return t('metalPlaceGroupSubtitle');
 }
 
-function groupSubtitle(group: CrewLiveGroup, t: TFn, metalPlaceConfig?: MetalPlaceConfig | null) {
+function groupSubtitle(
+  group: CrewLiveGroup,
+  t: TFn,
+  metalPlaceConfig: MetalPlaceConfig | null | undefined,
+  now: Date,
+) {
   if (group.kind === 'band') {
     return t('bandGroupSubtitle', {
       stage: group.band.stage,
@@ -90,7 +97,7 @@ function groupSubtitle(group: CrewLiveGroup, t: TFn, metalPlaceConfig?: MetalPla
       end: formatFestivalTime(group.band.end_time),
     });
   }
-  if (group.kind === 'metal_place') return metalPlaceSubtitle(metalPlaceConfig ?? null, t);
+  if (group.kind === 'metal_place') return metalPlaceSubtitle(metalPlaceConfig ?? null, now, t);
   if (group.kind === 'camping') return t('campingGroupSubtitle');
   return t('lostGroupSubtitle');
 }
@@ -107,6 +114,7 @@ type CrewGroupsSectionProps = {
   userId: string | null;
   myPlan: LivePlan;
   metalPlaceConfig: MetalPlaceConfig | null;
+  now: Date;
   onSkip: () => Promise<void>;
   onDuck?: () => void;
   duckCooldownUntil?: number | null;
@@ -120,6 +128,7 @@ export default function CrewGroupsSection({
   userId,
   myPlan,
   metalPlaceConfig,
+  now,
   onSkip,
   onDuck,
   duckCooldownUntil,
@@ -167,7 +176,7 @@ export default function CrewGroupsSection({
                     {groupKicker(group, t, isUserHere)}
                   </span>
                   <h3 className={styles.groupTitle} data-text={groupTitle(group, t)}>{groupTitle(group, t)}</h3>
-                  <p className={styles.groupSubtitle}>{groupSubtitle(group, t, metalPlaceConfig)}</p>
+                  <p className={styles.groupSubtitle}>{groupSubtitle(group, t, metalPlaceConfig, now)}</p>
                   {isUserHere && group.kind === 'band' && myPlan.nextBand && (
                     <p className={styles.groupNextUp}>
                       {t('nextUp')} → {myPlan.nextBand.name}

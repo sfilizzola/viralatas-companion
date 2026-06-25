@@ -995,6 +995,39 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 
 ---
 
+---
+
+### Phase 44 — Metal Place Multi-Window Configuration
+**Status:** ✅ Complete
+
+**Completed:** 2026-06-25
+
+**Goal:** Replace single festival-day + time window on `metal_place_config` with multiple godlike-configurable same-day slots in `metal_place_windows` (max 8); companion app only.
+
+**Deliverables shipped:**
+- `supabase/migrations/20260623000000_phase44_metal_place_windows.sql` — new table, strict legacy migration, slim metadata row, Realtime
+- `src/services/metalPlaceValidation.ts` — `findActiveMetalPlaceWindow`, `validateMetalPlaceWindows`, `sortMetalPlaceWindows`
+- `src/services/presencePolicy.ts` — `isMetalPlaceWindowActive` uses `windows[]`; `test_override_day` removed
+- `src/repositories/presence.ts` — replace-all save, dual-table sync + Realtime subscription
+- `src/lib/db/config.ts` — IDB legacy read shim; merged `{ label, windows[] }` shape
+- `src/components/profile/MetalPlaceAdminSection.tsx` — slot list UI, batch save, validation errors
+- Live Band Test ↔ Metal Place mutual exclusion removed (`MetalPlaceBridge`, conflict dialogs, i18n keys)
+- Tests: `presencePolicy.test.ts`, `presenceRepository.test.ts`, `liveNowScenarios.test.ts`
+
+**Acceptance criteria (all met):**
+- [x] Legacy single-window row migrates to one slot; partial/empty legacy → zero slots
+- [x] Multi-slot active/inactive, gaps, exclusive end bound, zero-slots-off
+- [x] Same-day overlap and invalid times rejected on save; cap 8 enforced
+- [x] Auto-checkout at window end; Realtime config change re-runs checkout
+- [x] `test_override_day` fully removed (DB, types, UI, policy)
+- [x] Build green · all tests green
+
+**Architectural notes:**
+- `metal_place_config` = metadata row `id=1`; slots in `metal_place_windows`; client merges for IDB + policy.
+- Overnight windows not supported; use Time Travel for QA instead of `test_override_day`.
+
+---
+
 ### Phase 43 — Mural Reactions
 **Status:** ✅ Complete
 

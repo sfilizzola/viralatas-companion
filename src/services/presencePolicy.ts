@@ -1,6 +1,6 @@
 import type { LivePlanStatus, PresenceLocation } from './livePreview';
 import type { MetalPlaceConfig, UserPresence } from '../types';
-import { getFestivalDay } from './time';
+import { findActiveMetalPlaceWindow } from './metalPlaceValidation';
 
 export type PresenceDecision = {
   setCamping: boolean | null;    // null = no change
@@ -14,48 +14,20 @@ export type PresenceToggleContext = {
 };
 
 /**
- * Returns true when the Metal Place window is currently active for the given
+ * Returns true when any Metal Place window is currently active for the given
  * config and wall-clock time (CEST / Europe/Berlin).
  *
- * False when config is null, incomplete, or the current festival day does not
- * match (unless test_override_day bypasses the day check).
+ * False when config is null, has zero windows, or no slot matches day + [start, end).
  */
 export function isMetalPlaceWindowActive(
   config: MetalPlaceConfig | null,
   nowDate: Date,
 ): boolean {
-  if (!config?.start_time || !config?.end_time) {
+  if (!config?.windows?.length) {
     return false;
   }
 
-  const isTestMode = config.test_override_day !== null && config.test_override_day !== undefined;
-
-  if (!isTestMode) {
-    if (config.festival_day === null || config.festival_day === undefined) {
-      return false;
-    }
-    const currentFestivalDay = getFestivalDay(nowDate);
-    if (currentFestivalDay !== config.festival_day) {
-      return false;
-    }
-  }
-
-  const [startHour, startMin] = config.start_time.split(':').map(Number);
-  const [endHour, endMin] = config.end_time.split(':').map(Number);
-
-  const wallClock = new Intl.DateTimeFormat('en-GB', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    timeZone: 'Europe/Berlin',
-  }).format(nowDate);
-  const [nowHourStr, nowMinStr] = wallClock.split(':');
-  const nowTotalMinutes = Number.parseInt(nowHourStr, 10) * 60 + Number.parseInt(nowMinStr, 10);
-
-  const startTotalMinutes = startHour * 60 + startMin;
-  const endTotalMinutes = endHour * 60 + endMin;
-
-  return nowTotalMinutes >= startTotalMinutes && nowTotalMinutes < endTotalMinutes;
+  return findActiveMetalPlaceWindow(config.windows, nowDate) !== null;
 }
 
 /**

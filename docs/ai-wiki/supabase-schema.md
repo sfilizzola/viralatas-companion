@@ -470,37 +470,57 @@ CREATE TABLE public.user_badge_history (
 
 ### `public.metal_place_config`
 
-**Purpose**: Godlike settings for Metal Place check-in window.
+**Purpose**: Metadata row for Metal Place configuration (label + audit fields). Window slots live in `metal_place_windows`; the companion app merges both into a single `MetalPlaceConfig` object in IndexedDB.
 
 ```sql
 CREATE TABLE public.metal_place_config (
-  id serial PRIMARY KEY,
-  festival_day integer CHECK (festival_day IN (1, 2, 3, 4, NULL)),
-  start_time time DEFAULT '18:00',
-  end_time time DEFAULT '06:00',
+  id integer PRIMARY KEY DEFAULT 1 CHECK (id = 1),
   label text DEFAULT 'Metal Place',
-  test_override_day integer CHECK (test_override_day IN (1, 2, 3, 4, NULL)),
-  updated_by uuid,
-  updated_at timestamptz DEFAULT now(),
-  
-  FOREIGN KEY (updated_by) REFERENCES public.users(id)
+  updated_by uuid REFERENCES public.users(id),
+  updated_at timestamptz NOT NULL DEFAULT now()
 );
 
--- Only one row (enforced by app)
-INSERT INTO public.metal_place_config (id) VALUES (1);
+-- Single row (enforced by CHECK + app upsert id=1)
+INSERT INTO public.metal_place_config (id) VALUES (1) ON CONFLICT (id) DO NOTHING;
 ```
 
-**Realtime**: Enabled.
+**Realtime**: Enabled (metadata changes trigger client re-fetch of full config).
 
-**RLS Policy**:
+**RLS Policies**:
+- Authenticated: `SELECT`
+- Godlike: `INSERT`, `UPDATE`
+
+---
+
+### `public.metal_place_windows`
+
+**Purpose**: Godlike-configurable Metal Place check-in slots (up to 8). Each row is one same-day window on a festival day. Zero rows = Metal Place disabled.
+
 ```sql
-CREATE POLICY "Only godlike can read/update metal_place_config"
-ON public.metal_place_config
-FOR ALL
-USING (
-  (SELECT role FROM public.users WHERE id = auth.uid()) = 'godlike'
+CREATE TABLE public.metal_place_windows (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  festival_day integer NOT NULL CHECK (festival_day IN (1, 2, 3, 4)),
+  start_time time NOT NULL,
+  end_time time NOT NULL,
+  sort_order integer NOT NULL DEFAULT 0,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  CHECK (start_time < end_time),
+  CHECK (end_time <= time '23:59')
 );
 ```
+
+**Constraints**:
+- Same-day only — `end_time` must be `≤ 23:59` (overnight windows spanning midnight are **not** supported).
+- Overlap validation is enforced client-side on save (`validateMetalPlaceWindows`); DB does not enforce non-overlap.
+
+**Realtime**: Enabled (window INSERT/UPDATE/DELETE triggers client re-fetch of metadata + windows → IndexedDB).
+
+**RLS Policies**:
+- Authenticated: `SELECT`
+- Godlike: `INSERT`, `UPDATE`, `DELETE`
+
+**Client save strategy** (`presenceRepository.saveMetalPlaceConfigRemote`): upsert metadata row `id=1`; upsert windows by stable UUID; delete server rows not in payload; assign `sort_order` from auto-sort (`festival_day`, `start_time`).
 
 ---
 
@@ -602,6 +622,7 @@ INSERT INTO public.app_settings DEFAULT VALUES;
 - public.announcements
 - public.user_missed_bands
 - public.metal_place_config
+- public.metal_place_windows
 - public.live_band_test_config
 
 **Disabled Tables**:
@@ -723,7 +744,8 @@ npm run festival:reset -- --with-bands --force
 | `announcements` | Non-deleted | Own author | Author / Manager+ | Author / Manager+ |
 | `user_presence` | All | Own user | Own user | Own user |
 | `user_missed_bands` | All | Own user | Own user | Own user |
-| `metal_place_config` | Godlike | Godlike | Godlike | Godlike |
+| `metal_place_config` | Authenticated | Godlike | Godlike | — |
+| `metal_place_windows` | Authenticated | Godlike | Godlike | Godlike |
 | `live_band_test_config` | Godlike | Godlike | Godlike | Godlike |
 
 ---
@@ -747,4 +769,4 @@ npm run festival:reset -- --with-bands --force
 
 ---
 
-**Last updated:** 2026-05-22 — added `playlist_testing` column to `app_settings` (Phase 22 Part 1); updated DDL, column descriptions, and RLS notes.
+**Last updated:** 2026-06-25 — Phase 44: `metal_place_windows` table; `metal_place_config` metadata-only; Realtime on both; removed `festival_day`, `start_time`, `end_time`, `test_override_day`.

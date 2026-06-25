@@ -144,10 +144,17 @@ const sampleMissed = (userId: string, bandId: string): UserMissedBand => ({
 });
 
 const sampleMetalPlaceConfig = (): MetalPlaceConfig => ({
-  festival_day: 1,
-  start_time: '2026-07-29T10:00:00Z',
-  end_time: '2026-07-29T22:00:00Z',
+  id: 1,
   label: 'Metal Place',
+  windows: [
+    {
+      id: 'sample-window-1',
+      festival_day: 1,
+      start_time: '10:00',
+      end_time: '22:00',
+      sort_order: 0,
+    },
+  ],
   updated_by: 'godlike',
   updated_at: '2026-05-01T12:00:00Z',
 });
