@@ -72,6 +72,11 @@ describe('loadStoredFilters', () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ upcoming: 'yes' }));
     expect(loadStoredFilters().upcoming).toBe(false);
   });
+
+  it('falls back to null for userId when stored value is not a string', () => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ userId: 42 }));
+    expect(loadStoredFilters().userId).toBeNull();
+  });
 });
 
 describe('saveStoredFilters + loadStoredFilters round-trip', () => {
@@ -83,7 +88,7 @@ describe('saveStoredFilters + loadStoredFilters round-trip', () => {
       genre: 'Heavy Metal',
       upcoming: true,
       sortOrder: 'time-asc',
-      userId: null,
+      userId: 'user-abc-123',
     };
     saveStoredFilters(filters);
     const loaded = loadStoredFilters();
@@ -93,6 +98,7 @@ describe('saveStoredFilters + loadStoredFilters round-trip', () => {
     expect(loaded.stage).toEqual(['Faster', 'Louder']);
     expect(loaded.genre).toBe('Heavy Metal');
     expect(loaded.upcoming).toBe(true);
+    expect(loaded.userId).toBe('user-abc-123');
   });
 
   it('does not persist the query field to localStorage', () => {
@@ -101,6 +107,20 @@ describe('saveStoredFilters + loadStoredFilters round-trip', () => {
     expect(raw).toBeTruthy();
     const parsed = JSON.parse(raw!);
     expect(parsed).not.toHaveProperty('query');
+  });
+
+  it('persists userId to localStorage', () => {
+    saveStoredFilters({
+      query: '',
+      day: null,
+      stage: [],
+      genre: null,
+      upcoming: false,
+      sortOrder: 'time-asc',
+      userId: 'user-xyz-789',
+    });
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY)!);
+    expect(parsed.userId).toBe('user-xyz-789');
   });
 
   it('overwrites previous saved filters when called again', () => {

@@ -4,6 +4,16 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-26 (Lineup user-picks filter persistence)
+
+### Fixed
+- **`scheduleFilterStorage`** — vira-lata picks filter (`userId`) now persists in localStorage with day/stage/genre/upcoming/sortOrder. Search query remains session-only.
+
+### Changed
+- `architecture.md` — `scheduleFilterStorage` entry no longer documents `userId` as stripped on save.
+
+---
+
 ## 2026-06-26 (Phase 45 close — Camp HQ Geolocation)
 
 ### Added

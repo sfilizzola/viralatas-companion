@@ -507,7 +507,7 @@ INSERT into user_picks
 | `livePreview.ts` | Live plan grouping helpers (`mapCrewLivePlans`, `groupCrewLivePlans`, `deriveUserBadgeLocation`) — consumed by `buildSocialSnapshot()` | Reads/writes test config in IDB |
 | `socialSnapshot.ts` | Pure `buildSocialSnapshot()` — **social snapshot** shared by `/now` and live vest | ✅ Yes (IDB inputs only) |
 | `bandFilter.ts` | `filterBands(bands, filters, now, userPickIds?)` — pure filter predicate; optional 4th param restricts to a user's picked band IDs (Phase 38.A) | ✅ Yes |
-| `scheduleFilterStorage.ts` | `loadStoredFilters()` / `saveStoredFilters()` — localStorage persistence for schedule filter state; strips `userId` before write (never persisted) | ✅ Yes |
+| `scheduleFilterStorage.ts` | `loadStoredFilters()` / `saveStoredFilters()` — localStorage persistence for schedule filter state; search `query` is session-only | ✅ Yes |
 | `attendees.ts` | `computeAttendees(picks, crewUsers)` — maps raw picks to hydrated `BandAttendee[]` per band; exports `BandAttendee` and `AttendeeMap` types | ✅ Yes |
 | `weakSkips.ts` | `getWeakSkipCount()`, `recordCommittedSkip()` — committed “I am weak” skips in `user_metadata.weak_skips_2026` via best-effort `auth.updateUser` (same pattern as `location_visits` in `presenceRepository`) | Auth metadata only |
 | `badges/currentFestivalYear.ts` | `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()` — live vest year filter + consolidation gate | ✅ Yes |

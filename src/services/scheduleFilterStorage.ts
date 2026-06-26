@@ -19,7 +19,7 @@ export function loadStoredFilters(): BandFilterValue {
       genre: typeof parsed.genre === 'string' ? parsed.genre : null,
       upcoming: typeof parsed.upcoming === 'boolean' ? parsed.upcoming : false,
       sortOrder,
-      userId: null,
+      userId: typeof parsed.userId === 'string' ? parsed.userId : null,
     };
   } catch {
     return EMPTY_FILTERS;
@@ -28,9 +28,8 @@ export function loadStoredFilters(): BandFilterValue {
 
 export function saveStoredFilters(filters: BandFilterValue) {
   try {
-    const { query: _q, userId: _u, ...persisted } = filters;
+    const { query: _q, ...persisted } = filters;
     void _q;
-    void _u;
     localStorage.setItem(FILTERS_STORAGE_KEY, JSON.stringify(persisted));
   } catch {
     /* localStorage unavailable; silently skip */
