@@ -673,12 +673,26 @@ reactionsRepository.toggle(announcementId, userId, emoji)
 
 ---
 
+## Camp HQ info zone (Phase 45)
+
+Above the post form (info zone, before `isBlocked` gate), `AnnouncementsPage` mounts `<CampHqCard />`:
+
+- Renders only when godlike has set campground GPS (`useCampLocation()` → IDB first)
+- `CampNavStrip variant="mural"` (C+ gaffer tape) — tap opens Google Maps; touch long-press opens `CampLocationSheet`
+- Blocked posters still see the strip but cannot post
+- Unrelated to presence "camping" toggle on `/now`
+
+Full flow: `docs/ai-wiki/flows/camp-location.md`.
+
+---
+
 ## Relevant Source Files
 
 | File | Role |
 |------|------|
 | `src/hooks/useAnnouncements.ts` | IDB read, reaction summaries, `toggleReaction`, pagination, moderation state |
-| `src/pages/AnnouncementsPage.tsx` | Layout, post form, feed + `ReactionBar` per card |
+| `src/pages/AnnouncementsPage.tsx` | Layout, `CampHqCard` info zone, post form, feed + `ReactionBar` per card |
+| `src/components/camp/CampHqCard.tsx` | Mural camp strip wrapper (Phase 45) |
 | `src/services/announcementsDisplay.ts` | `applyPinSort`, `relativeTime`, `buildReactionSummaries` |
 | `src/repositories/announcements.ts` | Post, sync, delete, pin/unpin, flush pending, reaction orphan purge |
 | `src/repositories/reactions.ts` | Toggle, offline flush, full pull, Realtime |

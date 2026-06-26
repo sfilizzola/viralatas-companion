@@ -4,6 +4,21 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-26 (Phase 45 close — Camp HQ Geolocation)
+
+### Added
+- Phase 45 closed on `dev` / **v1.3.19** — Camp HQ geolocation shipped (godlike admin, Mural C+ strip, map D1 dock, IDB `camp_location` v14).
+
+### Changed
+- `architecture.md`, `domain-model.md`, `sync-engine.md`, `offline-first.md`, `index.md` — Phase 45 cross-links, IDB v14, `CampLocation` entity, hook/repository tables.
+- `flows/festival-minimap.md`, `flows/announcements.md` — `CampMapDock` / `CampHqCard` placement + link to `flows/camp-location.md`.
+
+### Architectural Notes
+- Camp location sync is **hook-mount only** — not in `runReconnectSync()`; no offline queue; no Realtime on `app_settings` (v1).
+- IDB v14 + `getDB()` reopen fix: browsers stuck at v13 without `camp_location` store now upgrade cleanly.
+
+---
+
 ## 2026-06-26 (Camp location IDB upgrade fix)
 
 ### Fixed

@@ -1,6 +1,6 @@
 # Viralatas Companion — Architectural Wiki
 
-**Last Updated**: 2026-05-27 (Phase 30 closed)
+**Last Updated**: 2026-06-26 (Phase 45 closed)
 
 ## Purpose
 
@@ -25,7 +25,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
 | Frontend | React 18 + Vite | Component UI, hot reload |
-| Offline Store | IndexedDB v10 (`idb` lib) | Primary source of truth for reads |
+| Offline Store | IndexedDB v14 (`idb` lib) | Primary source of truth for reads |
 | Sync Target | Supabase PostgreSQL + Realtime | Source of truth for auth, persistence, live updates |
 | Auth | Supabase Auth | Email/password login; persisted to IndexedDB |
 | PWA | Vite PWA Plugin + Workbox | Service Worker, manifest, auto-update, caching |
@@ -65,6 +65,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[Flow: Playlist Launch](flows/playlist-launch.md)** — `/my-picks` strip → Setlist Vira-Latas deep-link; `playlist_testing` feature flag; godlike admin toggle
 - **[Flow: MoshSplit Balance](flows/moshsplit.md)** — `/profile` balance section → MoshSplit deep-link; Part 1 mock (hidden), Part 2 API (blocked)
 - **[Flow: Festival Wrap](flows/festival-wrap.md)** — Post-festival `/wrap` recap (7–8 scroll sections); IDB-only stats; teaser banner + godlike D+1 QA
+- **[Flow: Camp HQ Geolocation](flows/camp-location.md)** — Godlike sets shared campground GPS; Mural C+ strip + map D1 dock; IDB cache; Google Maps deep-link
 
 ### Architectural Decisions (ADRs)
 - **[ADR: IndexedDB as Primary Store](decisions/indexeddb-primary-store.md)** — Why IDB, not Supabase-primary
@@ -182,21 +183,22 @@ window.addEventListener('viralatas:picks-changed', () => {
        │ immediate writes + event emit            │
        ▼                                          │
 ┌──────────────────────┐                  ┌──────▼──────────┐
-│  IndexedDB (v10)     │                  │ Window Events   │
+│  IndexedDB (v14)     │                  │ Window Events   │
 │                      │                  │                 │
 │  stores:             │                  │ 'picks-changed' │
 │  - user_picks        │◄─────────────────│ 'crew-users-...'│
 │  - offline_picks     │                  │ 'presence-...'  │
 │  - announcements     │                  │ 'announce-...'  │
-│  - offline_ann.      │                  │ 'badge-history' │
-│  - bands (cache)     │                  └─────────────────┘
+│  - offline_ann.      │                  │ 'camp-location' │
+│  - bands (cache)     │                  │ 'badge-history' │
 │  - crew_users (cache: is_friend, special_badges)│
 │  - user_presence     │
+│  - camp_location     │
 │  - offline_presence  │
 │  - user_missed_bands │
 │  - user_badge_history│
 │  - offline_missed    │
-└──────────┬───────────┘
+└──────────┬───────────┘                  └─────────────────┘
            │ async sync (reconnect, 'online' event)
            ▼
 ┌──────────────────────────────────────────────────────────┐
@@ -228,6 +230,7 @@ window.addEventListener('viralatas:picks-changed', () => {
 | **Band Seed** | `supabase/seed/bands.ts`, `docs/ai-wiki/lineup.md`, `docs/ai-wiki/stages.md` |
 | **Duck / Push** | `src/repositories/duck.ts`, `src/hooks/useDuckQuack.ts`, `src/hooks/useDuckNotifications.ts`, `src/lib/pushSubscription.ts`, `src/components/DuckButton.tsx`, `src/components/DuckToast.tsx`, `src/workers/sw.ts`, `supabase/functions/send-duck-push/index.ts`, `supabase/functions/send-test-push/index.ts` |
 | **App Pack integrations** | `src/components/PlaylistLaunchButton.tsx`, `src/components/profile/MoshSplitSection.tsx`, `src/lib/appSettings.ts` (`playlist_testing`) |
+| **Camp HQ geolocation** | `src/hooks/useCampLocation.ts`, `src/repositories/campLocation.ts`, `src/components/camp/`, `src/components/profile/CampingLocationAdminSection.tsx` |
 
 ---
 
@@ -239,6 +242,7 @@ window.addEventListener('viralatas:picks-changed', () => {
 - **UserPick**: User → Band relationship (many-to-many)
 - **Announcement**: Text posts with author, creation time, soft-delete support
 - **UserPresence**: Camping status, Metal Place check-in status
+- **CampLocation**: Shared campground GPS (godlike-set; IDB-cached; Phase 45)
 - **UserMissedBand**: Bands user marked as "didn't watch" (for badges)
 - **UserBadgeHistory**: Frozen year-badge rows after godlike consolidation (Phase 29); survives `festival:reset`
 
@@ -265,6 +269,8 @@ User (1) ──┬─→ (∞) UserPick ←─ (∞) Band
 | **Post announcement** | IndexedDB + Supabase | IndexedDB + pending queue |
 | **View announcements** | Realtime + IndexedDB | IndexedDB only (stale) |
 | **Conflict alerts** | Run offline (cached logic) | Run offline (cached logic) |
+| **Camp HQ strip / Maps link** | IDB + hook sync | IDB only (stale until page remount) |
+| **Godlike set camp GPS** | Supabase + IDB | Not available (no queue) |
 
 **Sync happens**: On app init, `navigator.onLine === true`, on `'online'` event, or manual trigger.
 
@@ -475,6 +481,7 @@ Window events emitted from `src/lib/db.ts`:
 - `'viralatas:live-band-test-config-changed'` — live_band_test_config updated
 - `'viralatas:missed-changed'` — user_missed_bands or offline_missed_bands updated
 - `'viralatas:badge-history-changed'` — user_badge_history cache updated
+- `'viralatas:camp-location-changed'` — camp_location store updated (Phase 45)
 
 Window events dispatched by hooks/components (not from db.ts):
 - `'viralatas:duck-quack'` (CustomEvent `{ detail: { bandId: string } }`) — emitted by `useDuckNotifications` when a Realtime INSERT arrives on `duck_quacks`; consumed by `DuckToast`
@@ -482,4 +489,4 @@ Window events dispatched by hooks/components (not from db.ts):
 
 ---
 
-**Last edited**: 2026-05-28 — Phase 31 social snapshot unification, crew profile cache
+**Last edited**: 2026-06-26 — Phase 45 Camp HQ Geolocation; IndexedDB v14; camp-location flow link

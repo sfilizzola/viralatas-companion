@@ -606,6 +606,8 @@ INSERT INTO public.app_settings DEFAULT VALUES;
 - `playlist_testing` (Phase 22 Part 1) — feature-flag for the Playlist Launch button on `/my-picks`. When `true` (default), the button is shown only to `godlike`/`manager` roles (testing mode). When `false`, the button is visible to all vira-latas. The button is always hidden when the user has 0 picks. Read by `PlaylistLaunchButton` on mount via `getPlaylistTesting()` / `setPlaylistTesting()` from `src/lib/appSettings.ts`.
 - `camping_latitude` / `camping_longitude` (Phase 45) — nullable decimal GPS for the vira-latas' shared campground. Both null = camp UI hidden. Godlike sets via `CampingLocationAdminSection`; all vira-latas read via `campLocationRepository.syncCampLocation()`. Cached in IndexedDB `camp_location` store. See `docs/ai-wiki/flows/camp-location.md`.
 
+**IndexedDB mirror** (IDB v14): store `camp_location` (key `'current'` → `{ lat, lng }`); no offline queue.
+
 **RLS:**
 
 - `app_settings_select` — `using (true)` — anyone can read.

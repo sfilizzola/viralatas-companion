@@ -6,7 +6,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 >
 > **Status values:** `pending` · `partial — Phase N` (engine/data only) · `✅ Phase N` (shipped — spec collapsed; see `docs/ai-wiki/phases-history.md`)
 >
-> **Last synced:** 2026-06-08 — Phases 39–40 closed; 38.B promoted from PHASES.md.
+> **Last synced:** 2026-06-26 — Phase 45 closed; Camp HQ Geolocation shipped v1.3.19.
 
 ## Ideas at a glance
 

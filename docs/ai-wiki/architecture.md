@@ -36,7 +36,13 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/lib/db/badgeHistory.ts` — IndexedDB replace-all for current user on sync
 - `src/services/badges/currentFestivalYear.ts` — `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()`
 - `supabase/functions/consolidate-year-badges/` — Server-side year-badge snapshot (Deno badge engine copies)
-- `src/pages/MapPage.tsx` — `/map` live minimap; derives placements via `useSocialSnapshot` + `buildPlacements` (Phase 35)
+- `src/pages/MapPage.tsx` — `/map` live minimap; derives placements via `useSocialSnapshot` + `buildPlacements` (Phase 35); `CampMapDock` below minimap (Phase 45)
+- `src/components/camp/CampNavStrip.tsx`, `CampHqCard.tsx`, `CampMapDock.tsx`, `CampLocationSheet.tsx` — Camp HQ consumer UI (Phase 45)
+- `src/components/profile/CampingLocationAdminSection.tsx` — Godlike decimal GPS input (Phase 45)
+- `src/repositories/campLocation.ts` — Supabase ↔ IDB camp coords sync (Phase 45)
+- `src/hooks/useCampLocation.ts` — IDB-first camp coords; background pull on mount (Phase 45)
+- `src/lib/db/campLocation.ts` — IndexedDB `camp_location` store + `CAMP_LOCATION_CHANGED_EVENT` (Phase 45)
+- `src/services/campLocation.ts` — Parse, format, Google Maps URL helpers (Phase 45)
 - `src/components/map/MinimapOverlay.tsx` — Presentation-only map image + avatar dot buttons at fractional coords (Phase 35)
 - `src/components/map/minimapZones.ts` — `MINIMAP_ZONES` zone geometry config, `stageToZone()`, `groupKindToZone()` (Phase 35)
 - `src/services/minimapPlacement.ts` — Pure `buildPlacements()` with phyllotaxis layout + self-ordering (Phase 35)
@@ -82,10 +88,10 @@ Components are organized by concern:
 - `/schedule` (LineupPage) — Full lineup with filters (stage, genre, day, time); Phase 38.A adds per-crew-member filter: `BandFilterValue.userId` drives `filterBands` with a `userPickIds` set, compact `ViraLataFilterSelect` in the drawer (searchable scroll list + pick counts), a viewing banner, and shared-pick markers on `BandCard`
 - `/my-picks` (MyWackenPage) — User's picks by festival day (upcoming → divider → ended inline); Attended/Missed chips on ended rows; upcoming-only conflict counts; one-time coach banner (`localStorage` dismiss)
 - `/popular` (PopularPage) — Bands sorted by total pick count; ranked `BandCard` leaderboard rows with magnitude bars (picks / rating / ended modes)
-- `/announcements` (AnnouncementsPage) — Mural-style announcements board; Phase 43 Pit-stamp emoji reactions (`ReactionBar` + `EmojiPicker`) per post
+- `/announcements` (AnnouncementsPage) — Mural-style announcements board; Phase 43 Pit-stamp emoji reactions (`ReactionBar` + `EmojiPicker`) per post; Phase 45 `CampHqCard` (C+ gaffer tape) in info zone above post form — see `flows/camp-location.md`
 - `/profile` (ProfilePage) — User info, role controls, godlike admin
 - `/wrap` (WrapPage) — Post-festival recap; IDB-only stats; scroll-snap A2 Vest Chronicle (see `flows/festival-wrap.md`)
-- `/map` (MapPage) — Live minimap; avatar dots from same `useSocialSnapshot` as `/now`; no new schema or sync; reached via glyph F on `/now` (see `flows/festival-minimap.md`)
+- `/map` (MapPage) — Live minimap; avatar dots from same `useSocialSnapshot` as `/now`; Phase 45 `CampMapDock` (D1) below minimap; reached via glyph F on `/now` (see `flows/festival-minimap.md`, `flows/camp-location.md`)
 
 **Pattern**: All pages read from custom hooks, never call repositories directly.
 
@@ -235,7 +241,7 @@ emitPicksChanged();               // Components re-render
 
 Public import path remains `src/lib/db.ts` (thin re-export shim). Domain modules live under `src/lib/db/` (`connection`, `session`, `catalog`, `picks`, `presence`, `announcements`, `missed`, `config`, `duck`, `badgeHistory`, `meta`, `events`, `types`).
 
-**Version**: 10 (incremented on schema changes — Phase 29 adds `user_badge_history`)
+**Version**: 14 (incremented on schema changes — Phase 45 adds `camp_location`; v14 also fixes `getDB()` reopen when stores are missing at same on-disk version)
 
 **Object Stores** (collections):
 
@@ -255,6 +261,7 @@ Public import path remains `src/lib/db.ts` (thin re-export shim). Domain modules
 | `user_badge_history` | id (uuid) | Frozen year-badge archive per user (Phase 29) |
 | `metal_place_config` | string `'current'` | Festival day/time for Metal Place |
 | `live_band_test_config` | string `'current'` | Test override for live band (godlike) |
+| `camp_location` | string `'current'` | Shared campground GPS `{ lat, lng }` (Phase 45); synced from `app_settings` |
 | `meta` | string `'cache_version'` | Cache version for invalidation |
 
 **Operations**: All defined in `db.ts` and exported as async functions:
@@ -472,6 +479,7 @@ INSERT into user_picks
 | `useBandConflicts(bandIds)` | `Conflict[]` | None (computed) | MyPicksPage |
 | `useNow()` | `{ now, override }` | localStorage, window events | Time-based views |
 | `useOfflinePendingBandIds()` | `Set<bandId>` | `PICKS_CHANGED_EVENT` | BandCard (show pending chip) |
+| `useCampLocation()` | `CampLocation \| null` | `CAMP_LOCATION_CHANGED_EVENT` + mount sync | `CampHqCard`, `CampMapDock` |
 
 ### Repositories (src/repositories/)
 
@@ -485,6 +493,7 @@ INSERT into user_picks
 | `missedRepository` | `toggle()`, `flushOfflineQueue()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues offline |
 | `bandsRepository` | `checkAndApplyCacheVersion()`, `loadBands()` | Wipes IDB if cache version changes |
 | `badgeHistoryRepository` | `loadLocal()`, `syncFromRemote()`, `consolidateYear()`, `seedLocalPreview()`, `clearLocalPreview()` | Writes `user_badge_history` IDB; pull from Supabase; godlike consolidate via Edge Function |
+| `campLocationRepository` | `loadCampLocation()`, `syncCampLocation()`, `saveCampLocationRemote()`, `clearCampLocationRemote()` | Reads/writes IDB `camp_location`; godlike save/clear updates `app_settings`; no offline queue (Phase 45) |
 
 ### Services (src/services/)
 
@@ -559,6 +568,8 @@ Display path: no supabase.from('users') in vest hooks
 - Missed band mark: Queued to `offline_missed_bands`
 - Weak skip counter / location visit counts: Best-effort `auth.updateUser` on commit (no IDB queue; session cache is read source for badges)
 - Badge history: Read from IDB; pull from Supabase on profile mount and `'online'` (no offline queue — godlike consolidate requires network)
+- Camp HQ GPS (admin): Requires network — no offline queue; godlike Save/Clear fails when offline
+- Camp HQ GPS (consumer read): From IDB `camp_location`; background `syncCampLocation()` on hook mount when online (not in `runReconnectSync`)
 
 **Reads:**
 - Always from IndexedDB (stale if offline)
@@ -655,4 +666,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-06-09 — Phase 42.A Presence layer refactor: `presencePolicy.ts` (pure rules) and `presenceService.ts` (orchestration) added to Relevant Source Files and Services table; `presenceRepository` updated to pure I/O (8 methods); 3-layer seam documented in Layer 3 section and Repositories table.
+**Last updated:** 2026-06-26 — Phase 45 Camp HQ Geolocation: `camp_location` IDB store (v14), `campLocationRepository`, `useCampLocation`, consumer UI on `/announcements` and `/map`; no camp surface on `/now`.

@@ -997,6 +997,45 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 
 ---
 
+### Phase 45 — Camp HQ Geolocation
+**Status:** ✅ Complete · **Released:** v1.3.19 on `main` (2026-06-26)
+
+**Completed:** 2026-06-26
+
+**Goal:** Godlike sets shared **Campground** GPS on arrival; vira-latas open Maps from Mural **C+** strip or map **D1** dock. No camp UI on `/now`. Title = **Campground** (not Vira-Latas HQ).
+
+**Deliverables shipped:**
+- `supabase/migrations/20260626000000_app_settings_camp_location.sql` — `app_settings.camping_latitude` / `camping_longitude` (nullable, godlike RLS)
+- `src/lib/db/campLocation.ts` + IDB v14 `camp_location` store; `CAMP_LOCATION_CHANGED_EVENT`
+- `src/repositories/campLocation.ts` — sync, save, clear; hook-mount sync (no Realtime v1)
+- `src/services/campLocation.ts` — parse, validate, maps URL, `openCampInMaps`
+- `useCampLocation`, `useLongPress`, `useCampLocationActions`
+- `CampNavStrip` / `CampHqCard` on `/announcements` (C+ gaffer tape); `CampMapDock` on `/map` (D1 below minimap)
+- `CampLocationSheet` — mobile long-press: copy + open Maps; desktop tap-only
+- `CampPinIcon`; `CampingLocationAdminSection` in Godlike Tools (decimal pair, one-tap clear)
+- i18n `CampLocation_{br,en,es,de}.json` + GodlikeAdmin camp keys (4 locales)
+- `docs/ai-wiki/flows/camp-location.md`; DS §15 + manifest; `festival:reset` preserves camp coords
+- Post-ship fix: IDB v14 reopen when object store missing (stale v13 connection)
+
+**Acceptance criteria (all met):**
+- [x] Godlike paste/save/one-tap clear; invalid input inline errors; decimal pair only
+- [x] Mural C+ strip + map D1 dock only when coords set; title **Campground**
+- [x] Tap opens maps URL; long-press sheet (mobile) + copy works
+- [x] No camp UI on `/now`; no overlay on minimap crew dots
+- [x] Blocked posters still see Campground strip on Mural
+- [x] Coords cached in IndexedDB; tap works offline after first sync
+- [x] `festival:reset` preserves camp coordinates
+- [x] Build green · 893 tests green
+
+**Architectural notes:**
+- **Campground vs HQ:** `/now` "camping" presence group stays Vira-Latas HQ; Camp HQ is geolocation only (Mural + Map).
+- **Offline-first read:** UI reads IndexedDB; Supabase sync on hook mount, not Realtime (v1).
+- **Grill decisions locked:** one-tap clear (no confirm), no desktop sheet, map-specific hint key.
+
+**Phase closed:** 2026-06-26 — build + 893 tests green; wiki + DS synced; `PHASES.md` cleared (next: 46).
+
+---
+
 ### Phase 44 — Metal Place Multi-Window Configuration
 **Status:** ✅ Complete · **Released:** v1.3.18 on `main` (2026-06-25)
 

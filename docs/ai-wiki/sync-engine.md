@@ -19,6 +19,7 @@ Document how data is synchronized between IndexedDB (primary), offline queues, a
 - `src/repositories/users.ts` — Crew member sync
 - `src/repositories/missed.ts` — Missed band sync
 - `src/repositories/bands.ts` — Band sync (`sync()`), cache version check, godlike cache invalidation (Phase 27.H)
+- `src/repositories/campLocation.ts` — Camp HQ GPS sync from `app_settings` → IDB `camp_location` (Phase 45; no offline queue)
 - `src/lib/db/` — IndexedDB domain modules (barrel `index.ts`; public shim `src/lib/db.ts`)
 
 ---
@@ -156,6 +157,25 @@ function ReconnectSync() {
 5. **Return flushed count** — sum of all queue flushes (incl. reactions); `ReconnectSync` emits `viralatas:sync-complete` once if total > 0
 
 **Why one coordinator?** Previously PickSync, AnnouncementSync, and DuckSync each registered separate `online` handlers; DuckSync skipped mount flush; missed-band flush only ran when `useMissedBands` mounted. Hooks (`usePickCounts`, `usePresenceRealtime`, etc.) duplicated remote pulls on mount.
+
+---
+
+### Camp location sync (Phase 45 — outside ReconnectSync)
+
+Camp HQ coordinates are **not** flushed or pulled by `runReconnectSync()`. They use a separate, lighter path:
+
+| Step | When | What |
+|------|------|------|
+| IDB read | `useCampLocation()` mount | `loadCampLocation()` — immediate UI |
+| Remote pull | Same hook mount (online) | `campLocationRepository.syncCampLocation()` → SELECT `app_settings` → write/clear IDB |
+| Godlike write | Save/Clear in admin | `saveCampLocationRemote()` / `clearCampLocationRemote()` → Supabase UPDATE + IDB + event |
+
+**Not in scope v1:**
+- No `offline_camp_location` queue — admin save requires network
+- No Realtime on `app_settings` — consumer devices need page navigation to pick up godlike edits mid-session
+- Not part of `runReconnectSync()` pull batch
+
+See `docs/ai-wiki/flows/camp-location.md`.
 
 ---
 
@@ -475,6 +495,8 @@ All Realtime → IndexedDB writes are mounted once in **`RealtimeSync`** (`src/c
 | useDuckNotifications | duck_quacks_realtime | INSERT on duck_quacks | Dispatches `viralatas:duck-quack` event |
 | missedRepository | missed_bands | INSERT, DELETE on user_missed_bands | Saves to user_missed_bands IDB |
 
+**Not Realtime (v1):** `app_settings` (incl. `camping_latitude` / `camping_longitude`) — camp coords sync on `useCampLocation()` mount only.
+
 **Subscription lifecycle** (sync layer):
 ```typescript
 // src/components/sync/RealtimeSync.tsx
@@ -551,4 +573,4 @@ createOptimisticQueue(storage, {
 
 On flush: load IDB queue → `buildFlushBatches()` → `syncOne()` per batch → remove all IDs in batch on success. Failed batches stay queued for next reconnect.
 
-**Last updated:** 2026-05-25 — Phase 27.H: band sync folded into `bandsRepository.sync()`; `src/lib/sync.ts` removed.
+**Last updated:** 2026-06-26 — Phase 45: camp location sync documented (hook-mount pull; not in `runReconnectSync`); `app_settings` excluded from Realtime.

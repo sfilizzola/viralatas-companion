@@ -23,7 +23,8 @@ The user taps the glyph F "Pin + bolt" button in the `/now` header (beside the t
 7. The current user's dot (`isSelf`) is rendered last and highlighted with a gold ring — never buried under other dots.
 8. Tapping a dot toggles a name pill (single selection); tapping the map or the same dot again dismisses it. The self dot's pill shows by default.
 9. `useNow(30_000)` re-fires every 30 seconds, so derived positions shift as bands start and end — matching the clock granularity of `/now`.
-10. User taps the back arrow to return to `/now`.
+10. When camp coords are set, `CampMapDock` renders below `MinimapOverlay` (D1 gaffer-tape strip → Google Maps). See `flows/camp-location.md`.
+11. User taps the back arrow to return to `/now`.
 
 ---
 
@@ -33,6 +34,7 @@ The minimap is fully offline-capable. All inputs to `buildPlacements` come from 
 
 - `crewGroups` derives from cached picks, presence, bands, and crew-user profiles in IndexedDB.
 - `public/infield_map.png` is precached by the Service Worker (appears in the Workbox precache manifest after `npm run build`).
+- Camp HQ coords (`camp_location` IDB) render in `CampMapDock` when cached — same offline read path as Mural; see `flows/camp-location.md`.
 - `OfflineBanner` appears at the top of the page when `navigator.onLine` is false.
 - A static offline note (`t('offlineNote')`) is also rendered below the header.
 
@@ -53,7 +55,8 @@ No minimap-specific sync logic exists. The minimap is a pure presentation layer 
 
 | File | Role |
 |------|------|
-| `src/pages/MapPage.tsx` | Route container; calls `useSocialSnapshot`, derives `placements`, handles offline state |
+| `src/pages/MapPage.tsx` | Route container; calls `useSocialSnapshot`, derives `placements`, handles offline state; mounts `CampMapDock` (Phase 45) |
+| `src/components/camp/CampMapDock.tsx` | D1 camp strip below minimap; `useCampLocation()` → Google Maps (Phase 45) |
 | `src/components/map/MinimapOverlay.tsx` | Presentation-only; renders image + avatar buttons; tap-to-toggle pill |
 | `src/components/map/minimapZones.ts` | Single source of zone geometry: `MINIMAP_ZONES`, `stageToZone()`, `groupKindToZone()` |
 | `src/services/minimapPlacement.ts` | Pure function `buildPlacements(crewGroups, zones, selfUserId)` |
@@ -96,6 +99,9 @@ MinimapOverlay
   └─ <button> per Placement       → absolute position at xPct/yPct
         ├─ isSelf → gold ring + default name pill
         └─ tap toggle → name pill (single selection)
+
+CampMapDock (.campDockUnder, Phase 45)
+  └─ CampNavStrip variant="map" → tap/long-press → Google Maps / CampLocationSheet
 ```
 
 ---
@@ -127,3 +133,7 @@ MinimapOverlay
 - Should there be a zoom or pinch-to-zoom gesture on the map image for better readability on small screens?
 - Should the minimap be reachable from `/popular` or the bottom nav in a future phase?
 - If the map asset (`public/infield_map.png`) is ever updated or replaced, zone boxes in `MINIMAP_ZONES` must be re-tuned — no automated test covers this (visual sign-off only).
+
+---
+
+**Last updated:** 2026-06-26 — Phase 45: `CampMapDock` (D1) below minimap; cross-link to `flows/camp-location.md`.

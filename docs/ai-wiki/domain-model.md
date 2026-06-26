@@ -34,6 +34,7 @@ Viralatas Metaleiros is a small group (~20 people) attending Wacken Open Air 202
 9. **BlockedPoster** — Manager blocking moderation rules
 10. **UserBadgeHistory** — Frozen year-badge row after godlike consolidation (Phase 29)
 11. **UserBandRating** — A vira-lata's 1–5 score for a concert they attended (Phase 32)
+12. **CampLocation** — Shared campground GPS set by godlike; cached in IDB for Mural + Map navigation (Phase 45)
 
 ---
 
@@ -563,6 +564,41 @@ type LiveBandTestConfig = {
 
 ---
 
+### CampLocation (Phase 45)
+
+**Essence**: The vira-latas' shared campground GPS coordinates — one pair for the whole crew, not per-user.
+
+```typescript
+type CampLocation = {
+  lat: number;   // decimal degrees, e.g. 54.037809
+  lng: number;   // decimal degrees, e.g. 9.368845
+};
+```
+
+**Persistence:**
+- **Supabase** — `public.app_settings.camping_latitude` / `camping_longitude` (nullable; both null = no camp UI)
+- **IndexedDB** — `camp_location` store, key `'current'` → `{ lat, lng }`
+
+**Invariants:**
+- Both lat and lng must be non-null for UI to render (`isCampLocation()`); partial null treated as unset
+- Godlike-only write (existing `app_settings` RLS)
+- Unrelated to `UserPresence.is_camping` (presence toggle vs. shared HQ GPS)
+
+**Business Rules:**
+- Godlike sets/clears via `CampingLocationAdminSection` on `/profile`
+- All vira-latas open Google Maps from `CampNavStrip` on `/announcements` (C+) or `/map` (D1)
+- No camp UI on `/now`
+- `festival:reset` preserves `app_settings` — camp coords survive pre-festival wipe
+
+**Lifecycle:**
+1. Godlike Save → `campLocationRepository.saveCampLocationRemote()` → Supabase UPDATE + IDB write → `CAMP_LOCATION_CHANGED_EVENT`
+2. Consumer mount → `useCampLocation()` → IDB read immediately → background `syncCampLocation()` when online
+3. Other clients see new coords after page navigation (no Realtime on `app_settings` v1)
+
+**Relevant source files:** `docs/ai-wiki/flows/camp-location.md`, `src/repositories/campLocation.ts`, `src/lib/db/campLocation.ts`, `src/hooks/useCampLocation.ts`
+
+---
+
 ### UserBadgeHistory
 
 **Essence**: A frozen snapshot of one earned year-badge, written when godlike consolidates a festival year. Survives `festival:reset` and outlives live vest metadata.
@@ -715,6 +751,7 @@ Computed in `useNowData()` using current time + user picks.
 - Assign special joke badges
 - Consolidate year-badges into archive (`ConsolidateBadgesSection`)
 - Configure live band test override
+- Set/clear shared campground GPS (`CampingLocationAdminSection`, Phase 45)
 - Edit test user flag
 - Modify other users' profiles (future)
 
@@ -763,4 +800,4 @@ Computed in `useNowData()` using current time + user picks.
 
 ---
 
-**Last updated:** 2026-06-25 — Phase 44: `MetalPlaceConfig` + `MetalPlaceWindow` multi-slot model; removed `test_override_day` and root-level day/time fields.
+**Last updated:** 2026-06-26 — Phase 45: `CampLocation` entity; godlike campground GPS on `app_settings`.

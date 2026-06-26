@@ -13,6 +13,7 @@ Document the guarantees, tradeoffs, and mechanics of the offline-first architect
 - `src/repositories/picks.ts`, `announcements.ts`, `presence.ts`, `missed.ts`, `duck.ts` — Offline queue logic + `flushOfflineQueue()`
 - `src/repositories/users.ts` — `syncCrew()` crew profile cache incl. `special_badges` (Phase 31)
 - `src/repositories/badgeHistoryRepository.ts` — Badge archive IDB read + Supabase pull (no offline queue; Phase 29)
+- `src/repositories/campLocation.ts` — Camp HQ GPS IDB read + Supabase pull on hook mount; godlike save network-only (Phase 45)
 - `src/lib/syncCoordinator.ts` — Single reconnect contract (Phase 27.C)
 - `src/components/sync/` — `BandSync`, `ReconnectSync`, `RealtimeSync`, `CacheVersionCheck` (Phase 26.G + 27.C/D/H)
 - `vite.config.ts` — PWA / Service Worker caching strategy
@@ -60,6 +61,8 @@ The app **must** remain fully functional offline:
 - ✅ Mark bands as seen (queued for sync)
 - ✅ View live vest assigned badges (from `crew_users.special_badges` after last `syncCrew()`)
 - ✅ `/now` and live vest crew counts aligned offline (shared `buildSocialSnapshot()`)
+- ✅ Open campground in Maps from Mural/Map when coords cached in IDB (Phase 45)
+- ❌ Godlike set/clear camp GPS offline (network required; no queue)
 - ❌ Run badge year consolidation (godlike; requires network)
 - ❌ Receive LLM alerts (requires network call)
 - ❌ See brand-new announcements (requires Realtime)
@@ -406,6 +409,16 @@ Delete from offline queue:
 | `festival:reset` | Archive rows untouched in Supabase and IDB ✓ |
 | Re-consolidate same year | Idempotent upsert (`UNIQUE user_id, festival_year, slug`) ✓ |
 
+### Camp location (Phase 45)
+
+| Scenario | Guarantee |
+|----------|-----------|
+| View camp strip offline | Served from IDB `camp_location` after prior sync ✓ |
+| Godlike Save/Clear offline | Fails with error — no offline queue ✓ |
+| Open Google Maps offline | Client-built URL; device maps app may work ✓ |
+| Godlike edits on another device mid-session | Stale until consumer navigates to route mounting `useCampLocation()` (no Realtime v1) ⚠️ |
+| IDB v13 missing `camp_location` store | v14 `getDB()` reopen creates store on next access ✓ |
+
 ---
 
 ## Realtime vs. Offline Cache
@@ -529,4 +542,4 @@ Appears when:
 
 ---
 
-**Last updated:** 2026-05-28 — Phase 31 crew profile cache; vest display from IDB after sync.
+**Last updated:** 2026-06-26 — Phase 45 Camp HQ: IDB `camp_location` read offline; admin write network-only; hook-mount sync (not reconnect batch).
