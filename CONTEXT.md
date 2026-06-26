@@ -80,6 +80,14 @@ _Avoid_: Badge dedup, duplicate patch hiding
 The active Wacken cycle year, derived at runtime as the maximum `BadgeConfig.year` across the live badge registry. The live vest evaluates only evergreen badges (`year` omitted) plus year-badges matching this value.
 _Avoid_: CURRENT_FESTIVAL_YEAR constant, festival year config
 
+**Campground** (camp location):
+The crew’s fixed physical campsite GPS — one lat/lng pair set by godlike on arrival, stable for the rest of that Wacken cycle, surfaced on the Mural and `/map` as a Maps deep link. Not live presence; not who is at camp. Godlike may **one-tap clear** coordinates before the festival to hide surfaces while testing (no confirm dialog).
+_Avoid_: Vira-Latas HQ (that label on `/now` is the **camping presence group** only), camp HQ card, HQ pin
+
+**Camping presence group** (`Vira-Latas HQ` on `/now`):
+The live `/now` bucket listing vira-latas currently checked in at camping. Unrelated to Campground coordinates.
+_Avoid_: Campground, camp pin, GPS card
+
 ## Flagged ambiguities
 
 _(none yet)_
