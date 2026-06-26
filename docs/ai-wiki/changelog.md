@@ -4,6 +4,13 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-26 (Camp location IDB upgrade fix)
+
+### Fixed
+- **`camp_location` save error** — Bumped IndexedDB to v14 and fixed `getDB()` to reopen at a higher version when object stores are missing. Same-version reopen skipped `upgrade()`, so browsers stuck at v13 without `camp_location` threw "object store was not found" on godlike Save.
+
+---
+
 ## 2026-06-26 (Phase 45 — Camp HQ Geolocation)
 
 ### Added

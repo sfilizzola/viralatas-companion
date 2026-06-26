@@ -2,7 +2,7 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { ViralatasDB } from './types';
 
 export const DB_NAME = 'viralatas-db';
-export const DB_VERSION = 13;
+export const DB_VERSION = 14;
 
 /** Canonical object store list — keep in sync with the upgrade() block below. */
 export const VIRALATAS_OBJECT_STORES = [
@@ -47,9 +47,7 @@ function isDatabaseCurrent(db: IDBPDatabase<ViralatasDB>): boolean {
   return VIRALATAS_OBJECT_STORES.every((store) => db.objectStoreNames.contains(store));
 }
 
-function openDatabase(): Promise<IDBPDatabase<ViralatasDB>> {
-  return openDB<ViralatasDB>(DB_NAME, DB_VERSION, {
-      upgrade(db) {
+function upgradeDatabase(db: IDBPDatabase<ViralatasDB>) {
         if (!db.objectStoreNames.contains('session')) {
           db.createObjectStore('session');
         }
@@ -128,8 +126,10 @@ function openDatabase(): Promise<IDBPDatabase<ViralatasDB>> {
         if (!db.objectStoreNames.contains('offline_announcement_reactions')) {
           db.createObjectStore('offline_announcement_reactions', { keyPath: 'id' });
         }
-      },
-    });
+}
+
+function openDatabase(version = DB_VERSION): Promise<IDBPDatabase<ViralatasDB>> {
+  return openDB<ViralatasDB>(DB_NAME, version, { upgrade: upgradeDatabase });
 }
 
 /** Close cached IDB connection so the next getDB() reopens and runs upgrade(). */
@@ -155,8 +155,18 @@ export async function getDB(): Promise<IDBPDatabase<ViralatasDB>> {
   let db = await dbPromise;
   if (!isDatabaseCurrent(db)) {
     db.close();
-    dbPromise = openDatabase();
+    // Same-version open skips upgrade(); bump past on-disk version to create missing stores.
+    const reopenVersion = Math.max(DB_VERSION, db.version + 1);
+    dbPromise = openDatabase(reopenVersion);
     db = await dbPromise;
+  }
+
+  if (!isDatabaseCurrent(db)) {
+    db.close();
+    dbPromise = null;
+    throw new Error(
+      'IndexedDB schema upgrade failed. Reload the page to finish upgrading local storage.',
+    );
   }
 
   return db;

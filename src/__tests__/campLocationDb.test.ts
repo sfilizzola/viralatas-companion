@@ -38,4 +38,26 @@ describe('camp_location IndexedDB store', () => {
     expect(handler).toHaveBeenCalledOnce();
     window.removeEventListener(CAMP_LOCATION_CHANGED_EVENT, handler);
   });
+
+  it('creates camp_location when reopening a v13 database that omitted the store', async () => {
+    await new Promise<void>((resolve, reject) => {
+      const request = indexedDB.open('viralatas-db', 13);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains('session')) {
+          db.createObjectStore('session');
+        }
+      };
+      request.onsuccess = () => {
+        request.result.close();
+        resolve();
+      };
+      request.onerror = () => reject(request.error ?? new Error('open failed'));
+    });
+
+    await resetDbConnectionForTests();
+    const location = sampleLocation();
+    await saveCampLocation(location);
+    expect(await loadCampLocation()).toEqual(location);
+  });
 });

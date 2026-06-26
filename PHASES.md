@@ -36,7 +36,7 @@ Full detail → plan § Grill session decisions · `CONTEXT.md`
 
 **Data**
 - [ ] Migration: `app_settings.camping_latitude`, `app_settings.camping_longitude` (nullable)
-- [ ] IndexedDB store `camp_location` (DB version 13)
+- [ ] IndexedDB store `camp_location` (DB version 14)
 - [ ] `campLocationRepository` — sync, save, clear
 - [ ] `CAMP_LOCATION_CHANGED_EVENT` for live refresh
 
