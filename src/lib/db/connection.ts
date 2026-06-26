@@ -42,18 +42,13 @@ export function wipeTargetObjectStores(): WipeTargetStore[] {
 
 let dbPromise: Promise<IDBPDatabase<ViralatasDB>> | null = null;
 
-/** Test-only: close cached connection so the next IDB op opens a fresh database. */
-export async function resetDbConnectionForTests(): Promise<void> {
-  if (dbPromise) {
-    const db = await dbPromise;
-    db.close();
-    dbPromise = null;
-  }
+function isDatabaseCurrent(db: IDBPDatabase<ViralatasDB>): boolean {
+  if (db.version < DB_VERSION) return false;
+  return VIRALATAS_OBJECT_STORES.every((store) => db.objectStoreNames.contains(store));
 }
 
-export function getDB() {
-  if (!dbPromise) {
-    dbPromise = openDB<ViralatasDB>(DB_NAME, DB_VERSION, {
+function openDatabase(): Promise<IDBPDatabase<ViralatasDB>> {
+  return openDB<ViralatasDB>(DB_NAME, DB_VERSION, {
       upgrade(db) {
         if (!db.objectStoreNames.contains('session')) {
           db.createObjectStore('session');
@@ -135,6 +130,34 @@ export function getDB() {
         }
       },
     });
+}
+
+/** Close cached IDB connection so the next getDB() reopens and runs upgrade(). */
+export async function resetDbConnection(): Promise<void> {
+  if (!dbPromise) return;
+  try {
+    const db = await dbPromise;
+    db.close();
+  } catch {
+    // ignore close errors on broken connections
   }
-  return dbPromise;
+  dbPromise = null;
+}
+
+/** @deprecated alias for tests */
+export const resetDbConnectionForTests = resetDbConnection;
+
+export async function getDB(): Promise<IDBPDatabase<ViralatasDB>> {
+  if (!dbPromise) {
+    dbPromise = openDatabase();
+  }
+
+  let db = await dbPromise;
+  if (!isDatabaseCurrent(db)) {
+    db.close();
+    dbPromise = openDatabase();
+    db = await dbPromise;
+  }
+
+  return db;
 }
