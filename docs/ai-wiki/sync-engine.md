@@ -467,7 +467,7 @@ All Realtime → IndexedDB writes are mounted once in **`RealtimeSync`** (`src/c
 | Consumer | Channel | Events | Action |
 |------|---------|--------|--------|
 | picksRepository | pick_counts | INSERT, DELETE on user_picks | Saves to user_picks IDB |
-| presenceRepository | metal_place_config_live | * on metal_place_config | Saves to metal_place_config IDB |
+| presenceRepository | metal_place_config_live | * on metal_place_config **and** metal_place_windows | Full re-fetch via `syncMetalPlaceConfig()` → merged `{ label, windows[] }` in IDB (Phase 44) |
 | liveBandTest service | live_band_test_config_live | * on live_band_test_config | Saves to live_band_test_config IDB |
 | presenceRepository | user_presence_live | * on user_presence | Saves to user_presence IDB |
 | announcementsRepository | announcements_live | INSERT/UPDATE/DELETE announcements | Saves to announcements IDB |

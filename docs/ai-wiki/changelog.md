@@ -23,6 +23,10 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - Overnight windows explicitly unsupported (`end_time ≤ 23:59`); gaps between slots = off.
 - `festival:reset` preserves `metal_place_windows` alongside `metal_place_config` (godlike ops state never wiped).
 
+### Phase 44 close
+- Released **v1.3.18** on `main`; Supabase migration applied in prod.
+- Wiki: `sync-engine.md` dual-table Realtime row for Metal Place.
+
 ---
 
 ## 2026-06-23

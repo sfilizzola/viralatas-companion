@@ -998,7 +998,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 ---
 
 ### Phase 44 — Metal Place Multi-Window Configuration
-**Status:** ✅ Complete
+**Status:** ✅ Complete · **Released:** v1.3.18 on `main` (2026-06-25)
 
 **Completed:** 2026-06-25
 
@@ -1010,9 +1010,10 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `src/services/presencePolicy.ts` — `isMetalPlaceWindowActive` uses `windows[]`; `test_override_day` removed
 - `src/repositories/presence.ts` — replace-all save, dual-table sync + Realtime subscription
 - `src/lib/db/config.ts` — IDB legacy read shim; merged `{ label, windows[] }` shape
-- `src/components/profile/MetalPlaceAdminSection.tsx` — slot list UI, batch save, validation errors
+- `src/components/profile/MetalPlaceAdminSection.tsx` — stacked slot cards for 400px godlike panel; batch save; validation errors
 - Live Band Test ↔ Metal Place mutual exclusion removed (`MetalPlaceBridge`, conflict dialogs, i18n keys)
 - Tests: `presencePolicy.test.ts`, `presenceRepository.test.ts`, `liveNowScenarios.test.ts`
+- Prod: Supabase migration applied; companion deployed v1.3.18
 
 **Acceptance criteria (all met):**
 - [x] Legacy single-window row migrates to one slot; partial/empty legacy → zero slots
@@ -1025,6 +1026,8 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 **Architectural notes:**
 - `metal_place_config` = metadata row `id=1`; slots in `metal_place_windows`; client merges for IDB + policy.
 - Overnight windows not supported; use Time Travel for QA instead of `test_override_day`.
+
+**Phase closed:** 2026-06-25 — build + 872 tests green; wiki + DS synced; `PHASES.md` cleared (next: 45).
 
 ---
 
