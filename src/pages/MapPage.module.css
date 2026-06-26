@@ -91,6 +91,12 @@
   text-align: center;
 }
 
+.campDockUnder {
+  width: 100%;
+  max-width: 440px;
+  margin-top: var(--s-2);
+}
+
 .stagesBtn {
   display: flex;
   align-items: center;

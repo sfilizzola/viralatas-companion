@@ -10,6 +10,7 @@ import { isFestivalActive } from '../services/time';
 import BottomNav from '../components/BottomNav';
 import Icon from '../components/icons/Icon';
 import ArrivalMap from '../components/ArrivalMap';
+import CampHqCard from '../components/camp/CampHqCard';
 import { ReactionBar } from '../components/announcements/ReactionBar';
 import { Avatar, Chip } from '../ui';
 import { useNow } from '../hooks/useNow';
@@ -115,6 +116,8 @@ export default function AnnouncementsPage() {
             </div>
           </section>
         )}
+
+        <CampHqCard />
 
         {showArrivalMapTop && (
           <ArrivalMap crewUsers={crewUsers} currentUserId={userId} currentTime={currentTime} />

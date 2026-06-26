@@ -107,6 +107,10 @@ export type ViralatasDB = {
     key: string;
     value: LiveBandTestConfig;
   };
+  camp_location: {
+    key: string;
+    value: import('../../types').CampLocation;
+  };
   meta: {
     key: string;
     value: { cache_version: string };

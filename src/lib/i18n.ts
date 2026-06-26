@@ -75,6 +75,10 @@ import stageScheduleSheetBr from '../i18n/StageScheduleSheet_br.json';
 import stageScheduleSheetDe from '../i18n/StageScheduleSheet_de.json';
 import stageScheduleSheetEn from '../i18n/StageScheduleSheet_en.json';
 import stageScheduleSheetEs from '../i18n/StageScheduleSheet_es.json';
+import campLocationBr from '../i18n/CampLocation_br.json';
+import campLocationDe from '../i18n/CampLocation_de.json';
+import campLocationEn from '../i18n/CampLocation_en.json';
+import campLocationEs from '../i18n/CampLocation_es.json';
 
 export type Language = 'br' | 'en' | 'es' | 'de';
 
@@ -98,6 +102,7 @@ type TranslationFile =
   | 'UpcomingBandCard'
   | 'TimelineScrubber'
   | 'StageScheduleSheet'
+  | 'CampLocation'
   | 'GodlikeAdmin';
 
 type TranslationStrings = Record<string, string>;
@@ -126,6 +131,7 @@ const translations: Translations = {
     UpcomingBandCard: upcomingBandCardBr,
     TimelineScrubber: timelineScrubberBr,
     StageScheduleSheet: stageScheduleSheetBr,
+    CampLocation: campLocationBr,
     GodlikeAdmin: {},
   },
   en: {
@@ -148,6 +154,7 @@ const translations: Translations = {
     UpcomingBandCard: upcomingBandCardEn,
     TimelineScrubber: timelineScrubberEn,
     StageScheduleSheet: stageScheduleSheetEn,
+    CampLocation: campLocationEn,
     GodlikeAdmin: {},
   },
   es: {
@@ -170,6 +177,7 @@ const translations: Translations = {
     UpcomingBandCard: upcomingBandCardEs,
     TimelineScrubber: timelineScrubberEs,
     StageScheduleSheet: stageScheduleSheetEs,
+    CampLocation: campLocationEs,
     GodlikeAdmin: {},
   },
   de: {
@@ -192,6 +200,7 @@ const translations: Translations = {
     UpcomingBandCard: upcomingBandCardDe,
     TimelineScrubber: timelineScrubberDe,
     StageScheduleSheet: stageScheduleSheetDe,
+    CampLocation: campLocationDe,
     GodlikeAdmin: {},
   },
 };

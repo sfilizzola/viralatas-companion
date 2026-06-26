@@ -1,0 +1,10 @@
+{
+  "campHqTitle": "Campground",
+  "campHqHint": "Tap for Maps · hold to copy",
+  "campMapHint": "Real campground · tap for Maps",
+  "campHqOpenMaps": "Open in Maps",
+  "campHqCopy": "Copy coordinates",
+  "campHqCopied": "Copied!",
+  "campHqSheetLabel": "Campground",
+  "campMapDockLabel": "Open campground in Maps"
+}

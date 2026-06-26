@@ -3,6 +3,7 @@ export {
   BANDS_CHANGED_EVENT,
   CREW_USERS_CHANGED_EVENT,
   LIVE_BAND_TEST_CONFIG_CHANGED_EVENT,
+  CAMP_LOCATION_CHANGED_EVENT,
   METAL_PLACE_CONFIG_CHANGED_EVENT,
   MISSED_CHANGED_EVENT,
   RATINGS_CHANGED_EVENT,
@@ -89,6 +90,11 @@ export {
   saveLiveBandTestConfig,
   clearLiveBandTestConfig,
 } from './config';
+export {
+  loadCampLocation,
+  saveCampLocation,
+  clearCampLocationCache,
+} from './campLocation';
 export {
   enqueueOfflineDuckQuack,
   loadOfflineDuckQuackQueue,

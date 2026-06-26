@@ -590,6 +590,8 @@ CREATE TABLE public.app_settings (
   registration_enabled boolean DEFAULT true NOT NULL,
   duck_enabled boolean DEFAULT true NOT NULL,
   playlist_testing boolean DEFAULT true NOT NULL,
+  camping_latitude double precision NULL,
+  camping_longitude double precision NULL,
   updated_at timestamptz DEFAULT now() NOT NULL
 );
 
@@ -602,6 +604,7 @@ INSERT INTO public.app_settings DEFAULT VALUES;
 - `registration_enabled` — when `false`, the registration screen is closed; only existing vira-latas can log in. Read by `/register` to render the closed state.
 - `duck_enabled` (Phase 21) — when `false`, the duck/quack button is not rendered anywhere in the app. Fetched once at app boot via `getDuckEnabled()` and exposed via `DuckEnabledProvider`. See `docs/ai-wiki/flows/duck.md` for full behavior.
 - `playlist_testing` (Phase 22 Part 1) — feature-flag for the Playlist Launch button on `/my-picks`. When `true` (default), the button is shown only to `godlike`/`manager` roles (testing mode). When `false`, the button is visible to all vira-latas. The button is always hidden when the user has 0 picks. Read by `PlaylistLaunchButton` on mount via `getPlaylistTesting()` / `setPlaylistTesting()` from `src/lib/appSettings.ts`.
+- `camping_latitude` / `camping_longitude` (Phase 45) — nullable decimal GPS for the vira-latas' shared campground. Both null = camp UI hidden. Godlike sets via `CampingLocationAdminSection`; all vira-latas read via `campLocationRepository.syncCampLocation()`. Cached in IndexedDB `camp_location` store. See `docs/ai-wiki/flows/camp-location.md`.
 
 **RLS:**
 
@@ -769,4 +772,4 @@ npm run festival:reset -- --with-bands --force
 
 ---
 
-**Last updated:** 2026-06-25 — Phase 44: `metal_place_windows` table; `metal_place_config` metadata-only; Realtime on both; removed `festival_day`, `start_time`, `end_time`, `test_override_day`.
+**Last updated:** 2026-06-26 — Phase 45: `camping_latitude` / `camping_longitude` on `app_settings`; camp coords cached in IDB; no Realtime.

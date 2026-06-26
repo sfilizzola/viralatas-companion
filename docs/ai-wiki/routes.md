@@ -128,6 +128,8 @@ export default function PrivateRoute({ children }: Props) {
 - **Offline banner** — Show when offline
 - **Latest announcement banner** — Most recent mural post
 
+**Camp HQ:** No camp location UI on `/now` (no `CampHqCard`, `CampMapDock`, or `useCampLocation`). Presence "camping" toggle is separate from shared campground GPS.
+
 **Data Flows**:
 - `useAuth()` — Current user
 - `useNow()` — Current time (with godlike override)
@@ -222,6 +224,7 @@ export default function PrivateRoute({ children }: Props) {
 **Purpose**: Mural-style announcement board
 
 **Key Features**:
+- **Camp HQ strip (C+)** — When godlike has set campground GPS, `CampHqCard` renders `CampNavStrip` in the info zone (below useful links, above post form). Green gaffer tape, tent pin, tap → Google Maps; long-press → coord sheet on touch devices. Visible even when the user is blocked from posting.
 - **Text input** — Post a message (max ~500 chars, enforced in UI)
 - **Announcement grid** — Cards in reverse chronological order
   - Avatar + author name + role chip
@@ -245,6 +248,8 @@ export default function PrivateRoute({ children }: Props) {
 - Fully functional
 - Pending posts visible locally until synced
 
+**Flow wiki**: `docs/ai-wiki/flows/camp-location.md` (Camp HQ strip)
+
 ---
 
 ### /map (MapPage)
@@ -263,9 +268,11 @@ export default function PrivateRoute({ children }: Props) {
 
 **Tap**: Tap any dot to toggle its name pill (single selection); tap map or same dot to dismiss (reverts to self pill).
 
-**Offline**: Fully offline — map image precached by Service Worker; placement derived from IndexedDB cache.
+**Camp HQ dock (D1)**: When campground GPS is set, `CampMapDock` renders `CampNavStrip` directly below `MinimapOverlay` (`.campDockUnder`). Same tap/long-press behavior as the Mural strip.
 
-**Flow wiki**: `docs/ai-wiki/flows/festival-minimap.md`
+**Offline**: Fully offline — map image precached by Service Worker; placement derived from IndexedDB cache; camp coords from IDB `camp_location` store.
+
+**Flow wiki**: `docs/ai-wiki/flows/festival-minimap.md`, `docs/ai-wiki/flows/camp-location.md` (Camp HQ dock)
 
 ---
 
@@ -497,4 +504,4 @@ AnnouncementsPage (offline)
 
 ---
 
-**Last updated:** 2026-05-27 — Phase 29 Previously Achieved archive + godlike consolidate on `/profile`
+**Last updated:** 2026-06-26 — Phase 45: Camp HQ strip on `/announcements`; CampMapDock on `/map`; explicit no camp UI on `/now`

@@ -268,6 +268,8 @@ export type Database = {
           duck_enabled: boolean;
           playlist_testing: boolean;
           moshsplit_enabled: boolean;
+          camping_latitude: number | null;
+          camping_longitude: number | null;
           updated_at: string;
         };
         Insert: {
@@ -276,6 +278,8 @@ export type Database = {
           duck_enabled?: boolean;
           playlist_testing?: boolean;
           moshsplit_enabled?: boolean;
+          camping_latitude?: number | null;
+          camping_longitude?: number | null;
           updated_at?: string;
         };
         Update: {
@@ -284,6 +288,8 @@ export type Database = {
           duck_enabled?: boolean;
           playlist_testing?: boolean;
           moshsplit_enabled?: boolean;
+          camping_latitude?: number | null;
+          camping_longitude?: number | null;
           updated_at?: string;
         };
         Relationships: [];

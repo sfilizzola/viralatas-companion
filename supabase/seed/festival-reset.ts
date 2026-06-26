@@ -44,6 +44,7 @@
  *     push subscription fields, language preference, …).
  *   • public.metal_place_config, public.metal_place_windows,
      public.live_band_test_config (godlike ops state).
+ *   • public.app_settings (includes camp coordinates — godlike overwrites on next arrival).
  *
  * NEVER run mid-festival without coordination — wipes are immediate via realtime
  * to every connected client.

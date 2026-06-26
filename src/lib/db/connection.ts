@@ -2,7 +2,7 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { ViralatasDB } from './types';
 
 export const DB_NAME = 'viralatas-db';
-export const DB_VERSION = 12;
+export const DB_VERSION = 13;
 
 /** Canonical object store list — keep in sync with the upgrade() block below. */
 export const VIRALATAS_OBJECT_STORES = [
@@ -17,6 +17,7 @@ export const VIRALATAS_OBJECT_STORES = [
   'pending_announcements',
   'metal_place_config',
   'live_band_test_config',
+  'camp_location',
   'meta',
   'user_missed_bands',
   'offline_missed_bands',
@@ -89,6 +90,9 @@ export function getDB() {
         }
         if (!db.objectStoreNames.contains('live_band_test_config')) {
           db.createObjectStore('live_band_test_config');
+        }
+        if (!db.objectStoreNames.contains('camp_location')) {
+          db.createObjectStore('camp_location');
         }
         if (!db.objectStoreNames.contains('meta')) {
           db.createObjectStore('meta');

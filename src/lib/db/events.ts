@@ -4,6 +4,7 @@ export const CREW_USERS_CHANGED_EVENT = 'viralatas:crew-users-changed';
 export const PRESENCE_CHANGED_EVENT = 'viralatas:presence-changed';
 export const ANNOUNCEMENTS_CHANGED_EVENT = 'viralatas:announcements-changed';
 export const METAL_PLACE_CONFIG_CHANGED_EVENT = 'viralatas:metal-place-config-changed';
+export const CAMP_LOCATION_CHANGED_EVENT = 'viralatas:camp-location-changed';
 export const LIVE_BAND_TEST_CONFIG_CHANGED_EVENT = 'viralatas:live-band-test-config-changed';
 export const MISSED_CHANGED_EVENT = 'viralatas:missed-changed';
 export const RATINGS_CHANGED_EVENT = 'viralatas:ratings-changed';

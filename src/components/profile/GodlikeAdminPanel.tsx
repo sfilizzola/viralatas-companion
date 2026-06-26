@@ -14,6 +14,7 @@ import ConsolidateBadgesSection from './ConsolidateBadgesSection';
 import CacheResetSection from './CacheResetSection';
 import FeatureFlagsSection from './FeatureFlagsSection';
 import MetalPlaceAdminSection from './MetalPlaceAdminSection';
+import CampingLocationAdminSection from './CampingLocationAdminSection';
 import LiveBandTestAdminSection from './LiveBandTestAdminSection';
 import UserManagementSection from './UserManagementSection';
 import styles from '../../pages/ProfilePage.module.css';
@@ -148,6 +149,7 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
             <CacheResetSection t={t} />
             <FeatureFlagsSection t={t} onDuckEnabledChange={setDuckFeatureEnabled} />
             <MetalPlaceAdminSection t={t} />
+            <CampingLocationAdminSection t={t} />
             <LiveBandTestAdminSection t={t} />
 
             <div className={styles.liveBandTestSection}>

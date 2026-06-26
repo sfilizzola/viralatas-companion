@@ -8,3 +8,4 @@ export { bandsRepository } from './bands';
 export { duckRepository } from './duck';
 export { reactionsRepository } from './reactions';
 export { badgeHistoryRepository } from './badgeHistoryRepository';
+export { campLocationRepository } from './campLocation';

@@ -14,6 +14,7 @@ import {
   RATINGS_CHANGED_EVENT,
   PRESENCE_CHANGED_EVENT,
   clearLiveBandTestConfig,
+  loadCampLocation,
   clearMetalPlaceConfig,
   clearSession,
   enqueueOfflineAnnouncement,
@@ -77,6 +78,7 @@ import {
   saveCacheVersion,
   saveCrewUsers,
   saveLiveBandTestConfig,
+  saveCampLocation,
   saveMetalPlaceConfig,
   saveMissedBand,
   saveSession,
@@ -761,6 +763,7 @@ describe('IndexedDB layer (lib/db.ts)', () => {
       await saveCacheVersion('v1');
       await saveMetalPlaceConfig(sampleMetalPlaceConfig());
       await saveLiveBandTestConfig(sampleLiveBandTestConfig());
+      await saveCampLocation({ lat: 54.037809, lng: 9.368845 });
       await enqueueOfflineDuckQuack({
         id: 'quack-1',
         user_id: 'user-1',
@@ -831,6 +834,9 @@ describe('IndexedDB layer (lib/db.ts)', () => {
           case 'live_band_test_config':
             expect(await loadLiveBandTestConfig(), `${store} should be cleared`).toBeNull();
             break;
+          case 'camp_location':
+            expect(await loadCampLocation(), `${store} should be cleared`).toBeNull();
+            break;
           case 'offline_duck_quacks':
             expect(await loadOfflineDuckQuackQueue(), `${store} should be cleared`).toEqual([]);
             break;
@@ -849,7 +855,7 @@ describe('IndexedDB layer (lib/db.ts)', () => {
       expect(await loadSession()).toEqual({ token: 'keep' });
       expect(await loadCacheVersion()).toBe('v1');
 
-      expect(WIPE_CLEARED_STORES).toHaveLength(18);
+      expect(WIPE_CLEARED_STORES).toHaveLength(19);
       expect(WIPE_PRESERVED_STORES).toHaveLength(2);
       expect(WIPE_CLEARED_STORES.length + WIPE_PRESERVED_STORES.length).toBe(
         EXPECTED_OBJECT_STORES.length,

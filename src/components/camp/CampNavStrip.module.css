@@ -1,0 +1,73 @@
+.strip {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-1);
+  background: var(--bg-elevated);
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  font: inherit;
+  transition: background 0.14s ease, border-color 0.14s ease;
+}
+
+.strip:hover {
+  background: linear-gradient(90deg, var(--signal-ok-soft), var(--bg-elevated));
+}
+
+.stripMap {
+  border-color: var(--signal-ok-muted);
+}
+
+.tape {
+  position: absolute;
+  top: -7px;
+  left: 18px;
+  width: 36px;
+  height: 14px;
+  transform: rotate(-4deg);
+  background: rgba(95, 208, 187, 0.28);
+  border: 1px solid rgba(95, 208, 187, 0.45);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--signal-ok-bright);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.title {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--signal-ok-bright);
+}
+
+.hint {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.arrow {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 14px;
+}

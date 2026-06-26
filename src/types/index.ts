@@ -127,6 +127,11 @@ export type LiveBandTestConfig = {
   updated_at?: string;
 };
 
+export type CampLocation = {
+  lat: number;
+  lng: number;
+};
+
 export type AlertContext = {
   currentTime: string;
   festivalDay: number;

@@ -10,6 +10,7 @@ import { buildPlacements } from '../services/minimapPlacement';
 import { formatTime } from '../services/bandTime';
 import { MINIMAP_ZONES } from '../components/map/minimapZones';
 import MinimapOverlay from '../components/map/MinimapOverlay';
+import CampMapDock from '../components/camp/CampMapDock';
 import TimelineScrubber from '../components/map/TimelineScrubber';
 import OfflineBanner from '../components/OfflineBanner';
 import StageScheduleSheet from '../components/StageScheduleSheet';
@@ -125,6 +126,9 @@ export default function MapPage() {
         ) : (
           <>
             <MinimapOverlay placements={placements} mapAlt={t('mapAlt')} />
+            <div className={styles.campDockUnder}>
+              <CampMapDock />
+            </div>
             {placements.length === 0 && <p className={styles.empty}>{t('empty')}</p>}
           </>
         )}

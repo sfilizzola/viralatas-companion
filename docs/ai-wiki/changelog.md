@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-26 (Phase 45 — Camp HQ Geolocation)
+
+### Added
+- **`app_settings.camping_latitude` / `camping_longitude`** — nullable decimal GPS for shared vira-lata campground; godlike-only write via existing RLS.
+- **Camp location stack** — `campLocationRepository`, `useCampLocation`, IDB `camp_location` store, `CampLocation` i18n namespace.
+- **Consumer UI** — `CampHqCard` / `CampNavStrip` (C+ gaffer tape) on `/announcements` info zone; `CampMapDock` (D1) below minimap on `/map`; `CampLocationSheet` on mobile long-press; tap opens Google Maps.
+- **Godlike admin** — `CampingLocationAdminSection` in Godlike Admin panel (decimal GPS input, Save, Clear).
+- **Flow wiki** — `docs/ai-wiki/flows/camp-location.md`.
+
+### Changed
+- `AnnouncementsPage.tsx` — mounts `CampHqCard` above post form (blocked posters still see strip).
+- `MapPage.tsx` — `CampMapDock` in `.campDockUnder` below `MinimapOverlay`.
+- `supabase-schema.md`, `routes.md` — camp columns and route-level UI placement documented.
+
+### Architectural Notes
+- **Offline-first read:** UI reads camp coords from IndexedDB; Supabase sync on hook mount, not Realtime (v1).
+- **No `/now` surface:** Camp HQ is Mural + Map only; presence "camping" toggle is unrelated.
+- **`festival:reset` preserves `app_settings`:** Camp coordinates survive pre-festival wipe.
+
+---
+
 ## 2026-06-25 (Phase 44 — Metal Place Multi-Window Configuration)
 
 ### Added
