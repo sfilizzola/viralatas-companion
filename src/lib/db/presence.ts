@@ -3,16 +3,16 @@ import { getDB } from './connection';
 import { PRESENCE_CHANGED_EVENT } from './events';
 import type { OfflinePresenceOp } from './types';
 
-function emitPresenceChanged() {
+function emitPresenceChanged(presence?: UserPresence) {
   if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event(PRESENCE_CHANGED_EVENT));
+    window.dispatchEvent(new CustomEvent(PRESENCE_CHANGED_EVENT, { detail: presence }));
   }
 }
 
 export async function saveUserPresence(presence: UserPresence) {
   const db = await getDB();
   await db.put('user_presence', presence);
-  emitPresenceChanged();
+  emitPresenceChanged(presence);
 }
 
 export async function loadUserPresence(userId: string): Promise<UserPresence | undefined> {

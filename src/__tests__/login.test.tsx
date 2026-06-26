@@ -172,6 +172,28 @@ describe('User Login', () => {
       expect(result.current.user).toBeNull();
     });
 
+    it('ignores INITIAL_SESSION null after IDB bootstrap', async () => {
+      const session = makeSession();
+      mocks.loadSession.mockResolvedValue({
+        [AUTH_STORAGE_KEY]: JSON.stringify(session),
+      });
+      let authListener: ((_event: string, session: Session | null) => void) | undefined;
+      mocks.onAuthStateChange.mockImplementation((callback) => {
+        authListener = callback;
+        return { data: { subscription: { unsubscribe: mocks.unsubscribe } } };
+      });
+
+      const { result } = renderHook(() => useAuth(), { wrapper: authWrapper });
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      authListener?.('INITIAL_SESSION', null);
+
+      await waitFor(() => {
+        expect(result.current.session?.access_token).toBe('access-token');
+        expect(result.current.sessionExpired).toBe(false);
+      });
+    });
+
     it('keeps session and flags expired on background SIGNED_OUT', async () => {
       const session = makeSession();
       mocks.loadSession.mockResolvedValue({

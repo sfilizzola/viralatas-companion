@@ -10,6 +10,19 @@ import { useIdbSubscription } from './useIdbSubscription';
 export const CREW_CACHE_KEY = 'crew-users';
 export const PRESENCE_CACHE_KEY = 'all-user-presence';
 
+export function patchPresenceFromEvent(
+  event: Event,
+  current: UserPresence[] | undefined,
+): UserPresence[] | null {
+  const detail = (event as CustomEvent<UserPresence | undefined>).detail;
+  if (!detail || !current) return null;
+  const idx = current.findIndex((row) => row.user_id === detail.user_id);
+  if (idx >= 0) {
+    return current.map((row, i) => (i === idx ? detail : row));
+  }
+  return [...current, detail];
+}
+
 export function useCrewUsersCache() {
   return useIdbSubscription({
     key: CREW_CACHE_KEY,
@@ -25,5 +38,6 @@ export function usePresenceCache() {
     events: [PRESENCE_CHANGED_EVENT],
     loader: loadAllUserPresence,
     fallback: [] as UserPresence[],
+    patchFromEvent: patchPresenceFromEvent,
   });
 }

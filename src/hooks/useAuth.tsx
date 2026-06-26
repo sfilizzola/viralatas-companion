@@ -68,11 +68,17 @@ function handleAuthStateChange(
     return;
   }
 
+  // Supabase INITIAL_SESSION is often null before async IDB storage resolves — keep IDB bootstrap.
+  if (event === 'INITIAL_SESSION' && !session && hadIdbSessionRef.current) {
+    setState((prev) => ({ ...prev, loading: false }));
+    return;
+  }
+
   setState((prev) => ({
     session,
     user: session?.user ?? null,
     loading: false,
-    hadIdbSession: prev.hadIdbSession,
+    hadIdbSession: prev.hadIdbSession || !!session,
     sessionExpired: false,
   }));
 }

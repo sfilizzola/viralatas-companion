@@ -1,5 +1,5 @@
 import type { Session } from '@supabase/supabase-js';
-import { loadSession } from './db';
+import { loadSession, resetDbConnection } from './db';
 
 export const AUTH_STORAGE_KEY = 'viralatas-auth';
 /** Legacy mistaken key from early bootstrap — kept for reads only. */
@@ -24,7 +24,20 @@ function parseStoredSession(stored: unknown): Session | null {
 }
 
 export async function readSessionFromIdb(): Promise<IdbSessionRead> {
-  const raw = await loadSession();
+  let raw: unknown;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      raw = await loadSession();
+      break;
+    } catch {
+      if (attempt === 0) {
+        await resetDbConnection();
+        continue;
+      }
+      throw new Error('Failed to read auth session from IndexedDB');
+    }
+  }
+
   if (!raw || typeof raw !== 'object') {
     return { session: null, hadIdbSession: false };
   }

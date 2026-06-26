@@ -14,6 +14,8 @@ export type IdbSubscriptionSpec<T> = {
   events: readonly string[];
   loader: () => Promise<T>;
   fallback: T;
+  /** When set, apply in-memory patch before falling back to a full IDB reload. */
+  patchFromEvent?: (event: Event, current: T | undefined) => T | null;
 };
 
 const cells = new Map<string, CacheCell<unknown>>();
@@ -45,8 +47,11 @@ async function loadCell<T>(spec: IdbSubscriptionSpec<T>): Promise<void> {
       if (import.meta.env.DEV) {
         console.warn('[idb] loader timeout', spec.key, err);
       }
-      cell.data = spec.fallback;
-      notify(cell);
+      // Keep last good snapshot on refresh failure — empty fallback causes /now + badge flashes.
+      if (cell.data === undefined) {
+        cell.data = spec.fallback;
+        notify(cell);
+      }
     })
     .finally(() => {
       cell.loadPromise = null;
@@ -59,7 +64,18 @@ function attachListeners<T>(spec: IdbSubscriptionSpec<T>) {
   if (attachedKeys.has(spec.key)) return;
   attachedKeys.add(spec.key);
 
-  const handler = () => void loadCell(spec);
+  const handler = (event: Event) => {
+    if (spec.patchFromEvent) {
+      const cell = getCell<T>(spec.key);
+      const patched = spec.patchFromEvent(event, cell.data);
+      if (patched) {
+        cell.data = patched;
+        notify(cell);
+        return;
+      }
+    }
+    void loadCell(spec);
+  };
   for (const event of spec.events) {
     window.addEventListener(event, handler);
   }

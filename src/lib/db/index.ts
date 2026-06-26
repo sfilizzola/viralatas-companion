@@ -16,6 +16,7 @@ export type { OfflineBandRatingOp, OfflineDuckQuackOp, OfflineMissedOp, OfflineP
 export { REACTION_EMOJIS } from './types';
 export {
   resetDbConnectionForTests,
+  resetDbConnection,
   VIRALATAS_OBJECT_STORES,
   WIPE_PRESERVED_OBJECT_STORES,
   wipeTargetObjectStores,
