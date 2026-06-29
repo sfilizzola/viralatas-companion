@@ -40,7 +40,8 @@ Human page (context only): https://www.wacken.com/de/line-up/running-order-musik
 ## Workflow
 
 1. Diff official feed vs `lineup.md` by `slot_id`
-2. Edit `lineup.md` + changelog
-3. Edit `supabase/seed/bands.ts` → `npm run seed:bands:sync` → `--apply`
+2. `npm run lineup:check-official` (or `--lineup` / `--complete` to apply)
+3. Edit changelog if manual follow-up needed
+4. `npm run seed:bands:sync` → `--apply`
 
 See also: `docs/ai-wiki/lineup-sync.md`, `docs/ai-wiki/stages.md`

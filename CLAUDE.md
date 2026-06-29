@@ -263,7 +263,7 @@ Never invert this to: `UI → API → local cache`. IndexedDB is the source of t
 
 **Safe defaults:**
 
-- Lineup edits → `npm run seed:bands:sync` (dry-run first; `--apply` preserves picks on UPDATE)
+- Lineup edits → `npm run lineup:check-official` first, then `npm run seed:bands:sync` (dry-run first; `--apply` preserves picks on UPDATE)
 - `slot_id` bootstrap → `npm run seed:bands:backfill-slot-id -- --apply` (UPDATE only)
 - Verify without writes → dry-run sync + SQL counts (see `.claude/context/production-database.md` and `docs/ai-wiki/lineup-sync.md`)
 
@@ -402,6 +402,7 @@ Only when **both the build and all tests are green** may you proceed with the co
 
 - **Seed scripts:** `supabase/seed/` and `npm run seed:*`
   - **Production:** no PITR — see **Production database safety** above. Never run destructive seed/reset on prod without explicit user OK.
+  - `npm run lineup:check-official` — Fetch wacken.com JSON, diff vs `docs/ai-wiki/lineup.md` (exit 0/1/2). `--lineup` writes wiki; `--complete` also patches `bands.ts`. Then `seed:bands:sync`.
   - `npm run seed:bands` — Destructive full lineup replace (festival reset only; wipes picks)
   - `npm run seed:bands:backfill-slot-id -- --apply` — One-time slot_id bootstrap (preserves picks; run before lock migration)
   - `npm run seed:bands:sync` — Non-destructive lineup sync (dry-run by default; `--apply` to write)

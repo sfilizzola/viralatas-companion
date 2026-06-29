@@ -4,13 +4,14 @@
 > For stage schedules (slot times, stage colors, day codes, pairing rules), see [stages.md](stages.md).
 >
 > To update the lineup:
-> 1. Edit this file
-> 2. Apply changes to `supabase/seed/bands.ts`
-> 3. Run `npm run seed:bands:sync` (dry-run), then `npm run seed:bands:sync -- --apply`
+> 1. `npm run lineup:check-official` — fetch wacken.com JSON, diff vs this file (no writes)
+> 2. `npm run lineup:check-official -- --lineup` — confirm and write this file when diffs exist
+> 3. `npm run lineup:check-official -- --complete` — also patch `supabase/seed/bands.ts` (`name`/`image_url`)
+> 4. `npm run seed:bands:sync` (dry-run), then `npm run seed:bands:sync -- --apply`
 >
 > Use destructive `npm run seed:bands` only for festival reset / full rebuild — see [lineup-sync.md](lineup-sync.md).
 >
-> **Checking official Wacken data:** [lineup-official-source.md](lineup-official-source.md) (JSON endpoints + agent checklist).
+> **Official source details:** [lineup-official-source.md](lineup-official-source.md) (JSON endpoints, filter rules, exit codes).
 
 **Summary:** 173 bands CONFIRMED · 13 `TDB MTB` Metal Battle placeholders · 0 named TDB · 12 TBD (Name=TBD) · 199 total · 1 ceremony (Farewell & Announcements, HAR13)
 
@@ -551,13 +552,22 @@ The following bands were in the previous version of this file as fake/guessed pl
 
 ### How to check the official running order
 
-See **[lineup-official-source.md](lineup-official-source.md)** — wacken.com JSON endpoints, camping-ground filter rules (exclude LGH Clubstage), `slot_id` mapping, status mapping, and the repeat-check checklist. Agents: [`.claude/context/lineup-official-source.md`](../../.claude/context/lineup-official-source.md).
+Use the operator script — do **not** hand-curl JSON for routine checks:
+
+```bash
+npm run lineup:check-official                    # diff only — exit 0=in sync, 1=diffs, 2=error
+npm run lineup:check-official -- --lineup        # preview + y/N → write this file
+npm run lineup:check-official -- --complete      # lineup.md + bands.ts (each confirmed)
+```
+
+Then apply to the database → [lineup-sync.md](lineup-sync.md) (`seed:bands:sync` dry-run → `--apply`).
+
+**Reference:** [lineup-official-source.md](lineup-official-source.md) — endpoints, camping-ground filters, `slot_id` mapping, status mapping, app-only overrides (`HAR13`, `JUN*`). Agents: [`.claude/context/lineup-official-source.md`](../../.claude/context/lineup-official-source.md).
 
 ### How to add a new confirmed band image
 
-1. In the Band Assignments section above, change `TBD` → `CONFIRMED` and replace `PLACEHOLDER` with the full image URL from wacken.com
-2. In `supabase/seed/bands.ts`, find the entry by `slot_id` and update `image_url` with the same URL
-3. Run `npm run seed:bands:sync` to preview, then `npm run seed:bands:sync -- --apply`
+1. Run `npm run lineup:check-official -- --complete` when wacken.com confirms the band (or edit this file + `bands.ts` manually).
+2. Run `npm run seed:bands:sync` to preview, then `npm run seed:bands:sync -- --apply`
 
 ### How to move a band to a different stage or day
 

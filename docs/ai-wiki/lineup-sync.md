@@ -10,6 +10,8 @@ For catastrophic refresh (full table replace), use destructive `npm run seed:ban
 
 | File | Role |
 |------|------|
+| `supabase/seed/lineup-check-official.ts` | CLI — fetch wacken.com JSON, diff vs `lineup.md`, optional apply |
+| `supabase/seed/lineup-official-source.ts` | Fetch/filter/map logic, diff, patch `lineup.md` + `bands.ts` |
 | `supabase/seed/bands-sync.ts` | Main sync tool — dry-run plan + `--apply` |
 | `supabase/seed/bands-move.ts` | Pick transfer when band relocates slot (`--from` / `--to`) |
 | `supabase/seed/bands.ts` | Seed source of truth; exports `assertSeedIntegrity`, `bands`, `SLOT_ID_RE` |
@@ -17,6 +19,8 @@ For catastrophic refresh (full table replace), use destructive `npm run seed:ban
 | `supabase/migrations/20260524000000_bands_slot_id_add.sql` | Adds NULLable `slot_id` + index |
 | `supabase/migrations/20260524000001_bands_slot_id_lock.sql` | NOT NULL + UNIQUE; drops old composite UNIQUE |
 | `supabase/seed/seed-shared.ts` | Shared env loader, service client, `cache_version` bump |
+| `docs/ai-wiki/lineup.md` | Human-editable band assignments (compare/apply target for official check) |
+| `docs/ai-wiki/lineup-official-source.md` | JSON endpoints, filter rules, script contract |
 
 ### slot_id bootstrap (before lock migration)
 
@@ -27,6 +31,31 @@ npx supabase db push                         # lock migration only
 ```
 
 **Never** use `seed:bands --force` for bootstrap — DELETE+INSERT wipes all picks.
+
+## Checking official Wacken feed
+
+Before editing `bands.ts` by hand, run the official-source check. Full JSON/filter rules → [lineup-official-source.md](lineup-official-source.md).
+
+**Operator sequence** (repeat when Wacken updates the running order):
+
+```bash
+npm run lineup:check-official                    # 1. fetch + diff — no writes
+npm run lineup:check-official -- --lineup        # 2. preview + confirm → write lineup.md
+npm run lineup:check-official -- --complete      # 3. above + confirm → patch bands.ts (name/image_url)
+npm run seed:bands:sync                          # 4. dry-run DB plan
+npm run seed:bands:sync -- --apply               # 5. apply to prod (picks preserved on UPDATE)
+```
+
+| Step | Writes | Requires `.env.local` |
+|------|--------|------------------------|
+| `lineup:check-official` (default) | No | No — network fetch only |
+| `--lineup` | `docs/ai-wiki/lineup.md` (summary + source dates + table rows) | No |
+| `--complete` | `lineup.md` then `supabase/seed/bands.ts` (second confirm) | No |
+| `seed:bands:sync` | DB when `--apply` | Yes — service role key |
+
+**Exit codes** (`lineup:check-official`): `0` = in sync (or apply succeeded / user cancelled after diff); `1` = diffs found (check mode only); `2` = fetch or runtime error.
+
+**Script policy** (baked in): wacken.com JSON authoritative; `HAR13` stays `CEREMONY`; `JUN1`–`JUN8` wiki-only (not compared); image URL patches only on newly confirmed slots or name/status change — not thumbnail vs poster drift.
 
 ## When to Run
 
@@ -41,6 +70,9 @@ Requires `.env.local` with `VITE_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (
 
 | Command | Flag | Effect |
 |---------|------|--------|
+| `lineup:check-official` | (none) | Fetch wacken.com JSON, diff vs `lineup.md`, print report — no writes; exit `1` if diffs |
+| `lineup:check-official` | `--lineup` | Diff + preview patches + y/N confirm → write `lineup.md` |
+| `lineup:check-official` | `--complete` | `--lineup` flow, then second confirm → patch `bands.ts` (`name`/`image_url` per `slot_id`; skips `HAR13`, `JUN*`, dropped TBD rows) |
 | `seed:bands:sync` | (none) | Dry-run — prints plan, writes nothing |
 | `seed:bands:sync` | `--apply` | Execute plan; bump `cache_version` |
 | `seed:bands:sync` | `--json` | Machine-readable plan (combinable with `--apply`) |
@@ -131,7 +163,7 @@ Expected after Phase 24: `total = 187`, `null_slot_id = 0`, `distinct_slot_ids =
 
 ### 5. When testing a seed edit end-to-end
 
-1. Edit `bands.ts` (+ `lineup.md` if needed).
+1. `npm run lineup:check-official` — confirm official feed matches wiki, or apply with `--lineup` / `--complete`.
 2. `seed:bands:sync` dry-run — confirm **exactly** the change you expect.
 3. Note `SELECT count(*) FROM user_picks` **before** `--apply`.
 4. `seed:bands:sync -- --apply`
@@ -164,3 +196,5 @@ For future risky work, clone to a **staging Supabase project** with a separate `
 
 - CI-triggered sync deferred (service role in operator `.env.local` only).
 - No audit log of sync runs in v1.
+
+**Last updated:** 2026-06-29 — `lineup:check-official` operator workflow integrated before `seed:bands:sync`.

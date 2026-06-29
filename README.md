@@ -157,6 +157,7 @@ Core entities include `users`, `bands`, `user_picks`, `announcements`, `user_pre
 
 | Script | Purpose |
 |--------|---------|
+| `npm run lineup:check-official` | Fetch wacken.com running order, diff vs `docs/ai-wiki/lineup.md` (no writes). `--lineup` / `--complete` apply wiki + seed — see [lineup-official-source.md](docs/ai-wiki/lineup-official-source.md) |
 | `npm run seed:bands` | **Destructive** full lineup replace — **deletes all bands and picks**. Dev/staging reset only. |
 | `npm run seed:bands:sync` | Non-destructive lineup sync (dry-run by default; `--apply` to write, preserves picks on UPDATE) |
 | `npm run seed:bands:backfill-slot-id -- --apply` | One-time `slot_id` bootstrap (UPDATE only) |
@@ -181,6 +182,7 @@ npm run preview          # Preview production build
 npm run lint             # ESLint
 npm test                 # Vitest
 npm run test:coverage    # Coverage report
+npm run lineup:check-official
 npm run seed:bands
 npm run seed:bands:sync
 npm run seed:live-now

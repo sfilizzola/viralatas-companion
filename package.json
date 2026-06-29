@@ -15,6 +15,7 @@
     "seed:bands:backfill-slot-id": "tsx supabase/seed/bands-backfill-slot-id.ts",
     "seed:bands:sync": "tsx supabase/seed/bands-sync.ts",
     "seed:bands:move": "tsx supabase/seed/bands-move.ts",
+    "lineup:check-official": "tsx supabase/seed/lineup-check-official.ts",
     "seed:live-now": "tsx supabase/seed/live-now.ts",
     "seed:test-users": "tsx supabase/seed/test-users.ts reset",
     "seed:test-users:delete": "tsx supabase/seed/test-users.ts delete",

@@ -10,9 +10,12 @@ Document how agents and operators fetch the **live** Wacken 2026 music running o
 
 | File | Role |
 |------|------|
+| `supabase/seed/lineup-check-official.ts` | CLI entry — modes, confirms, exit codes |
+| `supabase/seed/lineup-official-source.ts` | Fetch, filter, `slot_id` map, parse/diff/patch `lineup.md` and `bands.ts` |
+| `src/__tests__/lineup-official-source.test.ts` | Unit tests for classify, diff, patch (no network) |
 | [`lineup.md`](lineup.md) | Human-editable band assignments + `slot_id` rows (compare target) |
 | [`stages.md`](stages.md) | Slot times per `slot_id` (update if official times move) |
-| [`lineup-sync.md`](lineup-sync.md) | Apply `lineup.md` → `supabase/seed/bands.ts` via `seed:bands:sync` |
+| [`lineup-sync.md`](lineup-sync.md) | Apply `bands.ts` → database via `seed:bands:sync` |
 | `supabase/seed/bands.ts` | Seed source applied to the database |
 
 Agent quick pointer: [`.claude/context/lineup-official-source.md`](../../.claude/context/lineup-official-source.md)
@@ -47,11 +50,52 @@ Embedded in the running-order page `<script>` block (`t3vue.ajaxUrls`). Music ru
 
 ### Fetch (no browser)
 
+Prefer the operator script (see **Script usage** below). Manual curl for debugging only:
+
 ```bash
 rtk curl -sL "https://www.wacken.com/fileadmin/Json/events-concert.json" -o /tmp/wacken-events-concert.json
 rtk curl -sL "https://www.wacken.com/fileadmin/Json/stages.json" -o /tmp/wacken-stages.json
 rtk curl -sL "https://www.wacken.com/fileadmin/Json/festivaldays.json" -o /tmp/wacken-festivaldays.json
 ```
+
+---
+
+## Script usage (`npm run lineup:check-official`)
+
+Implements fetch → filter → `slot_id` map → diff → optional patch. No `.env.local` required (network only until DB apply).
+
+### Three modes
+
+| Command | Writes | Behavior |
+|---------|--------|----------|
+| `npm run lineup:check-official` | None | Fetch wacken.com JSON, diff vs `lineup.md`, print report |
+| `npm run lineup:check-official -- --lineup` | `docs/ai-wiki/lineup.md` | Above + preview patches + y/N confirm → update summary line, per-day **Source:** dates, table rows |
+| `npm run lineup:check-official -- --complete` | `lineup.md` + `supabase/seed/bands.ts` | `--lineup` flow, then second y/N confirm → patch seed `name`/`image_url` by `slot_id` |
+
+Always shows exact slot changes before prompting. Cancelling a confirm writes nothing (or leaves `lineup.md` saved if user declined only the `bands.ts` step in `--complete` mode).
+
+### Exit codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | In sync; or apply succeeded; or user cancelled after review |
+| `1` | Diffs found (default check mode only) |
+| `2` | Fetch failure or uncaught runtime error |
+
+### Patch policy
+
+- **Authority:** wacken.com `events-concert.json` + `stages.json` (see filter rules above).
+- **`HAR13`:** never patched from official feed — wiki keeps `CEREMONY` / Farewell & Announcements.
+- **`JUN1`–`JUN8`:** excluded from comparison and `bands.ts` patches (wiki-only until Wacken publishes Jungle).
+- **`bands.ts`:** updates `name` and `image_url` only for slots with seed rows; skips ceremony, Jungle, and orphan TBD rows with no matching seed entry.
+- **Images:** patch `image_url` only when a slot becomes newly confirmed (`PLACEHOLDER` → URL) or when **name/status** changes — ignore thumbnail vs poster path drift on already-confirmed bands.
+
+### End-to-end workflow
+
+1. `npm run lineup:check-official` — read diff report.
+2. `npm run lineup:check-official -- --lineup` — apply wiki when ready.
+3. `npm run lineup:check-official -- --complete` — sync seed file (or edit `bands.ts` manually for edge cases).
+4. [`lineup-sync.md`](lineup-sync.md) — `npm run seed:bands:sync` dry-run → `--apply` to push to Supabase.
 
 ---
 
@@ -119,6 +163,8 @@ This matches [`lineup.md`](lineup.md) and `supabase/seed/bands.ts`.
 
 Image URL for `CONFIRMED`: `event.artists[0].assets[0].thumbnail` — prefix `https://www.wacken.com` when path-relative.
 
+`lineup:check-official` only proposes **image** updates when a slot becomes newly confirmed (`PLACEHOLDER` → URL) or when **name/status** changes — not for thumbnail vs poster path drift on already-confirmed bands.
+
 Metal Battle region label: often in `event.title` (e.g. `MB Greece`), not `subtitle`.
 
 ---
@@ -139,15 +185,11 @@ All other camping slots should match the filtered official feed.
 ## Agent checklist (repeat until festival)
 
 1. **Read** [`lineup.md`](lineup.md) summary line and last **Source: … as of YYYY-MM-DD** date.
-2. **Fetch** JSON feeds (commands above) — never use committed snapshots.
-3. **Filter** with rules in this doc → ~191 camping events (excl. LGH, excl. JUN).
-4. **Diff** by `slot_id` against `lineup.md`:
-   - Name / status changes (`TDB` → `CONFIRMED`, `TDB MTB` swaps)
-   - New empty slots (`TBD`)
-   - Image URL updates for `CONFIRMED`
-   - Time changes → check [`stages.md`](stages.md) too
-5. **Update** `lineup.md` first (bump source date, summary counts, changelog).
-6. **Then** `supabase/seed/bands.ts` → [`lineup-sync.md`](lineup-sync.md) dry-run → `--apply`.
+2. **Run** `npm run lineup:check-official` — fetches live JSON (never use committed snapshots).
+3. **Review** diff report: name/status, new `TBD` slots, image updates, time changes → check [`stages.md`](stages.md) too.
+4. **Apply wiki:** `npm run lineup:check-official -- --lineup` (or edit manually), then changelog if needed.
+5. **Apply seed:** `npm run lineup:check-official -- --complete` or hand-edit `supabase/seed/bands.ts`.
+6. **Apply DB:** [`lineup-sync.md`](lineup-sync.md) — `seed:bands:sync` dry-run → `--apply`.
 7. Optional cross-check [metal-battle.com](https://www.metal-battle.com/) for MB hints only.
 
 ### Summary count sanity (2026-06-29 baseline)
@@ -173,4 +215,6 @@ Counts drift as Wacken confirms bands — update the summary line when syncing.
 
 ## Open questions
 
-- `npm run lineup:check-official` — planned helper script to automate fetch + diff (not yet implemented).
+- _(none)_
+
+**Last updated:** 2026-06-29 — `lineup:check-official` script contract, exit codes, DB apply handoff to `lineup-sync.md`.

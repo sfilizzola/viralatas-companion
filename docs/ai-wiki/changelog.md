@@ -9,14 +9,20 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ### Added
 - `docs/ai-wiki/lineup-official-source.md` — wacken.com JSON endpoints, camping-ground filters (exclude LGH Clubstage), `slot_id`/status mapping, app-only overrides (`HAR13`, `JUN*`), repeat-check agent checklist.
 - `.claude/context/lineup-official-source.md` — compact agent pointer to the wiki page.
+- **`npm run lineup:check-official`** — operator script (`supabase/seed/lineup-check-official.ts` + `lineup-official-source.ts`): three modes (check / `--lineup` / `--complete`), exit codes 0/1/2, y/N confirms before writes; patches `lineup.md` then optional `bands.ts` (`name`/`image_url` by `slot_id`).
+- `src/__tests__/lineup-official-source.test.ts` — 7 unit tests for classify, diff, `HAR13` override, patch summary (no network).
 
 ### Changed
-- `docs/ai-wiki/lineup.md` — Maintenance Guide links to `lineup-official-source.md`.
-- `docs/ai-wiki/lineup-sync.md`, `docs/ai-wiki/index.md` — cross-links to official-source doc.
+- `docs/ai-wiki/lineup.md` — Maintenance Guide and top blockquote use three-mode script flow instead of manual curl/edit steps.
+- `docs/ai-wiki/lineup-sync.md` — "Checking official Wacken feed" section before `seed:bands:sync`; flag matrix rows for `lineup:check-official`; end-to-end workflow references check-first.
+- `docs/ai-wiki/lineup-official-source.md` — full script contract, exit codes, patch policy, DB handoff to `lineup-sync.md`.
+- `docs/ai-wiki/testing.md`, `docs/ai-wiki/index.md`, `README.md`, `CLAUDE.md` — document script and operator sequence.
 - `docs/ai-wiki/lineup.md` — synced to wacken.com running-order JSON (2026-06-29): 18 Metal Battle bands promoted `TDB` → `CONFIRMED` with wacken.com image URLs; `WET3` reverted from named **I See Red** to `TDB MTB` (MB Greece — wacken.com still shows Metal Battle TBA; [metal-battle.com](https://www.metal-battle.com/) names I See Red but wacken.com is authoritative); minor official spellings (Born Broken, SÓT, Gagor); Airbourne `FAS15` image URL updated; summary counts 173 CONFIRMED / 13 TDB MTB / 0 named TDB. **`HAR13` Farewell & Announcements kept as `CEREMONY`** despite empty wacken.com feed slot.
 
 ### Architectural Notes
-- `supabase/seed/bands.ts` and `src/services/metalBattle.ts` still reflect the pre-sync state — apply in a follow-up step via `seed:bands:sync`.
+- **Check-before-sync workflow:** official feed → `lineup:check-official` → `seed:bands:sync`. Wiki/seed edits should flow from wacken.com JSON, not ad-hoc curl + hand diff.
+- Image URL patches only on newly confirmed or name/status change — thumbnail vs poster drift ignored.
+- `supabase/seed/bands.ts` and `src/services/metalBattle.ts` may still lag wiki until `--complete` + `seed:bands:sync -- --apply`.
 
 ## 2026-06-26 (Lineup user-picks filter persistence)
 
