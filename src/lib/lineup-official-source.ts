@@ -3,10 +3,6 @@
  * See docs/ai-wiki/lineup-official-source.md
  */
 
-import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
 export const EVENTS_URL =
   'https://www.wacken.com/fileadmin/Json/events-concert.json';
 export const STAGES_URL = 'https://www.wacken.com/fileadmin/Json/stages.json';
@@ -85,18 +81,6 @@ type WackenEvent = {
 };
 
 type WackenStage = { uid: number; title: string };
-
-export function repoRoot(): string {
-  return join(dirname(fileURLToPath(import.meta.url)), '../..');
-}
-
-export function lineupMdPath(): string {
-  return join(repoRoot(), 'docs/ai-wiki/lineup.md');
-}
-
-export function bandsTsPath(): string {
-  return join(repoRoot(), 'supabase/seed/bands.ts');
-}
 
 export function normName(value: string): string {
   return value
@@ -293,8 +277,6 @@ export function computeDiff(
   const skippedOverrides: DiffResult['skippedOverrides'] = [];
   const skippedJungle: string[] = [];
 
-  const wikiBySlot = new Map(wikiRows.map((r) => [r.slotId, r]));
-
   for (const wiki of wikiRows) {
     if (OVERRIDE_SLOT_IDS.has(wiki.slotId)) {
       const off = official.get(wiki.slotId);
@@ -326,7 +308,6 @@ export function computeDiff(
     if (wiki.status !== target.status) {
       changes.push({ field: 'status', before: wiki.status, after: target.status });
     }
-    // Only push image when newly confirmed or identity changed — avoid thumbnail vs poster noise.
     const identityChanging =
       !namesEquivalent(wiki.name, target.name) || wiki.status !== target.status;
     const needsImageUpdate =
@@ -421,7 +402,6 @@ export function patchBandsTsContent(
     const slotMarker = `slot_id: '${patch.slotId}'`;
     const lineIndex = next.split('\n').findIndex((line) => line.includes(slotMarker));
     if (lineIndex === -1) {
-      // Dropped TBD slots (LOU21, WET30, …) are not in bands.ts
       continue;
     }
 
@@ -489,14 +469,6 @@ export function formatDiffReport(
   }
 
   return lines.join('\n');
-}
-
-export function loadLineupMarkdown(): string {
-  return readFileSync(lineupMdPath(), 'utf-8');
-}
-
-export function loadBandsTs(): string {
-  return readFileSync(bandsTsPath(), 'utf-8');
 }
 
 export function todayIsoDate(): string {

@@ -11,7 +11,7 @@ For catastrophic refresh (full table replace), use destructive `npm run seed:ban
 | File | Role |
 |------|------|
 | `supabase/seed/lineup-check-official.ts` | CLI — fetch wacken.com JSON, diff vs `lineup.md`, optional apply |
-| `supabase/seed/lineup-official-source.ts` | Fetch/filter/map logic, diff, patch `lineup.md` + `bands.ts` |
+| `src/lib/lineup-official-source.ts` | Fetch/filter/map logic, diff, patch `lineup.md` + `bands.ts` |
 | `supabase/seed/bands-sync.ts` | Main sync tool — dry-run plan + `--apply` |
 | `supabase/seed/bands-move.ts` | Pick transfer when band relocates slot (`--from` / `--to`) |
 | `supabase/seed/bands.ts` | Seed source of truth; exports `assertSeedIntegrity`, `bands`, `SLOT_ID_RE` |

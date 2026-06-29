@@ -7,7 +7,7 @@ import {
   namesEquivalent,
   parseLineupMarkdown,
   applyLineupPatches,
-} from '../../supabase/seed/lineup-official-source';
+} from '../../src/lib/lineup-official-source';
 
 const sampleEvents = [
   {

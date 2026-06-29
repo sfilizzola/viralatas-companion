@@ -9,7 +9,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ### Added
 - `docs/ai-wiki/lineup-official-source.md` — wacken.com JSON endpoints, camping-ground filters (exclude LGH Clubstage), `slot_id`/status mapping, app-only overrides (`HAR13`, `JUN*`), repeat-check agent checklist.
 - `.claude/context/lineup-official-source.md` — compact agent pointer to the wiki page.
-- **`npm run lineup:check-official`** — operator script (`supabase/seed/lineup-check-official.ts` + `lineup-official-source.ts`): three modes (check / `--lineup` / `--complete`), exit codes 0/1/2, y/N confirms before writes; patches `lineup.md` then optional `bands.ts` (`name`/`image_url` by `slot_id`).
+- **`npm run lineup:check-official`** — operator script (`supabase/seed/lineup-check-official.ts` + `src/lib/lineup-official-source.ts`): three modes (check / `--lineup` / `--complete`), exit codes 0/1/2, y/N confirms before writes; patches `lineup.md` then optional `bands.ts` (`name`/`image_url` by `slot_id`).
 - `src/__tests__/lineup-official-source.test.ts` — 7 unit tests for classify, diff, `HAR13` override, patch summary (no network).
 
 ### Changed

@@ -11,7 +11,7 @@ Document how agents and operators fetch the **live** Wacken 2026 music running o
 | File | Role |
 |------|------|
 | `supabase/seed/lineup-check-official.ts` | CLI entry — modes, confirms, exit codes |
-| `supabase/seed/lineup-official-source.ts` | Fetch, filter, `slot_id` map, parse/diff/patch `lineup.md` and `bands.ts` |
+| `src/lib/lineup-official-source.ts` | Fetch, filter, `slot_id` map, parse/diff/patch `lineup.md` and `bands.ts` |
 | `src/__tests__/lineup-official-source.test.ts` | Unit tests for classify, diff, patch (no network) |
 | [`lineup.md`](lineup.md) | Human-editable band assignments + `slot_id` rows (compare target) |
 | [`stages.md`](stages.md) | Slot times per `slot_id` (update if official times move) |

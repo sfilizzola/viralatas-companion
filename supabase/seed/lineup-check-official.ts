@@ -8,26 +8,42 @@
  * See docs/ai-wiki/lineup-official-source.md
  */
 
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
+import { fileURLToPath } from 'node:url';
 
 import {
   applyLineupPatches,
-  bandsTsPath,
   computeDiff,
   fetchOfficialSlots,
   formatDiffReport,
   formatPatchPreview,
-  lineupMdPath,
-  loadBandsTs,
-  loadLineupMarkdown,
   parseLineupMarkdown,
   patchBandsTsContent,
   todayIsoDate,
   type DiffResult,
   type SlotPatch,
-} from './lineup-official-source';
+} from '../../src/lib/lineup-official-source';
+
+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
+
+function lineupMdPath(): string {
+  return join(REPO_ROOT, 'docs/ai-wiki/lineup.md');
+}
+
+function bandsTsPath(): string {
+  return join(REPO_ROOT, 'supabase/seed/bands.ts');
+}
+
+function loadLineupMarkdownFromDisk(): string {
+  return readFileSync(lineupMdPath(), 'utf-8');
+}
+
+function loadBandsTs(): string {
+  return readFileSync(bandsTsPath(), 'utf-8');
+}
 
 type Mode = 'check' | 'lineup' | 'complete';
 
@@ -81,7 +97,7 @@ async function run(): Promise<number> {
     return 2;
   }
 
-  const lineupContent = loadLineupMarkdown();
+  const lineupContent = loadLineupMarkdownFromDisk();
   const wikiRows = parseLineupMarkdown(lineupContent);
   const diff: DiffResult = computeDiff(wikiRows, official);
 
@@ -102,7 +118,6 @@ async function run(): Promise<number> {
     return 1;
   }
 
-  // ── lineup.md ───────────────────────────────────────────────────────────
   printWritePreview('lineup.md changes', lineupMdPath(), diff.patches);
 
   const lineupOk = await confirm('Write lineup.md with the changes above?');
@@ -122,7 +137,6 @@ async function run(): Promise<number> {
     return 0;
   }
 
-  // ── bands.ts ────────────────────────────────────────────────────────────
   const bandsContent = loadBandsTs();
   const bandsPreview = patchBandsTsContent(bandsContent, diff.patches);
   const bandsChanged = bandsPreview !== bandsContent;
@@ -133,7 +147,6 @@ async function run(): Promise<number> {
     return 0;
   }
 
-  // Show which slots will touch bands.ts
   const bandsPatches = diff.patches.filter(
     (p) =>
       !p.slotId.startsWith('JUN') &&

@@ -11,7 +11,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 - `src/__tests__/` — All test files (**78 files**, **861 tests** as of UI primitive coverage)
 - `vitest.config.ts` — Test runner configuration
 - `package.json` — Test scripts (`test`, `test:coverage`) and seed scripts (`lineup:check-official`, `seed:bands`, `seed:bands:sync`, `seed:bands:backfill-slot-id`, `seed:bands:move`, `seed:test-users`, `seed:live-now`, `festival:reset`)
-- `supabase/seed/` — Seed scripts for test data, `lineup-check-official.ts` / `lineup-official-source.ts` (official feed diff), and the destructive `festival-reset.ts` operator script (see `docs/ai-wiki/festival-reset.md`)
+- `supabase/seed/` — Seed scripts for test data, `lineup-check-official.ts` (CLI) + `src/lib/lineup-official-source.ts` (official feed diff), and the destructive `festival-reset.ts` operator script (see `docs/ai-wiki/festival-reset.md`)
 
 ---
 
@@ -72,7 +72,7 @@ Document testing approach, test organization, offline scenario testing, and how 
 | `missedRepository.test.ts` | Mark/unmark missed band online and offline (4 tests) |
 | `festivalWrap.test.ts` | `buildFestivalWrapStats()` badge parity, crew Jaccard, assigned slugs, avatar URLs (Phase 30) |
 | `wrapDismiss.test.ts` | `viralatas:wrap-dismissed-2026` dismiss key round-trip (Phase 30) |
-| `lineup-official-source.test.ts` | Official feed classify/map/diff/patch: `TDB MTB`, `CONFIRMED` URLs, `HAR13` override, `applyLineupPatches` summary (7 tests; no network) |
+| `lineup-official-source.test.ts` | Official feed classify/map/diff/patch: `TDB MTB`, `CONFIRMED` URLs, `HAR13` override, `applyLineupPatches` summary (7 tests; no network) — imports `src/lib/lineup-official-source.ts` |
 
 **Coverage**: **861 tests** across **78** test files. `vitest.config.ts` enforces **80%** on `src/components/**` and `src/ui/**`; **95%** on `src/lib/db/**`. UI primitives at **100%** lines/functions after `ui.test.tsx`.
 
@@ -101,7 +101,7 @@ npm test -- <file>      # Run specific test file
 
 ### 3. Operator / Seed Script Tests
 
-**Location:** `src/__tests__/lineup-official-source.test.ts` (imports `supabase/seed/lineup-official-source.ts`)
+**Location:** `src/__tests__/lineup-official-source.test.ts` (imports `src/lib/lineup-official-source.ts`)
 
 Pure unit tests — mocked event/stage fixtures, no wacken.com network:
 
