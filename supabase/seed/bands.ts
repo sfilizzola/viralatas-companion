@@ -27,7 +27,7 @@
  *   - Each slot's start_time / end_time comes from stages.md (Slot ID → time).
  *
  * Expected row count after seed: **187** (each row declares `slot_id` explicitly)
- *   = 155 CONFIRMED + 12 TDB MTB + 19 named TDB (known name, image pending) + 1 ceremony (HAR13 Farewell & Announcements).
+ *   = 173 CONFIRMED + 13 TDB MTB + 0 named TDB + 1 ceremony (HAR13 Farewell & Announcements).
  *
  * For small lineup edits (name, time, genre, image), use `npm run seed:bands:sync`
  * instead — it preserves user picks. This script is for festival reset only.
@@ -167,28 +167,28 @@ export const bands: BandSeed[] = [
   // W.E.T. STAGE — Day 1
   { slot_id: 'WET1', name: MTB,                  stage: STAGES.WET, start_time: t(D1,11, 0), end_time: t(D1,11,20),  genre: 'Metal Battle',    image_url: PLACEHOLDER },                                                                  
   { slot_id: 'WET2', name: 'Speak in Whispers',  stage: STAGES.WET, start_time: t(D1,11,50), end_time: t(D1,12,10),  genre: 'Metal Battle',     image_url: `${WOA}/fileadmin/_processed_/9/9/csm_speak_in_whispers_26_157b14e684.jpg` }, 
-  { slot_id: 'WET3', name: 'I See Red',            stage: STAGES.WET, start_time: t(D1,12,40), end_time: t(D1,13, 0),  genre: 'Metal Battle',     image_url: PLACEHOLDER },                                                                  
-  { slot_id: 'WET4', name: 'Goodnight Greatness',  stage: STAGES.WET, start_time: t(D1,13,30), end_time: t(D1,13,50),  genre: 'Metal Battle',     image_url: PLACEHOLDER },                                                                  
-  { slot_id: 'WET5', name: "The Crescent's Call", stage: STAGES.WET, start_time: t(D1,14,20), end_time: t(D1,14,40),  genre: 'Metal Battle',    image_url: PLACEHOLDER },                                                                  
-  { slot_id: 'WET6', name: 'Ashed Winter',         stage: STAGES.WET, start_time: t(D1,15,50), end_time: t(D1,16,10),  genre: 'Metal Battle',     image_url: PLACEHOLDER },                                                                  
-  { slot_id: 'WET7', name: 'Blanket Hill',         stage: STAGES.WET, start_time: t(D1,16,40), end_time: t(D1,17, 0),  genre: 'Metal Battle', image_url: PLACEHOLDER },                                                                  
+  { slot_id: 'WET3', name: MTB,            stage: STAGES.WET, start_time: t(D1,12,40), end_time: t(D1,13, 0),  genre: 'Metal Battle',     image_url: PLACEHOLDER },                                                                  
+  { slot_id: 'WET4', name: 'Goodnight Greatness',  stage: STAGES.WET, start_time: t(D1,13,30), end_time: t(D1,13,50),  genre: 'Metal Battle',     image_url: `${WOA}/fileadmin/_processed_/6/e/csm_goodnight_greatness_26_5e993ee771.jpg` },                                                                  
+  { slot_id: 'WET5', name: "The Crescent's Call", stage: STAGES.WET, start_time: t(D1,14,20), end_time: t(D1,14,40),  genre: 'Metal Battle',    image_url: `${WOA}/fileadmin/_processed_/c/a/csm_The_Crescents_Call._26_ec89342cc5.jpg` },                                                                  
+  { slot_id: 'WET6', name: 'Ashed Winter',         stage: STAGES.WET, start_time: t(D1,15,50), end_time: t(D1,16,10),  genre: 'Metal Battle',     image_url: `${WOA}/fileadmin/_processed_/b/4/csm_ashed_winter_26_9e44606ec2.jpg` },                                                                  
+  { slot_id: 'WET7', name: 'Blanket Hill',         stage: STAGES.WET, start_time: t(D1,16,40), end_time: t(D1,17, 0),  genre: 'Metal Battle', image_url: `${WOA}/fileadmin/_processed_/b/8/csm_blanket_hill_26_0a741e61f3.jpg` },                                                                  
   { slot_id: 'WET8', name: MTB,                  stage: STAGES.WET, start_time: t(D1,17,30), end_time: t(D1,17,50),  genre: 'Metal Battle',    image_url: PLACEHOLDER },                                                                  
-  { slot_id: 'WET9', name: 'Elchivo',              stage: STAGES.WET, start_time: t(D1,18,20), end_time: t(D1,18,40),  genre: 'Metal Battle',     image_url: PLACEHOLDER },                                                                  
-  { slot_id: 'WET10', name: 'Morphide',             stage: STAGES.WET, start_time: t(D1,19,10), end_time: t(D1,19,30),  genre: 'Metal Battle',     image_url: PLACEHOLDER },                                                                  
+  { slot_id: 'WET9', name: 'Elchivo',              stage: STAGES.WET, start_time: t(D1,18,20), end_time: t(D1,18,40),  genre: 'Metal Battle',     image_url: `${WOA}/fileadmin/_processed_/8/f/csm_elchivo_26_576ae82fc4.jpg` },                                                                  
+  { slot_id: 'WET10', name: 'Morphide',             stage: STAGES.WET, start_time: t(D1,19,10), end_time: t(D1,19,30),  genre: 'Metal Battle',     image_url: `${WOA}/fileadmin/_processed_/8/e/csm_morphide_26_73f176435f.jpg` },                                                                  
   { slot_id: 'WET11', name: 'Velvet Rush',        stage: STAGES.WET, start_time: t(D1,20,15), end_time: t(D1,21, 0),  genre: 'Hard Rock',                     image_url: `${WOA}/fileadmin/_processed_/c/c/csm_velvet_rush_26_79ee43e0e7.jpg` },         
   { slot_id: 'WET12', name: 'Rose Tattoo',        stage: STAGES.WET, start_time: t(D1,22,45), end_time: t(D1n, 0, 0), genre: 'Hard Rock',               image_url: `${WOA}/fileadmin/_processed_/5/5/csm_rose_tattoo26_a5747c907d.jpg` },          
 
   // HEADBANGERS STAGE — Day 1
   { slot_id: 'HBA1', name: MTB,           stage: STAGES.HEADBANGERS, start_time: t(D1,11,25), end_time: t(D1,11,45),  genre: 'Metal Battle',                  image_url: PLACEHOLDER },                                                          
-  { slot_id: 'HBA2', name: 'BornBroken',  stage: STAGES.HEADBANGERS, start_time: t(D1,12,15), end_time: t(D1,12,35),  genre: 'Metal Battle',               image_url: PLACEHOLDER },                                                          
+  { slot_id: 'HBA2', name: 'Born Broken',  stage: STAGES.HEADBANGERS, start_time: t(D1,12,15), end_time: t(D1,12,35),  genre: 'Metal Battle',               image_url: `${WOA}/fileadmin/_processed_/a/9/csm_born_broken_26_e3d993f78e.jpg` },                                                          
   { slot_id: 'HBA3', name: MTB,           stage: STAGES.HEADBANGERS, start_time: t(D1,13, 5), end_time: t(D1,13,25),  genre: 'Metal Battle',   image_url: PLACEHOLDER },                                                          
   { slot_id: 'HBA4', name: MTB,           stage: STAGES.HEADBANGERS, start_time: t(D1,13,55), end_time: t(D1,14,15),  genre: 'Metal Battle',              image_url: PLACEHOLDER },                                                          
   { slot_id: 'HBA5', name: 'Expellow',    stage: STAGES.HEADBANGERS, start_time: t(D1,14,45), end_time: t(D1,15,45),  genre: TBD_GENRE,                           image_url: `${WOA}/fileadmin/_processed_/b/b/csm_expellow_26b_f274263240.jpg` }, 
-  { slot_id: 'HBA6', name: 'Sinamort',    stage: STAGES.HEADBANGERS, start_time: t(D1,16,15), end_time: t(D1,16,35),  genre: 'Metal Battle',            image_url: PLACEHOLDER },                                                          
-  { slot_id: 'HBA7', name: 'Deflag',      stage: STAGES.HEADBANGERS, start_time: t(D1,17, 5), end_time: t(D1,17,25),  genre: 'Metal Battle',                image_url: PLACEHOLDER },                                                          
+  { slot_id: 'HBA6', name: 'Sinamort',    stage: STAGES.HEADBANGERS, start_time: t(D1,16,15), end_time: t(D1,16,35),  genre: 'Metal Battle',            image_url: `${WOA}/fileadmin/_processed_/b/7/csm_sinamort_26_76b1458fee.jpg` },                                                          
+  { slot_id: 'HBA7', name: 'Deflag',      stage: STAGES.HEADBANGERS, start_time: t(D1,17, 5), end_time: t(D1,17,25),  genre: 'Metal Battle',                image_url: `${WOA}/fileadmin/_processed_/5/b/csm_deflag_26_e9757893eb.jpg` },                                                          
   { slot_id: 'HBA8', name: MTB,           stage: STAGES.HEADBANGERS, start_time: t(D1,17,55), end_time: t(D1,18,15),  genre: 'Metal Battle',              image_url: PLACEHOLDER },                                                          
   { slot_id: 'HBA9', name: MTB,           stage: STAGES.HEADBANGERS, start_time: t(D1,18,45), end_time: t(D1,19, 5),  genre: 'Metal Battle',               image_url: PLACEHOLDER },                                                          
-  { slot_id: 'HBA10', name: 'Sót',         stage: STAGES.HEADBANGERS, start_time: t(D1,19,35), end_time: t(D1,19,55),  genre: 'Metal Battle',              image_url: PLACEHOLDER },                                                          
+  { slot_id: 'HBA10', name: 'SÓT',         stage: STAGES.HEADBANGERS, start_time: t(D1,19,35), end_time: t(D1,19,55),  genre: 'Metal Battle',              image_url: `${WOA}/fileadmin/_processed_/b/6/csm_sot_26_0252001d7e.jpg` },                                                          
   { slot_id: 'HBA11', name: 'Kadavar',     stage: STAGES.HEADBANGERS, start_time: t(D1,21,15), end_time: t(D1,22,30),  genre: 'Doom Metal',                       image_url: `${WOA}/fileadmin/_processed_/f/9/csm_kadavar_26b_5241b42bda.jpg` },  
   { slot_id: 'HBA12', name: 'Mambo Kurt',  stage: STAGES.HEADBANGERS, start_time: t(D1n, 0,15), end_time: t(D1n, 1, 0), genre: TBD_GENRE,                          image_url: `${WOA}/fileadmin/_processed_/f/4/csm_mambo_kurt_25_d25410db45.jpg` }, 
 
@@ -236,11 +236,11 @@ export const bands: BandSeed[] = [
   { slot_id: 'LOU12', name: 'Turbonegro',     stage: STAGES.LOUDER, start_time: t(D2,22, 0), end_time: t(D2,23,30),  genre: 'Punk',        image_url: `${WOA}/fileadmin/_processed_/1/b/csm_turbonegro26_2118d824cd.jpg` },     
 
   // W.E.T. STAGE — Day 2
-  { slot_id: 'WET13', name: 'E.N.D.',                stage: STAGES.WET, start_time: t(D2,11, 0), end_time: t(D2,11,20),  genre: 'Metal Battle', image_url: PLACEHOLDER }, 
-  { slot_id: 'WET14', name: 'Haine',                 stage: STAGES.WET, start_time: t(D2,11,50), end_time: t(D2,12,10),  genre: 'Metal Battle',          image_url: PLACEHOLDER }, 
+  { slot_id: 'WET13', name: 'E.N.D.',                stage: STAGES.WET, start_time: t(D2,11, 0), end_time: t(D2,11,20),  genre: 'Metal Battle', image_url: `${WOA}/fileadmin/_processed_/f/a/csm_end_26_cc8178d602.jpg` }, 
+  { slot_id: 'WET14', name: 'Haine',                 stage: STAGES.WET, start_time: t(D2,11,50), end_time: t(D2,12,10),  genre: 'Metal Battle',          image_url: `${WOA}/fileadmin/_processed_/2/c/csm_haine_26_0e543cf557.jpg` }, 
   { slot_id: 'WET15', name: MTB,                     stage: STAGES.WET, start_time: t(D2,12,40), end_time: t(D2,13, 0),  genre: 'Metal Battle',       image_url: PLACEHOLDER }, 
   { slot_id: 'WET16', name: MTB,                     stage: STAGES.WET, start_time: t(D2,13,30), end_time: t(D2,13,50),  genre: 'Metal Battle',    image_url: PLACEHOLDER }, 
-  { slot_id: 'WET17', name: 'Given By The Flames',   stage: STAGES.WET, start_time: t(D2,14,20), end_time: t(D2,14,40),  genre: 'Metal Battle',          image_url: PLACEHOLDER }, 
+  { slot_id: 'WET17', name: 'Given By The Flames',   stage: STAGES.WET, start_time: t(D2,14,20), end_time: t(D2,14,40),  genre: 'Metal Battle',          image_url: `${WOA}/fileadmin/_processed_/4/7/csm_given_by_the_flames_26_a72a8cc764.jpg` }, 
   { slot_id: 'WET18', name: MTB,                     stage: STAGES.WET, start_time: t(D2,15,10), end_time: t(D2,15,30),  genre: 'Metal Battle',          image_url: PLACEHOLDER }, 
   { slot_id: 'WET19', name: 'Craft',                 stage: STAGES.WET, start_time: t(D2,16,15), end_time: t(D2,17, 0),  genre: 'Black Metal',                 image_url: `${WOA}/fileadmin/_processed_/8/d/csm_Craft_cropped_size_-_photo_by_Soile_Siirtola_fabe03b40f.jpg` }, 
   { slot_id: 'WET20', name: 'Spectral Wound',        stage: STAGES.WET, start_time: t(D2,18,15), end_time: t(D2,19, 0),  genre: 'Black Metal',                 image_url: `${WOA}/fileadmin/_processed_/2/e/csm_spectral_wound26_3263ad4710.jpg` }, 
@@ -248,11 +248,11 @@ export const bands: BandSeed[] = [
   { slot_id: 'WET22', name: 'Misþyrming & Nergal',   stage: STAGES.WET, start_time: t(D2,23, 0), end_time: t(D2n, 0, 0), genre: 'Black Metal',                 image_url: `${WOA}/fileadmin/_processed_/5/c/csm_Sventevith-Logo-2_da655748b4.jpg` }, 
 
   // HEADBANGERS STAGE — Day 2
-  { slot_id: 'HBA13', name: 'Novelization',          stage: STAGES.HEADBANGERS, start_time: t(D2,11,25), end_time: t(D2,11,45),  genre: 'Metal Battle',     image_url: PLACEHOLDER }, 
-  { slot_id: 'HBA14', name: 'Gágor',                stage: STAGES.HEADBANGERS, start_time: t(D2,12,15), end_time: t(D2,12,35),  genre: 'Metal Battle',  image_url: PLACEHOLDER }, 
-  { slot_id: 'HBA15', name: 'Force',                stage: STAGES.HEADBANGERS, start_time: t(D2,13, 5), end_time: t(D2,13,25),  genre: 'Metal Battle',           image_url: PLACEHOLDER }, 
-  { slot_id: 'HBA16', name: 'Midhaven',             stage: STAGES.HEADBANGERS, start_time: t(D2,13,55), end_time: t(D2,14,15),  genre: 'Metal Battle',           image_url: PLACEHOLDER }, 
-  { slot_id: 'HBA17', name: 'Gidora',               stage: STAGES.HEADBANGERS, start_time: t(D2,14,45), end_time: t(D2,15, 5),  genre: 'Metal Battle',     image_url: PLACEHOLDER }, 
+  { slot_id: 'HBA13', name: 'Novelization',          stage: STAGES.HEADBANGERS, start_time: t(D2,11,25), end_time: t(D2,11,45),  genre: 'Metal Battle',     image_url: `${WOA}/fileadmin/_processed_/1/3/csm_novelization_26_6842acc391.jpg` }, 
+  { slot_id: 'HBA14', name: 'Gagor',                stage: STAGES.HEADBANGERS, start_time: t(D2,12,15), end_time: t(D2,12,35),  genre: 'Metal Battle',  image_url: `${WOA}/fileadmin/_processed_/2/d/csm_gagor_26_868f71af24.jpg` }, 
+  { slot_id: 'HBA15', name: 'Force',                stage: STAGES.HEADBANGERS, start_time: t(D2,13, 5), end_time: t(D2,13,25),  genre: 'Metal Battle',           image_url: `${WOA}/fileadmin/_processed_/6/c/csm_force_26_9eb5006911.jpg` }, 
+  { slot_id: 'HBA16', name: 'Midhaven',             stage: STAGES.HEADBANGERS, start_time: t(D2,13,55), end_time: t(D2,14,15),  genre: 'Metal Battle',           image_url: `${WOA}/fileadmin/_processed_/c/9/csm_midhaven_26_ad2bc280fa.jpg` }, 
+  { slot_id: 'HBA17', name: 'Gidora',               stage: STAGES.HEADBANGERS, start_time: t(D2,14,45), end_time: t(D2,15, 5),  genre: 'Metal Battle',     image_url: `${WOA}/fileadmin/_processed_/f/c/csm_gidora_26_ed631fb6b6.jpg` }, 
   { slot_id: 'HBA18', name: MTB,                    stage: STAGES.HEADBANGERS, start_time: t(D2,15,35), end_time: t(D2,15,55),  genre: 'Metal Battle',     image_url: PLACEHOLDER }, 
   { slot_id: 'HBA19', name: 'Firespawn',            stage: STAGES.HEADBANGERS, start_time: t(D2,17,15), end_time: t(D2,18, 0),  genre: 'Death Metal',                  image_url: `${WOA}/fileadmin/_processed_/0/3/csm_Firespawn-WOA26_b9d52bcc7e.jpg` }, 
   { slot_id: 'HBA20', name: 'Blood Red Throne',     stage: STAGES.HEADBANGERS, start_time: t(D2,19,15), end_time: t(D2,20,15),  genre: 'Death Metal',                  image_url: `${WOA}/fileadmin/_processed_/0/a/csm_blood_red_throne26_98867522b5.jpg` }, 
@@ -378,7 +378,7 @@ export const bands: BandSeed[] = [
   // FASTER STAGE — Day 4
   { slot_id: 'FAS13', name: 'Kim Dracula', stage: STAGES.FASTER, start_time: t(D4,12,30), end_time: t(D4,13,30),  genre: 'Metal',  image_url: `${WOA}/fileadmin/_processed_/3/4/csm_kim_dracula26_6085add158.jpg` }, 
   { slot_id: 'FAS14', name: 'Nevermore',   stage: STAGES.FASTER, start_time: t(D4,15, 0), end_time: t(D4,16, 0),  genre: 'Metal',  image_url: `${WOA}/fileadmin/_processed_/6/6/csm_nevermore_26b_55b9630985.jpg` }, 
-  { slot_id: 'FAS15', name: 'Airbourne',   stage: STAGES.FASTER, start_time: t(D4,17,30), end_time: t(D4,18,45),  genre: 'Party Metal',        image_url: `${WOA}/fileadmin/_processed_/d/e/csm_Airborn-WOA26_24e9c1f588.jpg` },  
+  { slot_id: 'FAS15', name: 'Airbourne',   stage: STAGES.FASTER, start_time: t(D4,17,30), end_time: t(D4,18,45),  genre: 'Party Metal',        image_url: `${WOA}/fileadmin/_processed_/0/3/csm_airbourne-photo-2018_b62415c35e.jpg` },  
   { slot_id: 'FAS16', name: 'Powerwolf',   stage: STAGES.FASTER, start_time: t(D4,20,45), end_time: t(D4,22,30),  genre: 'Power Metal',        image_url: `${WOA}/fileadmin/_processed_/9/f/csm_Powerwolf-WOA26_acf32b8b68.jpg` }, 
   { slot_id: 'FAS17', name: 'Alestorm',    stage: STAGES.FASTER, start_time: t(D4n, 1, 0), end_time: t(D4n, 2, 0), genre: 'Party Metal',        image_url: `${WOA}/fileadmin/_processed_/6/d/csm_alestorm_26_9ddf45fa2e.jpg` },     
 
