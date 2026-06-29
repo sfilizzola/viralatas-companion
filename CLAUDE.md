@@ -271,7 +271,7 @@ Never invert this to: `UI → API → local cache`. IndexedDB is the source of t
 
 ## Stage configuration
 
-8 stages × 4 days at Wacken 2026. Full table, colors, festival schedule, and lineup update procedure → `.claude/context/stages-and-lineup.md`.
+8 stages × 4 days at Wacken 2026. Stage table + schedules → `docs/ai-wiki/stages.md` + `docs/ai-wiki/lineup.md`. **Official running-order JSON fetch/diff** → `docs/ai-wiki/lineup-official-source.md` (agent pointer: `.claude/context/lineup-official-source.md`).
 Stage colors live in `src/pages/LineupPage.tsx`; unknown stages fall back to `var(--accent)`.
 
 ---
@@ -420,7 +420,7 @@ Only when **both the build and all tests are green** may you proceed with the co
 
 - `PHASES.md` — Current phase: acceptance criteria, deliverables
 - `docs/ai-wiki/` — Architecture wiki
-- `.claude/context/` — On-demand context: **skill-routing**, rtk-reference, stages-and-lineup, **production-database**, llm-alerts, badges, auth-trigger, wiki-template, key-decisions
+- `.claude/context/` — On-demand context: **skill-routing**, rtk-reference, **lineup-official-source**, **production-database**, llm-alerts, badges, auth-trigger, wiki-template, key-decisions
 - `.claude/agents/` — Specialized subagents (see Subagent locations above)
 - `README.md`, `supabase/migrations/`, `src/types/index.ts`
 

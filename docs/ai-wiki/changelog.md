@@ -4,6 +4,20 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-06-29
+
+### Added
+- `docs/ai-wiki/lineup-official-source.md` — wacken.com JSON endpoints, camping-ground filters (exclude LGH Clubstage), `slot_id`/status mapping, app-only overrides (`HAR13`, `JUN*`), repeat-check agent checklist.
+- `.claude/context/lineup-official-source.md` — compact agent pointer to the wiki page.
+
+### Changed
+- `docs/ai-wiki/lineup.md` — Maintenance Guide links to `lineup-official-source.md`.
+- `docs/ai-wiki/lineup-sync.md`, `docs/ai-wiki/index.md` — cross-links to official-source doc.
+- `docs/ai-wiki/lineup.md` — synced to wacken.com running-order JSON (2026-06-29): 18 Metal Battle bands promoted `TDB` → `CONFIRMED` with wacken.com image URLs; `WET3` reverted from named **I See Red** to `TDB MTB` (MB Greece — wacken.com still shows Metal Battle TBA; [metal-battle.com](https://www.metal-battle.com/) names I See Red but wacken.com is authoritative); minor official spellings (Born Broken, SÓT, Gagor); Airbourne `FAS15` image URL updated; summary counts 173 CONFIRMED / 13 TDB MTB / 0 named TDB. **`HAR13` Farewell & Announcements kept as `CEREMONY`** despite empty wacken.com feed slot.
+
+### Architectural Notes
+- `supabase/seed/bands.ts` and `src/services/metalBattle.ts` still reflect the pre-sync state — apply in a follow-up step via `seed:bands:sync`.
+
 ## 2026-06-26 (Lineup user-picks filter persistence)
 
 ### Fixed

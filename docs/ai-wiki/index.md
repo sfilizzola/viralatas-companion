@@ -51,6 +51,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 ### Festival Content
 - **[Stage Reference](stages.md)** — 8 stages: categories, colors, pairing rules, slot schedules (start/end times per slot per day)
 - **[Band Lineup](lineup.md)** — Band assignments by day and stage; cross-references stages.md via Slot IDs
+- **[Wacken Official Running Order (JSON)](lineup-official-source.md)** — Live JSON feeds, filter rules, agent checklist for lineup diffs
 
 ### Features & Mechanics
 - **[Badge System](badges.md)** — 22+ condition types, live vest + Previously Achieved archive, year consolidation, how to add badges

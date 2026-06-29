@@ -154,6 +154,7 @@ For future risky work, clone to a **staging Supabase project** with a separate `
 
 ## Cross-References
 
+- [Wacken Official Running Order (JSON)](lineup-official-source.md) — Fetch + filter official feed before editing lineup
 - [Band Lineup](lineup.md) — Human-editable source; stable identity section
 - [Supabase Schema](supabase-schema.md) — `public.bands` DDL with `slot_id`
 - [Festival Reset](festival-reset.md) — Destructive sibling; `--with-bands` still uses `seed:bands`
