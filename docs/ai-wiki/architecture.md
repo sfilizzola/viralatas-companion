@@ -47,7 +47,7 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/components/map/minimapZones.ts` — `MINIMAP_ZONES` zone geometry config, `stageToZone()`, `groupKindToZone()` (Phase 35)
 - `src/services/minimapPlacement.ts` — Pure `buildPlacements()` with phyllotaxis layout + self-ordering (Phase 35)
 - `src/services/userColor.ts` — `colorForUserId()` deterministic HSL color for avatar initials (Phase 35)
-- `src/services/metalBattle.ts` — `getMetalBattleCountryFlag(slotId)`; static `slot_id`→country map → ISO2 flag emoji (or regional 🌍) for the Metal Battle genre label on `BandCard`
+- `src/services/metalBattle.ts` — `getMetalBattleCountryFlag(slotId)`; static `slot_id`→ISO2 country map → flag emoji for the Metal Battle genre label on `BandCard`
 - `src/components/StageScheduleSheet.tsx` — bottom sheet (2×4 grid) showing current/next band per stage; calls `buildStageScheduleSnapshot(bands, now)` from `src/services/stageSchedule.ts` (Phase 39)
 - `src/services/stageSchedule.ts` — `buildStageScheduleSnapshot(bands, now)` → `StageScheduleEntry[]` with `{ stage, band, status: 'current' | 'next' }`; pure function, no IDB reads
 - `vite.config.ts` — PWA configuration, caching strategy, and local dev proxy for MoshSplit API
@@ -511,7 +511,7 @@ INSERT into user_picks
 | `attendees.ts` | `computeAttendees(picks, crewUsers)` — maps raw picks to hydrated `BandAttendee[]` per band; exports `BandAttendee` and `AttendeeMap` types | ✅ Yes |
 | `weakSkips.ts` | `getWeakSkipCount()`, `recordCommittedSkip()` — committed “I am weak” skips in `user_metadata.weak_skips_2026` via best-effort `auth.updateUser` (same pattern as `location_visits` in `presenceRepository`) | Auth metadata only |
 | `badges/currentFestivalYear.ts` | `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()` — live vest year filter + consolidation gate | ✅ Yes |
-| `metalBattle.ts` | `getMetalBattleCountryFlag(slotId)` — static `slot_id`→country map → ISO2 flag emoji (or regional 🌍); prefixes the `Metal Battle` genre label on `BandCard` | ✅ Yes (static data, no IDB) |
+| `metalBattle.ts` | `getMetalBattleCountryFlag(slotId)` — static `slot_id`→ISO2 map → flag emoji; prefixes the `Metal Battle` genre label on `BandCard`; `null` when slot not in map (e.g. `WET23`) | ✅ Yes (static data, no IDB) |
 | `stageSchedule.ts` | `buildStageScheduleSnapshot(bands, now)` — pure fn; returns `StageScheduleEntry[]` (one per stage: `{ stage, band, status: 'current' \| 'next' }`); consumed by `StageScheduleSheet` | ✅ Yes (no IDB) |
 | `presencePolicy.ts` | Pure presence rules (no I/O): `isMetalPlaceWindowActive(config, nowDate)`, `resolvePresenceToggle(nextValue, context) → PresenceDecision`, `shouldAutoClearCamping(isCamping, planStatus)`, `shouldAutoCheckout(config, nowDate, presence)`; exports `PresenceDecision`, `PresenceToggleContext` types (Phase 42.A) | ✅ Yes |
 | `presenceService.ts` | Presence orchestration: `applyPresenceToggle`, `autoClearCampingOnCurrentBand`, `validateAndAutoCheckout`, `autoCheckoutAllUsers` — calls policy then repository; consumed by `useNowData`, admin sections (Phase 42.A) | Calls IDB + Supabase via repository |

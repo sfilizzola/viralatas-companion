@@ -8,15 +8,19 @@ describe('getMetalBattleCountryFlag', () => {
     expect(getMetalBattleCountryFlag('WET2')).toBe('🇨🇾');
   });
 
-  it('returns 🌍 for a regional entry (Sub Saharan Africa)', () => {
-    expect(getMetalBattleCountryFlag('HBA3')).toBe('🌍');
+  it('returns 🇿🇦 for HBA3 (South Africa — Human Nebula)', () => {
+    expect(getMetalBattleCountryFlag('HBA3')).toBe('🇿🇦');
   });
 
-  it('returns 🌍 for a regional entry (Balkan Regions)', () => {
-    expect(getMetalBattleCountryFlag('WET13')).toBe('🌍');
+  it('returns 🇭🇷 for WET13 (Croatia — E.N.D.)', () => {
+    expect(getMetalBattleCountryFlag('WET13')).toBe('🇭🇷');
   });
 
-  it('returns null for a slot with no confirmed representative', () => {
+  it('returns 🇸🇰 for HBA14 (Slovakia — Gagor)', () => {
+    expect(getMetalBattleCountryFlag('HBA14')).toBe('🇸🇰');
+  });
+
+  it('returns null for a slot absent from the map (WET23 award ceremony)', () => {
     // WET23 is Day 3 TBA — not in the map
     expect(getMetalBattleCountryFlag('WET23')).toBeNull();
   });

@@ -16,7 +16,7 @@ const METAL_BATTLE_COUNTRIES: Record<string, string> = {
   // ── Day 1 (Wednesday) — Headbangers Stage ─────────────────────
   HBA1:  'US',  // USA
   HBA2:  'CA',  // Canada          — BornBroken
-  HBA3:  '🌍', // Sub Saharan Africa (regional — no single-country flag)
+  HBA3:  'ZA',  // South Africa      — Human Nebula
   HBA4:  'IE',  // Ireland
   HBA6:  'LT',  // Lithuania       — Sinamort
   HBA7:  'IT',  // Italy           — Deflag
@@ -25,7 +25,7 @@ const METAL_BATTLE_COUNTRIES: Record<string, string> = {
   HBA10: 'IS',  // Iceland         — Sót
 
   // ── Day 2 (Thursday) — W.E.T. Stage ───────────────────────────
-  WET13: '🌍', // Balkan Regions  — E.N.D. (regional — no single-country flag)
+  WET13: 'HR',  // Croatia           — E.N.D.
   WET14: 'MT',  // Malta           — Haine
   WET15: 'BG',  // Bulgaria
   WET16: 'PH',  // Philippines
@@ -34,7 +34,7 @@ const METAL_BATTLE_COUNTRIES: Record<string, string> = {
 
   // ── Day 2 (Thursday) — Headbangers Stage ──────────────────────
   HBA13: 'NL',  // Netherlands     — Novelization
-  HBA14: 'CZ',  // Czech Republic  — Gágor
+  HBA14: 'SK',  // Slovakia          — Gagor
   HBA15: 'CL',  // Chile           — Force
   HBA16: 'IN',  // India           — Midhaven
   HBA17: 'SV',  // El Salvador     — Gidora
@@ -48,13 +48,11 @@ function isoToFlag(code: string): string {
 }
 
 /**
- * Returns the country/region flag emoji for a Metal Battle band by slot_id.
- * Returns null if the slot has no confirmed representative yet.
+ * Returns the country flag emoji for a Metal Battle band by slot_id.
+ * Returns null when the slot is absent from the map (e.g. WET23 award ceremony).
  */
 export function getMetalBattleCountryFlag(slotId: string): string | null {
   const val = METAL_BATTLE_COUNTRIES[slotId];
   if (!val) return null;
-  // Regional entries store a pre-built emoji (not a 2-character ISO code).
-  if ([...val].length !== 2) return val;
   return isoToFlag(val);
 }

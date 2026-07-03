@@ -4,6 +4,11 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-07-03
+
+### Changed
+- `src/services/metalBattle.ts` — corrected three Metal Battle flag mappings to match confirmed band countries: `HBA14` 🇨🇿→🇸🇰 (Gagor / Slovakia), `HBA3` 🌍→🇿🇦 (Human Nebula / South Africa), `WET13` 🌍→🇭🇷 (E.N.D. / Croatia). Removed regional 🌍 entries; `null` only for slots absent from the map (e.g. `WET23` award ceremony).
+
 ## 2026-06-29
 
 ### Added
