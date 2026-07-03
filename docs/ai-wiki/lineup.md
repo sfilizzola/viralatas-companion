@@ -13,7 +13,7 @@
 >
 > **Official source details:** [lineup-official-source.md](lineup-official-source.md) (JSON endpoints, filter rules, exit codes).
 
-**Summary:** 173 bands CONFIRMED · 13 `TDB MTB` Metal Battle placeholders · 0 named TDB · 12 TBD (Name=TBD) · 199 total · 1 ceremony (Farewell & Announcements, HAR13)
+**Summary:** 173 bands CONFIRMED · 12 `UNCONFIRMED` Metal Battle (metal-battle.com) · 1 `TDB MTB` Metal Battle placeholder · 0 named TDB · 12 TBD (Name=TBD) · 199 total · 1 ceremony (Farewell & Announcements, HAR13)
 
 **Genres:** 13 canonical labels after Phase 25 collapse — **[old → new mapping table](genre-collapse-mapping.md)** · [domain-model](domain-model.md#band) · [ADR](decisions/genre-collapse-canonical-labels.md). Unknown/TBD tags in this file seed as `Metal`.
 
@@ -52,7 +52,8 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 - **`CONFIRMED`** = Band has a real image URL from wacken.com
 - **`TBD`** = Placeholder — no confirmed band yet (non-Metal-Battle slot)
-- **`TDB MTB`** = Metal Battle slot whose representative band has not yet been announced. Once announced, the row should be updated to `CONFIRMED` with the band name and image URL from wacken.com.
+- **`TDB MTB`** = Metal Battle slot with no named representative yet (name column is literally `TDB MTB`)
+- **`UNCONFIRMED`** = Metal Battle representative named on [metal-battle.com](https://www.metal-battle.com/) but not yet on wacken.com (`PLACEHOLDER` image). Promote to `CONFIRMED` when wacken.com publishes the band name and image URL.
 
 ---
 
@@ -68,7 +69,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 > **Note:** Harder stage is closed on Day 1. Faster starts at 16:00 (Doors: 15:30). Louder, W.E.T., Headbangers, Wasteland, and Wackinger stages open from 10:30 / 11:00. Welcome to the Jungle has not been added to the official running order.
 >
-> **Source:** Band placements below mirror the official Wacken 2026 running order (https://www.wacken.com/de/line-up/running-order-musik/) as of 2026-06-29. **wacken.com is authoritative** over [metal-battle.com](https://www.metal-battle.com/) when they disagree (e.g. `WET3` MB Greece is still `TDB MTB` on wacken.com although metal-battle.com names I See Red).
+> **Source:** Band placements below mirror the official Wacken 2026 running order (https://www.wacken.com/de/line-up/running-order-musik/) as of 2026-06-29. **wacken.com is authoritative** for `CONFIRMED` rows. Slots marked `UNCONFIRMED` carry [metal-battle.com](https://www.metal-battle.com/) winner names until wacken.com catches up (12 slots as of 2026-07-03).
 
 ### Harder Stage
 
@@ -98,14 +99,14 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| TDB MTB | Metal Battle | WET1 | TDB MTB | PLACEHOLDER |
+| Seers of Light | Metal Battle | WET1 | UNCONFIRMED | PLACEHOLDER |
 | Speak in Whispers | Metal Battle | WET2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/9/csm_speak_in_whispers_26_157b14e684.jpg |
-| TDB MTB | Metal Battle | WET3 | TDB MTB | PLACEHOLDER |
+| I See Red | Metal Battle | WET3 | UNCONFIRMED | PLACEHOLDER |
 | Goodnight Greatness | Metal Battle | WET4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/e/csm_goodnight_greatness_26_5e993ee771.jpg |
 | The Crescent's Call | Metal Battle | WET5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/a/csm_The_Crescents_Call._26_ec89342cc5.jpg |
 | Ashed Winter | Metal Battle | WET6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/4/csm_ashed_winter_26_9e44606ec2.jpg |
 | Blanket Hill | Metal Battle | WET7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/8/csm_blanket_hill_26_0a741e61f3.jpg |
-| TDB MTB | Metal Battle | WET8 | TDB MTB | PLACEHOLDER |
+| Witchlords | Metal Battle | WET8 | UNCONFIRMED | PLACEHOLDER |
 | Elchivo | Metal Battle | WET9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/f/csm_elchivo_26_576ae82fc4.jpg |
 | Morphide | Metal Battle | WET10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/e/csm_morphide_26_73f176435f.jpg |
 | Velvet Rush | Hard Rock | WET11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/c/csm_velvet_rush_26_79ee43e0e7.jpg |
@@ -115,15 +116,15 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| TDB MTB | Metal Battle | HBA1 | TDB MTB | PLACEHOLDER |
+| Gannondorf | Metal Battle | HBA1 | UNCONFIRMED | PLACEHOLDER |
 | Born Broken | Metal Battle | HBA2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/9/csm_born_broken_26_e3d993f78e.jpg |
-| TDB MTB | Metal Battle | HBA3 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle | HBA4 | TDB MTB | PLACEHOLDER |
+| Human Nebula | Metal Battle | HBA3 | UNCONFIRMED | PLACEHOLDER |
+| Dead Memories | Metal Battle | HBA4 | UNCONFIRMED | PLACEHOLDER |
 | Expellow | Metal | HBA5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/b/csm_expellow_26b_f274263240.jpg |
 | Sinamort | Metal Battle | HBA6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/7/csm_sinamort_26_76b1458fee.jpg |
 | Deflag | Metal Battle | HBA7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/b/csm_deflag_26_e9757893eb.jpg |
-| TDB MTB | Metal Battle | HBA8 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle | HBA9 | TDB MTB | PLACEHOLDER |
+| Noiduin | Metal Battle | HBA8 | UNCONFIRMED | PLACEHOLDER |
+| Invasion | Metal Battle | HBA9 | UNCONFIRMED | PLACEHOLDER |
 | SÓT | Metal Battle | HBA10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/6/csm_sot_26_0252001d7e.jpg |
 | Kadavar | Doom Metal | HBA11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/9/csm_kadavar_26b_5241b42bda.jpg |
 | Mambo Kurt | Metal | HBA12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/4/csm_mambo_kurt_25_d25410db45.jpg |
@@ -200,10 +201,10 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | ------ | ------ | ------ | ------------- | ----------- |
 | E.N.D. | Metal Battle | WET13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/a/csm_end_26_cc8178d602.jpg |
 | Haine | Metal Battle | WET14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/c/csm_haine_26_0e543cf557.jpg |
-| TDB MTB | Metal Battle | WET15 | TDB MTB | PLACEHOLDER |
-| TDB MTB | Metal Battle | WET16 | TDB MTB | PLACEHOLDER |
+| Death Row | Metal Battle | WET15 | UNCONFIRMED | PLACEHOLDER |
+| Sentient Void | Metal Battle | WET16 | UNCONFIRMED | PLACEHOLDER |
 | Given By The Flames | Metal Battle | WET17 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/7/csm_given_by_the_flames_26_a72a8cc764.jpg |
-| TDB MTB | Metal Battle | WET18 | TDB MTB | PLACEHOLDER |
+| Rise of the Shadows | Metal Battle | WET18 | UNCONFIRMED | PLACEHOLDER |
 | Craft | Black Metal | WET19 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/d/csm_Craft_cropped_size_-_photo_by_Soile_Siirtola_fabe03b40f.jpg |
 | Spectral Wound | Black Metal | WET20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/e/csm_spectral_wound26_3263ad4710.jpg |
 | Misery Index | Death Metal | WET21 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/a/csm_Misery_Index-WOA26_477d278139.jpg |
@@ -218,7 +219,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | Force | Metal Battle | HBA15 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/c/csm_force_26_9eb5006911.jpg |
 | Midhaven | Metal Battle | HBA16 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/9/csm_midhaven_26_ad2bc280fa.jpg |
 | Gidora | Metal Battle | HBA17 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/c/csm_gidora_26_ed631fb6b6.jpg |
-| TDB MTB | Metal Battle | HBA18 | TDB MTB | PLACEHOLDER |
+| Days of Ruin | Metal Battle | HBA18 | UNCONFIRMED | PLACEHOLDER |
 | Firespawn | Death Metal | HBA19 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/3/csm_Firespawn-WOA26_b9d52bcc7e.jpg |
 | Blood Red Throne | Death Metal | HBA20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/a/csm_blood_red_throne26_98867522b5.jpg |
 | Anaal Nathrakh | Black Metal | HBA21 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/6/csm_AnaalNathrakh1_1706ff6610.jpg |
