@@ -144,6 +144,20 @@ Users install via Safari "Add to Home Screen" (iOS) or "Install app" (Android).
 - Offline access works
 - Version updates on next launch (browser checks manifest)
 
+### In-app install coaching
+
+Users who open the app in a mobile browser tab (not standalone) see a **center modal** once after login (`PwaInstallAutoPrompt` in `PrivateRoute`). Dismissal is persisted per device (`viralatas:pwa-install-hint-dismissed`).
+
+| Trigger | Behavior |
+|---------|----------|
+| First authed route on mobile browser | Auto modal; backdrop/Escape do not dismiss — **Got it** required |
+| Android + `beforeinstallprompt` | Primary **Install app** button + menu fallback copy |
+| iOS Safari | Numbered Share → Add to Home Screen steps (no programmatic install) |
+| Desktop / already standalone | No auto modal |
+| Profile → Install app | Reopens modal anytime (manual mode; Escape/backdrop close OK) |
+
+**Relevant source:** `src/components/InstallAppModal.tsx`, `src/hooks/usePwaInstall.ts`, `src/lib/pwaInstall.ts`, `src/components/InstallAppProfileLink.tsx`.
+
 ### Service Worker (Workbox)
 
 ```typescript

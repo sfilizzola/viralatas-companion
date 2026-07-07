@@ -14,6 +14,9 @@ import { supabase } from '../lib/supabase';
 
 const INITIAL_SYNC_LIMIT = 10;
 
+/** Generous cap — long posts OK, but stops wall-of-text UI breakage. */
+export const ANNOUNCEMENT_MAX_CONTENT_LENGTH = 4000;
+
 const announcementOfflineQueue = createOptimisticQueue<Announcement>(
   {
     load: loadOfflineAnnouncementsQueue,
@@ -63,6 +66,10 @@ async function fetchMore(before: string, limit = 5): Promise<Announcement[]> {
 }
 
 async function post(userId: string, content: string): Promise<void> {
+  if (content.length > ANNOUNCEMENT_MAX_CONTENT_LENGTH) {
+    throw new Error('ANNOUNCEMENT_CONTENT_TOO_LONG');
+  }
+
   const draft: Announcement = {
     id: crypto.randomUUID(),
     author_id: userId,

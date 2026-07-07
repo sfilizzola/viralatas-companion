@@ -1,6 +1,6 @@
 # Viralatas Companion — Architectural Wiki
 
-**Last Updated**: 2026-06-29 (`lineup:check-official` operator tooling)
+**Last Updated**: 2026-07-07 (Phase 46 — Godlike remote lineup sync; official feed sync to lineup.md)
 
 ## Purpose
 
@@ -67,6 +67,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[Flow: MoshSplit Balance](flows/moshsplit.md)** — `/profile` balance section → MoshSplit deep-link; Part 1 mock (hidden), Part 2 API (blocked)
 - **[Flow: Festival Wrap](flows/festival-wrap.md)** — Post-festival `/wrap` recap (7–8 scroll sections); IDB-only stats; teaser banner + godlike D+1 QA
 - **[Flow: Camp HQ Geolocation](flows/camp-location.md)** — Godlike sets shared campground GPS; Mural C+ strip + map D1 dock; IDB cache; Google Maps deep-link
+- **[Flow: Remote Lineup Sync](flows/lineup-remote-sync.md)** — Godlike phone preview/apply of official Wacken feed vs production `bands`; partial apply; post-festival laptop reconcile
 
 ### Architectural Decisions (ADRs)
 - **[ADR: IndexedDB as Primary Store](decisions/indexeddb-primary-store.md)** — Why IDB, not Supabase-primary
@@ -84,7 +85,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 
 ### Operational Tooling
 - **[Wacken Official Running Order (JSON)](lineup-official-source.md)** — Live JSON feeds, filter rules, `npm run lineup:check-official` (check → `--lineup` → `--complete`).
-- **[Lineup Sync](lineup-sync.md)** — Non-destructive `seed:bands:sync` and `seed:bands:move`. Dry-run by default; preserves user picks across small lineup edits.
+- **[Lineup Sync](lineup-sync.md)** — Laptop CLI: `seed:bands:sync` and `seed:bands:move` (dry-run default; picks preserved). **At festival:** godlike [Remote Lineup Sync](flows/lineup-remote-sync.md) preview/apply from `/profile`.
 - **[Festival Reset](festival-reset.md)** — `npm run festival:reset` one-shot script: state wipe (announcements, blocked_posters, user_presence, assigned + persistent badges, cache_version bump) with optional bands re-seed via `--with-bands`. Flag matrix, scope guard, edge cases.
 
 ---

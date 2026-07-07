@@ -6,6 +6,19 @@ Diff `supabase/seed/bands.ts` against `public.bands` by stable `slot_id`, previe
 
 For catastrophic refresh (full table replace), use destructive `npm run seed:bands` or `npm run festival:reset -- --with-bands`.
 
+### Remote sync (Phase 46 — phone)
+
+Godlike **Lineup sync** in `/profile` applies the official wacken.com feed directly to production `public.bands` (no git writes). Use at the festival when Wacken changes the running order and no laptop is available.
+
+→ Full flow: [flows/lineup-remote-sync.md](flows/lineup-remote-sync.md)
+
+After the festival, reconcile git with production:
+
+```bash
+npm run lineup:check-official -- --complete
+npm run seed:bands:sync          # dry-run — should be empty
+```
+
 ## Relevant Source Files
 
 | File | Role |
@@ -186,6 +199,7 @@ For future risky work, clone to a **staging Supabase project** with a separate `
 
 ## Cross-References
 
+- [Flow: Remote Lineup Sync](flows/lineup-remote-sync.md) — Godlike phone preview/apply (Phase 46); production DB only
 - [Wacken Official Running Order (JSON)](lineup-official-source.md) — Fetch + filter official feed before editing lineup
 - [Band Lineup](lineup.md) — Human-editable source; stable identity section
 - [Supabase Schema](supabase-schema.md) — `public.bands` DDL with `slot_id`
@@ -197,4 +211,4 @@ For future risky work, clone to a **staging Supabase project** with a separate `
 - CI-triggered sync deferred (service role in operator `.env.local` only).
 - No audit log of sync runs in v1.
 
-**Last updated:** 2026-06-29 — `lineup:check-official` operator workflow integrated before `seed:bands:sync`.
+**Last updated:** 2026-07-07 — Phase 46 remote godlike sync cross-link; post-festival reconcile sequence with `lineup:check-official --complete`.

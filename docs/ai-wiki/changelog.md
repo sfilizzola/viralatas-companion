@@ -4,6 +4,20 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-07-07
+
+### Added
+- **Phase 46 — Godlike remote lineup sync** — `lineup-sync` Edge Function (`preview` / `apply`), `LineupSyncSection` in godlike Tools, `lineup-remote-plan.ts` + `lineup-remote-apply.ts`, unit tests, DS `#ds-godlike-lineup-sync`, flow doc `flows/lineup-remote-sync.md`, ADR `docs/adr/0001-lineup-sync-shared-plan-module.md`.
+- **PWA install hint** — Center modal on first authenticated mobile browser visit (`InstallAppModal`, `PwaInstallAutoPrompt` in `PrivateRoute`); Android native install when `beforeinstallprompt` fires; iOS manual steps; dismiss-once via `localStorage`; Profile **Install app** link for desktop or re-reading steps. See `docs/ai-wiki/decisions/pwa-not-native.md` § In-app install coaching.
+
+### Changed
+- **Phase 46 close — lineup official sync** — `docs/ai-wiki/lineup.md` + `supabase/seed/bands.ts` synced from wacken.com running-order JSON (2026-07-07): 12 Metal Battle bands promoted `UNCONFIRMED`→`CONFIRMED` (WET1, WET3, WET8, WET15–WET16, WET18, HBA1, HBA3–HBA4, HBA8–HBA9, HBA18); summary now 185 CONFIRMED / 1 `TDB MTB` / 12 TBD / 1 ceremony. `WET18` official spelling **Rise of Shadows**.
+- **Mural nav label (DE)** — Bottom nav and page title use **Mural** (was *Pinnwand*) for brand consistency across locales.
+- **Mural post length** — 4,000-character cap in UI + `announcementsRepository.post()`; existing oversized posts scroll inside the card so moderation actions stay on screen.
+- **Password reset copy** — Cassio joke subtitle clarifies the user is resetting **their own** password; Supabase “same as old password” errors map to a generic message (no password oracle).
+- **`lineup-sync.md`** — cross-link to remote godlike phone flow.
+- **`CONTEXT.md`** — glossary terms for remote lineup sync, slot move, plan token, partial apply.
+
 ## 2026-07-03
 
 ### Changed

@@ -79,6 +79,10 @@ import campLocationBr from '../i18n/CampLocation_br.json';
 import campLocationDe from '../i18n/CampLocation_de.json';
 import campLocationEn from '../i18n/CampLocation_en.json';
 import campLocationEs from '../i18n/CampLocation_es.json';
+import installAppBr from '../i18n/InstallApp_br.json';
+import installAppDe from '../i18n/InstallApp_de.json';
+import installAppEn from '../i18n/InstallApp_en.json';
+import installAppEs from '../i18n/InstallApp_es.json';
 
 export type Language = 'br' | 'en' | 'es' | 'de';
 
@@ -103,6 +107,7 @@ type TranslationFile =
   | 'TimelineScrubber'
   | 'StageScheduleSheet'
   | 'CampLocation'
+  | 'InstallApp'
   | 'GodlikeAdmin';
 
 type TranslationStrings = Record<string, string>;
@@ -132,6 +137,7 @@ const translations: Translations = {
     TimelineScrubber: timelineScrubberBr,
     StageScheduleSheet: stageScheduleSheetBr,
     CampLocation: campLocationBr,
+    InstallApp: installAppBr,
     GodlikeAdmin: {},
   },
   en: {
@@ -155,6 +161,7 @@ const translations: Translations = {
     TimelineScrubber: timelineScrubberEn,
     StageScheduleSheet: stageScheduleSheetEn,
     CampLocation: campLocationEn,
+    InstallApp: installAppEn,
     GodlikeAdmin: {},
   },
   es: {
@@ -178,6 +185,7 @@ const translations: Translations = {
     TimelineScrubber: timelineScrubberEs,
     StageScheduleSheet: stageScheduleSheetEs,
     CampLocation: campLocationEs,
+    InstallApp: installAppEs,
     GodlikeAdmin: {},
   },
   de: {
@@ -201,6 +209,7 @@ const translations: Translations = {
     TimelineScrubber: timelineScrubberDe,
     StageScheduleSheet: stageScheduleSheetDe,
     CampLocation: campLocationDe,
+    InstallApp: installAppDe,
     GodlikeAdmin: {},
   },
 };

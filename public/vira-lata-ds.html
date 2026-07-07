@@ -2684,7 +2684,7 @@
 <body>
 <script type="application/json" id="ds-manifest">
 {
-  "version": "3.0",
+  "version": "3.6",
   "file": "public/vira-lata-ds.html",
   "note": "Agent table of contents. Read this first to navigate the file. Anchors and section numbers are STABLE and referenced across docs/code — never renumber. Keep this manifest in sync when adding/renaming a section, token, or component.",
   "sections": [
@@ -2737,6 +2737,7 @@
     { "name": "Switch",                "sectionId": "components" },
     { "name": "MyWackenPage",          "sectionId": "components" },
     { "name": "MyWackenCoachBanner",   "sectionId": "components" },
+    { "name": "InstallAppModal",       "sectionId": "components" },
     { "name": "GodlikeTimeTravel",     "sectionId": "components" },
     { "name": "BandRatingInput",       "sectionId": "components" },
     { "name": "ProfileHeader",         "sectionId": "components" },
@@ -2766,7 +2767,8 @@
     { "name": "CampHqCard",            "sectionId": "camp-location" },
     { "name": "CampMapDock",           "sectionId": "camp-location" },
     { "name": "CampLocationSheet",     "sectionId": "camp-location" },
-    { "name": "CampPinIcon",           "sectionId": "camp-location" }
+    { "name": "CampPinIcon",           "sectionId": "camp-location" },
+    { "name": "LineupSyncSection",     "sectionId": "ds-godlike-lineup-sync" }
   ]
 }
 </script>
@@ -4182,6 +4184,20 @@
           </tbody>
         </table>
         <p><strong>CSS module:</strong> teal wash <code>rgba(22,160,133,0.1)</code>, border-bottom <code>rgba(22,160,133,0.25)</code>, kicker 9px mono <code>--signal-ok</code>, body 11px <code>color-mix(--signal-ok 55%, --text-muted)</code>, dismiss absolute top-right with <code>focus-visible</code> teal outline.</p>
+
+      <div class="subhead">InstallAppModal <span class="mono-11">src/components/InstallAppModal.tsx</span></div>
+        <p>One-time PWA install coaching for mobile browser users. Center modal on first authenticated route; Profile <strong>Install app</strong> reopens in manual mode.</p>
+        <table>
+          <thead><tr><th>Rule</th><th>Behavior</th></tr></thead>
+          <tbody>
+            <tr><td>Auto show</td><td>Logged in + mobile + not standalone + <code>!isPwaInstallHintDismissed()</code></td></tr>
+            <tr><td>Dismiss</td><td><strong>Got it</strong> → <code>viralatas:pwa-install-hint-dismissed</code> (auto mode only)</td></tr>
+            <tr><td>Android</td><td>Native <strong>Install app</strong> when <code>beforeinstallprompt</code> captured; else numbered Chrome menu steps</td></tr>
+            <tr><td>iOS</td><td>Numbered Share → Add to Home Screen steps</td></tr>
+            <tr><td>Modal shell</td><td><code>Modal</code> with <code>closeOnBackdrop={false}</code> / <code>closeOnEscape={false}</code> in auto mode</td></tr>
+          </tbody>
+        </table>
+        <p><strong>CSS module:</strong> accent radial wash, mono step counters, display title, primary Install + Got it actions. Profile entry: <code>InstallAppProfileLink.tsx</code>.</p>
 
       <div class="subhead">Godlike Time Travel <span class="mono-11">TimeTravelSection · services/time.ts</span></div>
         <p>Profile-only clock override for testing Live Now, My Wacken grouping, badges, and wrap gates. <strong>Datetime-local input is interpreted as Europe/Berlin (Wacken CEST)</strong> via <code>parseWackenDatetimeLocal()</code> / <code>formatWackenDatetimeLocal()</code> — not the browser's local timezone. Quick day chips (D-1…D+1) keep the current wall-clock time when switching festival days.</p>
@@ -5957,6 +5973,7 @@
         <li><b>GodlikeAdminPanel</b> — full admin controls, visible only to <code>role=godlike</code></li>
         <li><b>ManagerAdminPanel</b> — moderation tools, visible to <code>role=manager</code> and above</li>
         <li><b>MetalPlaceAdminSection</b> — godlike slot list for Metal Place windows (Phase 44): stacked card rows inside 400px godlike panel — header (window label + remove), full-width day select, start/end time row with labels. Add window + Save full-width below. Max 8 slots; zero slots = off. Amber panel (<code>.metalPlaceSection</code>).</li>
+        <li><b>LineupSyncSection</b> — godlike remote lineup sync (Phase 46): first child in Godlike Tools, above Clear cache. Amber <code>.lineupSyncSection</code> ops strip — Check → applicable summary chips → optional accordion report → move/delete warnings → Apply. Partial apply; success shows applied + skipped. See <a href="#ds-godlike-lineup-sync">§ Lineup Sync</a>.</li>
         <li><b>LiveBandTestAdminSection</b> — independent from Metal Place (no mutual exclusion); Time Travel covers Metal Place QA</li>
         <li><b>AssignBadgeModal</b> — modal for assigning badges to specific users</li>
         <li><b>PatchesBackgroundPicker</b> — lets users choose their vest background texture on the profile page</li>
@@ -5970,6 +5987,19 @@
         <li><code>.actionBadge</code> — purple tint · open badge assignment modal</li>
         <li><code>.actionUnblock</code> — orange tint · unblock a blocked user</li>
         <li><code>.secondaryAction</code> — neutral (no-op kept for backward compat)</li>
+      </ul>
+    </div>
+
+    <div class="subhead" id="ds-godlike-lineup-sync">Lineup sync (godlike)</div>
+    <div class="demo-notes ds-x-c6fca1f6">
+      <p><code>LineupSyncSection</code> — godlike-only. Placement: first section inside Godlike Tools collapsible, above <code>CacheResetSection</code>.</p>
+      <ul>
+        <li><b>States:</b> idle · loading · in_sync · preview · applying · success · error / stale</li>
+        <li><b>Chips:</b> applicable UPDATE / MOVE / INSERT / DELETE counts only; blocked rows in warnings + mono report</li>
+        <li><b>Friction:</b> applicable MOVE → amber banner; blocked DELETE → type <code>DELETE</code> before apply</li>
+        <li><b>Partial apply:</b> safe buckets run; blocked moves/deletes skipped; success shows applied + skipped + <code>cache_version</code></li>
+        <li><b>Offline:</b> check/apply disabled with network copy</li>
+        <li><b>CSS:</b> <code>.lineupSyncSection</code>, <code>.lineupSyncChipRow</code>, <code>.lineupSyncReport</code> (max-height 240px, mono)</li>
       </ul>
     </div>
   </section>
@@ -7157,6 +7187,13 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.6 — Phase 46 Godlike Lineup Sync · Jul 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§08 Additional — <code>#ds-godlike-lineup-sync</code></b> — <code>LineupSyncSection</code>: godlike remote lineup sync (first in Godlike Tools, above Clear cache). States, applicable chips, partial apply, offline guard, <code>.lineupSyncSection</code> CSS.</li>
+          <li>DS manifest: <code>LineupSyncSection</code> component registered → <code>ds-godlike-lineup-sync</code> anchor.</li>
+        </ul>
+      </div>
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.5 — Phase 45 Camp HQ Geolocation · Jun 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">

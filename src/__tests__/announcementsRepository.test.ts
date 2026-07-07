@@ -17,7 +17,7 @@ vi.mock('../lib/db', () => ({
 
 import { supabase } from '../lib/supabase';
 import * as db from '../lib/db';
-import { announcementsRepository } from '../repositories/announcements';
+import { announcementsRepository, ANNOUNCEMENT_MAX_CONTENT_LENGTH } from '../repositories/announcements';
 import type { Announcement } from '../types';
 
 beforeEach(() => {
@@ -97,6 +97,17 @@ describe('announcementsRepository.post', () => {
 
     expect(db.saveAnnouncement).toHaveBeenCalled();
     expect(db.enqueueOfflineAnnouncement).toHaveBeenCalled();
+  });
+
+  it('rejects content longer than ANNOUNCEMENT_MAX_CONTENT_LENGTH', async () => {
+    const tooLong = 'x'.repeat(ANNOUNCEMENT_MAX_CONTENT_LENGTH + 1);
+
+    await expect(announcementsRepository.post('user1', tooLong)).rejects.toThrow(
+      'ANNOUNCEMENT_CONTENT_TOO_LONG',
+    );
+
+    expect(db.saveAnnouncement).not.toHaveBeenCalled();
+    expect(supabase.from).not.toHaveBeenCalled();
   });
 });
 

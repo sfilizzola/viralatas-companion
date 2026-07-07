@@ -1,0 +1,100 @@
+.panel {
+  width: min(22rem, calc(100vw - 2 * var(--s-4)));
+  max-height: 85vh;
+  overflow-y: auto;
+  border-radius: var(--r-2);
+  padding: var(--s-5) var(--s-4) var(--s-4);
+  background:
+    radial-gradient(120% 80% at 50% -20%, rgba(196, 30, 58, 0.14), transparent 55%),
+    var(--bg-elevated);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 24px 48px rgba(0, 0, 0, 0.55);
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin: 0 0 var(--s-2);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.1;
+  margin: 0 0 var(--s-2);
+}
+
+.subtitle {
+  margin: 0 0 var(--s-4);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.steps {
+  margin: 0 0 var(--s-4);
+  padding: var(--s-3);
+  list-style: none;
+  counter-reset: install-step;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--border);
+  border-radius: var(--r-1);
+}
+
+.step {
+  position: relative;
+  counter-increment: install-step;
+  padding-left: calc(var(--s-4) + 0.35rem);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.step + .step {
+  margin-top: var(--s-2);
+}
+
+.step::before {
+  content: counter(install-step);
+  position: absolute;
+  left: 0;
+  top: 0.05rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 2px;
+  border: 1px solid color-mix(in srgb, var(--accent) 55%, var(--border));
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.1rem;
+  text-align: center;
+  color: var(--accent);
+}
+
+.installBtn {
+  margin-bottom: var(--s-2);
+}
+
+.fallback {
+  margin: 0 0 var(--s-4);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}

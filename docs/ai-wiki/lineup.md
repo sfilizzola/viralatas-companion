@@ -13,7 +13,7 @@
 >
 > **Official source details:** [lineup-official-source.md](lineup-official-source.md) (JSON endpoints, filter rules, exit codes).
 
-**Summary:** 173 bands CONFIRMED · 12 `UNCONFIRMED` Metal Battle (metal-battle.com) · 1 `TDB MTB` Metal Battle placeholder · 0 named TDB · 12 TBD (Name=TBD) · 199 total · 1 ceremony (Farewell & Announcements, HAR13)
+**Summary:** 185 bands CONFIRMED · 1 `TDB MTB` Metal Battle placeholders · 0 named TDB · 12 TBD (Name=TBD) · 199 total · 1 ceremony (Farewell & Announcements, HAR13)
 
 **Genres:** 13 canonical labels after Phase 25 collapse — **[old → new mapping table](genre-collapse-mapping.md)** · [domain-model](domain-model.md#band) · [ADR](decisions/genre-collapse-canonical-labels.md). Unknown/TBD tags in this file seed as `Metal`.
 
@@ -69,7 +69,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 > **Note:** Harder stage is closed on Day 1. Faster starts at 16:00 (Doors: 15:30). Louder, W.E.T., Headbangers, Wasteland, and Wackinger stages open from 10:30 / 11:00. Welcome to the Jungle has not been added to the official running order.
 >
-> **Source:** Band placements below mirror the official Wacken 2026 running order (https://www.wacken.com/de/line-up/running-order-musik/) as of 2026-06-29. **wacken.com is authoritative** for `CONFIRMED` rows. Slots marked `UNCONFIRMED` carry [metal-battle.com](https://www.metal-battle.com/) winner names until wacken.com catches up (12 slots as of 2026-07-03).
+> **Source:** Band placements below mirror the official Wacken 2026 running order (https://www.wacken.com/de/line-up/running-order-musik/) as of 2026-07-07. **wacken.com is authoritative** for `CONFIRMED` rows. All 12 former `UNCONFIRMED` Metal Battle slots were promoted to `CONFIRMED` on 2026-07-07 (`lineup:check-official --complete`); only `WET23` remains `TDB MTB` among Metal Battle rows.
 
 ### Harder Stage
 
@@ -99,14 +99,14 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| Seers of Light | Metal Battle | WET1 | UNCONFIRMED | PLACEHOLDER |
+| Seers of Light | Metal Battle | WET1 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/1/csm_seers_of_light_26_d43bfa874a.jpg |
 | Speak in Whispers | Metal Battle | WET2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/9/csm_speak_in_whispers_26_157b14e684.jpg |
-| I See Red | Metal Battle | WET3 | UNCONFIRMED | PLACEHOLDER |
+| I See Red | Metal Battle | WET3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/7/csm_i_see_red_26_740c88bbf9.jpg |
 | Goodnight Greatness | Metal Battle | WET4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/e/csm_goodnight_greatness_26_5e993ee771.jpg |
 | The Crescent's Call | Metal Battle | WET5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/a/csm_The_Crescents_Call._26_ec89342cc5.jpg |
 | Ashed Winter | Metal Battle | WET6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/4/csm_ashed_winter_26_9e44606ec2.jpg |
 | Blanket Hill | Metal Battle | WET7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/8/csm_blanket_hill_26_0a741e61f3.jpg |
-| Witchlords | Metal Battle | WET8 | UNCONFIRMED | PLACEHOLDER |
+| Witchlords | Metal Battle | WET8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/9/csm_witchlords_26_c2f8cf6e6c.jpg |
 | Elchivo | Metal Battle | WET9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/f/csm_elchivo_26_576ae82fc4.jpg |
 | Morphide | Metal Battle | WET10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/e/csm_morphide_26_73f176435f.jpg |
 | Velvet Rush | Hard Rock | WET11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/c/csm_velvet_rush_26_79ee43e0e7.jpg |
@@ -116,15 +116,15 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| Gannondorf | Metal Battle | HBA1 | UNCONFIRMED | PLACEHOLDER |
+| Gannondorf | Metal Battle | HBA1 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/7/csm_ganondorf_26_282329a2d3.jpg |
 | Born Broken | Metal Battle | HBA2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/9/csm_born_broken_26_e3d993f78e.jpg |
-| Human Nebula | Metal Battle | HBA3 | UNCONFIRMED | PLACEHOLDER |
-| Dead Memories | Metal Battle | HBA4 | UNCONFIRMED | PLACEHOLDER |
+| Human Nebula | Metal Battle | HBA3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/7/csm_human_nebula_26_595097da2b.jpg |
+| Dead Memories | Metal Battle | HBA4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/8/csm_dead_memories_26_6a49209120.jpg |
 | Expellow | Metal | HBA5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/b/csm_expellow_26b_f274263240.jpg |
 | Sinamort | Metal Battle | HBA6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/7/csm_sinamort_26_76b1458fee.jpg |
 | Deflag | Metal Battle | HBA7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/b/csm_deflag_26_e9757893eb.jpg |
-| Noiduin | Metal Battle | HBA8 | UNCONFIRMED | PLACEHOLDER |
-| Invasion | Metal Battle | HBA9 | UNCONFIRMED | PLACEHOLDER |
+| Noiduin | Metal Battle | HBA8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/c/csm_oiduim_26_38a376558c.jpg |
+| Invasion | Metal Battle | HBA9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/7/csm_invasion_26_9270af2a05.jpg |
 | SÓT | Metal Battle | HBA10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/6/csm_sot_26_0252001d7e.jpg |
 | Kadavar | Doom Metal | HBA11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/9/csm_kadavar_26b_5241b42bda.jpg |
 | Mambo Kurt | Metal | HBA12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/4/csm_mambo_kurt_25_d25410db45.jpg |
@@ -166,7 +166,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 ## Day 2 — Thursday, 30 July 2026
 
-> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-06-29. All 8 stages open on Day 2 (Welcome to the Jungle not yet in official running order).
+> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-07. All 8 stages open on Day 2 (Welcome to the Jungle not yet in official running order).
 
 ### Harder Stage
 
@@ -201,10 +201,10 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | ------ | ------ | ------ | ------------- | ----------- |
 | E.N.D. | Metal Battle | WET13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/a/csm_end_26_cc8178d602.jpg |
 | Haine | Metal Battle | WET14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/c/csm_haine_26_0e543cf557.jpg |
-| Death Row | Metal Battle | WET15 | UNCONFIRMED | PLACEHOLDER |
-| Sentient Void | Metal Battle | WET16 | UNCONFIRMED | PLACEHOLDER |
+| Death Row | Metal Battle | WET15 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/1/6/csm_death_row_26_1520597d2a.jpg |
+| Sentient Void | Metal Battle | WET16 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/4/csm_sentient_void_26_5fec72603f.jpg |
 | Given By The Flames | Metal Battle | WET17 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/7/csm_given_by_the_flames_26_a72a8cc764.jpg |
-| Rise of the Shadows | Metal Battle | WET18 | UNCONFIRMED | PLACEHOLDER |
+| Rise of Shadows | Metal Battle | WET18 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/2/csm_raise_of_the_shadows_26_5f881e5e68.jpg |
 | Craft | Black Metal | WET19 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/8/d/csm_Craft_cropped_size_-_photo_by_Soile_Siirtola_fabe03b40f.jpg |
 | Spectral Wound | Black Metal | WET20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/e/csm_spectral_wound26_3263ad4710.jpg |
 | Misery Index | Death Metal | WET21 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/a/csm_Misery_Index-WOA26_477d278139.jpg |
@@ -219,7 +219,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 | Force | Metal Battle | HBA15 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/c/csm_force_26_9eb5006911.jpg |
 | Midhaven | Metal Battle | HBA16 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/9/csm_midhaven_26_ad2bc280fa.jpg |
 | Gidora | Metal Battle | HBA17 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/f/c/csm_gidora_26_ed631fb6b6.jpg |
-| Days of Ruin | Metal Battle | HBA18 | UNCONFIRMED | PLACEHOLDER |
+| Days of Ruin | Metal Battle | HBA18 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/0/csm_days_of_ruin_26_6357e7d8fe.jpg |
 | Firespawn | Death Metal | HBA19 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/3/csm_Firespawn-WOA26_b9d52bcc7e.jpg |
 | Blood Red Throne | Death Metal | HBA20 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/0/a/csm_blood_red_throne26_98867522b5.jpg |
 | Anaal Nathrakh | Black Metal | HBA21 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/6/csm_AnaalNathrakh1_1706ff6610.jpg |
@@ -263,7 +263,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 ## Day 3 — Friday, 31 July 2026
 
-> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-06-29.
+> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-07.
 
 ### Harder Stage
 
@@ -360,7 +360,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 ## Day 4 — Saturday, 1 August 2026
 
-> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-06-29. Note: the Farewell & Announcements ceremony moved from Faster (FAS17 previously) to Harder (HAR13). Sabaton headlines Harder, not Faster. The wacken.com running-order feed shows an empty slot at `HAR13`; we keep **Farewell & Announcements** as a `CEREMONY` placeholder until wacken.com names it.
+> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-07. Note: the Farewell & Announcements ceremony moved from Faster (FAS17 previously) to Harder (HAR13). Sabaton headlines Harder, not Faster. The wacken.com running-order feed shows an empty slot at `HAR13`; we keep **Farewell & Announcements** as a `CEREMONY` placeholder until wacken.com names it.
 
 ### Faster Stage
 
@@ -587,3 +587,5 @@ See [stages.md — How to Confirm a Slot's Official Time](stages.md#how-to-confi
 ### How to add a new slot
 
 See [stages.md — How to Add a New Slot](stages.md#how-to-add-a-new-slot). Once the slot exists in stages.md, add the band row here referencing the new Slot ID.
+
+**Last updated:** 2026-07-07 — Official feed sync: 12 Metal Battle bands UNCONFIRMED→CONFIRMED; summary 185 CONFIRMED / 1 TDB MTB.
