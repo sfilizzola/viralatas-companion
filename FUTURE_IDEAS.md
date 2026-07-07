@@ -6,7 +6,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 >
 > **Status values:** `pending` · `partial — Phase N` (engine/data only) · `✅ Phase N` (shipped — spec collapsed; see `docs/ai-wiki/phases-history.md`)
 >
-> **Last synced:** 2026-07-07 — Phase 46 closed; Godlike remote lineup sync shipped v1.3.21.
+> **Last synced:** 2026-07-07 — Phase 46 CLI alignment patch shipped v1.3.22.
 
 ## Ideas at a glance
 

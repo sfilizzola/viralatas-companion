@@ -1037,7 +1037,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 ---
 
 ### Phase 46 — Godlike Remote Lineup Sync
-**Status:** ✅ Complete · **Released:** v1.3.21 on `main` (2026-07-07)
+**Status:** ✅ Complete · **Released:** v1.3.22 on `main` (2026-07-07)
 
 **Completed:** 2026-07-07
 
@@ -1053,6 +1053,7 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 - `public/vira-lata-ds.html` — `#ds-godlike-lineup-sync` (manifest v3.6)
 - `docs/ai-wiki/flows/lineup-remote-sync.md`; `lineup-sync.md` cross-link; `docs/adr/0001-lineup-sync-shared-plan-module.md`
 - Post-ship: Deno import paths fixed for Edge Function deploy (`c5a751f`)
+- Post-ship v1.3.22: remote plan aligned with CLI (`namesEquivalent` name diffs; skip `Name=TBD` INSERTs)
 - Laptop reconcile: `lineup.md` + `bands.ts` synced to wacken.com 2026-07-07 (12 Metal Battle UNCONFIRMED→CONFIRMED)
 
 **Acceptance criteria (all met):**
