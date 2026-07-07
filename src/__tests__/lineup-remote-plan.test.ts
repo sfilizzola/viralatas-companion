@@ -193,6 +193,38 @@ describe('buildLineupPlan', () => {
     expect(plan.inserts[0].slotId).toBe('WET9');
   });
 
+  it('skips INSERT for Name=TBD slots (bands.ts policy)', () => {
+    const dbBands = [dbRow({ id: 'a', slot_id: 'FAS1', name: 'Lovebites' })];
+    const officialMap = new Map([
+      ['FAS1', official('FAS1', 'Lovebites')],
+      ['LOU21', official('LOU21', 'TBD')],
+    ]);
+    const plan = buildLineupPlan(dbBands, officialMap, emptyCtx());
+    expect(plan.inserts).toHaveLength(0);
+    expect(plan.skipped).toContainEqual({
+      slotId: 'LOU21',
+      reason: 'TBD slot not seeded (bands.ts policy)',
+    });
+  });
+
+  it('does not UPDATE when only official name casing differs', () => {
+    const dbBands = [
+      dbRow({
+        id: 'a',
+        slot_id: 'WET24',
+        name: 'Employed to Serve',
+        start_time: officialUnixToIso(1785340800),
+        end_time: officialUnixToIso(1785344400),
+      }),
+    ];
+    const officialMap = new Map([
+      ['WET24', official('WET24', 'Employed To Serve')],
+    ]);
+    const plan = buildLineupPlan(dbBands, officialMap, emptyCtx());
+    expect(plan.updates).toHaveLength(0);
+    expect(isPlanEmpty(plan)).toBe(true);
+  });
+
   it('DELETEs db rows missing from official feed', () => {
     const dbBands = [
       dbRow({ id: 'a', slot_id: 'FAS1', name: 'Lovebites' }),

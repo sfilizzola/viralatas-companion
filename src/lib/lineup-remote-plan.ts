@@ -7,6 +7,7 @@ import type { OfficialSlot } from './lineup-official-source.ts';
 import {
   OVERRIDE_SLOT_IDS,
   imagesEquivalent,
+  isDroppedTbdOfficialSlot,
   isJungleSlot,
   namesEquivalent,
 } from './lineup-official-source.ts';
@@ -167,6 +168,9 @@ function fieldValuesEqual(
   }
   if (field === 'image_url') {
     return imagesEquivalent(String(a ?? ''), String(b ?? ''));
+  }
+  if (field === 'name') {
+    return namesEquivalent(String(a ?? ''), String(b ?? ''));
   }
   if (field === 'category') {
     return normalizeCategory(String(a ?? '')) === normalizeCategory(String(b ?? ''));
@@ -354,6 +358,10 @@ export function buildLineupPlan(
   for (const [slotId, official] of officialSlots) {
     if (isPolicySkippedSlot(slotId)) continue;
     if (dbBySlot.has(slotId)) continue;
+    if (isDroppedTbdOfficialSlot(official)) {
+      plan.skipped.push({ slotId, reason: 'TBD slot not seeded (bands.ts policy)' });
+      continue;
+    }
     plan.inserts.push({
       slotId,
       row: officialRowToDbFields(official),

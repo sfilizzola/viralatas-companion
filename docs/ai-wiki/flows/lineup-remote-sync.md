@@ -36,6 +36,8 @@ Let the godlike operator preview and apply Wacken's official running order again
 
 **Offline:** Check/apply disabled when `!navigator.onLine`.
 
+**CLI parity:** Plan builder shares `lineup-official-source.ts` with `lineup:check-official` — `namesEquivalent` for band names; `Name=TBD` official slots are not INSERTed (wiki/seed omit them; see `isDroppedTbdOfficialSlot`). When CLI dry-runs are empty, godlike preview should report in sync unless a real MOVE/DELETE is pending.
+
 ## Safety rails
 
 | Risk | Mitigation |
@@ -73,4 +75,4 @@ npm run seed:bands:sync          # dry-run — should be empty
 
 - _(none — apply semantics locked grill session 2026-07-07)_
 
-**Last updated:** 2026-07-07 — Phase 46 close; post-festival laptop reconcile via `lineup:check-official --complete` + `seed:bands:sync` dry-run.
+**Last updated:** 2026-07-07 — CLI parity: `namesEquivalent` name diffs; skip TBD INSERTs (`isDroppedTbdOfficialSlot`).

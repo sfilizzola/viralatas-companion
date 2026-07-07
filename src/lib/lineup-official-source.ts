@@ -28,6 +28,13 @@ export function isJungleSlot(slotId: string): boolean {
   return slotId.startsWith('JUN');
 }
 
+/** Name=TBD slots live in lineup.md only; bands.ts / seed:bands:sync omit them. */
+export function isDroppedTbdOfficialSlot(
+  official: Pick<OfficialSlot, 'name'>,
+): boolean {
+  return official.name === 'TBD';
+}
+
 export type BandStatus = 'CONFIRMED' | 'TDB MTB' | 'TBD' | 'CEREMONY';
 
 export type OfficialSlot = {

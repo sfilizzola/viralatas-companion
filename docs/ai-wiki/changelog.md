@@ -12,6 +12,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ### Changed
 - **Phase 46 close — lineup official sync** — `docs/ai-wiki/lineup.md` + `supabase/seed/bands.ts` synced from wacken.com running-order JSON (2026-07-07): 12 Metal Battle bands promoted `UNCONFIRMED`→`CONFIRMED` (WET1, WET3, WET8, WET15–WET16, WET18, HBA1, HBA3–HBA4, HBA8–HBA9, HBA18); summary now 185 CONFIRMED / 1 `TDB MTB` / 12 TBD / 1 ceremony. `WET18` official spelling **Rise of Shadows**.
+- **Remote lineup sync ↔ CLI alignment** — `buildLineupPlan` uses `namesEquivalent` for name diffs (no cosmetic casing UPDATEs) and skips INSERT for official `Name=TBD` slots via shared `isDroppedTbdOfficialSlot` (same rule as `bands.ts` / `seed:bands:sync`).
 - **Mural nav label (DE)** — Bottom nav and page title use **Mural** (was *Pinnwand*) for brand consistency across locales.
 - **Mural post length** — 4,000-character cap in UI + `announcementsRepository.post()`; existing oversized posts scroll inside the card so moderation actions stay on screen.
 - **Password reset copy** — Cassio joke subtitle clarifies the user is resetting **their own** password; Supabase “same as old password” errors map to a generic message (no password oracle).
