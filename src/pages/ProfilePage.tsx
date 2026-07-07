@@ -110,11 +110,11 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
 
       {showWrapTeaser && <WrapTeaserBanner />}
 
-      <InstallAppProfileLink />
-
       <section id="vest" className={styles.pfSection}>
         <BadgesDisplay user={user} />
       </section>
+
+      <InstallAppProfileLink />
 
       <BadgeHistorySection userId={user.id} />
 
