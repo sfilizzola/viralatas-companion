@@ -72,3 +72,5 @@ npm run seed:bands:sync          # dry-run — should be empty
 ## Open questions
 
 - _(none — apply semantics locked grill session 2026-07-07)_
+
+**Last updated:** 2026-07-07 — Phase 46 close; post-festival laptop reconcile via `lineup:check-official --complete` + `seed:bands:sync` dry-run.

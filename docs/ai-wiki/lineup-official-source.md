@@ -192,14 +192,14 @@ All other camping slots should match the filtered official feed.
 6. **Apply DB:** [`lineup-sync.md`](lineup-sync.md) — `seed:bands:sync` dry-run → `--apply`.
 7. Optional cross-check [metal-battle.com](https://www.metal-battle.com/) for MB hints only.
 
-### Summary count sanity (2026-06-29 baseline)
+### Summary count sanity (2026-07-07 baseline)
 
 After filtering + wiki-only rows, expect **199** total rows in `lineup.md`:
 
 | Status | Typical count |
 |--------|----------------|
-| `CONFIRMED` | 173 |
-| `TDB MTB` | 13 |
+| `CONFIRMED` | 185 |
+| `TDB MTB` | 1 (`WET23`) |
 | `TBD` | 12 |
 | `CEREMONY` | 1 (`HAR13`) |
 
@@ -211,10 +211,11 @@ Counts drift as Wacken confirms bands — update the summary line when syncing.
 
 - [Band Lineup](lineup.md) — assignments table
 - [Lineup Sync](lineup-sync.md) — `seed:bands:sync` operator tooling
+- [Flow: Remote Lineup Sync](flows/lineup-remote-sync.md) — godlike phone preview/apply (Phase 46)
 - [Stage Reference](stages.md) — slot times and stage colors
 
 ## Open questions
 
 - _(none)_
 
-**Last updated:** 2026-06-29 — `lineup:check-official` script contract, exit codes, DB apply handoff to `lineup-sync.md`.
+**Last updated:** 2026-07-07 — Summary counts after 12 Metal Battle UNCONFIRMED→CONFIRMED promotions; cross-ref [flows/lineup-remote-sync.md](flows/lineup-remote-sync.md) for godlike phone apply.

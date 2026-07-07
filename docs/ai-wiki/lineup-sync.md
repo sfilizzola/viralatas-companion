@@ -199,6 +199,7 @@ For future risky work, clone to a **staging Supabase project** with a separate `
 
 ## Cross-References
 
+- [Flow: Remote Lineup Sync](flows/lineup-remote-sync.md) — Godlike phone preview/apply (Phase 46); production DB only
 - [Wacken Official Running Order (JSON)](lineup-official-source.md) — Fetch + filter official feed before editing lineup
 - [Band Lineup](lineup.md) — Human-editable source; stable identity section
 - [Supabase Schema](supabase-schema.md) — `public.bands` DDL with `slot_id`
@@ -210,4 +211,4 @@ For future risky work, clone to a **staging Supabase project** with a separate `
 - CI-triggered sync deferred (service role in operator `.env.local` only).
 - No audit log of sync runs in v1.
 
-**Last updated:** 2026-06-29 — `lineup:check-official` operator workflow integrated before `seed:bands:sync`.
+**Last updated:** 2026-07-07 — Phase 46 remote godlike sync cross-link; post-festival reconcile sequence with `lineup:check-official --complete`.

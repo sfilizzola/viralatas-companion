@@ -1036,6 +1036,53 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 
 ---
 
+### Phase 46 — Godlike Remote Lineup Sync
+**Status:** ✅ Complete · **Released:** v1.3.20 on `main` (2026-07-07)
+
+**Completed:** 2026-07-07
+
+**Goal:** Godlike previews and applies Wacken official lineup changes to production `public.bands` from `/profile` on a phone — dry-run first, explicit confirm, slot moves migrate picks, `cache_version` bump.
+
+**Deliverables shipped:**
+- `src/lib/lineup-remote-plan.ts` — `buildLineupPlan`, report, hash, blocked-move detection, plan token
+- `src/lib/lineup-remote-apply.ts` — `applyLineupPlan`, partial apply, deferred MOVE deletes, `cache_version` bump
+- `supabase/functions/lineup-sync/` — godlike-only Edge Function (`preview` / `apply`); imports shared `src/lib/` modules
+- `src/components/profile/LineupSyncSection.tsx` — Ops strip UI (first in Godlike Tools); states: idle, offline, loading, preview, applying, success, error/stale
+- `src/__tests__/lineup-remote-plan.test.ts`, `lineup-remote-apply.test.ts` — plan buckets, move detection, apply order
+- i18n `GodlikeAdmin_{br,en,es,de}.json` — lineup sync keys (4 locales)
+- `public/vira-lata-ds.html` — `#ds-godlike-lineup-sync` (manifest v3.6)
+- `docs/ai-wiki/flows/lineup-remote-sync.md`; `lineup-sync.md` cross-link; `docs/adr/0001-lineup-sync-shared-plan-module.md`
+- Post-ship: Deno import paths fixed for Edge Function deploy (`c5a751f`)
+- Laptop reconcile: `lineup.md` + `bands.ts` synced to wacken.com 2026-07-07 (12 Metal Battle UNCONFIRMED→CONFIRMED)
+
+**Acceptance criteria (all met):**
+- [x] Godlike-only: non-godlike gets 403 from Edge Function
+- [x] Preview fetches wacken.com JSON, diffs vs `public.bands`, writes nothing
+- [x] Preview shows UPDATE / MOVE / INSERT / DELETE buckets + pick impact
+- [x] Apply requires prior preview; stale official feed rejected (`plan_stale`)
+- [x] MOVE uses per-table pick snapshots + deferred source deletes (swap-safe)
+- [x] Blocked moves detected; excluded from apply + chip counts
+- [x] Partial apply skips blocked moves/deletes; success shows applied + skipped counts
+- [x] Plan token single-use; hash covers full plan; 10 min TTL
+- [x] DELETE with picks blocked unless typed `DELETE` + `confirmDeletes: true`
+- [x] Successful apply bumps `app_config.cache_version`
+- [x] Policy parity: skip `HAR13`, `JUN*`; image patch rules match `lineup:check-official`
+- [x] `LineupSyncSection` first in Godlike Tools; matches locked UI / prototype states
+- [x] Unit tests cover plan buckets + move detection
+- [x] Build green · 931 tests green
+- [x] Wiki + DS updated; post-festival laptop reconcile documented
+
+**Architectural notes:**
+- **Source at apply time:** live wacken.com JSON vs `public.bands` — not local seed files; repo may drift until laptop reconcile
+- **Offline-first unchanged:** UI does not read bands from Supabase; clients pick up lineup via existing `cache_version` invalidation
+- **Service role:** only in Edge Function — never on client
+- **Apply order:** MOVE repoints + destination UPDATEs → deferred MOVE source DELETEs → UPDATEs → INSERTs → DELETEs
+- **Edge Function imports:** `src/lib/` direct + CI serve smoke (ADR-0001)
+
+**Phase closed:** 2026-07-07 — build + 931 tests green; wiki + DS synced; `PHASES.md` cleared (next: 47).
+
+---
+
 ### Phase 44 — Metal Place Multi-Window Configuration
 **Status:** ✅ Complete · **Released:** v1.3.18 on `main` (2026-06-25)
 
