@@ -7,8 +7,8 @@ import type {
   LineupPlan,
   LineupPlanSummary,
   PlanMove,
-} from './lineup-remote-plan';
-import { summarizePlan } from './lineup-remote-plan';
+} from './lineup-remote-plan.ts';
+import { summarizePlan } from './lineup-remote-plan.ts';
 
 export type ApplyOptions = {
   confirmDeletes: boolean;

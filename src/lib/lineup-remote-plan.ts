@@ -3,13 +3,13 @@
  * See docs/superpowers/specs/2026-07-07-godlike-remote-lineup-sync-design.md
  */
 
-import type { OfficialSlot } from './lineup-official-source';
+import type { OfficialSlot } from './lineup-official-source.ts';
 import {
   OVERRIDE_SLOT_IDS,
   imagesEquivalent,
   isJungleSlot,
   namesEquivalent,
-} from './lineup-official-source';
+} from './lineup-official-source.ts';
 
 const PLACEHOLDER_IMAGE =
   'https://www.wacken.com/_assets/3fb8fb6daec87d7565c05103aa89d6b0/2026/Images/news_list_dummy%401x.png';
