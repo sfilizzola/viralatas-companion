@@ -12,6 +12,7 @@ import TimeTravelSection from './TimeTravelSection';
 import TestBadgeSection from './TestBadgeSection';
 import ConsolidateBadgesSection from './ConsolidateBadgesSection';
 import CacheResetSection from './CacheResetSection';
+import LineupSyncSection from './LineupSyncSection';
 import FeatureFlagsSection from './FeatureFlagsSection';
 import MetalPlaceAdminSection from './MetalPlaceAdminSection';
 import CampingLocationAdminSection from './CampingLocationAdminSection';
@@ -146,6 +147,7 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
       <Collapsible trigger={toolsTrigger} className={styles.godlikeCollapsible}>
         <div className={styles.conflictsInner}>
           <div className={styles.godlikeSectionContent}>
+            <LineupSyncSection t={t} />
             <CacheResetSection t={t} />
             <FeatureFlagsSection t={t} onDuckEnabledChange={setDuckFeatureEnabled} />
             <MetalPlaceAdminSection t={t} />

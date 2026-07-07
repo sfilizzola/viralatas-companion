@@ -6,6 +6,19 @@ Diff `supabase/seed/bands.ts` against `public.bands` by stable `slot_id`, previe
 
 For catastrophic refresh (full table replace), use destructive `npm run seed:bands` or `npm run festival:reset -- --with-bands`.
 
+### Remote sync (Phase 46 — phone)
+
+Godlike **Lineup sync** in `/profile` applies the official wacken.com feed directly to production `public.bands` (no git writes). Use at the festival when Wacken changes the running order and no laptop is available.
+
+→ Full flow: [flows/lineup-remote-sync.md](flows/lineup-remote-sync.md)
+
+After the festival, reconcile git with production:
+
+```bash
+npm run lineup:check-official -- --complete
+npm run seed:bands:sync          # dry-run — should be empty
+```
+
 ## Relevant Source Files
 
 | File | Role |

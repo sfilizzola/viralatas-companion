@@ -1097,6 +1097,103 @@
   background: rgba(184, 134, 11, 0.06);
 }
 
+.lineupSyncSection {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--role-godlike-muted, rgba(184, 134, 11, 0.3));
+  border-radius: var(--r-2);
+  background: var(--role-godlike-soft, rgba(184, 134, 11, 0.06));
+  margin-bottom: 1rem;
+}
+
+.lineupSyncSectionTitle {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: rgba(218, 165, 32, 0.95);
+}
+
+.lineupSyncDescription,
+.lineupSyncMeta {
+  margin: 0 0 0.75rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: rgba(218, 165, 32, 0.82);
+}
+
+.lineupSyncChipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-primary);
+}
+
+.lineupSyncReport {
+  margin: 0 0 0.75rem;
+  padding: 0.75rem;
+  max-height: 240px;
+  overflow-y: auto;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  background: var(--bg-elevated);
+  border-radius: var(--r-1);
+  border-left: 3px solid var(--role-godlike, rgba(218, 165, 32, 0.95));
+}
+
+.lineupSyncWarning,
+.lineupSyncDeleteWarning {
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: rgba(218, 165, 32, 0.95);
+  background: rgba(184, 134, 11, 0.12);
+  border-radius: var(--r-1);
+}
+
+.lineupSyncDeleteWarning {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.lineupSyncDeleteInput {
+  width: 100%;
+  margin: 0 0 0.75rem;
+  padding: 0.5rem 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-radius: var(--r-1);
+}
+
+.lineupSyncAccordionToggle {
+  display: block;
+  width: 100%;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  text-align: left;
+  font-size: 0.8125rem;
+  color: rgba(218, 165, 32, 0.95);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.lineupSyncActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
 .metalPlaceSectionTitle {
   margin: 0 0 1rem;
   font-size: 1rem;

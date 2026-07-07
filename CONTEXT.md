@@ -88,11 +88,55 @@ _Avoid_: Vira-Latas HQ (that label on `/now` is the **camping presence group** o
 The live `/now` bucket listing vira-latas currently checked in at camping. Unrelated to Campground coordinates.
 _Avoid_: Campground, camp pin, GPS card
 
+**Remote lineup sync**:
+A godlike-only operator action in the PWA: fetch Wacken's official running order, preview a **lineup plan** against production `bands`, then apply after explicit confirm. Does not update git-tracked seed files.
+_Avoid_: Phone seed, mobile bands sync, remote seed
+
+**Lineup plan**:
+The dry-run diff between the official running order and production `bands`, classified into UPDATE, MOVE, INSERT, and DELETE buckets with pick-impact counts. Preview is read-only; apply executes the plan and bumps `cache_version`.
+_Avoid_: Sync diff, bands diff, migration plan
+
+**Official running order**:
+Wacken's live JSON feed (wacken.com) — authoritative source when building a remote lineup plan during the festival. Repo seed files may lag until **laptop reconcile**.
+_Avoid_: Official lineup, Wacken feed (too generic)
+
+**Slot move**:
+A CONFIRMED band that Wacken relocated to a different `slot_id`. Picks and missed-band records follow the band, not the slot — repointed using a **move pick snapshot** (vira-lata `user_id`s on the source band at preview time). TBD / TDB MTB / ceremony slots are never auto-moved. When multiple moves ship in one plan, pick repoints and metadata updates finish before vacated slot rows are removed.
+_Avoid_: Band swap, pick transfer, bands-move (CLI script name)
+
+**Move pick snapshot**:
+The per-table sets of vira-lata `user_id`s who held a pick or missed-band record on the source band when the lineup plan was previewed (`pickUserIds` and `missedUserIds` on each move). Apply repoints only these users in each table — never all current rows on a shared destination band.
+_Avoid_: Pick list, repoint set, mover IDs
+
+**Blocked move**:
+A detected slot move withheld from apply because the destination slot's current band still has picks (or missed-band records) and that displaced band is not accounted for elsewhere in the same lineup plan (no matching MOVE or DELETE for it). Operator must resolve from laptop or adjust the official feed before apply.
+_Avoid_: Failed move, move error, stuck move
+
+**Partial lineup apply**:
+Applying only the safe buckets from a lineup plan — UPDATE, INSERT, and non-blocked MOVE/DELETE rows — while skipping blocked moves (and blocked deletes unless `DELETE` confirmed). Successful partial apply still bumps `cache_version`. A **plan token** is single-use: any successful apply burns it; operator must preview again before the next apply. Success UI states applied and skipped counts separately.
+_Avoid_: Half sync, incremental apply, apply subset
+
+**Plan token**:
+A short-lived (10 min) credential issued on preview that binds a lineup plan hash to a point in time. The hash covers the **full** plan — applicable and blocked rows alike. Apply re-fetches the official feed, rebuilds the plan, and rejects with `plan_stale` if the hash no longer matches. Consumed after one successful apply (full or partial). Integrity relies on apply-time revalidation, not a shared signing secret (v1).
+_Avoid_: Sync token, preview token, lineup JWT
+
+**Laptop reconcile**:
+Post-festival CLI workflow (`lineup:check-official --complete` then `seed:bands:sync` dry-run) to bring `lineup.md` and `bands.ts` back in line with production after remote sync during the festival.
+_Avoid_: Git sync, seed reconcile
+
 ## Flagged ambiguities
 
 _(none yet)_
 
 ## Example dialogue
+
+**Dev:** Wacken swaps Skyline and Thundermother between FAS5 and LOU3. I preview on phone — two moves. What happens to pickers?
+
+**Expert:** Preview snapshoots who picked each band. Apply repoints only those users, updates metadata, deletes vacated rows **after** both repoints. Thundermother pickers don't silently become Skyline pickers.
+
+**Dev:** LOU3 has Thundermother picks but official dropped her — Skyline moves into LOU3. Can I apply?
+
+**Expert:** **Blocked move** — banner + report, not in move chip. You can **partial apply** safe UPDATEs. Re-preview after fixing on laptop.
 
 **Dev:** Beto earned `dreamer` and `roots` at Wacken 2026. Consolidation ran in August. It's March 2027 — picks are empty and `festival:reset` cleared persist metadata. Where do those patches show?
 

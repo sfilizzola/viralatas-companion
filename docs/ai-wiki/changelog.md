@@ -6,13 +6,16 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ## 2026-07-07
 
+### Added
+- **Phase 46 — Godlike remote lineup sync** — `lineup-sync` Edge Function (`preview` / `apply`), `LineupSyncSection` in godlike Tools, `lineup-remote-plan.ts` + `lineup-remote-apply.ts`, unit tests, DS `#ds-godlike-lineup-sync`, flow doc `flows/lineup-remote-sync.md`, ADR `docs/adr/0001-lineup-sync-shared-plan-module.md`.
+- **PWA install hint** — Center modal on first authenticated mobile browser visit (`InstallAppModal`, `PwaInstallAutoPrompt` in `PrivateRoute`); Android native install when `beforeinstallprompt` fires; iOS manual steps; dismiss-once via `localStorage`; Profile **Install app** link for desktop or re-reading steps. See `docs/ai-wiki/decisions/pwa-not-native.md` § In-app install coaching.
+
 ### Changed
 - **Mural nav label (DE)** — Bottom nav and page title use **Mural** (was *Pinnwand*) for brand consistency across locales.
 - **Mural post length** — 4,000-character cap in UI + `announcementsRepository.post()`; existing oversized posts scroll inside the card so moderation actions stay on screen.
 - **Password reset copy** — Cassio joke subtitle clarifies the user is resetting **their own** password; Supabase “same as old password” errors map to a generic message (no password oracle).
-
-### Added
-- **PWA install hint** — Center modal on first authenticated mobile browser visit (`InstallAppModal`, `PwaInstallAutoPrompt` in `PrivateRoute`); Android native install when `beforeinstallprompt` fires; iOS manual steps; dismiss-once via `localStorage`; Profile **Install app** link for desktop or re-reading steps. See `docs/ai-wiki/decisions/pwa-not-native.md` § In-app install coaching.
+- **`lineup-sync.md`** — cross-link to remote godlike phone flow.
+- **`CONTEXT.md`** — glossary terms for remote lineup sync, slot move, plan token, partial apply.
 
 ## 2026-07-03
 

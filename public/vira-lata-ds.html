@@ -2767,7 +2767,8 @@
     { "name": "CampHqCard",            "sectionId": "camp-location" },
     { "name": "CampMapDock",           "sectionId": "camp-location" },
     { "name": "CampLocationSheet",     "sectionId": "camp-location" },
-    { "name": "CampPinIcon",           "sectionId": "camp-location" }
+    { "name": "CampPinIcon",           "sectionId": "camp-location" },
+    { "name": "LineupSyncSection",     "sectionId": "ds-godlike-lineup-sync" }
   ]
 }
 </script>
@@ -5972,6 +5973,7 @@
         <li><b>GodlikeAdminPanel</b> — full admin controls, visible only to <code>role=godlike</code></li>
         <li><b>ManagerAdminPanel</b> — moderation tools, visible to <code>role=manager</code> and above</li>
         <li><b>MetalPlaceAdminSection</b> — godlike slot list for Metal Place windows (Phase 44): stacked card rows inside 400px godlike panel — header (window label + remove), full-width day select, start/end time row with labels. Add window + Save full-width below. Max 8 slots; zero slots = off. Amber panel (<code>.metalPlaceSection</code>).</li>
+        <li><b>LineupSyncSection</b> — godlike remote lineup sync (Phase 46): first child in Godlike Tools, above Clear cache. Amber <code>.lineupSyncSection</code> ops strip — Check → applicable summary chips → optional accordion report → move/delete warnings → Apply. Partial apply; success shows applied + skipped. See <a href="#ds-godlike-lineup-sync">§ Lineup Sync</a>.</li>
         <li><b>LiveBandTestAdminSection</b> — independent from Metal Place (no mutual exclusion); Time Travel covers Metal Place QA</li>
         <li><b>AssignBadgeModal</b> — modal for assigning badges to specific users</li>
         <li><b>PatchesBackgroundPicker</b> — lets users choose their vest background texture on the profile page</li>
@@ -5985,6 +5987,19 @@
         <li><code>.actionBadge</code> — purple tint · open badge assignment modal</li>
         <li><code>.actionUnblock</code> — orange tint · unblock a blocked user</li>
         <li><code>.secondaryAction</code> — neutral (no-op kept for backward compat)</li>
+      </ul>
+    </div>
+
+    <div class="subhead" id="ds-godlike-lineup-sync">Lineup sync (godlike)</div>
+    <div class="demo-notes ds-x-c6fca1f6">
+      <p><code>LineupSyncSection</code> — godlike-only. Placement: first section inside Godlike Tools collapsible, above <code>CacheResetSection</code>.</p>
+      <ul>
+        <li><b>States:</b> idle · loading · in_sync · preview · applying · success · error / stale</li>
+        <li><b>Chips:</b> applicable UPDATE / MOVE / INSERT / DELETE counts only; blocked rows in warnings + mono report</li>
+        <li><b>Friction:</b> applicable MOVE → amber banner; blocked DELETE → type <code>DELETE</code> before apply</li>
+        <li><b>Partial apply:</b> safe buckets run; blocked moves/deletes skipped; success shows applied + skipped + <code>cache_version</code></li>
+        <li><b>Offline:</b> check/apply disabled with network copy</li>
+        <li><b>CSS:</b> <code>.lineupSyncSection</code>, <code>.lineupSyncChipRow</code>, <code>.lineupSyncReport</code> (max-height 240px, mono)</li>
       </ul>
     </div>
   </section>
