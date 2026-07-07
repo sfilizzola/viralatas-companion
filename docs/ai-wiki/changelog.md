@@ -4,6 +4,13 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-07-07
+
+### Changed
+- **Mural nav label (DE)** — Bottom nav and page title use **Mural** (was *Pinnwand*) for brand consistency across locales.
+- **Mural post length** — 4,000-character cap in UI + `announcementsRepository.post()`; existing oversized posts scroll inside the card so moderation actions stay on screen.
+- **Password reset copy** — Cassio joke subtitle clarifies the user is resetting **their own** password; Supabase “same as old password” errors map to a generic message (no password oracle).
+
 ## 2026-07-03
 
 ### Changed

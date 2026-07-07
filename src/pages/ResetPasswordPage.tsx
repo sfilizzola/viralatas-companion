@@ -1,6 +1,7 @@
 import { useState, type FormEvent, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { mapPasswordUpdateError } from '../lib/authPasswordErrors';
 import { useI18n } from '../lib/i18n';
 import styles from './AuthPage.module.css';
 
@@ -45,14 +46,14 @@ export default function ResetPasswordPage() {
     try {
       const { error: updateError } = await supabase.auth.updateUser({ password: newPassword });
       if (updateError) {
-        setError(updateError.message);
+        setError(mapPasswordUpdateError(updateError.message, t));
         setLoading(false);
         return;
       }
       setSuccess(true);
       setTimeout(() => navigate('/now'), 1800);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unexpected error');
+      setError(mapPasswordUpdateError(err instanceof Error ? err.message : '', t));
       setLoading(false);
     }
   }

@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react';
 import type { Announcement, UsefulLink } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { useAnnouncements } from '../hooks/useAnnouncements';
+import { ANNOUNCEMENT_MAX_CONTENT_LENGTH } from '../repositories/announcements';
 import { useI18n } from '../lib/i18n';
 import { loadUsefulLinks } from '../services/usefulLinks';
 import { relativeTime } from '../services/announcementsDisplay';
@@ -47,6 +48,7 @@ export default function AnnouncementsPage() {
 
   const [draft, setDraft] = useState('');
   const [posting, setPosting] = useState(false);
+  const [postError, setPostError] = useState<string | null>(null);
   const [usefulLinks, setUsefulLinks] = useState<UsefulLink[]>([]);
 
   useEffect(() => {
@@ -62,10 +64,24 @@ export default function AnnouncementsPage() {
   async function handlePost(e: FormEvent) {
     e.preventDefault();
     if (!userId || !draft.trim() || posting) return;
+    if (draft.length > ANNOUNCEMENT_MAX_CONTENT_LENGTH) {
+      setPostError(t('contentTooLong', { max: ANNOUNCEMENT_MAX_CONTENT_LENGTH }));
+      return;
+    }
     setPosting(true);
-    await post(draft);
-    setDraft('');
-    setPosting(false);
+    setPostError(null);
+    try {
+      await post(draft);
+      setDraft('');
+    } catch (error) {
+      if (error instanceof Error && error.message === 'ANNOUNCEMENT_CONTENT_TOO_LONG') {
+        setPostError(t('contentTooLong', { max: ANNOUNCEMENT_MAX_CONTENT_LENGTH }));
+      } else {
+        setPostError(t('postError'));
+      }
+    } finally {
+      setPosting(false);
+    }
   }
 
   async function handleDelete(id: string) {
@@ -131,12 +147,29 @@ export default function AnnouncementsPage() {
               className={styles.textarea}
               placeholder={t('placeholder')}
               value={draft}
-              onChange={(e) => setDraft(e.target.value)}
+              onChange={(e) => {
+                setDraft(e.target.value);
+                if (postError) setPostError(null);
+              }}
+              maxLength={ANNOUNCEMENT_MAX_CONTENT_LENGTH}
               rows={4}
             />
-            <button className={styles.postBtn} type="submit" disabled={posting || !draft.trim()}>
-              {posting ? t('posting') : t('post')}
-            </button>
+            <div className={styles.postFooter}>
+              <span
+                className={`${styles.charCount} ${draft.length > ANNOUNCEMENT_MAX_CONTENT_LENGTH * 0.9 ? styles.charCountWarn : ''}`}
+                aria-live="polite"
+              >
+                {t('charCount', { current: draft.length, max: ANNOUNCEMENT_MAX_CONTENT_LENGTH })}
+              </span>
+              <button
+                className={styles.postBtn}
+                type="submit"
+                disabled={posting || !draft.trim() || draft.length > ANNOUNCEMENT_MAX_CONTENT_LENGTH}
+              >
+                {posting ? t('posting') : t('post')}
+              </button>
+            </div>
+            {postError && <p className={styles.postError}>{postError}</p>}
           </form>
         )}
 

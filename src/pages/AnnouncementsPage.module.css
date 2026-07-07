@@ -173,6 +173,29 @@
   background: var(--accent-hover);
 }
 
+.postFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.charCount {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.charCountWarn {
+  color: var(--accent);
+}
+
+.postError {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--danger, #e55);
+}
+
 /* ============================================================
    BLOCKED MESSAGE
    ============================================================ */
@@ -379,7 +402,10 @@
   line-height: 1.5;
   white-space: pre-wrap;
   word-break: break-word;
+  overflow-wrap: anywhere;
   margin: 0;
+  max-height: min(50vh, 24rem);
+  overflow-y: auto;
 }
 
 /* ---- Pinned card variant ---- */
