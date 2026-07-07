@@ -19,6 +19,7 @@ import GodlikeAdminPanel from '../components/profile/GodlikeAdminPanel';
 import WrapTeaserBanner from '../components/wrap/WrapTeaserBanner';
 import { useWrapTeaserVisible } from '../hooks/useWrapTeaserVisible';
 import ManagerAdminPanel from '../components/profile/ManagerAdminPanel';
+import InstallAppProfileLink from '../components/InstallAppProfileLink';
 import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
@@ -108,6 +109,8 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
       />
 
       {showWrapTeaser && <WrapTeaserBanner />}
+
+      <InstallAppProfileLink />
 
       <section id="vest" className={styles.pfSection}>
         <BadgesDisplay user={user} />

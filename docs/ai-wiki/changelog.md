@@ -11,6 +11,9 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - **Mural post length** — 4,000-character cap in UI + `announcementsRepository.post()`; existing oversized posts scroll inside the card so moderation actions stay on screen.
 - **Password reset copy** — Cassio joke subtitle clarifies the user is resetting **their own** password; Supabase “same as old password” errors map to a generic message (no password oracle).
 
+### Added
+- **PWA install hint** — Center modal on first authenticated mobile browser visit (`InstallAppModal`, `PwaInstallAutoPrompt` in `PrivateRoute`); Android native install when `beforeinstallprompt` fires; iOS manual steps; dismiss-once via `localStorage`; Profile **Install app** link for desktop or re-reading steps. See `docs/ai-wiki/decisions/pwa-not-native.md` § In-app install coaching.
+
 ## 2026-07-03
 
 ### Changed

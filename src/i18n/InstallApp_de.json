@@ -1,0 +1,15 @@
+{
+  "title": "Viralatas installieren",
+  "subtitle": "Läuft offline in Wacken. Kein App Store nötig.",
+  "installButton": "App installieren",
+  "gotIt": "Alles klar",
+  "iosStep1": "Tippe in Safari auf Teilen (Quadrat mit ↑).",
+  "iosStep2": "Scrolle und tippe auf \"Zum Home-Bildschirm\".",
+  "iosStep3": "Öffne Viralatas vom Home-Bildschirm — Push und Offline funktionieren dort am besten.",
+  "androidStep1": "Tippe auf das Menü (⋮) oben rechts in Chrome.",
+  "androidStep2": "Tippe auf \"App installieren\" oder \"Zum Startbildschirm\".",
+  "androidStep3": "Öffne vom Startbildschirm für das volle Festival-Erlebnis.",
+  "androidOrManual": "Oder über das Menü: ⋮ → App installieren",
+  "profileLink": "App installieren",
+  "profileLinkHint": "Zum Home-Bildschirm für Offline-Nutzung und Push-Alerts"
+}

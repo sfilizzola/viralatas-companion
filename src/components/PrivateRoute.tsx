@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import AuthBootstrapShell from './AuthBootstrapShell';
+import PwaInstallAutoPrompt from './PwaInstallAutoPrompt';
 
 type Props = { children: React.ReactNode };
 
@@ -12,7 +13,12 @@ export default function PrivateRoute({ children }: Props) {
   }
 
   if (session || sessionExpired) {
-    return <>{children}</>;
+    return (
+      <>
+        {session && <PwaInstallAutoPrompt />}
+        {children}
+      </>
+    );
   }
 
   return <Navigate to="/login" replace />;

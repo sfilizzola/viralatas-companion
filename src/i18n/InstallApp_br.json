@@ -1,0 +1,15 @@
+{
+  "title": "Instalar Viralatas",
+  "subtitle": "Funciona offline no Wacken. Sem app store.",
+  "installButton": "Instalar app",
+  "gotIt": "Entendi",
+  "iosStep1": "Toque em Compartilhar no Safari (quadrado com ↑).",
+  "iosStep2": "Role e toque em \"Adicionar à Tela de Início\".",
+  "iosStep3": "Abra o Viralatas pela tela inicial — alertas e modo offline funcionam melhor assim.",
+  "androidStep1": "Toque no menu (⋮) no canto superior direito do Chrome.",
+  "androidStep2": "Toque em \"Instalar app\" ou \"Adicionar à tela inicial\".",
+  "androidStep3": "Abra pela tela inicial para a experiência completa no festival.",
+  "androidOrManual": "Ou use o menu: ⋮ → Instalar app",
+  "profileLink": "Instalar app",
+  "profileLinkHint": "Adicione à tela inicial para offline e alertas push"
+}
