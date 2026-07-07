@@ -6,7 +6,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 >
 > **Status values:** `pending` · `partial — Phase N` (engine/data only) · `✅ Phase N` (shipped — spec collapsed; see `docs/ai-wiki/phases-history.md`)
 >
-> **Last synced:** 2026-07-07 — Phase 46 CLI alignment patch shipped v1.3.22.
+> **Last synced:** 2026-07-07 — Jungle go-live plan parked (Idea 5); not scheduled for implementation.
 
 ## Ideas at a glance
 
@@ -16,6 +16,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 | 2 | Rating on My Wacken | Low | Low — no new schema; reuse `userRatingByBand` + read-only chip on ended rows | pending (data ✅ Phase 32) |
 | 3 | Rating-based badges | Medium | Low — additive registry entries; no further schema change | partial — Phase 34 |
 | 4 | Avatar Peek Sheet | Medium | Low — bottom sheet + CTA; re-uses existing presence/pick data | pending |
+| 5 | Jungle stage go-live | Medium | Low — feed-gated sync; no schema change; picks preserved on UPDATE | pending — spec + plan ready |
 
 ---
 
@@ -195,3 +196,89 @@ Regras:
 - i18n in all 4 languages (br, en, de, es)
 
 **Depends on:** ✅ Phase 38.A `userId` filter on `/schedule`.
+
+---
+
+## Idea 5 — Jungle stage go-live
+
+**Status:** `pending` — design approved 2026-07-07; **not scheduled for implementation**. Spec and implementation plan written; execute when Wacken publishes Welcome to the Jungle in the official running order (or proactively before festival if desired).
+
+**Goal:** When Jungle appears in wacken.com `events-concert.json`, CLI and godlike remote sync fill confirmed `JUN1`–`JUN8` slots automatically. When Jungle is absent from the feed, the app keeps showing nothing for that stage (current behavior).
+
+**Complexity:** Medium · **Risk:** Low — no DB schema change; reuses `lineup-official-source.ts` + `lineup-remote-plan.ts`; INSERT only for confirmed band names; UPDATE preserves picks.
+
+### Locked decisions (brainstorming 2026-07-07)
+
+| Topic | Choice |
+|-------|--------|
+| Apply path | Laptop CLI **and** godlike phone sync — identical behavior |
+| Visibility | Show only slots with a **confirmed band name** in the official feed |
+| Times | `docs/ai-wiki/stages.md` grid (operator sets `Confirmed = YES` before apply) |
+| Slot ID mapping | Chronological global counter — same as FAS/WAK/etc. |
+| Approach | Feed-gated auto-enable (`jungleIsPublished`) |
+
+### Problem today
+
+1. `bands.ts` omits all `JUN1`–`JUN8` rows (`Name = TBD` in `lineup.md`).
+2. `STAGE_UID_TO_ABBREV` has no Jungle mapping — events dropped at filter time.
+3. `isJungleSlot()` permanently skips JUN in diff, patch, and remote plan.
+
+Correct while Jungle is unpublished; breaks the moment Wacken adds the stage unless code is updated.
+
+### Architecture (feed-gated)
+
+```
+Official JSON fetch
+  → resolve Jungle stage.uid from stages.json title
+  → jungleIsPublished? (any JUN* CONFIRMED in feed)
+      false → skip all JUN (hidden, same as today)
+      true  → JUN flows through diff/sync like other stages
+  → INSERT only confirmed names; official TBD JUN slots stay hidden
+  → times from JUN_SLOT_TIMES (stages.md grid), not official unix
+  → CLI --complete appends new bands.ts rows for confirmed JUN slots
+  → seed:bands:sync --apply INSERTs to prod (or godlike remote apply)
+```
+
+**No UI work** — schedule/stage colors already support `"Welcome to the Jungle"`.
+
+### Deliverables (10 tasks — see plan)
+
+- [ ] `src/lib/jungle-slot-times.ts` — `JUN_SLOT_TIMES` ISO map from `stages.md`
+- [ ] `jungleIsPublished` + `isPolicySkippedSlot(slotId, official)` in `lineup-official-source.ts`
+- [ ] Dynamic JUN stage UID from `stages.json` in `buildOfficialSlots`
+- [ ] Feed-gated `computeDiff` / `patchBandsTsContent`
+- [ ] `generateBandsTsRowsForJungle` for `--complete` seed row INSERT
+- [ ] Remote plan: conditional skip + JUN time override on INSERT/UPDATE
+- [ ] `lineup-check-official.ts` `--complete` wiring
+- [ ] Relax `assertSeedIntegrity` fixed 187-row count in `bands.ts`
+- [ ] Wiki: `lineup-official-source.md`, `lineup-sync.md`, changelog
+- [ ] Tests: `jungle-slot-times`, official-source gate, remote-plan JUN INSERT
+
+### Operator workflow (go-live day)
+
+**Laptop:**
+```bash
+npm run lineup:check-official
+# Confirm stages.md Jungle slots Confirmed = YES
+npm run lineup:check-official -- --lineup
+npm run lineup:check-official -- --complete
+npm run seed:bands:sync
+npm run seed:bands:sync -- --apply
+```
+
+**Infield (no laptop):** `/profile` → Lineup sync → preview → apply.
+
+### Acceptance criteria
+
+- [ ] No Jungle in official feed → zero JUN bands in DB; `/schedule` unchanged
+- [ ] Partial publish (e.g. 3 confirmed) → exactly 3 bands appear; official TBD slots hidden
+- [ ] CLI and godlike remote apply produce same DB state for same feed snapshot
+- [ ] JUN `start_time` / `end_time` match `stages.md` grid, not official JSON unix
+- [ ] Picks preserved on UPDATE; DELETE blocked when picks exist
+- [ ] `rtk npm test` and `rtk npm run build` green
+
+### Design references
+
+- Spec: `docs/superpowers/specs/2026-07-07-jungle-stage-go-live-design.md`
+- Plan: `docs/superpowers/plans/2026-07-07-jungle-stage-go-live.md`
+- Wiki (update on ship): `docs/ai-wiki/lineup-official-source.md`, `docs/ai-wiki/lineup-sync.md`
