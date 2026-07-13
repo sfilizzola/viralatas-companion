@@ -1489,14 +1489,26 @@
     display: flex; align-items: center; justify-content: center; gap: 6px;
     transition: background 0.16s, color 0.16s;
   }
-  .presence-toggle button:hover { color: var(--text); }
-  .presence-toggle button.on {
-    background: var(--bg-elevated);
-    color: var(--text);
-    box-shadow: inset 0 0 0 1px var(--border-strong);
+  .presence-toggle button:hover:not(.camping):not(.on) { color: var(--text); }
+  .presence-toggle button.camping:not(.on) {
+    background: rgba(88,28,135,0.18);
+    color: rgba(196,148,255,0.88);
+    box-shadow: inset 0 0 0 1px rgba(168,85,247,0.35);
   }
-  .presence-toggle button.on.camping { color: var(--signal-ok-bright); }
-  .presence-toggle button.on.metal { color: var(--metal-place); }
+  .presence-toggle button.camping:not(.on):hover {
+    background: rgba(88,28,135,0.22);
+    color: rgba(196,148,255,0.95);
+  }
+  .presence-toggle button.on.camping {
+    background: rgba(22,160,133,0.14);
+    color: var(--signal-ok-bright);
+    box-shadow: inset 0 0 0 1px rgba(22,160,133,0.45);
+  }
+  .presence-toggle button.on.metal {
+    background: rgba(217,119,6,0.14);
+    color: rgba(253,224,71,0.95);
+    box-shadow: inset 0 0 0 1px rgba(217,119,6,0.55);
+  }
   .presence-toggle button .dot {
     width: 6px; height: 6px; border-radius: 50%;
     background: currentColor;
@@ -3290,19 +3302,29 @@
         <div class="where-am-i">
           <div class="legend"><b>Onde estou</b><span>manual override, syncs to crew grid</span></div>
           <div class="presence-toggle">
+            <button class="camping"><span class="dot"></span>Estou no camping</button>
+          </div>
+          <div class="help">Camping <b>off</b> — light purple tint (Lost palette): location auto-resolves from your current pick.</div>
+          <div class="presence-toggle mt-12px">
             <button class="on camping"><span class="dot"></span>Estou no camping</button>
           </div>
-          <div class="help">When off, your location auto-resolves from your current pick. If you have no active pick, you fall to <b>Lost 🤘</b>.</div>
+          <div class="help">Camping <b>on</b> — green tint matches the Camping location card below.</div>
           <div class="presence-toggle has-metal mt-12px">
-            <button><span class="dot" style="color:var(--signal-ok-bright)"></span>Camping</button>
-            <button class="on metal"><span class="dot" style="color:var(--metal-place)"></span>Metal Place</button>
+            <button class="on camping"><span class="dot"></span>Camping</button>
+            <button class="metal"><span class="dot"></span>Metal Place</button>
           </div>
-          <div class="help">Metal Place appears only while the configured event window is active. Camping and Metal Place are mutually exclusive; tapping the active option clears the manual override.</div>
+          <div class="help">Dual mode — Camping on (green), Metal idle (muted).</div>
+          <div class="presence-toggle has-metal mt-12px">
+            <button class="camping"><span class="dot"></span>Camping</button>
+            <button class="on metal"><span class="dot"></span>Metal Place</button>
+          </div>
+          <div class="help">Dual mode — Metal on (amber), Camping off (purple). Tapping the active option clears manual override.</div>
         </div>
       </div>
       <div class="demo-notes">
         <h4>Behavior</h4>
         <ul>
+          <li>Camping off uses light purple tint (<code>rgba(88,28,135,0.18)</code>) — Lost palette; camping on uses green; metal on uses amber</li>
           <li>Manual override is nullable: off means auto-resolve from the user's current band pick</li>
           <li>Outside the Metal Place window, render only the Camping on/off toggle</li>
           <li>During the Metal Place window, render Camping and Metal Place as two mutually exclusive options</li>
@@ -5078,8 +5100,8 @@
             <div class="where-am-i ds-x-04041a7c">
               <div class="legend"><b>Onde estou</b><span>self</span></div>
               <div class="presence-toggle has-metal">
-                <button class="ds-x-5f9720ec"><span class="dot ds-x-46f893c6"></span>Camping</button>
-                <button class="on metal ds-x-5f9720ec"><span class="dot ds-x-714a6a5d"></span>Metal Pl.</button>
+                <button class="camping ds-x-5f9720ec"><span class="dot"></span>Camping</button>
+                <button class="on metal ds-x-5f9720ec"><span class="dot"></span>Metal Pl.</button>
               </div>
             </div>
             <div class="loc-stack">

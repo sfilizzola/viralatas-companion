@@ -104,6 +104,7 @@
   --signal-warn: #f39c12;
   --signal-warn-light: #f9c66b;
   --signal-ok: #16a085;
+  --signal-ok-bright: #5fd0bb;
   --signal-lost: #a855f7;
 
   /* ---------- role colors ---------- */

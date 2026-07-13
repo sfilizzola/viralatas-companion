@@ -4,6 +4,11 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-07-13
+
+### Changed
+- **Presence toggle colors** — `PresenceToggle` on `/now`: camping off uses light purple Lost tint; camping on green; metal place on amber. Matches camping / lost / metal_place location cards. Token `--signal-ok-bright` added to `src/index.css`. DS `#components` presence-toggle demos updated.
+
 ## 2026-07-07
 
 ### Added

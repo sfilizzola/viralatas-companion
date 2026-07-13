@@ -77,17 +77,37 @@
   opacity: 0.65;
 }
 
-.on {
-  background: var(--bg-elevated);
-  box-shadow: inset 0 0 0 1px var(--border-strong);
-  color: var(--text);
+/* Camping OFF — light purple (Lost palette, auto / not at camping) */
+.camping:not(.on) {
+  background: rgba(88, 28, 135, 0.18);
+  color: rgba(196, 148, 255, 0.88);
+  box-shadow: inset 0 0 0 1px rgba(168, 85, 247, 0.35);
 }
 
+.camping:not(.on):hover:not(:disabled) {
+  background: rgba(88, 28, 135, 0.22);
+  color: rgba(196, 148, 255, 0.95);
+}
+
+/* Camping ON — green (camping location card) */
 .on.camping {
-  color: #5fd0bb;
+  background: rgba(22, 160, 133, 0.14);
+  color: var(--signal-ok-bright);
+  box-shadow: inset 0 0 0 1px rgba(22, 160, 133, 0.45);
 }
 
+.on.camping:hover:not(:disabled) {
+  color: var(--signal-ok-bright);
+}
+
+/* Metal Place ON — amber (metal_place location card) */
 .on.metal {
+  background: rgba(217, 119, 6, 0.14);
+  color: rgba(253, 224, 71, 0.95);
+  box-shadow: inset 0 0 0 1px rgba(217, 119, 6, 0.55);
+}
+
+.on.metal:hover:not(:disabled) {
   color: rgba(253, 224, 71, 0.95);
 }
 
