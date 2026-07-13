@@ -384,7 +384,7 @@ Only when **both the build and all tests are green** may you proceed with the co
 
 ## Automatic versioning (main branch only)
 
-**Current version:** `22`
+**Current version:** `23`
 
 **Rule:** When a commit is pushed to the `main` branch:
 1. Increment the version number by 1
