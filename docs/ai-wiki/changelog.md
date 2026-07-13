@@ -6,6 +6,9 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ## 2026-07-13
 
+### Added
+- **Useful Links — Top Up** — Event Portal cash top-up link added as first pill on Mural (`public/useful-links.json`).
+
 ### Changed
 - **Presence toggle colors** — `PresenceToggle` on `/now`: camping off uses recessed dim purple Lost tint; camping on uses elevated green pill; metal place on uses elevated amber pill. Matches location card semantics with clear on/off affordance.
 

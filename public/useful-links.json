@@ -1,6 +1,11 @@
 {
   "links": [
     {
+      "title": "Top Up",
+      "url": "https://eventportal.io/i/454cebba-e3c6-471e-8a16-ef8507232ac1",
+      "icon": "💳"
+    },
+    {
       "title": "Splitwise — Wacken 2026",
       "url": "https://secure.splitwise.com/#/groups/74712577",
       "icon": "💸"
