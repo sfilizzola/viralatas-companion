@@ -13,8 +13,8 @@
  *   - Slot start/end times:                    docs/ai-wiki/stages.md
  *
  * Rules applied when generating this file:
- *   - Slots whose `Name` is `TBD` in lineup.md are NOT seeded (12 dropped:
- *     JUN1-JUN8, LOU21, WET30, WAS24, WAS32).
+ *   - Slots whose `Name` is `TBD` in lineup.md are NOT seeded (6 dropped:
+ *     JUN9, JUN10, LOU21, WET30, WAS24, WAS32).
  *   - Slots whose `Band Status` is `TDB MTB` ARE seeded with the literal name
  *     `TDB MTB` (`MTB` constant), genre from lineup.md, and `image_url =
  *     PLACEHOLDER`.
@@ -26,8 +26,8 @@
  *   - Bands with `Genre: TBD` use the fallback genre `"Metal"`.
  *   - Each slot's start_time / end_time comes from stages.md (Slot ID → time).
  *
- * Expected row count after seed: **187** (each row declares `slot_id` explicitly)
- *   = 173 CONFIRMED + 12 UNCONFIRMED + 1 TDB MTB + 0 named TDB + 1 ceremony (HAR13 Farewell & Announcements).
+ * Expected row count after seed: **199** (each row declares `slot_id` explicitly)
+ *   = 185 CONFIRMED + 12 Jungle CONFIRMED + 1 TDB MTB + 0 named TDB + 1 ceremony (HAR13 Farewell & Announcements).
  *
  * For small lineup edits (name, time, genre, image), use `npm run seed:bands:sync`
  * instead — it preserves user picks. This script is for festival reset only.
@@ -121,7 +121,7 @@ const TBD_GENRE = 'Metal';
 // announced for one of these slots, edit both lineup.md and this file.
 const MTB = 'TDB MTB';
 
-export const EXPECTED_BAND_COUNT = 187;
+export const EXPECTED_BAND_COUNT = 199;
 export const SLOT_ID_RE = /^(HAR|FAS|LOU|WET|HBA|WAS|WAK|JUN)\d+$/;
 
 export type BandSeed = {
@@ -136,11 +136,11 @@ export type BandSeed = {
 };
 
 // ---------------------------------------------------------------------------
-// Band data — 187 entries total (mirrors lineup.md exactly)
+// Band data — 199 entries total (mirrors lineup.md exactly)
 // Each row's slot_id matches the Slot ID in stages.md / lineup.md.
 // Stage order within each day (per lineup.md):
 //   Harder · Faster · Louder · W.E.T. · Headbangers · Wasteland · Wackinger · Jungle
-// Welcome to the Jungle has no entries — all JUN slots are TBD in the running order.
+// JUN9, JUN10 omitted — Name = TBD in lineup.md.
 // ---------------------------------------------------------------------------
 
 export const bands: BandSeed[] = [
@@ -211,7 +211,10 @@ export const bands: BandSeed[] = [
   { slot_id: 'WAK7', name: 'Unzucht',               stage: STAGES.WACKINGER, start_time: t(D1,22,15), end_time: t(D1,23,15), genre: 'Metal', image_url: `${WOA}/fileadmin/_processed_/b/2/csm_unzucht_26_5662cb7925.jpg` },              
 
   // WELCOME TO THE JUNGLE — Day 1
-  // JUN1, JUN2 — dropped (Name = TBD in lineup.md)
+  { slot_id: 'JUN1', name: 'Thomas Nicholas Band',    stage: STAGES.JUNGLE, start_time: t(D1,16, 0), end_time: t(D1,17, 0), genre: TBD_GENRE,  image_url: `${WOA}/fileadmin/_processed_/d/6/csm_thomas_nicholas_26_d2983140b2.jpg` },
+  { slot_id: 'JUN2', name: 'Acoustic Steel',          stage: STAGES.JUNGLE, start_time: t(D1,18, 0), end_time: t(D1,19, 0), genre: TBD_GENRE,  image_url: `${WOA}/fileadmin/_processed_/5/8/csm_acoustic-steel-2022_4e664b08e6.jpg` },
+  { slot_id: 'JUN3', name: 'Vika Goes Wild',          stage: STAGES.JUNGLE, start_time: t(D1,19,45), end_time: t(D1,20,30), genre: TBD_GENRE,  image_url: `${WOA}/fileadmin/_processed_/7/f/csm_Vika-Goes-Wild_26_edbaa7e72a.jpg` },
+  { slot_id: 'JUN4', name: 'Alien Rockin Explosion',  stage: STAGES.JUNGLE, start_time: t(D1,21, 0), end_time: t(D1,21,30), genre: 'Hard Rock', image_url: `${WOA}/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg` },
 
   // ═══════════════════════════════════════════════════════
   // DAY 2 — Thursday 30 July
@@ -279,7 +282,9 @@ export const bands: BandSeed[] = [
   { slot_id: 'WAK14', name: 'Manntra',      stage: STAGES.WACKINGER, start_time: t(D2,22,15), end_time: t(D2,23,15), genre: 'Folk Metal', image_url: `${WOA}/fileadmin/_processed_/1/3/csm_manntra_26_a22fae1fff.jpg` },         
 
   // WELCOME TO THE JUNGLE — Day 2
-  // JUN3, JUN4 — dropped (Name = TBD in lineup.md)
+  { slot_id: 'JUN5', name: 'Mambo Kurt',                                              stage: STAGES.JUNGLE, start_time: t(D2,17,30), end_time: t(D2,18,15), genre: TBD_GENRE,  image_url: `${WOA}/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg` },
+  { slot_id: 'JUN6', name: 'System of a Down by Anett & Livi Acoustic + Radó Éden', stage: STAGES.JUNGLE, start_time: t(D2,19,15), end_time: t(D2,20,15), genre: TBD_GENRE,  image_url: `${WOA}/fileadmin/_processed_/2/9/csm_soad_cover_26_131b7ecf02.jpg` },
+  { slot_id: 'JUN7', name: 'Alien Rockin Explosion',                                  stage: STAGES.JUNGLE, start_time: t(D2,21, 0), end_time: t(D2,21,30), genre: 'Hard Rock', image_url: `${WOA}/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg` },
 
   // ═══════════════════════════════════════════════════════
   // DAY 3 — Friday 31 July
@@ -348,7 +353,10 @@ export const bands: BandSeed[] = [
   { slot_id: 'WAK22', name: 'Faun',            stage: STAGES.WACKINGER, start_time: t(D3,22,15), end_time: t(D3,23,15), genre: 'Folk Metal',                image_url: `${WOA}/fileadmin/_processed_/2/4/csm_Faun2-WOA26_dec165b202.jpg` },                 
 
   // WELCOME TO THE JUNGLE — Day 3
-  // JUN5 — dropped (Name = TBD in lineup.md)
+  { slot_id: 'JUN8', name: 'Mambo Kurt',             stage: STAGES.JUNGLE, start_time: t(D3,17,30), end_time: t(D3,18,30), genre: TBD_GENRE,  image_url: `${WOA}/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg` },
+  // JUN9, JUN10 — dropped (Name = TBD in lineup.md)
+  { slot_id: 'JUN11', name: 'Alien Rockin Explosion', stage: STAGES.JUNGLE, start_time: t(D3,21, 0), end_time: t(D3,21,30), genre: 'Hard Rock', image_url: `${WOA}/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg` },
+  { slot_id: 'JUN12', name: "Maschine's Late Night Show", stage: STAGES.JUNGLE, start_time: t(D3,21,31), end_time: t(D3,23, 0), genre: TBD_GENRE, image_url: `${WOA}/fileadmin/_processed_/9/0/csm_late_night_show_2019_535ef1d94c.jpg` },
 
   // ═══════════════════════════════════════════════════════
   // DAY 4 — Saturday 1 August
@@ -430,7 +438,8 @@ export const bands: BandSeed[] = [
   { slot_id: 'WAK29', name: 'Einherjer',              stage: STAGES.WACKINGER, start_time: t(D4,22,15), end_time: t(D4,23,15), genre: 'Black Metal',    image_url: `${WOA}/fileadmin/_processed_/c/2/csm_Einherjer-WOA26_9393fba15b.jpg` },          
 
   // WELCOME TO THE JUNGLE — Day 4
-  // JUN6, JUN7, JUN8 — dropped (Name = TBD in lineup.md)
+  { slot_id: 'JUN13', name: 'Mambo Kurt',             stage: STAGES.JUNGLE, start_time: t(D4,18, 0), end_time: t(D4,19, 0), genre: TBD_GENRE,  image_url: `${WOA}/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg` },
+  { slot_id: 'JUN14', name: 'Alien Rockin Explosion', stage: STAGES.JUNGLE, start_time: t(D4,21, 0), end_time: t(D4,21,30), genre: 'Hard Rock', image_url: `${WOA}/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg` },
 ];
 
 
