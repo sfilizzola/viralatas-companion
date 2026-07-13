@@ -13,7 +13,7 @@
 >
 > **Official source details:** [lineup-official-source.md](lineup-official-source.md) (JSON endpoints, filter rules, exit codes).
 
-**Summary:** 185 bands CONFIRMED · 1 `TDB MTB` Metal Battle placeholders · 0 named TDB · 12 TBD (Name=TBD) · 199 total · 1 ceremony (Farewell & Announcements, HAR13)
+**Summary:** 197 bands CONFIRMED · 1 `TDB MTB` Metal Battle placeholders · 0 named TDB · 6 TBD (Name=TBD) · 205 total · 1 ceremony (Farewell & Announcements, HAR13)
 
 **Genres:** 13 canonical labels after Phase 25 collapse — **[old → new mapping table](genre-collapse-mapping.md)** · [domain-model](domain-model.md#band) · [ADR](decisions/genre-collapse-canonical-labels.md). Unknown/TBD tags in this file seed as `Metal`.
 
@@ -67,9 +67,9 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 ## Day 1 — Wednesday, 29 July 2026
 
-> **Note:** Harder stage is closed on Day 1. Faster starts at 16:00 (Doors: 15:30). Louder, W.E.T., Headbangers, Wasteland, and Wackinger stages open from 10:30 / 11:00. Welcome to the Jungle has not been added to the official running order.
+> **Note:** Harder stage is closed on Day 1. Faster starts at 16:00 (Doors: 15:30). Louder, W.E.T., Headbangers, Wasteland, Wackinger, and Welcome to the Jungle stages open from 10:30 / 11:00.
 >
-> **Source:** Band placements below mirror the official Wacken 2026 running order (https://www.wacken.com/de/line-up/running-order-musik/) as of 2026-07-07. **wacken.com is authoritative** for `CONFIRMED` rows. All 12 former `UNCONFIRMED` Metal Battle slots were promoted to `CONFIRMED` on 2026-07-07 (`lineup:check-official --complete`); only `WET23` remains `TDB MTB` among Metal Battle rows.
+> **Source:** Band placements below mirror the official Wacken 2026 running order (https://www.wacken.com/de/line-up/running-order-musik/) as of 2026-07-13. **wacken.com is authoritative** for `CONFIRMED` rows. Welcome to the Jungle (`JUN1`–`JUN14`) added from official feed 2026-07-13; `JUN9` and `JUN10` remain `TBD`.
 
 ### Harder Stage
 
@@ -155,18 +155,20 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 ### Welcome to the Jungle Stage
 
-> Welcome to the Jungle has not been published in the official running order yet — slots and bands here are TBD.
+> **Source:** Official running order as of 2026-07-13. Slot times → [stages.md](stages.md#welcome-to-the-jungle).
 
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| TBD | Metal | JUN1 | TBD | PLACEHOLDER |
-| TBD | Metal | JUN2 | TBD | PLACEHOLDER |
+| Thomas Nicholas Band | Metal | JUN1 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/6/csm_thomas_nicholas_26_d2983140b2.jpg |
+| Acoustic Steel | Metal | JUN2 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/5/8/csm_acoustic-steel-2022_4e664b08e6.jpg |
+| Vika Goes Wild | Metal | JUN3 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/f/csm_Vika-Goes-Wild_26_edbaa7e72a.jpg |
+| Alien Rockin Explosion | Hard Rock | JUN4 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg |
 
 ---
 
 ## Day 2 — Thursday, 30 July 2026
 
-> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-07. All 8 stages open on Day 2 (Welcome to the Jungle not yet in official running order).
+> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-13. All 8 stages open on Day 2.
 
 ### Harder Stage
 
@@ -252,18 +254,17 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 ### Welcome to the Jungle Stage
 
-> Welcome to the Jungle has not been published in the official running order yet — slots and bands here are TBD.
-
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| TBD | Metal | JUN3 | TBD | PLACEHOLDER |
-| TBD | Metal | JUN4 | TBD | PLACEHOLDER |
+| Mambo Kurt | Metal | JUN5 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg |
+| System of a Down by Anett & Livi Acoustic + Radó Éden | Metal | JUN6 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/2/9/csm_soad_cover_26_131b7ecf02.jpg |
+| Alien Rockin Explosion | Hard Rock | JUN7 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg |
 
 ---
 
 ## Day 3 — Friday, 31 July 2026
 
-> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-07.
+> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-13.
 
 ### Harder Stage
 
@@ -350,17 +351,19 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 ### Welcome to the Jungle Stage
 
-> Welcome to the Jungle has not been published in the official running order yet — slot and band TBD.
-
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| TBD | Metal | JUN5 | TBD | PLACEHOLDER |
+| Mambo Kurt | Metal | JUN8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg |
+| TBD | Metal | JUN9 | TBD | PLACEHOLDER |
+| TBD | Metal | JUN10 | TBD | PLACEHOLDER |
+| Alien Rockin Explosion | Hard Rock | JUN11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg |
+| Maschine's Late Night Show | Metal | JUN12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/0/csm_late_night_show_2019_535ef1d94c.jpg |
 
 ---
 
 ## Day 4 — Saturday, 1 August 2026
 
-> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-07. Note: the Farewell & Announcements ceremony moved from Faster (FAS17 previously) to Harder (HAR13). Sabaton headlines Harder, not Faster. The wacken.com running-order feed shows an empty slot at `HAR13`; we keep **Farewell & Announcements** as a `CEREMONY` placeholder until wacken.com names it.
+> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-13. Note: the Farewell & Announcements ceremony moved from Faster (FAS17 previously) to Harder (HAR13). Sabaton headlines Harder, not Faster. The wacken.com running-order feed shows an empty slot at `HAR13`; we keep **Farewell & Announcements** as a `CEREMONY` placeholder until wacken.com names it.
 
 ### Faster Stage
 
@@ -447,13 +450,10 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 ### Welcome to the Jungle Stage
 
-> Welcome to the Jungle has not been published in the official running order yet — slots and bands here are TBD.
-
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| TBD | Metal | JUN6 | TBD | PLACEHOLDER |
-| TBD | Metal | JUN7 | TBD | PLACEHOLDER |
-| TBD | Metal | JUN8 | TBD | PLACEHOLDER |
+| Mambo Kurt | Metal | JUN13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg |
+| Alien Rockin Explosion | Hard Rock | JUN14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg |
 
 ---
 
@@ -588,4 +588,4 @@ See [stages.md — How to Confirm a Slot's Official Time](stages.md#how-to-confi
 
 See [stages.md — How to Add a New Slot](stages.md#how-to-add-a-new-slot). Once the slot exists in stages.md, add the band row here referencing the new Slot ID.
 
-**Last updated:** 2026-07-07 — Official feed sync: 12 Metal Battle bands UNCONFIRMED→CONFIRMED; summary 185 CONFIRMED / 1 TDB MTB.
+**Last updated:** 2026-07-13 — Welcome to the Jungle (`JUN1`–`JUN14`) from official running order; summary 197 CONFIRMED / 6 TBD / 205 total.
