@@ -250,19 +250,26 @@ describe('buildLineupPlan', () => {
     expect(plan.deletes[0].blocked).toBe(true);
   });
 
-  it('skips HAR13 and JUN slots', () => {
+  it('skips HAR13 but updates JUN like other stages', () => {
     const dbBands = [
       dbRow({ id: 'har', slot_id: 'HAR13', name: 'Ceremony' }),
-      dbRow({ id: 'jun', slot_id: 'JUN1', name: 'Jungle Band' }),
+      dbRow({
+        id: 'jun',
+        slot_id: 'JUN1',
+        name: 'Jungle Band',
+        start_time: officialUnixToIso(1785340800),
+        end_time: officialUnixToIso(1785344400),
+        image_url: 'https://x/1.jpg',
+      }),
     ];
     const officialMap = new Map([
       ['HAR13', { ...official('HAR13', 'Different'), status: 'CEREMONY' as const }],
-      ['JUN1', official('JUN1', 'Other')],
+      ['JUN1', official('JUN1', 'Other Band')],
     ]);
     const plan = buildLineupPlan(dbBands, officialMap, emptyCtx());
-    expect(plan.updates).toHaveLength(0);
+    expect(plan.updates.some((u) => u.slotId === 'JUN1')).toBe(true);
+    expect(plan.updates.some((u) => u.slotId === 'HAR13')).toBe(false);
     expect(plan.deletes).toHaveLength(0);
-    expect(plan.moves).toHaveLength(0);
   });
 });
 

@@ -120,4 +120,58 @@ describe('lineup-official-source', () => {
     expect(next).toContain('csm_speak_in_whispers_26.jpg');
     expect(next).toContain('1 bands CONFIRMED');
   });
+
+  it('maps Welcome To The Jungle stage uid 13 to JUN slot ids', () => {
+    const events = [
+      {
+        start: 1000,
+        end: 2000,
+        title: '',
+        subtitle: '',
+        festivalday: { uid: 34, title: 'Wednesday' },
+        stage: { uid: 13 },
+        artists: [
+          {
+            assets: [
+              {
+                artist: { title: 'Dovydas' },
+                thumbnail: '/fileadmin/_processed_/c/a/csm_dovydas_26_9d5ae0b771.jpg',
+              },
+            ],
+          },
+        ],
+      },
+    ] as Parameters<typeof buildOfficialSlots>[0];
+    const stages = [
+      { uid: 13, title: 'Welcome To The Jungle' },
+      { uid: 21, title: 'LGH Clubstage' },
+    ];
+    const slots = buildOfficialSlots(events, stages);
+    expect(slots.get('JUN1')?.name).toBe('Dovydas');
+    expect(slots.size).toBe(1);
+  });
+
+  it('diffs Jungle wiki rows against official (no skip)', () => {
+    const official = new Map([
+      [
+        'JUN8',
+        {
+          slotId: 'JUN8',
+          name: 'Dovydas',
+          status: 'CONFIRMED' as const,
+          imageUrl: 'https://www.wacken.com/fileadmin/x.jpg',
+          mbRegion: '',
+          start: 1,
+          end: 2,
+        },
+      ],
+    ]);
+    const wiki = parseLineupMarkdown(
+      '| Mambo Kurt | Metal | JUN8 | CONFIRMED | https://www.wacken.com/fileadmin/old.jpg |',
+    );
+    const diff = computeDiff(wiki, official);
+    expect(diff.patches).toHaveLength(1);
+    expect(diff.patches[0].slotId).toBe('JUN8');
+    expect(diff.inSync).toBe(false);
+  });
 });
