@@ -145,7 +145,7 @@ WET1, … WET36
 HBA1, … HBA36
 WAS1, … WAS32
 WAK1, … WAK29
-JUN1, … JUN14
+JUN1, … JUN12
 ```
 
 This matches [`lineup.md`](lineup.md) and `supabase/seed/bands.ts`.
@@ -218,4 +218,4 @@ Counts drift as Wacken confirms bands — update the summary line when syncing.
 
 - _(none)_
 
-**Last updated:** 2026-07-07 — Summary counts after 12 Metal Battle UNCONFIRMED→CONFIRMED promotions; cross-ref [flows/lineup-remote-sync.md](flows/lineup-remote-sync.md) for godlike phone apply.
+**Last updated:** 2026-07-16 — Jungle slot range corrected to JUN1–JUN12 (Wed–Sat chronological count); cross-ref [flows/lineup-remote-sync.md](flows/lineup-remote-sync.md) for godlike phone apply.

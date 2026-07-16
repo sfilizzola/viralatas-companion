@@ -201,7 +201,7 @@ Regras:
 
 ## Idea 5 — Jungle stage go-live
 
-**Status:** `cancelled — superseded` (2026-07-16). The feed-gated go-live approach is retired. Active work: treat Welcome to the Jungle as a normal camping stage — see `docs/superpowers/specs/2026-07-16-jungle-as-normal-stage-design.md`.
+**Status:** `cancelled — superseded` (2026-07-16). The feed-gated go-live approach is retired. Active work: treat Welcome to the Jungle as a normal camping stage — see [`docs/ai-wiki/lineup-official-source.md`](docs/ai-wiki/lineup-official-source.md) (Jungle filter + `JUN1`–`JUN12` slot mapping). Optional local scratch spec: `docs/superpowers/specs/2026-07-16-jungle-as-normal-stage-design.md`.
 
 **Goal (original):** When Jungle appears in wacken.com `events-concert.json`, CLI and godlike remote sync fill confirmed `JUN1`–`JUN8` slots automatically. When Jungle is absent from the feed, the app keeps showing nothing for that stage (current behavior).
 
