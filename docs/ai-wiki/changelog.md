@@ -4,6 +4,11 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-07-16
+
+### Changed
+- **Jungle as normal stage** — Official uid `13` → `JUN`; `lineup:check-official` and godlike remote plan compare/patch Jungle like other camping stages (Wed–Sat only). Wiki/`bands.ts` use chronological **JUN1–JUN12** (Dovydas at JUN8; removed old JUN13/JUN14 and Maschine's Late Night Show). FUTURE_IDEAS Idea 5 cancelled/superseded.
+
 ## 2026-07-13
 
 ### Added
