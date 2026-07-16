@@ -19,10 +19,10 @@ Human page (context only): https://www.wacken.com/de/line-up/running-order-musik
 
 ## Quick filters
 
-- Days: `festivalday.uid` ∈ `{34,35,36,37}` (2026 Wed–Sat)
+- Days: `festivalday.uid` ∈ `{34,35,36,37}` (2026 Wed–Sat) — Sun/Mon/Tue Jungle filtered out
 - **Exclude** `stage.uid === 21` (LGH Clubstage)
-- **Ignore** Welcome to the Jungle (`JUN*` wiki-only until Wacken publishes)
-- `slot_id`: global counter per abbrev (`FAS1`…), sort events by `start`
+- **Include** `stage.uid === 13` → `JUN` (Welcome To The Jungle), same as other camping stages
+- `slot_id`: global counter per abbrev (`FAS1`… / `JUN1`…), sort events by `start`
 
 ## Source priority
 
@@ -35,7 +35,6 @@ Human page (context only): https://www.wacken.com/de/line-up/running-order-musik
 | Slot | Keep in wiki |
 |------|----------------|
 | `HAR13` | `CEREMONY` Farewell & Announcements (official feed may show empty slot) |
-| `JUN1`–`JUN8` | `TBD` until official feed includes Jungle |
 
 ## Workflow
 

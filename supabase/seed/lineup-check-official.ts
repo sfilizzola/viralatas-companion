@@ -143,13 +143,12 @@ async function run(): Promise<number> {
 
   if (!bandsChanged) {
     console.log('');
-    console.log('bands.ts: no seed rows to update for these patches (TBD/JUN slots omitted).');
+    console.log('bands.ts: no seed rows to update for these patches (TBD/orphan slots omitted).');
     return 0;
   }
 
   const bandsPatches = diff.patches.filter(
     (p) =>
-      !p.slotId.startsWith('JUN') &&
       p.slotId !== 'HAR13' &&
       bandsContent.includes(`slot_id: '${p.slotId}'`),
   );
