@@ -68,7 +68,7 @@ npm run seed:bands:sync -- --apply               # 5. apply to prod (picks prese
 
 **Exit codes** (`lineup:check-official`): `0` = in sync (or apply succeeded / user cancelled after diff); `1` = diffs found (check mode only); `2` = fetch or runtime error.
 
-**Script policy** (baked in): wacken.com JSON authoritative; `HAR13` stays `CEREMONY`; `JUN1`–`JUN8` wiki-only (not compared); image URL patches only on newly confirmed slots or name/status change — not thumbnail vs poster drift.
+**Script policy** (baked in): wacken.com JSON authoritative; `HAR13` stays `CEREMONY`; image URL patches only on newly confirmed slots or name/status change — not thumbnail vs poster drift.
 
 ## When to Run
 
@@ -85,7 +85,7 @@ Requires `.env.local` with `VITE_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (
 |---------|------|--------|
 | `lineup:check-official` | (none) | Fetch wacken.com JSON, diff vs `lineup.md`, print report — no writes; exit `1` if diffs |
 | `lineup:check-official` | `--lineup` | Diff + preview patches + y/N confirm → write `lineup.md` |
-| `lineup:check-official` | `--complete` | `--lineup` flow, then second confirm → patch `bands.ts` (`name`/`image_url` per `slot_id`; skips `HAR13`, `JUN*`, dropped TBD rows) |
+| `lineup:check-official` | `--complete` | `--lineup` flow, then second confirm → patch `bands.ts` (`name`/`image_url` per `slot_id`; skips `HAR13`, dropped TBD rows) |
 | `seed:bands:sync` | (none) | Dry-run — prints plan, writes nothing |
 | `seed:bands:sync` | `--apply` | Execute plan; bump `cache_version` |
 | `seed:bands:sync` | `--json` | Machine-readable plan (combinable with `--apply`) |

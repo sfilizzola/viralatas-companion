@@ -36,7 +36,7 @@ Let the godlike operator preview and apply Wacken's official running order again
 
 **Offline:** Check/apply disabled when `!navigator.onLine`.
 
-**CLI parity:** Plan builder shares `lineup-official-source.ts` with `lineup:check-official` — `namesEquivalent` for band names; `Name=TBD` official slots are not INSERTed (wiki/seed omit them; see `isDroppedTbdOfficialSlot`). When CLI dry-runs are empty, godlike preview should report in sync unless a real MOVE/DELETE is pending.
+**CLI parity:** Plan builder shares `lineup-official-source.ts` with `lineup:check-official` — `namesEquivalent` for band names; `Name=TBD` official slots are not INSERTed (wiki/seed omit them; see `isDroppedTbdOfficialSlot`). Jungle is **not** policy-skipped (only `HAR13`). When CLI dry-runs are empty, godlike preview should report in sync unless a real MOVE/DELETE is pending.
 
 ## Safety rails
 

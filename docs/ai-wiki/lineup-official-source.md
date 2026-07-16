@@ -86,8 +86,7 @@ Always shows exact slot changes before prompting. Cancelling a confirm writes no
 
 - **Authority:** wacken.com `events-concert.json` + `stages.json` (see filter rules above).
 - **`HAR13`:** never patched from official feed — wiki keeps `CEREMONY` / Farewell & Announcements.
-- **`JUN1`–`JUN8`:** excluded from comparison and `bands.ts` patches (wiki-only until Wacken publishes Jungle).
-- **`bands.ts`:** updates `name` and `image_url` only for slots with seed rows; skips ceremony, Jungle, and orphan TBD rows with no matching seed entry.
+- **`bands.ts`:** updates `name`/`image_url` for slots with seed rows; skips ceremony and orphan TBD rows with no seed entry.
 - **Images:** patch `image_url` only when a slot becomes newly confirmed (`PLACEHOLDER` → URL) or when **name/status** changes — ignore thumbnail vs poster path drift on already-confirmed bands.
 
 ### End-to-end workflow
@@ -130,8 +129,9 @@ From `stages.json` (2026 music feed):
 | `8` | W:E:T Stage | YES → `WET` |
 | `10` | Wackinger Stage | YES → `WAK` |
 | `11` | Wasteland Stage | YES → `WAS` |
+| `13` | Welcome To The Jungle | YES → `JUN` |
 
-**Welcome to the Jungle** is not in the official feed. Wiki `JUN1`–`JUN8` placeholders stay until Wacken publishes them.
+Jungle is compared like other camping stages. Wed–Sat only via day UIDs `34`–`37`; Sun/Mon/Tue Jungle events are filtered out.
 
 ### `slot_id` assignment
 
@@ -145,6 +145,7 @@ WET1, … WET36
 HBA1, … HBA36
 WAS1, … WAS32
 WAK1, … WAK29
+JUN1, … JUN14
 ```
 
 This matches [`lineup.md`](lineup.md) and `supabase/seed/bands.ts`.
@@ -176,9 +177,8 @@ These may **differ** from wacken.com by deliberate repo policy. Do not “fix”
 | `slot_id` | Wiki policy | Reason |
 |-----------|-------------|--------|
 | `HAR13` | `CEREMONY` — Farewell & Announcements | Official feed shows empty slot between Arch Enemy and Sabaton; keep ceremony placeholder until wacken names it |
-| `JUN1`–`JUN8` | `TBD` | Jungle stage not published in running order yet |
 
-All other camping slots should match the filtered official feed.
+All other camping slots (including Jungle `JUN*`) should match the filtered official feed.
 
 ---
 

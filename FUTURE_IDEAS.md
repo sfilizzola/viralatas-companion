@@ -6,7 +6,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 >
 > **Status values:** `pending` · `partial — Phase N` (engine/data only) · `✅ Phase N` (shipped — spec collapsed; see `docs/ai-wiki/phases-history.md`)
 >
-> **Last synced:** 2026-07-07 — Jungle go-live plan parked (Idea 5); not scheduled for implementation.
+> **Last synced:** 2026-07-16 — Idea 5 cancelled; superseded by Jungle-as-normal-stage work.
 
 ## Ideas at a glance
 
@@ -16,7 +16,7 @@ Ideas and features that would enhance the app but are not yet scheduled for impl
 | 2 | Rating on My Wacken | Low | Low — no new schema; reuse `userRatingByBand` + read-only chip on ended rows | pending (data ✅ Phase 32) |
 | 3 | Rating-based badges | Medium | Low — additive registry entries; no further schema change | partial — Phase 34 |
 | 4 | Avatar Peek Sheet | Medium | Low — bottom sheet + CTA; re-uses existing presence/pick data | pending |
-| 5 | Jungle stage go-live | Medium | Low — feed-gated sync; no schema change; picks preserved on UPDATE | pending — spec + plan ready |
+| 5 | Jungle stage go-live | Medium | Low — feed-gated sync; no schema change; picks preserved on UPDATE | cancelled — superseded |
 
 ---
 
@@ -201,9 +201,9 @@ Regras:
 
 ## Idea 5 — Jungle stage go-live
 
-**Status:** `pending` — design approved 2026-07-07; **not scheduled for implementation**. Spec and implementation plan written; execute when Wacken publishes Welcome to the Jungle in the official running order (or proactively before festival if desired).
+**Status:** `cancelled — superseded` (2026-07-16). The feed-gated go-live approach is retired. Active work: treat Welcome to the Jungle as a normal camping stage — see `docs/superpowers/specs/2026-07-16-jungle-as-normal-stage-design.md`.
 
-**Goal:** When Jungle appears in wacken.com `events-concert.json`, CLI and godlike remote sync fill confirmed `JUN1`–`JUN8` slots automatically. When Jungle is absent from the feed, the app keeps showing nothing for that stage (current behavior).
+**Goal (original):** When Jungle appears in wacken.com `events-concert.json`, CLI and godlike remote sync fill confirmed `JUN1`–`JUN8` slots automatically. When Jungle is absent from the feed, the app keeps showing nothing for that stage (current behavior).
 
 **Complexity:** Medium · **Risk:** Low — no DB schema change; reuses `lineup-official-source.ts` + `lineup-remote-plan.ts`; INSERT only for confirmed band names; UPDATE preserves picks.
 
