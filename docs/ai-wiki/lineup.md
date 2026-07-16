@@ -13,7 +13,7 @@
 >
 > **Official source details:** [lineup-official-source.md](lineup-official-source.md) (JSON endpoints, filter rules, exit codes).
 
-**Summary:** 197 bands CONFIRMED · 1 `TDB MTB` Metal Battle placeholders · 0 named TDB · 6 TBD (Name=TBD) · 205 total · 1 ceremony (Farewell & Announcements, HAR13)
+**Summary:** 197 bands CONFIRMED · 1 `TDB MTB` Metal Battle placeholders · 0 named TDB · 4 TBD (Name=TBD) · 203 total · 1 ceremony (Farewell & Announcements, HAR13)
 
 **Genres:** 13 canonical labels after Phase 25 collapse — **[old → new mapping table](genre-collapse-mapping.md)** · [domain-model](domain-model.md#band) · [ADR](decisions/genre-collapse-canonical-labels.md). Unknown/TBD tags in this file seed as `Metal`.
 
@@ -69,7 +69,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 > **Note:** Harder stage is closed on Day 1. Faster starts at 16:00 (Doors: 15:30). Louder, W.E.T., Headbangers, Wasteland, Wackinger, and Welcome to the Jungle stages open from 10:30 / 11:00.
 >
-> **Source:** Band placements below mirror the official Wacken 2026 running order (https://www.wacken.com/de/line-up/running-order-musik/) as of 2026-07-13. **wacken.com is authoritative** for `CONFIRMED` rows. Welcome to the Jungle (`JUN1`–`JUN14`) added from official feed 2026-07-13; `JUN9` and `JUN10` remain `TBD`.
+> **Source:** Band placements below mirror the official Wacken 2026 running order (https://www.wacken.com/de/line-up/running-order-musik/) as of 2026-07-16. **wacken.com is authoritative** for `CONFIRMED` rows. Welcome to the Jungle uses official chronological `JUN1`–`JUN12` (Wed–Sat).
 
 ### Harder Stage
 
@@ -353,11 +353,9 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| Mambo Kurt | Metal | JUN8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg |
-| TBD | Metal | JUN9 | TBD | PLACEHOLDER |
-| TBD | Metal | JUN10 | TBD | PLACEHOLDER |
-| Alien Rockin Explosion | Hard Rock | JUN11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg |
-| Maschine's Late Night Show | Metal | JUN12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/9/0/csm_late_night_show_2019_535ef1d94c.jpg |
+| Dovydas | Metal | JUN8 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/a/csm_dovydas_26_9d5ae0b771.jpg |
+| Mambo Kurt | Metal | JUN9 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg |
+| Alien Rockin Explosion | Hard Rock | JUN10 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg |
 
 ---
 
@@ -452,8 +450,8 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| Mambo Kurt | Metal | JUN13 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg |
-| Alien Rockin Explosion | Hard Rock | JUN14 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg |
+| Mambo Kurt | Metal | JUN11 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg |
+| Alien Rockin Explosion | Hard Rock | JUN12 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg |
 
 ---
 
@@ -588,4 +586,4 @@ See [stages.md — How to Confirm a Slot's Official Time](stages.md#how-to-confi
 
 See [stages.md — How to Add a New Slot](stages.md#how-to-add-a-new-slot). Once the slot exists in stages.md, add the band row here referencing the new Slot ID.
 
-**Last updated:** 2026-07-13 — Welcome to the Jungle (`JUN1`–`JUN14`) from official running order; summary 197 CONFIRMED / 6 TBD / 205 total.
+**Last updated:** 2026-07-16 — Welcome to the Jungle (`JUN1`–`JUN12`) from official running order; summary 197 CONFIRMED / 4 TBD / 203 total.
