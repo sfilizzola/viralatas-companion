@@ -13,8 +13,8 @@
  *   - Slot start/end times:                    docs/ai-wiki/stages.md
  *
  * Rules applied when generating this file:
- *   - Slots whose `Name` is `TBD` in lineup.md are NOT seeded (6 dropped:
- *     JUN9, JUN10, LOU21, WET30, WAS24, WAS32).
+ *   - Slots whose `Name` is `TBD` in lineup.md are NOT seeded (4 dropped:
+ *     LOU21, WET30, WAS24, WAS32).
  *   - Slots whose `Band Status` is `TDB MTB` ARE seeded with the literal name
  *     `TDB MTB` (`MTB` constant), genre from lineup.md, and `image_url =
  *     PLACEHOLDER`.
@@ -140,7 +140,6 @@ export type BandSeed = {
 // Each row's slot_id matches the Slot ID in stages.md / lineup.md.
 // Stage order within each day (per lineup.md):
 //   Harder · Faster · Louder · W.E.T. · Headbangers · Wasteland · Wackinger · Jungle
-// JUN9, JUN10 omitted — Name = TBD in lineup.md.
 // ---------------------------------------------------------------------------
 
 export const bands: BandSeed[] = [
@@ -353,10 +352,9 @@ export const bands: BandSeed[] = [
   { slot_id: 'WAK22', name: 'Faun',            stage: STAGES.WACKINGER, start_time: t(D3,22,15), end_time: t(D3,23,15), genre: 'Folk Metal',                image_url: `${WOA}/fileadmin/_processed_/2/4/csm_Faun2-WOA26_dec165b202.jpg` },                 
 
   // WELCOME TO THE JUNGLE — Day 3
-  { slot_id: 'JUN8', name: 'Mambo Kurt',             stage: STAGES.JUNGLE, start_time: t(D3,17,30), end_time: t(D3,18,30), genre: TBD_GENRE,  image_url: `${WOA}/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg` },
-  // JUN9, JUN10 — dropped (Name = TBD in lineup.md)
-  { slot_id: 'JUN11', name: 'Alien Rockin Explosion', stage: STAGES.JUNGLE, start_time: t(D3,21, 0), end_time: t(D3,21,30), genre: 'Hard Rock', image_url: `${WOA}/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg` },
-  { slot_id: 'JUN12', name: "Maschine's Late Night Show", stage: STAGES.JUNGLE, start_time: t(D3,21,31), end_time: t(D3,23, 0), genre: TBD_GENRE, image_url: `${WOA}/fileadmin/_processed_/9/0/csm_late_night_show_2019_535ef1d94c.jpg` },
+  { slot_id: 'JUN8', name: 'Dovydas', stage: STAGES.JUNGLE, start_time: t(D3,18,45), end_time: t(D3,19,45), genre: TBD_GENRE, image_url: `${WOA}/fileadmin/_processed_/c/a/csm_dovydas_26_9d5ae0b771.jpg` },
+  { slot_id: 'JUN9', name: 'Mambo Kurt', stage: STAGES.JUNGLE, start_time: t(D3,20, 0), end_time: t(D3,20,45), genre: TBD_GENRE, image_url: `${WOA}/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg` },
+  { slot_id: 'JUN10', name: 'Alien Rockin Explosion', stage: STAGES.JUNGLE, start_time: t(D3,21, 0), end_time: t(D3,21,30), genre: 'Hard Rock', image_url: `${WOA}/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg` },
 
   // ═══════════════════════════════════════════════════════
   // DAY 4 — Saturday 1 August
@@ -438,8 +436,8 @@ export const bands: BandSeed[] = [
   { slot_id: 'WAK29', name: 'Einherjer',              stage: STAGES.WACKINGER, start_time: t(D4,22,15), end_time: t(D4,23,15), genre: 'Black Metal',    image_url: `${WOA}/fileadmin/_processed_/c/2/csm_Einherjer-WOA26_9393fba15b.jpg` },          
 
   // WELCOME TO THE JUNGLE — Day 4
-  { slot_id: 'JUN13', name: 'Mambo Kurt',             stage: STAGES.JUNGLE, start_time: t(D4,18, 0), end_time: t(D4,19, 0), genre: TBD_GENRE,  image_url: `${WOA}/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg` },
-  { slot_id: 'JUN14', name: 'Alien Rockin Explosion', stage: STAGES.JUNGLE, start_time: t(D4,21, 0), end_time: t(D4,21,30), genre: 'Hard Rock', image_url: `${WOA}/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg` },
+  { slot_id: 'JUN11', name: 'Mambo Kurt', stage: STAGES.JUNGLE, start_time: t(D4,18, 0), end_time: t(D4,19, 0), genre: TBD_GENRE, image_url: `${WOA}/fileadmin/_processed_/b/0/csm_mambo_kurt_2019_c044b9331f.jpg` },
+  { slot_id: 'JUN12', name: 'Alien Rockin Explosion', stage: STAGES.JUNGLE, start_time: t(D4,21, 0), end_time: t(D4,21,30), genre: 'Hard Rock', image_url: `${WOA}/fileadmin/_processed_/a/b/csm_alien_rockin_explosion_2019_41b138b937.jpg` },
 ];
 
 
