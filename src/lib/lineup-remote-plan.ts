@@ -8,7 +8,6 @@ import {
   OVERRIDE_SLOT_IDS,
   imagesEquivalent,
   isDroppedTbdOfficialSlot,
-  isJungleSlot,
   namesEquivalent,
 } from './lineup-official-source.ts';
 
@@ -227,7 +226,7 @@ function diffDbFields(
 }
 
 function isPolicySkippedSlot(slotId: string): boolean {
-  return OVERRIDE_SLOT_IDS.has(slotId) || isJungleSlot(slotId);
+  return OVERRIDE_SLOT_IDS.has(slotId);
 }
 
 function pickCount(ctx: LineupPlanContext, bandId: string): number {

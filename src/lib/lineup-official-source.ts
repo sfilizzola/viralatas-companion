@@ -18,15 +18,11 @@ export const STAGE_UID_TO_ABBREV: Record<number, string> = {
   8: 'WET',
   10: 'WAK',
   11: 'WAS',
+  13: 'JUN',
 };
 
 /** Slots kept as wiki/seed policy — never auto-patched from official feed. */
 export const OVERRIDE_SLOT_IDS = new Set(['HAR13']);
-
-/** Wiki-only until Wacken publishes Jungle in the feed. */
-export function isJungleSlot(slotId: string): boolean {
-  return slotId.startsWith('JUN');
-}
 
 /** Name=TBD slots live in lineup.md only; bands.ts / seed:bands:sync omit them. */
 export function isDroppedTbdOfficialSlot(
@@ -68,7 +64,6 @@ export type SlotPatch = {
 export type DiffResult = {
   patches: SlotPatch[];
   skippedOverrides: Array<{ slotId: string; note: string }>;
-  skippedJungle: string[];
   inSync: boolean;
 };
 
@@ -264,7 +259,6 @@ export function targetWikiSlot(
   official: OfficialSlot | undefined,
 ): WikiSlot | null {
   if (OVERRIDE_SLOT_IDS.has(wiki.slotId)) return null;
-  if (isJungleSlot(wiki.slotId)) return null;
   if (!official) return null;
 
   return {
@@ -282,7 +276,6 @@ export function computeDiff(
 ): DiffResult {
   const patches: SlotPatch[] = [];
   const skippedOverrides: DiffResult['skippedOverrides'] = [];
-  const skippedJungle: string[] = [];
 
   for (const wiki of wikiRows) {
     if (OVERRIDE_SLOT_IDS.has(wiki.slotId)) {
@@ -293,11 +286,6 @@ export function computeDiff(
           note: `wiki keeps ${wiki.status} "${wiki.name}" (official: ${off.status} "${off.name}")`,
         });
       }
-      continue;
-    }
-
-    if (isJungleSlot(wiki.slotId)) {
-      skippedJungle.push(wiki.slotId);
       continue;
     }
 
@@ -333,7 +321,6 @@ export function computeDiff(
   return {
     patches,
     skippedOverrides,
-    skippedJungle,
     inSync: patches.length === 0,
   };
 }
@@ -404,7 +391,6 @@ export function patchBandsTsContent(
 
   for (const patch of patches) {
     if (OVERRIDE_SLOT_IDS.has(patch.slotId)) continue;
-    if (isJungleSlot(patch.slotId)) continue;
 
     const slotMarker = `slot_id: '${patch.slotId}'`;
     const lineIndex = next.split('\n').findIndex((line) => line.includes(slotMarker));
@@ -466,13 +452,6 @@ export function formatDiffReport(
     for (const o of diff.skippedOverrides) {
       lines.push(`  ${o.slotId}: ${o.note}`);
     }
-  }
-
-  if (diff.skippedJungle.length > 0) {
-    lines.push(
-      '',
-      `Jungle placeholders not compared: ${diff.skippedJungle.join(', ')}`,
-    );
   }
 
   return lines.join('\n');
