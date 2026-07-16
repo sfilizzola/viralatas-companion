@@ -103,7 +103,7 @@ Each slot has a unique ID combining stage abbreviation + sequential number, **gl
 | HBA | HBA1 – HBA36 |
 | WAS | WAS1 – WAS32 |
 | WAK | WAK1 – WAK29 |
-| JUN | JUN1 – JUN14 |
+| JUN | JUN1 – JUN12 |
 
 ---
 
@@ -512,7 +512,7 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 
 ### WELCOME TO THE JUNGLE
 
-> **Source:** Slot times mirror the official Wacken 2026 running order (https://www.wacken.com/de/line-up/running-order-musik/) as of 2026-07-13. Slot IDs follow the global chronological counter (JUN1 = first Jungle slot on Day 1).
+> **Source:** Slot times mirror the official Wacken 2026 running order (https://www.wacken.com/de/line-up/running-order-musik/) as of 2026-07-16. Slot IDs follow the global chronological counter (JUN1 = first Jungle slot on Day 1).
 
 #### Day 1 (Wednesday)
 
@@ -535,18 +535,16 @@ The `supabase/seed/bands.ts` script maps this file's slot grid to band records:
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| JUN8 | 17:30 | 18:30 | YES |
-| JUN9 | 18:45 | 19:45 | YES |
-| JUN10 | 20:00 | 20:45 | YES |
-| JUN11 | 21:00 | 21:30 | YES |
-| JUN12 | 21:31 | 23:00 | YES |
+| JUN8 | 18:45 | 19:45 | YES |
+| JUN9 | 20:00 | 20:45 | YES |
+| JUN10 | 21:00 | 21:30 | YES |
 
 #### Day 4 (Saturday)
 
 | Slot ID | Start | End | Confirmed |
 |---------|-------|-----|-----------|
-| JUN13 | 18:00 | 19:00 | YES |
-| JUN14 | 21:00 | 21:30 | YES |
+| JUN11 | 18:00 | 19:00 | YES |
+| JUN12 | 21:00 | 21:30 | YES |
 
 ---
 
@@ -572,4 +570,4 @@ When a new band is announced that doesn't fit an existing slot:
 
 ---
 
-**Last updated:** 2026-07-13 — Welcome to the Jungle stage schedules synced from official running order (JUN1–JUN14; all slots Confirmed = YES).
+**Last updated:** 2026-07-16 — Welcome to the Jungle stage schedules synced from official running order (JUN1–JUN12; all slots Confirmed = YES).
