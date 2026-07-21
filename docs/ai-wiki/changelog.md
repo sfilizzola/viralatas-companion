@@ -4,6 +4,11 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-07-21
+
+### Added
+- Badge `metal-yoga-survivor`: godlike-assigned Festival 2026 honor for surviving Metal Yoga (warrior pose without breaking your spine).
+
 ## 2026-07-16
 
 ### Changed

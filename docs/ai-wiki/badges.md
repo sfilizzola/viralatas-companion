@@ -672,7 +672,7 @@ Strict `(ratedSeen × 100) / seenCount >= pct`; **false** when `seenCount === 0`
 
 ---
 
-## Current Badges Inventory (75 Total)
+## Current Badges Inventory (76 Total)
 
 ### Profile & Social (7)
 - `puppy` — First Wacken (2026 only)
@@ -759,7 +759,7 @@ After Phase 25, every band carries one of **13 canonical genre labels**. Eleven 
 
 Pre-collapse subgenre strings (Goregrind, Humppa, Horror Punk, Melodic Death Metal, …) were merged into these buckets and **no longer appear** on `Band.genre`. See `src/services/genreGuide.ts` for the full old→new map.
 
-### Merit / Assigned (17)
+### Merit / Assigned (19)
 - `mosh-pit` — Hit the floor, came back (godlike-assigned)
 - `crowdsurfer` — Flew over the crowd (godlike-assigned)
 - `girl-power` — Metal queen (godlike-assigned)
@@ -778,6 +778,7 @@ Pre-collapse subgenre strings (Goregrind, Humppa, Horror Punk, Melodic Death Met
 - `tactical-nap` — "Tactical Nap". Fell asleep mid-pit, mid-set, or mid-conversation — strategic withdrawal (godlike-assigned).
 - `patient-zero` — "Paciente Zero" / "Patient Zero". One minute dancing, next minute pupil check — time is a flat circle (godlike-assigned).
 - `alemao-mode` — "Alemão Mode". One song, one announcement, one trembling lip — Alemão would be proud (godlike-assigned).
+- `metal-yoga-survivor` — "Sobrevivente do Metal Yoga" / "Metal Yoga Survivor". Held warrior pose without snapping your spine. Namaste, you vira-lata (godlike-assigned).
 
 ### Location Presence (6)
 - `metal-place-2026` — Visited Metal Place (persist: true)

@@ -605,6 +605,14 @@ export const BADGES: BadgeConfig[] = [
     year: 2026,
   },
   {
+    slug: 'metal-yoga-survivor',
+    imagePath: '/badges/badge_metal-yoga-survivor.png',
+    labelKey: 'badgeMetalYogaSurvivor',
+    descriptionKey: 'badgeMetalYogaSurvivorDescription',
+    condition: { type: 'assigned' },
+    year: 2026,
+  },
+  {
     slug: 'zine-pup',
     imagePath: '/badges/badge_zine-pup.png',
     labelKey: 'badgeZinePup',
