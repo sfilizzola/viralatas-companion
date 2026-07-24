@@ -13,7 +13,7 @@
 >
 > **Official source details:** [lineup-official-source.md](lineup-official-source.md) (JSON endpoints, filter rules, exit codes).
 
-**Summary:** 197 bands CONFIRMED · 1 `TDB MTB` Metal Battle placeholders · 0 named TDB · 4 TBD (Name=TBD) · 203 total · 1 ceremony (Farewell & Announcements, HAR13)
+**Summary:** 200 bands CONFIRMED · 1 `TDB MTB` Metal Battle placeholders · 0 named TDB · 1 TBD (Name=TBD) · 203 total · 1 ceremony (Farewell & Announcements, HAR13)
 
 **Genres:** 13 canonical labels after Phase 25 collapse — **[old → new mapping table](genre-collapse-mapping.md)** · [domain-model](domain-model.md#band) · [ADR](decisions/genre-collapse-canonical-labels.md). Unknown/TBD tags in this file seed as `Metal`.
 
@@ -69,7 +69,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 > **Note:** Harder stage is closed on Day 1. Faster starts at 16:00 (Doors: 15:30). Louder, W.E.T., Headbangers, Wasteland, Wackinger, and Welcome to the Jungle stages open from 10:30 / 11:00.
 >
-> **Source:** Band placements below mirror the official Wacken 2026 running order (https://www.wacken.com/de/line-up/running-order-musik/) as of 2026-07-16. **wacken.com is authoritative** for `CONFIRMED` rows. Welcome to the Jungle uses official chronological `JUN1`–`JUN12` (Wed–Sat).
+> **Source:** Band placements below mirror the official Wacken 2026 running order (https://www.wacken.com/de/line-up/running-order-musik/) as of 2026-07-24. **wacken.com is authoritative** for `CONFIRMED` rows. Welcome to the Jungle uses official chronological `JUN1`–`JUN12` (Wed–Sat).
 
 ### Harder Stage
 
@@ -155,7 +155,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 ### Welcome to the Jungle Stage
 
-> **Source:** Official running order as of 2026-07-13. Slot times → [stages.md](stages.md#welcome-to-the-jungle).
+> **Source:** Official running order as of 2026-07-24. Slot times → [stages.md](stages.md#welcome-to-the-jungle).
 
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
@@ -168,7 +168,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 ## Day 2 — Thursday, 30 July 2026
 
-> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-13. All 8 stages open on Day 2.
+> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-24. All 8 stages open on Day 2.
 
 ### Harder Stage
 
@@ -264,7 +264,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 ## Day 3 — Friday, 31 July 2026
 
-> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-13.
+> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-24.
 
 ### Harder Stage
 
@@ -361,7 +361,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 ## Day 4 — Saturday, 1 August 2026
 
-> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-13. Note: the Farewell & Announcements ceremony moved from Faster (FAS17 previously) to Harder (HAR13). Sabaton headlines Harder, not Faster. The wacken.com running-order feed shows an empty slot at `HAR13`; we keep **Farewell & Announcements** as a `CEREMONY` placeholder until wacken.com names it.
+> **Source:** Band placements below mirror the official Wacken 2026 running order as of 2026-07-24. Note: the Farewell & Announcements ceremony moved from Faster (FAS17 previously) to Harder (HAR13). Sabaton headlines Harder, not Faster. The wacken.com running-order feed shows an empty slot at `HAR13`; we keep **Farewell & Announcements** as a `CEREMONY` placeholder until wacken.com names it.
 
 ### Faster Stage
 
@@ -388,7 +388,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| TBD | Metal | LOU21 | TBD | PLACEHOLDER |
+| Adrian Pauls Rockin' Roncalli Show | Metal | LOU21 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/7/f/csm_APOLLO_Manhattan_Madness_Adrian_und_Uliana_jpg_83e3cef04d.jpg |
 | Kittie | Heavy Metal | LOU22 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/6/csm_kittie_26_31697daab6.jpg |
 | Thrown | Doom Metal | LOU23 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/9/csm_Thrown-WOA26_f70cc40622.jpg |
 | Bleed from Within | Metalcore | LOU24 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/6/csm_bleed_from_within_26_c38f26c402.jpg |
@@ -400,7 +400,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| TBD | Metal | WET30 | TBD | PLACEHOLDER |
+| Torsten Sträter | Metal | WET30 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/d/6/csm_torsten_straeter_2023_fd12ba1d88.jpg |
 | Blood Command | Punk | WET31 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/e/8/csm_Blood_Command-WOA26_f82b942e22.jpg |
 | Our Promise | Metal | WET32 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/0/csm_our_promise_26_661c3c384d.jpg |
 | Hardline | Hard Rock | WET33 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/5/csm_hardline_26_73180980cd.jpg |
@@ -436,7 +436,7 @@ Each slot has a unique ID (e.g. `FAS1`, `HAR7`). Use it to look up the **time** 
 
 | Name | Genre | Slot | Band Status | Image URL |
 | ------ | ------ | ------ | ------------- | ----------- |
-| TBD | Metal | WAS24 | TBD | PLACEHOLDER |
+| Doc Burner | Metal | WAS24 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/6/0/csm_doc_burner_26_95c315e296.jpg |
 | Stonem | Metal | WAS25 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/4/9/csm_stonem_26_e1ff4b71dd.jpg |
 | Asrock | Metal | WAS26 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/c/a/csm_asrock_26_85c4a23518.jpg |
 | Allt | Black Metal | WAS27 | CONFIRMED | https://www.wacken.com/fileadmin/_processed_/a/f/csm_Allt-WOA26_20072966da.jpg |

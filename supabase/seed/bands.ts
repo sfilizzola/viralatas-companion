@@ -13,8 +13,7 @@
  *   - Slot start/end times:                    docs/ai-wiki/stages.md
  *
  * Rules applied when generating this file:
- *   - Slots whose `Name` is `TBD` in lineup.md are NOT seeded (4 dropped:
- *     LOU21, WET30, WAS24, WAS32).
+ *   - Slots whose `Name` is `TBD` in lineup.md are NOT seeded (1 dropped: WAS32).
  *   - Slots whose `Band Status` is `TDB MTB` ARE seeded with the literal name
  *     `TDB MTB` (`MTB` constant), genre from lineup.md, and `image_url =
  *     PLACEHOLDER`.
@@ -26,8 +25,9 @@
  *   - Bands with `Genre: TBD` use the fallback genre `"Metal"`.
  *   - Each slot's start_time / end_time comes from stages.md (Slot ID → time).
  *
- * Expected row count after seed: **199** (each row declares `slot_id` explicitly)
- *   = 185 CONFIRMED + 12 Jungle CONFIRMED + 1 TDB MTB + 0 named TDB + 1 ceremony (HAR13 Farewell & Announcements).
+ * Expected row count after seed: **202** (each row declares `slot_id` explicitly)
+ *   = 200 CONFIRMED + 1 TDB MTB + 1 ceremony (HAR13 Farewell & Announcements).
+ *   (lineup.md total 203 − 1 Name=TBD WAS32 = 202 seeded)
  *
  * For small lineup edits (name, time, genre, image), use `npm run seed:bands:sync`
  * instead — it preserves user picks. This script is for festival reset only.
@@ -121,7 +121,7 @@ const TBD_GENRE = 'Metal';
 // announced for one of these slots, edit both lineup.md and this file.
 const MTB = 'TDB MTB';
 
-export const EXPECTED_BAND_COUNT = 199;
+export const EXPECTED_BAND_COUNT = 202;
 export const SLOT_ID_RE = /^(HAR|FAS|LOU|WET|HBA|WAS|WAK|JUN)\d+$/;
 
 export type BandSeed = {
@@ -136,7 +136,7 @@ export type BandSeed = {
 };
 
 // ---------------------------------------------------------------------------
-// Band data — 199 entries total (mirrors lineup.md exactly)
+// Band data — 202 entries total (mirrors lineup.md exactly)
 // Each row's slot_id matches the Slot ID in stages.md / lineup.md.
 // Stage order within each day (per lineup.md):
 //   Harder · Faster · Louder · W.E.T. · Headbangers · Wasteland · Wackinger · Jungle
@@ -389,7 +389,7 @@ export const bands: BandSeed[] = [
   { slot_id: 'FAS17', name: 'Alestorm',    stage: STAGES.FASTER, start_time: t(D4n, 1, 0), end_time: t(D4n, 2, 0), genre: 'Party Metal',        image_url: `${WOA}/fileadmin/_processed_/6/d/csm_alestorm_26_9ddf45fa2e.jpg` },     
 
   // LOUDER STAGE — Day 4
-  // LOU21 — dropped (Name = TBD in lineup.md)
+  { slot_id: 'LOU21', name: "Adrian Pauls Rockin' Roncalli Show", stage: STAGES.LOUDER, start_time: t(D4,12, 0), end_time: t(D4,13, 0),  genre: 'Metal',               image_url: `${WOA}/fileadmin/_processed_/7/f/csm_APOLLO_Manhattan_Madness_Adrian_und_Uliana_jpg_83e3cef04d.jpg` },
   { slot_id: 'LOU22', name: 'Kittie',             stage: STAGES.LOUDER, start_time: t(D4,13,45), end_time: t(D4,14,45),  genre: 'Heavy Metal',         image_url: `${WOA}/fileadmin/_processed_/d/6/csm_kittie_26_31697daab6.jpg` },              
   { slot_id: 'LOU23', name: 'Thrown',             stage: STAGES.LOUDER, start_time: t(D4,15,30), end_time: t(D4,16,30),  genre: 'Doom Metal',          image_url: `${WOA}/fileadmin/_processed_/4/9/csm_Thrown-WOA26_f70cc40622.jpg` },           
   { slot_id: 'LOU24', name: 'Bleed from Within',  stage: STAGES.LOUDER, start_time: t(D4,17,15), end_time: t(D4,18,15),  genre: 'Metalcore',           image_url: `${WOA}/fileadmin/_processed_/c/6/csm_bleed_from_within_26_c38f26c402.jpg` },  
@@ -398,7 +398,7 @@ export const bands: BandSeed[] = [
   { slot_id: 'LOU27', name: 'Triptykon',          stage: STAGES.LOUDER, start_time: t(D4,22,45), end_time: t(D4n, 0, 0), genre: 'Black Metal',  image_url: `${WOA}/fileadmin/_processed_/3/c/csm_Triptykon-WOA26_0599ad9698.jpg` },         
 
   // W.E.T. STAGE — Day 4
-  // WET30 — dropped (Name = TBD in lineup.md)
+  { slot_id: 'WET30', name: 'Torsten Sträter',        stage: STAGES.WET, start_time: t(D4,11, 0), end_time: t(D4,11,55),  genre: 'Metal',            image_url: `${WOA}/fileadmin/_processed_/d/6/csm_torsten_straeter_2023_fd12ba1d88.jpg` },
   { slot_id: 'WET31', name: 'Blood Command',          stage: STAGES.WET, start_time: t(D4,13, 0), end_time: t(D4,13,45),  genre: 'Punk',       image_url: `${WOA}/fileadmin/_processed_/e/8/csm_Blood_Command-WOA26_f82b942e22.jpg` },      
   { slot_id: 'WET32', name: 'Our Promise',            stage: STAGES.WET, start_time: t(D4,15, 0), end_time: t(D4,15,45),  genre: 'Metal',            image_url: `${WOA}/fileadmin/_processed_/a/0/csm_our_promise_26_661c3c384d.jpg` },             
   { slot_id: 'WET33', name: 'Hardline',               stage: STAGES.WET, start_time: t(D4,17, 0), end_time: t(D4,17,45),  genre: 'Hard Rock',  image_url: `${WOA}/fileadmin/_processed_/c/5/csm_hardline_26_73180980cd.jpg` },                
@@ -416,7 +416,7 @@ export const bands: BandSeed[] = [
   { slot_id: 'HBA36', name: 'The Limit',        stage: STAGES.HEADBANGERS, start_time: t(D4n, 1, 0), end_time: t(D4n, 2, 0), genre: TBD_GENRE,          image_url: `${WOA}/fileadmin/_processed_/b/6/csm_the_limit_26_954965f6df.jpg` },          
 
   // WASTELAND STAGE — Day 4
-  // WAS24 — dropped (Name = TBD in lineup.md)
+  { slot_id: 'WAS24', name: 'Doc Burner', stage: STAGES.WASTELAND, start_time: t(D4,14, 0), end_time: t(D4,14,30),  genre: 'Metal',        image_url: `${WOA}/fileadmin/_processed_/6/0/csm_doc_burner_26_95c315e296.jpg` },
   { slot_id: 'WAS25', name: 'Stonem',     stage: STAGES.WASTELAND, start_time: t(D4,15, 0), end_time: t(D4,15,30),  genre: 'Metal',        image_url: `${WOA}/fileadmin/_processed_/4/9/csm_stonem_26_e1ff4b71dd.jpg` }, 
   { slot_id: 'WAS26', name: 'Asrock',     stage: STAGES.WASTELAND, start_time: t(D4,16, 0), end_time: t(D4,16,45),  genre: 'Metal',        image_url: `${WOA}/fileadmin/_processed_/c/a/csm_asrock_26_85c4a23518.jpg` },  
   { slot_id: 'WAS27', name: 'Allt',       stage: STAGES.WASTELAND, start_time: t(D4,17,15), end_time: t(D4,18, 0),  genre: 'Black Metal',  image_url: `${WOA}/fileadmin/_processed_/a/f/csm_Allt-WOA26_20072966da.jpg` },  

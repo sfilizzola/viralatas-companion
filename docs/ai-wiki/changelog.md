@@ -4,6 +4,12 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-07-24
+
+### Changed
+- **`supabase/seed/bands.ts`** — seeded three Day-4 slots newly CONFIRMED in `lineup.md`: LOU21 (Adrian Pauls Rockin' Roncalli Show), WET30 (Torsten Sträter), WAS24 (Doc Burner). `EXPECTED_BAND_COUNT` 199 → **202**. Still drops Name=`TBD` WAS32 only.
+- **`lineup-official-source.md`** — summary count sanity table updated to 203 wiki / 202 seed (2026-07-24).
+
 ## 2026-07-21
 
 ### Added

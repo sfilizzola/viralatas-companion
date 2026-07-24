@@ -192,15 +192,15 @@ All other camping slots (including Jungle `JUN*`) should match the filtered offi
 6. **Apply DB:** [`lineup-sync.md`](lineup-sync.md) — `seed:bands:sync` dry-run → `--apply`.
 7. Optional cross-check [metal-battle.com](https://www.metal-battle.com/) for MB hints only.
 
-### Summary count sanity (2026-07-07 baseline)
+### Summary count sanity (2026-07-24)
 
-After filtering + wiki-only rows, expect **199** total rows in `lineup.md`:
+After filtering + wiki-only rows, expect **203** total rows in `lineup.md` (seed **202** — omits Name=`TBD` `WAS32`):
 
 | Status | Typical count |
 |--------|----------------|
-| `CONFIRMED` | 185 |
+| `CONFIRMED` | 200 |
 | `TDB MTB` | 1 (`WET23`) |
-| `TBD` | 12 |
+| `TBD` | 1 (`WAS32`, not seeded) |
 | `CEREMONY` | 1 (`HAR13`) |
 
 Counts drift as Wacken confirms bands — update the summary line when syncing.
