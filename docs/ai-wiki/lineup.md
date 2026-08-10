@@ -586,4 +586,4 @@ See [stages.md — How to Confirm a Slot's Official Time](stages.md#how-to-confi
 
 See [stages.md — How to Add a New Slot](stages.md#how-to-add-a-new-slot). Once the slot exists in stages.md, add the band row here referencing the new Slot ID.
 
-**Last updated:** 2026-07-16 — Welcome to the Jungle (`JUN1`–`JUN12`) from official running order; summary 197 CONFIRMED / 4 TBD / 203 total.
+**Last updated:** 2026-07-24 — Day-4 LOU21 / WET30 / WAS24 promoted TBD→CONFIRMED; summary 200 CONFIRMED / 1 `TDB MTB` / 1 TBD (WAS32) / 203 total · seed 202.
