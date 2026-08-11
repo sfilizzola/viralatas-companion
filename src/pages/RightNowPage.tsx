@@ -1,5 +1,6 @@
 import { useI18n, type Language } from '../lib/i18n';
 import { useNowData } from '../hooks/useNowData';
+import { useActiveFestival } from '../hooks/useActiveFestival';
 import { useDuckEnabled } from '../contexts/DuckEnabledContext';
 import { useDuckQuack } from '../hooks/useDuckQuack';
 import type { CrewLiveGroup } from '../services/livePreview';
@@ -26,17 +27,18 @@ const DATE_LOCALES: Record<Language, string> = {
   de: 'de-DE',
 };
 
-function nowLabel(date: Date, language: Language) {
+function nowLabel(date: Date, language: Language, timeZone: string) {
   return new Intl.DateTimeFormat(DATE_LOCALES[language], {
     weekday: 'short',
     hour: '2-digit',
     minute: '2-digit',
-    timeZone: 'Europe/Berlin',
+    timeZone,
   }).format(date);
 }
 
 export default function RightNowPage() {
   const { language, t } = useI18n('RightNowPage');
+  const { festival } = useActiveFestival();
   const duckEnabled = useDuckEnabled();
   const navigate = useNavigate();
   const [activeGroup, setActiveGroup] = useState<CrewLiveGroup | null>(null);
@@ -128,8 +130,14 @@ export default function RightNowPage() {
           </Link>
           <div className={styles.headerDivider} aria-hidden="true" />
           <span className={styles.timestamp}>
-            <span className={styles.timestampValue}>{nowLabel(now, language)}</span>
-            <span className={styles.timestampLabel}>{t('wackenTime')}</span>
+            <span className={styles.timestampValue}>
+              {nowLabel(now, language, festival?.timezone ?? 'Europe/Berlin')}
+            </span>
+            <span className={styles.timestampLabel}>
+              {festival
+                ? t('festivalTime', { name: festival.name })
+                : t('festivalTimeFallback')}
+            </span>
           </span>
         </div>
       </header>

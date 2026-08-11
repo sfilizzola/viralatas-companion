@@ -5,7 +5,7 @@ import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
 import ProfilePage from './pages/ProfilePage';
 import LineupPage from './pages/LineupPage';
-import MyWackenPage from './pages/MyWackenPage';
+import MyPicksPage from './pages/MyPicksPage';
 import PopularPage from './pages/PopularPage';
 import RightNowPage from './pages/RightNowPage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
@@ -56,7 +56,7 @@ function AppRoutes() {
           element={
             <PrivateRoute>
               <FestivalGate>
-                <MyWackenPage />
+                <MyPicksPage />
               </FestivalGate>
             </PrivateRoute>
           }

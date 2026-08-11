@@ -22,7 +22,7 @@ describe('useI18n – basic lookup', () => {
     });
     expect(result.current.t('now')).toBe('Agora');
     expect(result.current.t('schedule')).toBe('Line-up');
-    expect(result.current.t('picks')).toBe('Meu Wacken');
+    expect(result.current.t('picks')).toBe('Meus Picks');
     expect(result.current.t('profile')).toBe('Perfil');
   });
 
@@ -32,7 +32,7 @@ describe('useI18n – basic lookup', () => {
     });
     expect(result.current.t('now')).toBe('Now');
     expect(result.current.t('schedule')).toBe('Lineup');
-    expect(result.current.t('picks')).toBe('My Wacken');
+    expect(result.current.t('picks')).toBe('My Picks');
     expect(result.current.t('profile')).toBe('Profile');
   });
 

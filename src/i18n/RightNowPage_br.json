@@ -1,6 +1,7 @@
 {
   "title": "Agora",
-  "wackenTime": "no horário de Wacken",
+  "festivalTime": "horário de {name}",
+  "festivalTimeFallback": "horário do festival",
   "camping": "Estou no camping",
   "presenceTitle": "Onde estou",
   "presenceCamping": "Camping",

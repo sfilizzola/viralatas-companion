@@ -29,7 +29,7 @@ type BandCardProps = {
   pending?: boolean;
   hidePick?: boolean;
   isBandEnded?: boolean;
-  /** Timeline + My Wacken ended rows only */
+  /** Timeline + My Picks ended rows only */
   attendanceChip?: AttendanceChipKind;
   missedCount?: number;
   children?: ReactNode;
