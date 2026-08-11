@@ -13,6 +13,7 @@ function createMockSupabase() {
     bands: [
       {
         id: 'from-id',
+    festival_id: 'wacken-2026',
         slot_id: 'FAS5',
         name: 'Skyline',
         stage: 'Faster',
@@ -24,6 +25,7 @@ function createMockSupabase() {
       },
       {
         id: 'to-id',
+    festival_id: 'wacken-2026',
         slot_id: 'LOU3',
         name: 'Thundermother',
         stage: 'Louder',

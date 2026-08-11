@@ -26,6 +26,7 @@ vi.mock('../components/QuackStrip', () => ({
 
 const mockBand: Band = {
   id: 'band-1',
+  festival_id: 'wacken-2026',
   name: 'Test Band',
   stage: 'Main Stage',
   start_time: '2026-08-15T20:00:00Z',

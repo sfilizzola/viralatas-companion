@@ -9,6 +9,7 @@ import type { Band, UserBandRating } from '../types';
 
 const band: Band = {
   id: 'b1',
+    festival_id: 'wacken-2026',
   slot_id: 'slot-b1',
   name: 'Test',
   stage: 'Faster',

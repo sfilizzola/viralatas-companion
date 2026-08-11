@@ -6,6 +6,7 @@ const NOW = new Date('2026-08-10T00:00:00.000Z');
 
 function band(partial: Partial<Band> & Pick<Band, 'id'>): Band {
   return {
+    festival_id: 'wacken-2026',
     slot_id: 'FAS1',
     name: `Band ${partial.id}`,
     stage: 'Faster',

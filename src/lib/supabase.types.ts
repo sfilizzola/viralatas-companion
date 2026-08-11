@@ -54,6 +54,7 @@ export type Database = {
       bands: {
         Row: {
           id: string;
+          festival_id: string;
           name: string;
           stage: string;
           start_time: string;
@@ -63,6 +64,7 @@ export type Database = {
         };
         Insert: {
           id?: string;
+          festival_id: string;
           name: string;
           stage: string;
           start_time: string;
@@ -72,6 +74,7 @@ export type Database = {
         };
         Update: {
           id?: string;
+          festival_id?: string;
           name?: string;
           stage?: string;
           start_time?: string;
@@ -85,16 +88,19 @@ export type Database = {
         Row: {
           user_id: string;
           band_id: string;
+          festival_id: string;
           created_at: string;
         };
         Insert: {
           user_id: string;
           band_id: string;
+          festival_id: string;
           created_at?: string;
         };
         Update: {
           user_id?: string;
           band_id?: string;
+          festival_id?: string;
           created_at?: string;
         };
         Relationships: [];
@@ -123,6 +129,7 @@ export type Database = {
       announcements: {
         Row: {
           id: string;
+          festival_id: string;
           author_id: string;
           content: string;
           created_at: string;
@@ -131,6 +138,7 @@ export type Database = {
         };
         Insert: {
           id?: string;
+          festival_id: string;
           author_id: string;
           content: string;
           created_at?: string;
@@ -139,6 +147,7 @@ export type Database = {
         };
         Update: {
           id?: string;
+          festival_id?: string;
           author_id?: string;
           content?: string;
           created_at?: string;

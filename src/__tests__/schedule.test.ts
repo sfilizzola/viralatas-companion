@@ -48,6 +48,7 @@ function createBand(
   const endStr = `${endDay}T${endH}:${endM}:00+02:00`;
 
   return {
+    festival_id: 'wacken-2026',
     id: `band-${Math.random()}`,
     slot_id: `TST-${name.replace(/\s+/g, '-').toLowerCase()}`,
     name,

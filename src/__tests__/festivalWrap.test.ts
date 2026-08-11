@@ -34,6 +34,7 @@ function authUser(metadata: Record<string, unknown> = {}): AuthUser {
 
 function band(partial: Partial<Band> & Pick<Band, 'id'>): Band {
   return {
+    festival_id: 'wacken-2026',
     slot_id: 'FAS1',
     name: `Band ${partial.id}`,
     stage: 'Faster',
@@ -102,9 +103,7 @@ describe('buildFestivalWrapStats', () => {
     const snap = minimalSnapshot({
       userPicks: bands.map((b) => ({ band_id: b.id })),
       allPicks: bands.map((b) => ({
-        user_id: 'u1',
-        band_id: b.id,
-        created_at: '2026-07-01T00:00:00Z',
+        user_id: 'u1', band_id: b.id, festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z',
       })),
       bands,
       allMissed: [{ user_id: 'u1', band_id: 'b1' }],
@@ -128,10 +127,10 @@ describe('buildFestivalWrapStats', () => {
     const snap = minimalSnapshot({
       userPicks: [{ band_id: 'a' }],
       allPicks: [
-        { user_id: 'u1', band_id: 'a', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u2', band_id: 'a', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u3', band_id: 'b', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u1', band_id: 'c', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u3', band_id: 'b', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'c', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
       ],
       bands: [bandA, bandB, bandC],
     });
@@ -151,12 +150,12 @@ describe('buildFestivalWrapStats', () => {
     const snap = minimalSnapshot({
       userPicks: [{ band_id: 'a' }, { band_id: 'b' }],
       allPicks: [
-        { user_id: 'u1', band_id: 'a', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u1', band_id: 'b', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u2', band_id: 'a', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u2', band_id: 'b', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u2', band_id: 'c', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u3', band_id: 'x', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'b', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'b', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'c', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u3', band_id: 'x', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
       ],
       bands,
     });
@@ -181,10 +180,10 @@ describe('buildFestivalWrapStats', () => {
     const snap = minimalSnapshot({
       userPicks: [{ band_id: 'a' }, { band_id: 'b' }],
       allPicks: [
-        { user_id: 'u1', band_id: 'a', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u1', band_id: 'b', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u2', band_id: 'a', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u2', band_id: 'b', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'b', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'b', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
       ],
       bands,
       crewUsers: crewWithAvatars,
@@ -205,9 +204,9 @@ describe('buildFestivalWrapStats', () => {
     const snap = minimalSnapshot({
       userPicks: [{ band_id: 'a' }],
       allPicks: [
-        { user_id: 'u1', band_id: 'a', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u1', band_id: 'a', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u2', band_id: 'a', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
       ],
       bands: [b],
     });
@@ -220,7 +219,7 @@ describe('buildFestivalWrapStats', () => {
     const b = band({ id: 'a' });
     const snap = minimalSnapshot({
       userPicks: [{ band_id: 'a' }],
-      allPicks: [{ user_id: 'u1', band_id: 'a', created_at: '2026-07-01T00:00:00Z' }],
+      allPicks: [{ user_id: 'u1', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' }],
       bands: [b],
       isCurrentUserFriend: true,
     });
@@ -237,7 +236,7 @@ describe('buildFestivalWrapStats', () => {
     const b = band({ id: 'a' });
     const snap = minimalSnapshot({
       userPicks: [{ band_id: 'a' }],
-      allPicks: [{ user_id: 'u1', band_id: 'a', created_at: '2026-07-01T00:00:00Z' }],
+      allPicks: [{ user_id: 'u1', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' }],
       bands: [b],
       allMissed: [],
     });
@@ -251,7 +250,7 @@ describe('buildFestivalWrapStats', () => {
     const b = band({ id: 'a' });
     const snap = minimalSnapshot({
       userPicks: [{ band_id: 'a' }],
-      allPicks: [{ user_id: 'u1', band_id: 'a', created_at: '2026-07-01T00:00:00Z' }],
+      allPicks: [{ user_id: 'u1', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' }],
       bands: [b],
       assignedBadges: ['mosh-pit', 'not-a-real-badge', 'crowdsurfer'],
     });
@@ -264,7 +263,7 @@ describe('buildFestivalWrapStats', () => {
     const b = band({ id: 'a' });
     const snap = minimalSnapshot({
       userPicks: [{ band_id: 'a' }],
-      allPicks: [{ user_id: 'u1', band_id: 'a', created_at: '2026-07-01T00:00:00Z' }],
+      allPicks: [{ user_id: 'u1', band_id: 'a', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' }],
       bands: [b],
       assignedBadges: [],
     });
@@ -279,7 +278,7 @@ describe('buildFestivalWrapStats', () => {
     ];
     const snap = minimalSnapshot({
       userPicks: [{ band_id: 'b1' }],
-      allPicks: [{ user_id: 'u1', band_id: 'b1', created_at: '2026-07-01T00:00:00Z' }],
+      allPicks: [{ user_id: 'u1', band_id: 'b1', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' }],
       bands,
     });
     const stats = buildFestivalWrapStats(snap, 'u1', authUser());
@@ -294,10 +293,10 @@ describe('buildFestivalWrapStats', () => {
     const snap = minimalSnapshot({
       userPicks: [{ band_id: 'b1' }, { band_id: 'b2' }],
       allPicks: [
-        { user_id: 'u1', band_id: 'b1', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u1', band_id: 'b2', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u2', band_id: 'b1', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u2', band_id: 'b2', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'b1', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'b2', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'b1', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'b2', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
       ],
       bands,
     });
@@ -320,8 +319,8 @@ describe('buildFestivalWrapStats', () => {
     const snap = minimalSnapshot({
       userPicks: [{ band_id: 'b1' }],
       allPicks: [
-        { user_id: 'u1', band_id: 'b1', created_at: '2026-07-01T00:00:00Z' },
-        { user_id: 'u2', band_id: 'b1', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u1', band_id: 'b1', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
+        { user_id: 'u2', band_id: 'b1', festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z' },
       ],
       bands,
     });

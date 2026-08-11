@@ -10,6 +10,7 @@ function band(
 ): Band {
   return {
     id,
+    festival_id: 'wacken-2026',
     slot_id: `TST-${id}`,
     name: id,
     stage,

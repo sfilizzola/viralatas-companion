@@ -22,6 +22,7 @@ function member(id: string, overrides: Partial<CrewLivePlan> = {}): CrewLivePlan
 function band(stage: string): Band {
   return {
     id: `band-${stage}`,
+    festival_id: 'wacken-2026',
     slot_id: `S-${stage}`,
     name: `Band ${stage}`,
     stage,

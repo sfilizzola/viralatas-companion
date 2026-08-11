@@ -63,6 +63,7 @@ const userId = 'user-test';
 
 const ANNOUNCEMENT: Parameters<typeof saveAnnouncement>[0] = {
   id: 'ann-1',
+    festival_id: 'wacken-2026',
   author_id: userId,
   content: 'Metal!',
   created_at: '2026-07-29T14:00:00Z',

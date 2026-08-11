@@ -32,6 +32,7 @@ beforeEach(() => {
 
 const SERVER_ANNOUNCEMENT: Announcement = {
   id: 'server-id-1',
+    festival_id: 'wacken-2026',
   author_id: 'user1',
   content: 'Hello metal!',
   created_at: '2026-07-29T14:00:00Z',
@@ -114,13 +115,14 @@ describe('announcementsRepository.post', () => {
 describe('announcementsRepository.flushPending', () => {
   it('posts pending announcements to Supabase and clears them from the queue on success', async () => {
     const pending: Announcement[] = [
-      { id: 'pending-1', author_id: 'user1', content: 'First', created_at: '2026-07-29T10:00:00Z', deleted_at: null, is_pinned: false },
-      { id: 'pending-2', author_id: 'user2', content: 'Second', created_at: '2026-07-29T11:00:00Z', deleted_at: null, is_pinned: false },
+      { id: 'pending-1', festival_id: 'wacken-2026', author_id: 'user1', content: 'First', created_at: '2026-07-29T10:00:00Z', deleted_at: null, is_pinned: false },
+      { id: 'pending-2', festival_id: 'wacken-2026', author_id: 'user2', content: 'Second', created_at: '2026-07-29T11:00:00Z', deleted_at: null, is_pinned: false },
     ];
     vi.mocked(db.loadOfflineAnnouncementsQueue).mockResolvedValue(pending);
 
     const serverResponse: Announcement = {
       id: 'server-id-99',
+    festival_id: 'wacken-2026',
       author_id: 'user1',
       content: 'First',
       created_at: '2026-07-29T10:00:00Z',
@@ -153,7 +155,7 @@ describe('announcementsRepository.flushPending', () => {
 
   it('does not clear from queue when Supabase insert fails', async () => {
     const pending: Announcement[] = [
-      { id: 'pending-fail', author_id: 'user1', content: 'Will fail', created_at: '2026-07-29T10:00:00Z', deleted_at: null, is_pinned: false },
+      { id: 'pending-fail', festival_id: 'wacken-2026', author_id: 'user1', content: 'Will fail', created_at: '2026-07-29T10:00:00Z', deleted_at: null, is_pinned: false },
     ];
     vi.mocked(db.loadOfflineAnnouncementsQueue).mockResolvedValue(pending);
 

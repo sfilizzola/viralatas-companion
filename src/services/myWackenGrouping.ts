@@ -12,6 +12,7 @@ export type MyWackenDayGroup = {
 export function festivalDayKeyFromNow(now: Date): string {
   return bandDay({
     id: '__now__',
+    festival_id: 'wacken-2026',
     slot_id: '__now__',
     name: '',
     stage: '',

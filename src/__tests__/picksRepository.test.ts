@@ -279,9 +279,7 @@ describe('picksRepository.flushOfflineQueue()', () => {
 
     expect(mocks.mockUpsert).toHaveBeenCalledOnce();
     expect(mocks.mockUpsert.mock.calls[0][0]).toMatchObject({
-      user_id: 'user1',
-      band_id: 'band1',
-      created_at: '2026-07-29T10:00:00Z',
+      user_id: 'user1', band_id: 'band1', festival_id: 'wacken-2026', created_at: '2026-07-29T10:00:00Z',
     });
     expect(mocks.mockRemoveFromOfflineQueue).toHaveBeenCalledWith('op-1');
     expect(result).toBe(1);
@@ -366,8 +364,8 @@ describe('picksRepository.syncCrewFromRemote()', () => {
 
   it('calls replaceUserPicks with all fetched rows', async () => {
     const rows = [
-      { user_id: 'user1', band_id: 'band1', created_at: '2026-07-29T10:00:00Z' },
-      { user_id: 'user2', band_id: 'band2', created_at: '2026-07-29T11:00:00Z' },
+      { user_id: 'user1', band_id: 'band1', festival_id: 'wacken-2026', created_at: '2026-07-29T10:00:00Z' },
+      { user_id: 'user2', band_id: 'band2', festival_id: 'wacken-2026', created_at: '2026-07-29T11:00:00Z' },
     ];
     mocks.mockSelect.mockResolvedValue({ data: rows, error: null });
 

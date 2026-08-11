@@ -16,6 +16,7 @@ import type { Band, CrewUser, UserPick, UserPresence } from '../types';
 function band(id: string, start: string, end: string, overrides: Partial<Band> = {}): Band {
   return {
     id,
+    festival_id: 'wacken-2026',
     slot_id: overrides.slot_id ?? `TST-${id}`,
     name: `Band ${id}`,
     stage: 'Faster',
@@ -106,7 +107,7 @@ describe('mapCrewLivePlans with liveTestBandId', () => {
       { id: 'u2', display_name: 'NonPicker', avatar_url: null },
     ];
     const picks: UserPick[] = [
-      { user_id: 'u1', band_id: 'b', created_at: '2026-05-01T00:00:00Z' },
+      { user_id: 'u1', band_id: 'b', festival_id: 'wacken-2026', created_at: '2026-05-01T00:00:00Z' },
     ];
     const presence: UserPresence[] = [];
 
@@ -279,7 +280,7 @@ describe('computeCrewLocationCounts', () => {
       crewUser('watcher'),
     ];
     const picks: UserPick[] = [
-      { user_id: 'watcher', band_id: 'live', created_at: festivalNow.toISOString() },
+      { user_id: 'watcher', band_id: 'live', festival_id: 'wacken-2026', created_at: festivalNow.toISOString() },
     ];
     const counts = computeCrewLocationCounts([liveBand], picks, users, [], festivalNow);
     expect(counts.lost).toBe(2);

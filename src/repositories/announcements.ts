@@ -28,7 +28,7 @@ const announcementOfflineQueue = createOptimisticQueue<Announcement>(
     syncOne: async (item) => {
       const { data, error } = await supabase
         .from('announcements')
-        .insert({ author_id: item.author_id, content: item.content })
+        .insert({ author_id: item.author_id, content: item.content, festival_id: item.festival_id })
         .select()
         .single();
       if (error) return { error };
@@ -72,6 +72,7 @@ async function post(userId: string, content: string): Promise<void> {
 
   const draft: Announcement = {
     id: crypto.randomUUID(),
+    festival_id: 'wacken-2026',
     author_id: userId,
     content,
     created_at: new Date().toISOString(),
@@ -88,7 +89,7 @@ async function post(userId: string, content: string): Promise<void> {
 
   const { data, error } = await supabase
     .from('announcements')
-    .insert({ author_id: userId, content })
+    .insert({ author_id: userId, content, festival_id: draft.festival_id })
     .select()
     .single();
 
