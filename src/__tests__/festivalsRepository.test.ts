@@ -158,6 +158,56 @@ beforeEach(() => {
   mocks.mockFrom.mockImplementation(() => chain);
 });
 
+describe('festivalsRepository.syncCatalog', () => {
+  it('maps festivals select rows to Festival[]', async () => {
+    const remoteRow = {
+      ...FESTIVAL,
+      created_at: '2026-01-01T00:00:00Z',
+      features: { metal_place: true, duck: false },
+    };
+    const select = vi.fn().mockResolvedValue({ data: [remoteRow], error: null });
+    mocks.mockFrom.mockImplementation((table: string) => {
+      if (table === 'festivals') return { select };
+      return chainResolved({ data: null, error: null });
+    });
+
+    const result = await festivalsRepository.syncCatalog();
+
+    expect(mocks.mockFrom).toHaveBeenCalledWith('festivals');
+    expect(select).toHaveBeenCalledWith('*');
+    expect(result).toEqual([
+      {
+        id: FESTIVAL_ID,
+        slug: 'wacken-2026',
+        name: 'Wacken Open Air 2026',
+        timezone: 'Europe/Berlin',
+        starts_at: '2026-07-27T00:00:00+02:00',
+        ends_at: '2026-08-02T03:00:00+02:00',
+        features: { metal_place: true, duck: false },
+        cache_version: 'cv-42',
+      },
+    ]);
+  });
+});
+
+describe('festivalsRepository.syncMyMemberships', () => {
+  it('returns memberships for the given userId', async () => {
+    const eq = vi.fn().mockResolvedValue({ data: [MEMBERSHIP], error: null });
+    const select = vi.fn().mockReturnValue({ eq });
+    mocks.mockFrom.mockImplementation((table: string) => {
+      if (table === 'festival_memberships') return { select };
+      return chainResolved({ data: null, error: null });
+    });
+
+    const result = await festivalsRepository.syncMyMemberships(USER_ID);
+
+    expect(mocks.mockFrom).toHaveBeenCalledWith('festival_memberships');
+    expect(select).toHaveBeenCalledWith('*');
+    expect(eq).toHaveBeenCalledWith('user_id', USER_ID);
+    expect(result).toEqual([MEMBERSHIP]);
+  });
+});
+
 describe('festivalsRepository.optIn', () => {
   it('inserts membership for the user and festival', async () => {
     const insertChain = chainResolved({ data: null, error: null });
