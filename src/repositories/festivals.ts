@@ -34,6 +34,17 @@ async function syncCatalog(): Promise<Festival[]> {
   return (data ?? []).map((row) => asFestival(row as Record<string, unknown>));
 }
 
+/** Server `users.active_festival_id` — source of truth when online. */
+async function fetchServerActiveFestivalId(userId: string): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('active_festival_id')
+    .eq('id', userId)
+    .maybeSingle();
+  if (error) throw error;
+  return (data as { active_festival_id: string | null } | null)?.active_festival_id ?? null;
+}
+
 async function syncMyMemberships(userId: string): Promise<FestivalMembership[]> {
   const { data, error } = await supabase
     .from('festival_memberships')
@@ -118,6 +129,7 @@ async function setActiveFestival(userId: string, festivalId: string): Promise<vo
 export const festivalsRepository = {
   syncCatalog,
   syncMyMemberships,
+  fetchServerActiveFestivalId,
   optIn,
   optOut,
   setActiveFestival,

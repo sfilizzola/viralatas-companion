@@ -17,6 +17,7 @@ import SessionExpiredBanner from './components/SessionExpiredBanner';
 import SyncToast from './components/SyncToast';
 import DuckToast from './components/DuckToast';
 import { SyncOrchestration } from './components/sync';
+import { ActiveFestivalProvider } from './components/festival/ActiveFestivalProvider';
 import { DuckEnabledProvider } from './contexts/DuckEnabledContext';
 import { useAuth } from './hooks/useAuth';
 
@@ -28,7 +29,7 @@ function AppRoutes() {
   }
 
   return (
-    <>
+    <ActiveFestivalProvider>
       <SyncOrchestration />
       <SyncToast />
       <DuckToast />
@@ -104,7 +105,7 @@ function AppRoutes() {
         />
         <Route path="*" element={<Navigate to="/now" replace />} />
       </Routes>
-    </>
+    </ActiveFestivalProvider>
   );
 }
 
