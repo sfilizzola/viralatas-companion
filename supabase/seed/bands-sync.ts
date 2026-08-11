@@ -4,6 +4,10 @@
  * Run:  npm run seed:bands:sync              (dry-run)
  *       npm run seed:bands:sync -- --apply    (write changes)
  *       npm run seed:bands:sync -- --json     (machine-readable plan)
+ *       npm run seed:bands:sync -- --festival wacken-2026
+ *
+ * Scoped to `--festival <slug>` (default wacken-2026). Only that festival's
+ * bands are loaded / inserted / deleted; other festivals are untouched.
  *
  * Requires .env.local with VITE_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY.
  */
@@ -14,7 +18,13 @@ import {
   type BandSeed,
   SLOT_ID_RE,
 } from './bands';
-import { bumpCacheVersion, createServiceClient, isSelfInvoked } from './seed-shared';
+import {
+  bumpCacheVersion,
+  createServiceClient,
+  isSelfInvoked,
+  parseFestivalSlug,
+  resolveFestivalId,
+} from './seed-shared';
 
 type DbRow = {
   id: string;
@@ -105,13 +115,14 @@ function fieldDiff(
   return Object.keys(diffs).length > 0 ? diffs : null;
 }
 
-async function loadDbRows(): Promise<Map<string, DbRow>> {
+async function loadDbRows(festivalId: string): Promise<Map<string, DbRow>> {
   const { supabase } = createServiceClient();
   const { data, error } = await supabase
     .from('bands')
     .select(
       'id, slot_id, name, stage, start_time, end_time, genre, image_url, category',
-    );
+    )
+    .eq('festival_id', festivalId);
   if (error) {
     console.error('Failed to load bands:', error.message);
     process.exit(1);
@@ -268,11 +279,12 @@ function printPlan(
   }
 }
 
-async function countBands(): Promise<number> {
+async function countBandsForFestival(festivalId: string): Promise<number> {
   const { supabase } = createServiceClient();
   const { count, error } = await supabase
     .from('bands')
-    .select('*', { count: 'exact', head: true });
+    .select('*', { count: 'exact', head: true })
+    .eq('festival_id', festivalId);
   if (error) {
     console.error('Count failed:', error.message);
     process.exit(1);
@@ -280,9 +292,13 @@ async function countBands(): Promise<number> {
   return count ?? 0;
 }
 
-async function applyPlan(plan: SyncPlan): Promise<void> {
+async function applyPlan(
+  plan: SyncPlan,
+  festivalId: string,
+  festivalSlug: string,
+): Promise<void> {
   const { supabase } = createServiceClient();
-  const beforeCount = await countBands();
+  const beforeCount = await countBandsForFestival(festivalId);
 
   for (const entry of plan.updates) {
     const patch: Record<string, unknown> = {};
@@ -292,7 +308,8 @@ async function applyPlan(plan: SyncPlan): Promise<void> {
     const { error } = await supabase
       .from('bands')
       .update(patch)
-      .eq('id', entry.dbId);
+      .eq('id', entry.dbId)
+      .eq('festival_id', festivalId);
     if (error) {
       console.error(`UPDATE failed for ${entry.slot_id}:`, error.message);
       process.exit(1);
@@ -300,7 +317,7 @@ async function applyPlan(plan: SyncPlan): Promise<void> {
   }
 
   if (plan.updates.length > 0) {
-    const dbRows = await loadDbRows();
+    const dbRows = await loadDbRows(festivalId);
     for (const entry of plan.updates) {
       const seed = bands.find((row) => row.slot_id === entry.slot_id);
       const db = dbRows.get(entry.slot_id);
@@ -316,12 +333,16 @@ async function applyPlan(plan: SyncPlan): Promise<void> {
   }
 
   if (plan.inserts.length > 0) {
-    const { error } = await supabase.from('bands').insert(plan.inserts);
+    const rows = plan.inserts.map((row) => ({
+      ...row,
+      festival_id: festivalId,
+    }));
+    const { error } = await supabase.from('bands').insert(rows);
     if (error) {
       console.error('INSERT failed:', error.message);
       process.exit(1);
     }
-    const afterInsert = await countBands();
+    const afterInsert = await countBandsForFestival(festivalId);
     if (afterInsert !== beforeCount + plan.inserts.length) {
       console.error(
         `Insert post-condition failed — expected ${beforeCount + plan.inserts.length} rows, found ${afterInsert}.`,
@@ -332,14 +353,18 @@ async function applyPlan(plan: SyncPlan): Promise<void> {
 
   if (plan.deletes.length > 0) {
     const ids = plan.deletes.map((row) => row.dbId);
-    const { error } = await supabase.from('bands').delete().in('id', ids);
+    const { error } = await supabase
+      .from('bands')
+      .delete()
+      .in('id', ids)
+      .eq('festival_id', festivalId);
     if (error) {
       console.error('DELETE failed:', error.message);
       process.exit(1);
     }
     const expected =
       beforeCount + plan.inserts.length - plan.deletes.length;
-    const afterDelete = await countBands();
+    const afterDelete = await countBandsForFestival(festivalId);
     if (afterDelete !== expected) {
       console.error(
         `Delete post-condition failed — expected ${expected} rows, found ${afterDelete}.`,
@@ -348,7 +373,7 @@ async function applyPlan(plan: SyncPlan): Promise<void> {
     }
   }
 
-  const bump = await bumpCacheVersion(supabase);
+  const bump = await bumpCacheVersion(supabase, festivalSlug);
   if (bump.ok) {
     console.log(`  ✓ cache_version = ${bump.value}`);
   }
@@ -362,18 +387,28 @@ export async function main() {
   assertSeedIntegrity(bands);
   const apply = process.argv.includes('--apply');
   const json = process.argv.includes('--json');
+  const festivalSlug = parseFestivalSlug();
 
-  const dbRows = await loadDbRows();
+  const { supabase, supabaseUrl } = createServiceClient();
+  let festivalId: string;
+  try {
+    festivalId = await resolveFestivalId(supabase, festivalSlug);
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err));
+    process.exit(1);
+  }
+
+  const dbRows = await loadDbRows(festivalId);
   const plan = buildPlan(bands, dbRows);
   const impact = await computePickImpact(plan.deletes);
-
-  const { supabaseUrl } = createServiceClient();
 
   if (json) {
     console.log(
       JSON.stringify(
         {
           apply,
+          festival: festivalSlug,
+          festivalId,
           dbCount: dbRows.size,
           seedCount: bands.length,
           plan,
@@ -384,6 +419,7 @@ export async function main() {
       ),
     );
   } else {
+    console.log(`Festival: ${festivalSlug} (${festivalId})`);
     printPlan(plan, impact, {
       apply,
       supabaseUrl,
@@ -398,7 +434,7 @@ export async function main() {
     plan.deletes.length === 0;
 
   if (apply && !isEmpty) {
-    await applyPlan(plan);
+    await applyPlan(plan, festivalId, festivalSlug);
   } else if (apply && isEmpty) {
     console.log('No changes to apply.');
   }

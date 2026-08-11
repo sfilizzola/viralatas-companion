@@ -78,3 +78,23 @@ export function isSelfInvoked(moduleUrl: string): boolean {
   if (!process.argv[1]) return false;
   return resolve(process.argv[1]) === fileURLToPath(moduleUrl);
 }
+
+/** `--festival <slug>` from argv; defaults to the Wacken 2026 seed festival. */
+export function parseFestivalSlug(argv = process.argv): string {
+  const i = argv.indexOf('--festival');
+  if (i >= 0 && argv[i + 1]) return argv[i + 1];
+  return 'wacken-2026';
+}
+
+export async function resolveFestivalId(
+  client: SupabaseClient,
+  slug: string,
+): Promise<string> {
+  const { data, error } = await client
+    .from('festivals')
+    .select('id')
+    .eq('slug', slug)
+    .single();
+  if (error || !data) throw new Error(`Festival not found: ${slug}`);
+  return data.id as string;
+}

@@ -33,19 +33,22 @@
  * instead — it preserves user picks. This script is for festival reset only.
  *
  * ────────────────────────────────────────────────────────────────────────
- * DESTRUCTIVE BEHAVIOR — this script REPLACES the entire `bands` table.
+ * DESTRUCTIVE BEHAVIOR — replaces bands for ONE festival (`--festival`).
  * ────────────────────────────────────────────────────────────────────────
  *
  * On every run, the script will:
- *   1. Count existing bands.
- *   2. DELETE every row in `public.bands`.
- *      Cascades to dependents:
- *        - `user_picks`         (ON DELETE CASCADE  — all picks erased)
- *        - `user_missed_bands`  (ON DELETE CASCADE  — all "seen" flags erased)
- *        - `live_band_test_config.band_id`  (ON DELETE SET NULL)
- *   3. Verify the table is empty (aborts on mismatch).
- *   4. INSERT all bands from the constant array below.
- *   5. Verify row count equals the constant length (aborts on mismatch).
+ *   1. Resolve `--festival <slug>` (default: wacken-2026).
+ *   2. Count existing bands for that festival only.
+ *   3. DELETE bands WHERE festival_id = that festival.
+ *      Cascades to dependents of those bands only:
+ *        - `user_picks`         (ON DELETE CASCADE  — that festival's picks)
+ *        - `user_missed_bands`  (ON DELETE CASCADE)
+ *        - `live_band_test_config.band_id`  (ON DELETE SET NULL, if pointed)
+ *   4. Verify that festival's band count is 0 (other festivals untouched).
+ *   5. INSERT all bands from the constant array with festival_id set.
+ *   6. Verify that festival's row count equals the constant length.
+ *
+ * Other festivals' bands and picks are never deleted.
  *
  * Times (start_time/end_time) are part of each band row, so old times are
  * replaced as part of the table replacement — there is no per-row update path.
@@ -53,32 +56,15 @@
  * Run with --force to skip the confirmation prompt (useful in CI / scripts).
  * Without --force the script will print a 5-second warning before deleting.
  *
- * NEVER run this against a live festival session — picks WILL be lost.
+ * NEVER run this against a live festival session — picks for that festival WILL be lost.
  */
 
-import { readFileSync } from 'node:fs';
 import { createClient } from '@supabase/supabase-js';
-
-// ---------------------------------------------------------------------------
-// Env loading
-// ---------------------------------------------------------------------------
-
-function loadEnvFile() {
-  try {
-    const raw = readFileSync('.env.local', 'utf-8');
-    for (const line of raw.split('\n')) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith('#')) continue;
-      const eq = trimmed.indexOf('=');
-      if (eq === -1) continue;
-      const key = trimmed.slice(0, eq).trim();
-      const val = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, '');
-      if (!process.env[key]) process.env[key] = val;
-    }
-  } catch {
-    // .env.local not found — rely on process.env being set by the caller
-  }
-}
+import {
+  loadEnvFile,
+  parseFestivalSlug,
+  resolveFestivalId,
+} from './seed-shared';
 
 // ---------------------------------------------------------------------------
 // Schedule helpers
@@ -464,12 +450,14 @@ export function assertSeedIntegrity(rows: BandSeed[]) {
 // Run
 // ---------------------------------------------------------------------------
 
-async function countBands(
+async function countBandsForFestival(
   supabase: ReturnType<typeof createClient>,
+  festivalId: string,
 ): Promise<number> {
   const { count, error } = await supabase
     .from('bands')
-    .select('*', { count: 'exact', head: true });
+    .select('*', { count: 'exact', head: true })
+    .eq('festival_id', festivalId);
   if (error) {
     console.error('Count failed:', error.message);
     process.exit(1);
@@ -484,6 +472,7 @@ async function seed() {
   const supabaseUrl = process.env.VITE_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const force = process.argv.includes('--force');
+  const festivalSlug = parseFestivalSlug();
 
   if (!supabaseUrl || !serviceRoleKey) {
     console.error('Missing VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
@@ -494,23 +483,33 @@ async function seed() {
     auth: { persistSession: false },
   });
 
+  let festivalId: string;
+  try {
+    festivalId = await resolveFestivalId(supabase, festivalSlug);
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err));
+    process.exit(1);
+  }
+
   // ── Step 1: announce destructive intent ─────────────────────────────────
   console.log('━'.repeat(72));
-  console.log('Wacken 2026 lineup seed — DESTRUCTIVE — picks WILL be lost');
-  console.log('For small changes use: npm run seed:bands:sync');
+  console.log(
+    `Lineup seed for ${festivalSlug} — DESTRUCTIVE — that festival's picks WILL be lost`,
+  );
+  console.log('For small changes use: npm run seed:bands:sync -- --festival <slug>');
   console.log('━'.repeat(72));
   console.log(`Target:        ${supabaseUrl}`);
+  console.log(`Festival:      ${festivalSlug} (${festivalId})`);
   console.log(`Bands to seed: ${bands.length} (from supabase/seed/bands.ts)`);
 
-  const existing = await countBands(supabase);
-  console.log(`Existing rows in public.bands: ${existing}`);
+  const existing = await countBandsForFestival(supabase, festivalId);
+  console.log(`Existing bands for this festival: ${existing}`);
   console.log('');
   console.log('This will:');
-  console.log('  • DELETE every row in public.bands');
-  console.log('  • CASCADE-delete every row in public.user_picks');
-  console.log('  • CASCADE-delete every row in public.user_missed_bands');
-  console.log('  • NULL out live_band_test_config.band_id');
-  console.log(`  • INSERT ${bands.length} fresh rows from lineup.md`);
+  console.log(`  • DELETE bands WHERE festival_id = ${festivalSlug}`);
+  console.log('  • CASCADE-delete that festival\'s user_picks + user_missed_bands');
+  console.log('  • Other festivals\' bands/picks are NOT touched');
+  console.log(`  • INSERT ${bands.length} fresh rows with festival_id set`);
   console.log('');
 
   if (!force) {
@@ -518,39 +517,39 @@ async function seed() {
     await new Promise((r) => setTimeout(r, 5000));
   }
 
-  // ── Step 2: delete everything ───────────────────────────────────────────
-  // `.gte('start_time', '1900-01-01')` matches every row (start_time is NOT NULL).
-  console.log('Deleting all rows in public.bands…');
+  // ── Step 2: delete this festival's bands only ───────────────────────────
+  console.log(`Deleting bands for festival ${festivalSlug}…`);
   const { error: delError } = await supabase
     .from('bands')
     .delete()
-    .gte('start_time', '1900-01-01T00:00:00Z');
+    .eq('festival_id', festivalId);
   if (delError) {
     console.error('Delete failed:', delError.message);
     process.exit(1);
   }
 
-  const afterDelete = await countBands(supabase);
+  const afterDelete = await countBandsForFestival(supabase, festivalId);
   if (afterDelete !== 0) {
     console.error(
-      `Delete verification failed — expected 0 rows, found ${afterDelete}.`,
+      `Delete verification failed — expected 0 rows for festival, found ${afterDelete}.`,
     );
     process.exit(1);
   }
-  console.log(`  Deleted ${existing} rows · table is now empty ✓`);
+  console.log(`  Deleted ${existing} rows · festival band set empty ✓`);
 
-  // ── Step 3: insert fresh data ───────────────────────────────────────────
+  // ── Step 3: insert fresh data with festival_id ──────────────────────────
   console.log(`Inserting ${bands.length} bands…`);
-  const { error: insError } = await supabase.from('bands').insert(bands);
+  const rows = bands.map((b) => ({ ...b, festival_id: festivalId }));
+  const { error: insError } = await supabase.from('bands').insert(rows);
   if (insError) {
     console.error('Insert failed:', insError.message);
     process.exit(1);
   }
 
-  const afterInsert = await countBands(supabase);
+  const afterInsert = await countBandsForFestival(supabase, festivalId);
   if (afterInsert !== bands.length) {
     console.error(
-      `Insert verification failed — expected ${bands.length} rows, found ${afterInsert}.`,
+      `Insert verification failed — expected ${bands.length} rows for festival, found ${afterInsert}.`,
     );
     process.exit(1);
   }

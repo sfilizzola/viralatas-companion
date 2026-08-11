@@ -6,9 +6,14 @@
  *   npm run festival:reset -- --with-bands          # state wipe + bands re-seed
  *   npm run festival:reset -- --dry-run             # preview only, writes nothing
  *   npm run festival:reset -- --force               # skip the 5-second countdown
+ *   npm run festival:reset -- --festival wacken-2026
  *
  * Flags may be combined (commutative). --dry-run always wins over --force/--with-bands
  * for write semantics (it still _shows_ what --with-bands would do, but never invokes it).
+ *
+ * `--festival <slug>` (default wacken-2026) scopes announcements wipe, cache bump,
+ * and optional bands re-seed. Other festivals' bands/picks/announcements are preserved.
+ * Global tables (blocked_posters, user_presence, badge metadata) remain crew-wide.
  *
  * Requires env vars (reads from .env.local automatically):
  *   VITE_SUPABASE_URL
@@ -18,10 +23,10 @@
  * DESTRUCTIVE BEHAVIOR — wipes pre-festival activity. There is no undo.
  * ────────────────────────────────────────────────────────────────────────
  *
- * Wiped:
- *   • public.announcements                                (every row)
- *   • public.blocked_posters                              (every row)
- *   • public.user_presence                                (every row)
+ * Wiped (festival-scoped when applicable):
+ *   • public.announcements                                (rows for --festival only)
+ *   • public.blocked_posters                              (every row — global table)
+ *   • public.user_presence                                (every row — global table)
  *   • public.users.special_badges                         (cleared to '{}' for every user)
  *   • auth.users.raw_user_meta_data keys:
  *       - achieved_badge_slugs
@@ -29,14 +34,15 @@
  *       - location_visits
  *     (only these three keys are stripped; every other metadata key is preserved
  *      — wacken_years, wacken_arrival_day, push subs, language, etc.)
- *   • public.festivals.cache_version for wacken-2026 is BUMPED (not deleted)
+ *   • public.festivals.cache_version for --festival is BUMPED (not deleted)
  *
- * Optionally wiped (only with --with-bands):
- *   • public.bands                                        (full replace via supabase/seed/bands.ts)
- *   • public.user_picks                                   (CASCADE from bands)
- *   • public.user_missed_bands                            (CASCADE from bands)
+ * Optionally wiped (only with --with-bands, scoped to --festival):
+ *   • public.bands for that festival                      (via supabase/seed/bands.ts)
+ *   • public.user_picks for those bands                   (CASCADE — other festivals kept)
+ *   • public.user_missed_bands for those bands            (CASCADE)
  *
  * Preserved (never touched):
+ *   • Other festivals' bands, picks, announcements
  *   • public.users rows themselves; columns: role, display_name, email, avatar_url,
  *     country, is_friend, etc.
  *   • auth.users rows themselves (only metadata is patched, never the row).
@@ -55,6 +61,7 @@
 import { readFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { parseFestivalSlug, resolveFestivalId } from './seed-shared';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -105,8 +112,14 @@ function loadEnvFile() {
 // the concrete client is passed in, even though runtime is fine.
 type Sb = SupabaseClient<any>;
 
-async function countRows(sb: Sb, table: string): Promise<number> {
-  const { count, error } = await sb.from(table).select('*', { count: 'exact', head: true });
+async function countRows(
+  sb: Sb,
+  table: string,
+  festivalId?: string,
+): Promise<number> {
+  let q = sb.from(table).select('*', { count: 'exact', head: true });
+  if (festivalId) q = q.eq('festival_id', festivalId);
+  const { count, error } = await q;
   if (error) {
     console.error(`Count failed for ${table}: ${error.message}`);
     process.exit(1);
@@ -227,12 +240,16 @@ async function bumpCacheVersion(
 // Bands re-seed (subprocess; isolated process, no env/state pollution)
 // ---------------------------------------------------------------------------
 
-function spawnBandsSeed(): Promise<number> {
+function spawnBandsSeed(festivalSlug: string): Promise<number> {
   return new Promise((resolve) => {
-    const child = spawn('npx', ['tsx', 'supabase/seed/bands.ts', '--force'], {
-      stdio: 'inherit',
-      env: process.env,
-    });
+    const child = spawn(
+      'npx',
+      ['tsx', 'supabase/seed/bands.ts', '--force', '--festival', festivalSlug],
+      {
+        stdio: 'inherit',
+        env: process.env,
+      },
+    );
     child.on('exit', (code) => resolve(code ?? 1));
     child.on('error', (err) => {
       console.error(`Failed to spawn bands seed: ${err.message}`);
@@ -255,6 +272,7 @@ async function festivalReset() {
   const force = argv.includes('--force');
   const dryRun = argv.includes('--dry-run');
   const withBands = argv.includes('--with-bands');
+  const festivalSlug = parseFestivalSlug(process.argv);
 
   if (!supabaseUrl || !serviceRoleKey) {
     console.error('Missing VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
@@ -266,6 +284,14 @@ async function festivalReset() {
     auth: { persistSession: false },
   });
 
+  let festivalId: string;
+  try {
+    festivalId = await resolveFestivalId(sb, festivalSlug);
+  } catch (err) {
+    console.error(err instanceof Error ? err.message : String(err));
+    process.exit(1);
+  }
+
   // ── Pre-flight summary ──────────────────────────────────────────────────
   console.log('━'.repeat(72));
   console.log(
@@ -274,18 +300,19 @@ async function festivalReset() {
     }`,
   );
   console.log('━'.repeat(72));
-  console.log(`Target: ${supabaseUrl}`);
+  console.log(`Target:   ${supabaseUrl}`);
+  console.log(`Festival: ${festivalSlug} (${festivalId})`);
   console.log('');
 
   console.log('Reading current state…');
   const [annCount, blockedCount, presenceCount, assignedCount, authUsers, bandsCount] =
     await Promise.all([
-      countRows(sb, 'announcements'),
+      countRows(sb, 'announcements', festivalId),
       countRows(sb, 'blocked_posters'),
       countRows(sb, 'user_presence'),
       countUsersWithAssignedBadges(sb),
       listAllAuthUsers(sb),
-      withBands ? countRows(sb, 'bands') : Promise.resolve(-1),
+      withBands ? countRows(sb, 'bands', festivalId) : Promise.resolve(-1),
     ]);
 
   const usersWithPersistentBadges = authUsers.filter((u) =>
@@ -294,7 +321,7 @@ async function festivalReset() {
 
   console.log('');
   console.log('Current state:');
-  console.log(`  • announcements rows ................. ${annCount}`);
+  console.log(`  • announcements (this festival) ...... ${annCount}`);
   console.log(`  • blocked_posters rows ............... ${blockedCount}`);
   console.log(`  • user_presence rows ................. ${presenceCount}`);
   console.log(`  • users with assigned badges ......... ${assignedCount}`);
@@ -302,24 +329,26 @@ async function festivalReset() {
     `  • auth.users total ................... ${authUsers.length} (${usersWithPersistentBadges} carry persistent badge keys)`,
   );
   if (withBands) {
-    console.log(`  • bands rows (will be replaced) ...... ${bandsCount}`);
+    console.log(`  • bands (this festival, replaced) .... ${bandsCount}`);
   }
   console.log('');
 
   console.log('Plan:');
-  console.log('  1. DELETE every row in public.announcements');
-  console.log('  2. DELETE every row in public.blocked_posters');
-  console.log('  3. DELETE every row in public.user_presence');
+  console.log(`  1. DELETE public.announcements WHERE festival_id = ${festivalSlug}`);
+  console.log('  2. DELETE every row in public.blocked_posters (global)');
+  console.log('  3. DELETE every row in public.user_presence (global)');
   console.log("  4. UPDATE public.users SET special_badges = '{}'");
   console.log(
     `  5. STRIP keys ${PERSISTENT_BADGE_METADATA_KEYS.join(', ')} from auth.users metadata`,
   );
   console.log(
-    '  6. BUMP festivals.cache_version for wacken-2026 (force Active Festival pack invalidation)',
+    `  6. BUMP festivals.cache_version for ${festivalSlug} (force Active Festival pack invalidation)`,
   );
   if (withBands) {
-    console.log('  7. RE-SEED public.bands (delegates to supabase/seed/bands.ts --force)');
-    console.log('     └─ CASCADEs public.user_picks + public.user_missed_bands');
+    console.log(
+      `  7. RE-SEED public.bands for ${festivalSlug} (bands.ts --force --festival ${festivalSlug})`,
+    );
+    console.log('     └─ CASCADEs that festival\'s user_picks + user_missed_bands only');
   }
   console.log('');
 
@@ -336,18 +365,18 @@ async function festivalReset() {
   }
   console.log('');
 
-  // ── 1. Wipe announcements ──────────────────────────────────────────────
-  console.log('[1/6] Deleting public.announcements…');
+  // ── 1. Wipe announcements for this festival only ───────────────────────
+  console.log(`[1/6] Deleting public.announcements for ${festivalSlug}…`);
   {
     const { error } = await sb
       .from('announcements')
       .delete()
-      .not('id', 'is', null);
+      .eq('festival_id', festivalId);
     if (error) {
       console.error(`  ✗ delete failed: ${error.message}`);
       process.exit(1);
     }
-    const after = await countRows(sb, 'announcements');
+    const after = await countRows(sb, 'announcements', festivalId);
     if (after !== 0) {
       console.error(`  ✗ post-condition failed: expected 0 rows, found ${after}`);
       process.exit(1);
@@ -443,8 +472,8 @@ async function festivalReset() {
   }
 
   // ── 6. Bump per-festival cache_version ─────────────────────────────────
-  console.log('[6/6] Bumping festivals.cache_version for wacken-2026…');
-  const bump = await bumpCacheVersion(sb, 'wacken-2026');
+  console.log(`[6/6] Bumping festivals.cache_version for ${festivalSlug}…`);
+  const bump = await bumpCacheVersion(sb, festivalSlug);
   if (bump.ok) {
     console.log(`  ✓ festivals.cache_version = ${bump.value}`);
   }
@@ -453,9 +482,11 @@ async function festivalReset() {
   if (withBands) {
     console.log('');
     console.log('━'.repeat(72));
-    console.log('Delegating to supabase/seed/bands.ts --force …');
+    console.log(
+      `Delegating to supabase/seed/bands.ts --force --festival ${festivalSlug} …`,
+    );
     console.log('━'.repeat(72));
-    const code = await spawnBandsSeed();
+    const code = await spawnBandsSeed(festivalSlug);
     if (code !== 0) {
       console.error(`Bands seed exited with code ${code}.`);
       process.exit(code);
