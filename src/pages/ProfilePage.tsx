@@ -28,7 +28,6 @@ export default function ProfilePage() {
   const { language, setLanguage, t } = useI18n('ProfilePage');
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { festival } = useActiveFestival();
   const displayName = (user?.user_metadata?.['display_name'] as string | undefined) ?? user?.email ?? '';
   const avatarUrl = user?.user_metadata?.['avatar_url'] as string | undefined;
 
@@ -79,6 +78,7 @@ type ProfileFormProps = {
 function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language, setLanguage, t }: ProfileFormProps) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
+  const { festival } = useActiveFestival();
 
   const initial = displayName.charAt(0).toUpperCase();
   const savedCountry = (user.user_metadata?.['country'] as string | undefined) ?? null;
