@@ -2,8 +2,10 @@ import { useEffect, useState, type FormEvent } from 'react';
 import type { Announcement, UsefulLink } from '../types';
 import { useAuth } from '../hooks/useAuth';
 import { useAnnouncements } from '../hooks/useAnnouncements';
+import { useActiveFestival } from '../hooks/useActiveFestival';
 import { ANNOUNCEMENT_MAX_CONTENT_LENGTH } from '../repositories/announcements';
 import { useI18n } from '../lib/i18n';
+import { canShowCamp } from '../lib/festivalFeatures';
 import { loadUsefulLinks } from '../services/usefulLinks';
 import { relativeTime } from '../services/announcementsDisplay';
 import type { AnnouncementWithReactions } from '../services/announcementsDisplay';
@@ -20,8 +22,10 @@ import styles from './AnnouncementsPage.module.css';
 export default function AnnouncementsPage() {
   const { t } = useI18n('AnnouncementsPage');
   const { session } = useAuth();
+  const { festival } = useActiveFestival();
   const userId = session?.user?.id ?? null;
   const currentTime = useNow();
+  const showCamp = canShowCamp(festival);
 
   const {
     announcements,
@@ -100,8 +104,10 @@ export default function AnnouncementsPage() {
   }
 
   const festivalActive = isFestivalActive(currentTime);
-  const showArrivalMapTop = userId && crewUsers.length > 0 && !festivalActive;
-  const showArrivalMapBottom = userId && crewUsers.length > 0 && festivalActive;
+  const showArrivalMapTop =
+    showCamp && !!userId && crewUsers.length > 0 && !festivalActive;
+  const showArrivalMapBottom =
+    showCamp && !!userId && crewUsers.length > 0 && festivalActive;
 
   return (
     <div className={styles.page}>
@@ -133,7 +139,7 @@ export default function AnnouncementsPage() {
           </section>
         )}
 
-        <CampHqCard />
+        {showCamp && <CampHqCard />}
 
         {showArrivalMapTop && (
           <ArrivalMap crewUsers={crewUsers} currentUserId={userId} currentTime={currentTime} />

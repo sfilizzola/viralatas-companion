@@ -20,12 +20,15 @@ import WrapTeaserBanner from '../components/wrap/WrapTeaserBanner';
 import { useWrapTeaserVisible } from '../hooks/useWrapTeaserVisible';
 import ManagerAdminPanel from '../components/profile/ManagerAdminPanel';
 import InstallAppProfileLink from '../components/InstallAppProfileLink';
+import { useActiveFestival } from '../hooks/useActiveFestival';
+import { canShowWrap } from '../lib/festivalFeatures';
 import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
   const { language, setLanguage, t } = useI18n('ProfilePage');
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { festival } = useActiveFestival();
   const displayName = (user?.user_metadata?.['display_name'] as string | undefined) ?? user?.email ?? '';
   const avatarUrl = user?.user_metadata?.['avatar_url'] as string | undefined;
 
@@ -87,7 +90,7 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
     announcementsRepository.fetchCurrentUserRole(user.id).then(setUserRole);
   }, [user.id]);
 
-  const showWrapTeaser = useWrapTeaserVisible();
+  const showWrapTeaser = useWrapTeaserVisible() && canShowWrap(festival);
 
   const [moshSplitEnabled, setMoshSplitEnabledState] = useState(false);
 

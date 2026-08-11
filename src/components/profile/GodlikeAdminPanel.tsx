@@ -2,7 +2,14 @@ import { useState, useEffect, useCallback } from 'react';
 import type { UserRole } from '../../types';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../hooks/useAuth';
+import { useActiveFestival } from '../../hooks/useActiveFestival';
 import { useGodlikeAdminI18n } from '../../lib/i18n';
+import {
+  canShowCamp,
+  canShowDuck,
+  canShowMetalPlace,
+  canShowRemoteLineup,
+} from '../../lib/festivalFeatures';
 import { announcementsRepository } from '../../repositories';
 import { useCooldown } from '../../hooks/useCooldown';
 import { Collapsible } from '../../ui';
@@ -27,9 +34,14 @@ type GodlikeAdminPanelProps = {
 export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
   const { ready, t, language } = useGodlikeAdminI18n();
   const { user } = useAuth();
+  const { festival } = useActiveFestival();
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [loading, setLoading] = useState(true);
   const [duckFeatureEnabled, setDuckFeatureEnabled] = useState(true);
+  const showRemoteLineup = canShowRemoteLineup(festival);
+  const showMetalPlaceAdmin = canShowMetalPlace(festival);
+  const showCampAdmin = canShowCamp(festival);
+  const showDuckAdmin = canShowDuck(festival);
 
   const TEST_QUACK_COOLDOWN_MS = 15_000;
   const [testQuackCooldownUntil, setTestQuackCooldownUntil] = useState<number | null>(null);
@@ -147,27 +159,31 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
       <Collapsible trigger={toolsTrigger} className={styles.godlikeCollapsible}>
         <div className={styles.conflictsInner}>
           <div className={styles.godlikeSectionContent}>
-            <LineupSyncSection t={t} />
+            {showRemoteLineup && <LineupSyncSection t={t} />}
             <CacheResetSection t={t} />
-            <FeatureFlagsSection t={t} onDuckEnabledChange={setDuckFeatureEnabled} />
-            <MetalPlaceAdminSection t={t} />
-            <CampingLocationAdminSection t={t} />
+            {showDuckAdmin && (
+              <FeatureFlagsSection t={t} onDuckEnabledChange={setDuckFeatureEnabled} />
+            )}
+            {showMetalPlaceAdmin && <MetalPlaceAdminSection t={t} />}
+            {showCampAdmin && <CampingLocationAdminSection t={t} />}
             <LiveBandTestAdminSection t={t} />
 
-            <div className={styles.liveBandTestSection}>
-              <h4 className={styles.liveBandTestSectionTitle}>{t('testQuackTitle')}</h4>
-              <p className={styles.liveBandTestDescription}>{t('testQuackDescription')}</p>
-              {!duckFeatureEnabled && (
-                <p className={styles.testModeHint}>{t('testQuackDisabledHint')}</p>
-              )}
-              <QuackGhostRow
-                onDuck={() => {
-                  if (isTestQuackOnCooldown) return;
-                  setTestQuackCooldownUntil(Date.now() + TEST_QUACK_COOLDOWN_MS);
-                }}
-                cooldownUntil={testQuackCooldownUntil}
-              />
-            </div>
+            {showDuckAdmin && (
+              <div className={styles.liveBandTestSection}>
+                <h4 className={styles.liveBandTestSectionTitle}>{t('testQuackTitle')}</h4>
+                <p className={styles.liveBandTestDescription}>{t('testQuackDescription')}</p>
+                {!duckFeatureEnabled && (
+                  <p className={styles.testModeHint}>{t('testQuackDisabledHint')}</p>
+                )}
+                <QuackGhostRow
+                  onDuck={() => {
+                    if (isTestQuackOnCooldown) return;
+                    setTestQuackCooldownUntil(Date.now() + TEST_QUACK_COOLDOWN_MS);
+                  }}
+                  cooldownUntil={testQuackCooldownUntil}
+                />
+              </div>
+            )}
 
             <div className={styles.liveBandTestSection}>
               <h4 className={styles.liveBandTestSectionTitle}>{t('testPushTitle')}</h4>

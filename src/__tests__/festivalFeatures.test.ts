@@ -1,5 +1,14 @@
 import { describe, it, expect } from 'vitest';
-import { hasFestivalFeature } from '../lib/festivalFeatures';
+import {
+  canShowCamp,
+  canShowDuck,
+  canShowMap,
+  canShowMetalPlace,
+  canShowPresence,
+  canShowRemoteLineup,
+  canShowWrap,
+  hasFestivalFeature,
+} from '../lib/festivalFeatures';
 import type { Festival } from '../types/festival';
 
 const base: Festival = {
@@ -21,5 +30,39 @@ describe('hasFestivalFeature', () => {
   it('returns false when flag missing or false', () => {
     expect(hasFestivalFeature({ ...base, features: {} }, 'map')).toBe(false);
     expect(hasFestivalFeature({ ...base, features: { map: false } }, 'map')).toBe(false);
+  });
+
+  it('returns false for null/undefined festival', () => {
+    expect(hasFestivalFeature(null, 'map')).toBe(false);
+    expect(hasFestivalFeature(undefined, 'duck')).toBe(false);
+  });
+});
+
+describe('canShow* helpers', () => {
+  it('maps each feature key', () => {
+    expect(canShowMap(base)).toBe(true);
+    expect(canShowMetalPlace(base)).toBe(true);
+    expect(canShowDuck(base)).toBe(true);
+    expect(canShowCamp(base)).toBe(true);
+    expect(canShowWrap(base)).toBe(true);
+    expect(canShowRemoteLineup(base)).toBe(true);
+  });
+
+  it('returns false when the feature is off', () => {
+    const off: Festival = { ...base, features: {} };
+    expect(canShowMap(off)).toBe(false);
+    expect(canShowMetalPlace(off)).toBe(false);
+    expect(canShowDuck(off)).toBe(false);
+    expect(canShowCamp(off)).toBe(false);
+    expect(canShowWrap(off)).toBe(false);
+    expect(canShowRemoteLineup(off)).toBe(false);
+  });
+
+  it('canShowPresence is true when camp or metal_place is on', () => {
+    expect(canShowPresence(base)).toBe(true);
+    expect(canShowPresence({ ...base, features: { camp: true } })).toBe(true);
+    expect(canShowPresence({ ...base, features: { metal_place: true } })).toBe(true);
+    expect(canShowPresence({ ...base, features: { map: true } })).toBe(false);
+    expect(canShowPresence(null)).toBe(false);
   });
 });

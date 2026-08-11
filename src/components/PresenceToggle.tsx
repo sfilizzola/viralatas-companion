@@ -13,6 +13,8 @@ type PresenceToggleLabels = {
 type PresenceToggleProps = {
   value: PresenceLocation;
   metalPlaceAvailable: boolean;
+  /** Defaults to true. When false, the camping option is hidden. */
+  campingAvailable?: boolean;
   labels: PresenceToggleLabels;
   onChange: (value: PresenceLocation) => void | Promise<void>;
   className?: string;
@@ -22,6 +24,7 @@ type PresenceToggleProps = {
 export default function PresenceToggle({
   value,
   metalPlaceAvailable,
+  campingAvailable = true,
   labels,
   onChange,
   className,
@@ -44,16 +47,18 @@ export default function PresenceToggle({
         <b id={titleId}>{labels.title}</b>
       </div>
       <div className={toggleClassName}>
-        <button
-          type="button"
-          className={`${styles.option} ${styles.camping} ${value === 'camping' ? styles.on : ''}`}
-          aria-pressed={value === 'camping'}
-          onClick={() => toggle('camping')}
-          disabled={disabled}
-        >
-          <span className={styles.dot} aria-hidden />
-          {labels.camping}
-        </button>
+        {campingAvailable && (
+          <button
+            type="button"
+            className={`${styles.option} ${styles.camping} ${value === 'camping' ? styles.on : ''}`}
+            aria-pressed={value === 'camping'}
+            onClick={() => toggle('camping')}
+            disabled={disabled}
+          >
+            <span className={styles.dot} aria-hidden />
+            {labels.camping}
+          </button>
+        )}
         {metalPlaceAvailable && (
           <button
             type="button"

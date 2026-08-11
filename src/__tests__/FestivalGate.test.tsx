@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import FestivalGate from '../components/FestivalGate';
+import FestivalGate, { FeatureRoute } from '../components/FestivalGate';
+import type { Festival } from '../types/festival';
 
 const mocks = vi.hoisted(() => ({
   useActiveFestival: vi.fn(),
@@ -14,6 +15,17 @@ vi.mock('../hooks/useActiveFestival', () => ({
 vi.mock('../components/AuthBootstrapShell', () => ({
   default: () => <div>bootstrapping</div>,
 }));
+
+const wacken: Festival = {
+  id: 'f1',
+  slug: 'wacken-2026',
+  name: 'Wacken',
+  timezone: 'Europe/Berlin',
+  starts_at: '2026-07-27T00:00:00+02:00',
+  ends_at: '2026-08-02T03:00:00+02:00',
+  features: { map: true, wrap: true },
+  cache_version: '1',
+};
 
 function renderGate() {
   return render(
@@ -28,6 +40,30 @@ function renderGate() {
           }
         />
         <Route path="/festivals" element={<div>festivals catalog</div>} />
+      </Routes>
+    </MemoryRouter>,
+  );
+}
+
+function renderFeatureRoute(feature: 'map' | 'wrap', festival: Festival | null) {
+  mocks.useActiveFestival.mockReturnValue({
+    ready: true,
+    memberships: festival ? [{ user_id: 'u1', festival_id: festival.id, opted_in_at: '2026-01-01T00:00:00Z' }] : [],
+    activeFestivalId: festival?.id ?? null,
+    festival,
+  });
+  return render(
+    <MemoryRouter initialEntries={['/map']}>
+      <Routes>
+        <Route
+          path="/map"
+          element={
+            <FeatureRoute feature={feature}>
+              <div>feature content</div>
+            </FeatureRoute>
+          }
+        />
+        <Route path="/now" element={<div>now page</div>} />
       </Routes>
     </MemoryRouter>,
   );
@@ -76,5 +112,22 @@ describe('FestivalGate', () => {
     });
     renderGate();
     expect(screen.getByText('festival content')).toBeInTheDocument();
+  });
+});
+
+describe('FeatureRoute', () => {
+  it('renders children when the festival has the feature', () => {
+    renderFeatureRoute('map', wacken);
+    expect(screen.getByText('feature content')).toBeInTheDocument();
+  });
+
+  it('redirects to /now when the feature is missing', () => {
+    renderFeatureRoute('map', { ...wacken, features: {} });
+    expect(screen.getByText('now page')).toBeInTheDocument();
+  });
+
+  it('redirects to /now when there is no active festival', () => {
+    renderFeatureRoute('wrap', null);
+    expect(screen.getByText('now page')).toBeInTheDocument();
   });
 });

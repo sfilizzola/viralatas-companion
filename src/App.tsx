@@ -13,7 +13,7 @@ import WrapPage from './pages/WrapPage';
 import MapPage from './pages/MapPage';
 import FestivalsPage from './pages/FestivalsPage';
 import PrivateRoute from './components/PrivateRoute';
-import FestivalGate from './components/FestivalGate';
+import FestivalGate, { FeatureRoute } from './components/FestivalGate';
 import AuthBootstrapShell from './components/AuthBootstrapShell';
 import SessionExpiredBanner from './components/SessionExpiredBanner';
 import SyncToast from './components/SyncToast';
@@ -32,99 +32,109 @@ function AppRoutes() {
 
   return (
     <ActiveFestivalProvider>
-      <SyncOrchestration />
-      <SyncToast />
-      <DuckToast />
-      <SessionExpiredBanner />
-      <Routes>
-        <Route path="/" element={<Navigate to="/now" replace />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route
-          path="/schedule"
-          element={
-            <PrivateRoute>
-              <FestivalGate>
-                <LineupPage />
-              </FestivalGate>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/my-picks"
-          element={
-            <PrivateRoute>
-              <FestivalGate>
-                <MyPicksPage />
-              </FestivalGate>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/popular"
-          element={
-            <PrivateRoute>
-              <FestivalGate>
-                <PopularPage />
-              </FestivalGate>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/now"
-          element={
-            <PrivateRoute>
-              <FestivalGate>
-                <RightNowPage />
-              </FestivalGate>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/announcements"
-          element={
-            <PrivateRoute>
-              <FestivalGate>
-                <AnnouncementsPage />
-              </FestivalGate>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/map"
-          element={
-            <PrivateRoute>
-              <MapPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/profile"
-          element={
-            <PrivateRoute>
-              <ProfilePage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/festivals"
-          element={
-            <PrivateRoute>
-              <FestivalsPage />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/wrap"
-          element={
-            <PrivateRoute>
-              <WrapPage />
-            </PrivateRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/now" replace />} />
-      </Routes>
+      <DuckEnabledProvider>
+        <SyncOrchestration />
+        <SyncToast />
+        <DuckToast />
+        <SessionExpiredBanner />
+        <Routes>
+          <Route path="/" element={<Navigate to="/now" replace />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route
+            path="/schedule"
+            element={
+              <PrivateRoute>
+                <FestivalGate>
+                  <LineupPage />
+                </FestivalGate>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/my-picks"
+            element={
+              <PrivateRoute>
+                <FestivalGate>
+                  <MyPicksPage />
+                </FestivalGate>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/popular"
+            element={
+              <PrivateRoute>
+                <FestivalGate>
+                  <PopularPage />
+                </FestivalGate>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/now"
+            element={
+              <PrivateRoute>
+                <FestivalGate>
+                  <RightNowPage />
+                </FestivalGate>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/announcements"
+            element={
+              <PrivateRoute>
+                <FestivalGate>
+                  <AnnouncementsPage />
+                </FestivalGate>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/map"
+            element={
+              <PrivateRoute>
+                <FestivalGate>
+                  <FeatureRoute feature="map">
+                    <MapPage />
+                  </FeatureRoute>
+                </FestivalGate>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <ProfilePage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/festivals"
+            element={
+              <PrivateRoute>
+                <FestivalsPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/wrap"
+            element={
+              <PrivateRoute>
+                <FestivalGate>
+                  <FeatureRoute feature="wrap">
+                    <WrapPage />
+                  </FeatureRoute>
+                </FestivalGate>
+              </PrivateRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/now" replace />} />
+        </Routes>
+      </DuckEnabledProvider>
     </ActiveFestivalProvider>
   );
 }
@@ -132,10 +142,8 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <DuckEnabledProvider>
-        <SpeedInsights />
-        <AppRoutes />
-      </DuckEnabledProvider>
+      <SpeedInsights />
+      <AppRoutes />
     </BrowserRouter>
   );
 }

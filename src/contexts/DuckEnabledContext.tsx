@@ -8,6 +8,8 @@ import {
   type ReactNode,
 } from 'react';
 import { getDuckEnabled } from '../lib/appSettings';
+import { useActiveFestival } from '../hooks/useActiveFestival';
+import { canShowDuck } from '../lib/festivalFeatures';
 
 type DuckEnabledContextValue = {
   duckEnabled: boolean;
@@ -27,12 +29,13 @@ const DEFAULT_VALUE: DuckEnabledContextValue = {
 const DuckEnabledContext = createContext<DuckEnabledContextValue>(DEFAULT_VALUE);
 
 export function DuckEnabledProvider({ children }: Readonly<{ children: ReactNode }>) {
-  const [duckEnabled, setDuckEnabled] = useState(true);
+  const { festival } = useActiveFestival();
+  const [duckEnabledFlag, setDuckEnabledFlag] = useState(true);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     const value = await getDuckEnabled();
-    setDuckEnabled(value);
+    setDuckEnabledFlag(value);
     setLoading(false);
   }, []);
 
@@ -41,6 +44,8 @@ export function DuckEnabledProvider({ children }: Readonly<{ children: ReactNode
       setLoading(false);
     });
   }, [refresh]);
+
+  const duckEnabled = duckEnabledFlag && canShowDuck(festival);
 
   const contextValue = useMemo(
     () => ({ duckEnabled, loading, refresh }),
