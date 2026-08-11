@@ -16,6 +16,7 @@ export type OfflinePickOp = {
   id: string;
   user_id: string;
   band_id: string;
+  festival_id: string;
   action: 'add' | 'remove';
   created_at: string;
 };
@@ -97,6 +98,7 @@ export type ViralatasDB = {
   };
   pending_announcements: {
     key: string;
+    /** Pending offline posts — Announcement already requires festival_id. */
     value: Announcement;
   };
   metal_place_config: {
@@ -113,7 +115,11 @@ export type ViralatasDB = {
   };
   meta: {
     key: string;
-    value: { cache_version: string };
+    value: {
+      cache_version?: string;
+      active_festival_id?: string;
+      active_festival_cache_version?: string;
+    };
   };
   user_missed_bands: {
     key: [string, string];

@@ -303,6 +303,7 @@ describe('IndexedDB layer (lib/db.ts)', () => {
         id: 'op-1',
         user_id: 'user-1',
         band_id: 'band-1',
+        festival_id: 'wacken-2026',
         action: 'add' as const,
         created_at: '2026-05-01T12:00:00Z',
       };
@@ -738,6 +739,7 @@ describe('IndexedDB layer (lib/db.ts)', () => {
         id: 'op-1',
         user_id: 'user-1',
         band_id: 'band-1',
+        festival_id: 'wacken-2026',
         action: 'add',
         created_at: '2026-05-01T12:00:00Z',
       });

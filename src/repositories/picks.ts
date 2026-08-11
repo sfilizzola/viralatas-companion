@@ -27,6 +27,7 @@ async function queuePick(
     id: offlinePickId(userId, bandId),
     user_id: userId,
     band_id: bandId,
+    festival_id: 'wacken-2026',
     action,
     created_at: createdAt,
   });
@@ -47,7 +48,7 @@ const pickOfflineQueue = createOptimisticQueue<OfflinePickOp>(
     syncOne: async (op) => {
       if (op.action === 'add') {
         return supabase.from('user_picks').upsert({
-          user_id: op.user_id, band_id: op.band_id, festival_id: 'wacken-2026', created_at: op.created_at,
+          user_id: op.user_id, band_id: op.band_id, festival_id: op.festival_id, created_at: op.created_at,
         });
       }
       return supabase

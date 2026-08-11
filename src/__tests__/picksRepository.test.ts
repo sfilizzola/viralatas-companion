@@ -75,6 +75,7 @@ function makeOp(
     id: id ?? `${userId}:${bandId}:${createdAt}`,
     user_id: userId,
     band_id: bandId,
+    festival_id: 'wacken-2026',
     action,
     created_at: createdAt,
   };
