@@ -13,6 +13,7 @@ import WrapPage from './pages/WrapPage';
 import MapPage from './pages/MapPage';
 import FestivalsPage from './pages/FestivalsPage';
 import PrivateRoute from './components/PrivateRoute';
+import FestivalGate from './components/FestivalGate';
 import AuthBootstrapShell from './components/AuthBootstrapShell';
 import SessionExpiredBanner from './components/SessionExpiredBanner';
 import SyncToast from './components/SyncToast';
@@ -44,7 +45,9 @@ function AppRoutes() {
           path="/schedule"
           element={
             <PrivateRoute>
-              <LineupPage />
+              <FestivalGate>
+                <LineupPage />
+              </FestivalGate>
             </PrivateRoute>
           }
         />
@@ -52,7 +55,9 @@ function AppRoutes() {
           path="/my-picks"
           element={
             <PrivateRoute>
-              <MyWackenPage />
+              <FestivalGate>
+                <MyWackenPage />
+              </FestivalGate>
             </PrivateRoute>
           }
         />
@@ -60,7 +65,9 @@ function AppRoutes() {
           path="/popular"
           element={
             <PrivateRoute>
-              <PopularPage />
+              <FestivalGate>
+                <PopularPage />
+              </FestivalGate>
             </PrivateRoute>
           }
         />
@@ -68,7 +75,9 @@ function AppRoutes() {
           path="/now"
           element={
             <PrivateRoute>
-              <RightNowPage />
+              <FestivalGate>
+                <RightNowPage />
+              </FestivalGate>
             </PrivateRoute>
           }
         />
@@ -76,7 +85,9 @@ function AppRoutes() {
           path="/announcements"
           element={
             <PrivateRoute>
-              <AnnouncementsPage />
+              <FestivalGate>
+                <AnnouncementsPage />
+              </FestivalGate>
             </PrivateRoute>
           }
         />

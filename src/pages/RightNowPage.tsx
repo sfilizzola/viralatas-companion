@@ -6,6 +6,7 @@ import type { CrewLiveGroup } from '../services/livePreview';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
+import FestivalSwitcher from '../components/FestivalSwitcher';
 import OfflineBanner from '../components/OfflineBanner';
 import BadgesDisplay from '../components/BadgesDisplay';
 import PresenceToggle from '../components/PresenceToggle';
@@ -99,7 +100,10 @@ export default function RightNowPage() {
     <div className={styles.page}>
       <OfflineBanner />
       <header className={styles.header}>
-        <span className={styles.title}>{t('title')}</span>
+        <div className={styles.headerLeft}>
+          <span className={styles.title}>{t('title')}</span>
+          <FestivalSwitcher />
+        </div>
         <div className={styles.headerRight}>
           <button
             className={styles.chip}
