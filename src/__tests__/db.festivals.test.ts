@@ -14,6 +14,8 @@ import {
   enqueueOfflinePresence,
   getActiveFestivalCacheVersion,
   getActiveFestivalId,
+  loadFestivalCatalog,
+  loadFestivalMemberships,
   loadAllAnnouncementReactions,
   loadAllBandRatings,
   loadAllMissedBands,
@@ -50,12 +52,16 @@ import {
   saveSession,
   saveUserPick,
   saveUserPresence,
+  saveFestivalCatalog,
+  saveFestivalMemberships,
   setActiveFestivalCacheVersion,
   setActiveFestivalId,
 } from '../lib/db';
 import type {
   Announcement,
   Band,
+  Festival,
+  FestivalMembership,
   LiveBandTestConfig,
   MetalPlaceConfig,
   UserMissedBand,
@@ -152,6 +158,58 @@ describe('IndexedDB festival meta (lib/db/festivals.ts)', () => {
 
       await setActiveFestivalCacheVersion('fest-v1');
       expect(await getActiveFestivalCacheVersion()).toBe('fest-v1');
+    });
+  });
+
+  describe('festival catalog + memberships cache', () => {
+    it('save/load festival catalog and memberships round-trip', async () => {
+      const catalog: Festival[] = [
+        {
+          id: 'wacken-2026',
+          slug: 'wacken-2026',
+          name: 'Wacken',
+          timezone: 'Europe/Berlin',
+          starts_at: '2026-07-27T00:00:00+02:00',
+          ends_at: '2026-08-02T03:00:00+02:00',
+          features: { map: true },
+          cache_version: '1',
+        },
+      ];
+      const memberships: FestivalMembership[] = [
+        { user_id: 'user-1', festival_id: 'wacken-2026', opted_in_at: '2026-05-01T12:00:00Z' },
+      ];
+
+      expect(await loadFestivalCatalog()).toEqual([]);
+      expect(await loadFestivalMemberships()).toEqual([]);
+
+      await saveFestivalCatalog(catalog);
+      await saveFestivalMemberships(memberships);
+
+      expect(await loadFestivalCatalog()).toEqual(catalog);
+      expect(await loadFestivalMemberships()).toEqual(memberships);
+    });
+
+    it('survives clearActiveFestivalPack (meta, not pack stores)', async () => {
+      await saveFestivalCatalog([
+        {
+          id: 'wacken-2026',
+          slug: 'wacken-2026',
+          name: 'Wacken',
+          timezone: 'Europe/Berlin',
+          starts_at: '2026-07-27T00:00:00+02:00',
+          ends_at: '2026-08-02T03:00:00+02:00',
+          features: {},
+          cache_version: '1',
+        },
+      ]);
+      await saveFestivalMemberships([
+        { user_id: 'user-1', festival_id: 'wacken-2026', opted_in_at: '2026-05-01T12:00:00Z' },
+      ]);
+
+      await clearActiveFestivalPack();
+
+      expect(await loadFestivalCatalog()).toHaveLength(1);
+      expect(await loadFestivalMemberships()).toHaveLength(1);
     });
   });
 

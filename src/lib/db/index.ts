@@ -110,5 +110,9 @@ export {
   getActiveFestivalCacheVersion,
   setActiveFestivalCacheVersion,
   clearActiveFestivalPack,
+  saveFestivalCatalog,
+  loadFestivalCatalog,
+  saveFestivalMemberships,
+  loadFestivalMemberships,
 } from './festivals';
 export { loadUserBadgeHistory, replaceUserBadgeHistory } from './badgeHistory';

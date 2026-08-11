@@ -13,7 +13,14 @@ export default function FestivalGate({ children }: Props) {
     return <AuthBootstrapShell />;
   }
 
-  if (memberships.length === 0 || !activeFestivalId) {
+  const offline = typeof navigator !== 'undefined' && !navigator.onLine;
+  // Online: require memberships + active id. Offline cold-start: allow through when
+  // activeFestivalId is set even if memberships failed to hydrate from network.
+  const hasAccess =
+    (memberships.length > 0 && !!activeFestivalId) ||
+    (offline && !!activeFestivalId);
+
+  if (!hasAccess) {
     return <Navigate to="/festivals" replace />;
   }
 

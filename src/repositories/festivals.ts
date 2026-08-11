@@ -2,6 +2,8 @@ import {
   clearActiveFestivalId,
   clearActiveFestivalPack,
   getActiveFestivalId,
+  saveFestivalCatalog,
+  saveFestivalMemberships,
   setActiveFestivalCacheVersion,
   setActiveFestivalId,
 } from '../lib/db/festivals';
@@ -31,7 +33,9 @@ function asFestival(row: Record<string, unknown>): Festival {
 async function syncCatalog(): Promise<Festival[]> {
   const { data, error } = await supabase.from('festivals').select('*');
   if (error) throw error;
-  return (data ?? []).map((row) => asFestival(row as Record<string, unknown>));
+  const catalog = (data ?? []).map((row) => asFestival(row as Record<string, unknown>));
+  await saveFestivalCatalog(catalog);
+  return catalog;
 }
 
 /** Server `users.active_festival_id` — source of truth when online. */
@@ -51,7 +55,9 @@ async function syncMyMemberships(userId: string): Promise<FestivalMembership[]> 
     .select('*')
     .eq('user_id', userId);
   if (error) throw error;
-  return (data ?? []) as FestivalMembership[];
+  const memberships = (data ?? []) as FestivalMembership[];
+  await saveFestivalMemberships(memberships);
+  return memberships;
 }
 
 async function optIn(userId: string, festivalId: string): Promise<void> {

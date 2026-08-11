@@ -1,8 +1,11 @@
+import type { Festival, FestivalMembership } from '../../types';
 import { getDB } from './connection';
 import type { ViralatasDB } from './types';
 
 const ACTIVE_FESTIVAL_ID_KEY = 'active_festival_id';
 const ACTIVE_FESTIVAL_CACHE_VERSION_KEY = 'active_festival_cache_version';
+const FESTIVAL_CATALOG_KEY = 'festival_catalog';
+const FESTIVAL_MEMBERSHIPS_KEY = 'festival_memberships';
 
 /** Festival-scoped stores cleared on pack switch — session, meta, badge history kept. */
 export const FESTIVAL_PACK_OBJECT_STORES = [
@@ -65,4 +68,30 @@ export async function clearActiveFestivalPack(): Promise<void> {
   const tx = db.transaction(stores, 'readwrite');
   await Promise.all(stores.map((store) => tx.objectStore(store).clear()));
   await tx.done;
+}
+
+/** Persist festival catalog for offline FestivalGate / ActiveFestivalProvider. */
+export async function saveFestivalCatalog(catalog: Festival[]): Promise<void> {
+  const db = await getDB();
+  await db.put('meta', { festival_catalog: catalog }, FESTIVAL_CATALOG_KEY);
+}
+
+export async function loadFestivalCatalog(): Promise<Festival[]> {
+  const db = await getDB();
+  const row = await db.get('meta', FESTIVAL_CATALOG_KEY);
+  return row?.festival_catalog ?? [];
+}
+
+/** Persist current user's memberships for offline hydrate. */
+export async function saveFestivalMemberships(
+  memberships: FestivalMembership[],
+): Promise<void> {
+  const db = await getDB();
+  await db.put('meta', { festival_memberships: memberships }, FESTIVAL_MEMBERSHIPS_KEY);
+}
+
+export async function loadFestivalMemberships(): Promise<FestivalMembership[]> {
+  const db = await getDB();
+  const row = await db.get('meta', FESTIVAL_MEMBERSHIPS_KEY);
+  return row?.festival_memberships ?? [];
 }

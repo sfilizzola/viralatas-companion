@@ -3,13 +3,15 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
 import {
   clearActiveFestivalId,
   getActiveFestivalId,
-  setActiveFestivalId,
+  loadFestivalCatalog,
+  loadFestivalMemberships,
 } from '../../lib/db/festivals';
 import { useAuth } from '../../hooks/useAuth';
 import { festivalsRepository } from '../../repositories/festivals';
@@ -49,34 +51,49 @@ export function ActiveFestivalProvider({ children }: Readonly<{ children: ReactN
   const [catalog, setCatalog] = useState<Festival[]>([]);
   const [memberships, setMemberships] = useState<FestivalMembership[]>([]);
   const [activeFestivalId, setActiveFestivalIdState] = useState<string | null>(null);
+  /** Prevents re-entrant pack switch while hydrate is already reconciling server active id. */
+  const reconcilingActiveRef = useRef(false);
 
   const hydrate = useCallback(async (uid: string) => {
     let activeId = await getActiveFestivalId();
+    // Offline-first: seed from IDB before (or instead of) network sync.
+    let nextCatalog = await loadFestivalCatalog();
+    let nextMemberships = await loadFestivalMemberships();
 
-    let nextCatalog: Festival[] = [];
-    let nextMemberships: FestivalMembership[] = [];
     try {
       [nextCatalog, nextMemberships] = await Promise.all([
         festivalsRepository.syncCatalog(),
         festivalsRepository.syncMyMemberships(uid),
       ]);
     } catch {
-      // Offline / sync failure — still finish hydrate with IDB active id.
+      // Offline / sync failure — keep IDB catalog + memberships.
     }
 
-    if (typeof navigator !== 'undefined' && navigator.onLine) {
+    if (
+      typeof navigator !== 'undefined' &&
+      navigator.onLine &&
+      !reconcilingActiveRef.current
+    ) {
       try {
         const serverId = await festivalsRepository.fetchServerActiveFestivalId(uid);
         if (serverId !== activeId) {
           if (serverId) {
-            await setActiveFestivalId(serverId);
+            reconcilingActiveRef.current = true;
+            try {
+              // Full pack switch — do not meta-only update (would orphan empty pack).
+              await festivalsRepository.setActiveFestival(uid, serverId);
+              activeId = serverId;
+            } finally {
+              reconcilingActiveRef.current = false;
+            }
           } else {
             await clearActiveFestivalId();
+            activeId = null;
           }
-          activeId = serverId;
         }
       } catch {
-        // Keep IDB active id if server reconcile fails.
+        // Keep IDB active id if server reconcile / pack switch fails.
+        reconcilingActiveRef.current = false;
       }
     }
 

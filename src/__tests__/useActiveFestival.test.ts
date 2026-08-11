@@ -30,8 +30,9 @@ const mocks = vi.hoisted(() => ({
   optOut: vi.fn(),
   setActiveFestival: vi.fn(),
   getActiveFestivalId: vi.fn(),
-  setActiveFestivalId: vi.fn(),
   clearActiveFestivalId: vi.fn(),
+  loadFestivalCatalog: vi.fn(),
+  loadFestivalMemberships: vi.fn(),
   fetchServerActiveFestivalId: vi.fn(),
   useAuth: vi.fn(),
 }));
@@ -53,8 +54,9 @@ vi.mock('../repositories/festivals', () => ({
 
 vi.mock('../lib/db/festivals', () => ({
   getActiveFestivalId: mocks.getActiveFestivalId,
-  setActiveFestivalId: mocks.setActiveFestivalId,
   clearActiveFestivalId: mocks.clearActiveFestivalId,
+  loadFestivalCatalog: mocks.loadFestivalCatalog,
+  loadFestivalMemberships: mocks.loadFestivalMemberships,
 }));
 
 import { ActiveFestivalProvider } from '../components/festival/ActiveFestivalProvider';
@@ -77,8 +79,9 @@ beforeEach(() => {
   });
 
   mocks.getActiveFestivalId.mockResolvedValue(FESTIVAL_ID);
-  mocks.setActiveFestivalId.mockResolvedValue(undefined);
   mocks.clearActiveFestivalId.mockResolvedValue(undefined);
+  mocks.loadFestivalCatalog.mockResolvedValue([]);
+  mocks.loadFestivalMemberships.mockResolvedValue([]);
   mocks.syncCatalog.mockResolvedValue([FESTIVAL]);
   mocks.syncMyMemberships.mockResolvedValue([MEMBERSHIP]);
   mocks.fetchServerActiveFestivalId.mockResolvedValue(FESTIVAL_ID);
@@ -132,7 +135,7 @@ describe('useActiveFestival', () => {
     });
   });
 
-  it('prefers server active_festival_id when online and updates IDB', async () => {
+  it('reconciles server active_festival_id via full pack switch when online', async () => {
     mocks.getActiveFestivalId.mockResolvedValue('local-fest');
     mocks.fetchServerActiveFestivalId.mockResolvedValue(FESTIVAL_ID);
 
@@ -142,8 +145,29 @@ describe('useActiveFestival', () => {
       expect(result.current.ready).toBe(true);
     });
 
-    expect(mocks.setActiveFestivalId).toHaveBeenCalledWith(FESTIVAL_ID);
+    expect(mocks.setActiveFestival).toHaveBeenCalledWith(USER_ID, FESTIVAL_ID);
     expect(result.current.activeFestivalId).toBe(FESTIVAL_ID);
     expect(result.current.festival).toEqual(FESTIVAL);
+  });
+
+  it('offline hydrate keeps ready + memberships from IDB when sync fails', async () => {
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+    mocks.loadFestivalCatalog.mockResolvedValue([FESTIVAL]);
+    mocks.loadFestivalMemberships.mockResolvedValue([MEMBERSHIP]);
+    mocks.syncCatalog.mockRejectedValue(new Error('offline'));
+    mocks.syncMyMemberships.mockRejectedValue(new Error('offline'));
+
+    const { result } = renderHook(() => useActiveFestival(), { wrapper });
+
+    await waitFor(() => {
+      expect(result.current.ready).toBe(true);
+    });
+
+    expect(result.current.catalog).toEqual([FESTIVAL]);
+    expect(result.current.memberships).toEqual([MEMBERSHIP]);
+    expect(result.current.activeFestivalId).toBe(FESTIVAL_ID);
+    expect(result.current.festival).toEqual(FESTIVAL);
+    expect(mocks.fetchServerActiveFestivalId).not.toHaveBeenCalled();
+    expect(mocks.setActiveFestival).not.toHaveBeenCalled();
   });
 });

@@ -15,6 +15,8 @@ const mocks = vi.hoisted(() => {
   const mockSetActiveFestivalCacheVersion = vi.fn().mockResolvedValue(undefined);
   const mockGetActiveFestivalId = vi.fn().mockResolvedValue(null);
   const mockClearActiveFestivalId = vi.fn().mockResolvedValue(undefined);
+  const mockSaveFestivalCatalog = vi.fn().mockResolvedValue(undefined);
+  const mockSaveFestivalMemberships = vi.fn().mockResolvedValue(undefined);
 
   const mockBandsSync = vi.fn().mockResolvedValue(undefined);
   const mockPicksSync = vi.fn().mockResolvedValue(undefined);
@@ -38,6 +40,8 @@ const mocks = vi.hoisted(() => {
     mockSetActiveFestivalCacheVersion,
     mockGetActiveFestivalId,
     mockClearActiveFestivalId,
+    mockSaveFestivalCatalog,
+    mockSaveFestivalMemberships,
     mockBandsSync,
     mockPicksSync,
     mockAnnouncementsSync,
@@ -58,6 +62,8 @@ vi.mock('../lib/db/festivals', () => ({
   setActiveFestivalCacheVersion: mocks.mockSetActiveFestivalCacheVersion,
   getActiveFestivalId: mocks.mockGetActiveFestivalId,
   clearActiveFestivalId: mocks.mockClearActiveFestivalId,
+  saveFestivalCatalog: mocks.mockSaveFestivalCatalog,
+  saveFestivalMemberships: mocks.mockSaveFestivalMemberships,
 }));
 
 vi.mock('../repositories/bands', () => ({
@@ -133,6 +139,8 @@ beforeEach(() => {
   mocks.mockSetActiveFestivalCacheVersion.mockResolvedValue(undefined);
   mocks.mockGetActiveFestivalId.mockResolvedValue(null);
   mocks.mockClearActiveFestivalId.mockResolvedValue(undefined);
+  mocks.mockSaveFestivalCatalog.mockResolvedValue(undefined);
+  mocks.mockSaveFestivalMemberships.mockResolvedValue(undefined);
   mocks.mockBandsSync.mockResolvedValue(undefined);
   mocks.mockPicksSync.mockResolvedValue(undefined);
   mocks.mockAnnouncementsSync.mockResolvedValue(undefined);
@@ -187,6 +195,7 @@ describe('festivalsRepository.syncCatalog', () => {
         cache_version: 'cv-42',
       },
     ]);
+    expect(mocks.mockSaveFestivalCatalog).toHaveBeenCalledWith(result);
   });
 });
 
@@ -205,6 +214,7 @@ describe('festivalsRepository.syncMyMemberships', () => {
     expect(select).toHaveBeenCalledWith('*');
     expect(eq).toHaveBeenCalledWith('user_id', USER_ID);
     expect(result).toEqual([MEMBERSHIP]);
+    expect(mocks.mockSaveFestivalMemberships).toHaveBeenCalledWith([MEMBERSHIP]);
   });
 });
 

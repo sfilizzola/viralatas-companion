@@ -71,6 +71,7 @@ function renderFeatureRoute(feature: 'map' | 'wrap', festival: Festival | null) 
 
 beforeEach(() => {
   vi.clearAllMocks();
+  Object.defineProperty(navigator, 'onLine', { configurable: true, value: true });
 });
 
 describe('FestivalGate', () => {
@@ -112,6 +113,28 @@ describe('FestivalGate', () => {
     });
     renderGate();
     expect(screen.getByText('festival content')).toBeInTheDocument();
+  });
+
+  it('allows through offline when activeFestivalId is set even if memberships empty', () => {
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+    mocks.useActiveFestival.mockReturnValue({
+      ready: true,
+      memberships: [],
+      activeFestivalId: 'f1',
+    });
+    renderGate();
+    expect(screen.getByText('festival content')).toBeInTheDocument();
+  });
+
+  it('still redirects offline when activeFestivalId is missing', () => {
+    Object.defineProperty(navigator, 'onLine', { configurable: true, value: false });
+    mocks.useActiveFestival.mockReturnValue({
+      ready: true,
+      memberships: [],
+      activeFestivalId: null,
+    });
+    renderGate();
+    expect(screen.getByText('festivals catalog')).toBeInTheDocument();
   });
 });
 

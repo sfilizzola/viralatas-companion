@@ -119,6 +119,8 @@ export type ViralatasDB = {
       cache_version?: string;
       active_festival_id?: string;
       active_festival_cache_version?: string;
+      festival_catalog?: import('../../types').Festival[];
+      festival_memberships?: import('../../types').FestivalMembership[];
     };
   };
   user_missed_bands: {
