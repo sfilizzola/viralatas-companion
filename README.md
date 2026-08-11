@@ -158,14 +158,16 @@ Core entities include `users`, `bands`, `user_picks`, `announcements`, `user_pre
 | Script | Purpose |
 |--------|---------|
 | `npm run lineup:check-official` | Fetch wacken.com running order, diff vs `docs/ai-wiki/lineup.md` (no writes). `--lineup` / `--complete` apply wiki + seed — see [lineup-official-source.md](docs/ai-wiki/lineup-official-source.md) |
-| `npm run seed:bands` | **Destructive** full lineup replace — **deletes all bands and picks**. Dev/staging reset only. |
-| `npm run seed:bands:sync` | Non-destructive lineup sync (dry-run by default; `--apply` to write, preserves picks on UPDATE) |
+| `npm run seed:bands` | **Destructive** lineup replace for `--festival` (default `wacken-2026`) — that festival's picks CASCADE. Other festivals untouched. |
+| `npm run seed:bands:sync` | Non-destructive lineup sync scoped to `--festival` (dry-run by default; `--apply` to write) |
 | `npm run seed:bands:backfill-slot-id -- --apply` | One-time `slot_id` bootstrap (UPDATE only) |
 | `npm run seed:bands:move -- --from FAS1 --to LOU3 [--apply]` | Move picks when a band changes slot |
+| `npm run seed:festival` | Upsert a festival by `--slug` / `--name` / `--tz` / `--starts` / `--ends` / `--features` |
+| `npm run seed:demo-fest` | Multi-festival proof: upsert `demo-fest-2027` + 3 fake bands (does not touch Wacken) |
 | `npm run seed:test-users` | Disposable test vira-latas + random picks/presence |
 | `npm run seed:test-users:delete` | Remove only `viralatas-test.example.com` users |
 | `npm run seed:live-now` | Time-shift bands for `/now` testing (reseeds bands → wipes picks) |
-| `npm run festival:reset` | Wipes social state; `--with-bands` also nukes lineup/picks |
+| `npm run festival:reset` | Wipes social state for `--festival`; `--with-bands` reseeds that festival only |
 
 **Production:** this Supabase project has **no point-in-time restore**. Prefer `seed:bands:sync` for lineup edits. Do not run destructive seeds on prod without explicit intent.
 
