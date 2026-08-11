@@ -1,3 +1,10 @@
+export type {
+  Festival,
+  FestivalFeatureKey,
+  FestivalFeatures,
+  FestivalMembership,
+} from './festival';
+
 export type UserRole = 'normal' | 'manager' | 'godlike';
 
 export type Country = 'de' | 'es' | 'br' | 'us' | 'co' | 'be' | 'other';
@@ -15,6 +22,7 @@ export type User = {
   wacken_years: number[];
   country: Country | null;
   wacken_arrival_day?: string | null;
+  active_festival_id?: string | null;
 };
 
 export type CrewUser = Pick<
@@ -28,6 +36,7 @@ export type BandCategory = 'band' | 'ceremony';
 
 export type Band = {
   id: string;
+  festival_id: string;
   slot_id: string;
   name: string;
   stage: string;
@@ -41,6 +50,7 @@ export type Band = {
 export type UserPick = {
   user_id: string;
   band_id: string;
+  festival_id: string;
   created_at: string;
 };
 
@@ -78,6 +88,7 @@ export type UserPresence = {
 
 export type Announcement = {
   id: string;
+  festival_id: string;
   author_id: string;
   content: string;
   created_at: string;
