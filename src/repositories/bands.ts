@@ -7,11 +7,10 @@ import { presenceRepository } from './presence';
 import { announcementsRepository } from './announcements';
 
 export const bandsRepository = {
-  async sync(): Promise<void> {
-    const { data, error } = await supabase
-      .from('bands')
-      .select('*')
-      .order('start_time');
+  async sync(festivalId?: string): Promise<void> {
+    let query = supabase.from('bands').select('*');
+    if (festivalId) query = query.eq('festival_id', festivalId);
+    const { data, error } = await query.order('start_time');
 
     if (error) throw error;
     if (data && data.length > 0) await saveBands(data as unknown as Band[]);

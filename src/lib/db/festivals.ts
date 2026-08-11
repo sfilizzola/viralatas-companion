@@ -37,6 +37,13 @@ export async function setActiveFestivalId(festivalId: string): Promise<void> {
   await db.put('meta', { active_festival_id: festivalId }, ACTIVE_FESTIVAL_ID_KEY);
 }
 
+/** Clears Active Festival id + cache version meta (e.g. Leave Active Festival). */
+export async function clearActiveFestivalId(): Promise<void> {
+  const db = await getDB();
+  await db.delete('meta', ACTIVE_FESTIVAL_ID_KEY);
+  await db.delete('meta', ACTIVE_FESTIVAL_CACHE_VERSION_KEY);
+}
+
 export async function getActiveFestivalCacheVersion(): Promise<string | null> {
   const db = await getDB();
   const row = await db.get('meta', ACTIVE_FESTIVAL_CACHE_VERSION_KEY);

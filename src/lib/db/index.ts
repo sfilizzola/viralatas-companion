@@ -106,6 +106,7 @@ export {
   FESTIVAL_PACK_OBJECT_STORES,
   getActiveFestivalId,
   setActiveFestivalId,
+  clearActiveFestivalId,
   getActiveFestivalCacheVersion,
   setActiveFestivalCacheVersion,
   clearActiveFestivalPack,

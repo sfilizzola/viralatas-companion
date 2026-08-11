@@ -41,10 +41,10 @@ const announcementOfflineQueue = createOptimisticQueue<Announcement>(
   },
 );
 
-async function sync(): Promise<void> {
-  const { data, error } = await supabase
-    .from('announcements')
-    .select('*')
+async function sync(festivalId?: string): Promise<void> {
+  let query = supabase.from('announcements').select('*');
+  if (festivalId) query = query.eq('festival_id', festivalId);
+  const { data, error } = await query
     .order('created_at', { ascending: false })
     .limit(INITIAL_SYNC_LIMIT);
 

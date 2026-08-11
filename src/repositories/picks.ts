@@ -107,8 +107,10 @@ async function syncForUser(userId: string): Promise<void> {
   await replaceUserPicks(data as UserPick[], userId);
 }
 
-async function syncCrewFromRemote(): Promise<void> {
-  const { data, error } = await supabase.from('user_picks').select('*');
+async function syncCrewFromRemote(festivalId?: string): Promise<void> {
+  let query = supabase.from('user_picks').select('*');
+  if (festivalId) query = query.eq('festival_id', festivalId);
+  const { data, error } = await query;
   if (error || !data) return;
 
   await replaceUserPicks(data as UserPick[]);

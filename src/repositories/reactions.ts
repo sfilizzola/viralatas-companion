@@ -114,7 +114,27 @@ async function flushOfflineQueue(): Promise<number> {
   return reactionsOfflineQueue.flush();
 }
 
-async function syncFromRemote(): Promise<void> {
+async function syncFromRemote(festivalId?: string): Promise<void> {
+  if (festivalId) {
+    const { data: announcements, error: annError } = await supabase
+      .from('announcements')
+      .select('id')
+      .eq('festival_id', festivalId);
+    if (annError) return;
+    const announcementIds = (announcements ?? []).map((a) => a.id);
+    if (announcementIds.length === 0) {
+      await replaceAllAnnouncementReactions([]);
+      return;
+    }
+    const { data, error } = await supabase
+      .from('announcement_reactions')
+      .select('*')
+      .in('announcement_id', announcementIds);
+    if (error || !data) return;
+    await replaceAllAnnouncementReactions(data as AnnouncementReactionRow[]);
+    return;
+  }
+
   const { data, error } = await supabase.from('announcement_reactions').select('*');
   if (error || !data) return;
   await replaceAllAnnouncementReactions(data as AnnouncementReactionRow[]);

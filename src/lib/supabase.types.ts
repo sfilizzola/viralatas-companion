@@ -18,6 +18,7 @@ export type Database = {
           country: string | null;
           special_badges: string[];
           wacken_arrival_day: string | null;
+          active_festival_id: string | null;
         };
         Insert: {
           id?: string;
@@ -33,6 +34,7 @@ export type Database = {
           country?: string | null;
           special_badges?: string[];
           wacken_arrival_day?: string | null;
+          active_festival_id?: string | null;
         };
         Update: {
           id?: string;
@@ -48,6 +50,61 @@ export type Database = {
           country?: string | null;
           special_badges?: string[];
           wacken_arrival_day?: string | null;
+          active_festival_id?: string | null;
+        };
+        Relationships: [];
+      };
+      festivals: {
+        Row: {
+          id: string;
+          slug: string;
+          name: string;
+          timezone: string;
+          starts_at: string;
+          ends_at: string;
+          features: Json;
+          cache_version: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          slug: string;
+          name: string;
+          timezone?: string;
+          starts_at: string;
+          ends_at: string;
+          features?: Json;
+          cache_version?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          slug?: string;
+          name?: string;
+          timezone?: string;
+          starts_at?: string;
+          ends_at?: string;
+          features?: Json;
+          cache_version?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      festival_memberships: {
+        Row: {
+          user_id: string;
+          festival_id: string;
+          opted_in_at: string;
+        };
+        Insert: {
+          user_id: string;
+          festival_id: string;
+          opted_in_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          festival_id?: string;
+          opted_in_at?: string;
         };
         Relationships: [];
       };
