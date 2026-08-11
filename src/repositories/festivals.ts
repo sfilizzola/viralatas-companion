@@ -76,7 +76,7 @@ async function loadActivePack(userId: string, festivalId: string): Promise<void>
     picksRepository.syncCrewFromRemote(festivalId),
     announcementsRepository.sync(festivalId),
     reactionsRepository.syncFromRemote(festivalId),
-    missedRepository.syncFromRemote(userId),
+    missedRepository.syncFromRemote(userId, festivalId),
     ratingsRepository.syncCrewFromRemote(festivalId),
     usersRepository.syncCrew(festivalId),
   ]);

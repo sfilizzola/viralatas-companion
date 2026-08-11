@@ -1,4 +1,20 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { TEST_FESTIVAL_ID } from './helpers/testFestival';
+
+const mocks = vi.hoisted(() => ({
+  mockGetActiveFestivalId: vi.fn().mockResolvedValue('wacken-2026'),
+  mockSetActiveFestivalId: vi.fn().mockResolvedValue(undefined),
+  mockFrom: vi.fn(),
+}));
+
+vi.mock('../lib/db', () => ({
+  getActiveFestivalId: mocks.mockGetActiveFestivalId,
+  setActiveFestivalId: mocks.mockSetActiveFestivalId,
+}));
+
+vi.mock('../lib/supabase', () => ({
+  supabase: { from: mocks.mockFrom },
+}));
 
 vi.mock('../repositories', () => ({
   picksRepository: {
@@ -31,11 +47,15 @@ vi.mock('../repositories', () => ({
   usersRepository: {
     syncCrew: vi.fn().mockResolvedValue(undefined),
   },
+  bandsRepository: {
+    sync: vi.fn().mockResolvedValue(undefined),
+  },
 }));
 
 import { runReconnectSync } from '../lib/syncCoordinator';
 import {
   announcementsRepository,
+  bandsRepository,
   duckRepository,
   missedRepository,
   picksRepository,
@@ -49,6 +69,8 @@ const userId = 'user-coordinator-test';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.mockGetActiveFestivalId.mockResolvedValue(TEST_FESTIVAL_ID);
+  mocks.mockSetActiveFestivalId.mockResolvedValue(undefined);
   vi.mocked(picksRepository.flushOfflineQueue).mockResolvedValue(0);
   vi.mocked(presenceRepository.flushOfflineQueue).mockResolvedValue(0);
   vi.mocked(announcementsRepository.flushOfflineQueue).mockResolvedValue(0);
@@ -111,6 +133,9 @@ describe('runReconnectSync', () => {
     vi.mocked(ratingsRepository.syncCrewFromRemote).mockImplementation(async () => {
       callOrder.push('pull-ratings');
     });
+    vi.mocked(bandsRepository.sync).mockImplementation(async () => {
+      callOrder.push('pull-bands');
+    });
 
     const flushed = await runReconnectSync(userId);
 
@@ -120,6 +145,41 @@ describe('runReconnectSync', () => {
     expect(callOrder.indexOf('flush-reactions')).toBeLessThan(callOrder.indexOf('pull-announcements'));
     expect(callOrder.indexOf('pull-announcements')).toBeLessThan(callOrder.indexOf('pull-reactions'));
     expect(callOrder.indexOf('pull-reactions')).toBeLessThan(callOrder.indexOf('pull-picks'));
+  });
+
+  it('passes active festival id to festival-scoped flush and pull methods', async () => {
+    vi.mocked(picksRepository.flushOfflineQueue).mockResolvedValue(1);
+    vi.mocked(reactionsRepository.flushOfflineQueue).mockResolvedValue(1);
+
+    await runReconnectSync(userId);
+
+    expect(picksRepository.flushOfflineQueue).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
+    expect(announcementsRepository.flushOfflineQueue).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
+    expect(announcementsRepository.sync).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
+    expect(reactionsRepository.syncFromRemote).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
+    expect(bandsRepository.sync).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
+    expect(picksRepository.syncCrewFromRemote).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
+    expect(usersRepository.syncCrew).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
+    expect(missedRepository.syncFromRemote).toHaveBeenCalledWith(userId, TEST_FESTIVAL_ID);
+    expect(ratingsRepository.syncCrewFromRemote).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
+  });
+
+  it('hydrates active festival from users.active_festival_id when IDB meta is empty', async () => {
+    mocks.mockGetActiveFestivalId.mockResolvedValue(null);
+    const mockMaybeSingle = vi.fn().mockResolvedValue({
+      data: { active_festival_id: TEST_FESTIVAL_ID },
+      error: null,
+    });
+    const mockEq = vi.fn().mockReturnValue({ maybeSingle: mockMaybeSingle });
+    const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
+    mocks.mockFrom.mockReturnValue({ select: mockSelect });
+
+    await runReconnectSync(userId);
+
+    expect(mocks.mockFrom).toHaveBeenCalledWith('users');
+    expect(mocks.mockSetActiveFestivalId).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
+    expect(picksRepository.flushOfflineQueue).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
+    expect(bandsRepository.sync).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
   });
 
   it('calls all flush and pull repository methods', async () => {
@@ -137,10 +197,11 @@ describe('runReconnectSync', () => {
     expect(reactionsRepository.flushOfflineQueue).toHaveBeenCalledOnce();
     expect(announcementsRepository.sync).toHaveBeenCalledOnce();
     expect(reactionsRepository.syncFromRemote).toHaveBeenCalledOnce();
+    expect(bandsRepository.sync).toHaveBeenCalledOnce();
     expect(picksRepository.syncCrewFromRemote).toHaveBeenCalledOnce();
     expect(usersRepository.syncCrew).toHaveBeenCalledOnce();
     expect(presenceRepository.syncCrewFromRemote).toHaveBeenCalledOnce();
-    expect(missedRepository.syncFromRemote).toHaveBeenCalledWith(userId);
+    expect(missedRepository.syncFromRemote).toHaveBeenCalledWith(userId, TEST_FESTIVAL_ID);
     expect(ratingsRepository.syncCrewFromRemote).toHaveBeenCalledOnce();
   });
 

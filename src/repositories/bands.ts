@@ -1,5 +1,11 @@
 import { supabase } from '../lib/supabase';
-import { loadCacheVersion, saveCacheVersion, wipeAllLocalData, saveBands } from '../lib/db';
+import {
+  getActiveFestivalId,
+  loadCacheVersion,
+  saveCacheVersion,
+  wipeAllLocalData,
+  saveBands,
+} from '../lib/db';
 import type { Band } from '../types';
 import { picksRepository } from './picks';
 import { usersRepository } from './users';
@@ -35,12 +41,13 @@ export const bandsRepository = {
         await wipeAllLocalData();
         await saveCacheVersion(remoteVersion);
 
+        const festivalId = (await getActiveFestivalId()) ?? undefined;
         await Promise.all([
-          bandsRepository.sync(),
-          picksRepository.syncCrewFromRemote(),
-          usersRepository.syncCrew(),
+          bandsRepository.sync(festivalId),
+          picksRepository.syncCrewFromRemote(festivalId),
+          usersRepository.syncCrew(festivalId),
           presenceRepository.syncCrewFromRemote(),
-          announcementsRepository.sync(),
+          announcementsRepository.sync(festivalId),
         ]);
       }
     } catch (error) {

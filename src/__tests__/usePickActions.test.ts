@@ -10,7 +10,9 @@ vi.mock('../lib/supabase', () => ({
       upsert: vi.fn().mockResolvedValue({ error: null }),
       delete: vi.fn(() => ({
         eq: vi.fn(() => ({
-          eq: vi.fn().mockResolvedValue({ error: null }),
+          eq: vi.fn(() => ({
+            eq: vi.fn().mockResolvedValue({ error: null }),
+          })),
         })),
       })),
       select: vi.fn().mockResolvedValue({ data: [], error: null }),
@@ -24,8 +26,9 @@ vi.mock('../services/weakSkips', () => ({
   recordCommittedSkip,
 }));
 
-import { resetDbConnectionForTests, saveUserPick } from '../lib/db';
+import { resetDbConnectionForTests, saveUserPick, setActiveFestivalId } from '../lib/db';
 import { usePickActions } from '../hooks/usePickActions';
+import { TEST_FESTIVAL_ID } from './helpers/testFestival';
 
 const userId = 'user-test';
 const bandId = 'band-test';
@@ -33,6 +36,7 @@ const bandId = 'band-test';
 beforeEach(async () => {
   await resetDbConnectionForTests();
   await deleteViralatasDatabase();
+  await setActiveFestivalId(TEST_FESTIVAL_ID);
   recordCommittedSkip.mockClear();
   Object.defineProperty(navigator, 'onLine', { value: true, writable: true, configurable: true });
 });

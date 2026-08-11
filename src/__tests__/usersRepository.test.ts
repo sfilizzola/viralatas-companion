@@ -43,6 +43,49 @@ describe('usersRepository.syncCrew', () => {
     ]);
   });
 
+  it('scopes crew to festival_memberships when festivalId is provided', async () => {
+    const membershipSelect = vi.fn().mockReturnValue({
+      eq: vi.fn().mockResolvedValue({
+        data: [{ user_id: 'u1' }, { user_id: 'u2' }],
+        error: null,
+      }),
+    });
+    const crew = [
+      { id: 'u1', display_name: 'Alice', avatar_url: null, wacken_arrival_day: 1, is_friend: true, special_badges: [] },
+      { id: 'u2', display_name: 'Bob', avatar_url: null, wacken_arrival_day: 1, is_friend: false, special_badges: [] },
+    ];
+    const mockOrder = vi.fn().mockResolvedValue({ data: crew, error: null });
+    const mockIn = vi.fn().mockReturnValue({ order: mockOrder });
+    const usersSelect = vi.fn().mockReturnValue({ in: mockIn });
+
+    vi.mocked(supabase.from).mockImplementation((table: string) => {
+      if (table === 'festival_memberships') {
+        return { select: membershipSelect } as any;
+      }
+      return { select: usersSelect } as any;
+    });
+
+    await usersRepository.syncCrew('fest-1');
+
+    expect(supabase.from).toHaveBeenCalledWith('festival_memberships');
+    expect(mockIn).toHaveBeenCalledWith('id', ['u1', 'u2']);
+    expect(db.saveCrewUsers).toHaveBeenCalledWith([
+      expect.objectContaining({ id: 'u1' }),
+      expect.objectContaining({ id: 'u2' }),
+    ]);
+  });
+
+  it('saves empty crew when festival has no memberships', async () => {
+    const membershipSelect = vi.fn().mockReturnValue({
+      eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+    });
+    vi.mocked(supabase.from).mockReturnValue({ select: membershipSelect } as any);
+
+    await usersRepository.syncCrew('fest-empty');
+
+    expect(db.saveCrewUsers).toHaveBeenCalledWith([]);
+  });
+
   it('persists special_badges on crew_users IDB rows', async () => {
     const crew = [{ id: 'u1', display_name: 'Alice', avatar_url: null, wacken_arrival_day: 1, is_friend: false, special_badges: ['code-wizards'] }];
     const mockOrder = vi.fn().mockResolvedValue({ data: crew, error: null });

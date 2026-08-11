@@ -104,7 +104,9 @@ vi.mock('../lib/supabase', () => ({
       upsert: vi.fn().mockResolvedValue({ error: null }),
       delete: vi.fn(() => ({
         eq: vi.fn(() => ({
-          eq: vi.fn().mockResolvedValue({ error: null }),
+          eq: vi.fn(() => ({
+            eq: vi.fn().mockResolvedValue({ error: null }),
+          })),
         })),
       })),
       select: vi.fn().mockResolvedValue({ data: [], error: null }),
@@ -169,9 +171,11 @@ import {
   saveMetalPlaceConfig,
   saveUserPick,
   saveUserPresence,
+  setActiveFestivalId,
 } from '../lib/db';
 import { clearTimeOverride, setTimeOverride } from '../services/time';
 import { useNowData } from '../hooks/useNowData';
+import { TEST_FESTIVAL_ID } from './helpers/testFestival';
 
 const currentBand = scenarioBand(
   'band-current',
@@ -217,6 +221,7 @@ beforeEach(async () => {
   localStorageStore.clear();
   await resetDbConnectionForTests();
   await deleteViralatasDatabase();
+  await setActiveFestivalId(TEST_FESTIVAL_ID);
   setTimeOverride(SCENARIO_NOW);
   isTimeWithinMetalPlaceWindow.mockReturnValue(true);
   setCampingStatus.mockClear();

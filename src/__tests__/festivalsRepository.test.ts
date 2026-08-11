@@ -360,7 +360,7 @@ describe('festivalsRepository.setActiveFestival', () => {
     expect(mocks.mockPicksSync).toHaveBeenCalledWith(FESTIVAL_ID);
     expect(mocks.mockAnnouncementsSync).toHaveBeenCalledWith(FESTIVAL_ID);
     expect(mocks.mockReactionsSync).toHaveBeenCalledWith(FESTIVAL_ID);
-    expect(mocks.mockMissedSync).toHaveBeenCalledWith(USER_ID);
+    expect(mocks.mockMissedSync).toHaveBeenCalledWith(USER_ID, FESTIVAL_ID);
     expect(mocks.mockRatingsSync).toHaveBeenCalledWith(FESTIVAL_ID);
     expect(mocks.mockUsersSync).toHaveBeenCalledWith(FESTIVAL_ID);
   });
@@ -374,7 +374,7 @@ describe('festivalsRepository.loadActivePack', () => {
     expect(mocks.mockPicksSync).toHaveBeenCalledWith(FESTIVAL_ID);
     expect(mocks.mockAnnouncementsSync).toHaveBeenCalledWith(FESTIVAL_ID);
     expect(mocks.mockReactionsSync).toHaveBeenCalledWith(FESTIVAL_ID);
-    expect(mocks.mockMissedSync).toHaveBeenCalledWith(USER_ID);
+    expect(mocks.mockMissedSync).toHaveBeenCalledWith(USER_ID, FESTIVAL_ID);
     expect(mocks.mockRatingsSync).toHaveBeenCalledWith(FESTIVAL_ID);
     expect(mocks.mockUsersSync).toHaveBeenCalledWith(FESTIVAL_ID);
   });

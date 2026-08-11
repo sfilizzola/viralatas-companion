@@ -5,6 +5,7 @@ vi.mock('../lib/db', () => ({
   saveCacheVersion: vi.fn(),
   wipeAllLocalData: vi.fn(),
   saveBands: vi.fn(),
+  getActiveFestivalId: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock('../lib/supabase', () => ({
