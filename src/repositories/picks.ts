@@ -128,8 +128,24 @@ async function syncForUser(userId: string, festivalId?: string): Promise<void> {
 }
 
 async function syncCrewFromRemote(festivalId?: string): Promise<void> {
+  // Soft-leave keeps user_picks rows; membership-gate so leavers don't inflate counts.
+  let memberIds: string[] | null = null;
+  if (festivalId) {
+    const { data: memberships, error: membershipError } = await supabase
+      .from('festival_memberships')
+      .select('user_id')
+      .eq('festival_id', festivalId);
+    if (membershipError) return;
+    memberIds = (memberships ?? []).map((m) => (m as { user_id: string }).user_id);
+    if (memberIds.length === 0) {
+      await replaceUserPicks([]);
+      return;
+    }
+  }
+
   let query = supabase.from('user_picks').select('*');
   if (festivalId) query = query.eq('festival_id', festivalId);
+  if (memberIds) query = query.in('user_id', memberIds);
   const { data, error } = await query;
   if (error || !data) return;
 

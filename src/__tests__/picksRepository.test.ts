@@ -13,13 +13,24 @@ const mocks = vi.hoisted(() => {
   // upsert(data) → directly awaitable
   const mockUpsert = vi.fn().mockResolvedValue({ error: null });
 
-  // select('*') → awaitable; .eq('festival_id', …) for scoped sync
-  const mockSelectEq = vi.fn().mockResolvedValue({ data: [], error: null });
+  // select('*') → awaitable; .eq('festival_id', …) / .in('user_id', …) for scoped sync
+  const mockSelectIn = vi.fn().mockResolvedValue({ data: [], error: null });
+  const mockSelectEq = vi.fn(function selectEq() {
+    const result = Promise.resolve({ data: [], error: null }) as Promise<{ data: unknown; error: unknown }> & {
+      eq: typeof mockSelectEq;
+      in: typeof mockSelectIn;
+    };
+    result.eq = mockSelectEq;
+    result.in = mockSelectIn;
+    return result;
+  });
   const mockSelect = vi.fn(() => {
     const result = Promise.resolve({ data: [], error: null }) as Promise<{ data: unknown; error: unknown }> & {
       eq: typeof mockSelectEq;
+      in: typeof mockSelectIn;
     };
     result.eq = mockSelectEq;
+    result.in = mockSelectIn;
     return result;
   });
 
@@ -47,6 +58,7 @@ const mocks = vi.hoisted(() => {
     mockDeleteEqFinal,
     mockSelect,
     mockSelectEq,
+    mockSelectIn,
     mockSaveUserPick,
     mockRemoveUserPick,
     mockReplaceUserPicks,
@@ -71,8 +83,10 @@ vi.mock('../lib/db', () => ({
   getActiveFestivalId: mocks.mockGetActiveFestivalId,
 }));
 
+import { countPicks } from '../hooks/usePickCounts';
 import { picksRepository } from '../repositories/picks';
 import type { OfflinePickOp } from '../lib/db';
+import type { UserPick } from '../types';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -116,12 +130,23 @@ beforeEach(() => {
   mocks.mockDeleteEq2.mockReturnValue({ eq: mocks.mockDeleteEqFinal });
   mocks.mockDeleteEq1.mockReturnValue({ eq: mocks.mockDeleteEq2 });
   mocks.mockDelete.mockReturnValue({ eq: mocks.mockDeleteEq1 });
-  mocks.mockSelectEq.mockResolvedValue({ data: [], error: null });
+  mocks.mockSelectIn.mockResolvedValue({ data: [], error: null });
+  mocks.mockSelectEq.mockImplementation(function selectEq() {
+    const result = Promise.resolve({ data: [], error: null }) as Promise<{ data: unknown; error: unknown }> & {
+      eq: typeof mocks.mockSelectEq;
+      in: typeof mocks.mockSelectIn;
+    };
+    result.eq = mocks.mockSelectEq;
+    result.in = mocks.mockSelectIn;
+    return result;
+  });
   mocks.mockSelect.mockImplementation(() => {
     const result = Promise.resolve({ data: [], error: null }) as Promise<{ data: unknown; error: unknown }> & {
       eq: typeof mocks.mockSelectEq;
+      in: typeof mocks.mockSelectIn;
     };
     result.eq = mocks.mockSelectEq;
+    result.in = mocks.mockSelectIn;
     return result;
   });
   mocks.mockFrom.mockReturnValue({
@@ -456,21 +481,93 @@ describe('picksRepository.flushOfflineQueue()', () => {
 // ---------------------------------------------------------------------------
 
 describe('picksRepository.syncCrewFromRemote()', () => {
+  function mockMembershipScopedSync(options: {
+    memberIds: string[];
+    pickRows?: unknown[] | null;
+    pickError?: unknown;
+    membershipError?: unknown;
+  }) {
+    const membershipEq = vi.fn().mockResolvedValue({
+      data: options.memberIds.map((user_id) => ({ user_id })),
+      error: options.membershipError ?? null,
+    });
+    const membershipSelect = vi.fn().mockReturnValue({ eq: membershipEq });
+
+    const pickIn = vi.fn().mockResolvedValue({
+      data: options.pickRows === undefined ? [] : options.pickRows,
+      error: options.pickError ?? null,
+    });
+    const pickEq = vi.fn().mockReturnValue({ in: pickIn });
+    const pickSelect = vi.fn().mockReturnValue({ eq: pickEq, in: pickIn });
+
+    mocks.mockFrom.mockImplementation(((table: string) => {
+      if (table === 'festival_memberships') {
+        return { select: membershipSelect };
+      }
+      return {
+        upsert: mocks.mockUpsert,
+        delete: mocks.mockDelete,
+        select: pickSelect,
+      };
+    }) as typeof mocks.mockFrom);
+
+    return { membershipEq, membershipSelect, pickEq, pickIn, pickSelect };
+  }
+
   it('queries Supabase for all user_picks rows when unscoped', async () => {
     await picksRepository.syncCrewFromRemote();
 
     expect(mocks.mockFrom).toHaveBeenCalledWith('user_picks');
     expect(mocks.mockSelect).toHaveBeenCalledWith('*');
     expect(mocks.mockSelectEq).not.toHaveBeenCalled();
+    expect(mocks.mockFrom).not.toHaveBeenCalledWith('festival_memberships');
   });
 
-  it('filters by festival_id when provided', async () => {
+  it('membership-gates picks by festival_id when provided', async () => {
+    const { membershipEq, pickEq, pickIn } = mockMembershipScopedSync({
+      memberIds: ['user1', 'user2'],
+    });
+
     await picksRepository.syncCrewFromRemote(TEST_FESTIVAL_ID);
 
-    expect(mocks.mockSelectEq).toHaveBeenCalledWith('festival_id', TEST_FESTIVAL_ID);
+    expect(mocks.mockFrom).toHaveBeenCalledWith('festival_memberships');
+    expect(membershipEq).toHaveBeenCalledWith('festival_id', TEST_FESTIVAL_ID);
+    expect(pickEq).toHaveBeenCalledWith('festival_id', TEST_FESTIVAL_ID);
+    expect(pickIn).toHaveBeenCalledWith('user_id', ['user1', 'user2']);
   });
 
-  it('calls replaceUserPicks with all fetched rows', async () => {
+  it('excludes leaver picks from replaceUserPicks (membership filter)', async () => {
+    const memberPick = {
+      user_id: 'user1',
+      band_id: 'band1',
+      festival_id: TEST_FESTIVAL_ID,
+      created_at: '2026-07-29T10:00:00Z',
+    };
+    // Server still has leaver pick rows; membership query only returns user1.
+    mockMembershipScopedSync({
+      memberIds: ['user1'],
+      pickRows: [memberPick],
+    });
+
+    await picksRepository.syncCrewFromRemote(TEST_FESTIVAL_ID);
+
+    expect(mocks.mockReplaceUserPicks).toHaveBeenCalledOnce();
+    expect(mocks.mockReplaceUserPicks).toHaveBeenCalledWith([memberPick]);
+    // Leaver user2 never appears in the IDB replace payload → Popular counts exclude them.
+    const replaced = mocks.mockReplaceUserPicks.mock.calls[0][0] as UserPick[];
+    expect(replaced.every((p) => p.user_id === 'user1')).toBe(true);
+    expect(countPicks(replaced)).toEqual({ band1: 1 });
+  });
+
+  it('clears IDB picks when festival has no memberships', async () => {
+    mockMembershipScopedSync({ memberIds: [] });
+
+    await picksRepository.syncCrewFromRemote(TEST_FESTIVAL_ID);
+
+    expect(mocks.mockReplaceUserPicks).toHaveBeenCalledWith([]);
+  });
+
+  it('calls replaceUserPicks with all fetched rows when unscoped', async () => {
     const rows = [
       { user_id: 'user1', band_id: 'band1', festival_id: TEST_FESTIVAL_ID, created_at: '2026-07-29T10:00:00Z' },
       { user_id: 'user2', band_id: 'band2', festival_id: TEST_FESTIVAL_ID, created_at: '2026-07-29T11:00:00Z' },
@@ -478,8 +575,10 @@ describe('picksRepository.syncCrewFromRemote()', () => {
     mocks.mockSelect.mockImplementation(() => {
       const result = Promise.resolve({ data: rows, error: null }) as Promise<{ data: unknown; error: unknown }> & {
         eq: typeof mocks.mockSelectEq;
+        in: typeof mocks.mockSelectIn;
       };
       result.eq = mocks.mockSelectEq;
+      result.in = mocks.mockSelectIn;
       return result;
     });
 
@@ -494,8 +593,9 @@ describe('picksRepository.syncCrewFromRemote()', () => {
       const result = Promise.resolve({ data: null, error: new Error('forbidden') }) as Promise<{
         data: unknown;
         error: unknown;
-      }> & { eq: typeof mocks.mockSelectEq };
+      }> & { eq: typeof mocks.mockSelectEq; in: typeof mocks.mockSelectIn };
       result.eq = mocks.mockSelectEq;
+      result.in = mocks.mockSelectIn;
       return result;
     });
 
@@ -507,8 +607,10 @@ describe('picksRepository.syncCrewFromRemote()', () => {
     mocks.mockSelect.mockImplementation(() => {
       const result = Promise.resolve({ data: null, error: null }) as Promise<{ data: unknown; error: unknown }> & {
         eq: typeof mocks.mockSelectEq;
+        in: typeof mocks.mockSelectIn;
       };
       result.eq = mocks.mockSelectEq;
+      result.in = mocks.mockSelectIn;
       return result;
     });
 
