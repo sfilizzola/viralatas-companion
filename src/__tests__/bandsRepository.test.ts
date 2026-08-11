@@ -1,11 +1,20 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../lib/db', () => ({
-  loadCacheVersion: vi.fn(),
-  saveCacheVersion: vi.fn(),
-  wipeAllLocalData: vi.fn(),
+const mocks = vi.hoisted(() => ({
+  getActiveFestivalId: vi.fn(),
+  getActiveFestivalCacheVersion: vi.fn(),
+  setActiveFestivalCacheVersion: vi.fn(),
+  clearActiveFestivalPack: vi.fn(),
   saveBands: vi.fn(),
-  getActiveFestivalId: vi.fn().mockResolvedValue(null),
+  loadActivePack: vi.fn(),
+}));
+
+vi.mock('../lib/db', () => ({
+  getActiveFestivalId: mocks.getActiveFestivalId,
+  getActiveFestivalCacheVersion: mocks.getActiveFestivalCacheVersion,
+  setActiveFestivalCacheVersion: mocks.setActiveFestivalCacheVersion,
+  clearActiveFestivalPack: mocks.clearActiveFestivalPack,
+  saveBands: mocks.saveBands,
 }));
 
 vi.mock('../lib/supabase', () => ({
@@ -14,33 +23,26 @@ vi.mock('../lib/supabase', () => ({
   },
 }));
 
-vi.mock('../repositories/picks', () => ({
-  picksRepository: { syncCrewFromRemote: vi.fn() },
-}));
-
-vi.mock('../repositories/users', () => ({
-  usersRepository: { syncCrew: vi.fn() },
-}));
-
-vi.mock('../repositories/presence', () => ({
-  presenceRepository: { syncCrewFromRemote: vi.fn() },
-}));
-
-vi.mock('../repositories/announcements', () => ({
-  announcementsRepository: { sync: vi.fn() },
+vi.mock('../repositories/festivals', () => ({
+  festivalsRepository: {
+    loadActivePack: mocks.loadActivePack,
+  },
 }));
 
 import { bandsRepository } from '../repositories/bands';
-import { loadCacheVersion, saveCacheVersion, wipeAllLocalData, saveBands } from '../lib/db';
 import { supabase } from '../lib/supabase';
-import { picksRepository } from '../repositories/picks';
-import { usersRepository } from '../repositories/users';
-import { presenceRepository } from '../repositories/presence';
-import { announcementsRepository } from '../repositories/announcements';
 
-function mockAppConfigResponse(version: string | null) {
-  const single = vi.fn().mockResolvedValue({ data: version !== null ? { value: version } : null });
-  const eq = vi.fn().mockReturnValue({ single });
+const FESTIVAL_ID = 'fest-1';
+const USER_ID = 'user-1';
+
+function mockFestivalResponse(version: string | null) {
+  const maybeSingle = vi
+    .fn()
+    .mockResolvedValue({
+      data: version !== null ? { id: FESTIVAL_ID, cache_version: version } : null,
+      error: null,
+    });
+  const eq = vi.fn().mockReturnValue({ maybeSingle });
   const select = vi.fn().mockReturnValue({ eq });
   vi.mocked(supabase.from).mockReturnValue({ select } as ReturnType<typeof supabase.from>);
 }
@@ -51,10 +53,17 @@ function mockBandsResponse(bands: unknown[] | null, error: Error | null = null) 
   vi.mocked(supabase.from).mockReturnValue({ select } as ReturnType<typeof supabase.from>);
 }
 
+function mockFestivalUpdate() {
+  const eq = vi.fn().mockResolvedValue({ error: null });
+  const update = vi.fn().mockReturnValue({ eq });
+  vi.mocked(supabase.from).mockReturnValue({ update } as ReturnType<typeof supabase.from>);
+  return { update, eq };
+}
+
 describe('bandsRepository.sync', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(saveBands).mockResolvedValue(undefined);
+    mocks.saveBands.mockResolvedValue(undefined);
   });
 
   it('fetches bands from Supabase and saves to IndexedDB', async () => {
@@ -64,14 +73,14 @@ describe('bandsRepository.sync', () => {
     await bandsRepository.sync();
 
     expect(supabase.from).toHaveBeenCalledWith('bands');
-    expect(saveBands).toHaveBeenCalledWith(bands);
+    expect(mocks.saveBands).toHaveBeenCalledWith(bands);
   });
 
   it('throws when Supabase returns an error', async () => {
     mockBandsResponse(null, new Error('network error'));
 
     await expect(bandsRepository.sync()).rejects.toThrow('network error');
-    expect(saveBands).not.toHaveBeenCalled();
+    expect(mocks.saveBands).not.toHaveBeenCalled();
   });
 
   it('does not call saveBands when response is empty', async () => {
@@ -79,71 +88,109 @@ describe('bandsRepository.sync', () => {
 
     await bandsRepository.sync();
 
-    expect(saveBands).not.toHaveBeenCalled();
+    expect(mocks.saveBands).not.toHaveBeenCalled();
   });
 });
 
 describe('bandsRepository.checkAndApplyCacheVersion', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(wipeAllLocalData).mockResolvedValue(undefined);
-    vi.mocked(saveCacheVersion).mockResolvedValue(undefined);
-    vi.spyOn(bandsRepository, 'sync').mockResolvedValue(undefined);
-    vi.mocked(picksRepository.syncCrewFromRemote).mockResolvedValue(undefined);
-    vi.mocked(usersRepository.syncCrew).mockResolvedValue(undefined);
-    vi.mocked(presenceRepository.syncCrewFromRemote).mockResolvedValue(undefined);
-    vi.mocked(announcementsRepository.sync).mockResolvedValue(undefined);
+    mocks.getActiveFestivalId.mockResolvedValue(FESTIVAL_ID);
+    mocks.getActiveFestivalCacheVersion.mockResolvedValue('v1');
+    mocks.setActiveFestivalCacheVersion.mockResolvedValue(undefined);
+    mocks.clearActiveFestivalPack.mockResolvedValue(undefined);
+    mocks.loadActivePack.mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
   });
 
   it('does nothing when remote version matches local version', async () => {
-    mockAppConfigResponse('v42');
-    vi.mocked(loadCacheVersion).mockResolvedValue('v42');
+    mockFestivalResponse('v1');
 
-    await bandsRepository.checkAndApplyCacheVersion();
+    await bandsRepository.checkAndApplyCacheVersion(USER_ID);
 
-    expect(wipeAllLocalData).not.toHaveBeenCalled();
-    expect(saveCacheVersion).not.toHaveBeenCalled();
-    expect(bandsRepository.sync).not.toHaveBeenCalled();
-    expect(picksRepository.syncCrewFromRemote).not.toHaveBeenCalled();
-    expect(usersRepository.syncCrew).not.toHaveBeenCalled();
-    expect(presenceRepository.syncCrewFromRemote).not.toHaveBeenCalled();
-    expect(announcementsRepository.sync).not.toHaveBeenCalled();
+    expect(mocks.clearActiveFestivalPack).not.toHaveBeenCalled();
+    expect(mocks.setActiveFestivalCacheVersion).not.toHaveBeenCalled();
+    expect(mocks.loadActivePack).not.toHaveBeenCalled();
   });
 
-  it('wipes IDB, saves new version, and triggers all re-syncs when versions differ', async () => {
-    mockAppConfigResponse('v99');
-    vi.mocked(loadCacheVersion).mockResolvedValue('v1');
+  it('clears Active Festival pack and reloads on version mismatch', async () => {
+    mockFestivalResponse('v99');
+    mocks.getActiveFestivalCacheVersion.mockResolvedValue('v1');
 
-    await bandsRepository.checkAndApplyCacheVersion();
+    await bandsRepository.checkAndApplyCacheVersion(USER_ID);
 
-    expect(wipeAllLocalData).toHaveBeenCalledOnce();
-    expect(saveCacheVersion).toHaveBeenCalledWith('v99');
-    expect(bandsRepository.sync).toHaveBeenCalledOnce();
-    expect(picksRepository.syncCrewFromRemote).toHaveBeenCalledOnce();
-    expect(usersRepository.syncCrew).toHaveBeenCalledOnce();
-    expect(presenceRepository.syncCrewFromRemote).toHaveBeenCalledOnce();
-    expect(announcementsRepository.sync).toHaveBeenCalledOnce();
+    expect(mocks.clearActiveFestivalPack).toHaveBeenCalledOnce();
+    expect(mocks.setActiveFestivalCacheVersion).toHaveBeenCalledWith('v99');
+    expect(mocks.loadActivePack).toHaveBeenCalledWith(USER_ID, FESTIVAL_ID);
   });
 
-  it('does nothing when app_config returns no data', async () => {
-    mockAppConfigResponse(null);
-    vi.mocked(loadCacheVersion).mockResolvedValue('v1');
+  it('does nothing when festivals returns no row', async () => {
+    mockFestivalResponse(null);
 
-    await bandsRepository.checkAndApplyCacheVersion();
+    await bandsRepository.checkAndApplyCacheVersion(USER_ID);
 
-    expect(wipeAllLocalData).not.toHaveBeenCalled();
-    expect(saveCacheVersion).not.toHaveBeenCalled();
+    expect(mocks.clearActiveFestivalPack).not.toHaveBeenCalled();
+  });
+
+  it('does nothing when there is no active festival', async () => {
+    mocks.getActiveFestivalId.mockResolvedValue(null);
+    mockFestivalResponse('v99');
+
+    await bandsRepository.checkAndApplyCacheVersion(USER_ID);
+
+    expect(supabase.from).not.toHaveBeenCalled();
+    expect(mocks.clearActiveFestivalPack).not.toHaveBeenCalled();
   });
 
   it('does nothing when navigator.onLine is false', async () => {
     Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
-    mockAppConfigResponse('v99');
-    vi.mocked(loadCacheVersion).mockResolvedValue('v1');
+    mockFestivalResponse('v99');
 
-    await bandsRepository.checkAndApplyCacheVersion();
+    await bandsRepository.checkAndApplyCacheVersion(USER_ID);
 
     expect(supabase.from).not.toHaveBeenCalled();
-    expect(wipeAllLocalData).not.toHaveBeenCalled();
+    expect(mocks.clearActiveFestivalPack).not.toHaveBeenCalled();
     Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
+  });
+
+  it('stores remote version without wipe when local marker is unset', async () => {
+    mockFestivalResponse('v42');
+    mocks.getActiveFestivalCacheVersion.mockResolvedValue(null);
+
+    await bandsRepository.checkAndApplyCacheVersion(USER_ID);
+
+    expect(mocks.clearActiveFestivalPack).not.toHaveBeenCalled();
+    expect(mocks.setActiveFestivalCacheVersion).toHaveBeenCalledWith('v42');
+    expect(mocks.loadActivePack).not.toHaveBeenCalled();
+  });
+});
+
+describe('bandsRepository.invalidateCacheForAllUsers', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mocks.getActiveFestivalId.mockResolvedValue(FESTIVAL_ID);
+    mocks.clearActiveFestivalPack.mockResolvedValue(undefined);
+    mocks.setActiveFestivalCacheVersion.mockResolvedValue(undefined);
+  });
+
+  it('bumps festivals.cache_version for the active festival and clears pack', async () => {
+    const { update, eq } = mockFestivalUpdate();
+
+    await bandsRepository.invalidateCacheForAllUsers();
+
+    expect(supabase.from).toHaveBeenCalledWith('festivals');
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ cache_version: expect.any(String) }),
+    );
+    expect(eq).toHaveBeenCalledWith('id', FESTIVAL_ID);
+    expect(mocks.clearActiveFestivalPack).toHaveBeenCalledOnce();
+    expect(mocks.setActiveFestivalCacheVersion).toHaveBeenCalledWith(expect.any(String));
+  });
+
+  it('throws when there is no active festival', async () => {
+    mocks.getActiveFestivalId.mockResolvedValue(null);
+    await expect(bandsRepository.invalidateCacheForAllUsers()).rejects.toThrow(
+      /No active festival/,
+    );
   });
 });

@@ -29,7 +29,7 @@
  *       - location_visits
  *     (only these three keys are stripped; every other metadata key is preserved
  *      — wacken_years, wacken_arrival_day, push subs, language, etc.)
- *   • public.app_config row { key='cache_version' } is BUMPED (not deleted)
+ *   • public.festivals.cache_version for wacken-2026 is BUMPED (not deleted)
  *
  * Optionally wiped (only with --with-bands):
  *   • public.bands                                        (full replace via supabase/seed/bands.ts)
@@ -191,20 +191,32 @@ function stripPersistentBadgeKeys(
 // Bump cache_version (forces clients to invalidate IndexedDB on next load)
 // ---------------------------------------------------------------------------
 
-async function bumpCacheVersion(sb: Sb): Promise<{ ok: boolean; value: string }> {
+async function bumpCacheVersion(
+  sb: Sb,
+  festivalIdOrSlug = 'wacken-2026',
+): Promise<{ ok: boolean; value: string }> {
   const value = new Date().toISOString();
-  const { data, error } = await sb
-    .from('app_config')
-    .update({ value })
-    .eq('key', 'cache_version')
-    .select('key');
+  let { data, error } = await sb
+    .from('festivals')
+    .update({ cache_version: value })
+    .eq('id', festivalIdOrSlug)
+    .select('id');
+  if (!error && (!data || data.length === 0)) {
+    ({ data, error } = await sb
+      .from('festivals')
+      .update({ cache_version: value })
+      .eq('slug', festivalIdOrSlug)
+      .select('id'));
+  }
   if (error) {
-    console.warn(`  ⚠ cache_version bump failed (data wipe still succeeded): ${error.message}`);
+    console.warn(
+      `  ⚠ festivals.cache_version bump failed (data wipe still succeeded): ${error.message}`,
+    );
     return { ok: false, value };
   }
   if (!data || data.length === 0) {
     console.warn(
-      '  ⚠ cache_version row missing in public.app_config — clients will catch up on natural reload.',
+      `  ⚠ festival '${festivalIdOrSlug}' missing — clients will catch up on natural reload.`,
     );
     return { ok: false, value };
   }
@@ -302,7 +314,9 @@ async function festivalReset() {
   console.log(
     `  5. STRIP keys ${PERSISTENT_BADGE_METADATA_KEYS.join(', ')} from auth.users metadata`,
   );
-  console.log('  6. BUMP public.app_config cache_version (force client cache invalidation)');
+  console.log(
+    '  6. BUMP festivals.cache_version for wacken-2026 (force Active Festival pack invalidation)',
+  );
   if (withBands) {
     console.log('  7. RE-SEED public.bands (delegates to supabase/seed/bands.ts --force)');
     console.log('     └─ CASCADEs public.user_picks + public.user_missed_bands');
@@ -428,11 +442,11 @@ async function festivalReset() {
     console.error(`  ✗ ${failed} metadata strip failures — see warnings above`);
   }
 
-  // ── 6. Bump cache_version ──────────────────────────────────────────────
-  console.log('[6/6] Bumping public.app_config cache_version…');
-  const bump = await bumpCacheVersion(sb);
+  // ── 6. Bump per-festival cache_version ─────────────────────────────────
+  console.log('[6/6] Bumping festivals.cache_version for wacken-2026…');
+  const bump = await bumpCacheVersion(sb, 'wacken-2026');
   if (bump.ok) {
-    console.log(`  ✓ cache_version = ${bump.value}`);
+    console.log(`  ✓ festivals.cache_version = ${bump.value}`);
   }
 
   // ── Optional: bands re-seed (delegates to supabase/seed/bands.ts) ──────

@@ -1,16 +1,13 @@
 import { supabase } from '../lib/supabase';
 import {
+  clearActiveFestivalPack,
+  getActiveFestivalCacheVersion,
   getActiveFestivalId,
-  loadCacheVersion,
-  saveCacheVersion,
-  wipeAllLocalData,
   saveBands,
+  setActiveFestivalCacheVersion,
 } from '../lib/db';
+import { shouldInvalidatePack } from '../lib/festivalCacheVersion';
 import type { Band } from '../types';
-import { picksRepository } from './picks';
-import { usersRepository } from './users';
-import { presenceRepository } from './presence';
-import { announcementsRepository } from './announcements';
 
 export const bandsRepository = {
   async sync(festivalId?: string): Promise<void> {
@@ -22,50 +19,71 @@ export const bandsRepository = {
     if (data && data.length > 0) await saveBands(data as unknown as Band[]);
   },
 
-  async checkAndApplyCacheVersion(): Promise<void> {
+  /**
+   * Compares Active Festival `festivals.cache_version` to the local pack marker.
+   * On mismatch: clears only the Active Festival pack (not forever data like badge
+   * history) and reloads that festival's offline pack.
+   */
+  async checkAndApplyCacheVersion(userId?: string): Promise<void> {
     if (!navigator.onLine) return;
 
     try {
-      const { data } = await supabase
-        .from('app_config')
-        .select('*')
-        .eq('key', 'cache_version')
-        .single();
+      const festivalId = await getActiveFestivalId();
+      if (!festivalId) return;
 
-      if (!data) return;
+      const { data: festival, error } = await supabase
+        .from('festivals')
+        .select('id, cache_version')
+        .eq('id', festivalId)
+        .maybeSingle();
 
-      const remoteVersion = data.value;
-      const localVersion = await loadCacheVersion();
+      if (error) throw error;
+      if (!festival) return;
 
-      if (remoteVersion !== localVersion) {
-        await wipeAllLocalData();
-        await saveCacheVersion(remoteVersion);
+      const localVersion = await getActiveFestivalCacheVersion();
+      const remote = {
+        id: festival.id as string,
+        cache_version: festival.cache_version as string,
+      };
 
-        const festivalId = (await getActiveFestivalId()) ?? undefined;
-        await Promise.all([
-          bandsRepository.sync(festivalId),
-          picksRepository.syncCrewFromRemote(festivalId),
-          usersRepository.syncCrew(festivalId),
-          presenceRepository.syncCrewFromRemote(),
-          announcementsRepository.sync(festivalId),
-        ]);
+      if (
+        !shouldInvalidatePack(festivalId, { [festivalId]: localVersion }, [remote])
+      ) {
+        if (localVersion == null) {
+          await setActiveFestivalCacheVersion(remote.cache_version);
+        }
+        return;
+      }
+
+      await clearActiveFestivalPack();
+      await setActiveFestivalCacheVersion(remote.cache_version);
+
+      if (userId) {
+        const { festivalsRepository } = await import('./festivals');
+        await festivalsRepository.loadActivePack(userId, festivalId);
       }
     } catch (error) {
       console.error('Cache version check failed:', error);
     }
   },
 
+  /** Bumps Active Festival cache_version so clients reload that festival's pack. */
   async invalidateCacheForAllUsers(): Promise<void> {
     const timestamp = new Date().toISOString();
+    const festivalId = await getActiveFestivalId();
+
+    if (!festivalId) {
+      throw new Error('No active festival — cannot invalidate cache');
+    }
 
     const { error } = await supabase
-      .from('app_config')
-      .update({ value: timestamp })
-      .eq('key', 'cache_version');
+      .from('festivals')
+      .update({ cache_version: timestamp })
+      .eq('id', festivalId);
 
     if (error) throw error;
 
-    await wipeAllLocalData();
-    await saveCacheVersion(timestamp);
+    await clearActiveFestivalPack();
+    await setActiveFestivalCacheVersion(timestamp);
   },
 };

@@ -12,6 +12,8 @@ import { summarizePlan } from './lineup-remote-plan.ts';
 
 export type ApplyOptions = {
   confirmDeletes: boolean;
+  /** Festival whose cache_version should bump after a successful apply. */
+  festivalId?: string;
 };
 
 export type ApplySkipped = {
@@ -26,19 +28,56 @@ export type ApplyResult = {
   log: string[];
 };
 
+/** Bumps `festivals.cache_version` for the synced festival (per-festival invalidation). */
 export async function bumpCacheVersionForClient(
   supabase: SupabaseClient,
+  festivalId: string,
 ): Promise<{ ok: boolean; value: string }> {
   const value = new Date().toISOString();
   const { data, error } = await supabase
-    .from('app_config')
-    .update({ value })
-    .eq('key', 'cache_version')
-    .select('key');
+    .from('festivals')
+    .update({ cache_version: value })
+    .eq('id', festivalId)
+    .select('id');
   if (error || !data?.length) {
     return { ok: false, value };
   }
   return { ok: true, value };
+}
+
+async function resolveSyncedFestivalId(
+  supabase: SupabaseClient,
+  plan: LineupPlan,
+  explicit?: string,
+): Promise<string | null> {
+  if (explicit) return explicit;
+
+  const bandId =
+    plan.updates[0]?.bandId ??
+    plan.moves[0]?.fromBandId ??
+    plan.deletes[0]?.bandId ??
+    null;
+
+  if (bandId) {
+    const { data } = await supabase
+      .from('bands')
+      .select('festival_id')
+      .eq('id', bandId)
+      .maybeSingle();
+    const festivalId = (data as { festival_id?: string } | null)?.festival_id;
+    if (festivalId) return festivalId;
+  }
+
+  const insertFestivalId = (plan.inserts[0]?.row as { festival_id?: string } | undefined)
+    ?.festival_id;
+  if (insertFestivalId) return insertFestivalId;
+
+  const { data } = await supabase
+    .from('festivals')
+    .select('id')
+    .eq('slug', 'wacken-2026')
+    .maybeSingle();
+  return (data as { id?: string } | null)?.id ?? null;
 }
 
 async function repointSnapshottedUsers(
@@ -209,10 +248,19 @@ export async function applyLineupPlan(
 
   let cacheVersion = '';
   if (writes > 0) {
-    const bump = await bumpCacheVersionForClient(supabase);
-    cacheVersion = bump.value;
-    if (bump.ok) {
-      log.push(`✓ cache_version = ${cacheVersion}`);
+    const festivalId = await resolveSyncedFestivalId(
+      supabase,
+      plan,
+      options.festivalId,
+    );
+    if (festivalId) {
+      const bump = await bumpCacheVersionForClient(supabase, festivalId);
+      cacheVersion = bump.value;
+      if (bump.ok) {
+        log.push(`✓ festivals.cache_version = ${cacheVersion}`);
+      }
+    } else {
+      log.push('⚠ skipped cache_version bump — no festival id resolved');
     }
   }
 
