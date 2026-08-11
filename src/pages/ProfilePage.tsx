@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { UserRole } from '../types';
 import { signOutUser } from '../lib/signOut';
 import { useAuth } from '../hooks/useAuth';
@@ -115,6 +115,13 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
       </section>
 
       <InstallAppProfileLink />
+
+      <section className={styles.pfNavSection}>
+        <Link to="/festivals" className={styles.pfNavRow}>
+          <span className={styles.pfNavLabel}>{t('festivals')}</span>
+          <span className={styles.pfNavHint}>{t('festivalsHint')}</span>
+        </Link>
+      </section>
 
       <BadgeHistorySection userId={user.id} />
 

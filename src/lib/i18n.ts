@@ -83,6 +83,10 @@ import installAppBr from '../i18n/InstallApp_br.json';
 import installAppDe from '../i18n/InstallApp_de.json';
 import installAppEn from '../i18n/InstallApp_en.json';
 import installAppEs from '../i18n/InstallApp_es.json';
+import festivalsBr from '../i18n/FestivalsPage_br.json';
+import festivalsDe from '../i18n/FestivalsPage_de.json';
+import festivalsEn from '../i18n/FestivalsPage_en.json';
+import festivalsEs from '../i18n/FestivalsPage_es.json';
 
 export type Language = 'br' | 'en' | 'es' | 'de';
 
@@ -108,6 +112,7 @@ type TranslationFile =
   | 'StageScheduleSheet'
   | 'CampLocation'
   | 'InstallApp'
+  | 'FestivalsPage'
   | 'GodlikeAdmin';
 
 type TranslationStrings = Record<string, string>;
@@ -138,6 +143,7 @@ const translations: Translations = {
     StageScheduleSheet: stageScheduleSheetBr,
     CampLocation: campLocationBr,
     InstallApp: installAppBr,
+    FestivalsPage: festivalsBr,
     GodlikeAdmin: {},
   },
   en: {
@@ -162,6 +168,7 @@ const translations: Translations = {
     StageScheduleSheet: stageScheduleSheetEn,
     CampLocation: campLocationEn,
     InstallApp: installAppEn,
+    FestivalsPage: festivalsEn,
     GodlikeAdmin: {},
   },
   es: {
@@ -186,6 +193,7 @@ const translations: Translations = {
     StageScheduleSheet: stageScheduleSheetEs,
     CampLocation: campLocationEs,
     InstallApp: installAppEs,
+    FestivalsPage: festivalsEs,
     GodlikeAdmin: {},
   },
   de: {
@@ -210,6 +218,7 @@ const translations: Translations = {
     StageScheduleSheet: stageScheduleSheetDe,
     CampLocation: campLocationDe,
     InstallApp: installAppDe,
+    FestivalsPage: festivalsDe,
     GodlikeAdmin: {},
   },
 };

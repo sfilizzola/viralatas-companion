@@ -11,6 +11,7 @@ import RightNowPage from './pages/RightNowPage';
 import AnnouncementsPage from './pages/AnnouncementsPage';
 import WrapPage from './pages/WrapPage';
 import MapPage from './pages/MapPage';
+import FestivalsPage from './pages/FestivalsPage';
 import PrivateRoute from './components/PrivateRoute';
 import AuthBootstrapShell from './components/AuthBootstrapShell';
 import SessionExpiredBanner from './components/SessionExpiredBanner';
@@ -92,6 +93,14 @@ function AppRoutes() {
           element={
             <PrivateRoute>
               <ProfilePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/festivals"
+          element={
+            <PrivateRoute>
+              <FestivalsPage />
             </PrivateRoute>
           }
         />
