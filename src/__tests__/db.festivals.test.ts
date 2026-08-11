@@ -8,38 +8,60 @@ import {
   enqueueOfflineAnnouncement,
   enqueueOfflineAnnouncementReaction,
   enqueueOfflineBandRating,
+  enqueueOfflineDuckQuack,
   enqueueOfflineMissed,
   enqueueOfflinePick,
+  enqueueOfflinePresence,
   getActiveFestivalCacheVersion,
   getActiveFestivalId,
   loadAllAnnouncementReactions,
   loadAllBandRatings,
   loadAllMissedBands,
   loadAllUserPicks,
+  loadAllUserPresence,
   loadAnnouncementsFromCache,
   loadBands,
   loadCacheVersion,
+  loadCampLocation,
   loadCrewUsers,
+  loadLiveBandTestConfig,
+  loadMetalPlaceConfig,
   loadOfflineAnnouncementReactionsQueue,
   loadOfflineAnnouncementsQueue,
   loadOfflineBandRatingsQueue,
+  loadOfflineDuckQuackQueue,
   loadOfflineMissedQueue,
+  loadOfflinePresenceQueue,
   loadOfflineQueue,
   loadSession,
+  loadUserBadgeHistory,
+  replaceUserBadgeHistory,
   resetDbConnectionForTests,
   saveAnnouncementReaction,
   saveAnnouncements,
   saveBandRating,
   saveBands,
   saveCacheVersion,
+  saveCampLocation,
   saveCrewUsers,
+  saveLiveBandTestConfig,
+  saveMetalPlaceConfig,
   saveMissedBand,
   saveSession,
   saveUserPick,
+  saveUserPresence,
   setActiveFestivalCacheVersion,
   setActiveFestivalId,
 } from '../lib/db';
-import type { Announcement, Band, UserMissedBand, UserPick } from '../types';
+import type {
+  Announcement,
+  Band,
+  LiveBandTestConfig,
+  MetalPlaceConfig,
+  UserMissedBand,
+  UserPick,
+  UserPresence,
+} from '../types';
 
 const sampleBand: Band = {
   id: 'band-1',
@@ -77,6 +99,35 @@ const sampleMissed = (userId: string, bandId: string): UserMissedBand => ({
   marked_at: '2026-05-01T12:00:00Z',
 });
 
+const samplePresence = (userId: string): UserPresence => ({
+  user_id: userId,
+  is_camping: true,
+  updated_at: '2026-05-01T12:00:00Z',
+});
+
+const sampleMetalPlaceConfig = (): MetalPlaceConfig => ({
+  id: 1,
+  label: 'Metal Place',
+  windows: [
+    {
+      id: 'sample-window-1',
+      festival_day: 1,
+      start_time: '10:00',
+      end_time: '22:00',
+      sort_order: 0,
+    },
+  ],
+  updated_by: 'godlike',
+  updated_at: '2026-05-01T12:00:00Z',
+});
+
+const sampleLiveBandTestConfig = (): LiveBandTestConfig => ({
+  band_id: 'band-1',
+  enabled: true,
+  updated_by: 'godlike',
+  updated_at: '2026-05-01T12:00:00Z',
+});
+
 beforeEach(async () => {
   await resetDbConnectionForTests();
   await deleteViralatasDatabase();
@@ -105,7 +156,7 @@ describe('IndexedDB festival meta (lib/db/festivals.ts)', () => {
   });
 
   describe('clearActiveFestivalPack', () => {
-    it('clears festival social stores but keeps session and evergreen meta', async () => {
+    it('clears festival social/grounds stores but keeps session, meta, badge history', async () => {
       await saveBands([sampleBand]);
       await saveCrewUsers([
         { id: 'u1', display_name: 'Alice', avatar_url: null, wacken_arrival_day: null },
@@ -118,6 +169,13 @@ describe('IndexedDB festival meta (lib/db/festivals.ts)', () => {
         festival_id: 'wacken-2026',
         action: 'add',
         created_at: '2026-05-01T12:00:00Z',
+      });
+      await saveUserPresence(samplePresence('user-1'));
+      await enqueueOfflinePresence({
+        id: 'presence-op-1',
+        user_id: 'user-1',
+        is_camping: true,
+        updated_at: '2026-05-01T12:00:00Z',
       });
       await saveAnnouncements([sampleAnnouncement('a-1', '2026-05-01T12:00:00Z')]);
       await enqueueOfflineAnnouncement(sampleAnnouncement('pending-1', '2026-05-01T12:00:00Z'));
@@ -156,6 +214,27 @@ describe('IndexedDB festival meta (lib/db/festivals.ts)', () => {
         emoji: '🤘',
         op: 'add',
       });
+      await enqueueOfflineDuckQuack({
+        id: 'quack-1',
+        user_id: 'user-1',
+        band_id: 'band-1',
+        quacked_at: '2026-05-01T12:00:00Z',
+      });
+      await saveMetalPlaceConfig(sampleMetalPlaceConfig());
+      await saveLiveBandTestConfig(sampleLiveBandTestConfig());
+      await saveCampLocation({ lat: 54.037809, lng: 9.368845 });
+      await replaceUserBadgeHistory(
+        [
+          {
+            user_id: 'user-1',
+            festival_year: 2026,
+            slug: 'puppy',
+            image_path: '/badges/badge_new-puppy.png',
+            label_key: 'badgePuppy',
+          },
+        ],
+        'user-1',
+      );
 
       await saveSession({ token: 'keep' });
       await saveCacheVersion('global-v1');
@@ -168,6 +247,8 @@ describe('IndexedDB festival meta (lib/db/festivals.ts)', () => {
       expect(await loadCrewUsers()).toEqual([]);
       expect(await loadAllUserPicks()).toEqual([]);
       expect(await loadOfflineQueue()).toEqual([]);
+      expect(await loadAllUserPresence()).toEqual([]);
+      expect(await loadOfflinePresenceQueue()).toEqual([]);
       expect(await loadAnnouncementsFromCache()).toEqual([]);
       expect(await loadOfflineAnnouncementsQueue()).toEqual([]);
       expect(await loadAllMissedBands()).toEqual([]);
@@ -176,11 +257,24 @@ describe('IndexedDB festival meta (lib/db/festivals.ts)', () => {
       expect(await loadOfflineBandRatingsQueue()).toEqual([]);
       expect(await loadAllAnnouncementReactions()).toEqual([]);
       expect(await loadOfflineAnnouncementReactionsQueue()).toEqual([]);
+      expect(await loadOfflineDuckQuackQueue()).toEqual([]);
+      expect(await loadMetalPlaceConfig()).toBeNull();
+      expect(await loadLiveBandTestConfig()).toBeNull();
+      expect(await loadCampLocation()).toBeNull();
 
       expect(await loadSession()).toEqual({ token: 'keep' });
       expect(await loadCacheVersion()).toBe('global-v1');
       expect(await getActiveFestivalId()).toBe('wacken-2026');
       expect(await getActiveFestivalCacheVersion()).toBe('fest-v1');
+      expect(await loadUserBadgeHistory('user-1')).toEqual([
+        {
+          user_id: 'user-1',
+          festival_year: 2026,
+          slug: 'puppy',
+          image_path: '/badges/badge_new-puppy.png',
+          label_key: 'badgePuppy',
+        },
+      ]);
     });
   });
 });

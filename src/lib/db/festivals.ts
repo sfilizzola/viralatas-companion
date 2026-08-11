@@ -4,12 +4,14 @@ import type { ViralatasDB } from './types';
 const ACTIVE_FESTIVAL_ID_KEY = 'active_festival_id';
 const ACTIVE_FESTIVAL_CACHE_VERSION_KEY = 'active_festival_cache_version';
 
-/** Festival-scoped social stores cleared on pack switch — session + evergreen meta kept. */
+/** Festival-scoped stores cleared on pack switch — session, meta, badge history kept. */
 export const FESTIVAL_PACK_OBJECT_STORES = [
   'bands',
   'crew_users',
   'user_picks',
   'offline_picks',
+  'user_presence',
+  'offline_presence',
   'announcements',
   'pending_announcements',
   'announcement_reactions',
@@ -18,6 +20,10 @@ export const FESTIVAL_PACK_OBJECT_STORES = [
   'offline_missed_bands',
   'user_band_ratings',
   'offline_band_ratings',
+  'offline_duck_quacks',
+  'metal_place_config',
+  'live_band_test_config',
+  'camp_location',
 ] as const satisfies readonly (keyof ViralatasDB)[];
 
 export async function getActiveFestivalId(): Promise<string | null> {
