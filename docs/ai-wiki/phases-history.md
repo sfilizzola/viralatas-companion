@@ -1084,6 +1084,43 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 
 ---
 
+### Phase 47 — Multi-Festival
+**Status:** ✅ Complete
+
+**Completed:** 2026-08-11
+
+**Goal:** Let vira-latas opt into multiple concrete **Festivals**, keep one **Active Festival** offline pack on device, scope social surfaces and sync to that Festival, and gate Wacken-grounds capabilities via **Festival features**.
+
+**Deliverables shipped:**
+- `supabase/migrations/20260811000000_multi_festival.sql` — `festivals`, `festival_memberships`, `festival_id` on bands/picks/announcements, `users.active_festival_id`, `is_festival_member()`, membership RLS (no godlike bypass), `band_attendance` with `security_invoker`, cutover backfill for `wacken-2026`
+- `src/types/festival.ts`, `src/lib/festivalFeatures.ts`, `src/lib/festivalCacheVersion.ts`
+- `src/lib/db/festivals.ts` — Active Festival meta + `clearActiveFestivalPack()` / `FESTIVAL_PACK_OBJECT_STORES`
+- `src/repositories/festivals.ts` — catalog, Join/Leave, `setActiveFestival` + `loadActivePack`
+- `ActiveFestivalProvider` + `useActiveFestival`; `FestivalGate` + `FeatureRoute`
+- `/festivals` catalog page; `FestivalSwitcher` on `/now`
+- Sync/reconnect + repositories scoped to Active Festival; per-Festival `festivals.cache_version` pack invalidation
+- Seeds: `supabase/seed/festivals.ts`, demo festival; feature-gated Presence / map / wrap / duck / camp / remote lineup
+- Tests: festival features, Active Festival, FestivalGate, multi-festival migration invariants, repository/sync updates
+- Wiki + DS §16 Multi-Festival; `CONTEXT.md` domain language
+
+**Acceptance criteria (all met):**
+- [x] Festival catalog metadata before Join; Join/Leave/Activate online
+- [x] Active Festival pack cleared and reloaded on switch; offline switch blocked
+- [x] Membership-gated counts via `band_attendance` + crew sync scoping
+- [x] Leave keeps picks; social counts exclude left members; mural posts remain
+- [x] Feature gates for map/wrap (+ UI helpers for camp/duck/metal_place/presence/remote_lineup)
+- [x] Godlike must Join like anyone else for normal PWA Festival access
+- [x] Wiki/docs ship without depending on `docs/superpowers/` paths
+
+**Architectural notes:**
+- **UI → IndexedDB ↕ Supabase** preserved; only the Active Festival pack is warm offline.
+- **Festival cache version** replaces global `app_config.cache_version` as the pack wipe trigger.
+- Badge “festival year” / vest language remains Wacken-cycle vocabulary until a future vest redesign.
+
+**Phase closed:** 2026-08-11 — wiki + Phase history synced; `PHASES.md` cleared (next: 48).
+
+---
+
 ### Phase 44 — Metal Place Multi-Window Configuration
 **Status:** ✅ Complete · **Released:** v1.3.18 on `main` (2026-06-25)
 

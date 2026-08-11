@@ -1,6 +1,6 @@
 # Viralatas Companion — Architectural Wiki
 
-**Last Updated**: 2026-07-07 (Phase 46 — Godlike remote lineup sync; official feed sync to lineup.md)
+**Last Updated**: 2026-08-11 (Phase 47 — Multi-festival: Active Festival pack, membership, feature gates)
 
 ## Purpose
 
@@ -39,10 +39,10 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 ### Architecture & Design
 - **[Design System](../../public/vira-lata-ds.html)** — Living UI spec: tokens, components, layouts, motion (`public/vira-lata-ds.html`)
 - **[Architecture Overview](architecture.md)** — Frontend, offline-first, sync, realtime, PWA
-- **[Domain Model](domain-model.md)** — Users, bands, picks, announcements, presence
-- **[Offline-First Pattern](offline-first.md)** — IndexedDB primary, sync secondary, queue mechanics
-- **[Sync Engine](sync-engine.md)** — Optimistic updates, queue deduplication, offline recovery
-- **[Routing & Navigation](routes.md)** — All app routes, page structure, guards
+- **[Domain Model](domain-model.md)** — Festivals, memberships, users, bands, picks, announcements, presence
+- **[Offline-First Pattern](offline-first.md)** — IndexedDB primary, Active Festival pack, queue mechanics
+- **[Sync Engine](sync-engine.md)** — Optimistic updates, Festival-scoped reconnect, pack invalidation
+- **[Routing & Navigation](routes.md)** — All app routes, FestivalGate / FeatureRoute, guards
 
 ### Data & Backend
 - **[Supabase Schema](supabase-schema.md)** — Database tables, RLS policies, migrations, realtime setup

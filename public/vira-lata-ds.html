@@ -2703,7 +2703,7 @@
 <body>
 <script type="application/json" id="ds-manifest">
 {
-  "version": "3.6",
+  "version": "3.7",
   "file": "public/vira-lata-ds.html",
   "note": "Agent table of contents. Read this first to navigate the file. Anchors and section numbers are STABLE and referenced across docs/code — never renumber. Keep this manifest in sync when adding/renaming a section, token, or component.",
   "sections": [
@@ -2722,6 +2722,7 @@
     { "num": "13", "id": "minimap",               "title": "Festival Minimap",        "purpose": "Minimap zones, avatar dots, entry button" },
     { "num": "14", "id": "stage-schedule-sheet", "title": "Stage Schedule Sheet",    "purpose": "Bottom sheet showing current/next band per stage in a 2×4 grid; LIVE ribbon + pulsing dot; NEXT dimmed tile; --tile-color CSS custom prop per tile" },
     { "num": "15", "id": "camp-location",        "title": "Camp HQ Geolocation",      "purpose": "CampNavStrip (C+ gaffer tape), CampHqCard on Mural, CampMapDock (D1) below minimap, CampLocationSheet, CampPinIcon; --signal-ok* tokens" },
+    { "num": "16", "id": "multi-festival",       "title": "Multi-Festival",           "purpose": "FestivalSwitcher on /now; Festivals catalog Join/Leave/Activate on /festivals" },
     { "num": null, "id": "changelog",             "title": "Changelog",               "purpose": "Dated revision history of the design system" }
   ],
   "tokens": {
@@ -2787,7 +2788,9 @@
     { "name": "CampMapDock",           "sectionId": "camp-location" },
     { "name": "CampLocationSheet",     "sectionId": "camp-location" },
     { "name": "CampPinIcon",           "sectionId": "camp-location" },
-    { "name": "LineupSyncSection",     "sectionId": "ds-godlike-lineup-sync" }
+    { "name": "LineupSyncSection",     "sectionId": "ds-godlike-lineup-sync" },
+    { "name": "FestivalSwitcher",      "sectionId": "multi-festival" },
+    { "name": "FestivalsPage",         "sectionId": "multi-festival" }
   ]
 }
 </script>
@@ -2807,6 +2810,7 @@
   <a href="#minimap">13 Minimap</a>
   <a href="#stage-schedule-sheet">14 Stage Schedule Sheet</a>
   <a href="#camp-location">15 Camp HQ</a>
+  <a href="#multi-festival">16 Multi-Festival</a>
   <a href="#changelog">Changelog</a>
 </nav>
 <div class="page">
@@ -7204,6 +7208,68 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
 
 
   <!-- ============================================================
+       16 MULTI-FESTIVAL
+       ============================================================ -->
+  <section class="section" id="multi-festival">
+    <div class="section-head">
+      <div class="num">16</div>
+      <div>
+        <h2>Multi-Festival</h2>
+        <p class="desc">Active Festival switcher on <code>/now</code> and Festival catalog on <code>/festivals</code>. Join/Leave/Activate require signal; pack clear + reload on switch.</p>
+      </div>
+    </div>
+
+    <div class="subhead">FestivalSwitcher · <code>src/components/FestivalSwitcher.tsx</code></div>
+    <div class="demo">
+      <div class="demo-stage" style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;padding:20px;background:var(--bg-sunken);border-radius:var(--r-2)">
+        <button type="button" style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r-1);border:1px solid var(--border-strong);background:var(--bg-elevated);color:var(--text);font-family:var(--font-mono);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em">
+          Wacken Open Air 2026 <span aria-hidden="true" style="opacity:0.6">▾</span>
+        </button>
+        <div style="min-width:220px;border:1px solid var(--border-strong);border-radius:var(--r-1);background:var(--bg-surface);overflow:hidden">
+          <div style="padding:10px 12px;font-family:var(--font-mono);font-size:11px;background:var(--accent-soft);color:var(--accent)">Wacken Open Air 2026 ✓</div>
+          <div style="padding:10px 12px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);border-top:1px solid var(--border)">Demo Fest 2027</div>
+        </div>
+      </div>
+    </div>
+    <div class="demo-notes">
+      <ul>
+        <li>Mounted on <code>/now</code>; hidden when zero joined Festivals</li>
+        <li>Trigger disabled when only one membership; chevron only when ≥2</li>
+        <li>Offline select → need-signal toast; online → <code>setActive</code> (pack clear + reload)</li>
+        <li>i18n namespace <code>FestivalsPage</code> (shared with catalog)</li>
+      </ul>
+    </div>
+
+    <div class="subhead">Festivals catalog · <code>src/pages/FestivalsPage.tsx</code></div>
+    <div class="demo">
+      <div class="demo-stage" style="display:flex;flex-direction:column;gap:10px;padding:20px;background:var(--bg-sunken);border-radius:var(--r-2)">
+        <div style="padding:14px 16px;border:1px solid var(--border-strong);border-radius:var(--r-2);background:var(--bg-surface)">
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:700;text-transform:uppercase;margin-bottom:4px">Wacken Open Air 2026</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:12px">27 Jul – 2 Aug 2026 · Europe/Berlin</div>
+          <div style="display:flex;gap:8px">
+            <span style="padding:6px 10px;border-radius:var(--r-1);font-family:var(--font-mono);font-size:10px;font-weight:600;text-transform:uppercase;background:var(--accent);color:#fff">Active</span>
+            <span style="padding:6px 10px;border-radius:var(--r-1);font-family:var(--font-mono);font-size:10px;font-weight:600;text-transform:uppercase;border:1px solid var(--border-strong);color:var(--text-muted)">Leave</span>
+          </div>
+        </div>
+        <div style="padding:14px 16px;border:1px solid var(--border);border-radius:var(--r-2);background:var(--bg-elevated)">
+          <div style="font-family:var(--font-display);font-size:18px;font-weight:700;text-transform:uppercase;margin-bottom:4px">Demo Fest 2027</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text-muted);margin-bottom:12px">Metadata only until Join</div>
+          <span style="display:inline-block;padding:6px 10px;border-radius:var(--r-1);font-family:var(--font-mono);font-size:10px;font-weight:600;text-transform:uppercase;border:1px solid var(--accent);color:var(--accent)">Join</span>
+        </div>
+      </div>
+    </div>
+    <div class="demo-notes">
+      <ul>
+        <li>Route <code>/festivals</code> — <code>PrivateRoute</code> only (no <code>FestivalGate</code>)</li>
+        <li>Pre-Join: name / dates / timezone only — no lineup preview</li>
+        <li>Actions: Join (+ Activate), Leave, Activate; all require online</li>
+        <li>CSS module <code>FestivalsPage.module.css</code>; BottomNav present</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
        CHANGELOG
        ============================================================ -->
   <section class="section" id="changelog">
@@ -7216,6 +7282,14 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.7 — Phase 47 Multi-Festival · Aug 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§16 Multi-Festival</b> — <code>FestivalSwitcher</code> on <code>/now</code>; Festivals catalog Join/Leave/Activate on <code>/festivals</code>.</li>
+          <li>DS manifest: §16 <code>multi-festival</code>; <code>FestivalSwitcher</code> + <code>FestivalsPage</code> registered.</li>
+          <li>Sidenav: "16 Multi-Festival" link added.</li>
+        </ul>
+      </div>
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.6 — Phase 46 Godlike Lineup Sync · Jul 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">

@@ -8,9 +8,17 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 
 ## Relevant Source Files
 
-- `src/App.tsx` — App shell, route setup, providers
+- `src/App.tsx` — App shell, route setup, providers (`ActiveFestivalProvider`, `FestivalGate`, `FeatureRoute`)
+- `src/components/festival/ActiveFestivalProvider.tsx` — Active Festival context (Phase 47)
+- `src/components/FestivalGate.tsx` — Membership gate + `FeatureRoute` (Phase 47)
+- `src/components/FestivalSwitcher.tsx` — Active Festival switcher on `/now` (Phase 47)
+- `src/pages/FestivalsPage.tsx` — Festival catalog Join/Leave/Activate (Phase 47)
+- `src/lib/festivalFeatures.ts` — Feature gate helpers (Phase 47)
+- `src/lib/festivalCacheVersion.ts` — Per-Festival pack invalidation (Phase 47)
+- `src/lib/db/festivals.ts` — Active Festival meta + `clearActiveFestivalPack()` (Phase 47)
+- `src/repositories/festivals.ts` — Catalog, memberships, switch + pack load (Phase 47)
 - `src/components/sync/` — Sync orchestration (`CacheVersionCheck`, `BandSync`, `ReconnectSync`, `PushSetup`, `DuckNotificationsListener`)
-- `src/lib/syncCoordinator.ts` — `runReconnectSync()` reconnect contract (Phase 27.C)
+- `src/lib/syncCoordinator.ts` — `runReconnectSync()` reconnect contract (Phase 27.C; Active Festival scoped Phase 47)
 - `src/lib/db/` — IndexedDB domain modules + barrel (`index.ts`); public entry `src/lib/db.ts` re-exports unchanged surface
 - `src/lib/realtimeSync.ts` — Unified Supabase Realtime `postgres_changes` subscription helper
 - `src/lib/supabase.ts` — Supabase client + custom auth storage
@@ -79,21 +87,43 @@ Components are organized by concern:
 
 | Folder | Purpose |
 |--------|---------|
-| `src/pages/` | Route-level containers (8 routes incl. `/wrap`) |
+| `src/pages/` | Route-level containers (incl. `/festivals`, `/wrap`, `/map`) |
 | `src/components/` | Shared UI building blocks |
 | `src/ui/` | Design system (Button, Modal, Input, etc.) |
 
 **Key Pages:**
-- `/now` (RightNowPage) — Live band display, crew attendance, conflict detection; shows `UpcomingBandCard` (15-min pre-show banner) when user's next picked band is within window (Phase 37)
-- `/schedule` (LineupPage) — Full lineup with filters (stage, genre, day, time); Phase 38.A adds per-crew-member filter: `BandFilterValue.userId` drives `filterBands` with a `userPickIds` set, compact `ViraLataFilterSelect` in the drawer (searchable scroll list + pick counts), a viewing banner, and shared-pick markers on `BandCard`
-- `/my-picks` (MyWackenPage) — User's picks by festival day (upcoming → divider → ended inline); Attended/Missed chips on ended rows; upcoming-only conflict counts; one-time coach banner (`localStorage` dismiss)
-- `/popular` (PopularPage) — Bands sorted by total pick count; ranked `BandCard` leaderboard rows with magnitude bars (picks / rating / ended modes)
-- `/announcements` (AnnouncementsPage) — Mural-style announcements board; Phase 43 Pit-stamp emoji reactions (`ReactionBar` + `EmojiPicker`) per post; Phase 45 `CampHqCard` (C+ gaffer tape) in info zone above post form — see `flows/camp-location.md`
-- `/profile` (ProfilePage) — User info, role controls, godlike admin
-- `/wrap` (WrapPage) — Post-festival recap; IDB-only stats; scroll-snap A2 Vest Chronicle (see `flows/festival-wrap.md`)
-- `/map` (MapPage) — Live minimap; avatar dots from same `useSocialSnapshot` as `/now`; Phase 45 `CampMapDock` (D1) below minimap; reached via glyph F on `/now` (see `flows/festival-minimap.md`, `flows/camp-location.md`)
+- `/festivals` (FestivalsPage) — Festival catalog: Join / Leave / Activate (Phase 47); no `FestivalGate`
+- `/now` (RightNowPage) — Live band display, **Festival crew** attendance, conflict detection; `FestivalSwitcher` when ≥1 membership; `UpcomingBandCard` (Phase 37)
+- `/schedule` (LineupPage) — Active Festival lineup with filters (stage, genre, day, time); Phase 38.A per-crew-member filter
+- `/my-picks` (MyPicksPage) — User's picks by festival day (upcoming → divider → ended inline)
+- `/popular` (PopularPage) — Bands sorted by membership-gated pick count
+- `/announcements` (AnnouncementsPage) — Active Festival mural; Phase 43 reactions; Phase 45 `CampHqCard` when camp feature on
+- `/profile` (ProfilePage) — User info, role controls, godlike admin (no FestivalGate — reachable with zero memberships)
+- `/wrap` (WrapPage) — Post-festival recap; gated by `FeatureRoute feature="wrap"`
+- `/map` (MapPage) — Live minimap; gated by `FeatureRoute feature="map"`
 
 **Pattern**: All pages read from custom hooks, never call repositories directly.
+
+### Multi-Festival (Phase 47)
+
+```
+ActiveFestivalProvider
+  ├─ catalog + memberships (Supabase when online)
+  ├─ activeFestivalId (IDB meta ↔ users.active_festival_id)
+  └─ festival.features → UI + FeatureRoute gates
+
+FestivalGate → redirect /festivals if no membership / no Active Festival
+FeatureRoute(map|wrap|…) → redirect /now if Active Festival lacks feature
+
+Switch Active Festival (online only):
+  clearActiveFestivalPack() → set active id + cache_version → loadActivePack()
+```
+
+**Active Festival pack** — IDB stores in `FESTIVAL_PACK_OBJECT_STORES` (bands, crew, picks, mural, reactions, missed, ratings, presence/config/camp, offline queues). Cleared on switch or Festival cache version mismatch; session / badge history kept.
+
+**Sync scoping** — `runReconnectSync` and domain sync methods take Active Festival id; pulls/flushes are Festival-scoped. `CacheVersionCheck` uses `festivals.cache_version` for the Active Festival only (`shouldInvalidatePack`).
+
+**Feature gates** — `hasFestivalFeature` / `canShow*` helpers; Presence UI requires camp or metal_place; duck/camp/map/wrap/remote_lineup similarly gated. Core schedule / picks / mural / `/now` always on for every Festival.
 
 ### Viralatas App Pack (Phase 22–23)
 
@@ -666,4 +696,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-06-26 — Phase 45 Camp HQ Geolocation: `camp_location` IDB store (v14), `campLocationRepository`, `useCampLocation`, consumer UI on `/announcements` and `/map`; no camp surface on `/now`.
+**Last updated:** 2026-08-11 — Phase 47 multi-festival: Active Festival pack, sync scoping, feature gates, Festival catalog/switcher.

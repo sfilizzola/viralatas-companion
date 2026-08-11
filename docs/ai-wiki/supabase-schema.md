@@ -28,6 +28,79 @@ Supabase provides:
 
 ## Core Tables
 
+### `public.festivals` (Phase 47)
+
+**Purpose**: Festival catalog — event instances with dates, optional feature flags, and per-Festival cache version.
+
+**Migration**: `supabase/migrations/20260811000000_multi_festival.sql`
+
+```sql
+CREATE TABLE public.festivals (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  slug text NOT NULL UNIQUE,
+  name text NOT NULL,
+  timezone text NOT NULL DEFAULT 'Europe/Berlin',
+  starts_at timestamptz NOT NULL,
+  ends_at timestamptz NOT NULL,
+  features jsonb NOT NULL DEFAULT '{}'::jsonb,
+  cache_version text NOT NULL DEFAULT '1',
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+```
+
+**Seed cutover**: Inserts `wacken-2026` with all Festival features enabled; `cache_version` seeded from legacy `app_config.cache_version` when present.
+
+**RLS**:
+- `festivals_select_authenticated` — SELECT for authenticated (`using (true)`)
+- No client INSERT/UPDATE/DELETE (ops / service role only)
+
+**Festival cache version**: Clients compare `festivals.cache_version` for the **Active Festival** against the local pack marker (`meta.active_festival_cache_version`). Mismatch → `clearActiveFestivalPack()` + reload that Festival only. Supersedes global `app_config.cache_version` as the pack invalidation token for multi-festival.
+
+---
+
+### `public.festival_memberships` (Phase 47)
+
+**Purpose**: Opt-in “I’m going” rows. Required for lineup social reads/writes.
+
+```sql
+CREATE TABLE public.festival_memberships (
+  user_id uuid NOT NULL REFERENCES public.users (id) ON DELETE CASCADE,
+  festival_id uuid NOT NULL REFERENCES public.festivals (id) ON DELETE CASCADE,
+  opted_in_at timestamptz NOT NULL DEFAULT now(),
+  PRIMARY KEY (user_id, festival_id)
+);
+```
+
+**Cutover**: Existing accounts backfilled into `wacken-2026`. New signups after cutover are **not** auto-enrolled (`handle_new_user()` unchanged).
+
+**RLS**:
+- SELECT own (`user_id = auth.uid()`)
+- SELECT peers on shared Festivals (`is_festival_member(festival_id)`)
+- INSERT/DELETE own only
+
+---
+
+### `public.is_festival_member(p_festival_id uuid)` (Phase 47)
+
+**Purpose**: `SECURITY DEFINER` helper used by RLS — returns whether `auth.uid()` holds a membership. Avoids RLS recursion on `festival_memberships`.
+
+```sql
+CREATE FUNCTION public.is_festival_member(p_festival_id uuid)
+RETURNS boolean
+LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = ''
+AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.festival_memberships m
+    WHERE m.festival_id = p_festival_id AND m.user_id = auth.uid()
+  );
+$$;
+```
+
+Granted `EXECUTE` to `authenticated`. Godlike does **not** bypass this helper for bands / picks / announcements.
+
+---
+
 ### `auth.users` (Managed by Supabase Auth)
 
 Created by Supabase, not directly managed by app.
@@ -73,10 +146,13 @@ CREATE TABLE public.users (
   wacken_years int[] DEFAULT ARRAY[]::int[],
   country text CHECK (country IN ('de', 'es', 'br', 'us', 'co', 'be', 'other', NULL)),
   wacken_arrival_day date,
+  active_festival_id uuid REFERENCES public.festivals (id),  -- Phase 47 Active Festival preference
   
   FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE
 );
 ```
+
+**Active Festival integrity (Phase 47):** Trigger `trg_users_active_festival_membership` / `enforce_active_festival_membership()` — when `active_festival_id` changes to non-null, the user must hold a matching `festival_memberships` row.
 
 **Trigger**: `handle_new_user()` creates row when user signs up.
 
@@ -125,12 +201,13 @@ USING (true);  -- All authenticated users can read all profiles
 
 ### `public.bands`
 
-**Purpose**: Festival lineup.
+**Purpose**: Per-Festival lineup.
 
 ```sql
 CREATE TABLE public.bands (
   id uuid PRIMARY KEY,
-  slot_id text NOT NULL UNIQUE,
+  festival_id uuid NOT NULL REFERENCES public.festivals (id),  -- Phase 47
+  slot_id text NOT NULL,
   name text NOT NULL,
   stage text NOT NULL,
   start_time timestamptz NOT NULL,
@@ -141,19 +218,19 @@ CREATE TABLE public.bands (
   created_at timestamptz DEFAULT now()
 );
 
-CREATE INDEX idx_bands_slot_id ON public.bands(slot_id);
+CREATE UNIQUE INDEX bands_festival_slot_id_uidx ON public.bands (festival_id, slot_id);
+CREATE INDEX idx_bands_festival_id ON public.bands(festival_id);
 CREATE INDEX idx_bands_stage ON public.bands(stage);
 CREATE INDEX idx_bands_start_time ON public.bands(start_time);
 ```
 
 **Realtime**: Enabled (rarely changes, but subscribed for test mode).
 
-**RLS Policy** (select):
+**RLS Policy** (select — Phase 47 members only; no godlike bypass):
 ```sql
-CREATE POLICY "Bands are readable by all"
-ON public.bands
-FOR SELECT
-USING (true);
+CREATE POLICY bands_select_members
+ON public.bands FOR SELECT TO authenticated
+USING (public.is_festival_member(festival_id));
 ```
 
 **RLS Policy** (insert/update/delete):
@@ -175,12 +252,13 @@ USING (
 
 ### `public.user_picks`
 
-**Purpose**: User's interest in watching bands.
+**Purpose**: User's interest in watching bands (Festival-scoped).
 
 ```sql
 CREATE TABLE public.user_picks (
   user_id uuid NOT NULL,
   band_id uuid NOT NULL,
+  festival_id uuid NOT NULL REFERENCES public.festivals (id),  -- Phase 47
   created_at timestamptz DEFAULT now(),
   
   PRIMARY KEY (user_id, band_id),
@@ -190,39 +268,56 @@ CREATE TABLE public.user_picks (
 
 CREATE INDEX idx_user_picks_user_id ON public.user_picks(user_id);
 CREATE INDEX idx_user_picks_band_id ON public.user_picks(band_id);
+CREATE INDEX idx_user_picks_festival_id ON public.user_picks(festival_id);
 ```
 
 **Realtime**: Enabled (heavily used, updates via Realtime).
 
-**RLS Policy** (select):
+**RLS Policy** (select — Phase 47 Festival members):
 ```sql
-CREATE POLICY "Users can see all picks"
-ON public.user_picks
-FOR SELECT
-USING (true);  -- All picks are public (no privacy)
+CREATE POLICY user_picks_select_members
+ON public.user_picks FOR SELECT TO authenticated
+USING (public.is_festival_member(festival_id));
 ```
 
-**RLS Policy** (insert/update):
+**RLS Policy** (insert — own + member + band belongs to festival):
 ```sql
-CREATE POLICY "Users can only insert their own picks"
-ON public.user_picks
-FOR INSERT
-WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can only update their own picks"
-ON public.user_picks
-FOR UPDATE
-USING (auth.uid() = user_id)
-WITH CHECK (auth.uid() = user_id);
+CREATE POLICY user_picks_insert_own_member
+ON public.user_picks FOR INSERT TO authenticated
+WITH CHECK (
+  auth.uid() = user_id
+  AND public.is_festival_member(festival_id)
+  AND EXISTS (
+    SELECT 1 FROM public.bands b
+    WHERE b.id = band_id AND b.festival_id = festival_id
+  )
+);
 ```
 
-**RLS Policy** (delete):
+**RLS Policy** (delete — own + member):
 ```sql
-CREATE POLICY "Users can only delete their own picks"
-ON public.user_picks
-FOR DELETE
-USING (auth.uid() = user_id);
+CREATE POLICY user_picks_delete_own_member
+ON public.user_picks FOR DELETE TO authenticated
+USING (
+  auth.uid() = user_id
+  AND public.is_festival_member(festival_id)
+);
 ```
+
+### `public.band_attendance` (view — Phase 47 membership-gated)
+
+```sql
+CREATE VIEW public.band_attendance
+WITH (security_invoker = true)
+AS
+  SELECT up.band_id, count(*)::bigint AS going_count
+  FROM public.user_picks up
+  INNER JOIN public.festival_memberships m
+    ON m.user_id = up.user_id AND m.festival_id = up.festival_id
+  GROUP BY up.band_id;
+```
+
+`security_invoker = true` so underlying RLS on `user_picks` / memberships still applies. Left-behind picks after Leave do not inflate counts.
 
 ---
 
@@ -306,57 +401,49 @@ CREATE TABLE public.announcement_reactions (
 
 ### `public.announcements`
 
-**Purpose**: Mural-style posts.
+**Purpose**: Mural-style posts scoped to a Festival.
 
 ```sql
 CREATE TABLE public.announcements (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  festival_id uuid NOT NULL REFERENCES public.festivals (id),  -- Phase 47
   author_id uuid NOT NULL,
   content text NOT NULL,
   created_at timestamptz DEFAULT now(),
-  deleted_at timestamptz DEFAULT NULL,  -- Soft delete
+  deleted_at timestamptz DEFAULT NULL,  -- Soft delete (legacy column; hard-delete path also used)
   
   FOREIGN KEY (author_id) REFERENCES public.users(id) ON DELETE CASCADE
 );
 
+CREATE INDEX idx_announcements_festival_id ON public.announcements(festival_id);
 CREATE INDEX idx_announcements_author_id ON public.announcements(author_id);
 CREATE INDEX idx_announcements_created_at ON public.announcements(created_at DESC);
 ```
 
-**Soft Delete**: `deleted_at IS NOT NULL` means hidden from clients.
-
 **Realtime**: Enabled.
 
-**RLS Policy** (select):
+**RLS Policy** (select — Phase 47 Festival members):
 ```sql
-CREATE POLICY "Users can see non-deleted announcements"
-ON public.announcements
-FOR SELECT
-USING (deleted_at IS NULL);
+CREATE POLICY announcements_select_members
+ON public.announcements FOR SELECT TO authenticated
+USING (public.is_festival_member(festival_id));
 ```
 
-**RLS Policy** (insert):
+**RLS Policy** (insert — own + member + not blocked):
 ```sql
-CREATE POLICY "Users can post announcements"
-ON public.announcements
-FOR INSERT
-WITH CHECK (auth.uid() = author_id);
-```
-
-**RLS Policy** (delete/soft-delete):
-```sql
-CREATE POLICY "Author or manager+ can delete announcements"
-ON public.announcements
-FOR UPDATE
-USING (
-  auth.uid() = author_id
-  OR (SELECT role FROM public.users WHERE id = auth.uid()) IN ('manager', 'godlike')
-)
+CREATE POLICY "insert_announcements"
+ON public.announcements FOR INSERT TO authenticated
 WITH CHECK (
   auth.uid() = author_id
-  OR (SELECT role FROM public.users WHERE id = auth.uid()) IN ('manager', 'godlike')
+  AND public.is_festival_member(festival_id)
+  AND NOT EXISTS (
+    SELECT 1 FROM public.blocked_posters WHERE user_id = auth.uid()
+  )
 );
 ```
+
+**RLS Policy** (delete — manager/godlike; unchanged name `delete_announcements`):
+Manager/godlike hard-delete policy retained from prior migrations.
 
 ---
 
@@ -552,7 +639,7 @@ INSERT INTO public.live_band_test_config (id) VALUES (1);
 
 ### `public.app_config`
 
-**Purpose**: Generic key/value config table. Currently holds the single `cache_version` row used to invalidate every client's IndexedDB on next app load.
+**Purpose**: Generic key/value config table. Historically held a global `cache_version` used to wipe every client's IndexedDB.
 
 ```sql
 CREATE TABLE public.app_config (
@@ -566,17 +653,13 @@ ON CONFLICT (key) DO NOTHING;
 
 **Migration**: `supabase/migrations/20260504000006_cache_version.sql`.
 
+**Phase 47 note**: Pack invalidation for the Active Festival uses **`festivals.cache_version`** (`bandsRepository.checkAndApplyCacheVersion` → `shouldInvalidatePack` → `clearActiveFestivalPack`). The multi-festival migration seeds `wacken-2026.cache_version` from this legacy row. Prefer bumping the Active Festival’s `festivals.cache_version` (e.g. `invalidateCacheForAllUsers()`) rather than relying on a global wipe.
+
 **RLS**:
-- All authenticated users can `SELECT` (everyone needs to read the version on app boot).
+- All authenticated users can `SELECT`.
 - Only the godlike user can `UPDATE` (enforced via `public.users.role = 'godlike'` check).
 
-**Not realtime** — clients read once on app init via `bandsRepository.checkAndApplyCacheVersion()`. A change only propagates on next page load.
-
-**Bumped by**:
-1. The godlike "Reset all data" button in the admin panel (writes a fresh ISO timestamp).
-2. The `npm run festival:reset` operator script — see `docs/ai-wiki/festival-reset.md`.
-
-When the bumped value differs from the client's locally-cached version, `wipeAllLocalData()` clears every IndexedDB store (except `session`) and forces a fresh fetch.
+**Not realtime**.
 
 ---
 
@@ -741,12 +824,14 @@ npm run festival:reset -- --with-bands --force
 
 | Table | Select | Insert | Update | Delete |
 |-------|--------|--------|--------|--------|
-| `users` | All | (via trigger) | Own user (via trigger) | (via trigger) |
-| `bands` | All | Godlike | Godlike | Godlike |
-| `user_picks` | All | Own user | Own user | Own user |
+| `festivals` | Authenticated | — (ops) | — (ops) | — (ops) |
+| `festival_memberships` | Own + peer members | Own | — | Own |
+| `users` | All | (via trigger) | Own (+ active_festival membership check) | (via trigger) |
+| `bands` | Festival members | Godlike | Godlike | Godlike |
+| `user_picks` | Festival members | Own + member | — | Own + member |
 | `user_band_ratings` | Authenticated | Own user | Own user | Own user |
 | `announcement_reactions` | Authenticated | Own user | — | Own user |
-| `announcements` | Non-deleted | Own author | Author / Manager+ | Author / Manager+ |
+| `announcements` | Festival members | Own + member (not blocked) | — | Manager+ (`delete_announcements`) |
 | `user_presence` | All | Own user | Own user | Own user |
 | `user_missed_bands` | All | Own user | Own user | Own user |
 | `metal_place_config` | Authenticated | Godlike | Godlike | — |
@@ -760,7 +845,7 @@ npm run festival:reset -- --with-bands --force
 1. **API Key Never on Client**: Claude API key stored in Supabase secrets, only Edge Functions can access.
 2. **RLS Enforced**: Each query checked against RLS policies server-side.
 3. **Session Validation**: Supabase Auth validates every API call.
-4. **No Admin Backdoor**: Even godlike users respect RLS (they just have different policies).
+4. **No Admin Backdoor**: Godlike does **not** bypass `is_festival_member` for bands / picks / announcements — must Join like anyone else for normal PWA access. Cross-Festival ops stay on service role / laptop.
 5. **Soft Deletes**: Deleted announcements filtered at query time, not shown to clients.
 
 ---
@@ -774,4 +859,4 @@ npm run festival:reset -- --with-bands --force
 
 ---
 
-**Last updated:** 2026-06-26 — Phase 45: `camping_latitude` / `camping_longitude` on `app_settings`; camp coords cached in IDB; no Realtime.
+**Last updated:** 2026-08-11 — Phase 47 multi-festival: `festivals`, `festival_memberships`, `festival_id` columns, `is_festival_member`, membership RLS, `band_attendance` security_invoker, `users.active_festival_id`.
