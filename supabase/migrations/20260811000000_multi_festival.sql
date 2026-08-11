@@ -193,6 +193,12 @@ create policy user_picks_insert_own_member
   with check (
     auth.uid() = user_id
     and public.is_festival_member(festival_id)
+    and exists (
+      select 1
+      from public.bands b
+      where b.id = band_id
+        and b.festival_id = festival_id
+    )
   );
 
 drop policy if exists "user_picks: delete own" on public.user_picks;
@@ -230,13 +236,48 @@ create policy "insert_announcements"
 
 -- Keep "delete_announcements" as manager/godlike (unchanged).
 
--- users.active_festival_id: covered by existing "users: update own profile".
 -- Godlike does NOT get a membership bypass for bands / picks / announcements.
 
 -- ---------------------------------------------------------------------------
--- 12. Membership-gated attendance (only count picks from current members)
+-- 12. active_festival_id integrity
+-- Existing "users: update own profile" is USING-only (auth.uid() = id) and must
+-- stay usable for unrelated profile columns. Validate only when active_festival_id
+-- changes: non-null values require a membership for that user.
 -- ---------------------------------------------------------------------------
-create or replace view public.band_attendance as
+create or replace function public.enforce_active_festival_membership()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if new.active_festival_id is not null
+     and not exists (
+       select 1
+       from public.festival_memberships m
+       where m.user_id = new.id
+         and m.festival_id = new.active_festival_id
+     ) then
+    raise exception 'active_festival_id % requires festival membership for user %',
+      new.active_festival_id, new.id;
+  end if;
+  return new;
+end;
+$$;
+
+drop trigger if exists trg_users_active_festival_membership on public.users;
+create trigger trg_users_active_festival_membership
+  before update of active_festival_id on public.users
+  for each row
+  execute procedure public.enforce_active_festival_membership();
+
+-- ---------------------------------------------------------------------------
+-- 13. Membership-gated attendance (respect underlying RLS)
+-- ---------------------------------------------------------------------------
+drop view if exists public.band_attendance;
+create view public.band_attendance
+with (security_invoker = true)
+as
   select
     up.band_id,
     count(*)::bigint as going_count
