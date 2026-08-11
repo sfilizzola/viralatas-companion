@@ -49,3 +49,6 @@ docs/superpowers/
 
 # Local design demos and scratch work
 _temp/
+
+# Git worktrees (local isolation)
+.worktrees/
