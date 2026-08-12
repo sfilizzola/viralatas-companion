@@ -12,6 +12,7 @@ import {
 import { createOptimisticQueue } from '../lib/optimisticQueue';
 import type { OfflinePickOp } from '../lib/db';
 import type { UserPick } from '../types';
+import { usersRepository } from './users';
 
 function offlinePickId(userId: string, bandId: string) {
   const unique = crypto.randomUUID?.() ?? `${Date.now()}:${Math.random()}`;
@@ -149,7 +150,10 @@ async function syncCrewFromRemote(festivalId?: string): Promise<void> {
   const { data, error } = await query;
   if (error || !data) return;
 
-  await replaceUserPicks(data as UserPick[]);
+  const picks = data as UserPick[];
+  await replaceUserPicks(picks);
+  // Heal stale crew cache if picks landed without matching roster rows.
+  await usersRepository.ensureCrewUsers(picks.map((p) => p.user_id));
 }
 
 async function flushOfflineQueue(festivalId?: string): Promise<number> {
@@ -169,6 +173,8 @@ function subscribeToRealtime(festivalId?: string | null): () => void {
         const pick = payload.new as UserPick;
         if (festivalId && pick.festival_id !== festivalId) return;
         await saveUserPick(pick);
+        // Late joiners: pick can land before crew roster has their profile.
+        await usersRepository.ensureCrewUsers([pick.user_id]);
       },
     },
     {

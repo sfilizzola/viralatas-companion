@@ -474,6 +474,16 @@ async function seed() {
   const force = process.argv.includes('--force');
   const festivalSlug = parseFestivalSlug();
 
+  // This module's `bands` array is Wacken-only. Other festivals need their own
+  // seed (e.g. npm run seed:summer-breeze). --festival only scopes DELETE/INSERT.
+  if (festivalSlug !== 'wacken-2026') {
+    console.error(
+      `Refusing seed:bands for festival "${festivalSlug}" — bands.ts is Wacken-only.\n` +
+        `Use the festival-specific seed (e.g. npm run seed:summer-breeze).`,
+    );
+    process.exit(1);
+  }
+
   if (!supabaseUrl || !serviceRoleKey) {
     console.error('Missing VITE_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY');
     process.exit(1);

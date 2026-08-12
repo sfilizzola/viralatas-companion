@@ -79,9 +79,7 @@ CREATE TABLE public.festival_memberships (
 - SELECT peers on shared Festivals (`is_festival_member(festival_id)`)
 - INSERT/DELETE own only
 
----
-
-### `public.is_festival_member(p_festival_id uuid)` (Phase 47)
+**Realtime**: Enabled (`20260812000000_festival_memberships_realtime.sql`). `RealtimeSync` → `usersRepository.subscribeToMembershipRealtime(festivalId)` refreshes the Active Festival `crew_users` pack on peer Join/Leave so late joiners don't show as `Vira-lata XXXX` in band cells.
 
 **Purpose**: `SECURITY DEFINER` helper used by RLS — returns whether `auth.uid()` holds a membership. Avoids RLS recursion on `festival_memberships`.
 
@@ -860,4 +858,4 @@ npm run festival:reset -- --with-bands --force
 
 ---
 
-**Last updated:** 2026-08-11 — Phase 47 multi-festival: `festivals`, `festival_memberships`, `festival_id` columns, `is_festival_member`, membership RLS, `band_attendance` security_invoker, `users.active_festival_id`.
+**Last updated:** 2026-08-12 — `festival_memberships` added to `supabase_realtime` (crew roster refresh on peer Join/Leave). Phase 47 multi-festival: `festivals`, `festival_memberships`, `festival_id` columns, `is_festival_member`, membership RLS, `band_attendance` security_invoker, `users.active_festival_id`.

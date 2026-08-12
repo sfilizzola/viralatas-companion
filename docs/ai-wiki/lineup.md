@@ -1,5 +1,7 @@
 # Wacken Open Air 2026 — Band Lineup Reference
 
+> **WOA-only.** This page is the Wacken Open Air 2026 lineup. Summer Breeze Open Air 2026 lives under [festivals/summer-breeze-2026/](festivals/summer-breeze-2026/lineup.md) ([stages](festivals/summer-breeze-2026/stages.md)).
+
 > **This file is the human-editable source of truth for band assignments.**
 > For stage schedules (slot times, stage colors, day codes, pairing rules), see [stages.md](stages.md).
 >

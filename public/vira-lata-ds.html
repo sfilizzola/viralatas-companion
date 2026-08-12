@@ -67,6 +67,7 @@
     --role-conflict: #f9c66b;
 
     /* ---- stages (canonical, never reinterpret) ---- */
+    /* Wacken Open Air */
     --stage-faster:     #2980b9;
     --stage-harder:     #e67e22;
     --stage-louder:     #8e44ad;
@@ -75,6 +76,11 @@
     --stage-wasteland:  #2c3e50;
     --stage-wackinger:  #95a5a6;
     --stage-jungle:     #f39c12;  /* same as signal-warn */
+    /* Summer Breeze Open Air — muted metal (white ribbon text) */
+    --stage-main:             #9b2c2c;
+    --stage-t:                #1a5f7a;
+    --stage-tool-rebel:       #8b5a1f;
+    --stage-campsite-circus:  #5b3a8c;
 
     /* ---- type ---- */
     --font-display: 'Oswald', 'Helvetica Neue Condensed', 'Arial Narrow', sans-serif;
@@ -563,7 +569,7 @@
      ============================================================ */
   .daytabs {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(var(--day-tab-count, 4), minmax(0, 1fr));
     border: 1px solid var(--border);
     border-radius: var(--r-1);
     overflow: hidden;
@@ -2722,7 +2728,7 @@
     { "num": "13", "id": "minimap",               "title": "Festival Minimap",        "purpose": "Minimap zones, avatar dots, entry button" },
     { "num": "14", "id": "stage-schedule-sheet", "title": "Stage Schedule Sheet",    "purpose": "Bottom sheet showing current/next band per stage in a 2×4 grid; LIVE ribbon + pulsing dot; NEXT dimmed tile; --tile-color CSS custom prop per tile" },
     { "num": "15", "id": "camp-location",        "title": "Camp HQ Geolocation",      "purpose": "CampNavStrip (C+ gaffer tape), CampHqCard on Mural, CampMapDock (D1) below minimap, CampLocationSheet, CampPinIcon; --signal-ok* tokens" },
-    { "num": "16", "id": "multi-festival",       "title": "Multi-Festival",           "purpose": "FestivalSwitcher on /now; Festivals catalog Join/Leave/Activate on /festivals" },
+    { "num": "16", "id": "multi-festival",       "title": "Multi-Festival",           "purpose": "FestivalSwitcher on /now two-band header; Festivals catalog Join/Leave/Activate on /festivals" },
     { "num": null, "id": "changelog",             "title": "Changelog",               "purpose": "Dated revision history of the design system" }
   ],
   "tokens": {
@@ -2732,7 +2738,7 @@
     "ceremony": ["--ceremony-gold","--ceremony-gold-dim","--ceremony-gold-bg","--ceremony-gold-soft","--ceremony-gold-muted","--ceremony-gold-border"],
     "location": ["--metal-place-bright","--metal-place","--metal-place-dim","--metal-place-bg"],
     "roles":    ["--role-manager","--role-manager-soft","--role-manager-muted","--role-godlike","--role-godlike-soft","--role-godlike-muted","--role-conflict"],
-    "stages":   ["--stage-faster","--stage-harder","--stage-louder","--stage-wet","--stage-headbangers","--stage-wasteland","--stage-wackinger","--stage-jungle"],
+    "stages":   ["--stage-faster","--stage-harder","--stage-louder","--stage-wet","--stage-headbangers","--stage-wasteland","--stage-wackinger","--stage-jungle","--stage-main","--stage-t","--stage-tool-rebel","--stage-campsite-circus"],
     "type":     ["--font-display","--font-sans","--font-mono"],
     "spacing":  ["--s-1","--s-2","--s-3","--s-4","--s-5","--s-6","--s-8","--s-10","--s-12"],
     "radii":    ["--r-0","--r-1","--r-2","--r-3","--r-pill"]
@@ -2864,7 +2870,7 @@
       <div class="swatch"><div class="chip swatch-ink" style="background:#555">#555555</div><div class="meta"><div class="name">Text Faint</div><div class="tok">--text-faint</div><div class="hex">disabled</div></div></div>
     </div>
 
-    <div class="subhead">Stage palette &middot; canonical, never reinterpret</div>
+    <div class="subhead">Stage palette &middot; Wacken Open Air</div>
     <div class="stage-rail">
       <div style="background:#2980b9"><div class="name">Faster</div><div><div>Main Infield</div><div class="hex">#2980B9</div></div></div>
       <div style="background:#e67e22"><div class="name">Harder</div><div><div>Main Infield</div><div class="hex">#E67E22</div></div></div>
@@ -2875,7 +2881,15 @@
       <div class="swatch-ink" style="background:#95a5a6"><div class="name">Wackinger</div><div><div>Specialized</div><div class="hex">#95A5A6</div></div></div>
       <div style="background:#f39c12"><div class="name">W.T.J.</div><div><div>Specialized</div><div class="hex">#F39C12</div></div></div>
     </div>
-    <p class="t-small mt-3">Use stage colors as solid fills (badges, stripes, pills, hero strips). When tinting at low alpha, target 8–18% over surface; never tint backgrounds above 25% — they stop reading as accent.</p>
+
+    <div class="subhead mt-6">Stage palette &middot; Summer Breeze Open Air</div>
+    <div class="stage-rail">
+      <div style="background:#9b2c2c"><div class="name">Main</div><div><div>Main Stage</div><div class="hex">#9B2C2C</div></div></div>
+      <div style="background:#1a5f7a"><div class="name">T-Stage</div><div><div>Parallel</div><div class="hex">#1A5F7A</div></div></div>
+      <div style="background:#8b5a1f"><div class="name">Tool Rebel</div><div><div>Wera Tool Rebel</div><div class="hex">#8B5A1F</div></div></div>
+      <div style="background:#5b3a8c"><div class="name">Circus</div><div><div>Campsite Circus</div><div class="hex">#5B3A8C</div></div></div>
+    </div>
+    <p class="t-small mt-3">Use stage colors as solid fills (badges, stripes, pills, hero strips). When tinting at low alpha, target 8–18% over surface; never tint backgrounds above 25% — they stop reading as accent. Unknown stages fall back to <code>--accent</code>.</p>
 
     <div class="subhead mt-8">Stage color token map</div>
     <table class="ds-table">
@@ -2892,49 +2906,73 @@
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#2980b9"></span>Faster</td>
           <td>--stage-faster</td>
           <td><code>#2980B9</code></td>
-          <td>Main Infield stage badge</td>
+          <td>Wacken · Main Infield</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#e67e22"></span>Harder</td>
           <td>--stage-harder</td>
           <td><code>#E67E22</code></td>
-          <td>Main Infield stage badge</td>
+          <td>Wacken · Main Infield</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#8e44ad"></span>Louder</td>
           <td>--stage-louder</td>
           <td><code>#8E44AD</code></td>
-          <td>Main Infield stage badge</td>
+          <td>Wacken · Main Infield</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#c0392b"></span>W.E.T.</td>
           <td>--stage-wet</td>
           <td><code>#C0392B</code></td>
-          <td>Outside Infield; also --signal-live / --accent (5× Wacken role)</td>
+          <td>Wacken · Outside Infield; also --signal-live / --accent (5× Wacken role)</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#16a085"></span>Headbangers</td>
           <td>--stage-headbangers</td>
           <td><code>#16A085</code></td>
-          <td>Outside Infield; also --signal-ok (camping state)</td>
+          <td>Wacken · Outside Infield; also --signal-ok (camping state)</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#2c3e50"></span>Wasteland</td>
           <td>--stage-wasteland</td>
           <td><code>#2C3E50</code></td>
-          <td>Specialized venue</td>
+          <td>Wacken · Specialized venue</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#95a5a6"></span>Wackinger</td>
           <td>--stage-wackinger</td>
           <td><code>#95A5A6</code></td>
-          <td>Specialized venue</td>
+          <td>Wacken · Specialized venue</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#f39c12"></span>W.T.J.</td>
           <td>--stage-jungle</td>
           <td><code>#F39C12</code></td>
-          <td>Specialized venue; also --signal-warn (conflict state)</td>
+          <td>Wacken · Specialized venue; also --signal-warn (conflict state)</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#9b2c2c"></span>Main Stage</td>
+          <td>--stage-main</td>
+          <td><code>#9B2C2C</code></td>
+          <td>Summer Breeze · dried blood / headliners</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#1a5f7a"></span>T-Stage</td>
+          <td>--stage-t</td>
+          <td><code>#1A5F7A</code></td>
+          <td>Summer Breeze · oxidized steel teal</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#8b5a1f"></span>Wera Tool Rebel</td>
+          <td>--stage-tool-rebel</td>
+          <td><code>#8B5A1F</code></td>
+          <td>Summer Breeze · darkened brass / rust</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#5b3a8c"></span>Campsite Circus</td>
+          <td>--stage-campsite-circus</td>
+          <td><code>#5B3A8C</code></td>
+          <td>Summer Breeze · deep amethyst</td>
         </tr>
       </tbody>
     </table>
@@ -3785,20 +3823,28 @@
     <!-- DAY TABS -->
     <div class="subhead">Day tab bar</div>
     <div class="demo">
-      <div class="demo-stage">
-        <div class="daytabs">
-          <button class="daytab"><div class="dlabel">Day 1</div><div class="ddate">29</div><div class="ddow">Wed · Jul</div></button>
-          <button class="daytab on"><div class="dlabel">Day 2</div><div class="ddate">30</div><div class="ddow">Thu · Jul</div></button>
-          <button class="daytab"><div class="dlabel">Day 3</div><div class="ddate">31</div><div class="ddow">Fri · Jul</div></button>
-          <button class="daytab"><div class="dlabel">Day 4</div><div class="ddate">01</div><div class="ddow">Sat · Aug</div></button>
+      <div class="demo-stage" style="display:flex;flex-direction:column;gap:12px">
+        <div class="daytabs" style="--day-tab-count:4">
+          <button class="daytab"><div class="dlabel">D1</div><div class="ddate">29</div><div class="ddow">Wed</div></button>
+          <button class="daytab on"><div class="dlabel">D2</div><div class="ddate">30</div><div class="ddow">Thu</div></button>
+          <button class="daytab"><div class="dlabel">D3</div><div class="ddate">31</div><div class="ddow">Fri</div></button>
+          <button class="daytab"><div class="dlabel">D4</div><div class="ddate">01</div><div class="ddow">Sat</div></button>
+        </div>
+        <div class="daytabs" style="--day-tab-count:5">
+          <button class="daytab"><div class="dlabel">D1</div><div class="ddate" style="font-size:18px">11</div><div class="ddow">Tue</div></button>
+          <button class="daytab on"><div class="dlabel">D2</div><div class="ddate" style="font-size:18px">12</div><div class="ddow">Wed</div></button>
+          <button class="daytab"><div class="dlabel">D3</div><div class="ddate" style="font-size:18px">13</div><div class="ddow">Thu</div></button>
+          <button class="daytab"><div class="dlabel">D4</div><div class="ddate" style="font-size:18px">14</div><div class="ddow">Fri</div></button>
+          <button class="daytab"><div class="dlabel">D5</div><div class="ddate" style="font-size:18px">15</div><div class="ddow">Sat</div></button>
         </div>
       </div>
       <div class="demo-notes">
         <h4>Notes</h4>
         <ul>
+          <li>Single-row segmented control — column count = festival day count via <code>--day-tab-count</code> (never hardcode 4)</li>
           <li>Active = elevated bg + 2px accent underline</li>
-          <li>Date = Oswald 22, day-of-week monospace</li>
-          <li>Used on /schedule + /my-picks</li>
+          <li>Date = Oswald 22 (18 when ≥5 days / <code>.dayTabsDense</code>); DOW monospace, ellipsis if squeezed</li>
+          <li>Used on <code>/schedule</code>; days derived from lineup <code>bandDay()</code> set</li>
         </ul>
       </div>
     </div>
@@ -7221,20 +7267,29 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
 
     <div class="subhead">FestivalSwitcher · <code>src/components/FestivalSwitcher.tsx</code></div>
     <div class="demo">
-      <div class="demo-stage" style="display:flex;flex-direction:column;gap:12px;align-items:flex-start;padding:20px;background:var(--bg-sunken);border-radius:var(--r-2)">
-        <button type="button" style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r-1);border:1px solid var(--border-strong);background:var(--bg-elevated);color:var(--text);font-family:var(--font-mono);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em">
-          Wacken Open Air 2026 <span aria-hidden="true" style="opacity:0.6">▾</span>
-        </button>
-        <div style="min-width:220px;border:1px solid var(--border-strong);border-radius:var(--r-1);background:var(--bg-surface);overflow:hidden">
-          <div style="padding:10px 12px;font-family:var(--font-mono);font-size:11px;background:var(--accent-soft);color:var(--accent)">Wacken Open Air 2026 ✓</div>
-          <div style="padding:10px 12px;font-family:var(--font-mono);font-size:11px;color:var(--text-muted);border-top:1px solid var(--border)">Demo Fest 2027</div>
+      <div class="demo-stage" style="display:flex;flex-direction:column;gap:10px;padding:16px;background:var(--bg-sunken);border-radius:var(--r-2);max-width:360px;border:1px solid var(--border)">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:700;text-transform:uppercase;line-height:1">Right Now</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--text);text-transform:uppercase;letter-spacing:0.04em;white-space:nowrap">Wed 14:32</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;min-width:0">
+          <button type="button" style="flex:1;min-width:0;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 10px;border-radius:var(--r-1);border:1px solid var(--border);background:var(--bg-surface);color:var(--text-muted);font-family:var(--font-mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em">
+            <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Summer Breeze Open Air 2026</span>
+            <span aria-hidden="true" style="opacity:0.7;flex-shrink:0">▾</span>
+          </button>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <span style="width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--border);border-radius:4px;background:var(--bg-surface);color:var(--text-muted);font-size:11px" title="Stages">▦</span>
+            <span style="width:32px;height:32px;display:grid;place-items:center;border:1px solid var(--border);border-radius:4px;background:var(--bg-surface);color:var(--text-muted);font-size:11px" title="Map">⌖</span>
+          </div>
         </div>
       </div>
     </div>
     <div class="demo-notes">
       <ul>
-        <li>Mounted on <code>/now</code>; hidden when zero joined Festivals</li>
-        <li>Trigger disabled when only one membership; chevron only when ≥2</li>
+        <li>Mounted on <code>/now</code> header toolbar; hidden when zero joined Festivals</li>
+        <li><b>Two-band header</b> — masthead (title + clock) over toolbar (switcher + Stages/Map). Festival name is not repeated under the clock.</li>
+        <li>Trigger <code>flex:1</code> with ellipsis; height 32px; disabled when only one membership; chevron only when ≥2</li>
+        <li>≤420px: Stages/Map become icon-only (labels visually hidden, <code>aria-label</code> retained)</li>
         <li>Offline select → need-signal toast; online → <code>setActive</code> (pack clear + reload)</li>
         <li>i18n namespace <code>FestivalsPage</code> (shared with catalog)</li>
       </ul>
@@ -7282,6 +7337,31 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.11 — SB stage colors muted · Aug 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§01 Color</b> — Summer Breeze tokens darkened for metal dark-UI readability: Main <code>#9B2C2C</code>, T <code>#1A5F7A</code>, Tool Rebel <code>#8B5A1F</code>, Circus <code>#5B3A8C</code>. White ribbon text on all four.</li>
+        </ul>
+      </div>
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.10 — Day tabs N-day · Aug 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>Day tab bar</b> — <code>--day-tab-count</code> drives equal single-row columns (4 or 5+); dense type when ≥5 days. No longer hardcoded to Wacken’s 4 days.</li>
+        </ul>
+      </div>
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.9 — /now header two-band · Aug 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§16 Multi-Festival</b> — FestivalSwitcher demo shows masthead + toolbar layout; switcher flex-grows with ellipsis; Stages/Map icon-only ≤420px.</li>
+        </ul>
+      </div>
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.8 — Summer Breeze stage colors · Aug 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§01 Color</b> — Summer Breeze stage tokens: <code>--stage-main</code>, <code>--stage-t</code>, <code>--stage-tool-rebel</code>, <code>--stage-campsite-circus</code>; second stage rail + token-map rows.</li>
+          <li>Manifest <code>tokens.stages</code> extended with the four SB tokens.</li>
+        </ul>
+      </div>
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.7 — Phase 47 Multi-Festival · Aug 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">

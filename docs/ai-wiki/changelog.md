@@ -8,9 +8,18 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ### Added
 - **[Add Festival (Ops)](add-festival-ops.md)** — Runbook for `npm run seed:festival`, festival-scoped band seeding (`--festival`), feature JSON keys, user Join/Active path, and safety notes. Linked from index, schema (`festivals`), and domain-model (Festival catalog).
+- **Summer Breeze Open Air 2026** festival wiki: [stages.md](festivals/summer-breeze-2026/stages.md) + [lineup.md](festivals/summer-breeze-2026/lineup.md) (135 music slots; primary = official gigs API, PDF for Surprise Show + Hindarfjäll; side events excluded from seed v1). Index Festival Content links + WOA-only note on root [lineup.md](lineup.md). Seed module `supabase/seed/summer-breeze-2026.ts` + `npm run seed:summer-breeze` (dry-run default; `--force` to apply).
+- **Festival-scoped Useful Links** — `public/useful-links.json` `linksByFestival` by slug. Summer Breeze: Top Up (`https://sboa26.eventportal.io`), Festival Map PDF, Splitwise, Instagram. Wacken keeps Top Up + Bus + Splitwise + Instagram. Mural selects via Active Festival slug.
 
 ### Changed
 - Index / Festival Reset blurb — note `--festival` scoping (default `wacken-2026`).
+- **Summer Breeze lineup meta** — official band `webclip` photos (134/135; Surprise Show null) + Phase 25 canonical genres on seed; `npm run seed:summer-breeze -- --patch-meta` updates `genre`/`image_url` without wiping picks; bumps `festivals.cache_version`.
+- **Summer Breeze stage UI colors** — four muted metal CSS tokens (`--stage-main` dried blood `#9b2c2c`, `--stage-t` oxidized steel `#1a5f7a`, `--stage-tool-rebel` darkened brass `#8b5a1f`, `--stage-campsite-circus` deep amethyst `#5b3a8c`) in `src/index.css` + `stageColors.ts`; DS §01; white ribbon text on all four (replaces earlier neon scarlet/cyan/yellow/violet).
+- [festivals/summer-breeze-2026/stages.md](festivals/summer-breeze-2026/stages.md) — stage table UI color tokens/hex (muted metal palette; white ribbon text).
+- **Summer Breeze stage colors retuned** — Dropped neon cyan/yellow for darker metal hues so badges/stripes stay readable on the dark UI.
+- **`/now` header mobile layout** — Two-band instrument header: title + clock on the masthead; festival switcher + Stages/Map on a toolbar row. Switcher grows with ellipsis; action chips go icon-only below 420px. Removes the cramped single-row fight and the duplicate long `{name} time` subtitle.
+- **Lineup day tab bar** — `BandFilters` day grid uses `--day-tab-count` from the festival’s unique `bandDay()` set (not hardcoded `repeat(4)`). Stays one row for any day count; `.dayTabsDense` tightens type at ≥5 days (Summer Breeze).
+- **Late-joiner crew profiles** — Peer Join after Active Festival pack load no longer leaves band cells as `Vira-lata XXXX` / blank avatar. Root cause: picks Realtime updated IDB while `crew_users` only refreshed on reconnect/pack switch (not camping). Fix: `festival_memberships` Realtime → `syncCrew`; pick INSERT/sync path calls `ensureCrewUsers`; `upsertCrewUsers` merge helper; `RealtimeSync` resubscribes on Active Festival change.
 
 ## 2026-08-11
 

@@ -494,12 +494,13 @@ All Realtime → IndexedDB writes are mounted once in **`RealtimeSync`** (`src/c
 
 | Consumer | Channel | Events | Action |
 |------|---------|--------|--------|
-| picksRepository | pick_counts | INSERT, DELETE on user_picks | Saves to user_picks IDB |
+| picksRepository | pick_counts | INSERT, DELETE on user_picks | Saves to user_picks IDB; INSERT also `ensureCrewUsers([user_id])` so late joiners hydrate name/avatar |
 | presenceRepository | metal_place_config_live | * on metal_place_config **and** metal_place_windows | Full re-fetch via `syncMetalPlaceConfig()` → merged `{ label, windows[] }` in IDB (Phase 44) |
 | liveBandTest service | live_band_test_config_live | * on live_band_test_config | Saves to live_band_test_config IDB |
 | presenceRepository | user_presence_live | * on user_presence | Saves to user_presence IDB |
 | announcementsRepository | announcements_live | INSERT/UPDATE/DELETE announcements | Saves to announcements IDB |
 | usersRepository | blocked_posters_live | INSERT/DELETE blocked_posters | Emits `BLOCKED_POSTERS_CHANGED_EVENT` |
+| usersRepository | festival_memberships_live_* | INSERT/DELETE festival_memberships (Active Festival filter) | `syncCrew(festivalId)` — refreshes membership-gated roster |
 | useDuckNotifications | duck_quacks_realtime | INSERT on duck_quacks | Dispatches `viralatas:duck-quack` event |
 | missedRepository | missed_bands | INSERT, DELETE on user_missed_bands | Saves to user_missed_bands IDB |
 
@@ -507,16 +508,16 @@ All Realtime → IndexedDB writes are mounted once in **`RealtimeSync`** (`src/c
 
 **Subscription lifecycle** (sync layer):
 ```typescript
-// src/components/sync/RealtimeSync.tsx
+// src/components/sync/RealtimeSync.tsx — re-subscribes when Active Festival changes
 useEffect(() => {
+  if (!ready) return;
   const unsubscribers = [
-    picksRepository.subscribeToRealtime(),
-    announcementsRepository.subscribeToRealtime(),
-    presenceRepository.subscribeToRealtime(),
+    picksRepository.subscribeToRealtime(festivalId),
+    usersRepository.subscribeToMembershipRealtime(festivalId), // when festivalId set
     // ...
   ];
   return () => unsubscribers.forEach((u) => u());
-}, []);
+}, [activeFestivalId, ready]);
 ```
 
 ---

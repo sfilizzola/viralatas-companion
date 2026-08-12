@@ -36,6 +36,16 @@ export async function saveCrewUsers(users: CrewUser[]) {
   emitCrewUsersChanged();
 }
 
+/** Merge/overwrite crew rows without clearing the rest of the roster. */
+export async function upsertCrewUsers(users: CrewUser[]) {
+  if (users.length === 0) return;
+  const db = await getDB();
+  const tx = db.transaction('crew_users', 'readwrite');
+  await Promise.all(users.map((user) => tx.store.put(user)));
+  await tx.done;
+  emitCrewUsersChanged();
+}
+
 export async function loadCrewUsers(): Promise<CrewUser[]> {
   const db = await getDB();
   return db.getAll('crew_users');

@@ -77,6 +77,7 @@ import {
   saveBands,
   saveCacheVersion,
   saveCrewUsers,
+  upsertCrewUsers,
   saveLiveBandTestConfig,
   saveCampLocation,
   saveMetalPlaceConfig,
@@ -250,6 +251,24 @@ describe('IndexedDB layer (lib/db.ts)', () => {
       expect(await loadCrewUsers()).toEqual(users);
       expect(handler).toHaveBeenCalledTimes(1);
       window.removeEventListener(CREW_USERS_CHANGED_EVENT, handler);
+    });
+
+    it('upsertCrewUsers merges without clearing existing roster', async () => {
+      await saveCrewUsers([
+        { id: 'u1', display_name: 'Alice', avatar_url: null, wacken_arrival_day: null },
+      ]);
+      await upsertCrewUsers([
+        { id: 'u2', display_name: 'Bob', avatar_url: 'https://cdn.example/bob.png', wacken_arrival_day: null },
+      ]);
+
+      const crew = await loadCrewUsers();
+      expect(crew).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: 'u1', display_name: 'Alice' }),
+          expect.objectContaining({ id: 'u2', display_name: 'Bob', avatar_url: 'https://cdn.example/bob.png' }),
+        ]),
+      );
+      expect(crew).toHaveLength(2);
     });
   });
 

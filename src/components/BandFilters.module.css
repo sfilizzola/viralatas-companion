@@ -142,12 +142,28 @@
 
 .dayTabs {
   flex: 1;
+  min-width: 0;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  /* Column count comes from BandFilters via --day-tab-count (festival-agnostic). */
+  grid-template-columns: repeat(var(--day-tab-count, 4), minmax(0, 1fr));
   border: 1px solid var(--border);
   border-radius: var(--r-1);
   overflow: hidden;
   background: var(--bg-surface);
+}
+
+.dayTabsDense .dayTab {
+  padding: 6px 2px;
+}
+
+.dayTabsDense .dayTabDate {
+  font-size: 18px;
+}
+
+.dayTabsDense .dayTabLabel,
+.dayTabsDense .dayTabDow {
+  font-size: 9px;
+  letter-spacing: 0.06em;
 }
 
 /* ---- Sort button ---- */
@@ -302,6 +318,10 @@
   font-size: 10px;
   color: var(--text-faint);
   text-transform: uppercase;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dayTabActive .dayTabDow {

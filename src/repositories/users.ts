@@ -1,4 +1,4 @@
-import { saveCrewUsers } from '../lib/db';
+import { loadCrewUsers, saveCrewUsers, upsertCrewUsers } from '../lib/db';
 import { BLOCKED_POSTERS_CHANGED_EVENT } from '../lib/db';
 import { subscribePostgresChanges } from '../lib/realtimeSync';
 import { supabase } from '../lib/supabase';
@@ -21,6 +21,15 @@ export type BlockedPosterWithUserDetails = BlockedPoster & {
   user_avatar_url: string | null;
   user_special_badges: string[];
 };
+
+const CREW_PROFILE_SELECT =
+  'id, display_name, avatar_url, wacken_arrival_day, is_friend, special_badges';
+
+function normalizeCrewRows(
+  data: Array<CrewUser & { special_badges?: string[] | null }>,
+): CrewUser[] {
+  return data.map((u) => ({ ...u, special_badges: u.special_badges ?? [] }));
+}
 
 async function hydrateCurrentUserBadgeMetadataFromCrew(crew: CrewUser[]): Promise<void> {
   const { data: { user } } = await supabase.auth.getUser();
@@ -48,9 +57,7 @@ async function syncCrew(festivalId?: string): Promise<void> {
     }
   }
 
-  let query = supabase
-    .from('users')
-    .select('id, display_name, avatar_url, wacken_arrival_day, is_friend, special_badges');
+  let query = supabase.from('users').select(CREW_PROFILE_SELECT);
   if (memberIds) query = query.in('id', memberIds);
   const { data, error } = await query.order('display_name', {
     ascending: true,
@@ -59,11 +66,35 @@ async function syncCrew(festivalId?: string): Promise<void> {
 
   if (error || !data) return;
 
-  const crew: CrewUser[] = (data as Array<CrewUser & { special_badges?: string[] | null }>).map(
-    (u) => ({ ...u, special_badges: u.special_badges ?? [] }),
+  const crew = normalizeCrewRows(
+    data as Array<CrewUser & { special_badges?: string[] | null }>,
   );
   await saveCrewUsers(crew);
   await hydrateCurrentUserBadgeMetadataFromCrew(crew);
+}
+
+/**
+ * Fetch any pick/presence user ids missing from the local crew roster and merge them.
+ * Covers the gap where user_picks Realtime arrives before (or without) a membership resync.
+ */
+async function ensureCrewUsers(userIds: string[]): Promise<void> {
+  const uniqueIds = [...new Set(userIds.filter(Boolean))];
+  if (uniqueIds.length === 0) return;
+
+  const existing = await loadCrewUsers();
+  const have = new Set(existing.map((u) => u.id));
+  const missing = uniqueIds.filter((id) => !have.has(id));
+  if (missing.length === 0) return;
+
+  const { data, error } = await supabase
+    .from('users')
+    .select(CREW_PROFILE_SELECT)
+    .in('id', missing);
+  if (error || !data?.length) return;
+
+  await upsertCrewUsers(
+    normalizeCrewRows(data as Array<CrewUser & { special_badges?: string[] | null }>),
+  );
 }
 
 async function fetchUserRolesMap(): Promise<Record<string, UserRole>> {
@@ -145,8 +176,28 @@ function subscribeToRealtime(): () => void {
   ]);
 }
 
+/** Peer Join/Leave on the Active Festival → refresh membership-gated crew roster. */
+function subscribeToMembershipRealtime(festivalId: string): () => void {
+  const festivalFilter = `festival_id=eq.${festivalId}`;
+  return subscribePostgresChanges(`festival_memberships_live_${festivalId}`, [
+    {
+      filter: { event: 'INSERT', table: 'festival_memberships', filter: festivalFilter },
+      handler: () => {
+        void syncCrew(festivalId);
+      },
+    },
+    {
+      filter: { event: 'DELETE', table: 'festival_memberships', filter: festivalFilter },
+      handler: () => {
+        void syncCrew(festivalId);
+      },
+    },
+  ]);
+}
+
 export const usersRepository = {
   syncCrew,
+  ensureCrewUsers,
   fetchUserRolesMap,
   fetchAllUsers,
   setUserRole,
@@ -155,4 +206,5 @@ export const usersRepository = {
   blockUser,
   unblockUser,
   subscribeToRealtime,
+  subscribeToMembershipRealtime,
 };

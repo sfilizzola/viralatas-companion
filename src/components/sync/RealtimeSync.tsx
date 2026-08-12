@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { getActiveFestivalId } from '../../lib/db';
+import { useActiveFestival } from '../../hooks/useActiveFestival';
 import {
   announcementsRepository,
   missedRepository,
@@ -14,43 +14,37 @@ import { subscribeToLiveBandTestConfigRealtime } from '../../services/liveBandTe
 /**
  * Mounts all Supabase Realtime → IndexedDB subscriptions once at app level.
  * Hooks react via window events only; they do not own Realtime channels.
+ * Re-subscribes when Active Festival changes so festival-scoped filters stay correct.
  */
 export function RealtimeSync() {
+  const { activeFestivalId, ready } = useActiveFestival();
+
   useEffect(() => {
-    let cancelled = false;
-    let unsubscribers: Array<() => void> = [];
+    if (!ready) return;
 
-    void (async () => {
-      const festivalId = (await getActiveFestivalId()) ?? undefined;
-      if (cancelled) return;
+    const festivalId = activeFestivalId ?? undefined;
+    const unsubscribers: Array<() => void> = [
+      picksRepository.subscribeToRealtime(festivalId),
+      announcementsRepository.subscribeToRealtime(festivalId),
+      presenceRepository.subscribeToRealtime(),
+      presenceRepository.subscribeToMetalPlaceConfigRealtime(),
+      subscribeToLiveBandTestConfigRealtime(),
+      missedRepository.subscribeToRealtime(),
+      ratingsRepository.subscribeToRealtime(),
+      reactionsRepository.subscribeToRealtime(),
+      usersRepository.subscribeToRealtime(),
+    ];
 
-      unsubscribers = [
-        picksRepository.subscribeToRealtime(festivalId),
-        announcementsRepository.subscribeToRealtime(festivalId),
-        presenceRepository.subscribeToRealtime(),
-        presenceRepository.subscribeToMetalPlaceConfigRealtime(),
-        subscribeToLiveBandTestConfigRealtime(),
-        missedRepository.subscribeToRealtime(),
-        ratingsRepository.subscribeToRealtime(),
-        reactionsRepository.subscribeToRealtime(),
-        usersRepository.subscribeToRealtime(),
-      ];
-
-      if (cancelled) {
-        for (const unsubscribe of unsubscribers) {
-          unsubscribe();
-        }
-        unsubscribers = [];
-      }
-    })();
+    if (festivalId) {
+      unsubscribers.push(usersRepository.subscribeToMembershipRealtime(festivalId));
+    }
 
     return () => {
-      cancelled = true;
       for (const unsubscribe of unsubscribers) {
         unsubscribe();
       }
     };
-  }, []);
+  }, [activeFestivalId, ready]);
 
   return null;
 }
