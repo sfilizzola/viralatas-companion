@@ -57,13 +57,13 @@ export default function AnnouncementsPage() {
 
   useEffect(() => {
     let isMounted = true;
-    loadUsefulLinks().then((links) => {
+    loadUsefulLinks(festival?.slug).then((links) => {
       if (isMounted) setUsefulLinks(links);
     });
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [festival?.slug]);
 
   async function handlePost(e: FormEvent) {
     e.preventDefault();

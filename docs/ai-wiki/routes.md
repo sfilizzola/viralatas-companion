@@ -258,6 +258,7 @@ Most festival social routes additionally wrap with `<FestivalGate>` (and optiona
 **Purpose**: Mural-style announcement board
 
 **Key Features**:
+- **Useful Links** — Festival-scoped pills from `public/useful-links.json` (`linksByFestival[slug]`, else top-level `links`). Summer Breeze: Top Up (`sboa26.eventportal.io`), Festival Map PDF, Splitwise, Instagram. Wacken: Top Up, Bus Schedule, Splitwise, Instagram.
 - **Camp HQ strip (C+)** — When godlike has set campground GPS, `CampHqCard` renders `CampNavStrip` in the info zone (below useful links, above post form). Green gaffer tape, tent pin, tap → Google Maps; long-press → coord sheet on touch devices. Visible even when the user is blocked from posting.
 - **Text input** — Post a message (max ~500 chars, enforced in UI)
 - **Announcement grid** — Cards in reverse chronological order

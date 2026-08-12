@@ -109,7 +109,10 @@ export type UsefulLink = {
 };
 
 export type UsefulLinksFile = {
+  /** Fallback when Active Festival has no dedicated list (or unknown slug). */
   links: UsefulLink[];
+  /** Optional per-Festival overrides keyed by `festivals.slug`. */
+  linksByFestival?: Record<string, UsefulLink[]>;
 };
 
 export type MetalPlaceWindow = {
