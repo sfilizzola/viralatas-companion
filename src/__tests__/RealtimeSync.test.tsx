@@ -6,16 +6,18 @@ const {
   subscribeToRealtime,
   subscribeToMetalPlaceConfigRealtime,
   subscribeToLiveBandTestConfigRealtime,
-  mockGetActiveFestivalId,
+  subscribeToMembershipRealtime,
+  mockUseActiveFestival,
 } = vi.hoisted(() => ({
   subscribeToRealtime: vi.fn().mockReturnValue(() => {}),
   subscribeToMetalPlaceConfigRealtime: vi.fn().mockReturnValue(() => {}),
   subscribeToLiveBandTestConfigRealtime: vi.fn().mockReturnValue(() => {}),
-  mockGetActiveFestivalId: vi.fn().mockResolvedValue('wacken-2026'),
+  subscribeToMembershipRealtime: vi.fn().mockReturnValue(() => {}),
+  mockUseActiveFestival: vi.fn(),
 }));
 
-vi.mock('../lib/db', () => ({
-  getActiveFestivalId: mockGetActiveFestivalId,
+vi.mock('../hooks/useActiveFestival', () => ({
+  useActiveFestival: mockUseActiveFestival,
 }));
 
 vi.mock('../repositories', () => ({
@@ -25,7 +27,7 @@ vi.mock('../repositories', () => ({
   missedRepository: { subscribeToRealtime },
   ratingsRepository: { subscribeToRealtime },
   reactionsRepository: { subscribeToRealtime },
-  usersRepository: { subscribeToRealtime },
+  usersRepository: { subscribeToRealtime, subscribeToMembershipRealtime },
 }));
 
 vi.mock('../services/liveBandTest', () => ({
@@ -36,10 +38,14 @@ import { RealtimeSync } from '../components/sync/RealtimeSync';
 
 beforeEach(() => {
   vi.clearAllMocks();
-  mockGetActiveFestivalId.mockResolvedValue(TEST_FESTIVAL_ID);
+  mockUseActiveFestival.mockReturnValue({
+    activeFestivalId: TEST_FESTIVAL_ID,
+    ready: true,
+  });
   subscribeToRealtime.mockReturnValue(() => {});
   subscribeToMetalPlaceConfigRealtime.mockReturnValue(() => {});
   subscribeToLiveBandTestConfigRealtime.mockReturnValue(() => {});
+  subscribeToMembershipRealtime.mockReturnValue(() => {});
 });
 
 describe('RealtimeSync', () => {
@@ -52,6 +58,19 @@ describe('RealtimeSync', () => {
     expect(subscribeToRealtime).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
     expect(subscribeToMetalPlaceConfigRealtime).toHaveBeenCalledOnce();
     expect(subscribeToLiveBandTestConfigRealtime).toHaveBeenCalledOnce();
+    expect(subscribeToMembershipRealtime).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
+  });
+
+  it('skips subscriptions until Active Festival context is ready', () => {
+    mockUseActiveFestival.mockReturnValue({
+      activeFestivalId: TEST_FESTIVAL_ID,
+      ready: false,
+    });
+
+    render(<RealtimeSync />);
+
+    expect(subscribeToRealtime).not.toHaveBeenCalled();
+    expect(subscribeToMembershipRealtime).not.toHaveBeenCalled();
   });
 
   it('cleans up all subscriptions on unmount', async () => {
@@ -64,6 +83,7 @@ describe('RealtimeSync', () => {
     const unsubUsers = vi.fn();
     const unsubMetalPlace = vi.fn();
     const unsubLiveBandTest = vi.fn();
+    const unsubMembership = vi.fn();
 
     subscribeToRealtime
       .mockReturnValueOnce(unsubPicks)
@@ -75,6 +95,7 @@ describe('RealtimeSync', () => {
       .mockReturnValueOnce(unsubUsers);
     subscribeToMetalPlaceConfigRealtime.mockReturnValue(unsubMetalPlace);
     subscribeToLiveBandTestConfigRealtime.mockReturnValue(unsubLiveBandTest);
+    subscribeToMembershipRealtime.mockReturnValue(unsubMembership);
 
     const { unmount } = render(<RealtimeSync />);
     await waitFor(() => {
@@ -91,5 +112,6 @@ describe('RealtimeSync', () => {
     expect(unsubUsers).toHaveBeenCalledOnce();
     expect(unsubMetalPlace).toHaveBeenCalledOnce();
     expect(unsubLiveBandTest).toHaveBeenCalledOnce();
+    expect(unsubMembership).toHaveBeenCalledOnce();
   });
 });

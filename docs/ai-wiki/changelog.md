@@ -7,6 +7,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ## 2026-08-12
 
 ### Added
+- **Release v1.5.2** — Summer Breeze companion pack on `main` (festival seed/wiki, muted stage colors, festival-scoped mural links, late-joiner crew hydration, `/now` header + N-day lineup tabs).
 - **[Add Festival (Ops)](add-festival-ops.md)** — Runbook for `npm run seed:festival`, festival-scoped band seeding (`--festival`), feature JSON keys, user Join/Active path, and safety notes. Linked from index, schema (`festivals`), and domain-model (Festival catalog).
 - **Summer Breeze Open Air 2026** festival wiki: [stages.md](festivals/summer-breeze-2026/stages.md) + [lineup.md](festivals/summer-breeze-2026/lineup.md) (135 music slots; primary = official gigs API, PDF for Surprise Show + Hindarfjäll; side events excluded from seed v1). Index Festival Content links + WOA-only note on root [lineup.md](lineup.md). Seed module `supabase/seed/summer-breeze-2026.ts` + `npm run seed:summer-breeze` (dry-run default; `--force` to apply).
 - **Festival-scoped Useful Links** — `public/useful-links.json` `linksByFestival` by slug. Summer Breeze: Top Up (`https://sboa26.eventportal.io`), Festival Map PDF, Splitwise, Instagram. Wacken keeps Top Up + Bus + Splitwise + Instagram. Mural selects via Active Festival slug.
