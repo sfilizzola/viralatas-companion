@@ -8,6 +8,9 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ### Added
 - **Summer Breeze Open Air 2026** festival wiki: [stages.md](festivals/summer-breeze-2026/stages.md) + [lineup.md](festivals/summer-breeze-2026/lineup.md) (135 music slots; primary = official gigs API, PDF for Surprise Show + Hindarfjäll; side events excluded from seed v1). Index Festival Content links + WOA-only note on root [lineup.md](lineup.md). Seed module `supabase/seed/summer-breeze-2026.ts` + `npm run seed:summer-breeze` (dry-run default; `--force` to apply).
+
+### Changed
+- **Summer Breeze lineup meta** — official band `webclip` photos (134/135; Surprise Show null) + Phase 25 canonical genres on seed; `npm run seed:summer-breeze -- --patch-meta` updates `genre`/`image_url` without wiping picks; bumps `festivals.cache_version`.
 - **Summer Breeze stage UI colors** — four muted metal CSS tokens (`--stage-main` dried blood `#9b2c2c`, `--stage-t` oxidized steel `#1a5f7a`, `--stage-tool-rebel` darkened brass `#8b5a1f`, `--stage-campsite-circus` deep amethyst `#5b3a8c`) in `src/index.css` + `stageColors.ts`; DS §01; white ribbon text on all four (replaces earlier neon scarlet/cyan/yellow/violet).
 
 ### Changed

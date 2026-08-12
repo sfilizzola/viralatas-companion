@@ -262,18 +262,21 @@ Do **not** edit [Wacken lineup.md](../../lineup.md) for this festival.
 
 ## Notes
 
-- **Surprise Show** (`TST13`): TBA musical act; times from PDF (not in API).
+- **Surprise Show** (`TST13`): TBA musical act; times from PDF (not in API); **no official photo**.
 - **Hindarfjäll** (`TRB16`): in API without times; PDF 01:25–02:10 after Thu night on Wera Tool Rebel.
 - Overnight ends shown as clock time on the next calendar date in the seed ISO timestamps.
 - Side program (Metalza, Metal Yoga, Voidcast, Harsh Vocals, discos, Announcement Bands 2027) intentionally omitted from v1 seed.
+- **Photos:** official `webclip` from [bands API](https://www.summer-breeze.de/wp-json/summer-breeze-app/v1/bands) (134/135).
+- **Genres:** Phase 25 canonical 13 labels ([ADR](../../decisions/genre-collapse-canonical-labels.md)); `Party Metal` = Airbourne + Alestorm only. Patch without wiping picks: `npm run seed:summer-breeze -- --patch-meta`.
 
 ---
 
 ## Seed apply (ops)
 
 ```bash
-npm run seed:summer-breeze          # dry-run
-npm run seed:summer-breeze -- --force
+npm run seed:summer-breeze                    # dry-run destructive plan
+npm run seed:summer-breeze -- --force         # full REPLACE (wipes SB picks)
+npm run seed:summer-breeze -- --patch-meta    # UPDATE genre + image_url only
 ```
 
 Never use `npm run seed:bands -- --festival summer-breeze-2026` (Wacken array; refused by guard).
