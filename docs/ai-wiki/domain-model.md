@@ -75,7 +75,7 @@ type Festival = {
 
 **Festival features** (optional): Metal Place, map, duck, camp, wrap, remote lineup. Core schedule / picks / `/now` / mural exist for every Festival. Wacken 2026 seeds all features `true`.
 
-**Festival catalog**: Ops/seed-created list. Before membership, a vira-lata sees **metadata only** (name, dates, timezone) — not lineup, picks, or mural.
+**Festival catalog**: Ops/seed-created list. Before membership, a vira-lata sees **metadata only** (name, dates, timezone) — not lineup, picks, or mural. How to add a Festival → [add-festival-ops.md](add-festival-ops.md).
 
 **Invariants:**
 - `slug` unique

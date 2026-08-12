@@ -1,6 +1,6 @@
 # Viralatas Companion — Architectural Wiki
 
-**Last Updated**: 2026-08-11 (Phase 47 — Multi-festival: Active Festival pack, membership, feature gates)
+**Last Updated**: 2026-08-12 (Ops: how to add a Festival via `seed:festival`)
 
 ## Purpose
 
@@ -86,7 +86,8 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 ### Operational Tooling
 - **[Wacken Official Running Order (JSON)](lineup-official-source.md)** — Live JSON feeds, filter rules, `npm run lineup:check-official` (check → `--lineup` → `--complete`).
 - **[Lineup Sync](lineup-sync.md)** — Laptop CLI: `seed:bands:sync` and `seed:bands:move` (dry-run default; picks preserved). **At festival:** godlike [Remote Lineup Sync](flows/lineup-remote-sync.md) preview/apply from `/profile`.
-- **[Festival Reset](festival-reset.md)** — `npm run festival:reset` one-shot script: state wipe (announcements, blocked_posters, user_presence, assigned + persistent badges, cache_version bump) with optional bands re-seed via `--with-bands`. Flag matrix, scope guard, edge cases.
+- **[Add Festival (Ops)](add-festival-ops.md)** — Create a Festival catalog row with `seed:festival`, seed bands with `--festival <slug>`, user Join/Active path; no in-app CRUD.
+- **[Festival Reset](festival-reset.md)** — `npm run festival:reset` one-shot script: state wipe (announcements, blocked_posters, user_presence, assigned + persistent badges, cache_version bump) with optional bands re-seed via `--with-bands`. Flag matrix, scope guard, edge cases. Festival-scoped via `--festival` (default `wacken-2026`).
 
 ---
 

@@ -2,9 +2,9 @@
 
 ## Purpose
 
-Document the `npm run festival:reset` operator script — a one-shot tool to clear pre-festival activity (badges, announcements, presence check-ins, moderation history) and optionally re-seed the bands table with the finalized lineup. Run once at festival start so live counts, badges, and the announcement mural reflect Wacken itself rather than two months of pre-game.
+Document the `npm run festival:reset` operator script — a one-shot tool to clear pre-festival activity (badges, announcements, presence check-ins, moderation history) and optionally re-seed the bands table with the finalized lineup. Run once at festival start so live counts, badges, and the announcement mural reflect Wacken itself rather than two months of pre-game. Scoped with `--festival <slug>` (default `wacken-2026`). To **create** a new Festival catalog row, see [add-festival-ops.md](add-festival-ops.md).
 
-**Warning:** This project's Supabase plan has **no point-in-time restore**. `--with-bands` CASCADE-wipes all `user_picks` with no undo. Agents must not run this on production without explicit operator confirmation. See `.claude/context/production-database.md`.
+**Warning:** This project's Supabase plan has **no point-in-time restore**. `--with-bands` CASCADE-wipes all `user_picks` for that Festival with no undo. Agents must not run this on production without explicit operator confirmation. See `.claude/context/production-database.md`.
 
 ---
 

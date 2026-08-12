@@ -53,6 +53,7 @@ CREATE TABLE public.festivals (
 **RLS**:
 - `festivals_select_authenticated` — SELECT for authenticated (`using (true)`)
 - No client INSERT/UPDATE/DELETE (ops / service role only)
+- **Ops create/update:** `npm run seed:festival` — see [add-festival-ops.md](add-festival-ops.md)
 
 **Festival cache version**: Clients compare `festivals.cache_version` for the **Active Festival** against the local pack marker (`meta.active_festival_cache_version`). Mismatch → `clearActiveFestivalPack()` + reload that Festival only. Supersedes global `app_config.cache_version` as the pack invalidation token for multi-festival.
 

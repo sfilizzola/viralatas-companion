@@ -4,6 +4,14 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-08-12
+
+### Added
+- **[Add Festival (Ops)](add-festival-ops.md)** — Runbook for `npm run seed:festival`, festival-scoped band seeding (`--festival`), feature JSON keys, user Join/Active path, and safety notes. Linked from index, schema (`festivals`), and domain-model (Festival catalog).
+
+### Changed
+- Index / Festival Reset blurb — note `--festival` scoping (default `wacken-2026`).
+
 ## 2026-08-11
 
 ### Added
