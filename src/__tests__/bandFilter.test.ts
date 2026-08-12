@@ -7,6 +7,7 @@ import type { BandFilterValue } from '../components/bandFilterValue';
 function makeBand(id: string, overrides: Partial<Band> = {}): Band {
   return {
     id,
+    festival_id: 'wacken-2026',
     slot_id: overrides.slot_id ?? `TST-${id}`,
     name: 'Test Band',
     stage: 'Faster',

@@ -1,6 +1,7 @@
 import type { Announcement, UserRole } from '../types';
 import {
   enqueueOfflineAnnouncement,
+  getActiveFestivalId,
   loadOfflineAnnouncementsQueue,
   removeAnnouncementFromCache,
   removeAnnouncementReactionsForPost,
@@ -17,6 +18,14 @@ const INITIAL_SYNC_LIMIT = 10;
 /** Generous cap — long posts OK, but stops wall-of-text UI breakage. */
 export const ANNOUNCEMENT_MAX_CONTENT_LENGTH = 4000;
 
+async function requireActiveFestivalId(): Promise<string> {
+  const festivalId = await getActiveFestivalId();
+  if (!festivalId) {
+    throw new Error('ACTIVE_FESTIVAL_REQUIRED');
+  }
+  return festivalId;
+}
+
 const announcementOfflineQueue = createOptimisticQueue<Announcement>(
   {
     load: loadOfflineAnnouncementsQueue,
@@ -28,7 +37,7 @@ const announcementOfflineQueue = createOptimisticQueue<Announcement>(
     syncOne: async (item) => {
       const { data, error } = await supabase
         .from('announcements')
-        .insert({ author_id: item.author_id, content: item.content })
+        .insert({ author_id: item.author_id, content: item.content, festival_id: item.festival_id })
         .select()
         .single();
       if (error) return { error };
@@ -41,10 +50,10 @@ const announcementOfflineQueue = createOptimisticQueue<Announcement>(
   },
 );
 
-async function sync(): Promise<void> {
-  const { data, error } = await supabase
-    .from('announcements')
-    .select('*')
+async function sync(festivalId?: string): Promise<void> {
+  let query = supabase.from('announcements').select('*');
+  if (festivalId) query = query.eq('festival_id', festivalId);
+  const { data, error } = await query
     .order('created_at', { ascending: false })
     .limit(INITIAL_SYNC_LIMIT);
 
@@ -52,10 +61,10 @@ async function sync(): Promise<void> {
   await saveAnnouncements(data as Announcement[]);
 }
 
-async function fetchMore(before: string, limit = 5): Promise<Announcement[]> {
-  const { data, error } = await supabase
-    .from('announcements')
-    .select('*')
+async function fetchMore(before: string, limit = 5, festivalId?: string): Promise<Announcement[]> {
+  let query = supabase.from('announcements').select('*');
+  if (festivalId) query = query.eq('festival_id', festivalId);
+  const { data, error } = await query
     .order('created_at', { ascending: false })
     .lt('created_at', before)
     .limit(limit);
@@ -70,8 +79,11 @@ async function post(userId: string, content: string): Promise<void> {
     throw new Error('ANNOUNCEMENT_CONTENT_TOO_LONG');
   }
 
+  const festivalId = await requireActiveFestivalId();
+
   const draft: Announcement = {
     id: crypto.randomUUID(),
+    festival_id: festivalId,
     author_id: userId,
     content,
     created_at: new Date().toISOString(),
@@ -88,7 +100,7 @@ async function post(userId: string, content: string): Promise<void> {
 
   const { data, error } = await supabase
     .from('announcements')
-    .insert({ author_id: userId, content })
+    .insert({ author_id: userId, content, festival_id: draft.festival_id })
     .select()
     .single();
 
@@ -120,13 +132,17 @@ async function deleteAnnouncement(id: string): Promise<void> {
   }
 }
 
-async function flushOfflineQueue(): Promise<number> {
-  return announcementOfflineQueue.flush();
+async function flushOfflineQueue(festivalId?: string): Promise<number> {
+  const activeId = festivalId ?? (await getActiveFestivalId());
+  if (!activeId) return 0;
+  return announcementOfflineQueue.flush({
+    include: (item) => item.festival_id === activeId,
+  });
 }
 
 /** @deprecated Use flushOfflineQueue — kept for callers not yet migrated. */
-async function flushPending(): Promise<number> {
-  return flushOfflineQueue();
+async function flushPending(festivalId?: string): Promise<number> {
+  return flushOfflineQueue(festivalId);
 }
 
 async function fetchCurrentUserRole(userId: string): Promise<UserRole> {
@@ -166,24 +182,31 @@ async function unpinAnnouncement(id: string): Promise<void> {
     .eq('id', id);
 }
 
-function subscribeToRealtime(): () => void {
+function subscribeToRealtime(festivalId?: string | null): () => void {
+  const festivalFilter = festivalId ? `festival_id=eq.${festivalId}` : undefined;
   return subscribePostgresChanges('announcements_live', [
     {
-      filter: { event: 'INSERT', table: 'announcements' },
+      filter: { event: 'INSERT', table: 'announcements', filter: festivalFilter },
       handler: async (payload) => {
-        await saveAnnouncement(payload.new as Announcement);
+        const row = payload.new as Announcement;
+        if (festivalId && row.festival_id !== festivalId) return;
+        await saveAnnouncement(row);
       },
     },
     {
-      filter: { event: 'UPDATE', table: 'announcements' },
+      filter: { event: 'UPDATE', table: 'announcements', filter: festivalFilter },
       handler: async (payload) => {
-        await saveAnnouncement(payload.new as Announcement);
+        const row = payload.new as Announcement;
+        if (festivalId && row.festival_id !== festivalId) return;
+        await saveAnnouncement(row);
       },
     },
     {
-      filter: { event: 'DELETE', table: 'announcements' },
+      filter: { event: 'DELETE', table: 'announcements', filter: festivalFilter },
       handler: async (payload) => {
-        const id = payload.old.id as string;
+        const old = payload.old as Partial<Announcement>;
+        if (festivalId && old.festival_id != null && old.festival_id !== festivalId) return;
+        const id = old.id as string;
         await removeAnnouncementFromCache(id);
         await removeAnnouncementReactionsForPost(id);
       },

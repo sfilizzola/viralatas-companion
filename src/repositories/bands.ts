@@ -1,65 +1,89 @@
 import { supabase } from '../lib/supabase';
-import { loadCacheVersion, saveCacheVersion, wipeAllLocalData, saveBands } from '../lib/db';
+import {
+  clearActiveFestivalPack,
+  getActiveFestivalCacheVersion,
+  getActiveFestivalId,
+  saveBands,
+  setActiveFestivalCacheVersion,
+} from '../lib/db';
+import { shouldInvalidatePack } from '../lib/festivalCacheVersion';
 import type { Band } from '../types';
-import { picksRepository } from './picks';
-import { usersRepository } from './users';
-import { presenceRepository } from './presence';
-import { announcementsRepository } from './announcements';
 
 export const bandsRepository = {
-  async sync(): Promise<void> {
-    const { data, error } = await supabase
-      .from('bands')
-      .select('*')
-      .order('start_time');
+  async sync(festivalId?: string): Promise<void> {
+    let query = supabase.from('bands').select('*');
+    if (festivalId) query = query.eq('festival_id', festivalId);
+    const { data, error } = await query.order('start_time');
 
     if (error) throw error;
     if (data && data.length > 0) await saveBands(data as unknown as Band[]);
   },
 
-  async checkAndApplyCacheVersion(): Promise<void> {
+  /**
+   * Compares Active Festival `festivals.cache_version` to the local pack marker.
+   * On mismatch: clears only the Active Festival pack (not forever data like badge
+   * history) and reloads that festival's offline pack.
+   */
+  async checkAndApplyCacheVersion(userId?: string): Promise<void> {
     if (!navigator.onLine) return;
 
     try {
-      const { data } = await supabase
-        .from('app_config')
-        .select('*')
-        .eq('key', 'cache_version')
-        .single();
+      const festivalId = await getActiveFestivalId();
+      if (!festivalId) return;
 
-      if (!data) return;
+      const { data: festival, error } = await supabase
+        .from('festivals')
+        .select('id, cache_version')
+        .eq('id', festivalId)
+        .maybeSingle();
 
-      const remoteVersion = data.value;
-      const localVersion = await loadCacheVersion();
+      if (error) throw error;
+      if (!festival) return;
 
-      if (remoteVersion !== localVersion) {
-        await wipeAllLocalData();
-        await saveCacheVersion(remoteVersion);
+      const localVersion = await getActiveFestivalCacheVersion();
+      const remote = {
+        id: festival.id as string,
+        cache_version: festival.cache_version as string,
+      };
 
-        await Promise.all([
-          bandsRepository.sync(),
-          picksRepository.syncCrewFromRemote(),
-          usersRepository.syncCrew(),
-          presenceRepository.syncCrewFromRemote(),
-          announcementsRepository.sync(),
-        ]);
+      if (
+        !shouldInvalidatePack(festivalId, { [festivalId]: localVersion }, [remote])
+      ) {
+        if (localVersion == null) {
+          await setActiveFestivalCacheVersion(remote.cache_version);
+        }
+        return;
+      }
+
+      await clearActiveFestivalPack();
+      await setActiveFestivalCacheVersion(remote.cache_version);
+
+      if (userId) {
+        const { festivalsRepository } = await import('./festivals');
+        await festivalsRepository.loadActivePack(userId, festivalId);
       }
     } catch (error) {
       console.error('Cache version check failed:', error);
     }
   },
 
+  /** Bumps Active Festival cache_version so clients reload that festival's pack. */
   async invalidateCacheForAllUsers(): Promise<void> {
     const timestamp = new Date().toISOString();
+    const festivalId = await getActiveFestivalId();
+
+    if (!festivalId) {
+      throw new Error('No active festival — cannot invalidate cache');
+    }
 
     const { error } = await supabase
-      .from('app_config')
-      .update({ value: timestamp })
-      .eq('key', 'cache_version');
+      .from('festivals')
+      .update({ cache_version: timestamp })
+      .eq('id', festivalId);
 
     if (error) throw error;
 
-    await wipeAllLocalData();
-    await saveCacheVersion(timestamp);
+    await clearActiveFestivalPack();
+    await setActiveFestivalCacheVersion(timestamp);
   },
 };

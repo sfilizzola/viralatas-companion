@@ -33,11 +33,29 @@ async function hydrateCurrentUserBadgeMetadataFromCrew(crew: CrewUser[]): Promis
   await supabase.auth.updateUser({ data: { special_badges: dbBadges } });
 }
 
-async function syncCrew(): Promise<void> {
-  const { data, error } = await supabase
+async function syncCrew(festivalId?: string): Promise<void> {
+  let memberIds: string[] | null = null;
+  if (festivalId) {
+    const { data: memberships, error: membershipError } = await supabase
+      .from('festival_memberships')
+      .select('user_id')
+      .eq('festival_id', festivalId);
+    if (membershipError) return;
+    memberIds = (memberships ?? []).map((m) => m.user_id);
+    if (memberIds.length === 0) {
+      await saveCrewUsers([]);
+      return;
+    }
+  }
+
+  let query = supabase
     .from('users')
-    .select('id, display_name, avatar_url, wacken_arrival_day, is_friend, special_badges')
-    .order('display_name', { ascending: true, nullsFirst: false });
+    .select('id, display_name, avatar_url, wacken_arrival_day, is_friend, special_badges');
+  if (memberIds) query = query.in('id', memberIds);
+  const { data, error } = await query.order('display_name', {
+    ascending: true,
+    nullsFirst: false,
+  });
 
   if (error || !data) return;
 

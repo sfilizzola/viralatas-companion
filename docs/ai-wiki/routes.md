@@ -10,8 +10,11 @@ Document all app routes, their purpose, access control, and key components.
 
 - `src/App.tsx` — Route definitions (React Router setup)
 - `src/components/PrivateRoute.tsx` — Auth guard component
+- `src/components/FestivalGate.tsx` — Membership + feature route guards (Phase 47)
+- `src/components/festival/ActiveFestivalProvider.tsx` — Active Festival context (Phase 47)
+- `src/components/FestivalSwitcher.tsx` — Active Festival switcher (Phase 47)
 - `src/components/BottomNav.tsx` — Navigation tabs
-- `src/pages/*.tsx` — Page components (8 routes incl. `/wrap`)
+- `src/pages/*.tsx` — Page components (incl. `/festivals`, `/wrap`)
 
 ---
 
@@ -20,16 +23,22 @@ Document all app routes, their purpose, access control, and key components.
 ```
 /login               → LoginPage (public)
 /register            → RegisterPage (public)
-/now                 → RightNowPage (protected) ← landing page after auth
-/schedule            → LineupPage (protected) — `LineupPage.tsx`; URL unchanged
-/my-picks            → MyWackenPage (protected) — `MyWackenPage.tsx`; URL unchanged
-/popular             → PopularPage (protected)
-/announcements       → AnnouncementsPage (protected)
-/map                 → MapPage (protected) — live vira-lata minimap; reached via glyph F on /now
-/profile             → ProfilePage (protected)
-/wrap                → WrapPage (protected) — festival recap; no festival-ended route gate
+/festivals           → FestivalsPage (protected) — catalog Join/Leave/Activate; no FestivalGate
+/now                 → RightNowPage (protected + FestivalGate) ← landing when Active Festival set
+/schedule            → LineupPage (protected + FestivalGate)
+/my-picks            → MyPicksPage (protected + FestivalGate)
+/popular             → PopularPage (protected + FestivalGate)
+/announcements       → AnnouncementsPage (protected + FestivalGate)
+/map                 → MapPage (protected + FestivalGate + FeatureRoute "map")
+/profile             → ProfilePage (protected) — no FestivalGate (reachable with zero memberships)
+/wrap                → WrapPage (protected + FestivalGate + FeatureRoute "wrap")
 /*                   → Redirect to /now
 ```
+
+**Guards (Phase 47):**
+- `PrivateRoute` — session required
+- `FestivalGate` — requires ≥1 membership and an Active Festival id; else `<Navigate to="/festivals" />`
+- `FeatureRoute feature="…"` — requires Active Festival `features[key] === true`; else `<Navigate to="/now" />`
 
 ---
 
@@ -109,6 +118,27 @@ export default function PrivateRoute({ children }: Props) {
 3. If no session, redirect to login
 4. If session exists, render protected component
 
+Most festival social routes additionally wrap with `<FestivalGate>` (and optionally `<FeatureRoute>`). `/festivals` and `/profile` stay reachable without an Active Festival so users can Join or manage account.
+
+---
+
+### /festivals (FestivalsPage)
+
+**Component**: `src/pages/FestivalsPage.tsx`
+
+**Purpose**: Festival catalog — metadata-only list before Join; Join / Leave / Activate for memberships.
+
+**Access**: `PrivateRoute` only (no `FestivalGate`).
+
+**Key Features**:
+- Lists seeded Festivals (name, dates, timezone)
+- **Join** → membership + set Active + load Active Festival pack (online)
+- **Leave** → delete membership; picks kept; membership-gated counts exclude left user
+- **Activate** → switch Active Festival (online; clears pack then reloads)
+- Offline Join/Leave/switch blocked with need-signal toast
+
+**Data**: `useActiveFestival()` (`catalog`, `memberships`, `optIn` / `optOut` / `setActive`)
+
 ---
 
 ### /now (RightNowPage)
@@ -117,12 +147,15 @@ export default function PrivateRoute({ children }: Props) {
 
 **Alias**: Landing page after login (default route)
 
-**Purpose**: Live view of what band is happening now, what the user and crew are watching
+**Purpose**: Live view of what band is happening now, what the user and **Festival crew** are watching (Active Festival scoped)
+
+**Access**: `PrivateRoute` + `FestivalGate`
 
 **Key Features**:
+- **FestivalSwitcher** — Shows Active Festival name; dropdown to switch among joined Festivals (online; need-signal toast offline)
 - **Current/Next band for user** — What the user picked that's happening now/next
-- **Crew grid** — Where everyone is (camping vs. Metal Place)
-- **Live attendance** — Other users watching the same band
+- **Crew grid** — Where Festival crew is (camping vs. Metal Place when features enabled)
+- **Live attendance** — Other members watching the same band
 - **Conflict warnings** — If user picked overlapping bands
 - **Time travel** (godlike only) — Jump to different festival day/time for testing
 - **Offline banner** — Show when offline
@@ -256,9 +289,9 @@ export default function PrivateRoute({ children }: Props) {
 
 **Component**: `src/pages/MapPage.tsx`
 
-**Purpose**: Live minimap showing vira-latas' current positions on the Wacken festival grounds as avatar dots over `public/infield_map.png`.
+**Purpose**: Live minimap showing vira-latas' current positions on the festival grounds as avatar dots over `public/infield_map.png`.
 
-**Access**: Protected (`PrivateRoute`). Not in the bottom nav — reached via the glyph F "Pin + bolt" button in the `/now` header.
+**Access**: `PrivateRoute` + `FestivalGate` + `FeatureRoute feature="map"`. Not in the bottom nav — reached via the glyph F "Pin + bolt" button in the `/now` header when the Active Festival has `map: true`.
 
 **Data**: `useSocialSnapshot(useNow(30_000))` → IndexedDB only (same `crewGroups` derivation as `/now`). No new schema, no new sync.
 
@@ -282,7 +315,7 @@ export default function PrivateRoute({ children }: Props) {
 
 **Purpose**: Post-festival personal recap — A2 Vest Chronicle (welcome + stat sections + optional assigned patches + vest pile + thanks finale; 7–8 scroll sections)
 
-**Access**: Protected (`PrivateRoute`). **No** `isFestivalEnded()` route gate — always reachable when logged in.
+**Access**: `PrivateRoute` + `FestivalGate` + `FeatureRoute feature="wrap"`. **No** `isFestivalEnded()` route gate — reachable whenever the Active Festival enables wrap.
 
 **Data**: `useFestivalWrapStats` → IndexedDB only (same snapshot as badges).
 
@@ -504,4 +537,4 @@ AnnouncementsPage (offline)
 
 ---
 
-**Last updated:** 2026-06-26 — Phase 45: Camp HQ strip on `/announcements`; CampMapDock on `/map`; explicit no camp UI on `/now`
+**Last updated:** 2026-08-11 — Phase 47: `/festivals`, `FestivalGate`, `FeatureRoute` for `/map` + `/wrap`, FestivalSwitcher on `/now`

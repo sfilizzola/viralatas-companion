@@ -9,16 +9,19 @@ Document how data is synchronized between IndexedDB (primary), offline queues, a
 ## Relevant Source Files
 
 - `src/components/sync/` — Sync orchestration (`SyncOrchestration`, `CacheVersionCheck`, `BandSync`, `ReconnectSync`, `PushSetup`, `DuckNotificationsListener`) — extracted from `App.tsx` (Phase 26.G)
-- `src/lib/syncCoordinator.ts` — `runReconnectSync()` single reconnect contract (Phase 27.C)
+- `src/lib/syncCoordinator.ts` — `runReconnectSync()` single reconnect contract (Phase 27.C; Active Festival scoped Phase 47)
+- `src/lib/festivalCacheVersion.ts` — `shouldInvalidatePack()` per-Festival invalidation (Phase 47)
+- `src/lib/db/festivals.ts` — Active Festival meta + `clearActiveFestivalPack()` (Phase 47)
+- `src/repositories/festivals.ts` — Catalog/memberships + `loadActivePack` / `setActiveFestival` (Phase 47)
 - `src/lib/optimisticQueue.ts` — shared `OptimisticQueue` with configurable dedup strategies (Phase 27.E)
-- `src/App.tsx` — Mounts `<SyncOrchestration />` only (84 lines)
+- `src/App.tsx` — Mounts `<SyncOrchestration />` inside `ActiveFestivalProvider`
 - `src/lib/realtimeSync.ts` — `subscribePostgresChanges()` unified Realtime helper (Phase 26.H)
-- `src/repositories/picks.ts` — Pick sync, queue deduplication
-- `src/repositories/announcements.ts` — Announcement sync and pending queue
+- `src/repositories/picks.ts` — Pick sync, queue deduplication (Festival-scoped)
+- `src/repositories/announcements.ts` — Announcement sync and pending queue (Festival-scoped)
 - `src/repositories/presence.ts` — Presence sync
-- `src/repositories/users.ts` — Crew member sync
+- `src/repositories/users.ts` — Festival crew sync
 - `src/repositories/missed.ts` — Missed band sync
-- `src/repositories/bands.ts` — Band sync (`sync()`), cache version check, godlike cache invalidation (Phase 27.H)
+- `src/repositories/bands.ts` — Band sync (`sync(festivalId)`), Festival cache version check, godlike pack invalidation (Phase 47)
 - `src/repositories/campLocation.ts` — Camp HQ GPS sync from `app_settings` → IDB `camp_location` (Phase 45; no offline queue)
 - `src/lib/db/` — IndexedDB domain modules (barrel `index.ts`; public shim `src/lib/db.ts`)
 
@@ -40,31 +43,34 @@ The sync engine ensures:
 
 `App.tsx` mounts `<SyncOrchestration />`, which composes focused sync components:
 
-### 1. CacheVersionCheck
+### 1. CacheVersionCheck (Phase 47 — per-Festival)
 
 ```typescript
 function CacheVersionCheck() {
   const { session } = useAuth();
+  const { activeFestivalId } = useActiveFestival();
   const userId = session?.user?.id;
 
   useEffect(() => {
-    if (userId) {
-      bandsRepository.checkAndApplyCacheVersion().catch(() => {});
+    if (userId && activeFestivalId) {
+      bandsRepository.checkAndApplyCacheVersion(userId).catch(() => {});
     }
-  }, [userId]);
+  }, [userId, activeFestivalId]);
 
   return null;
 }
 ```
 
-**Trigger**: On login (userId changes)
+**Trigger**: On login / Active Festival change (when both `userId` and `activeFestivalId` present)
 
-**Purpose**: 
-1. Get cache version from Supabase
-2. Compare with local cache version (from IndexedDB meta store)
-3. If different: `wipeAllLocalData()` → forces full re-sync
+**Purpose**:
+1. Read Active Festival `festivals.cache_version` from Supabase
+2. Compare with local pack marker (`meta.active_festival_cache_version`) via `shouldInvalidatePack`
+3. If different: `clearActiveFestivalPack()` → `loadActivePack()` for that Festival only
 
-**Why?**: If band lineup changes (e.g., band dropped), old picks reference deleted bands. A version bump clears everything and forces fresh fetch.
+**Why?**: Lineup / social pack changes for one Festival must not wipe another Festival’s data or forever stores (badge history). Other Festivals’ version bumps are ignored while they are not Active.
+
+**Switch path**: `festivalsRepository.setActiveFestival` also clears the pack, sets id + cache version, then `loadActivePack` (requires network).
 
 ---
 
@@ -73,37 +79,36 @@ function CacheVersionCheck() {
 ```typescript
 function BandSync() {
   const { session } = useAuth();
+  const { activeFestivalId } = useActiveFestival();
   const userId = session?.user?.id;
 
   useEffect(() => {
-    if (userId) {
-      bandsRepository.sync().catch(() => {});  // Swallow offline errors
+    if (userId && activeFestivalId) {
+      bandsRepository.sync(activeFestivalId).catch(() => {});
     }
-  }, [userId]);
+  }, [userId, activeFestivalId]);
 
   return null;
 }
 ```
 
-**Trigger**: On login
+**Trigger**: On login / Active Festival change
 
-**Operation** (`bandsRepository.sync()` in `src/repositories/bands.ts`):
+**Operation** (`bandsRepository.sync(festivalId?)`):
 ```typescript
-async sync(): Promise<void> {
-  const { data, error } = await supabase
-    .from('bands')
-    .select('*')
-    .order('start_time');
-
+async sync(festivalId?: string): Promise<void> {
+  let query = supabase.from('bands').select('*');
+  if (festivalId) query = query.eq('festival_id', festivalId);
+  const { data, error } = await query.order('start_time');
   if (error) throw error;
   if (data && data.length > 0) await saveBands(data);
 }
 ```
 
 **Behavior**:
-- If online: Fetches all bands from Supabase, overwrites IndexedDB
-- If offline: Swallows error, user sees cached bands from previous login
-- Run once on login; not re-run on reconnect (band list is immutable)
+- If online: Fetches Active Festival bands from Supabase, overwrites IndexedDB bands store
+- If offline: Swallows error, user sees cached Active Festival pack
+- Re-run when Active Festival changes (after pack clear + reload)
 
 ---
 
@@ -137,7 +142,9 @@ function ReconnectSync() {
 
 **Operations** (`runReconnectSync` in `src/lib/syncCoordinator.ts`):
 
-1. **Flush offline queues** (parallel batch) — repos expose `flushOfflineQueue()` backed by `OptimisticQueue`:
+Resolves Active Festival id (IDB meta, else `users.active_festival_id`) and passes it into Festival-scoped flush/pull methods.
+
+1. **Flush offline queues** (parallel batch) — repos expose `flushOfflineQueue(festivalId?)` backed by `OptimisticQueue`:
    - **picks** — `keepLast` by `(user_id, band_id)`, sorted by `created_at`
    - **presence** — `keepLast` by `user_id`, sorted by `updated_at`
    - **missed** — `byId` (`${user_id}|${band_id}`)
@@ -145,12 +152,13 @@ function ReconnectSync() {
    - **duck** — `fifo` (no dedup)
    - **ratings** — `byId` (`${user_id}|${band_id}`)
 2. **Flush reactions** (sequential, after step 1) — `reactionsRepository.flushOfflineQueue()` (`byId` on `${announcement_id}|${user_id}|${emoji}`); runs after announcements flush so FK targets exist on server
-3. **Pull announcements + reactions** (sequential):
-   - `announcementsRepository.sync()`
-   - `reactionsRepository.syncFromRemote()` — full pull after announcements (FK ordering)
-4. **Pull remote crew data** (parallel):
-   - `picksRepository.syncCrewFromRemote()`
-   - `usersRepository.syncCrew()`
+3. **Pull announcements + reactions** (sequential, Active Festival scoped):
+   - `announcementsRepository.sync(festivalId)`
+   - `reactionsRepository.syncFromRemote(festivalId)` — full pull after announcements (FK ordering)
+4. **Pull remote Festival crew data** (parallel, Active Festival scoped):
+   - `bandsRepository.sync(festivalId)`
+   - `picksRepository.syncCrewFromRemote(festivalId)`
+   - `usersRepository.syncCrew(festivalId)`
    - `presenceRepository.syncCrewFromRemote()`
    - `missedRepository.syncFromRemote(userId)`
    - `ratingsRepository.syncCrewFromRemote()`
@@ -430,38 +438,38 @@ async function syncCrewFromRemote(): Promise<void> {
 
 ---
 
-### bandsRepository.checkAndApplyCacheVersion()
+### bandsRepository.checkAndApplyCacheVersion(userId?)
 
 ```typescript
-// In bandsRepository
-export const bandsRepository = {
-  async checkAndApplyCacheVersion() {
-    const { data } = await supabase
-      .from('app_config')
-      .select('*')
-      .eq('key', 'cache_version')
-      .single();
+async checkAndApplyCacheVersion(userId?: string): Promise<void> {
+  const festivalId = await getActiveFestivalId();
+  if (!festivalId) return;
 
-    const serverVersion = data?.value;
-    const localVersion = await loadCacheVersion();
+  const { data: festival } = await supabase
+    .from('festivals')
+    .select('id, cache_version')
+    .eq('id', festivalId)
+    .maybeSingle();
 
-    if (serverVersion && serverVersion !== localVersion) {
-      // Mismatch: lineup changed (or operator bumped), clear all
-      await wipeAllLocalData();
-      await saveCacheVersion(serverVersion);
-      // Force re-fetch on next sync
-    }
+  const localVersion = await getActiveFestivalCacheVersion();
+  if (!shouldInvalidatePack(festivalId, { [festivalId]: localVersion }, [festival])) {
+    if (localVersion == null) await setActiveFestivalCacheVersion(festival.cache_version);
+    return;
   }
-};
+
+  await clearActiveFestivalPack();
+  await setActiveFestivalCacheVersion(festival.cache_version);
+  if (userId) await festivalsRepository.loadActivePack(userId, festivalId);
+}
 ```
 
-**Purpose**: Invalidate cache when the band lineup changes or an operator bumps the version (godlike "Reset all data" button, or `npm run festival:reset` — see `docs/ai-wiki/festival-reset.md`).
+**Purpose**: Invalidate the **Active Festival pack** when that Festival’s lineup/social pack changes (godlike invalidate, remote lineup apply bumping `festivals.cache_version`, or ops).
 
-**Server table**: `public.app_config` row with `key = 'cache_version'`, `value = <ISO timestamp string>` (defined in `supabase/migrations/20260504000006_cache_version.sql`).
+**Server column**: `public.festivals.cache_version` for the Active Festival. Legacy global `app_config.cache_version` is no longer the pack wipe trigger.
 
-**Trigger**: On every login.
+**Trigger**: On login / Active Festival change (`CacheVersionCheck`).
 
-**Side effect**: Clears all picks, announcements, crew data if version mismatch.
+**Side effect**: Clears `FESTIVAL_PACK_OBJECT_STORES` only (not session / badge history); reloads Active pack when `userId` provided.
 
 ---
 
@@ -573,4 +581,4 @@ createOptimisticQueue(storage, {
 
 On flush: load IDB queue → `buildFlushBatches()` → `syncOne()` per batch → remove all IDs in batch on success. Failed batches stay queued for next reconnect.
 
-**Last updated:** 2026-06-26 — Phase 45: camp location sync documented (hook-mount pull; not in `runReconnectSync`); `app_settings` excluded from Realtime.
+**Last updated:** 2026-08-11 — Phase 47: Active Festival–scoped reconnect + pack load; per-Festival `festivals.cache_version` invalidation.

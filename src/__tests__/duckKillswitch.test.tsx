@@ -16,6 +16,29 @@ vi.mock('../lib/supabase', () => ({
   supabase: { from: mocks.mockFrom },
 }));
 
+vi.mock('../hooks/useActiveFestival', () => ({
+  useActiveFestival: () => ({
+    festival: {
+      id: 'f1',
+      slug: 'wacken-2026',
+      name: 'Wacken',
+      timezone: 'Europe/Berlin',
+      starts_at: '2026-07-27T00:00:00+02:00',
+      ends_at: '2026-08-02T03:00:00+02:00',
+      features: { duck: true },
+      cache_version: '1',
+    },
+    features: { duck: true },
+    memberships: [],
+    catalog: [],
+    setActive: async () => {},
+    optIn: async () => {},
+    optOut: async () => {},
+    ready: true,
+    activeFestivalId: 'f1',
+  }),
+}));
+
 import { getDuckEnabled, setDuckEnabled } from '../lib/appSettings';
 import {
   DuckEnabledProvider,

@@ -117,7 +117,27 @@ async function flushOfflineQueue(): Promise<number> {
   return ratingsOfflineQueue.flush();
 }
 
-async function syncCrewFromRemote(): Promise<void> {
+async function syncCrewFromRemote(festivalId?: string): Promise<void> {
+  if (festivalId) {
+    const { data: bands, error: bandsError } = await supabase
+      .from('bands')
+      .select('id')
+      .eq('festival_id', festivalId);
+    if (bandsError) return;
+    const bandIds = (bands ?? []).map((b) => b.id);
+    if (bandIds.length === 0) {
+      await replaceAllBandRatings([]);
+      return;
+    }
+    const { data, error } = await supabase
+      .from('user_band_ratings')
+      .select('*')
+      .in('band_id', bandIds);
+    if (error || !data) return;
+    await replaceAllBandRatings(data as UserBandRating[]);
+    return;
+  }
+
   const { data, error } = await supabase.from('user_band_ratings').select('*');
   if (error || !data) return;
 

@@ -1,8 +1,66 @@
 # Viralatas Metaleiros
 
-Festival companion PWA for the Viralatas vira-latas crew at Wacken Open Air. Domain language for badges, festival cycles, and post-festival archival.
+Festival companion PWA for the Viralatas vira-latas. Domain language for multi-festival attendance, badges, Wacken-specific grounds features, and post-festival archival.
 
 ## Language
+
+### Festivals & attendance
+
+**Festival**:
+A concrete event instance with its own lineup, dates, attendees, and mural — e.g. Wacken Open Air 2026 or Hellfest 2027. Not a repeating brand, and not the badge “festival year.”
+_Avoid_: Festival cycle (for this meaning), event brand, venue, trip
+
+**Festival membership**:
+The fact that a signed-in **vira-lata** has opted into a specific **Festival** (“I’m going”). Required to see that Festival’s lineup social surfaces (picks of others, mural, `/now` crew). Distinct from having an account.
+_Avoid_: Attendee record (unless speaking casually), enrollment, RSVP, crew join
+
+**Vira-lata**:
+A person with an account in the Viralatas companion — the group identity. Not the same as **Festival membership**; a vira-lata may be on zero, one, or many Festivals.
+_Avoid_: Crew member (ambiguous), user (in product copy), attendee
+
+**Active Festival**:
+Which **Festival** a given **vira-lata** is currently working in — a personal preference (switcher), not a global app mode. Schedule, picks, mural, and `/now` social are scoped to it. The device keeps an offline pack for the Active Festival only; switching to another Festival requires network to load that pack.
+_Avoid_: Current festival (ambiguous with badge year), selected event, home festival
+
+**Festival crew**:
+The set of **vira-latas** who have **Festival membership** on the **Active Festival**. `/now`, popular, and who’s-going social views use this set (still applying friend/camping rules inside it). Not the global account roster.
+_Avoid_: Crew (unqualified), everyone, all users, attendees at large
+
+**Leave Festival**:
+Ending **Festival membership** for a Festival (“Leave”). The vira-lata loses Festival-crew access to that Festival’s social surfaces. Picks (and related per-band records) are **kept** in storage so opting in again restores them — not a hard wipe. Those kept picks do **not** count in popularity / who’s-going / `/now` for others until the picker has membership again (**membership-gated counts**). Mural posts the vira-lata already made **remain** visible to the Festival crew (not auto-hidden or auto-deleted on Leave).
+_Avoid_: Unsubscribe, delete festival data, hard leave
+
+**Membership-gated counts**:
+Attendance aggregates for a Festival (popular, going counts, `/now` others) only include pickers who currently have **Festival membership** on that Festival.
+_Avoid_: Ghost picks, raw pick-row counts, historical attendance (for live social)
+
+**Festival catalog**:
+The list of **Festivals** available to opt into (created by ops/seed, not in-app). Before **Festival membership**, a vira-lata sees **metadata only** (name, dates, timezone — not lineup, picks, or mural).
+_Avoid_: Festival directory with full schedule preview, public lineup browser (v1)
+
+**Festival feature**:
+An optional capability on a **Festival** (e.g. Metal Place, map, duck, camp, wrap, remote lineup). Core schedule / picks / `/now` / mural are not Festival features — they exist for every Festival. Wacken 2026 simply has more features enabled.
+_Avoid_: Wacken grounds pack (as the umbrella name), module (unless speaking engineering), add-on product
+
+**Active Festival pack**:
+The offline IndexedDB dataset for the **Active Festival**: bands, picks, mural, announcement reactions, missed bands, and ratings (the full core social pack). Cleared and reloaded when the Active Festival changes. Not a cache of every Festival the vira-lata has joined.
+_Avoid_: Global IDB roster, multi-festival warm cache
+
+**Membership backfill**:
+A one-time cutover that grants **Festival membership** on `wacken-2026` to existing accounts so the app keeps working after migrate-in-place. Not the steady-state join path — ongoing joins remain self opt-in from the **Festival catalog**. New accounts after cutover start with **no** memberships and Join from the catalog.
+_Avoid_: Auto-enroll forever, silent join for every new Festival, default festival for new signups
+
+**Godlike (multi-festival)**:
+Godlike does **not** bypass **Festival membership** for normal PWA reads/writes. To use a Festival in-app, godlike Joins like anyone else. Cross-Festival or pre-join ops stay on laptop/seed/service role.
+_Avoid_: Implicit member of every Festival, godlike catalog spectator without Join
+
+**Viralatas App Pack (v1 multi-festival)**:
+Sister PWAs (Setlist / MoshSplit) stay linked as today — **not** Festival-scoped in v1.
+_Avoid_: Per-Festival playlist space (until those products support it)
+
+**Crew profile cache**:
+The `crew_users` IndexedDB store used for social display. For multi-festival, it holds the **Festival crew** for the **Active Festival** (not every account in the app). UI reads this store first; reconnect sync replaces it for the Active Festival.
+_Avoid_: Crew IDB, users cache, global roster cache
 
 **Badge consolidation**:
 A one-time, godlike-triggered snapshot that copies each vira-lata's earned year-specific badges into `user_badge_history` at the end of a festival cycle. Test vira-latas (`is_test_user = true`) are excluded.
@@ -41,12 +99,16 @@ The client's copy of `user_badge_history` rows in IndexedDB. UI reads this store
 _Avoid_: Badge history IDB, offline badge archive
 
 **Social snapshot**:
-The derived festival-social state shared by `/now` and the live vest — crew plans, crew groups (camping / Metal Place / lost / at band), Metal Place window flag, live test band id, and crew location counts. Built by `buildSocialSnapshot()` from IDB inputs.
+The derived social state for the **Active Festival** shared by `/now` and the live vest — **Festival crew** plans and groups, plus Wacken-grounds fields (Metal Place window, camping/lost) when those features apply. Built from IDB inputs for the Active Festival.
 _Avoid_: Live preview state, crew cache DTO
 
 **Metal Place**:
-The crew’s physical meetup spot at Wacken (BBQ / hangout). Not a stage — a location vira-latas can check into when a window is open.
+The crew’s physical meetup spot at Wacken (BBQ / hangout). Not a stage — a location vira-latas can check into when a window is open. Enabled only when the Active Festival has the Metal Place **Festival feature**.
 _Avoid_: Venue, metal bar, BBQ zone (in user copy “Metal Place” is the product name)
+
+**Presence**:
+A vira-lata’s live location state for Festival-crew `/now` groups (camping vs Metal Place, etc.). Not core to every Festival — it belongs with camping / Metal Place **Festival features**. Festivals without those features have no Presence UI.
+_Avoid_: Check-in (generic), GPS presence, always-on status
 
 **Metal Place window**:
 A godlike-configured interval on one festival day (D1–D4) when check-in is allowed — same calendar day only, start before end, end by 23:59. Multiple windows may exist across the festival; at most one may be active at any instant (overlaps forbidden). Zero windows means Metal Place is off.
@@ -60,17 +122,13 @@ _Avoid_: RSVP, attendance mark
 One increment to `location_visits.metal_place` per check-in session — each false→true transition on `is_at_metal_place`, including a second check-in later the same festival day after auto-checkout. Not capped per day or per window.
 _Avoid_: Window visit, daily visit
 
-**Crew profile cache**:
-The `crew_users` IndexedDB store — roster fields including `is_friend` and `special_badges`. Synced from Supabase on reconnect; UI reads this store for display, not live `users` queries.
-_Avoid_: Crew IDB, users cache
-
 **Consolidation window**:
 The operator period after `isFestivalEnded()` is true and before the next `festival:reset`. Badge consolidation for a festival year may only run inside this window; re-runs within it are idempotent. Godlike users may bypass the gate via existing time override or an explicit admin force action for QA.
 _Avoid_: Freeze window, archive period
 
 **Festival ended**:
-True when the current instant is past the latest `end_time` among non-ceremony bands. Shared helper in `time.ts`; gates godlike consolidation for normal operation and will later gate `/wrap` discovery. Godlike may bypass via time override or an explicit `force` flag on the consolidate action (server validates godlike role).
-_Avoid_: Festival over, post-festival
+True for the **Active Festival** when the current instant is past the latest `end_time` among that Festival’s non-ceremony bands (i.e. the bands in the active offline pack). Gates wrap discovery / consolidation UX for whatever is Active — not a global “all Festivals over” flag.
+_Avoid_: Festival over, post-festival, any-festival-ended
 
 **Transition overlap**:
 Between consolidation and the next `festival:reset`, the same year-badge may appear on both the live vest and in Previously Achieved. This duplication is acceptable and requires no cross-store dedup logic.
@@ -124,11 +182,34 @@ _Avoid_: Sync token, preview token, lineup JWT
 Post-festival CLI workflow (`lineup:check-official --complete` then `seed:bands:sync` dry-run) to bring `lineup.md` and `bands.ts` back in line with production after remote sync during the festival.
 _Avoid_: Git sync, seed reconcile
 
+**Festival reset**:
+An ops wipe of pre-event / stale social state for **one** **Festival** (announcements and related state for that Festival; optional bands re-seed for that Festival only). Must not destroy other Festivals’ picks or lineups. Distinct from **Leave Festival** (a vira-lata action).
+_Avoid_: Global nuke once multiple Festivals exist, app reinstall, cache-only bump
+
+**Festival cache version**:
+A per-**Festival** invalidation token. When it changes for the **Active Festival**, the client clears and reloads that Festival’s offline pack. Changing another Festival’s version must not wipe a vira-lata’s Active Festival pack.
+_Avoid_: Global cache_version as the only lineup invalidation once multiple Festivals exist
+
 ## Flagged ambiguities
 
-_(none yet)_
+**Festival vs festival cycle / current festival year**:
+**Festival** = event instance (multi-festival product). **Festival cycle** / **current festival year** remain Wacken-badge-year language until the badge vest is redesigned. Do not use “festival cycle” to mean opting into Hellfest.
+
+**Friend (`is_friend`)**:
+Stays a **global** vira-lata flag for v1 (camping/Arrival/presence exclusions). Not modeled per **Festival**. Revisit if someone is Friend at one Festival and full crew at another.
+
+**Global `cache_version` (legacy)**:
+Pre-multi-festival single app_config token. Superseded in product language by **Festival cache version**; migration plan must replace or namespace the global wipe behavior.
 
 ## Example dialogue
+
+**Dev:** Can Beto plan Hellfest and Wacken in the same app?
+
+**Expert:** Yes. Each is a **Festival**. He **Joins** both (**Festival membership**), then sets **Active Festival** to whichever he’s working on. Only that Festival’s **Active Festival pack** is on the phone offline.
+
+**Dev:** Maria Left Hellfest. Do her Bloodbath picks still bump popular?
+
+**Expert:** No — **membership-gated counts**. The pick rows can stay, but she doesn’t count until she Joins again. Her mural posts from last week still show.
 
 **Dev:** Wacken swaps Skyline and Thundermother between FAS5 and LOU3. I preview on phone — two moves. What happens to pickers?
 
@@ -140,7 +221,7 @@ _(none yet)_
 
 **Dev:** Beto earned `dreamer` and `roots` at Wacken 2026. Consolidation ran in August. It's March 2027 — picks are empty and `festival:reset` cleared persist metadata. Where do those patches show?
 
-**Expert:** Only in **Previously Achieved**, under "Wacken 2026". The **live vest** shows evergreen badges plus whatever Beto earns for the 2027 cycle — not last year's year-badges.
+**Expert:** Only in **Previously Achieved**, under "Wacken 2026". The **live vest** shows evergreen badges plus whatever Beto earns for the 2027 cycle — not last year's year-badges. (Badge multi-Festival vest is not defined yet.)
 
 **Dev:** What about `pais-tropical`?
 

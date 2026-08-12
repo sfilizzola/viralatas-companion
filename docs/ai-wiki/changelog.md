@@ -4,6 +4,25 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-08-11
+
+### Added
+- **Phase 47 — Multi-festival** documented across domain, schema, architecture, routes, offline-first, sync-engine, phases-history.
+- Domain entities: **Festival**, **FestivalMembership**, **Active Festival**, **Festival crew**, **Leave Festival**, **membership-gated counts**, **Festival features**, **Active Festival pack**, **Festival cache version** (aligned with `CONTEXT.md`).
+- Schema: `public.festivals`, `public.festival_memberships`, `is_festival_member()`, `users.active_festival_id`, `festival_id` on bands/picks/announcements, `band_attendance` with `security_invoker`.
+- Routes: `/festivals`, `FestivalGate`, `FeatureRoute` for `/map` + `/wrap`, `FestivalSwitcher` on `/now`.
+- DS §16 Multi-Festival (`FestivalSwitcher`, Festivals catalog) + manifest v3.7.
+
+### Changed
+- Pack invalidation: Active Festival uses `festivals.cache_version` + `clearActiveFestivalPack()` (not global `wipeAllLocalData` via `app_config` alone).
+- Sync/reconnect and band sync scoped to Active Festival id.
+- `PHASES.md` — no active phased work; **Next phase: 48**.
+
+### Architectural Notes
+- Offline pack is single-Festival; Join/Leave/switch require network to clear and reload.
+- Godlike does not bypass Festival membership for normal PWA reads/writes.
+- Membership-gated counts: left users’ kept picks stay in storage but do not inflate social aggregates until re-Join.
+
 ## 2026-07-24
 
 ### Changed

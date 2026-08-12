@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { UserRole } from '../types';
 import { signOutUser } from '../lib/signOut';
 import { useAuth } from '../hooks/useAuth';
@@ -20,6 +20,8 @@ import WrapTeaserBanner from '../components/wrap/WrapTeaserBanner';
 import { useWrapTeaserVisible } from '../hooks/useWrapTeaserVisible';
 import ManagerAdminPanel from '../components/profile/ManagerAdminPanel';
 import InstallAppProfileLink from '../components/InstallAppProfileLink';
+import { useActiveFestival } from '../hooks/useActiveFestival';
+import { canShowWrap } from '../lib/festivalFeatures';
 import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
@@ -76,6 +78,7 @@ type ProfileFormProps = {
 function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language, setLanguage, t }: ProfileFormProps) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
+  const { festival } = useActiveFestival();
 
   const initial = displayName.charAt(0).toUpperCase();
   const savedCountry = (user.user_metadata?.['country'] as string | undefined) ?? null;
@@ -87,7 +90,7 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
     announcementsRepository.fetchCurrentUserRole(user.id).then(setUserRole);
   }, [user.id]);
 
-  const showWrapTeaser = useWrapTeaserVisible();
+  const showWrapTeaser = useWrapTeaserVisible() && canShowWrap(festival);
 
   const [moshSplitEnabled, setMoshSplitEnabledState] = useState(false);
 
@@ -115,6 +118,13 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
       </section>
 
       <InstallAppProfileLink />
+
+      <section className={styles.pfNavSection}>
+        <Link to="/festivals" className={styles.pfNavRow}>
+          <span className={styles.pfNavLabel}>{t('festivals')}</span>
+          <span className={styles.pfNavHint}>{t('festivalsHint')}</span>
+        </Link>
+      </section>
 
       <BadgeHistorySection userId={user.id} />
 

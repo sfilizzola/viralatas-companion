@@ -106,7 +106,7 @@ describe('BottomNav', () => {
 
     expect(screen.getByText('Now')).toBeInTheDocument();
     expect(screen.getByText('Lineup')).toBeInTheDocument();
-    expect(screen.getByText('My Wacken')).toBeInTheDocument();
+    expect(screen.getByText('My Picks')).toBeInTheDocument();
     expect(screen.getByText('Popular')).toBeInTheDocument();
     expect(screen.getByText('Mural')).toBeInTheDocument();
     expect(screen.getByText('Profile')).toBeInTheDocument();

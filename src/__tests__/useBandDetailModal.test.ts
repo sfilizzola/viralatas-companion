@@ -9,6 +9,7 @@ const otherUserId = 'user-2';
 
 const bandA: Band = {
   id: 'band-a',
+    festival_id: 'wacken-2026',
   slot_id: 'slot-a',
   name: 'Band A',
   stage: 'Main',
@@ -21,6 +22,7 @@ const bandA: Band = {
 
 const bandB: Band = {
   id: 'band-b',
+    festival_id: 'wacken-2026',
   slot_id: 'slot-b',
   name: 'Band B',
   stage: 'Side',

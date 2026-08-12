@@ -14,6 +14,7 @@ function renderWithI18n(ui: React.ReactElement) {
 
 const sampleBand: Band = {
   id: 'b1',
+    festival_id: 'wacken-2026',
   slot_id: 'FAS1',
   name: 'Iron Maiden',
   stage: 'Faster',
@@ -285,6 +286,7 @@ describe('BandCard', () => {
   it('shows country flag prepended to "Metal Battle" in schedule variant', () => {
     const metalBattleBand: Band = {
       id: 'mb1',
+    festival_id: 'wacken-2026',
       slot_id: 'WET2',       // Cyprus → 🇨🇾
       name: 'Speak in Whispers',
       stage: 'WET',
@@ -368,6 +370,7 @@ describe('BandCard', () => {
   it('shows plain "Metal Battle" when the slot has no confirmed country (WET23)', () => {
     const unknownBand: Band = {
       id: 'mb2',
+    festival_id: 'wacken-2026',
       slot_id: 'WET23',      // Day 3 TBA — not in the map
       name: 'TDB MTB',
       stage: 'WET',

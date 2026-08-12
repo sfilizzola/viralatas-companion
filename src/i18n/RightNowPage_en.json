@@ -1,6 +1,7 @@
 {
   "title": "Right Now",
-  "wackenTime": "Wacken time",
+  "festivalTime": "{name} time",
+  "festivalTimeFallback": "Festival time",
   "camping": "I'm at camp",
   "presenceTitle": "Where am I?",
   "presenceCamping": "Camping",

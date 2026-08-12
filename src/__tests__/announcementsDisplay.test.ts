@@ -5,6 +5,7 @@ import { applyPinSort, relativeTime } from '../services/announcementsDisplay';
 describe('applyPinSort', () => {
   const mk = (id: string, pinned = false): Announcement => ({
     id,
+    festival_id: 'wacken-2026',
     author_id: 'u1',
     content: id,
     created_at: `2026-07-29T${id.padStart(2, '0')}:00:00Z`,

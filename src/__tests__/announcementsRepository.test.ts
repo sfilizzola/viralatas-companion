@@ -1,4 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { TEST_FESTIVAL_ID } from './helpers/testFestival';
+
+const mocks = vi.hoisted(() => ({
+  mockGetActiveFestivalId: vi.fn().mockResolvedValue('wacken-2026'),
+}));
 
 vi.mock('../lib/supabase', () => ({
   supabase: {
@@ -13,6 +18,7 @@ vi.mock('../lib/db', () => ({
   loadOfflineAnnouncementsQueue: vi.fn().mockResolvedValue([]),
   removeFromOfflineAnnouncementsQueue: vi.fn().mockResolvedValue(undefined),
   removeAnnouncementFromCache: vi.fn().mockResolvedValue(undefined),
+  getActiveFestivalId: mocks.mockGetActiveFestivalId,
 }));
 
 import { supabase } from '../lib/supabase';
@@ -22,6 +28,7 @@ import type { Announcement } from '../types';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mocks.mockGetActiveFestivalId.mockResolvedValue(TEST_FESTIVAL_ID);
   Object.defineProperty(navigator, 'onLine', {
     value: true,
     writable: true,
@@ -32,6 +39,7 @@ beforeEach(() => {
 
 const SERVER_ANNOUNCEMENT: Announcement = {
   id: 'server-id-1',
+  festival_id: TEST_FESTIVAL_ID,
   author_id: 'user1',
   content: 'Hello metal!',
   created_at: '2026-07-29T14:00:00Z',
@@ -50,13 +58,21 @@ describe('announcementsRepository.post', () => {
 
     // Draft saved immediately to IDB
     expect(db.saveAnnouncement).toHaveBeenCalledWith(
-      expect.objectContaining({ author_id: 'user1', content: 'Hello metal!' }),
+      expect.objectContaining({
+        author_id: 'user1',
+        content: 'Hello metal!',
+        festival_id: TEST_FESTIVAL_ID,
+      }),
     );
 
     // Inserted to Supabase
     expect(supabase.from).toHaveBeenCalledWith('announcements');
     expect(mockInsert).toHaveBeenCalledWith(
-      expect.objectContaining({ author_id: 'user1', content: 'Hello metal!' }),
+      expect.objectContaining({
+        author_id: 'user1',
+        content: 'Hello metal!',
+        festival_id: TEST_FESTIVAL_ID,
+      }),
     );
 
     // Draft replaced by server record: draft removed, server record saved
@@ -75,16 +91,33 @@ describe('announcementsRepository.post', () => {
 
     // Draft saved to IDB
     expect(db.saveAnnouncement).toHaveBeenCalledWith(
-      expect.objectContaining({ author_id: 'user1', content: 'Offline post' }),
+      expect.objectContaining({
+        author_id: 'user1',
+        content: 'Offline post',
+        festival_id: TEST_FESTIVAL_ID,
+      }),
     );
 
-    // Queued for later sync
+    // Queued for later sync with festival_id
     expect(db.enqueueOfflineAnnouncement).toHaveBeenCalledWith(
-      expect.objectContaining({ author_id: 'user1', content: 'Offline post' }),
+      expect.objectContaining({
+        author_id: 'user1',
+        content: 'Offline post',
+        festival_id: TEST_FESTIVAL_ID,
+      }),
     );
 
     // No Supabase call
     expect(supabase.from).not.toHaveBeenCalled();
+  });
+
+  it('throws when no active festival is set', async () => {
+    mocks.mockGetActiveFestivalId.mockResolvedValue(null);
+
+    await expect(announcementsRepository.post('user1', 'No fest')).rejects.toThrow(
+      'ACTIVE_FESTIVAL_REQUIRED',
+    );
+    expect(db.saveAnnouncement).not.toHaveBeenCalled();
   });
 
   it('enqueues offline when Supabase insert returns an error', async () => {
@@ -114,13 +147,14 @@ describe('announcementsRepository.post', () => {
 describe('announcementsRepository.flushPending', () => {
   it('posts pending announcements to Supabase and clears them from the queue on success', async () => {
     const pending: Announcement[] = [
-      { id: 'pending-1', author_id: 'user1', content: 'First', created_at: '2026-07-29T10:00:00Z', deleted_at: null, is_pinned: false },
-      { id: 'pending-2', author_id: 'user2', content: 'Second', created_at: '2026-07-29T11:00:00Z', deleted_at: null, is_pinned: false },
+      { id: 'pending-1', festival_id: TEST_FESTIVAL_ID, author_id: 'user1', content: 'First', created_at: '2026-07-29T10:00:00Z', deleted_at: null, is_pinned: false },
+      { id: 'pending-2', festival_id: TEST_FESTIVAL_ID, author_id: 'user2', content: 'Second', created_at: '2026-07-29T11:00:00Z', deleted_at: null, is_pinned: false },
     ];
     vi.mocked(db.loadOfflineAnnouncementsQueue).mockResolvedValue(pending);
 
     const serverResponse: Announcement = {
       id: 'server-id-99',
+      festival_id: TEST_FESTIVAL_ID,
       author_id: 'user1',
       content: 'First',
       created_at: '2026-07-29T10:00:00Z',
@@ -141,6 +175,35 @@ describe('announcementsRepository.flushPending', () => {
     expect(db.saveAnnouncement).toHaveBeenCalledTimes(2);
   });
 
+  it('skips pending posts for a different festival', async () => {
+    const pending: Announcement[] = [
+      { id: 'pending-1', festival_id: TEST_FESTIVAL_ID, author_id: 'user1', content: 'Mine', created_at: '2026-07-29T10:00:00Z', deleted_at: null, is_pinned: false },
+      { id: 'pending-other', festival_id: 'other-fest', author_id: 'user1', content: 'Other', created_at: '2026-07-29T11:00:00Z', deleted_at: null, is_pinned: false },
+    ];
+    vi.mocked(db.loadOfflineAnnouncementsQueue).mockResolvedValue(pending);
+
+    const serverResponse: Announcement = {
+      id: 'server-id-99',
+      festival_id: TEST_FESTIVAL_ID,
+      author_id: 'user1',
+      content: 'Mine',
+      created_at: '2026-07-29T10:00:00Z',
+      deleted_at: null,
+      is_pinned: false,
+    };
+    const mockSingle = vi.fn().mockResolvedValue({ data: serverResponse, error: null });
+    const mockSelect = vi.fn().mockReturnValue({ single: mockSingle });
+    const mockInsert = vi.fn().mockReturnValue({ select: mockSelect });
+    vi.mocked(supabase.from).mockReturnValue({ insert: mockInsert } as any);
+
+    const flushed = await announcementsRepository.flushPending();
+
+    expect(flushed).toBe(1);
+    expect(mockInsert).toHaveBeenCalledTimes(1);
+    expect(db.removeFromOfflineAnnouncementsQueue).toHaveBeenCalledWith('pending-1');
+    expect(db.removeFromOfflineAnnouncementsQueue).not.toHaveBeenCalledWith('pending-other');
+  });
+
   it('returns 0 and makes no Supabase calls when the queue is empty', async () => {
     vi.mocked(db.loadOfflineAnnouncementsQueue).mockResolvedValue([]);
 
@@ -153,7 +216,7 @@ describe('announcementsRepository.flushPending', () => {
 
   it('does not clear from queue when Supabase insert fails', async () => {
     const pending: Announcement[] = [
-      { id: 'pending-fail', author_id: 'user1', content: 'Will fail', created_at: '2026-07-29T10:00:00Z', deleted_at: null, is_pinned: false },
+      { id: 'pending-fail', festival_id: TEST_FESTIVAL_ID, author_id: 'user1', content: 'Will fail', created_at: '2026-07-29T10:00:00Z', deleted_at: null, is_pinned: false },
     ];
     vi.mocked(db.loadOfflineAnnouncementsQueue).mockResolvedValue(pending);
 

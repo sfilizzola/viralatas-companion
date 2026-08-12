@@ -13,6 +13,7 @@ function createMockSupabase() {
     bands: [
       {
         id: 'from-id',
+    festival_id: 'wacken-2026',
         slot_id: 'FAS5',
         name: 'Skyline',
         stage: 'Faster',
@@ -24,6 +25,7 @@ function createMockSupabase() {
       },
       {
         id: 'to-id',
+    festival_id: 'wacken-2026',
         slot_id: 'LOU3',
         name: 'Thundermother',
         stage: 'Louder',
@@ -35,6 +37,7 @@ function createMockSupabase() {
       },
     ],
     app_config: [{ key: 'cache_version', value: 'old' }],
+    festivals: [{ id: 'wacken-2026', slug: 'wacken-2026', cache_version: 'old' }],
   };
 
   function from(table: string) {
@@ -77,6 +80,20 @@ function createMockSupabase() {
         const set = new Set(vals);
         state.filters.push((row) => set.has(row[col]));
         return builder;
+      },
+      async maybeSingle() {
+        let rows = [...(tables[table] ?? [])];
+        for (const filter of state.filters) {
+          rows = rows.filter(filter);
+        }
+        return { data: rows[0] ?? null, error: null };
+      },
+      async single() {
+        let rows = [...(tables[table] ?? [])];
+        for (const filter of state.filters) {
+          rows = rows.filter(filter);
+        }
+        return { data: rows[0] ?? null, error: null };
       },
       async then(resolve: (value: { data: Row[] | null; error: null; count?: number }) => void) {
         let rows = [...(tables[table] ?? [])];
@@ -162,6 +179,7 @@ describe('applyLineupPlan', () => {
     expect(tables.bands.some((row) => row.id === 'from-id')).toBe(false);
     expect(tables.user_picks.find((row) => row.user_id === 'u1')?.band_id).toBe('to-id');
     expect(result.cacheVersion).toBeTruthy();
+    expect(tables.festivals[0]?.cache_version).toBe(result.cacheVersion);
   });
 
   it('skips blocked move and blocked delete in partial apply', async () => {

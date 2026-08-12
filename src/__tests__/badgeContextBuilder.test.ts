@@ -29,6 +29,7 @@ function authUser(metadata: Record<string, unknown> = {}): AuthUser {
 
 const sampleBand: Band = {
   id: 'band-br',
+    festival_id: 'wacken-2026',
   slot_id: 'FAS1',
   name: 'Test Band',
   stage: 'Faster',
@@ -62,7 +63,7 @@ describe('buildBadgeContextFromSnapshot', () => {
     const ctx = buildBadgeContextFromSnapshot(
       {
         userPicks: [{ band_id: sampleBand.id }],
-        allPicks: [{ user_id: 'user-badge-ctx', band_id: sampleBand.id, created_at: '2026-05-01T00:00:00Z' }],
+        allPicks: [{ user_id: 'user-badge-ctx', band_id: sampleBand.id, festival_id: 'wacken-2026', created_at: '2026-05-01T00:00:00Z' }],
         bands: [sampleBand],
         allMissed: [],
         assignedBadges: [],

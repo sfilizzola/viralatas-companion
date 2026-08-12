@@ -32,8 +32,13 @@ export type OptimisticQueueConfig<T> = {
   onBatchSynced?: (item: T) => Promise<void>;
 };
 
-export interface OfflineQueueHandle {
-  flush(): Promise<number>;
+export type FlushOptions<T> = {
+  /** Only sync items that pass this predicate; others stay queued. */
+  include?: (item: T) => boolean;
+};
+
+export interface OfflineQueueHandle<T = unknown> {
+  flush(options?: FlushOptions<T>): Promise<number>;
 }
 
 /**
@@ -102,10 +107,13 @@ export function keepLastSyncTargets<T>(
 export function createOptimisticQueue<T>(
   storage: QueueStorage<T>,
   config: OptimisticQueueConfig<T>,
-): OfflineQueueHandle {
+): OfflineQueueHandle<T> {
   return {
-    async flush(): Promise<number> {
-      const queue = await storage.load();
+    async flush(options?: FlushOptions<T>): Promise<number> {
+      let queue = await storage.load();
+      if (options?.include) {
+        queue = queue.filter(options.include);
+      }
       if (queue.length === 0) return 0;
 
       const batches = buildFlushBatches(queue, config.getId, config.dedup);

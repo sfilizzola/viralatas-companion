@@ -20,6 +20,7 @@ export function scenarioBand(
 ): Band {
   return {
     id,
+    festival_id: 'wacken-2026',
     slot_id: overrides.slot_id ?? `TST-${id}`,
     name: overrides.name ?? `Band ${id}`,
     stage: overrides.stage ?? 'Faster',
@@ -41,7 +42,7 @@ export function scenarioUser(
 }
 
 export function scenarioPick(userId: string, bandId: string): UserPick {
-  return { user_id: userId, band_id: bandId, created_at: '2026-05-01T00:00:00Z' };
+  return { user_id: userId, band_id: bandId, festival_id: 'wacken-2026', created_at: '2026-05-01T00:00:00Z' };
 }
 
 export function scenarioPresence(

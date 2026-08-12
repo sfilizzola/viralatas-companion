@@ -11,7 +11,7 @@ function makeCrewUser(
 }
 
 function makePick(userId: string, bandId: string): UserPick {
-  return { user_id: userId, band_id: bandId, created_at: '2026-07-29T10:00:00Z' };
+  return { user_id: userId, band_id: bandId, festival_id: 'wacken-2026', created_at: '2026-07-29T10:00:00Z' };
 }
 
 describe('computeAttendees', () => {

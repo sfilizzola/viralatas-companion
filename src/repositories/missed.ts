@@ -80,7 +80,28 @@ async function flushOfflineQueue(): Promise<number> {
   return missedOfflineQueue.flush();
 }
 
-async function syncFromRemote(userId: string): Promise<void> {
+async function syncFromRemote(userId: string, festivalId?: string): Promise<void> {
+  if (festivalId) {
+    const { data: bands, error: bandsError } = await supabase
+      .from('bands')
+      .select('id')
+      .eq('festival_id', festivalId);
+    if (bandsError) return;
+    const bandIds = (bands ?? []).map((b) => b.id);
+    if (bandIds.length === 0) {
+      await replaceUserMissedBands([], userId);
+      return;
+    }
+    const { data, error } = await supabase
+      .from('user_missed_bands')
+      .select('*')
+      .eq('user_id', userId)
+      .in('band_id', bandIds);
+    if (error || !data) return;
+    await replaceUserMissedBands(data as UserMissedBand[], userId);
+    return;
+  }
+
   const { data, error } = await supabase
     .from('user_missed_bands')
     .select('*')
@@ -90,9 +111,9 @@ async function syncFromRemote(userId: string): Promise<void> {
   await replaceUserMissedBands(data as UserMissedBand[], userId);
 }
 
-async function sync(userId: string): Promise<void> {
+async function sync(userId: string, festivalId?: string): Promise<void> {
   await flushOfflineQueue();
-  await syncFromRemote(userId);
+  await syncFromRemote(userId, festivalId);
 }
 
 function subscribeToRealtime(): () => void {

@@ -10,7 +10,9 @@ vi.mock('../lib/supabase', () => ({
       upsert: vi.fn().mockResolvedValue({ error: null }),
       delete: vi.fn(() => ({
         eq: vi.fn(() => ({
-          eq: vi.fn().mockResolvedValue({ error: null }),
+          eq: vi.fn(() => ({
+            eq: vi.fn().mockResolvedValue({ error: null }),
+          })),
         })),
       })),
       select: vi.fn().mockResolvedValue({ data: [], error: null }),
@@ -24,8 +26,9 @@ vi.mock('../services/weakSkips', () => ({
   recordCommittedSkip,
 }));
 
-import { resetDbConnectionForTests, saveUserPick } from '../lib/db';
+import { resetDbConnectionForTests, saveUserPick, setActiveFestivalId } from '../lib/db';
 import { usePickActions } from '../hooks/usePickActions';
+import { TEST_FESTIVAL_ID } from './helpers/testFestival';
 
 const userId = 'user-test';
 const bandId = 'band-test';
@@ -33,26 +36,27 @@ const bandId = 'band-test';
 beforeEach(async () => {
   await resetDbConnectionForTests();
   await deleteViralatasDatabase();
+  await setActiveFestivalId(TEST_FESTIVAL_ID);
   recordCommittedSkip.mockClear();
   Object.defineProperty(navigator, 'onLine', { value: true, writable: true, configurable: true });
 });
 
 describe('usePickActions', () => {
   it('loads pickedIds from IDB on mount', async () => {
-    await saveUserPick({ user_id: userId, band_id: bandId, created_at: new Date().toISOString() });
+    await saveUserPick({ user_id: userId, band_id: bandId, festival_id: 'wacken-2026', created_at: new Date().toISOString() });
     const { result } = renderHook(() => usePickActions(userId));
     await waitFor(() => expect(result.current.pickedIds.has(bandId)).toBe(true));
   });
 
   it('picksReady is false until IDB hydrate, then true', async () => {
-    await saveUserPick({ user_id: userId, band_id: bandId, created_at: new Date().toISOString() });
+    await saveUserPick({ user_id: userId, band_id: bandId, festival_id: 'wacken-2026', created_at: new Date().toISOString() });
     const { result } = renderHook(() => usePickActions(userId));
     expect(result.current.picksReady).toBe(false);
     await waitFor(() => expect(result.current.picksReady).toBe(true));
   });
 
   it('togglePick removes a picked band', async () => {
-    await saveUserPick({ user_id: userId, band_id: bandId, created_at: new Date().toISOString() });
+    await saveUserPick({ user_id: userId, band_id: bandId, festival_id: 'wacken-2026', created_at: new Date().toISOString() });
     const { result } = renderHook(() => usePickActions(userId));
     await waitFor(() => expect(result.current.pickedIds.has(bandId)).toBe(true));
 
@@ -69,7 +73,7 @@ describe('usePickActions', () => {
   });
 
   it('unpickBand removes a picked band', async () => {
-    await saveUserPick({ user_id: userId, band_id: bandId, created_at: new Date().toISOString() });
+    await saveUserPick({ user_id: userId, band_id: bandId, festival_id: 'wacken-2026', created_at: new Date().toISOString() });
     const { result } = renderHook(() => usePickActions(userId));
     await waitFor(() => expect(result.current.pickedIds.has(bandId)).toBe(true));
 
@@ -78,7 +82,7 @@ describe('usePickActions', () => {
   });
 
   it('does not record weak skips when toggling picks off a card', async () => {
-    await saveUserPick({ user_id: userId, band_id: bandId, created_at: new Date().toISOString() });
+    await saveUserPick({ user_id: userId, band_id: bandId, festival_id: 'wacken-2026', created_at: new Date().toISOString() });
     const { result } = renderHook(() => usePickActions(userId));
     await waitFor(() => expect(result.current.pickedIds.has(bandId)).toBe(true));
 

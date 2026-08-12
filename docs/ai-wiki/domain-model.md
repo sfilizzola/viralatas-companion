@@ -8,7 +8,14 @@ Document the real-world entities, their relationships, business rules, and invar
 
 ## Relevant Source Files
 
-- `src/types/index.ts` — All type definitions
+- `src/types/index.ts` — Shared type re-exports
+- `src/types/festival.ts` — `Festival`, `FestivalMembership`, `FestivalFeatureKey`
+- `src/lib/festivalFeatures.ts` — Feature gate helpers (`hasFestivalFeature`, `canShowMap`, …)
+- `src/lib/festivalCacheVersion.ts` — Per-Festival pack invalidation predicate
+- `src/lib/db/festivals.ts` — Active Festival id/cache meta + `clearActiveFestivalPack()`
+- `src/repositories/festivals.ts` — Catalog, memberships, Join/Leave, switch + pack load
+- `src/components/festival/ActiveFestivalProvider.tsx` — Active Festival context
+- `src/hooks/useActiveFestival.ts` — Context consumer
 - `supabase/migrations/` — Database schema (source of truth)
 - `src/repositories/` — Business rules enforcement
 - `src/services/bandRatings.ts` — Eligibility, aggregates, Popular sort helpers
@@ -21,28 +28,108 @@ Document the real-world entities, their relationships, business rules, and invar
 
 ## High-Level Explanation
 
-Viralatas Metaleiros is a small group (~20 people) attending Wacken Open Air 2026 as vira-latas (metal-loving mutts). The domain models:
+Viralatas Metaleiros is a small group (~20 people) of **vira-latas** who can opt into one or more **Festivals** (Phase 47 multi-festival). Wacken Open Air 2026 is the first Festival; more can be seeded. The domain models:
 
-1. **User** — A vira-lata attending Wacken
-2. **Band** — An act performing on one of 8 stages
-3. **UserPick** — A vira-lata's interest in seeing a band
-4. **UserPresence** — Where is the vira-lata right now (camping vs. at Metal Place)
-5. **UserMissedBand** — A band the vira-lata actually watched (marked after the fact)
-6. **DuckQuack** — A social "quack" signal sent by a vira-lata during a live band set (Phase 20)
-7. **PushSubscription** — A device-level Web Push subscription for background notifications (Phase 20)
-8. **Announcement** — A mural post from any vira-lata
-9. **BlockedPoster** — Manager blocking moderation rules
-10. **UserBadgeHistory** — Frozen year-badge row after godlike consolidation (Phase 29)
-11. **UserBandRating** — A vira-lata's 1–5 score for a concert they attended (Phase 32)
-12. **CampLocation** — Shared campground GPS set by godlike; cached in IDB for Mural + Map navigation (Phase 45)
+1. **Festival** — Concrete event instance (lineup, dates, features, cache version)
+2. **FestivalMembership** — Opt-in that a vira-lata is going to a Festival
+3. **User** — A vira-lata account (may have zero/many memberships; one Active Festival preference)
+4. **Band** — An act on a Festival's lineup (scoped by `festival_id`)
+5. **UserPick** — Interest in seeing a band (scoped; social counts are membership-gated)
+6. **UserPresence** — Where the vira-lata is right now (camping / Metal Place — feature-gated)
+7. **UserMissedBand** — A band the vira-lata actually watched (marked after the fact)
+8. **DuckQuack** — Social "quack" during a live set (Phase 20; feature-gated)
+9. **PushSubscription** — Device-level Web Push registration (Phase 20)
+10. **Announcement** — Mural post on a Festival (scoped by `festival_id`)
+11. **BlockedPoster** — Manager blocking moderation rules
+12. **UserBadgeHistory** — Frozen year-badge row after godlike consolidation (Phase 29)
+13. **UserBandRating** — 1–5 concert score (Phase 32)
+14. **CampLocation** — Shared campground GPS (Phase 45; feature-gated)
+
+Canonical product language: `CONTEXT.md` (Festival, Active Festival, Festival crew, Leave, membership-gated counts, Festival features, Active Festival pack, Festival cache version).
 
 ---
 
 ## Entities
 
+### Festival
+
+**Essence**: A concrete event instance with its own lineup, dates, attendees, mural, and optional feature flags — e.g. Wacken Open Air 2026. Not a repeating brand, and not the badge “festival year.”
+
+```typescript
+type FestivalFeatureKey =
+  | 'metal_place' | 'map' | 'duck' | 'camp' | 'wrap' | 'remote_lineup';
+
+type FestivalFeatures = Partial<Record<FestivalFeatureKey, boolean>>;
+
+type Festival = {
+  id: string;
+  slug: string;                 // e.g. 'wacken-2026'
+  name: string;
+  timezone: string;             // e.g. 'Europe/Berlin'
+  starts_at: string;            // ISO 8601
+  ends_at: string;
+  features: FestivalFeatures;   // optional capabilities; core schedule/picks/mural always on
+  cache_version: string;        // Festival cache version (pack invalidation token)
+};
+```
+
+**Festival features** (optional): Metal Place, map, duck, camp, wrap, remote lineup. Core schedule / picks / `/now` / mural exist for every Festival. Wacken 2026 seeds all features `true`.
+
+**Festival catalog**: Ops/seed-created list. Before membership, a vira-lata sees **metadata only** (name, dates, timezone) — not lineup, picks, or mural.
+
+**Invariants:**
+- `slug` unique
+- Catalog SELECT open to all authenticated users; no client INSERT/UPDATE/DELETE (ops / service role)
+- Godlike does **not** bypass membership for normal PWA reads/writes — must Join like anyone else
+
+**Lifecycle:**
+1. Ops seeds Festival rows (`supabase/seed/festivals.ts`, demo festivals, etc.)
+2. Cutover backfill grants membership on `wacken-2026` to existing accounts
+3. New accounts after cutover start with **no** memberships — Join from `/festivals`
+
+---
+
+### FestivalMembership
+
+**Essence**: Opt-in that a signed-in vira-lata is going to a specific Festival (“I’m going”). Required to see that Festival’s lineup social surfaces.
+
+```typescript
+type FestivalMembership = {
+  user_id: string;
+  festival_id: string;
+  opted_in_at: string;          // ISO 8601
+};
+```
+
+**Invariants:**
+- Composite PK `(user_id, festival_id)`
+- Own-row INSERT/DELETE; SELECT own + peers who share a Festival (`is_festival_member`)
+- Distinct from having an account — zero, one, or many memberships allowed
+
+**Leave Festival:**
+- Deletes the membership row (“Leave”)
+- Picks and related per-band records are **kept** so re-Join restores them
+- Kept picks do **not** count in popularity / who’s-going / `/now` until membership returns (**membership-gated counts**)
+- Mural posts already made **remain** visible to the Festival crew (not auto-hidden on Leave)
+- Leaving the Active Festival clears local Active Festival id (redirect → `/festivals` via `FestivalGate`)
+
+---
+
+### Active Festival / Active Festival pack / Festival cache version
+
+**Active Festival**: Which Festival a given vira-lata is currently working in — a personal preference (`users.active_festival_id` + IDB meta), not a global app mode. Schedule, picks, mural, and `/now` social are scoped to it. Switching requires network to clear and reload the pack.
+
+**Active Festival pack**: Offline IndexedDB dataset for the Active Festival only — bands, crew roster, picks, mural, reactions, missed, ratings, presence/config/camp stores listed in `FESTIVAL_PACK_OBJECT_STORES`. Cleared via `clearActiveFestivalPack()` on switch or Festival cache version mismatch. Session, meta, and badge history are kept.
+
+**Festival cache version**: Per-Festival invalidation token on `festivals.cache_version`. When the Active Festival’s remote version differs from the local pack marker, the client clears and reloads **that** Festival’s pack only. Changing another Festival’s version must not wipe the Active pack (`shouldInvalidatePack`).
+
+**Festival crew**: Vira-latas with membership on the Active Festival. `/now`, popular, and who’s-going use this set (friend/camping rules still apply inside it). `crew_users` IDB holds this roster — not the global account list.
+
+---
+
 ### User
 
-**Essence**: A vira-lata attending the festival, identified by email.
+**Essence**: A vira-lata account (group identity). Not the same as Festival membership.
 
 ```typescript
 type User = {
@@ -58,6 +145,7 @@ type User = {
   wacken_years: number[];               // [2018, 2019, 2022, 2024]
   country: Country | null;              // 'br', 'de', 'us', etc.
   wacken_arrival_day?: string | null;   // Date (e.g., '2026-07-27') for badges
+  active_festival_id?: string | null;   // Active Festival preference (must be a membership)
 };
 
 type UserRole = 'normal' | 'manager' | 'godlike';
@@ -74,18 +162,21 @@ type Country = 'de' | 'es' | 'br' | 'us' | 'co' | 'be' | 'other';
 - `is_friend = true` → user is excluded from the `ArrivalMap` (`/announcements`) — rows, avatar clusters, and the collapsed-view "X arrived · Y to arrive" totals all derive from non-friend crew members only. The matching arrival-day picker in `EditProfileForm` (`/profile`) is also hidden for friend users; `wacken_arrival_day` is set to `null` on save when the picker is hidden so a stale value cannot be re-published.
 - Only godlike can toggle `is_friend` (via admin panel)
 - `NULL` and `false` are both treated as non-friend
+- `active_festival_id` when non-null must reference a Festival the user is a member of (`enforce_active_festival_membership` trigger)
+- Godlike does **not** get implicit membership on every Festival
 
 **Lifecycle:**
 1. User signs up (email/password via Supabase Auth)
 2. `auth.on_auth_state_changed` fires
-3. `handle_new_user()` trigger creates row in `public.users`
-4. User profile hydrates from IndexedDB + Supabase
+3. `handle_new_user()` trigger creates row in `public.users` (no auto membership after cutover)
+4. User Joins from Festival catalog → optional set Active Festival → pack loads
+5. User profile hydrates from IndexedDB + Supabase
 
 ---
 
 ### CrewUser (crew profile cache)
 
-**Essence**: A lightweight roster row cached in IndexedDB (`crew_users` store) for social features — `/now`, live vest, wrap stats, arrival map. Not the full `User` entity; synced from `public.users` on reconnect.
+**Essence**: Lightweight **Festival crew** roster row cached in IndexedDB (`crew_users` store) for social features — `/now`, live vest, wrap stats, arrival map. Holds members of the **Active Festival**, not every account. Synced from `public.users` (scoped) on reconnect / pack load.
 
 ```typescript
 type CrewUser = {
@@ -115,11 +206,13 @@ See also: **Crew profile cache** in `CONTEXT.md`; Phase 31 in [architecture.md](
 
 ### Band
 
-**Essence**: An act performing at a specific stage and time.
+**Essence**: An act performing at a specific stage and time on a **Festival**.
 
 ```typescript
 type Band = {
-  id: string;                  // uuid, from official Wacken lineup
+  id: string;                  // uuid
+  festival_id: string;         // FK → festivals (scoped lineup)
+  slot_id: string;             // unique per festival (festival_id, slot_id)
   name: string;                // "Slipknot", "Alestorm", etc.
   stage: string;               // "Faster", "Harder", "W.E.T.", etc.
   start_time: string;          // ISO 8601, e.g., "2026-07-29T18:30:00+02:00"
@@ -138,11 +231,12 @@ Full old→new mapping: **[genre-collapse-mapping.md](genre-collapse-mapping.md)
 **Party Metal** is locked to Alestorm + Airbourne only (badge condition unchanged).
 
 **Invariants:**
-- Each band appears once per stage-time (unique constraint)
-- Band list is immutable (godlike only)
-- Performances don't overlap by stage
+- `(festival_id, slot_id)` unique
+- Band list mutable by godlike / remote lineup sync only
+- RLS: SELECT only for Festival members (`is_festival_member(festival_id)`) — no godlike bypass
+- Performances don't overlap by stage within a Festival
 
-**Stages** (8 total):
+**Stages** (Wacken 2026 — 8 total):
 ```
 Main Infield (3):  Faster (blue), Harder (orange), Louder (purple)
 Outside (2):       W.E.T. (red), Headbangers (teal)
@@ -150,20 +244,21 @@ Specialized (3):   Wasteland (dark blue), Wackinger (gray), Welcome to the Jungl
 ```
 
 **Lifecycle:**
-1. Godlike seeds bands via `npm run seed:bands` (from supabase/seed/bands.ts)
-2. Band list cached to IndexedDB on first login
-3. User references bands by id in picks
+1. Godlike/ops seeds bands for a Festival (`npm run seed:bands` / sync / remote lineup)
+2. Active Festival pack caches bands to IndexedDB on Join/switch
+3. User references bands by id in picks (same `festival_id`)
 
 ---
 
 ### UserPick
 
-**Essence**: A vira-lata has decided to watch a band.
+**Essence**: A vira-lata has decided to watch a band on a Festival.
 
 ```typescript
 type UserPick = {
   user_id: string;             // uuid, foreign key to users
   band_id: string;             // uuid, foreign key to bands
+  festival_id: string;         // denormalized from band; membership-scoped
   created_at: string;          // ISO 8601, when pick was made
 };
 ```
@@ -172,11 +267,12 @@ type UserPick = {
 - Exactly one pick per (user_id, band_id) pair
 - User can't pick the same band twice
 - Unpicking is deletion (not soft-delete)
+- INSERT/DELETE require membership on `festival_id`; band must belong to that Festival
 
 **Business Rules:**
-- User can pick any number of bands
+- User can pick any number of bands on Festivals they have joined
 - Can unpick at any time (even during the performance)
-- Picks are visible to all crew members (real-time attendance counts)
+- Social attendance uses **membership-gated counts** — only pickers who currently have Festival membership count in popular / who’s-going / `band_attendance`
 
 **Lifecycle:**
 1. User toggles a band in any view (Schedule, My Picks, etc.)
@@ -417,13 +513,14 @@ type PushSubscription = {
 
 ### Announcement
 
-**Essence**: A public message from a vira-lata to the crew.
+**Essence**: A public message from a vira-lata to the **Festival crew** of one Festival.
 
 ```typescript
 type Announcement = {
   id: string;                  // uuid, auto-generated
+  festival_id: string;         // FK → festivals
   author_id: string;           // uuid, foreign key to users
-  content: string;             // The text (max ~500 chars in UI)
+  content: string;             // The text (UI length capped)
   created_at: string;          // ISO 8601
   deleted_at: string | null;   // Soft-delete timestamp (null = not deleted)
 };
@@ -433,12 +530,14 @@ type Announcement = {
 - author_id must exist (foreign key)
 - deleted_at is never unset (soft-delete only)
 - Only author or manager+ can delete
+- SELECT/INSERT require Festival membership; no godlike membership bypass
 
 **Business Rules:**
-- Any user can post
+- Any Festival member can post
 - Manager+ can hide other users' posts (soft-delete)
 - Godlike can unblock posters
-- Posts are visible in reverse-chronological order
+- Posts are visible in reverse-chronological order within the Active Festival pack
+- On Leave: existing posts remain visible to remaining Festival crew
 
 **Lifecycle:**
 1. User types message in AnnouncementsPage
@@ -648,23 +747,24 @@ type UserBadgeHistoryRow = {
 ## Relationships
 
 ```
-User (1) ──┬─→ (∞) UserPick ←─ (∞) Band
-           │
+Festival (1) ──┬─→ (∞) Band
+               ├─→ (∞) Announcement
+               └─→ (∞) FestivalMembership ←─ (∞) User
+
+User (1) ──┬─→ (∞) FestivalMembership → Festival
+           ├─→ (0..1) Active Festival [active_festival_id]
+           ├─→ (∞) UserPick ←─ (∞) Band
            ├─→ (1) UserPresence
-           │
            ├─→ (∞) Announcement [via author_id]
-           │
            ├─→ (∞) BlockedPoster [via user_id or blocked_by]
-           │
            ├─→ (∞) UserMissedBand ←─ (∞) Band
-           │
            ├─→ (∞) UserBandRating ←─ (∞) Band
-           │
            └─→ (∞) UserBadgeHistory
 
 
 Announcement
     │
+    └─→ (1) Festival
     └─→ (1) User [via author_id]
     └─→ (1) User [via BlockedPoster.blocked_by]
 ```
@@ -673,17 +773,19 @@ Announcement
 
 ## Computed Entities
 
-### BandAttendance (Computed View)
+### BandAttendance (Membership-gated view)
 
-Not stored; computed from user_picks table:
+Postgres view `public.band_attendance` (`security_invoker = true`) counts picks only from users who currently hold Festival membership on the pick’s Festival:
 
 ```sql
-SELECT band_id, COUNT(*) as count
-FROM user_picks
-GROUP BY band_id;
+SELECT up.band_id, count(*)::bigint AS going_count
+FROM user_picks up
+INNER JOIN festival_memberships m
+  ON m.user_id = up.user_id AND m.festival_id = up.festival_id
+GROUP BY up.band_id;
 ```
 
-Cached in `usePickCounts()` hook, updated via Realtime.
+Client popular / who’s-going paths also filter to Festival crew. Cached in `usePickCounts()` / pick caches, updated via Realtime.
 
 ### BandRatingAggregate (Computed)
 
@@ -800,4 +902,4 @@ Computed in `useNowData()` using current time + user picks.
 
 ---
 
-**Last updated:** 2026-06-26 — Phase 45: `CampLocation` entity; godlike campground GPS on `app_settings`.
+**Last updated:** 2026-08-11 — Phase 47 multi-festival: Festival, membership, Active Festival pack, features, membership-gated counts.

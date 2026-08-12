@@ -28,7 +28,7 @@ import MyWackenCoachBanner from '../components/MyWackenCoachBanner';
 import PlaylistLaunchButton from '../components/PlaylistLaunchButton';
 import styles from './SchedulePage.module.css';
 
-export default function MyWackenPage() {
+export default function MyPicksPage() {
   const { t } = useI18n('MyPicksPage');
   const { t: tSchedule } = useI18n('SchedulePage');
   const { session } = useAuth();

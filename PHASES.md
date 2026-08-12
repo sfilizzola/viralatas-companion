@@ -9,7 +9,9 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ## No active phased work
 
-**Next phase:** 47
+**Next phase:** 48
+
+Phase 47 (multi-festival) is complete — see `docs/ai-wiki/phases-history.md`.
 
 ---
 

@@ -102,4 +102,17 @@ export {
   removeFromOfflineDuckQuackQueue,
 } from './duck';
 export { wipeAllLocalData, saveCacheVersion, loadCacheVersion } from './meta';
+export {
+  FESTIVAL_PACK_OBJECT_STORES,
+  getActiveFestivalId,
+  setActiveFestivalId,
+  clearActiveFestivalId,
+  getActiveFestivalCacheVersion,
+  setActiveFestivalCacheVersion,
+  clearActiveFestivalPack,
+  saveFestivalCatalog,
+  loadFestivalCatalog,
+  saveFestivalMemberships,
+  loadFestivalMemberships,
+} from './festivals';
 export { loadUserBadgeHistory, replaceUserBadgeHistory } from './badgeHistory';

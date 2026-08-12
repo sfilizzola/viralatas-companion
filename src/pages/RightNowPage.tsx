@@ -1,11 +1,13 @@
 import { useI18n, type Language } from '../lib/i18n';
 import { useNowData } from '../hooks/useNowData';
+import { useActiveFestival } from '../hooks/useActiveFestival';
 import { useDuckEnabled } from '../contexts/DuckEnabledContext';
 import { useDuckQuack } from '../hooks/useDuckQuack';
 import type { CrewLiveGroup } from '../services/livePreview';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import BottomNav from '../components/BottomNav';
+import FestivalSwitcher from '../components/FestivalSwitcher';
 import OfflineBanner from '../components/OfflineBanner';
 import BadgesDisplay from '../components/BadgesDisplay';
 import PresenceToggle from '../components/PresenceToggle';
@@ -16,6 +18,13 @@ import { useWrapTeaserVisible } from '../hooks/useWrapTeaserVisible';
 import CrewGroupsSection from '../components/now/CrewGroupsSection';
 import LiveCardSheet from '../components/now/LiveCardSheet';
 import StageScheduleSheet from '../components/StageScheduleSheet';
+import {
+  canShowCamp,
+  canShowMap,
+  canShowMetalPlace,
+  canShowPresence,
+  canShowWrap,
+} from '../lib/festivalFeatures';
 import styles from './RightNowPage.module.css';
 
 const DATE_LOCALES: Record<Language, string> = {
@@ -25,17 +34,18 @@ const DATE_LOCALES: Record<Language, string> = {
   de: 'de-DE',
 };
 
-function nowLabel(date: Date, language: Language) {
+function nowLabel(date: Date, language: Language, timeZone: string) {
   return new Intl.DateTimeFormat(DATE_LOCALES[language], {
     weekday: 'short',
     hour: '2-digit',
     minute: '2-digit',
-    timeZone: 'Europe/Berlin',
+    timeZone,
   }).format(date);
 }
 
 export default function RightNowPage() {
   const { language, t } = useI18n('RightNowPage');
+  const { festival } = useActiveFestival();
   const duckEnabled = useDuckEnabled();
   const navigate = useNavigate();
   const [activeGroup, setActiveGroup] = useState<CrewLiveGroup | null>(null);
@@ -70,7 +80,22 @@ export default function RightNowPage() {
     userId,
     nextBand?.id ?? null,
   );
-  const showWrapTeaser = useWrapTeaserVisible();
+  const showWrapTeaser = useWrapTeaserVisible() && canShowWrap(festival);
+  const showMap = canShowMap(festival);
+  const showPresence = canShowPresence(festival);
+  const showCamp = canShowCamp(festival);
+  const showMetalPlace = canShowMetalPlace(festival);
+
+  const visibleCrewGroups = useMemo(
+    () =>
+      crewGroups.filter((group) => {
+        if (group.kind === 'camping') return showCamp;
+        if (group.kind === 'metal_place') return showMetalPlace;
+        if (group.kind === 'lost') return showPresence;
+        return true;
+      }),
+    [crewGroups, showCamp, showMetalPlace, showPresence],
+  );
 
   const timeDelta = nextBand
     ? (new Date(nextBand.start_time).getTime() - now.getTime()) / (1000 * 60)
@@ -99,7 +124,10 @@ export default function RightNowPage() {
     <div className={styles.page}>
       <OfflineBanner />
       <header className={styles.header}>
-        <span className={styles.title}>{t('title')}</span>
+        <div className={styles.headerLeft}>
+          <span className={styles.title}>{t('title')}</span>
+          <FestivalSwitcher />
+        </div>
         <div className={styles.headerRight}>
           <button
             className={styles.chip}
@@ -115,17 +143,25 @@ export default function RightNowPage() {
             </svg>
             <span>{t('stagesButton')}</span>
           </button>
-          <Link to="/map" className={styles.mapButton} aria-label={t('mapButton')}>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11Z"/>
-              <path d="M12.6 6.2 10 10.4h2.1l-1 3.3 2.9-4.4h-2.1l.8-3.1Z" fill="currentColor" stroke="none"/>
-            </svg>
-            <span>{t('mapButton')}</span>
-          </Link>
+          {showMap && (
+            <Link to="/map" className={styles.mapButton} aria-label={t('mapButton')}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11Z"/>
+                <path d="M12.6 6.2 10 10.4h2.1l-1 3.3 2.9-4.4h-2.1l.8-3.1Z" fill="currentColor" stroke="none"/>
+              </svg>
+              <span>{t('mapButton')}</span>
+            </Link>
+          )}
           <div className={styles.headerDivider} aria-hidden="true" />
           <span className={styles.timestamp}>
-            <span className={styles.timestampValue}>{nowLabel(now, language)}</span>
-            <span className={styles.timestampLabel}>{t('wackenTime')}</span>
+            <span className={styles.timestampValue}>
+              {nowLabel(now, language, festival?.timezone ?? 'Europe/Berlin')}
+            </span>
+            <span className={styles.timestampLabel}>
+              {festival
+                ? t('festivalTime', { name: festival.name })
+                : t('festivalTimeFallback')}
+            </span>
           </span>
         </div>
       </header>
@@ -139,11 +175,12 @@ export default function RightNowPage() {
       {showWrapTeaser && <WrapTeaserBanner />}
 
       <main className={styles.main}>
-        {userId && !isFriend && (
+        {userId && !isFriend && showPresence && (
           <PresenceToggle
             className={styles.presence}
             value={presenceValue}
-            metalPlaceAvailable={isMetalPlaceWindowActive}
+            campingAvailable={showCamp}
+            metalPlaceAvailable={showMetalPlace && isMetalPlaceWindowActive}
             labels={{
               title: t('presenceTitle'),
               camping: t('presenceCamping'),
@@ -177,7 +214,7 @@ export default function RightNowPage() {
 
             <h2 className={styles.sectionTitle}>{t('crewNow')}</h2>
             <CrewGroupsSection
-              crewGroups={crewGroups}
+              crewGroups={visibleCrewGroups}
               crewPlans={crewPlans}
               userId={userId}
               myPlan={myPlan}

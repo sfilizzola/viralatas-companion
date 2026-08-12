@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { getActiveFestivalId } from '../../lib/db';
 import {
   announcementsRepository,
   missedRepository,
@@ -16,19 +17,35 @@ import { subscribeToLiveBandTestConfigRealtime } from '../../services/liveBandTe
  */
 export function RealtimeSync() {
   useEffect(() => {
-    const unsubscribers = [
-      picksRepository.subscribeToRealtime(),
-      announcementsRepository.subscribeToRealtime(),
-      presenceRepository.subscribeToRealtime(),
-      presenceRepository.subscribeToMetalPlaceConfigRealtime(),
-      subscribeToLiveBandTestConfigRealtime(),
-      missedRepository.subscribeToRealtime(),
-      ratingsRepository.subscribeToRealtime(),
-      reactionsRepository.subscribeToRealtime(),
-      usersRepository.subscribeToRealtime(),
-    ];
+    let cancelled = false;
+    let unsubscribers: Array<() => void> = [];
+
+    void (async () => {
+      const festivalId = (await getActiveFestivalId()) ?? undefined;
+      if (cancelled) return;
+
+      unsubscribers = [
+        picksRepository.subscribeToRealtime(festivalId),
+        announcementsRepository.subscribeToRealtime(festivalId),
+        presenceRepository.subscribeToRealtime(),
+        presenceRepository.subscribeToMetalPlaceConfigRealtime(),
+        subscribeToLiveBandTestConfigRealtime(),
+        missedRepository.subscribeToRealtime(),
+        ratingsRepository.subscribeToRealtime(),
+        reactionsRepository.subscribeToRealtime(),
+        usersRepository.subscribeToRealtime(),
+      ];
+
+      if (cancelled) {
+        for (const unsubscribe of unsubscribers) {
+          unsubscribe();
+        }
+        unsubscribers = [];
+      }
+    })();
 
     return () => {
+      cancelled = true;
       for (const unsubscribe of unsubscribers) {
         unsubscribe();
       }

@@ -78,6 +78,7 @@ function authUser(metadata: Record<string, unknown> = {}): AuthUser {
 
 const sampleBand: Band = {
   id: 'band-br',
+    festival_id: 'wacken-2026',
   slot_id: 'FAS1',
   name: 'Test Band',
   stage: 'Faster',
@@ -125,9 +126,7 @@ describe('useBadgeContext', () => {
     await saveBands([sampleBand]);
     await saveCrewUsers([brCrewUser]);
     await saveUserPick({
-      user_id: userId,
-      band_id: sampleBand.id,
-      created_at: new Date().toISOString(),
+      user_id: userId, band_id: sampleBand.id, festival_id: 'wacken-2026', created_at: new Date().toISOString(),
     });
 
     const { result } = renderHook(() => useBadgeContext(authUser({ country: 'br' })));
@@ -147,9 +146,7 @@ describe('useBadgeContext', () => {
     expect(result.current.ctx.bandsPicked).toBe(0);
 
     await saveUserPick({
-      user_id: userId,
-      band_id: sampleBand.id,
-      created_at: new Date().toISOString(),
+      user_id: userId, band_id: sampleBand.id, festival_id: 'wacken-2026', created_at: new Date().toISOString(),
     });
     window.dispatchEvent(new Event(PICKS_CHANGED_EVENT));
 

@@ -9,13 +9,16 @@ Document the guarantees, tradeoffs, and mechanics of the offline-first architect
 ## Relevant Source Files
 
 - `src/lib/db/` — IndexedDB domain modules (barrel at `index.ts`; public shim `src/lib/db.ts`), stores, event emission
-- `src/repositories/bands.ts` — Band fetch on login (`sync()`), cache version wipe + full re-sync (Phase 27.H)
+- `src/lib/db/festivals.ts` — Active Festival id/cache meta + `clearActiveFestivalPack()` / `FESTIVAL_PACK_OBJECT_STORES` (Phase 47)
+- `src/lib/festivalCacheVersion.ts` — `shouldInvalidatePack` (Phase 47)
+- `src/repositories/festivals.ts` — Switch Active Festival → clear pack → load pack (Phase 47)
+- `src/repositories/bands.ts` — Band fetch (`sync(festivalId)`), per-Festival cache version pack clear + reload (Phase 47)
 - `src/repositories/picks.ts`, `announcements.ts`, `presence.ts`, `missed.ts`, `duck.ts` — Offline queue logic + `flushOfflineQueue()`
-- `src/repositories/users.ts` — `syncCrew()` crew profile cache incl. `special_badges` (Phase 31)
+- `src/repositories/users.ts` — `syncCrew(festivalId)` Festival crew profile cache incl. `special_badges` (Phase 31 + 47)
 - `src/repositories/badgeHistoryRepository.ts` — Badge archive IDB read + Supabase pull (no offline queue; Phase 29)
 - `src/repositories/campLocation.ts` — Camp HQ GPS IDB read + Supabase pull on hook mount; godlike save network-only (Phase 45)
-- `src/lib/syncCoordinator.ts` — Single reconnect contract (Phase 27.C)
-- `src/components/sync/` — `BandSync`, `ReconnectSync`, `RealtimeSync`, `CacheVersionCheck` (Phase 26.G + 27.C/D/H)
+- `src/lib/syncCoordinator.ts` — Single reconnect contract (Phase 27.C; Active Festival scoped Phase 47)
+- `src/components/sync/` — `BandSync`, `ReconnectSync`, `RealtimeSync`, `CacheVersionCheck` (Phase 26.G + 27.C/D/H + 47)
 - `vite.config.ts` — PWA / Service Worker caching strategy
 - `src/components/OfflineBanner.tsx` — Offline status UI
 - `src/components/SyncToast.tsx` — Sync completion feedback
@@ -52,20 +55,31 @@ Wacken Open Air has terrible cellular signal. Users will lose connectivity:
 - While traveling to/from the event
 - In the campground (rural)
 
-The app **must** remain fully functional offline:
-- ✅ View band schedule (cached on first load)
-- ✅ Browse crew attendance (cached last sync)
+The app **must** remain fully functional offline for the **Active Festival pack**:
+- ✅ View Active Festival schedule (cached after Join/switch)
+- ✅ Browse Festival crew attendance (cached last sync)
 - ✅ Pick/unpick bands (queued for sync)
 - ✅ Post announcements (queued for sync)
-- ✅ Update presence (queued for sync)
+- ✅ Update presence (queued for sync; when features allow)
 - ✅ Mark bands as seen (queued for sync)
 - ✅ View live vest assigned badges (from `crew_users.special_badges` after last `syncCrew()`)
 - ✅ `/now` and live vest crew counts aligned offline (shared `buildSocialSnapshot()`)
 - ✅ Open campground in Maps from Mural/Map when coords cached in IDB (Phase 45)
+- ❌ Switch Active Festival / Join / Leave offline (needs network to clear + reload pack)
 - ❌ Godlike set/clear camp GPS offline (network required; no queue)
 - ❌ Run badge year consolidation (godlike; requires network)
 - ❌ Receive LLM alerts (requires network call)
 - ❌ See brand-new announcements (requires Realtime)
+
+### Active Festival pack (Phase 47)
+
+The device keeps **one** offline social pack — for the Active Festival only (`FESTIVAL_PACK_OBJECT_STORES`). Switching Active Festival (online):
+
+1. `clearActiveFestivalPack()` — clears bands, crew, picks, mural, reactions, missed, ratings, presence/config/camp, related offline queues
+2. Persist new Active Festival id + `festivals.cache_version` marker in `meta`
+3. `loadActivePack()` — pull scoped remote data into IDB
+
+**Festival cache version**: When `festivals.cache_version` for the Active Festival differs from the local marker, the same pack clear + reload runs. Other Festivals’ version changes do not wipe the Active pack. Session, auth, and badge history survive pack clears.
 
 ### Cold Start (PWA killed → reopened offline)
 
@@ -542,4 +556,4 @@ Appears when:
 
 ---
 
-**Last updated:** 2026-06-26 — Phase 45 Camp HQ: IDB `camp_location` read offline; admin write network-only; hook-mount sync (not reconnect batch).
+**Last updated:** 2026-08-11 — Phase 47: Active Festival pack clear on switch; per-Festival cache version invalidation.

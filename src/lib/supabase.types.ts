@@ -18,6 +18,7 @@ export type Database = {
           country: string | null;
           special_badges: string[];
           wacken_arrival_day: string | null;
+          active_festival_id: string | null;
         };
         Insert: {
           id?: string;
@@ -33,6 +34,7 @@ export type Database = {
           country?: string | null;
           special_badges?: string[];
           wacken_arrival_day?: string | null;
+          active_festival_id?: string | null;
         };
         Update: {
           id?: string;
@@ -48,12 +50,68 @@ export type Database = {
           country?: string | null;
           special_badges?: string[];
           wacken_arrival_day?: string | null;
+          active_festival_id?: string | null;
+        };
+        Relationships: [];
+      };
+      festivals: {
+        Row: {
+          id: string;
+          slug: string;
+          name: string;
+          timezone: string;
+          starts_at: string;
+          ends_at: string;
+          features: Json;
+          cache_version: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          slug: string;
+          name: string;
+          timezone?: string;
+          starts_at: string;
+          ends_at: string;
+          features?: Json;
+          cache_version?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          slug?: string;
+          name?: string;
+          timezone?: string;
+          starts_at?: string;
+          ends_at?: string;
+          features?: Json;
+          cache_version?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      festival_memberships: {
+        Row: {
+          user_id: string;
+          festival_id: string;
+          opted_in_at: string;
+        };
+        Insert: {
+          user_id: string;
+          festival_id: string;
+          opted_in_at?: string;
+        };
+        Update: {
+          user_id?: string;
+          festival_id?: string;
+          opted_in_at?: string;
         };
         Relationships: [];
       };
       bands: {
         Row: {
           id: string;
+          festival_id: string;
           name: string;
           stage: string;
           start_time: string;
@@ -63,6 +121,7 @@ export type Database = {
         };
         Insert: {
           id?: string;
+          festival_id: string;
           name: string;
           stage: string;
           start_time: string;
@@ -72,6 +131,7 @@ export type Database = {
         };
         Update: {
           id?: string;
+          festival_id?: string;
           name?: string;
           stage?: string;
           start_time?: string;
@@ -85,16 +145,19 @@ export type Database = {
         Row: {
           user_id: string;
           band_id: string;
+          festival_id: string;
           created_at: string;
         };
         Insert: {
           user_id: string;
           band_id: string;
+          festival_id: string;
           created_at?: string;
         };
         Update: {
           user_id?: string;
           band_id?: string;
+          festival_id?: string;
           created_at?: string;
         };
         Relationships: [];
@@ -123,6 +186,7 @@ export type Database = {
       announcements: {
         Row: {
           id: string;
+          festival_id: string;
           author_id: string;
           content: string;
           created_at: string;
@@ -131,6 +195,7 @@ export type Database = {
         };
         Insert: {
           id?: string;
+          festival_id: string;
           author_id: string;
           content: string;
           created_at?: string;
@@ -139,6 +204,7 @@ export type Database = {
         };
         Update: {
           id?: string;
+          festival_id?: string;
           author_id?: string;
           content?: string;
           created_at?: string;

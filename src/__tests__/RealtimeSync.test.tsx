@@ -1,14 +1,21 @@
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { TEST_FESTIVAL_ID } from './helpers/testFestival';
 
 const {
   subscribeToRealtime,
   subscribeToMetalPlaceConfigRealtime,
   subscribeToLiveBandTestConfigRealtime,
+  mockGetActiveFestivalId,
 } = vi.hoisted(() => ({
   subscribeToRealtime: vi.fn().mockReturnValue(() => {}),
   subscribeToMetalPlaceConfigRealtime: vi.fn().mockReturnValue(() => {}),
   subscribeToLiveBandTestConfigRealtime: vi.fn().mockReturnValue(() => {}),
+  mockGetActiveFestivalId: vi.fn().mockResolvedValue('wacken-2026'),
+}));
+
+vi.mock('../lib/db', () => ({
+  getActiveFestivalId: mockGetActiveFestivalId,
 }));
 
 vi.mock('../repositories', () => ({
@@ -29,21 +36,25 @@ import { RealtimeSync } from '../components/sync/RealtimeSync';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockGetActiveFestivalId.mockResolvedValue(TEST_FESTIVAL_ID);
   subscribeToRealtime.mockReturnValue(() => {});
   subscribeToMetalPlaceConfigRealtime.mockReturnValue(() => {});
   subscribeToLiveBandTestConfigRealtime.mockReturnValue(() => {});
 });
 
 describe('RealtimeSync', () => {
-  it('mounts all repository Realtime subscriptions on mount', () => {
+  it('mounts all repository Realtime subscriptions on mount with active festival id', async () => {
     render(<RealtimeSync />);
 
-    expect(subscribeToRealtime).toHaveBeenCalledTimes(7);
+    await waitFor(() => {
+      expect(subscribeToRealtime).toHaveBeenCalledTimes(7);
+    });
+    expect(subscribeToRealtime).toHaveBeenCalledWith(TEST_FESTIVAL_ID);
     expect(subscribeToMetalPlaceConfigRealtime).toHaveBeenCalledOnce();
     expect(subscribeToLiveBandTestConfigRealtime).toHaveBeenCalledOnce();
   });
 
-  it('cleans up all subscriptions on unmount', () => {
+  it('cleans up all subscriptions on unmount', async () => {
     const unsubPicks = vi.fn();
     const unsubAnnouncements = vi.fn();
     const unsubPresence = vi.fn();
@@ -66,6 +77,9 @@ describe('RealtimeSync', () => {
     subscribeToLiveBandTestConfigRealtime.mockReturnValue(unsubLiveBandTest);
 
     const { unmount } = render(<RealtimeSync />);
+    await waitFor(() => {
+      expect(subscribeToRealtime).toHaveBeenCalledTimes(7);
+    });
     unmount();
 
     expect(unsubPicks).toHaveBeenCalledOnce();

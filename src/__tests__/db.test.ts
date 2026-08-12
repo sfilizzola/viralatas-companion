@@ -107,6 +107,7 @@ const WIPE_PRESERVED_STORES = WIPE_PRESERVED_OBJECT_STORES;
 
 const sampleBand: Band = {
   id: 'band-1',
+    festival_id: 'wacken-2026',
   slot_id: 'FAS1',
   name: 'Test Band',
   stage: 'Faster',
@@ -118,9 +119,7 @@ const sampleBand: Band = {
 };
 
 const samplePick = (userId: string, bandId: string): UserPick => ({
-  user_id: userId,
-  band_id: bandId,
-  created_at: '2026-05-01T12:00:00Z',
+  user_id: userId, band_id: bandId, festival_id: 'wacken-2026', created_at: '2026-05-01T12:00:00Z',
 });
 
 const samplePresence = (userId: string, overrides: Partial<UserPresence> = {}): UserPresence => ({
@@ -132,6 +131,7 @@ const samplePresence = (userId: string, overrides: Partial<UserPresence> = {}): 
 
 const sampleAnnouncement = (id: string, createdAt: string): Announcement => ({
   id,
+  festival_id: 'wacken-2026',
   author_id: 'user-1',
   content: `Announcement ${id}`,
   created_at: createdAt,
@@ -303,6 +303,7 @@ describe('IndexedDB layer (lib/db.ts)', () => {
         id: 'op-1',
         user_id: 'user-1',
         band_id: 'band-1',
+        festival_id: 'wacken-2026',
         action: 'add' as const,
         created_at: '2026-05-01T12:00:00Z',
       };
@@ -738,6 +739,7 @@ describe('IndexedDB layer (lib/db.ts)', () => {
         id: 'op-1',
         user_id: 'user-1',
         band_id: 'band-1',
+        festival_id: 'wacken-2026',
         action: 'add',
         created_at: '2026-05-01T12:00:00Z',
       });

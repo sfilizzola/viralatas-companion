@@ -2,7 +2,7 @@ import { openDB, type IDBPDatabase } from 'idb';
 import type { ViralatasDB } from './types';
 
 export const DB_NAME = 'viralatas-db';
-export const DB_VERSION = 14;
+export const DB_VERSION = 15;
 
 /** Canonical object store list — keep in sync with the upgrade() block below. */
 export const VIRALATAS_OBJECT_STORES = [
