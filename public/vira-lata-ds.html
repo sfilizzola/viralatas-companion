@@ -67,6 +67,7 @@
     --role-conflict: #f9c66b;
 
     /* ---- stages (canonical, never reinterpret) ---- */
+    /* Wacken Open Air */
     --stage-faster:     #2980b9;
     --stage-harder:     #e67e22;
     --stage-louder:     #8e44ad;
@@ -75,6 +76,11 @@
     --stage-wasteland:  #2c3e50;
     --stage-wackinger:  #95a5a6;
     --stage-jungle:     #f39c12;  /* same as signal-warn */
+    /* Summer Breeze Open Air */
+    --stage-main:             #e63946;
+    --stage-t:                #00bbf9;
+    --stage-tool-rebel:       #fee440;
+    --stage-campsite-circus:  #9b5de5;
 
     /* ---- type ---- */
     --font-display: 'Oswald', 'Helvetica Neue Condensed', 'Arial Narrow', sans-serif;
@@ -2732,7 +2738,7 @@
     "ceremony": ["--ceremony-gold","--ceremony-gold-dim","--ceremony-gold-bg","--ceremony-gold-soft","--ceremony-gold-muted","--ceremony-gold-border"],
     "location": ["--metal-place-bright","--metal-place","--metal-place-dim","--metal-place-bg"],
     "roles":    ["--role-manager","--role-manager-soft","--role-manager-muted","--role-godlike","--role-godlike-soft","--role-godlike-muted","--role-conflict"],
-    "stages":   ["--stage-faster","--stage-harder","--stage-louder","--stage-wet","--stage-headbangers","--stage-wasteland","--stage-wackinger","--stage-jungle"],
+    "stages":   ["--stage-faster","--stage-harder","--stage-louder","--stage-wet","--stage-headbangers","--stage-wasteland","--stage-wackinger","--stage-jungle","--stage-main","--stage-t","--stage-tool-rebel","--stage-campsite-circus"],
     "type":     ["--font-display","--font-sans","--font-mono"],
     "spacing":  ["--s-1","--s-2","--s-3","--s-4","--s-5","--s-6","--s-8","--s-10","--s-12"],
     "radii":    ["--r-0","--r-1","--r-2","--r-3","--r-pill"]
@@ -2864,7 +2870,7 @@
       <div class="swatch"><div class="chip swatch-ink" style="background:#555">#555555</div><div class="meta"><div class="name">Text Faint</div><div class="tok">--text-faint</div><div class="hex">disabled</div></div></div>
     </div>
 
-    <div class="subhead">Stage palette &middot; canonical, never reinterpret</div>
+    <div class="subhead">Stage palette &middot; Wacken Open Air</div>
     <div class="stage-rail">
       <div style="background:#2980b9"><div class="name">Faster</div><div><div>Main Infield</div><div class="hex">#2980B9</div></div></div>
       <div style="background:#e67e22"><div class="name">Harder</div><div><div>Main Infield</div><div class="hex">#E67E22</div></div></div>
@@ -2875,7 +2881,15 @@
       <div class="swatch-ink" style="background:#95a5a6"><div class="name">Wackinger</div><div><div>Specialized</div><div class="hex">#95A5A6</div></div></div>
       <div style="background:#f39c12"><div class="name">W.T.J.</div><div><div>Specialized</div><div class="hex">#F39C12</div></div></div>
     </div>
-    <p class="t-small mt-3">Use stage colors as solid fills (badges, stripes, pills, hero strips). When tinting at low alpha, target 8–18% over surface; never tint backgrounds above 25% — they stop reading as accent.</p>
+
+    <div class="subhead mt-6">Stage palette &middot; Summer Breeze Open Air</div>
+    <div class="stage-rail">
+      <div style="background:#e63946"><div class="name">Main</div><div><div>Main Stage</div><div class="hex">#E63946</div></div></div>
+      <div class="swatch-ink" style="background:#00bbf9"><div class="name">T-Stage</div><div><div>Parallel</div><div class="hex">#00BBF9</div></div></div>
+      <div class="swatch-ink" style="background:#fee440"><div class="name">Tool Rebel</div><div><div>Wera Tool Rebel</div><div class="hex">#FEE440</div></div></div>
+      <div style="background:#9b5de5"><div class="name">Circus</div><div><div>Campsite Circus</div><div class="hex">#9B5DE5</div></div></div>
+    </div>
+    <p class="t-small mt-3">Use stage colors as solid fills (badges, stripes, pills, hero strips). When tinting at low alpha, target 8–18% over surface; never tint backgrounds above 25% — they stop reading as accent. Unknown stages fall back to <code>--accent</code>.</p>
 
     <div class="subhead mt-8">Stage color token map</div>
     <table class="ds-table">
@@ -2892,49 +2906,73 @@
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#2980b9"></span>Faster</td>
           <td>--stage-faster</td>
           <td><code>#2980B9</code></td>
-          <td>Main Infield stage badge</td>
+          <td>Wacken · Main Infield</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#e67e22"></span>Harder</td>
           <td>--stage-harder</td>
           <td><code>#E67E22</code></td>
-          <td>Main Infield stage badge</td>
+          <td>Wacken · Main Infield</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#8e44ad"></span>Louder</td>
           <td>--stage-louder</td>
           <td><code>#8E44AD</code></td>
-          <td>Main Infield stage badge</td>
+          <td>Wacken · Main Infield</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#c0392b"></span>W.E.T.</td>
           <td>--stage-wet</td>
           <td><code>#C0392B</code></td>
-          <td>Outside Infield; also --signal-live / --accent (5× Wacken role)</td>
+          <td>Wacken · Outside Infield; also --signal-live / --accent (5× Wacken role)</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#16a085"></span>Headbangers</td>
           <td>--stage-headbangers</td>
           <td><code>#16A085</code></td>
-          <td>Outside Infield; also --signal-ok (camping state)</td>
+          <td>Wacken · Outside Infield; also --signal-ok (camping state)</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#2c3e50"></span>Wasteland</td>
           <td>--stage-wasteland</td>
           <td><code>#2C3E50</code></td>
-          <td>Specialized venue</td>
+          <td>Wacken · Specialized venue</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#95a5a6"></span>Wackinger</td>
           <td>--stage-wackinger</td>
           <td><code>#95A5A6</code></td>
-          <td>Specialized venue</td>
+          <td>Wacken · Specialized venue</td>
         </tr>
         <tr>
           <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#f39c12"></span>W.T.J.</td>
           <td>--stage-jungle</td>
           <td><code>#F39C12</code></td>
-          <td>Specialized venue; also --signal-warn (conflict state)</td>
+          <td>Wacken · Specialized venue; also --signal-warn (conflict state)</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#e63946"></span>Main Stage</td>
+          <td>--stage-main</td>
+          <td><code>#E63946</code></td>
+          <td>Summer Breeze · headliners / main program</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#00bbf9"></span>T-Stage</td>
+          <td>--stage-t</td>
+          <td><code>#00BBF9</code></td>
+          <td>Summer Breeze · parallel main program (dark ribbon text)</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#fee440"></span>Wera Tool Rebel</td>
+          <td>--stage-tool-rebel</td>
+          <td><code>#FEE440</code></td>
+          <td>Summer Breeze · parallel main program (dark ribbon text)</td>
+        </tr>
+        <tr>
+          <td class="ds-table-key"><span class="ds-swatch-cell" style="background:#9b5de5"></span>Campsite Circus</td>
+          <td>--stage-campsite-circus</td>
+          <td><code>#9B5DE5</code></td>
+          <td>Summer Breeze · campsite stage</td>
         </tr>
       </tbody>
     </table>
@@ -7282,6 +7320,13 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.8 — Summer Breeze stage colors · Aug 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§01 Color</b> — Summer Breeze stage tokens: <code>--stage-main</code>, <code>--stage-t</code>, <code>--stage-tool-rebel</code>, <code>--stage-campsite-circus</code>; second stage rail + token-map rows.</li>
+          <li>Manifest <code>tokens.stages</code> extended with the four SB tokens.</li>
+        </ul>
+      </div>
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.7 — Phase 47 Multi-Festival · Aug 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">

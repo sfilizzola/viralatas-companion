@@ -10,9 +10,14 @@ export type StageToken =
   | '--stage-headbangers'
   | '--stage-wasteland'
   | '--stage-wackinger'
-  | '--stage-jungle';
+  | '--stage-jungle'
+  | '--stage-main'
+  | '--stage-t'
+  | '--stage-tool-rebel'
+  | '--stage-campsite-circus';
 
 export const STAGE_COLOR_TOKENS: Record<string, StageToken> = {
+  // Wacken Open Air
   Faster: '--stage-faster',
   Harder: '--stage-harder',
   Louder: '--stage-louder',
@@ -21,6 +26,11 @@ export const STAGE_COLOR_TOKENS: Record<string, StageToken> = {
   Wasteland: '--stage-wasteland',
   Wackinger: '--stage-wackinger',
   'Welcome to the Jungle': '--stage-jungle',
+  // Summer Breeze Open Air
+  'Main Stage': '--stage-main',
+  'T-Stage': '--stage-t',
+  'Wera Tool Rebel Stage': '--stage-tool-rebel',
+  'Campsite Circus Stage': '--stage-campsite-circus',
 };
 
 export function stageColorVar(stage: string): string {

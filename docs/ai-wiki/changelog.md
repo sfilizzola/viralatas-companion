@@ -4,6 +4,13 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-08-12
+
+### Added
+- **Summer Breeze stage UI colors** — four distinct CSS tokens (`--stage-main` scarlet, `--stage-t` cyan, `--stage-tool-rebel` yellow, `--stage-campsite-circus` violet) in `src/index.css` + `stageColors.ts` maps; DS §01 rails/token map + manifest; bright stages use dark ribbon text in `StageScheduleSheet`.
+
+### Changed
+- [festivals/summer-breeze-2026/stages.md](festivals/summer-breeze-2026/stages.md) — stage table now includes UI color tokens/hex; open question on colors closed.
 ## 2026-08-11
 
 ### Added

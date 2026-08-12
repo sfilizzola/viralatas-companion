@@ -20,6 +20,10 @@ describe('STAGE_COLOR_TOKENS', () => {
     ['Wasteland', '--stage-wasteland'],
     ['Wackinger', '--stage-wackinger'],
     ['Welcome to the Jungle', '--stage-jungle'],
+    ['Main Stage', '--stage-main'],
+    ['T-Stage', '--stage-t'],
+    ['Wera Tool Rebel Stage', '--stage-tool-rebel'],
+    ['Campsite Circus Stage', '--stage-campsite-circus'],
   ])('%s → %s token', (stage, token) => {
     expect(STAGE_COLOR_TOKENS[stage]).toBe(token);
   });
@@ -43,6 +47,10 @@ describe('STAGE_COLORS', () => {
     ['Wasteland', 'var(--stage-wasteland)'],
     ['Wackinger', 'var(--stage-wackinger)'],
     ['Welcome to the Jungle', 'var(--stage-jungle)'],
+    ['Main Stage', 'var(--stage-main)'],
+    ['T-Stage', 'var(--stage-t)'],
+    ['Wera Tool Rebel Stage', 'var(--stage-tool-rebel)'],
+    ['Campsite Circus Stage', 'var(--stage-campsite-circus)'],
   ])('%s → %s', (stage, cssVar) => {
     expect(STAGE_COLORS[stage]).toBe(cssVar);
   });
@@ -58,6 +66,10 @@ describe('stageColor()', () => {
     ['Wasteland', 'var(--stage-wasteland)'],
     ['Wackinger', 'var(--stage-wackinger)'],
     ['Welcome to the Jungle', 'var(--stage-jungle)'],
+    ['Main Stage', 'var(--stage-main)'],
+    ['T-Stage', 'var(--stage-t)'],
+    ['Wera Tool Rebel Stage', 'var(--stage-tool-rebel)'],
+    ['Campsite Circus Stage', 'var(--stage-campsite-circus)'],
   ])('%s → %s', (stage, expected) => {
     expect(stageColor(stage)).toBe(expected);
   });
@@ -72,7 +84,7 @@ describe('stageColor()', () => {
 });
 
 describe('stageColorVar()', () => {
-  it('returns the same result as stageColor() for all 8 stages', () => {
+  it('returns the same result as stageColor() for all known stages', () => {
     const stages = [
       'Faster',
       'Harder',
@@ -82,6 +94,10 @@ describe('stageColorVar()', () => {
       'Wasteland',
       'Wackinger',
       'Welcome to the Jungle',
+      'Main Stage',
+      'T-Stage',
+      'Wera Tool Rebel Stage',
+      'Campsite Circus Stage',
     ];
     for (const stage of stages) {
       expect(stageColorVar(stage)).toBe(stageColor(stage));

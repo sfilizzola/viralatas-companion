@@ -126,6 +126,7 @@
   --ceremony-gold-bg:  rgba(212,175,55,0.07);
 
   /* ---------- stages (canonical, never reinterpret) ---------- */
+  /* Wacken Open Air */
   --stage-faster: #2980b9;
   --stage-harder: #e67e22;
   --stage-louder: #8e44ad;
@@ -134,6 +135,11 @@
   --stage-wasteland: #2c3e50;
   --stage-wackinger: #95a5a6;
   --stage-jungle: #f39c12;
+  /* Summer Breeze Open Air — distinct hues so stages never collide visually */
+  --stage-main: #e63946;
+  --stage-t: #00bbf9;
+  --stage-tool-rebel: #fee440;
+  --stage-campsite-circus: #9b5de5;
 
   /* ---------- type ---------- */
   --font-display: 'Oswald', 'Helvetica Neue Condensed', 'Arial Narrow', sans-serif;
