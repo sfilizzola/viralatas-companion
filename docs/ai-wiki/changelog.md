@@ -7,6 +7,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 ## 2026-08-12
 
 ### Added
+- **Release v1.5.3** — Stage Radar on `/now` when `features.camp` is off (Summer Breeze); camping + lost when camp is on.
 - **Stage Radar (Phase 48)** — When `features.camp` is off, `/now` shows a Variant B 2-col stage tile grid under crew band cards (`buildStageRadarSnapshot` + `StageRadarSection` / `StageRadarSheet`). Pick-based “N going”; live/next/done. When `camp` is on: camping + lost cards (no radar). Metal Place stays on its own flag. DS §17; flow: [live-now.md](flows/live-now.md).
 - **Release v1.5.2** — Summer Breeze companion pack on `main` (festival seed/wiki, muted stage colors, festival-scoped mural links, late-joiner crew hydration, `/now` header + N-day lineup tabs).
 - **[Add Festival (Ops)](add-festival-ops.md)** — Runbook for `npm run seed:festival`, festival-scoped band seeding (`--festival`), feature JSON keys, user Join/Active path, and safety notes. Linked from index, schema (`festivals`), and domain-model (Festival catalog).
