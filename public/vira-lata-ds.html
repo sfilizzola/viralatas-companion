@@ -2729,7 +2729,7 @@
     { "num": "14", "id": "stage-schedule-sheet", "title": "Stage Schedule Sheet",    "purpose": "Bottom sheet showing current/next band per stage in a 2×4 grid; LIVE ribbon + pulsing dot; NEXT dimmed tile; --tile-color CSS custom prop per tile" },
     { "num": "15", "id": "camp-location",        "title": "Camp HQ Geolocation",      "purpose": "CampNavStrip (C+ gaffer tape), CampHqCard on Mural, CampMapDock (D1) below minimap, CampLocationSheet, CampPinIcon; --signal-ok* tokens" },
     { "num": "16", "id": "multi-festival",       "title": "Multi-Festival",           "purpose": "FestivalSwitcher on /now two-band header; Festivals catalog Join/Leave/Activate on /festivals" },
-    { "num": "17", "id": "stage-radar",          "title": "Stage Radar",              "purpose": "Presence-off /now tile grid (Variant B §14 grammar): live/next/done per stage + pick-based going counts + StageRadarSheet" },
+    { "num": "17", "id": "stage-radar",          "title": "Stage Radar",              "purpose": "/now tile grid when features.camp is off (Variant B §14 grammar): live/next/done + pick-based going; camping+lost when camp is on" },
     { "num": null, "id": "changelog",             "title": "Changelog",               "purpose": "Dated revision history of the design system" }
   ],
   "tokens": {
@@ -7336,14 +7336,14 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
       <div class="num">17</div>
       <div>
         <h2>Stage Radar</h2>
-        <p class="desc">Phase 48. On presence-off festivals (e.g. Summer Breeze), fills the camping/lost slot under crew band cards on <code>/now</code>. Locked visual: <b>Variant B</b> — 2-column §14 schedule tiles with pick-based “N going” and a picker detail sheet.</p>
+        <p class="desc">Phase 48. When <code>features.camp</code> is off (e.g. Summer Breeze), fills the camping/lost slot under crew band cards on <code>/now</code>. When camp is on: camping + lost cards. Locked visual: <b>Variant B</b> — 2-column §14 schedule tiles with pick-based “N going” and a picker detail sheet.</p>
       </div>
     </div>
 
     <div class="subhead">Gate &amp; data</div>
     <div class="demo-notes">
       <ul>
-        <li>Mount when <code>!canShowPresence(festival)</code> (<code>camp</code> and <code>metal_place</code> both off)</li>
+        <li>Mount when <code>!canShowCamp(festival)</code> (<code>features.camp</code> off). When camp is on: camping + lost cards instead (no radar). Metal Place stays on <code>features.metal_place</code>.</li>
         <li>Pure helper <code>buildStageRadarSnapshot(bands, picks, crewUsers, now, { liveTestBandId })</code> in <code>src/services/stageRadar.ts</code> — applies <code>applyLiveBandTestOverride</code>; emits <code>live</code> | <code>next</code> | <code>done</code> for every distinct stage</li>
         <li>Picker count = Active Festival crew roster members who picked that stage’s live/next band (self included). Done → 0</li>
         <li>Hide when loading or <code>bands.length === 0</code></li>

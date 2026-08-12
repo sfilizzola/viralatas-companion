@@ -90,7 +90,7 @@ export default function RightNowPage() {
   const showPresence = canShowPresence(festival);
   const showCamp = canShowCamp(festival);
   const showMetalPlace = canShowMetalPlace(festival);
-  const showStageRadar = !showPresence;
+  const showStageRadar = !showCamp;
   const liveTestBandId = liveTestBand?.id ?? null;
 
   const radarEntries = useMemo(() => {
@@ -103,10 +103,10 @@ export default function RightNowPage() {
       crewGroups.filter((group) => {
         if (group.kind === 'camping') return showCamp;
         if (group.kind === 'metal_place') return showMetalPlace;
-        if (group.kind === 'lost') return showPresence;
+        if (group.kind === 'lost') return showCamp;
         return true;
       }),
-    [crewGroups, showCamp, showMetalPlace, showPresence],
+    [crewGroups, showCamp, showMetalPlace],
   );
 
   const timeDelta = nextBand

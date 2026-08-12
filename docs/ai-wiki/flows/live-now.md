@@ -519,13 +519,15 @@ User sees: Slipknot as CURRENT (15 min into set)
 
 ### Stage Radar (presence-off festivals)
 
-When `canShowPresence(festival)` is false (Summer Breeze: no camp / metal place), `RightNowPage` mounts **Stage Radar** below `CrewGroupsSection`:
+When `canShowCamp(festival)` is false (e.g. Summer Breeze `features.camp`), `RightNowPage` mounts **Stage Radar** below `CrewGroupsSection` instead of camping/lost cards:
 
 1. `buildStageRadarSnapshot(bands, picks, crewUsers, now, { liveTestBandId })` — one entry per distinct stage (`live` | `next` | `done`), sorted live → next-by-start → done-by-name. Applies the same live-band test override as crew plans.
 2. `StageRadarSection` — Variant B 2-column tiles (§14 Stage Schedule Sheet grammar + “N going” + done state). Done tiles are not buttons.
 3. Tap live/next → `StageRadarSheet` lists roster pickers (count-only on tiles).
 
-Wacken and other presence-on festivals are unchanged (camping/lost/metal place cards; no radar).
+**Gate:** `features.camp === true` → camping + lost crew groups (and PresenceToggle camping option). `features.camp` off → Stage Radar. Metal Place remains independently gated by `features.metal_place`.
+
+Festivals with camping on (Wacken) keep camping/lost; no radar.
 
 ### Group Order
 
