@@ -5,55 +5,61 @@
   background: var(--bg);
 }
 
+/* Two-band instrument header — masthead (title + clock) over toolbar (festival + actions).
+   Avoids the old single-row crush where long festival names fought Stages/Map/timestamp. */
 .header {
-  padding: 14px var(--s-4) 13px;
+  padding: 12px var(--s-4) 12px;
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--s-3);
+  flex-direction: column;
+  gap: 10px;
 }
 
-.headerLeft {
+.masthead {
   display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s-3);
   min-width: 0;
 }
 
 .title {
   display: block;
   margin: 0;
+  min-width: 0;
   font-family: var(--font-display);
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   letter-spacing: 0;
   line-height: 1;
   text-transform: uppercase;
 }
 
-.headerRight {
+.toolbar {
   display: flex;
   align-items: center;
   gap: var(--s-2);
+  min-width: 0;
 }
 
-.headerDivider {
-  width: 1px;
-  height: 18px;
-  background: var(--border-strong);
-  flex-shrink: 0;
-  margin: 0 var(--s-1);
-}
-
-.chip {
+.actions {
   display: flex;
   align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.chip,
+.mapButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   gap: 5px;
-  height: 26px;
-  padding: 0 8px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 10px;
   border-radius: 4px;
   border: 1px solid var(--border);
   background: var(--bg-surface);
@@ -69,70 +75,50 @@
   transition: color 0.12s ease, border-color 0.12s ease;
 }
 
-.chip svg {
-  width: 13px;
-  height: 13px;
-  flex-shrink: 0;
-}
-
-.chip:hover {
-  color: var(--text);
-  border-color: var(--border-strong);
-}
-
-.mapButton {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  height: 26px;
-  padding: 0 8px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text-muted);
-  font-family: var(--font-mono);
-  font-size: 10px;
-  line-height: 1;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  white-space: nowrap;
-  text-decoration: none;
-  transition: color 0.12s ease, border-color 0.12s ease;
-}
-
+.chip svg,
 .mapButton svg {
-  width: 13px;
-  height: 13px;
+  width: 14px;
+  height: 14px;
   flex-shrink: 0;
 }
 
+.chip:hover,
 .mapButton:hover {
   color: var(--text);
   border-color: var(--border-strong);
 }
 
 .timestamp {
-  color: var(--text-muted);
+  flex-shrink: 0;
+  color: var(--text);
   font-family: var(--font-mono);
-  font-size: 10px;
-  line-height: 1.25;
+  font-size: 11px;
+  line-height: 1;
   text-align: right;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
-.timestampValue {
-  display: block;
-  font-size: 11px;
-  color: var(--text);
-  line-height: 1;
-  margin-bottom: 2px;
-}
+/* Narrow phones: icon-only action chips so the festival trigger keeps the width. */
+@media (max-width: 420px) {
+  .chip,
+  .mapButton {
+    width: 32px;
+    padding: 0;
+  }
 
-.timestampLabel {
-  display: block;
-  font-size: 9px;
-  color: var(--text-faint);
-  letter-spacing: 0.08em;
+  .chipLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
 }
 
 .main {

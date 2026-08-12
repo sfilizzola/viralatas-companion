@@ -36,14 +36,14 @@ Do **not** confuse with [Wacken stages](../../stages.md) — that page is WOA-on
 
 | Stage | `slot_id` prefix | UI Color | Hex | Notes |
 |-------|-------------------|----------|-----|-------|
-| Main Stage | `MAI` | `var(--stage-main)` | `#e63946` (Scarlet) | Headliners / main program |
-| T-Stage | `TST` | `var(--stage-t)` | `#00bbf9` (Cyan) | Parallel main program |
-| Wera Tool Rebel Stage | `TRB` | `var(--stage-tool-rebel)` | `#fee440` (Yellow) | Parallel main program |
-| Campsite Circus Stage | `CAM` | `var(--stage-campsite-circus)` | `#9b5de5` (Violet) | Campsite stage (Tue pre-day + Wed–Sat) |
+| Main Stage | `MAI` | `var(--stage-main)` | `#9b2c2c` (Dried blood) | Headliners / main program |
+| T-Stage | `TST` | `var(--stage-t)` | `#1a5f7a` (Oxidized steel) | Parallel main program |
+| Wera Tool Rebel Stage | `TRB` | `var(--stage-tool-rebel)` | `#8b5a1f` (Darkened brass) | Parallel main program |
+| Campsite Circus Stage | `CAM` | `var(--stage-campsite-circus)` | `#5b3a8c` (Deep amethyst) | Campsite stage (Tue pre-day + Wed–Sat) |
 
 Poster labels often read `CAMPSITE CIRCUS` / `TOOL REBEL STAGE`; wiki + seed use the names above.
 
-Stage colors live in `src/index.css` as CSS custom properties. `stageColors.ts` maps the exact stage name strings above to `var(--stage-*)` tokens. Bright stages (`T-Stage`, `Wera Tool Rebel Stage`) use dark ribbon text in `StageScheduleSheet`.
+Stage colors live in `src/index.css` as CSS custom properties. `stageColors.ts` maps the exact stage name strings above to `var(--stage-*)` tokens. All four SB stages are dark enough for white ribbon text in `StageScheduleSheet`.
 
 ### Slot ID
 

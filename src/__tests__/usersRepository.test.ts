@@ -13,6 +13,8 @@ vi.mock('../lib/supabase', () => ({
 
 vi.mock('../lib/db', () => ({
   saveCrewUsers: vi.fn().mockResolvedValue(undefined),
+  upsertCrewUsers: vi.fn().mockResolvedValue(undefined),
+  loadCrewUsers: vi.fn().mockResolvedValue([]),
 }));
 
 import { supabase } from '../lib/supabase';
@@ -127,6 +129,53 @@ describe('usersRepository.syncCrew', () => {
     await usersRepository.syncCrew();
 
     expect(supabase.auth.updateUser).not.toHaveBeenCalled();
+  });
+});
+
+describe('usersRepository.ensureCrewUsers', () => {
+  it('fetches and upserts only ids missing from local crew roster', async () => {
+    vi.mocked(db.loadCrewUsers).mockResolvedValue([
+      { id: 'u1', display_name: 'Alice', avatar_url: null, wacken_arrival_day: null, is_friend: false, special_badges: [] },
+    ] as any);
+
+    const mockIn = vi.fn().mockResolvedValue({
+      data: [
+        {
+          id: 'u2',
+          display_name: 'Bob',
+          avatar_url: 'https://cdn.example/bob.png',
+          wacken_arrival_day: null,
+          is_friend: true,
+          special_badges: null,
+        },
+      ],
+      error: null,
+    });
+    const mockSelect = vi.fn().mockReturnValue({ in: mockIn });
+    vi.mocked(supabase.from).mockReturnValue({ select: mockSelect } as any);
+
+    await usersRepository.ensureCrewUsers(['u1', 'u2', 'u2']);
+
+    expect(mockIn).toHaveBeenCalledWith('id', ['u2']);
+    expect(db.upsertCrewUsers).toHaveBeenCalledWith([
+      expect.objectContaining({
+        id: 'u2',
+        display_name: 'Bob',
+        avatar_url: 'https://cdn.example/bob.png',
+        special_badges: [],
+      }),
+    ]);
+  });
+
+  it('no-ops when all ids are already cached', async () => {
+    vi.mocked(db.loadCrewUsers).mockResolvedValue([
+      { id: 'u1', display_name: 'Alice', avatar_url: null, wacken_arrival_day: null },
+    ] as any);
+
+    await usersRepository.ensureCrewUsers(['u1']);
+
+    expect(supabase.from).not.toHaveBeenCalled();
+    expect(db.upsertCrewUsers).not.toHaveBeenCalled();
   });
 });
 

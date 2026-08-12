@@ -22,7 +22,7 @@ export {
   wipeTargetObjectStores,
 } from './connection';
 export { saveSession, loadSession, clearSession } from './session';
-export { saveBands, loadBands, saveCrewUsers, loadCrewUsers } from './catalog';
+export { saveBands, loadBands, saveCrewUsers, upsertCrewUsers, loadCrewUsers } from './catalog';
 export {
   saveUserPick,
   removeUserPick,

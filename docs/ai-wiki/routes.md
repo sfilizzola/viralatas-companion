@@ -152,6 +152,7 @@ Most festival social routes additionally wrap with `<FestivalGate>` (and optiona
 **Access**: `PrivateRoute` + `FestivalGate`
 
 **Key Features**:
+- **Header (two-band)** — Masthead: title + festival clock. Toolbar: `FestivalSwitcher` (flex-grow, ellipsis) + Stages/Map actions (icon-only ≤420px). Festival name lives only on the switcher — no duplicate `{name} time` subtitle.
 - **FestivalSwitcher** — Shows Active Festival name; dropdown to switch among joined Festivals (online; need-signal toast offline)
 - **Current/Next band for user** — What the user picked that's happening now/next
 - **Crew grid** — Where Festival crew is (camping vs. Metal Place when features enabled)
@@ -537,4 +538,4 @@ AnnouncementsPage (offline)
 
 ---
 
-**Last updated:** 2026-08-11 — Phase 47: `/festivals`, `FestivalGate`, `FeatureRoute` for `/map` + `/wrap`, FestivalSwitcher on `/now`
+**Last updated:** 2026-08-12 — `/now` header two-band layout (masthead + festival toolbar) for mobile; Phase 47: `/festivals`, `FestivalGate`, `FeatureRoute` for `/map` + `/wrap`, FestivalSwitcher on `/now`

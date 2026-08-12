@@ -124,45 +124,47 @@ export default function RightNowPage() {
     <div className={styles.page}>
       <OfflineBanner />
       <header className={styles.header}>
-        <div className={styles.headerLeft}>
+        <div className={styles.masthead}>
           <span className={styles.title}>{t('title')}</span>
-          <FestivalSwitcher />
-        </div>
-        <div className={styles.headerRight}>
-          <button
-            className={styles.chip}
-            type="button"
-            aria-label={t('stagesButton')}
-            onClick={() => setShowStageSheet(true)}
-          >
-            <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
-              <rect x="1" y="1" width="7" height="7" rx="1" />
-              <rect x="10" y="1" width="7" height="7" rx="1" />
-              <rect x="1" y="10" width="7" height="7" rx="1" />
-              <rect x="10" y="10" width="7" height="7" rx="1" />
-            </svg>
-            <span>{t('stagesButton')}</span>
-          </button>
-          {showMap && (
-            <Link to="/map" className={styles.mapButton} aria-label={t('mapButton')}>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11Z"/>
-                <path d="M12.6 6.2 10 10.4h2.1l-1 3.3 2.9-4.4h-2.1l.8-3.1Z" fill="currentColor" stroke="none"/>
-              </svg>
-              <span>{t('mapButton')}</span>
-            </Link>
-          )}
-          <div className={styles.headerDivider} aria-hidden="true" />
-          <span className={styles.timestamp}>
-            <span className={styles.timestampValue}>
-              {nowLabel(now, language, festival?.timezone ?? 'Europe/Berlin')}
-            </span>
-            <span className={styles.timestampLabel}>
-              {festival
+          <time
+            className={styles.timestamp}
+            dateTime={now.toISOString()}
+            aria-label={
+              festival
                 ? t('festivalTime', { name: festival.name })
-                : t('festivalTimeFallback')}
-            </span>
-          </span>
+                : t('festivalTimeFallback')
+            }
+          >
+            {nowLabel(now, language, festival?.timezone ?? 'Europe/Berlin')}
+          </time>
+        </div>
+        <div className={styles.toolbar}>
+          <FestivalSwitcher />
+          <div className={styles.actions}>
+            <button
+              className={styles.chip}
+              type="button"
+              aria-label={t('stagesButton')}
+              onClick={() => setShowStageSheet(true)}
+            >
+              <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                <rect x="1" y="1" width="7" height="7" rx="1" />
+                <rect x="10" y="1" width="7" height="7" rx="1" />
+                <rect x="1" y="10" width="7" height="7" rx="1" />
+                <rect x="10" y="10" width="7" height="7" rx="1" />
+              </svg>
+              <span className={styles.chipLabel}>{t('stagesButton')}</span>
+            </button>
+            {showMap && (
+              <Link to="/map" className={styles.mapButton} aria-label={t('mapButton')}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11Z"/>
+                  <path d="M12.6 6.2 10 10.4h2.1l-1 3.3 2.9-4.4h-2.1l.8-3.1Z" fill="currentColor" stroke="none"/>
+                </svg>
+                <span className={styles.chipLabel}>{t('mapButton')}</span>
+              </Link>
+            )}
+          </div>
         </div>
       </header>
 

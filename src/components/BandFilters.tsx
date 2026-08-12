@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent } from 'react';
 import { useI18n } from '../lib/i18n';
 import { sortFilterGenres } from '../services/genreGuide';
 import { stageColor } from '../services/stageColors';
@@ -213,7 +213,12 @@ export default function BandFilters({
 
         {days.length > 0 && (
           <div className={styles.dayTabsRow}>
-            <div className={styles.dayTabs} role="tablist" aria-label={t('dia')}>
+            <div
+              className={`${styles.dayTabs} ${days.length >= 5 ? styles.dayTabsDense : ''}`}
+              style={{ '--day-tab-count': days.length } as CSSProperties}
+              role="tablist"
+              aria-label={t('dia')}
+            >
               {days.map(({ label, date }, idx) => {
                 const d = new Date(date);
                 const dayNum = String(d.getUTCDate()).padStart(2, '0');

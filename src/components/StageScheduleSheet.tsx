@@ -14,13 +14,7 @@ type Props = {
 };
 
 /** Stages where the stage color is bright enough to need dark ribbon text. */
-const DARK_RIBBON_TEXT = new Set([
-  'Harder',
-  'Wackinger',
-  'Welcome to the Jungle',
-  'Wera Tool Rebel Stage', // --stage-tool-rebel yellow
-  'T-Stage', // --stage-t cyan
-]);
+const DARK_RIBBON_TEXT = new Set(['Harder', 'Wackinger', 'Welcome to the Jungle']);
 
 function ribbonTextColor(stage: string): string {
   return DARK_RIBBON_TEXT.has(stage) ? '#111' : '#fff';

@@ -135,11 +135,11 @@
   --stage-wasteland: #2c3e50;
   --stage-wackinger: #95a5a6;
   --stage-jungle: #f39c12;
-  /* Summer Breeze Open Air — distinct hues so stages never collide visually */
-  --stage-main: #e63946;
-  --stage-t: #00bbf9;
-  --stage-tool-rebel: #fee440;
-  --stage-campsite-circus: #9b5de5;
+  /* Summer Breeze Open Air — muted metal hues; readable white text on dark UI */
+  --stage-main: #9b2c2c;
+  --stage-t: #1a5f7a;
+  --stage-tool-rebel: #8b5a1f;
+  --stage-campsite-circus: #5b3a8c;
 
   /* ---------- type ---------- */
   --font-display: 'Oswald', 'Helvetica Neue Condensed', 'Arial Narrow', sans-serif;

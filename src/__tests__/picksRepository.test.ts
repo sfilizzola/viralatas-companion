@@ -83,8 +83,15 @@ vi.mock('../lib/db', () => ({
   getActiveFestivalId: mocks.mockGetActiveFestivalId,
 }));
 
+vi.mock('../repositories/users', () => ({
+  usersRepository: {
+    ensureCrewUsers: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+
 import { countPicks } from '../hooks/usePickCounts';
 import { picksRepository } from '../repositories/picks';
+import { usersRepository } from '../repositories/users';
 import type { OfflinePickOp } from '../lib/db';
 import type { UserPick } from '../types';
 
@@ -557,6 +564,7 @@ describe('picksRepository.syncCrewFromRemote()', () => {
     const replaced = mocks.mockReplaceUserPicks.mock.calls[0][0] as UserPick[];
     expect(replaced.every((p) => p.user_id === 'user1')).toBe(true);
     expect(countPicks(replaced)).toEqual({ band1: 1 });
+    expect(usersRepository.ensureCrewUsers).toHaveBeenCalledWith(['user1']);
   });
 
   it('clears IDB picks when festival has no memberships', async () => {
