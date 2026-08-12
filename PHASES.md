@@ -7,11 +7,25 @@ Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for proj
 
 ---
 
-## No active phased work
+## Phase 48 — Stage Radar (presence-off `/now`)
 
-**Next phase:** 48
+**Goal:** On festivals with camping/metal-place/presence features off (Summer Breeze), fill the empty slot under crew band cards with a Stage Radar: every stage live/next/done + pick-based “N going”, tap → picker sheet.
 
-Phase 47 (multi-festival) is complete — see `docs/ai-wiki/phases-history.md`.
+**Visual lock:** Variant B — 2-col §14 schedule tiles (LIVE ribbon, NEXT 0.72, done muted). Prototype: `docs/superpowers/prototypes/stage-radar/index.html`.
+
+### Acceptance
+
+- [ ] Presence-off Active Festival: Stage Radar under `CrewGroupsSection`; one tile per stage
+- [ ] Live / next / done correct vs festival `now` (+ live-band test override)
+- [ ] “N going” = crew roster pickers of that band; sheet lists names (+ you)
+- [ ] Presence-on festivals (Wacken): no radar; camping/lost unchanged
+- [ ] Offline from IDB after first load
+- [ ] No new backend schema
+- [ ] Wiki + DS § stage-radar + changelog updated
+
+### Relevant plan
+
+`docs/superpowers/plans/2026-08-12-stage-radar.md` (local scratch)
 
 ---
 

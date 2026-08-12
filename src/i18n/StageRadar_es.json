@@ -1,0 +1,17 @@
+{
+  "sectionTitle": "Escenarios · ahora",
+  "live": "EN VIVO",
+  "next": "PRÓXIMO",
+  "done": "FIN",
+  "going": "{count} van",
+  "doneEmpty": "No hay más sets hoy",
+  "startsAt": "empieza a las {time}",
+  "nextFoot": "Próx. · {time}",
+  "timeRange": "{start} – {end}",
+  "sheetGoing": "Van ({count})",
+  "you": "tú",
+  "close": "Cerrar",
+  "rowAriaLive": "En vivo en {stage}: {band}, {count} van",
+  "rowAriaNext": "Próximo en {stage}: {band} a las {time}, {count} van",
+  "rowAriaDone": "{stage}: no hay más sets hoy"
+}

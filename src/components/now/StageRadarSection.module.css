@@ -1,0 +1,216 @@
+/* Stage Radar — Variant B (§14 Stage Schedule Sheet grammar, inline on /now) */
+
+.section {
+  margin-top: var(--s-4);
+}
+
+.title {
+  margin: 0 0 var(--s-2);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.item {
+  margin: 0;
+  min-width: 0;
+}
+
+.tile {
+  --tile-color: var(--accent);
+  position: relative;
+  width: 100%;
+  min-height: 118px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  background: var(--bg-elevated);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: filter 0.14s;
+}
+
+.tile:active {
+  filter: brightness(1.12);
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--tile-color);
+  outline-offset: 2px;
+}
+
+.tileLive {
+  border-color: color-mix(in srgb, var(--tile-color) 25%, var(--border));
+}
+
+.tileNext {
+  opacity: 0.72;
+}
+
+.tileNext .bar {
+  opacity: 0.3;
+}
+
+.tileDone {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.tileDone .bar {
+  opacity: 0.2;
+}
+
+.bar {
+  height: 4px;
+  flex-shrink: 0;
+  background: var(--tile-color);
+}
+
+.ribbonWrap {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.ribbon {
+  position: absolute;
+  top: 14px;
+  right: -18px;
+  width: 76px;
+  transform: rotate(45deg);
+  transform-origin: center center;
+  background: var(--tile-color);
+  padding: 4px 0 3px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--ribbon-text, #fff);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.inner {
+  padding: 9px 11px 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  flex: 1;
+  min-width: 0;
+}
+
+.stageName {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--tile-color);
+  line-height: 1;
+  padding-right: 28px;
+}
+
+.bandName {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+  color: var(--text);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.doneEmpty {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: none;
+  margin-top: 4px;
+  line-height: 1.25;
+}
+
+.footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding-top: 6px;
+}
+
+.footTime {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-faint);
+  min-width: 0;
+}
+
+.tileLive .footTime {
+  color: var(--text-muted);
+}
+
+.going {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tile-color);
+  flex-shrink: 0;
+  animation: livePulse 1.6s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.65);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liveDot {
+    animation: none;
+  }
+}

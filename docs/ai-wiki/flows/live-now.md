@@ -19,6 +19,9 @@ Document how the app displays the current/next band for each crew member, includ
 | `src/hooks/useLiveBandTestConfig.ts` | Live band test config IDB + window events (Realtime via `RealtimeSync`) |
 | `src/components/sync/RealtimeSync.tsx` | Mounts repository Realtime subscriptions (Phase 27.D) |
 | `src/components/now/UpcomingBandCard.tsx` | Dismissible 15-minute pre-show banner (Phase 37) |
+| `src/services/stageRadar.ts` | `buildStageRadarSnapshot` — live/next/done per stage + pick counts (Phase 48) |
+| `src/components/now/StageRadarSection.tsx` | Variant B 2-col tile grid under crew groups when presence off |
+| `src/components/now/StageRadarSheet.tsx` | Picker detail sheet for live/next radar tiles |
 | `src/repositories/presence.ts` | `applyPresenceToggle`, `autoClearCampingOnCurrentBand`, `validateAndAutoCheckout` |
 | `src/services/livePreview.ts` | `findLivePlan`, `mapCrewLivePlans`, `groupCrewLivePlans`, `computeCrewLocationCounts` |
 | `src/lib/realtimeSync.ts` | `subscribePostgresChanges()` helper (Phase 26.H) |
@@ -513,6 +516,16 @@ User sees: Slipknot as CURRENT (15 min into set)
 ---
 
 ## Crew Grouping & Rendering
+
+### Stage Radar (presence-off festivals)
+
+When `canShowPresence(festival)` is false (Summer Breeze: no camp / metal place), `RightNowPage` mounts **Stage Radar** below `CrewGroupsSection`:
+
+1. `buildStageRadarSnapshot(bands, picks, crewUsers, now, { liveTestBandId })` — one entry per distinct stage (`live` | `next` | `done`), sorted live → next-by-start → done-by-name. Applies the same live-band test override as crew plans.
+2. `StageRadarSection` — Variant B 2-column tiles (§14 Stage Schedule Sheet grammar + “N going” + done state). Done tiles are not buttons.
+3. Tap live/next → `StageRadarSheet` lists roster pickers (count-only on tiles).
+
+Wacken and other presence-on festivals are unchanged (camping/lost/metal place cards; no radar).
 
 ### Group Order
 

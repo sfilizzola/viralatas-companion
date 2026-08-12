@@ -1,0 +1,17 @@
+{
+  "sectionTitle": "Stages · now",
+  "live": "LIVE",
+  "next": "NEXT",
+  "done": "DONE",
+  "going": "{count} going",
+  "doneEmpty": "No more sets today",
+  "startsAt": "starts {time}",
+  "nextFoot": "Next · {time}",
+  "timeRange": "{start} – {end}",
+  "sheetGoing": "Going ({count})",
+  "you": "you",
+  "close": "Close",
+  "rowAriaLive": "Live at {stage}: {band}, {count} going",
+  "rowAriaNext": "Next at {stage}: {band} at {time}, {count} going",
+  "rowAriaDone": "{stage}: no more sets today"
+}

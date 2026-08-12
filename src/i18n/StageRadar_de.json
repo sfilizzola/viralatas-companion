@@ -1,0 +1,17 @@
+{
+  "sectionTitle": "Bühnen · jetzt",
+  "live": "LIVE",
+  "next": "ALS NÄCHSTES",
+  "done": "ENDE",
+  "going": "{count} gehen",
+  "doneEmpty": "Keine weiteren Sets heute",
+  "startsAt": "startet {time}",
+  "nextFoot": "Als Nächstes · {time}",
+  "timeRange": "{start} – {end}",
+  "sheetGoing": "Gehen ({count})",
+  "you": "du",
+  "close": "Schließen",
+  "rowAriaLive": "Live auf {stage}: {band}, {count} gehen",
+  "rowAriaNext": "Als Nächstes auf {stage}: {band} um {time}, {count} gehen",
+  "rowAriaDone": "{stage}: keine weiteren Sets heute"
+}

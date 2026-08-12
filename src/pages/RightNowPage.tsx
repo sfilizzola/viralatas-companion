@@ -17,6 +17,8 @@ import WrapTeaserBanner from '../components/wrap/WrapTeaserBanner';
 import { useWrapTeaserVisible } from '../hooks/useWrapTeaserVisible';
 import CrewGroupsSection from '../components/now/CrewGroupsSection';
 import LiveCardSheet from '../components/now/LiveCardSheet';
+import StageRadarSection from '../components/now/StageRadarSection';
+import StageRadarSheet from '../components/now/StageRadarSheet';
 import StageScheduleSheet from '../components/StageScheduleSheet';
 import {
   canShowCamp,
@@ -25,6 +27,7 @@ import {
   canShowPresence,
   canShowWrap,
 } from '../lib/festivalFeatures';
+import { buildStageRadarSnapshot, type StageRadarEntry } from '../services/stageRadar';
 import styles from './RightNowPage.module.css';
 
 const DATE_LOCALES: Record<Language, string> = {
@@ -49,6 +52,7 @@ export default function RightNowPage() {
   const duckEnabled = useDuckEnabled();
   const navigate = useNavigate();
   const [activeGroup, setActiveGroup] = useState<CrewLiveGroup | null>(null);
+  const [activeRadarEntry, setActiveRadarEntry] = useState<StageRadarEntry | null>(null);
   const [showStageSheet, setShowStageSheet] = useState(false);
   const [dismissedBandIds, setDismissedBandIds] = useState<Set<string>>(new Set());
   const {
@@ -56,6 +60,7 @@ export default function RightNowPage() {
     userId,
     isFriend,
     bands,
+    picks,
     crewUsers,
     latestAnnouncement,
     now,
@@ -85,6 +90,13 @@ export default function RightNowPage() {
   const showPresence = canShowPresence(festival);
   const showCamp = canShowCamp(festival);
   const showMetalPlace = canShowMetalPlace(festival);
+  const showStageRadar = !showPresence;
+  const liveTestBandId = liveTestBand?.id ?? null;
+
+  const radarEntries = useMemo(() => {
+    if (!showStageRadar || loading || bands.length === 0) return [];
+    return buildStageRadarSnapshot(bands, picks, crewUsers, now, { liveTestBandId });
+  }, [showStageRadar, loading, bands, picks, crewUsers, now, liveTestBandId]);
 
   const visibleCrewGroups = useMemo(
     () =>
@@ -228,6 +240,13 @@ export default function RightNowPage() {
               onGroupSelect={setActiveGroup}
               t={t}
             />
+
+            {showStageRadar && radarEntries.length > 0 && (
+              <StageRadarSection
+                entries={radarEntries}
+                onSelect={setActiveRadarEntry}
+              />
+            )}
           </>
         )}
       </main>
@@ -255,6 +274,14 @@ export default function RightNowPage() {
           now={now}
           onClose={() => setActiveGroup(null)}
           t={t}
+        />
+      )}
+
+      {activeRadarEntry && (
+        <StageRadarSheet
+          entry={activeRadarEntry}
+          userId={userId}
+          onClose={() => setActiveRadarEntry(null)}
         />
       )}
 

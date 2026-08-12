@@ -1,0 +1,17 @@
+{
+  "sectionTitle": "Palcos · agora",
+  "live": "AO VIVO",
+  "next": "PRÓXIMO",
+  "done": "FIM",
+  "going": "{count} indo",
+  "doneEmpty": "Sem mais sets hoje",
+  "startsAt": "começa às {time}",
+  "nextFoot": "Próx. · {time}",
+  "timeRange": "{start} – {end}",
+  "sheetGoing": "Indo ({count})",
+  "you": "você",
+  "close": "Fechar",
+  "rowAriaLive": "Ao vivo em {stage}: {band}, {count} indo",
+  "rowAriaNext": "Próximo em {stage}: {band} às {time}, {count} indo",
+  "rowAriaDone": "{stage}: sem mais sets hoje"
+}

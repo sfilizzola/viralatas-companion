@@ -87,6 +87,10 @@ import festivalsBr from '../i18n/FestivalsPage_br.json';
 import festivalsDe from '../i18n/FestivalsPage_de.json';
 import festivalsEn from '../i18n/FestivalsPage_en.json';
 import festivalsEs from '../i18n/FestivalsPage_es.json';
+import stageRadarBr from '../i18n/StageRadar_br.json';
+import stageRadarDe from '../i18n/StageRadar_de.json';
+import stageRadarEn from '../i18n/StageRadar_en.json';
+import stageRadarEs from '../i18n/StageRadar_es.json';
 
 export type Language = 'br' | 'en' | 'es' | 'de';
 
@@ -110,6 +114,7 @@ type TranslationFile =
   | 'UpcomingBandCard'
   | 'TimelineScrubber'
   | 'StageScheduleSheet'
+  | 'StageRadar'
   | 'CampLocation'
   | 'InstallApp'
   | 'FestivalsPage'
@@ -141,6 +146,7 @@ const translations: Translations = {
     UpcomingBandCard: upcomingBandCardBr,
     TimelineScrubber: timelineScrubberBr,
     StageScheduleSheet: stageScheduleSheetBr,
+    StageRadar: stageRadarBr,
     CampLocation: campLocationBr,
     InstallApp: installAppBr,
     FestivalsPage: festivalsBr,
@@ -166,6 +172,7 @@ const translations: Translations = {
     UpcomingBandCard: upcomingBandCardEn,
     TimelineScrubber: timelineScrubberEn,
     StageScheduleSheet: stageScheduleSheetEn,
+    StageRadar: stageRadarEn,
     CampLocation: campLocationEn,
     InstallApp: installAppEn,
     FestivalsPage: festivalsEn,
@@ -191,6 +198,7 @@ const translations: Translations = {
     UpcomingBandCard: upcomingBandCardEs,
     TimelineScrubber: timelineScrubberEs,
     StageScheduleSheet: stageScheduleSheetEs,
+    StageRadar: stageRadarEs,
     CampLocation: campLocationEs,
     InstallApp: installAppEs,
     FestivalsPage: festivalsEs,
@@ -216,6 +224,7 @@ const translations: Translations = {
     UpcomingBandCard: upcomingBandCardDe,
     TimelineScrubber: timelineScrubberDe,
     StageScheduleSheet: stageScheduleSheetDe,
+    StageRadar: stageRadarDe,
     CampLocation: campLocationDe,
     InstallApp: installAppDe,
     FestivalsPage: festivalsDe,

@@ -2709,7 +2709,7 @@
 <body>
 <script type="application/json" id="ds-manifest">
 {
-  "version": "3.7",
+  "version": "3.8",
   "file": "public/vira-lata-ds.html",
   "note": "Agent table of contents. Read this first to navigate the file. Anchors and section numbers are STABLE and referenced across docs/code — never renumber. Keep this manifest in sync when adding/renaming a section, token, or component.",
   "sections": [
@@ -2729,6 +2729,7 @@
     { "num": "14", "id": "stage-schedule-sheet", "title": "Stage Schedule Sheet",    "purpose": "Bottom sheet showing current/next band per stage in a 2×4 grid; LIVE ribbon + pulsing dot; NEXT dimmed tile; --tile-color CSS custom prop per tile" },
     { "num": "15", "id": "camp-location",        "title": "Camp HQ Geolocation",      "purpose": "CampNavStrip (C+ gaffer tape), CampHqCard on Mural, CampMapDock (D1) below minimap, CampLocationSheet, CampPinIcon; --signal-ok* tokens" },
     { "num": "16", "id": "multi-festival",       "title": "Multi-Festival",           "purpose": "FestivalSwitcher on /now two-band header; Festivals catalog Join/Leave/Activate on /festivals" },
+    { "num": "17", "id": "stage-radar",          "title": "Stage Radar",              "purpose": "Presence-off /now tile grid (Variant B §14 grammar): live/next/done per stage + pick-based going counts + StageRadarSheet" },
     { "num": null, "id": "changelog",             "title": "Changelog",               "purpose": "Dated revision history of the design system" }
   ],
   "tokens": {
@@ -2796,7 +2797,9 @@
     { "name": "CampPinIcon",           "sectionId": "camp-location" },
     { "name": "LineupSyncSection",     "sectionId": "ds-godlike-lineup-sync" },
     { "name": "FestivalSwitcher",      "sectionId": "multi-festival" },
-    { "name": "FestivalsPage",         "sectionId": "multi-festival" }
+    { "name": "FestivalsPage",         "sectionId": "multi-festival" },
+    { "name": "StageRadarSection",     "sectionId": "stage-radar" },
+    { "name": "StageRadarSheet",       "sectionId": "stage-radar" }
   ]
 }
 </script>
@@ -2817,6 +2820,7 @@
   <a href="#stage-schedule-sheet">14 Stage Schedule Sheet</a>
   <a href="#camp-location">15 Camp HQ</a>
   <a href="#multi-festival">16 Multi-Festival</a>
+  <a href="#stage-radar">17 Stage Radar</a>
   <a href="#changelog">Changelog</a>
 </nav>
 <div class="page">
@@ -7325,6 +7329,74 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
 
 
   <!-- ============================================================
+       17 STAGE RADAR
+       ============================================================ -->
+  <section class="section" id="stage-radar">
+    <div class="section-head">
+      <div class="num">17</div>
+      <div>
+        <h2>Stage Radar</h2>
+        <p class="desc">Phase 48. On presence-off festivals (e.g. Summer Breeze), fills the camping/lost slot under crew band cards on <code>/now</code>. Locked visual: <b>Variant B</b> — 2-column §14 schedule tiles with pick-based “N going” and a picker detail sheet.</p>
+      </div>
+    </div>
+
+    <div class="subhead">Gate &amp; data</div>
+    <div class="demo-notes">
+      <ul>
+        <li>Mount when <code>!canShowPresence(festival)</code> (<code>camp</code> and <code>metal_place</code> both off)</li>
+        <li>Pure helper <code>buildStageRadarSnapshot(bands, picks, crewUsers, now, { liveTestBandId })</code> in <code>src/services/stageRadar.ts</code> — applies <code>applyLiveBandTestOverride</code>; emits <code>live</code> | <code>next</code> | <code>done</code> for every distinct stage</li>
+        <li>Picker count = Active Festival crew roster members who picked that stage’s live/next band (self included). Done → 0</li>
+        <li>Hide when loading or <code>bands.length === 0</code></li>
+      </ul>
+    </div>
+
+    <div class="subhead">StageRadarSection · Variant B tiles · <code>src/components/now/StageRadarSection.tsx</code></div>
+    <div class="demo">
+      <div class="demo-stage" style="padding:16px;background:var(--bg-sunken);border-radius:var(--r-2);max-width:420px">
+        <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px">Stages · now</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="--tile-color:var(--stage-main);position:relative;min-height:118px;background:var(--bg-elevated);border-radius:10px;overflow:hidden;border:1px solid color-mix(in srgb, var(--stage-main) 25%, var(--border))">
+            <div style="height:4px;background:var(--tile-color)"></div>
+            <div style="position:absolute;top:0;right:0;width:64px;height:64px;overflow:hidden">
+              <div style="position:absolute;top:14px;right:-18px;width:76px;transform:rotate(45deg);background:var(--tile-color);padding:4px 0 3px;text-align:center;font-family:var(--font-display);font-size:9px;font-weight:700;letter-spacing:0.16em;color:#fff">LIVE</div>
+            </div>
+            <div style="padding:9px 11px 11px">
+              <div style="font-family:var(--font-display);font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--tile-color)">Main Stage</div>
+              <div style="font-family:var(--font-display);font-size:15px;font-weight:700;text-transform:uppercase;margin-top:4px">Powerwolf</div>
+              <div style="display:flex;justify-content:space-between;margin-top:10px;font-family:var(--font-mono);font-size:10px;color:var(--text-muted)"><span>16:00 – 17:10</span><span>3 going</span></div>
+            </div>
+          </div>
+          <div style="--tile-color:var(--stage-t);opacity:0.72;min-height:118px;background:var(--bg-elevated);border-radius:10px;overflow:hidden;border:1px solid var(--border)">
+            <div style="height:4px;background:var(--tile-color);opacity:0.3"></div>
+            <div style="padding:9px 11px 11px">
+              <div style="font-family:var(--font-display);font-size:10px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--tile-color)">T-Stage</div>
+              <div style="font-family:var(--font-display);font-size:15px;font-weight:700;text-transform:uppercase;margin-top:4px">Band X</div>
+              <div style="display:flex;justify-content:space-between;margin-top:10px;font-family:var(--font-mono);font-size:10px;color:var(--text-faint)"><span>Next · 18:40</span><span>2 going</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="demo-notes">
+      <ul>
+        <li><b>Grid</b> — <code>1fr 1fr</code>; LIVE ribbon Variant D; NEXT opacity 0.72 / bar 30%; DONE opacity ~0.45, not a button</li>
+        <li><b>Count-only</b> on tiles — no avatars; names in <code>StageRadarSheet</code></li>
+        <li>Cousin: §14 <code>StageScheduleSheet</code> (Stages chip) — radar stays inline, adds done + going</li>
+        <li>i18n namespace <code>StageRadar</code> — 4 locales</li>
+      </ul>
+    </div>
+
+    <div class="subhead">StageRadarSheet · <code>src/components/now/StageRadarSheet.tsx</code></div>
+    <div class="demo-notes">
+      <ul>
+        <li>LiveCardSheet grammar: backdrop, <code>sheetUp</code> 280ms, 2px accent top border, handle, stage kicker, display title, picker list + <code>you</code> tag</li>
+        <li>Opens for live/next only; done tiles not tappable</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
        CHANGELOG
        ============================================================ -->
   <section class="section" id="changelog">
@@ -7337,6 +7409,12 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.12 — Stage Radar · Aug 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§17 Stage Radar</b> — presence-off <code>/now</code> Variant B tile grid + picker sheet; components <code>StageRadarSection</code> / <code>StageRadarSheet</code>.</li>
+        </ul>
+      </div>
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.11 — SB stage colors muted · Aug 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
