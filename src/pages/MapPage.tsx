@@ -15,6 +15,8 @@ import TimelineScrubber from '../components/map/TimelineScrubber';
 import OfflineBanner from '../components/OfflineBanner';
 import StageScheduleSheet from '../components/StageScheduleSheet';
 import styles from './MapPage.module.css';
+import { useActiveFestival } from '../hooks/useActiveFestival';
+import { isTimedBand, timedBands } from '../services/timedBand';
 
 function useOffline(): boolean {
   const [offline, setOffline] = useState(
@@ -51,6 +53,7 @@ export default function MapPage() {
   const { t } = useI18n('MapPage');
   const now = useNow(30_000);
   const { user } = useAuth();
+  const { festival } = useActiveFestival();
   const selfUserId = user?.id ?? null;
   const offline = useOffline();
   const navigate = useNavigate();
@@ -63,11 +66,20 @@ export default function MapPage() {
 
   // effectiveTime: use previewTime when scrubbing, otherwise live now
   const effectiveTime = previewTime ?? now;
-  const { snapshot, loading } = useSocialSnapshot(effectiveTime);
+  const { snapshot, loading } = useSocialSnapshot(effectiveTime, festival);
 
   const placements = useMemo(
-    () => (snapshot ? buildPlacements(snapshot.crewGroups, MINIMAP_ZONES, selfUserId) : []),
-    [snapshot, selfUserId],
+    () =>
+      snapshot
+        ? buildPlacements(
+            snapshot.crewGroups.filter(
+              (group) => group.kind !== 'band' || isTimedBand(group.band, festival),
+            ),
+            MINIMAP_ZONES,
+            selfUserId,
+          )
+        : [],
+    [snapshot, festival, selfUserId],
   );
 
   const isPreview = previewTime !== null;
@@ -146,8 +158,9 @@ export default function MapPage() {
 
       {showStageSheet && (
         <StageScheduleSheet
-          bands={bands}
+          bands={timedBands(bands, festival)}
           now={effectiveTime}
+          festival={festival}
           previewTime={previewTime}
           onClose={() => setShowStageSheet(false)}
           onBandSelect={() => navigate('/schedule')}

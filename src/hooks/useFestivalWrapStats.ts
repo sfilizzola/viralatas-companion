@@ -6,6 +6,7 @@ import { useAuth } from './useAuth';
 import { useMissedBands } from './useMissedBands';
 import { useNow } from './useNow';
 import { useSocialSnapshot } from './useSocialSnapshot';
+import { useActiveFestival } from './useActiveFestival';
 
 export type FestivalWrapData = {
   stats: FestivalWrapStats | null;
@@ -15,9 +16,10 @@ export type FestivalWrapData = {
 
 export function useFestivalWrapStats(userId: string): FestivalWrapData {
   const { user } = useAuth();
+  const { festival } = useActiveFestival();
   const nowDate = useNow();
   const { snapshot: social, crewUsers, presence, picks, bands, loading } =
-    useSocialSnapshot(nowDate);
+    useSocialSnapshot(nowDate, festival);
   const { allMissed } = useMissedBands(userId);
   const { allRatings } = useAllRatingsCache();
 
@@ -35,9 +37,10 @@ export function useFestivalWrapStats(userId: string): FestivalWrapData {
       isCurrentUserFriend: crewRow?.is_friend === true,
       metalPlaceWindowActive: social.metalPlaceWindowActive,
       liveTestBandId: social.liveTestBandId,
+      festival,
     };
-    return buildFestivalWrapStats(idbSnap, userId, user, social, allRatings);
-  }, [loading, social, user, userId, crewUsers, presence, picks, bands, allMissed, allRatings]);
+    return buildFestivalWrapStats(idbSnap, userId, user, social, allRatings, festival);
+  }, [loading, social, user, userId, crewUsers, presence, picks, bands, allMissed, allRatings, festival]);
 
   return useMemo(
     () => ({

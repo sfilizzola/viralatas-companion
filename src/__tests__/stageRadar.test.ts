@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { buildStageRadarSnapshot } from '../services/stageRadar';
 import type { Band, CrewUser, UserPick } from '../types';
+import type { Festival } from '../types/festival';
 
 function band(
   id: string,
@@ -37,13 +38,24 @@ function pick(user_id: string, band_id: string): UserPick {
 }
 
 const NOW = new Date('2026-07-30T20:00:00Z');
+const FESTIVAL_ON = {
+  id: 'summer-breeze-2026',
+  slug: 'summer-breeze-2026',
+  name: 'Summer Breeze 2026',
+  timezone: 'Europe/Berlin',
+  starts_at: '2026-07-30T00:00:00Z',
+  ends_at: '2026-08-02T00:00:00Z',
+  features: { running_order: true },
+  cache_version: '1',
+} satisfies Festival;
+const FESTIVAL_OFF = { ...FESTIVAL_ON, features: {} } satisfies Festival;
 
 describe('buildStageRadarSnapshot', () => {
   it('marks playing band as live and includes pickers from crew roster', () => {
     const live = band('1', 'Iron Maiden', 'Main Stage', '2026-07-30T19:00:00Z', '2026-07-30T21:00:00Z');
     const users = [crew('u1', 'Ana'), crew('u2', 'Bruno')];
     const picks = [pick('u1', '1'), pick('u2', '1')];
-    const result = buildStageRadarSnapshot([live], picks, users, NOW);
+    const result = buildStageRadarSnapshot([live], picks, users, NOW, FESTIVAL_ON);
     expect(result).toHaveLength(1);
     expect(result[0].status).toBe('live');
     expect(result[0].band?.id).toBe('1');
@@ -53,14 +65,20 @@ describe('buildStageRadarSnapshot', () => {
 
   it('marks upcoming band as next', () => {
     const upcoming = band('2', 'Slayer', 'T-Stage', '2026-07-30T21:00:00Z', '2026-07-30T23:00:00Z');
-    const result = buildStageRadarSnapshot([upcoming], [], [], NOW);
+    const result = buildStageRadarSnapshot([upcoming], [], [], NOW, FESTIVAL_ON);
     expect(result[0].status).toBe('next');
     expect(result[0].pickerCount).toBe(0);
   });
 
   it('emits done when all bands on a stage have ended', () => {
     const ended = band('3', 'Metallica', 'Campsite Circus Stage', '2026-07-30T17:00:00Z', '2026-07-30T19:00:00Z');
-    const result = buildStageRadarSnapshot([ended], [pick('u1', '3')], [crew('u1', 'Ana')], NOW);
+    const result = buildStageRadarSnapshot(
+      [ended],
+      [pick('u1', '3')],
+      [crew('u1', 'Ana')],
+      NOW,
+      FESTIVAL_ON,
+    );
     expect(result).toEqual([
       expect.objectContaining({
         stage: 'Campsite Circus Stage',
@@ -78,7 +96,7 @@ describe('buildStageRadarSnapshot', () => {
       band('2', 'Slayer', 'T-Stage', '2026-07-30T21:00:00Z', '2026-07-30T23:00:00Z'),
       band('3', 'Old Act', 'Wera Tool Rebel Stage', '2026-07-30T17:00:00Z', '2026-07-30T19:00:00Z'),
     ];
-    const result = buildStageRadarSnapshot(bands, [], [], NOW);
+    const result = buildStageRadarSnapshot(bands, [], [], NOW, FESTIVAL_ON);
     expect(result.map((e) => e.status)).toEqual(['live', 'next', 'done']);
   });
 
@@ -90,7 +108,7 @@ describe('buildStageRadarSnapshot', () => {
       band('n1', 'Sooner', 'B Stage', '2026-07-30T21:00:00Z', '2026-07-30T22:00:00Z'),
       band('l1', 'Live', 'C Stage', '2026-07-30T19:00:00Z', '2026-07-30T21:00:00Z'),
     ];
-    const result = buildStageRadarSnapshot(bands, [], [], NOW);
+    const result = buildStageRadarSnapshot(bands, [], [], NOW, FESTIVAL_ON);
     expect(result.map((e) => e.stage)).toEqual([
       'C Stage',
       'B Stage',
@@ -104,19 +122,38 @@ describe('buildStageRadarSnapshot', () => {
     const live = band('1', 'Iron Maiden', 'Main Stage', '2026-07-30T19:00:00Z', '2026-07-30T21:00:00Z');
     const users = [crew('u1', 'Ana')];
     const picks = [pick('u1', '1'), pick('stranger', '1')];
-    const result = buildStageRadarSnapshot([live], picks, users, NOW);
+    const result = buildStageRadarSnapshot([live], picks, users, NOW, FESTIVAL_ON);
     expect(result[0].pickerCount).toBe(1);
     expect(result[0].pickers[0].userId).toBe('u1');
   });
 
   it('returns empty array when bands is empty', () => {
-    expect(buildStageRadarSnapshot([], [], [], NOW)).toEqual([]);
+    expect(buildStageRadarSnapshot([], [], [], NOW, FESTIVAL_ON)).toEqual([]);
   });
 
   it('applies live-band test override so that stage becomes live', () => {
     const target = band('t1', 'Test Band', 'Main Stage', '2026-08-01T12:00:00Z', '2026-08-01T13:00:00Z');
-    const result = buildStageRadarSnapshot([target], [], [], NOW, { liveTestBandId: 't1' });
+    const result = buildStageRadarSnapshot(
+      [target],
+      [],
+      [],
+      NOW,
+      FESTIVAL_ON,
+      { liveTestBandId: 't1' },
+    );
     expect(result[0].status).toBe('live');
     expect(result[0].band?.id).toBe('t1');
+  });
+
+  it('ignores filled clock fields when the Festival is in Announcement Lineup', () => {
+    const live = band(
+      '1',
+      'Iron Maiden',
+      'Main Stage',
+      '2026-07-30T19:00:00Z',
+      '2026-07-30T21:00:00Z',
+    );
+
+    expect(buildStageRadarSnapshot([live], [], [], NOW, FESTIVAL_OFF)).toEqual([]);
   });
 });

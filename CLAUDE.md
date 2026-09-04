@@ -306,7 +306,7 @@ Full inventory and condition engine → `docs/ai-wiki/badges.md`.
 
 ## Phases at a glance
 
-Phases 1–30 are complete. See `PHASES.md` and `FUTURE_IDEAS.md` for upcoming work.
+**Current phase: 50** — `/now` planning mode. See `PHASES.md`. Upcoming: 51 My Picks planning mode.
 
 **Full phase history** → `docs/ai-wiki/phases-history.md`
 
@@ -384,7 +384,7 @@ Only when **both the build and all tests are green** may you proceed with the co
 
 ## Automatic versioning (main branch only)
 
-**Current version:** `3`
+**Current version:** `4`
 
 **Rule:** When a commit is pushed to the `main` branch:
 1. Increment the version number by 1
@@ -419,7 +419,7 @@ Only when **both the build and all tests are green** may you proceed with the co
 
 ## References
 
-- `PHASES.md` — Current phase: acceptance criteria, deliverables
+- `PHASES.md` — Current phase **50** (`/now` planning mode): acceptance criteria, deliverables
 - `docs/ai-wiki/` — Architecture wiki
 - `.claude/context/` — On-demand context: **skill-routing**, rtk-reference, **lineup-official-source**, **production-database**, llm-alerts, badges, auth-trigger, wiki-template, key-decisions
 - `.claude/agents/` — Specialized subagents (see Subagent locations above)

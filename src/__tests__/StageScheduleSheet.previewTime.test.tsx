@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import StageScheduleSheet from '../components/StageScheduleSheet';
 import type { Band } from '../types';
+import type { Festival } from '../types/festival';
 
 vi.mock('../lib/i18n', () => ({
   useI18n: () => ({
@@ -31,6 +32,7 @@ vi.mock('../services/stageColors', () => ({
 
 const BANDS: Band[] = [];
 const NOW = new Date('2026-07-30T20:00:00+02:00');
+const FESTIVAL = { features: { running_order: true } } as Festival;
 
 describe('StageScheduleSheet previewTime prop', () => {
   it('live mode — no previewTime: subtitle shows "Now & up next", no headerPreview class', () => {
@@ -38,6 +40,7 @@ describe('StageScheduleSheet previewTime prop', () => {
       <StageScheduleSheet
         bands={BANDS}
         now={NOW}
+        festival={FESTIVAL}
         onClose={vi.fn()}
         onBandSelect={vi.fn()}
       />,
@@ -53,6 +56,7 @@ describe('StageScheduleSheet previewTime prop', () => {
       <StageScheduleSheet
         bands={BANDS}
         now={NOW}
+        festival={FESTIVAL}
         previewTime={previewTime}
         onClose={vi.fn()}
         onBandSelect={vi.fn()}

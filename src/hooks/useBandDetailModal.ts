@@ -3,6 +3,8 @@ import type { Band, BandRatingScore, UserMissedBand } from '../types';
 import type { BandAttendee } from './useBandAttendees';
 import type { OverlapEntry } from './useBandConflicts';
 import { canRateBand } from '../services/bandRatings';
+import type { Festival } from '../types/festival';
+import { isTimedBand } from '../services/timedBand';
 
 export type BandDetailModalProps = {
   band: Band;
@@ -20,6 +22,7 @@ export type BandDetailModalProps = {
   canRate: boolean;
   userScore: BandRatingScore | null;
   onRate: (score: BandRatingScore | null) => void;
+  showScheduleChrome: boolean;
 };
 
 type UseBandDetailModalParams = {
@@ -35,6 +38,7 @@ type UseBandDetailModalParams = {
   userRatingByBand: Record<string, BandRatingScore>;
   toggleRating: (bandId: string, score: BandRatingScore) => Promise<void>;
   clearRating: (bandId: string) => Promise<void>;
+  festival: Festival | null | undefined;
 };
 
 function bandsForConflict(
@@ -58,6 +62,7 @@ export function useBandDetailModal({
   userRatingByBand,
   toggleRating,
   clearRating,
+  festival,
 }: UseBandDetailModalParams) {
   const [activeBandId, setActiveBandId] = useState<string | null>(null);
 
@@ -79,8 +84,8 @@ export function useBandDetailModal({
   );
 
   const isBandEnded = useMemo(
-    () => !!activeBand && new Date(activeBand.end_time) < currentNow,
-    [activeBand, currentNow],
+    () => !!activeBand && isTimedBand(activeBand, festival) && new Date(activeBand.end_time) < currentNow,
+    [activeBand, currentNow, festival],
   );
 
   const openBand = useCallback((bandId: string) => {
@@ -119,6 +124,7 @@ export function useBandDetailModal({
 
   const modalProps = useMemo<BandDetailModalProps | null>(() => {
     if (!activeBand) return null;
+    const showScheduleChrome = isTimedBand(activeBand, festival);
 
     return {
       band: activeBand,
@@ -127,13 +133,13 @@ export function useBandDetailModal({
       onTogglePick: handleTogglePick,
       onClose: closeBand,
       isBandEnded,
-      hidePick: isBandEnded,
+      hidePick: showScheduleChrome && isBandEnded,
       missedUserIds,
       isMissed,
       onToggleMissed: handleToggleMissed,
-      conflictBands: bandsForConflict(conflicts, activeBand.id, 'hard'),
-      overlapBands: bandsForConflict(conflicts, activeBand.id, 'soft'),
-      canRate: canRateBand({
+      conflictBands: showScheduleChrome ? bandsForConflict(conflicts, activeBand.id, 'hard') : [],
+      overlapBands: showScheduleChrome ? bandsForConflict(conflicts, activeBand.id, 'soft') : [],
+      canRate: showScheduleChrome && canRateBand({
         band: activeBand,
         now: currentNow,
         isPicked: pickedIds.has(activeBand.id),
@@ -141,6 +147,7 @@ export function useBandDetailModal({
       }),
       userScore: userRatingByBand[activeBand.id] ?? null,
       onRate: handleRate,
+      showScheduleChrome,
     };
   }, [
     activeBand,
@@ -157,6 +164,7 @@ export function useBandDetailModal({
     missedBandIds,
     userRatingByBand,
     handleRate,
+    festival,
   ]);
 
   return {

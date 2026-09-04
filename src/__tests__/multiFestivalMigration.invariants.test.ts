@@ -13,9 +13,10 @@ describe('multi-festival migration invariants', () => {
       camp: true,
       wrap: true,
       remote_lineup: true,
+      running_order: true,
     };
     expect(Object.keys(features).sort()).toEqual(
-      ['camp', 'duck', 'map', 'metal_place', 'remote_lineup', 'wrap'].sort(),
+      ['camp', 'duck', 'map', 'metal_place', 'remote_lineup', 'running_order', 'wrap'].sort(),
     );
   });
 

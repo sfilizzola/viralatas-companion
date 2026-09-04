@@ -11,6 +11,7 @@ export {
   PRESENCE_CHANGED_EVENT,
   BLOCKED_POSTERS_CHANGED_EVENT,
   BADGE_HISTORY_CHANGED_EVENT,
+  FESTIVAL_CATALOG_CHANGED_EVENT,
 } from './events';
 export type { OfflineBandRatingOp, OfflineDuckQuackOp, OfflineMissedOp, OfflinePickOp, OfflinePresenceOp, OfflineAnnouncementReactionOp, AnnouncementReactionRow, ReactionEmoji } from './types';
 export { REACTION_EMOJIS } from './types';

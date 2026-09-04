@@ -50,9 +50,12 @@ CREATE TABLE public.festivals (
 
 **Seed cutover**: Inserts `wacken-2026` with all Festival features enabled; `cache_version` seeded from legacy `app_config.cache_version` when present.
 
+**Phase 49 Lineup era:** Migration `20260904000000_announcement_lineup.sql` sets `features.running_order = true` for slugs `wacken-2026` and `summer-breeze-2026` (Schedule Lineup). Missing/false = Announcement Lineup. New catalog rows may use `'{}'`.
+
 **RLS**:
 - `festivals_select_authenticated` — SELECT for authenticated (`using (true)`)
-- No client INSERT/UPDATE/DELETE (ops / service role only)
+- No client INSERT/DELETE (ops / service role)
+- `festivals_update_godlike_features` — UPDATE for godlike (`role = 'godlike'`). Column privileges: `REVOKE UPDATE ON festivals FROM authenticated` then `GRANT UPDATE (features, cache_version)` — unblocks Lineup era flip and `invalidateCacheForAllUsers()`.
 - **Ops create/update:** `npm run seed:festival` — see [add-festival-ops.md](add-festival-ops.md)
 
 **Festival cache version**: Clients compare `festivals.cache_version` for the **Active Festival** against the local pack marker (`meta.active_festival_cache_version`). Mismatch → `clearActiveFestivalPack()` + reload that Festival only. Supersedes global `app_config.cache_version` as the pack invalidation token for multi-festival.
@@ -206,18 +209,20 @@ USING (true);  -- All authenticated users can read all profiles
 CREATE TABLE public.bands (
   id uuid PRIMARY KEY,
   festival_id uuid NOT NULL REFERENCES public.festivals (id),  -- Phase 47
-  slot_id text NOT NULL,
+  slot_id text,                 -- nullable Phase 49 (Announcement Lineup)
   name text NOT NULL,
-  stage text NOT NULL,
-  start_time timestamptz NOT NULL,
-  end_time timestamptz NOT NULL,
+  stage text,                   -- nullable Phase 49
+  start_time timestamptz,       -- nullable Phase 49
+  end_time timestamptz,         -- nullable Phase 49
   image_url text,
   genre text,
   category text,
   created_at timestamptz DEFAULT now()
 );
 
-CREATE UNIQUE INDEX bands_festival_slot_id_uidx ON public.bands (festival_id, slot_id);
+CREATE UNIQUE INDEX bands_festival_slot_id_uidx
+  ON public.bands (festival_id, slot_id)
+  WHERE slot_id IS NOT NULL;
 CREATE INDEX idx_bands_festival_id ON public.bands(festival_id);
 CREATE INDEX idx_bands_stage ON public.bands(stage);
 CREATE INDEX idx_bands_start_time ON public.bands(start_time);
@@ -244,7 +249,7 @@ USING (
 ```
 
 **Seed Scripts**:
-- **Non-destructive (default):** `npm run seed:bands:sync` — diff by `slot_id`; dry-run by default; `--apply` to write. See [lineup-sync.md](lineup-sync.md).
+- **Non-destructive (default):** `npm run seed:bands:sync` — slot_id when present; laptop **name match** for announced (null `slot_id`) rows. Dry-run by default; `--apply` to write. Leftovers reported, never auto-deleted. See [lineup-sync.md](lineup-sync.md).
 - **Destructive:** `supabase/seed/bands.ts` — full table replace; wipes picks. Run: `npm run seed:bands`. Banner warns to use sync for small edits.
 
 ---
@@ -803,6 +808,7 @@ Scripts to populate test data (in `supabase/seed/`):
 | Script | Purpose |
 |--------|---------|
 | `bands.ts` | Import Wacken 2026 lineup |
+| `announcement-festivals-2027.ts` | Create-only 2027 Announcement Lineup catalog + untimed Bands (`npm run seed:announcement-festivals-2027`) |
 | `test-users.ts` | Create fake vira-latas for testing |
 | `live-now.ts` | Time-shift bands for live preview testing |
 | `festival-reset.ts` | One-shot pre-festival wipe (announcements, blocked_posters, user_presence, assigned + persistent badges) + `cache_version` bump; chains bands re-seed via `--with-bands`. See `docs/ai-wiki/festival-reset.md`. |
@@ -823,7 +829,7 @@ npm run festival:reset -- --with-bands --force
 
 | Table | Select | Insert | Update | Delete |
 |-------|--------|--------|--------|--------|
-| `festivals` | Authenticated | — (ops) | — (ops) | — (ops) |
+| `festivals` | Authenticated | — (ops) | Godlike (`features`, `cache_version` only) | — (ops) |
 | `festival_memberships` | Own + peer members | Own | — | Own |
 | `users` | All | (via trigger) | Own (+ active_festival membership check) | (via trigger) |
 | `bands` | Festival members | Godlike | Godlike | Godlike |
@@ -858,4 +864,4 @@ npm run festival:reset -- --with-bands --force
 
 ---
 
-**Last updated:** 2026-08-12 — `festival_memberships` added to `supabase_realtime` (crew roster refresh on peer Join/Leave). Phase 47 multi-festival: `festivals`, `festival_memberships`, `festival_id` columns, `is_festival_member`, membership RLS, `band_attendance` security_invoker, `users.active_festival_id`.
+**Last updated:** 2026-09-04 — Phase 49: nullable slots; godlike `features`/`cache_version` GRANT; `seed:announcement-festivals-2027`.

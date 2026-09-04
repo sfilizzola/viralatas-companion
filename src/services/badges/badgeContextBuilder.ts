@@ -15,6 +15,7 @@ import {
   buildRatingStatsInputFromPicks,
   buildRatingStatsSnapshot,
 } from '../ratingStats';
+import type { Festival } from '../../types/festival';
 
 export const EMPTY_BADGE_CONTEXT: BadgeContext = {
   wacken_years: [],
@@ -53,6 +54,7 @@ export type BadgeIdbSnapshot = {
   metalPlaceConfig?: MetalPlaceConfig | null;
   liveBandTestConfig?: LiveBandTestConfig | null;
   ratings?: UserBandRating[];
+  festival?: Festival | null;
 };
 
 function legacyLiveBandTestConfig(
@@ -78,6 +80,7 @@ function buildSocialSnapshotForBadgeSnap(
       snap.liveTestBandId,
       snap.liveBandTestConfig,
     ),
+    festival: snap.festival,
     now: currentNow,
   });
 

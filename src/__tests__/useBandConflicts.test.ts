@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import type { Band } from '../types';
+import type { Festival } from '../types/festival';
 import { computeBandConflicts, computeBandOverlaps, type OverlapEntry } from '../hooks/useBandConflicts';
+
+const FESTIVAL_ON = { features: { running_order: true } } as Festival;
+const FESTIVAL_OFF = { features: {} } as Festival;
 
 function band(
   id: string,
@@ -27,7 +31,7 @@ describe('computeBandOverlaps', () => {
     const a = band('a', 'Faster', '2026-07-29T18:00:00Z', '2026-07-29T19:00:00Z');
     const b = band('b', 'Harder', '2026-07-29T19:30:00Z', '2026-07-29T20:30:00Z');
 
-    const result = computeBandOverlaps([a, b]);
+    const result = computeBandOverlaps([a, b], FESTIVAL_ON);
 
     expect(result.size).toBe(0);
   });
@@ -36,7 +40,7 @@ describe('computeBandOverlaps', () => {
     const a = band('a', 'Faster', '2026-07-29T18:00:00Z', '2026-07-29T19:00:00Z');
     const b = band('b', 'Harder', '2026-07-29T18:30:00Z', '2026-07-29T19:30:00Z');
 
-    const result = computeBandOverlaps([a, b]);
+    const result = computeBandOverlaps([a, b], FESTIVAL_ON);
 
     expect(result.size).toBe(2);
     expect(result.get('a')).toHaveLength(1);
@@ -49,7 +53,7 @@ describe('computeBandOverlaps', () => {
     const a = band('a', 'Faster', '2026-07-29T18:00:00Z', '2026-07-29T19:00:00Z');
     const b = band('b', 'Faster', '2026-07-29T18:30:00Z', '2026-07-29T19:30:00Z');
 
-    const result = computeBandOverlaps([a, b]);
+    const result = computeBandOverlaps([a, b], FESTIVAL_ON);
 
     expect(result.size).toBe(0);
   });
@@ -58,7 +62,7 @@ describe('computeBandOverlaps', () => {
     const a = band('a', 'Faster', '2026-07-29T18:00:00Z', '2026-07-29T19:00:00Z');
     const b = band('b', 'Harder', '2026-07-29T19:00:00Z', '2026-07-29T20:00:00Z');
 
-    const result = computeBandOverlaps([a, b]);
+    const result = computeBandOverlaps([a, b], FESTIVAL_ON);
 
     expect(result.size).toBe(0);
   });
@@ -68,7 +72,7 @@ describe('computeBandOverlaps', () => {
     const b = band('b', 'Harder', '2026-07-29T18:30:00Z', '2026-07-29T19:30:00Z');
     const c = band('c', 'Louder', '2026-07-29T19:00:00Z', '2026-07-29T20:30:00Z');
 
-    const result = computeBandOverlaps([a, b, c]);
+    const result = computeBandOverlaps([a, b, c], FESTIVAL_ON);
 
     expect(result.get('a')).toHaveLength(2);
     expect(result.get('a')?.map((e) => e.band.id).sort()).toEqual(['b', 'c']);
@@ -79,14 +83,14 @@ describe('computeBandOverlaps', () => {
   });
 
   it('returns an empty map for an empty input', () => {
-    expect(computeBandOverlaps([]).size).toBe(0);
+    expect(computeBandOverlaps([], FESTIVAL_ON).size).toBe(0);
   });
 
   it('classifies 5-minute overlap as soft', () => {
     const a = band('a', 'Faster', '2026-07-29T20:00:00Z', '2026-07-29T21:00:00Z');
     const b = band('b', 'Harder', '2026-07-29T20:55:00Z', '2026-07-29T21:55:00Z');
 
-    const result = computeBandOverlaps([a, b]);
+    const result = computeBandOverlaps([a, b], FESTIVAL_ON);
 
     expect(result.get('a')?.[0].severity).toBe('soft');
     expect(result.get('b')?.[0].severity).toBe('soft');
@@ -96,7 +100,7 @@ describe('computeBandOverlaps', () => {
     const a = band('a', 'Faster', '2026-07-29T20:00:00Z', '2026-07-29T21:00:00Z');
     const b = band('b', 'Harder', '2026-07-29T20:45:00Z', '2026-07-29T21:45:00Z');
 
-    const result = computeBandOverlaps([a, b]);
+    const result = computeBandOverlaps([a, b], FESTIVAL_ON);
 
     expect(result.get('a')?.[0].severity).toBe('soft');
     expect(result.get('b')?.[0].severity).toBe('soft');
@@ -106,7 +110,7 @@ describe('computeBandOverlaps', () => {
     const a = band('a', 'Faster', '2026-07-29T20:00:00Z', '2026-07-29T21:00:00Z');
     const b = band('b', 'Harder', '2026-07-29T20:44:59Z', '2026-07-29T21:44:59Z');
 
-    const result = computeBandOverlaps([a, b]);
+    const result = computeBandOverlaps([a, b], FESTIVAL_ON);
 
     expect(result.get('a')?.[0].severity).toBe('hard');
     expect(result.get('b')?.[0].severity).toBe('hard');
@@ -116,7 +120,7 @@ describe('computeBandOverlaps', () => {
     const a = band('a', 'Faster', '2026-07-29T20:00:00Z', '2026-07-29T21:00:00Z');
     const b = band('b', 'Harder', '2026-07-29T20:30:00Z', '2026-07-29T21:30:00Z');
 
-    const result = computeBandOverlaps([a, b]);
+    const result = computeBandOverlaps([a, b], FESTIVAL_ON);
 
     expect(result.get('a')?.[0].severity).toBe('hard');
     expect(result.get('b')?.[0].severity).toBe('hard');
@@ -127,7 +131,7 @@ describe('computeBandOverlaps', () => {
     const hardPartner = band('b', 'Harder', '2026-07-29T18:30:00Z', '2026-07-29T19:30:00Z');
     const softPartner = band('c', 'Louder', '2026-07-29T19:55:00Z', '2026-07-29T20:55:00Z');
 
-    const result = computeBandOverlaps([a, hardPartner, softPartner]);
+    const result = computeBandOverlaps([a, hardPartner, softPartner], FESTIVAL_ON);
 
     const aEntries = result.get('a') as OverlapEntry[];
     expect(aEntries).toHaveLength(2);
@@ -138,6 +142,13 @@ describe('computeBandOverlaps', () => {
     expect(hardEntry?.severity).toBe('hard');
     expect(softEntry?.severity).toBe('soft');
   });
+
+  it('ignores untimed bands even when ISO times would overlap', () => {
+    const a = band('a', 'Faster', '2026-07-29T18:00:00Z', '2026-07-29T19:00:00Z');
+    const b = band('b', 'Harder', '2026-07-29T18:30:00Z', '2026-07-29T19:30:00Z');
+
+    expect(computeBandOverlaps([a, b], FESTIVAL_OFF).size).toBe(0);
+  });
 });
 
 describe('computeBandConflicts alias', () => {
@@ -145,7 +156,7 @@ describe('computeBandConflicts alias', () => {
     const a = band('a', 'Faster', '2026-07-29T18:00:00Z', '2026-07-29T19:00:00Z');
     const b = band('b', 'Harder', '2026-07-29T18:30:00Z', '2026-07-29T19:30:00Z');
 
-    const result = computeBandConflicts([a, b]);
+    const result = computeBandConflicts([a, b], FESTIVAL_ON);
 
     expect(result.size).toBe(2);
     expect(result.get('a')?.[0].band.id).toBe('b');

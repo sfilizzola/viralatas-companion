@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import type { Band } from '../types';
 import { bandDay, formatTime } from '../services/bandTime';
 import { filterBands } from '../services/bandFilter';
 import type { BandFilterValue } from '../components/bandFilterValue';
+import type { TimedBand } from '../services/timedBand';
 
 // ─────────────────────────────────────────────────────────────────
 // Sample data: 8 stages × 4 days
@@ -32,7 +32,7 @@ function createBand(
   day: string,
   hour: number,
   durationMins: number,
-): Band {
+): TimedBand {
   // Create ISO string with CEST offset (+02:00), treating `hour` as local CEST time
   const h = String(hour).padStart(2, '0');
   const m = '00';
@@ -69,19 +69,19 @@ describe('Schedule: 8 Stages × 4 Days', () => {
   describe('bandDay() - Day calculation', () => {
     it('assigns daytime bands to the correct day', () => {
       const band = createBand('Morning Metal', 'W.E.T.', '2026-08-05', 14, 60);
-      expect(bandDay(band)).toBe('2026-08-05');
+      expect(bandDay(band.start_time)).toBe('2026-08-05');
     });
 
     it('assigns evening bands to the correct day', () => {
       const band = createBand('Evening Chaos', 'Headbangers', '2026-08-06', 20, 60);
-      expect(bandDay(band)).toBe('2026-08-06');
+      expect(bandDay(band.start_time)).toBe('2026-08-06');
     });
 
     it('shifts after-midnight slots back to the previous day', () => {
       // Band starting at 23:00 UTC on day 1 is 01:00 CEST on day 2
       // After-midnight slots (00:00-03:59 CEST) belong to the previous day
       const band = createBand('Midnight Abyss', 'Wackinger', '2026-08-05', 22, 120);
-      const day = bandDay(band);
+      const day = bandDay(band.start_time);
       // 22:00 UTC = 00:00 CEST (next day), should shift back
       expect(day).toBe('2026-08-05');
     });
@@ -89,7 +89,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
     it('handles late-night bands correctly across all days', () => {
       for (const day of DAYS_4) {
         const band = createBand('Late Night', 'Wasteland', day, 22, 90);
-        const calculatedDay = bandDay(band);
+        const calculatedDay = bandDay(band.start_time);
         expect(calculatedDay).toBe(day);
       }
     });
@@ -161,11 +161,14 @@ describe('Schedule: 8 Stages × 4 Days', () => {
       const filtered = filterBands(bands, noFilters({ day: DAYS_4[1] }), new Date());
 
       expect(filtered).toHaveLength(1);
-      expect(bandDay(filtered[0])).toBe(DAYS_4[1]);
+      const startTime = filtered[0].start_time;
+      expect(startTime).not.toBeNull();
+      if (!startTime) return;
+      expect(bandDay(startTime)).toBe(DAYS_4[1]);
     });
 
     it('handles filtering across all 4 festival days', () => {
-      const bands: Band[] = [];
+      const bands: TimedBand[] = [];
       for (const day of DAYS_4) {
         for (let i = 0; i < 3; i++) {
           bands.push(createBand(`Band on ${day}`, STAGES_8[i], day, 14 + i, 60));
@@ -175,7 +178,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
       for (const day of DAYS_4) {
         const filtered = filterBands(bands, noFilters({ day }), new Date());
         expect(filtered).toHaveLength(3);
-        filtered.forEach((b) => expect(bandDay(b)).toBe(day));
+        filtered.forEach((b) => expect(b.start_time && bandDay(b.start_time)).toBe(day));
       }
     });
 
@@ -192,7 +195,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
 
   describe('Combination filters', () => {
     it('filters by both day and stage', () => {
-      const bands: Band[] = [];
+      const bands: TimedBand[] = [];
       for (const day of DAYS_4) {
         for (const stage of STAGES_8) {
           bands.push(createBand(`${stage} on ${day}`, stage, day, 14, 60));
@@ -207,7 +210,10 @@ describe('Schedule: 8 Stages × 4 Days', () => {
 
       expect(filtered).toHaveLength(1);
       expect(filtered[0].stage).toBe('Headbangers');
-      expect(bandDay(filtered[0])).toBe(DAYS_4[2]);
+      const startTime = filtered[0].start_time;
+      expect(startTime).not.toBeNull();
+      if (!startTime) return;
+      expect(bandDay(startTime)).toBe(DAYS_4[2]);
     });
 
     it('returns empty result when day and stage do not have overlap', () => {
@@ -272,7 +278,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
     });
 
     it('sorts correctly across all 4 festival days', () => {
-      const bands: Band[] = [];
+      const bands: TimedBand[] = [];
       for (let d = 0; d < DAYS_4.length; d++) {
         for (let h = 0; h < 3; h++) {
           bands.push(createBand(`${d}-${h}`, 'W.E.T.', DAYS_4[d], 14 + h, 60));
@@ -290,7 +296,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
 
   describe('Complex real-world scenarios', () => {
     it('handles a realistic 8-stage × 4-day schedule with hundreds of bands', () => {
-      const bands: Band[] = [];
+      const bands: TimedBand[] = [];
       for (const day of DAYS_4) {
         for (const stage of STAGES_8) {
           // 6-8 bands per stage per day
@@ -312,12 +318,12 @@ describe('Schedule: 8 Stages × 4 Days', () => {
       expect(filtered).toHaveLength(7);
       filtered.forEach((b) => {
         expect(b.stage).toBe('Headbangers');
-        expect(bandDay(b)).toBe(DAYS_4[1]);
+        expect(b.start_time && bandDay(b.start_time)).toBe(DAYS_4[1]);
       });
     });
 
     it('can toggle filters in and out without losing data', () => {
-      const bands: Band[] = [];
+      const bands: TimedBand[] = [];
       for (const day of DAYS_4) {
         for (const stage of STAGES_8) {
           bands.push(createBand(`Band`, stage, day, 14, 60));
@@ -339,7 +345,7 @@ describe('Schedule: 8 Stages × 4 Days', () => {
     });
 
     it('handles edge case: single band on each stage-day combination', () => {
-      const bands: Band[] = [];
+      const bands: TimedBand[] = [];
       for (const day of DAYS_4) {
         for (const stage of STAGES_8) {
           bands.push(createBand(`${stage} on ${day}`, stage, day, 18, 60));
@@ -347,7 +353,9 @@ describe('Schedule: 8 Stages × 4 Days', () => {
       }
 
       const stages = [...new Set(bands.map((b) => b.stage))];
-      const days = [...new Set(bands.map((b) => bandDay(b)))];
+      const days = [
+        ...new Set(bands.flatMap((b) => (b.start_time ? [bandDay(b.start_time)] : []))),
+      ];
 
       expect(stages).toHaveLength(8);
       expect(days).toHaveLength(4);

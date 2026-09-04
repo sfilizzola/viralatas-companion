@@ -55,11 +55,12 @@ export const bandsRepository = {
         return;
       }
 
+      const { festivalsRepository } = await import('./festivals');
+      await festivalsRepository.syncCatalog();
       await clearActiveFestivalPack();
       await setActiveFestivalCacheVersion(remote.cache_version);
 
       if (userId) {
-        const { festivalsRepository } = await import('./festivals');
         await festivalsRepository.loadActivePack(userId, festivalId);
       }
     } catch (error) {

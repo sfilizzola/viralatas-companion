@@ -8,6 +8,7 @@ import {
   type CrewLivePlan,
 } from './livePreview';
 import { isMetalPlaceWindowActive } from './presencePolicy';
+import type { Festival } from '../types/festival';
 
 export type SocialSnapshotInput = {
   bands: Band[];
@@ -16,6 +17,7 @@ export type SocialSnapshotInput = {
   presence: UserPresence[];
   metalPlaceConfig: MetalPlaceConfig | null;
   liveBandTestConfig: LiveBandTestConfig | null;
+  festival: Festival | null | undefined;
   now: Date;
 };
 
@@ -36,6 +38,7 @@ export function buildSocialSnapshot(input: SocialSnapshotInput): SocialSnapshot 
     input.crewUsers,
     input.presence,
     input.now,
+    input.festival,
     liveTestBandId,
   );
   const crewGroups = groupCrewLivePlans(crewPlans, { metalPlaceWindowActive });

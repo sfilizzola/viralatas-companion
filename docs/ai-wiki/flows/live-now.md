@@ -24,6 +24,7 @@ Document how the app displays the current/next band for each crew member, includ
 | `src/components/now/StageRadarSheet.tsx` | Picker detail sheet for live/next radar tiles |
 | `src/repositories/presence.ts` | `applyPresenceToggle`, `autoClearCampingOnCurrentBand`, `validateAndAutoCheckout` |
 | `src/services/livePreview.ts` | `findLivePlan`, `mapCrewLivePlans`, `groupCrewLivePlans`, `computeCrewLocationCounts` |
+| `src/services/timedBand.ts` | `isTimedBand` / `timedBands` hard wall — live/next never uses untimed rows |
 | `src/lib/realtimeSync.ts` | `subscribePostgresChanges()` helper (Phase 26.H) |
 
 ---
@@ -577,6 +578,10 @@ Other users' clients:
 
 ## Edge Cases
 
+### 0. Announcement Lineup / untimed Bands (Phase 49)
+
+`useNowData` and `livePreview` run on `timedBands(bands, festival)` only. **Announcement Lineup** (`features.running_order` off/missing) and leftover Bands without a trusted clock never become current/next. `/now` stays empty-safe; planning picks are `/schedule`. Live band test override also no-ops unless `isTimedBand`.
+
 ### 1. Band Ends Exactly at `now`
 
 ```
@@ -794,4 +799,4 @@ useEffect(() => {
 
 ---
 
-**Last updated:** 2026-06-25 — Phase 44: multi-window Metal Place (`windows[]`, `isMetalPlaceWindowActive`); overnight slots documented as unsupported; removed `test_override_day`.
+**Last updated:** 2026-09-04 — Phase 49: `timedBands` / `isTimedBand` hard wall; Announcement Lineup `/now` empty-safe.

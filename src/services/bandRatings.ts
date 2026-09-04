@@ -10,6 +10,7 @@ export function canRateBand(input: {
 }): boolean {
   if (input.band.category === 'ceremony') return false;
   if (!input.isPicked || input.isMissed) return false;
+  if (!input.band.end_time) return false;
   return new Date(input.band.end_time) < input.now;
 }
 
@@ -43,13 +44,19 @@ export function sortBandsByRating<T extends Band>(
   return [...bands].sort((a, b) => {
     const aggA = aggregates[a.id];
     const aggB = aggregates[b.id];
-    if (!aggA && !aggB) return a.start_time.localeCompare(b.start_time);
+    if (!aggA && !aggB) {
+      return a.start_time && b.start_time
+        ? a.start_time.localeCompare(b.start_time)
+        : a.name.localeCompare(b.name);
+    }
     if (!aggA) return 1;
     if (!aggB) return -1;
     const avgDelta = aggB.avg - aggA.avg;
     if (avgDelta !== 0) return avgDelta;
     const countDelta = aggB.count - aggA.count;
     if (countDelta !== 0) return countDelta;
-    return a.start_time.localeCompare(b.start_time);
+    return a.start_time && b.start_time
+      ? a.start_time.localeCompare(b.start_time)
+      : a.name.localeCompare(b.name);
   });
 }

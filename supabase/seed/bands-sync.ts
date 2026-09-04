@@ -25,14 +25,15 @@ import {
   parseFestivalSlug,
   resolveFestivalId,
 } from './seed-shared';
+import { planNameMatches } from '../../src/services/announcementMatch';
 
 type DbRow = {
   id: string;
   slot_id: string | null;
   name: string;
-  stage: string;
-  start_time: string;
-  end_time: string;
+  stage: string | null;
+  start_time: string | null;
+  end_time: string | null;
   genre: string | null;
   image_url: string | null;
   category: string | null;
@@ -56,20 +57,23 @@ type UpdateEntry = {
   slot_id: string;
   dbId: string;
   diffs: Partial<Record<SyncField, FieldDiff>>;
+  assignSlotId?: boolean;
 };
 
 type DeleteEntry = {
   slot_id: string;
   dbId: string;
   name: string;
-  stage: string;
-  start_time: string;
+  stage: string | null;
+  start_time: string | null;
 };
 
 type SyncPlan = {
   inserts: BandSeed[];
   updates: UpdateEntry[];
   deletes: DeleteEntry[];
+  leftovers: Array<{ dbId: string; name: string }>;
+  skippedClusters: ReturnType<typeof planNameMatches>['skippedClusters'];
 };
 
 type PickImpact = {
@@ -115,7 +119,7 @@ function fieldDiff(
   return Object.keys(diffs).length > 0 ? diffs : null;
 }
 
-async function loadDbRows(festivalId: string): Promise<Map<string, DbRow>> {
+async function loadDbRows(festivalId: string): Promise<DbRow[]> {
   const { supabase } = createServiceClient();
   const { data, error } = await supabase
     .from('bands')
@@ -128,38 +132,17 @@ async function loadDbRows(festivalId: string): Promise<Map<string, DbRow>> {
     process.exit(1);
   }
 
-  const nullRows = (data ?? []).filter((row) => !row.slot_id);
-  if (nullRows.length > 0) {
-    console.error(
-      'Abort: found bands with NULL slot_id. Run `npm run seed:bands:backfill-slot-id -- --apply` (preserves picks), then retry sync.',
-    );
-    for (const row of nullRows) {
-      console.error(
-        `  · id=${row.id} name="${row.name}" stage="${row.stage}" start=${row.start_time}`,
-      );
-    }
-    process.exit(1);
-  }
-
-  const map = new Map<string, DbRow>();
-  for (const row of data ?? []) {
-    map.set(row.slot_id as string, row as DbRow);
-  }
-  return map;
+  return (data ?? []) as DbRow[];
 }
 
 function buildPlan(seedRows: BandSeed[], dbRows: Map<string, DbRow>): SyncPlan {
   const seedBySlot = new Map(seedRows.map((row) => [row.slot_id, row]));
-  const inserts: BandSeed[] = [];
   const updates: UpdateEntry[] = [];
   const deletes: DeleteEntry[] = [];
 
   for (const row of seedRows) {
     const db = dbRows.get(row.slot_id);
-    if (!db) {
-      inserts.push(row);
-      continue;
-    }
+    if (!db) continue;
     const diffs = fieldDiff(row, db);
     if (diffs) {
       updates.push({ slot_id: row.slot_id, dbId: db.id, diffs });
@@ -178,7 +161,13 @@ function buildPlan(seedRows: BandSeed[], dbRows: Map<string, DbRow>): SyncPlan {
     }
   }
 
-  return { inserts, updates, deletes };
+  return {
+    inserts: [],
+    updates,
+    deletes,
+    leftovers: [],
+    skippedClusters: [],
+  };
 }
 
 async function computePickImpact(deletes: DeleteEntry[]): Promise<PickImpact> {
@@ -212,8 +201,8 @@ async function computePickImpact(deletes: DeleteEntry[]): Promise<PickImpact> {
   return { deletePicks, deleteMissed };
 }
 
-function formatTime(iso: string): string {
-  return iso.replace('T', ' ').slice(0, 16);
+function formatTime(iso: string | null): string {
+  return iso ? iso.replace('T', ' ').slice(0, 16) : '—';
 }
 
 function printPlan(
@@ -235,9 +224,34 @@ function printPlan(
   } else {
     for (const entry of plan.updates) {
       console.log(`  ${entry.slot_id}`);
+      if (entry.assignSlotId) {
+        console.log(`         slot_id: null → ${JSON.stringify(entry.slot_id)}`);
+      }
       for (const [field, diff] of Object.entries(entry.diffs)) {
         console.log(`         ${field}: ${JSON.stringify(diff.before)} → ${JSON.stringify(diff.after)}`);
       }
+    }
+  }
+  console.log('');
+
+  console.log(`LEFTOVER  (${plan.leftovers.length} announced bands)`);
+  if (plan.leftovers.length === 0) {
+    console.log('  (none)');
+  } else {
+    for (const row of plan.leftovers) {
+      console.log(`  id=${row.dbId}   '${row.name}' (kept, not deleted)`);
+    }
+  }
+  console.log('');
+
+  console.log(`SKIPPED  (${plan.skippedClusters.length} ambiguous name clusters)`);
+  if (plan.skippedClusters.length === 0) {
+    console.log('  (none)');
+  } else {
+    for (const cluster of plan.skippedClusters) {
+      console.log(
+        `  '${cluster.nameKey}'   announced=[${cluster.announcedDbIds.join(', ')}] official=[${cluster.officialSlotIds.join(', ')}]`,
+      );
     }
   }
   console.log('');
@@ -302,6 +316,9 @@ async function applyPlan(
 
   for (const entry of plan.updates) {
     const patch: Record<string, unknown> = {};
+    if (entry.assignSlotId) {
+      patch.slot_id = entry.slot_id;
+    }
     for (const [field, diff] of Object.entries(entry.diffs)) {
       patch[field] = diff.after;
     }
@@ -318,9 +335,14 @@ async function applyPlan(
 
   if (plan.updates.length > 0) {
     const dbRows = await loadDbRows(festivalId);
+    const dbBySlot = new Map(
+      dbRows
+        .filter((row): row is DbRow & { slot_id: string } => Boolean(row.slot_id))
+        .map((row) => [row.slot_id, row]),
+    );
     for (const entry of plan.updates) {
       const seed = bands.find((row) => row.slot_id === entry.slot_id);
-      const db = dbRows.get(entry.slot_id);
+      const db = dbBySlot.get(entry.slot_id);
       if (!seed || !db) continue;
       const remaining = fieldDiff(seed, db);
       if (remaining) {
@@ -399,7 +421,52 @@ export async function main() {
   }
 
   const dbRows = await loadDbRows(festivalId);
-  const plan = buildPlan(bands, dbRows);
+  const dbBySlot = new Map(
+    dbRows
+      .filter((row): row is DbRow & { slot_id: string } => Boolean(row.slot_id))
+      .map((row) => [row.slot_id, row]),
+  );
+  const slotMatchedSeed = bands.filter((row) => dbBySlot.has(row.slot_id));
+  const unmatchedSeed = bands.filter((row) => !dbBySlot.has(row.slot_id));
+  const announced = dbRows.filter((row) => !row.slot_id);
+  const namePlan = planNameMatches({
+    announced,
+    official: unmatchedSeed,
+  });
+  const unmatchedSeedBySlot = new Map(
+    unmatchedSeed.map((row) => [row.slot_id, row]),
+  );
+  const announcedById = new Map(announced.map((row) => [row.id, row]));
+  const slotPlan = buildPlan(slotMatchedSeed, dbBySlot);
+  const nameUpdates: UpdateEntry[] = namePlan.updates.map((entry) => {
+    const seed = unmatchedSeedBySlot.get(entry.slot_id);
+    const db = announcedById.get(entry.dbId);
+    if (!seed || !db) {
+      throw new Error(`Name-match plan references missing row for ${entry.slot_id}`);
+    }
+    return {
+      slot_id: entry.slot_id,
+      dbId: entry.dbId,
+      diffs: fieldDiff(seed, db) ?? {},
+      assignSlotId: true,
+    };
+  });
+  const plan: SyncPlan = {
+    inserts: namePlan.inserts.map((entry) => {
+      const seed = unmatchedSeedBySlot.get(entry.slot_id);
+      if (!seed) {
+        throw new Error(`Name-match plan references missing seed ${entry.slot_id}`);
+      }
+      return seed;
+    }),
+    updates: [...slotPlan.updates, ...nameUpdates],
+    deletes: slotPlan.deletes,
+    leftovers: namePlan.leftovers.map((entry) => ({
+      dbId: entry.dbId,
+      name: announcedById.get(entry.dbId)?.name ?? '(unknown)',
+    })),
+    skippedClusters: namePlan.skippedClusters,
+  };
   const impact = await computePickImpact(plan.deletes);
 
   if (json) {
@@ -409,7 +476,7 @@ export async function main() {
           apply,
           festival: festivalSlug,
           festivalId,
-          dbCount: dbRows.size,
+          dbCount: dbRows.length,
           seedCount: bands.length,
           plan,
           impact,
@@ -423,7 +490,7 @@ export async function main() {
     printPlan(plan, impact, {
       apply,
       supabaseUrl,
-      dbCount: dbRows.size,
+      dbCount: dbRows.length,
       seedCount: bands.length,
     });
   }
@@ -437,6 +504,10 @@ export async function main() {
     await applyPlan(plan, festivalId, festivalSlug);
   } else if (apply && isEmpty) {
     console.log('No changes to apply.');
+  }
+
+  if (plan.skippedClusters.length > 0) {
+    process.exit(1);
   }
 }
 

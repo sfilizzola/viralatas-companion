@@ -183,4 +183,13 @@ describe('isFestivalEnded', () => {
       ]),
     ).toBe(false);
   });
+
+  it('returns false when every non-ceremony end time is null', () => {
+    expect(
+      isFestivalEnded(new Date('2026-08-02T00:00:00+02:00'), [
+        { end_time: null, category: 'band' },
+        { end_time: null, category: null },
+      ]),
+    ).toBe(false);
+  });
 });

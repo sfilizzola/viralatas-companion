@@ -101,8 +101,12 @@ export function isFestivalEnded(
 
   const nonCeremony = bands.filter((band) => band.category !== 'ceremony');
   if (nonCeremony.length === 0) return false;
+  const dated = nonCeremony.filter(
+    (band): band is FestivalEndBand & { end_time: string } => Boolean(band.end_time),
+  );
+  if (dated.length === 0) return false;
 
-  const maxEndMs = nonCeremony.reduce((max, band) => {
+  const maxEndMs = dated.reduce((max, band) => {
     const endMs = new Date(band.end_time).getTime();
     return endMs > max ? endMs : max;
   }, Number.NEGATIVE_INFINITY);

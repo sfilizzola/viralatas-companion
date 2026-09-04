@@ -4,7 +4,12 @@ import {
   computeInitialCollapsedDays,
   countUpcomingLeftToday,
   groupMyWackenByDay,
+  splitPicksForMyPicks,
 } from '../services/myWackenGrouping';
+import type { Festival } from '../types/festival';
+
+const FESTIVAL_ON = { features: { running_order: true } } as Festival;
+const FESTIVAL_OFF = { features: {} } as Festival;
 
 function makeBand(overrides: Partial<Band> = {}): Band {
   return {
@@ -101,6 +106,34 @@ describe('groupMyWackenByDay', () => {
     const groups = groupMyWackenByDay(bands, new Set(['d1', 'd2-late', 'd2-early']), now);
     expect(groups.map((g) => g.dayKey)).toEqual(['2026-07-29', '2026-07-30']);
     expect(groups[1].upcoming.map((b) => b.id)).toEqual(['d2-early', 'd2-late']);
+  });
+
+  it('skips picked bands without a complete time window', () => {
+    const untimed = makeBand({ id: 'untimed', start_time: null, end_time: null });
+    expect(groupMyWackenByDay([untimed], new Set(['untimed']), now)).toEqual([]);
+  });
+});
+
+describe('splitPicksForMyPicks', () => {
+  it('separates trusted timed picks from untimed picks', () => {
+    const timed = makeBand({ id: 'timed' });
+    const untimed = makeBand({
+      id: 'untimed',
+      slot_id: null,
+      stage: null,
+      start_time: null,
+      end_time: null,
+    });
+    const pickedIds = new Set(['timed', 'untimed']);
+
+    expect(splitPicksForMyPicks([timed, untimed], pickedIds, FESTIVAL_ON)).toEqual({
+      timed: [timed],
+      untimed: [untimed],
+    });
+    expect(splitPicksForMyPicks([timed, untimed], pickedIds, FESTIVAL_OFF)).toEqual({
+      timed: [],
+      untimed: [timed, untimed],
+    });
   });
 });
 

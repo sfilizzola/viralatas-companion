@@ -29,6 +29,7 @@ import {
 } from '../lib/festivalFeatures';
 import { buildStageRadarSnapshot, type StageRadarEntry } from '../services/stageRadar';
 import styles from './RightNowPage.module.css';
+import { timedBands } from '../services/timedBand';
 
 const DATE_LOCALES: Record<Language, string> = {
   br: 'pt-BR',
@@ -80,7 +81,7 @@ export default function RightNowPage() {
     duckBandId,
     duckQuack,
     duckCooldownUntil,
-  } = useNowData();
+  } = useNowData(festival);
   const { quack: nextDuckQuack, cooldownUntil: nextDuckCooldown } = useDuckQuack(
     userId,
     nextBand?.id ?? null,
@@ -95,8 +96,10 @@ export default function RightNowPage() {
 
   const radarEntries = useMemo(() => {
     if (!showStageRadar || loading || bands.length === 0) return [];
-    return buildStageRadarSnapshot(bands, picks, crewUsers, now, { liveTestBandId });
-  }, [showStageRadar, loading, bands, picks, crewUsers, now, liveTestBandId]);
+    return buildStageRadarSnapshot(bands, picks, crewUsers, now, festival, {
+      liveTestBandId,
+    });
+  }, [showStageRadar, loading, bands, picks, crewUsers, now, festival, liveTestBandId]);
 
   const visibleCrewGroups = useMemo(
     () =>
@@ -287,8 +290,9 @@ export default function RightNowPage() {
 
       {showStageSheet && (
         <StageScheduleSheet
-          bands={bands}
+          bands={timedBands(bands, festival)}
           now={now}
+          festival={festival}
           onClose={() => setShowStageSheet(false)}
           onBandSelect={() => navigate('/schedule')}
         />

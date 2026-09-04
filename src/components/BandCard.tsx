@@ -47,6 +47,8 @@ type BandCardProps = {
   magnitude?: { value: number; max: number; tone: 'stage' | 'accent' };
   /** Crew picks browser: current user also picked this band */
   sharedPick?: boolean;
+  /** Hide clock/stage/conflict/duck presentation for announcement-lineup bands. */
+  showScheduleChrome?: boolean;
 };
 
 function getVariantClass(variant: BandCardVariant): string {
@@ -113,11 +115,16 @@ function buildBandCardClasses(params: Readonly<CardClassParams>): string {
     .join(' ');
 }
 
-function getBandPresentation(band: Band) {
+function getBandPresentation(band: Band, showScheduleChrome = true) {
   const isCeremony = band.category === 'ceremony';
   return {
     isCeremony,
-    color: isCeremony ? 'var(--ceremony-gold)' : stageColorVar(band.stage),
+    color:
+      isCeremony
+        ? 'var(--ceremony-gold)'
+        : showScheduleChrome && band.stage
+          ? stageColorVar(band.stage)
+          : 'var(--accent)',
     thumbFallback: isCeremony ? '✦' : band.name.charAt(0).toUpperCase(),
   };
 }
@@ -168,17 +175,19 @@ export default function BandCard({
   ratingStats,
   magnitude,
   sharedPick = false,
+  showScheduleChrome = true,
 }: Readonly<BandCardProps>) {
   const interactive = Boolean(onClick);
   const showPick = variant !== 'ranked' && !hidePick;
   const { popping, markUserToggled } = usePickPopAnimation(isPicked);
-  const { isCeremony, color } = getBandPresentation(band);
-  const showAttendanceChip = variant === 'timeline' && attendanceChip !== undefined;
+  const { isCeremony, color } = getBandPresentation(band, showScheduleChrome);
+  const showAttendanceChip =
+    showScheduleChrome && variant === 'timeline' && attendanceChip !== undefined;
   const cardClasses = buildBandCardClasses({
     variant,
     isCeremony,
     interactive,
-    conflict,
+    conflict: showScheduleChrome ? conflict : undefined,
     showAttendanceChip,
     attendanceChip,
     isBandEnded,
@@ -209,6 +218,7 @@ export default function BandCard({
           attendeeCluster={attendeeCluster}
           ratingStats={ratingStats}
           showDayGhost={showDayLabel && variant === 'ranked'}
+          showScheduleChrome={showScheduleChrome}
         />
       ) : (
         <StandardBandCardContent
@@ -217,19 +227,20 @@ export default function BandCard({
           isPicked={isPicked}
           count={count}
           onToggle={onToggle}
-          conflict={conflict}
+          conflict={showScheduleChrome ? conflict : undefined}
           pending={pending}
           isBandEnded={isBandEnded}
           attendanceChip={attendanceChip}
           missedCount={missedCount}
-          onDuck={onDuck}
+          onDuck={showScheduleChrome ? onDuck : undefined}
           duckCooldownUntil={duckCooldownUntil}
-          showDayLabel={showDayLabel}
+          showDayLabel={showScheduleChrome && showDayLabel}
           showPick={showPick}
           popping={popping}
           markUserToggled={markUserToggled}
           isCeremony={isCeremony}
           showAttendanceChip={showAttendanceChip}
+          showScheduleChrome={showScheduleChrome}
         >
           {children}
         </StandardBandCardContent>
@@ -257,6 +268,7 @@ type StandardBandCardContentProps = {
   markUserToggled: () => void;
   isCeremony: boolean;
   showAttendanceChip: boolean;
+  showScheduleChrome: boolean;
 };
 
 function StandardBandCardContent({
@@ -279,9 +291,10 @@ function StandardBandCardContent({
   markUserToggled,
   isCeremony,
   showAttendanceChip,
+  showScheduleChrome,
 }: Readonly<StandardBandCardContentProps & { children?: ReactNode }>) {
   const { t } = useI18n('SchedulePage');
-  const { thumbFallback } = getBandPresentation(band);
+  const { thumbFallback } = getBandPresentation(band, showScheduleChrome);
   const showDuck = Boolean(onDuck) && !isCeremony;
   const showDayGhost = showDayLabel && variant === 'schedule';
 
@@ -293,7 +306,7 @@ function StandardBandCardContent({
         <CardThumb imageUrl={band.image_url} fallback={thumbFallback} />
       )}
 
-      {variant === 'timeline' && (
+      {showScheduleChrome && variant === 'timeline' && band.start_time && band.end_time && (
         <CardWhen startTime={band.start_time} endTime={band.end_time} />
       )}
 
@@ -302,9 +315,9 @@ function StandardBandCardContent({
           .filter(Boolean)
           .join(' ')}
       >
-        {showDayGhost && (
+        {showDayGhost && band.start_time && (
           <span className={styles.dayGhost} aria-hidden>
-            {t(bandWeekdayKey(band))}
+            {t(bandWeekdayKey(band.start_time))}
           </span>
         )}
         <h2 className={styles.bandName}>{band.name}</h2>
@@ -319,6 +332,7 @@ function StandardBandCardContent({
           showAttendanceChip={showAttendanceChip}
           attendanceChip={attendanceChip}
           pending={pending}
+          showScheduleChrome={showScheduleChrome}
         />
         {children}
         {showDuck && onDuck && (
@@ -351,6 +365,7 @@ type BandCardMetaProps = {
   showAttendanceChip: boolean;
   attendanceChip?: AttendanceChipKind;
   pending?: boolean;
+  showScheduleChrome: boolean;
 };
 
 function BandCardMeta({
@@ -364,6 +379,7 @@ function BandCardMeta({
   showAttendanceChip,
   attendanceChip,
   pending,
+  showScheduleChrome,
 }: Readonly<BandCardMetaProps>) {
   const { t } = useI18n('SchedulePage');
 
@@ -373,12 +389,12 @@ function BandCardMeta({
         .filter(Boolean)
         .join(' ')}
     >
-      {isCeremony ? (
+      {showScheduleChrome && (isCeremony ? (
         <span className={styles.ceremonyLabel}>✦ {t('scheduleClosingCeremony')}</span>
       ) : (
         <Chip className={styles.stageBadge}>{band.stage}</Chip>
-      )}
-      {variant !== 'timeline' && (
+      ))}
+      {showScheduleChrome && variant !== 'timeline' && band.start_time && band.end_time && (
         <span className={styles.time}>
           {formatTime(band.start_time)} – {formatTime(band.end_time)}
         </span>
@@ -388,12 +404,12 @@ function BandCardMeta({
           <AttendanceText count={count} isBandEnded={isBandEnded} missedCount={missedCount} />
         </span>
       )}
-      {variant === 'timeline' && conflict && <ConflictChip conflict={conflict} />}
+      {showScheduleChrome && variant === 'timeline' && conflict && <ConflictChip conflict={conflict} />}
       {showAttendanceChip && attendanceChip && <AttendanceChip kind={attendanceChip} />}
       {band.genre && variant === 'schedule' && (
         <span className={styles.genre}>
           {band.genre === 'Metal Battle'
-            ? `${getMetalBattleCountryFlag(band.slot_id) ?? ''} Metal Battle`.trim()
+            ? `${band.slot_id ? getMetalBattleCountryFlag(band.slot_id) ?? '' : ''} Metal Battle`.trim()
             : band.genre}
         </span>
       )}
@@ -457,6 +473,7 @@ function RankedRow({
   attendeeCluster,
   ratingStats,
   showDayGhost,
+  showScheduleChrome,
 }: Readonly<{
   band: Band;
   rank?: number;
@@ -467,6 +484,7 @@ function RankedRow({
   attendeeCluster?: { attendees: BandAttendee[]; max?: number };
   ratingStats?: { avgFormatted: string; count: number; userScore?: BandRatingScore };
   showDayGhost: boolean;
+  showScheduleChrome: boolean;
 }>) {
   const { t } = useI18n('SchedulePage');
   const { t: tPopular } = useI18n('PopularPage');
@@ -501,14 +519,18 @@ function RankedRow({
       <div className={styles.rankedMain}>
         <h2 className={styles.rankedName}>{band.name}</h2>
         <div className={styles.rankedSub}>
-          {showDayGhost && (
+          {showScheduleChrome && showDayGhost && band.start_time && (
             <span className={`${styles.dayGhost} ${styles.rankedDay}`} aria-hidden>
-              {t(bandWeekdayKey(band))}
+              {t(bandWeekdayKey(band.start_time))}
             </span>
           )}
-          <span className={styles.stageDot} aria-hidden />
-          <span className={styles.rankedStage}>{band.stage}</span>
-          <span className={styles.rankedTime}>{formatTime(band.start_time)}</span>
+          {showScheduleChrome && band.stage && band.start_time && (
+            <>
+              <span className={styles.stageDot} aria-hidden />
+              <span className={styles.rankedStage}>{band.stage}</span>
+              <span className={styles.rankedTime}>{formatTime(band.start_time)}</span>
+            </>
+          )}
         </div>
         {isRating && ratingStats?.userScore !== undefined && (
           <div className={styles.rankedYou}>

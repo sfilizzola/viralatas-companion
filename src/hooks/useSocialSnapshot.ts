@@ -5,6 +5,8 @@ import { useBands } from './useBands';
 import { useCrewUsersCache, usePresenceCache } from './useSocialSnapshotSpecs';
 import { useLiveBandTestConfig } from './useLiveBandTestConfig';
 import { useMetalPlaceConfig } from './useMetalPlaceConfig';
+import { useActiveFestival } from './useActiveFestival';
+import type { Festival } from '../types/festival';
 
 export type SocialSnapshotData = {
   snapshot: SocialSnapshot | null;
@@ -15,7 +17,12 @@ export type SocialSnapshotData = {
   loading: boolean;
 };
 
-export function useSocialSnapshot(now: Date): SocialSnapshotData {
+export function useSocialSnapshot(
+  now: Date,
+  festivalOverride?: Festival | null,
+): SocialSnapshotData {
+  const { festival: contextFestival } = useActiveFestival();
+  const festival = festivalOverride === undefined ? contextFestival : festivalOverride;
   const picks = useAllPicks();
   const { bands, loading: bandsLoading } = useBands();
   const crewUsers = useCrewUsersCache();
@@ -38,9 +45,10 @@ export function useSocialSnapshot(now: Date): SocialSnapshotData {
       presence,
       metalPlaceConfig,
       liveBandTestConfig,
+      festival,
       now,
     });
-  }, [loading, bands, picks, crewUsers, presence, metalPlaceConfig, liveBandTestConfig, now]);
+  }, [loading, bands, picks, crewUsers, presence, metalPlaceConfig, liveBandTestConfig, festival, now]);
 
   return {
     snapshot,

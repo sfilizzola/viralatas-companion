@@ -66,7 +66,7 @@ function CacheVersionCheck() {
 **Purpose**:
 1. Read Active Festival `festivals.cache_version` from Supabase
 2. Compare with local pack marker (`meta.active_festival_cache_version`) via `shouldInvalidatePack`
-3. If different: `clearActiveFestivalPack()` → `loadActivePack()` for that Festival only
+3. If different: `festivalsRepository.syncCatalog()` (catalog is not in the pack) → `clearActiveFestivalPack()` → `loadActivePack()` for that Festival only
 
 **Why?**: Lineup / social pack changes for one Festival must not wipe another Festival’s data or forever stores (badge history). Other Festivals’ version bumps are ignored while they are not Active.
 
@@ -582,4 +582,4 @@ createOptimisticQueue(storage, {
 
 On flush: load IDB queue → `buildFlushBatches()` → `syncOne()` per batch → remove all IDs in batch on success. Failed batches stay queued for next reconnect.
 
-**Last updated:** 2026-08-11 — Phase 47: Active Festival–scoped reconnect + pack load; per-Festival `festivals.cache_version` invalidation.
+**Last updated:** 2026-09-04 — Phase 49: `checkAndApplyCacheVersion` calls `syncCatalog` before pack reload.

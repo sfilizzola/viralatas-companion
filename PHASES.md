@@ -1,32 +1,54 @@
 # PHASES.md — Active Development
 
-Current phase and upcoming work for Viralatas Metaleiros. See CLAUDE.md for project context, constraints, and key decisions.
+**Current phase: 50** — `/now` planning mode. Upcoming: 51 My Picks planning.
+
+See CLAUDE.md for project context, constraints, and key decisions.
 
 **Completed phase history** → `docs/ai-wiki/phases-history.md`  
 **Upcoming ideas** → `FUTURE_IDEAS.md`
 
 ---
 
-## Phase 48 — Stage Radar (presence-off `/now`)
+## Phase 50 — `/now` planning mode
 
-**Goal:** When festival `features.camp` is off (Summer Breeze), fill the empty camping/lost slot under crew band cards with Stage Radar. When `camp` is on: camping + lost cards as today.
+**Goal:** When `running_order` is off, `/now` is a dedicated **planning** screen — not an empty live grid and not only “skip untimed bands”. Crew still see that the festival is in announcement era (who people are picking, not who is on stage).
 
-**Visual lock:** Variant B — 2-col §14 schedule tiles (LIVE ribbon, NEXT 0.72, done muted). Prototype: `docs/superpowers/prototypes/stage-radar/index.html`.
+**Depends on:** Phase 49 (`running_order` + `isTimedBand` + nullable slots).
 
-### Acceptance
+**Visual:** Brainstorm + `huashu-design` prototypes (`docs/superpowers/prototypes/now-planning/`) before implementation. Spec not written yet.
 
-- [ ] `camp` off: Stage Radar under `CrewGroupsSection`; one tile per stage; no camping/lost cards
-- [ ] `camp` on: camping + lost cards; no Stage Radar
-- [ ] Live / next / done correct vs festival `now` (+ live-band test override)
-- [ ] “N going” = crew roster pickers of that band; sheet lists names (+ you)
-- [ ] Metal Place still independent via `features.metal_place`
-- [ ] Offline from IDB after first load
-- [ ] No new backend schema
-- [ ] Wiki + DS § stage-radar + changelog updated
+### Acceptance (draft — lock in brainstorm)
 
-### Relevant plan
+- [ ] Flag off: `/now` planning UI (no fake live/next from stored times)
+- [ ] Flag on: today’s `/now` unchanged
+- [ ] Offline from IDB
+- [ ] Wiki + DS + changelog
 
-`docs/superpowers/plans/2026-08-12-stage-radar.md` (local scratch)
+### Relevant spec / plan
+
+Not yet. Start with `/brainstorming` after Phase 49.
+
+---
+
+## Phase 51 — My Picks planning mode
+
+**Goal:** When `running_order` is off, `/my-picks` is a **planning** list of wanted bands — not a timed timeline and not conflict math. Picks remain the same rows that become the schedule after the flag flips.
+
+**Depends on:** Phase 49. Can share copy/era language with Phase 50.
+
+**Visual:** Brainstorm + `huashu-design` prototypes (`docs/superpowers/prototypes/picks-planning/`) before implementation. Spec not written yet.
+
+### Acceptance (draft — lock in brainstorm)
+
+- [ ] Flag off: My Picks planning UI (no timeline / conflict chrome)
+- [ ] Flag on: today’s My Picks unchanged
+- [ ] Picks identical to Phase 49 survival (`band_id` stable)
+- [ ] Offline from IDB
+- [ ] Wiki + DS + changelog
+
+### Relevant spec / plan
+
+Not yet. Start with `/brainstorming` after Phase 49 (or in parallel with 50 once 49 has shipped the flag).
 
 ---
 

@@ -7,19 +7,23 @@ import { getFestivalDay } from '../../services/time';
 import { Button, Collapsible, Modal } from '../../ui';
 import Icon from '../icons/Icon';
 import styles from '../../pages/ProfilePage.module.css';
+import type { Festival } from '../../types/festival';
+import { useActiveFestival } from '../../hooks/useActiveFestival';
+import { timedBands, type TimedBand } from '../../services/timedBand';
 
 type ConflictPair = {
-  bandA: Band;
-  bandB: Band;
+  bandA: TimedBand;
+  bandB: TimedBand;
   day: number;
 };
 
-function detectConflicts(bands: Band[]): ConflictPair[] {
-  const overlaps = computeBandOverlaps(bands);
+function detectConflicts(bands: Band[], festival: Festival | null | undefined): ConflictPair[] {
+  const usable = timedBands(bands, festival);
+  const overlaps = computeBandOverlaps(usable, festival);
   const seenPairs = new Set<string>();
   const conflicts: ConflictPair[] = [];
 
-  for (const band of bands) {
+  for (const band of usable) {
     for (const overlap of overlaps.get(band.id) ?? []) {
       if (overlap.severity !== 'hard') continue;
 
@@ -57,6 +61,7 @@ type ConflictSectionProps = {
 };
 
 export default function ConflictSection({ userId, t }: ConflictSectionProps) {
+  const { festival } = useActiveFestival();
   const { unpickBand } = usePickActions(userId);
   const [bands, setBands] = useState<Band[]>([]);
   const [picks, setPicks] = useState<UserPick[]>([]);
@@ -84,7 +89,10 @@ export default function ConflictSection({ userId, t }: ConflictSectionProps) {
     return bands.filter((b) => pickedIds.has(b.id));
   }, [bands, picks]);
 
-  const conflicts = useMemo(() => detectConflicts(pickedBands), [pickedBands]);
+  const conflicts = useMemo(
+    () => detectConflicts(pickedBands, festival),
+    [pickedBands, festival],
+  );
 
   const conflictsByDay = useMemo(() => {
     const grouped = new Map<number, ConflictPair[]>();

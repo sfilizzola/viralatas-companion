@@ -112,30 +112,33 @@ export type Database = {
         Row: {
           id: string;
           festival_id: string;
+          slot_id: string | null;
           name: string;
-          stage: string;
-          start_time: string;
-          end_time: string;
+          stage: string | null;
+          start_time: string | null;
+          end_time: string | null;
           image_url: string | null;
           genre: string | null;
         };
         Insert: {
           id?: string;
           festival_id: string;
+          slot_id?: string | null;
           name: string;
-          stage: string;
-          start_time: string;
-          end_time: string;
+          stage: string | null;
+          start_time: string | null;
+          end_time: string | null;
           image_url?: string | null;
           genre?: string | null;
         };
         Update: {
           id?: string;
           festival_id?: string;
+          slot_id?: string | null;
           name?: string;
-          stage?: string;
-          start_time?: string;
-          end_time?: string;
+          stage?: string | null;
+          start_time?: string | null;
+          end_time?: string | null;
           image_url?: string | null;
           genre?: string | null;
         };

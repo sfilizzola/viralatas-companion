@@ -608,3 +608,66 @@
 .applyBtn:hover {
   background: var(--accent-hover);
 }
+
+.announcementFilters {
+  flex-shrink: 0;
+}
+
+.announcementSearchWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 10px var(--s-4) 0;
+}
+
+.announcementSearch {
+  width: 100%;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-1);
+  outline: none;
+  background: var(--bg-sunken);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+}
+
+.announcementSearch:focus {
+  border-color: var(--accent);
+}
+
+.announcementSearch::placeholder {
+  color: var(--text-muted);
+}
+
+.announcementGenres {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 10px var(--s-4) 0;
+  scrollbar-width: none;
+}
+
+.announcementGenres::-webkit-scrollbar {
+  display: none;
+}
+
+.announcementGenre {
+  flex: 0 0 auto;
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.announcementGenreOn {
+  border-color: var(--accent);
+  background: rgba(192, 57, 43, 0.12);
+  color: var(--text);
+}

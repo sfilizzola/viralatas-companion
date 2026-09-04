@@ -141,6 +141,12 @@ vi.mock('../hooks/useAuth', () => ({
   }),
 }));
 
+vi.mock('../hooks/useActiveFestival', () => ({
+  useActiveFestival: () => ({
+    festival: { features: { running_order: true } },
+  }),
+}));
+
 vi.mock('../repositories', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../repositories')>();
   return {

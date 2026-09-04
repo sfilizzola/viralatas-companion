@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi } from 'vitest';
 import StageRadarSheet from '../components/now/StageRadarSheet';
 import type { StageRadarEntry } from '../services/stageRadar';
-import type { Band } from '../types';
+import type { TimedBand } from '../services/timedBand';
 
 vi.mock('../lib/i18n', () => ({
   useI18n: () => ({
@@ -28,7 +28,7 @@ vi.mock('../services/bandTime', () => ({
   formatTime: (iso: string) => iso.slice(11, 16),
 }));
 
-const band: Band = {
+const band: TimedBand = {
   id: '1',
   festival_id: 'sb',
   slot_id: '1',

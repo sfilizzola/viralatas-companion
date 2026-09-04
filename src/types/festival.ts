@@ -4,7 +4,8 @@ export type FestivalFeatureKey =
   | 'duck'
   | 'camp'
   | 'wrap'
-  | 'remote_lineup';
+  | 'remote_lineup'
+  | 'running_order';
 
 export type FestivalFeatures = Partial<Record<FestivalFeatureKey, boolean>>;
 

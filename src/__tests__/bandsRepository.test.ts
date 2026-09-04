@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   setActiveFestivalCacheVersion: vi.fn(),
   clearActiveFestivalPack: vi.fn(),
   saveBands: vi.fn(),
+  syncCatalog: vi.fn(),
   loadActivePack: vi.fn(),
 }));
 
@@ -25,6 +26,7 @@ vi.mock('../lib/supabase', () => ({
 
 vi.mock('../repositories/festivals', () => ({
   festivalsRepository: {
+    syncCatalog: mocks.syncCatalog,
     loadActivePack: mocks.loadActivePack,
   },
 }));
@@ -99,6 +101,7 @@ describe('bandsRepository.checkAndApplyCacheVersion', () => {
     mocks.getActiveFestivalCacheVersion.mockResolvedValue('v1');
     mocks.setActiveFestivalCacheVersion.mockResolvedValue(undefined);
     mocks.clearActiveFestivalPack.mockResolvedValue(undefined);
+    mocks.syncCatalog.mockResolvedValue([]);
     mocks.loadActivePack.mockResolvedValue(undefined);
     Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
   });
@@ -121,7 +124,11 @@ describe('bandsRepository.checkAndApplyCacheVersion', () => {
 
     expect(mocks.clearActiveFestivalPack).toHaveBeenCalledOnce();
     expect(mocks.setActiveFestivalCacheVersion).toHaveBeenCalledWith('v99');
+    expect(mocks.syncCatalog).toHaveBeenCalledOnce();
     expect(mocks.loadActivePack).toHaveBeenCalledWith(USER_ID, FESTIVAL_ID);
+    expect(mocks.syncCatalog.mock.invocationCallOrder[0]).toBeLessThan(
+      mocks.loadActivePack.mock.invocationCallOrder[0],
+    );
   });
 
   it('does nothing when festivals returns no row', async () => {

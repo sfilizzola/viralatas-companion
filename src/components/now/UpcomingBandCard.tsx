@@ -1,14 +1,14 @@
 import { useState, type MouseEvent } from 'react';
 import { useI18n } from '../../lib/i18n';
 import QuackStrip from '../QuackStrip';
-import type { Band } from '../../types';
 import type { CrewLivePlan } from '../../services/livePreview';
 import { formatFestivalTime } from '../../services/livePreview';
 import { stageColor } from '../../services/stageColors';
+import type { TimedBand } from '../../services/timedBand';
 import styles from './UpcomingBandCard.module.css';
 
 type UpcomingBandCardProps = {
-  nextBand: Band;
+  nextBand: TimedBand;
   crewMembers: CrewLivePlan[];
   userId: string | null;
   onDismiss: (bandId: string) => void;

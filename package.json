@@ -18,6 +18,7 @@
     "seed:festival": "tsx supabase/seed/festivals.ts",
     "seed:demo-fest": "tsx supabase/seed/demo-fest-2027.ts",
     "seed:summer-breeze": "tsx supabase/seed/summer-breeze-2026.ts",
+    "seed:announcement-festivals-2027": "tsx supabase/seed/announcement-festivals-2027.ts",
     "lineup:check-official": "tsx supabase/seed/lineup-check-official.ts",
     "seed:live-now": "tsx supabase/seed/live-now.ts",
     "seed:test-users": "tsx supabase/seed/test-users.ts reset",

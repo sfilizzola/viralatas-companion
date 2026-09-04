@@ -8,6 +8,7 @@ import {
   canShowRemoteLineup,
   canShowWrap,
   hasFestivalFeature,
+  hasRunningOrder,
 } from '../lib/festivalFeatures';
 import type { Festival } from '../types/festival';
 
@@ -64,5 +65,10 @@ describe('canShow* helpers', () => {
     expect(canShowPresence({ ...base, features: { metal_place: true } })).toBe(true);
     expect(canShowPresence({ ...base, features: { map: true } })).toBe(false);
     expect(canShowPresence(null)).toBe(false);
+  });
+
+  it('hasRunningOrder follows running_order', () => {
+    expect(hasRunningOrder(base)).toBe(false);
+    expect(hasRunningOrder({ ...base, features: { ...base.features, running_order: true } })).toBe(true);
   });
 });

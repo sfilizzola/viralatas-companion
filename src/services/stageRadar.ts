@@ -1,5 +1,7 @@
 import type { Band, CrewUser, UserPick } from '../types';
+import type { Festival } from '../types/festival';
 import { applyLiveBandTestOverride } from './livePreview';
+import { timedBands, type TimedBand } from './timedBand';
 
 export type StageRadarStatus = 'live' | 'next' | 'done';
 
@@ -12,7 +14,7 @@ export type StageRadarPicker = {
 export type StageRadarEntry = {
   stage: string;
   status: StageRadarStatus;
-  band: Band | null;
+  band: TimedBand | null;
   pickers: StageRadarPicker[];
   pickerCount: number;
 };
@@ -22,9 +24,9 @@ function pickerLabel(user: CrewUser): string {
 }
 
 function resolveBandForStage(
-  stageBands: Band[],
+  stageBands: TimedBand[],
   nowMs: number,
-): { status: StageRadarStatus; band: Band | null } {
+): { status: StageRadarStatus; band: TimedBand | null } {
   const sorted = stageBands.slice().sort((a, b) => a.start_time.localeCompare(b.start_time));
   const currentCandidates = sorted.filter(
     (b) =>
@@ -41,7 +43,7 @@ function resolveBandForStage(
 }
 
 function pickersForBand(
-  band: Band | null,
+  band: TimedBand | null,
   picks: UserPick[],
   crewUsers: CrewUser[],
 ): StageRadarPicker[] {
@@ -64,11 +66,18 @@ export function buildStageRadarSnapshot(
   picks: UserPick[],
   crewUsers: CrewUser[],
   now: Date,
+  festival: Festival | null | undefined,
   options?: { liveTestBandId?: string | null },
 ): StageRadarEntry[] {
-  if (bands.length === 0) return [];
+  const usable = timedBands(bands, festival);
+  if (usable.length === 0) return [];
 
-  const effective = applyLiveBandTestOverride(bands, options?.liveTestBandId, now);
+  const effective = applyLiveBandTestOverride(
+    usable,
+    options?.liveTestBandId,
+    now,
+    festival,
+  );
   const nowMs = now.getTime();
   const stages = [...new Set(effective.map((b) => b.stage))];
 

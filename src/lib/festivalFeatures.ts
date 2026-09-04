@@ -31,6 +31,10 @@ export function canShowRemoteLineup(f: Festival | null | undefined) {
   return hasFestivalFeature(f, 'remote_lineup');
 }
 
+export function hasRunningOrder(f: Festival | null | undefined) {
+  return hasFestivalFeature(f, 'running_order');
+}
+
 export function canShowPresence(f: Festival | null | undefined) {
   return canShowCamp(f) || canShowMetalPlace(f);
 }

@@ -39,8 +39,60 @@ The list of **Festivals** available to opt into (created by ops/seed, not in-app
 _Avoid_: Festival directory with full schedule preview, public lineup browser (v1)
 
 **Festival feature**:
-An optional capability on a **Festival** (e.g. Metal Place, map, duck, camp, wrap, remote lineup). Core schedule / picks / `/now` / mural are not Festival features — they exist for every Festival. Wacken 2026 simply has more features enabled.
-_Avoid_: Wacken grounds pack (as the umbrella name), module (unless speaking engineering), add-on product
+An optional capability on a **Festival** (e.g. Metal Place, map, duck, camp, wrap, remote lineup). Core schedule / picks / `/now` / mural are not Festival features — they exist for every Festival. Wacken 2026 simply has more features enabled. **Lineup era** is also not a Festival feature — every Festival has one.
+_Avoid_: Wacken grounds pack (as the umbrella name), module (unless speaking engineering), add-on product, running order (for this meaning)
+
+**Band**:
+A named act on a **Festival**’s lineup. Identity is the act, not a stage or time slot. In **Announcement Lineup** the Festival knows the Band; in **Schedule Lineup** it also knows day, time, and stage. When laptop sync matches one announced name to one official slot, it is still the same Band — picks stay.
+_Avoid_: Slot, set, performance (when meaning the act itself)
+
+**Pick**:
+A vira-lata’s interest marker on a **Band** — not a commitment. Same Pick in **Announcement Lineup** and **Schedule Lineup**; identity follows the Band, not the slot. In Announcement Lineup, Popular and My Picks still show those Picks (counts / name-only rows). They do not use a **trusted clock**.
+_Avoid_: RSVP, ticket, commitment, hiding picks until Schedule Lineup
+
+**Name match**:
+Laptop sync pairing an announced **Band** to an official slot by normalized name (trim, collapse space, Unicode NFKC, case-insensitive) inside one Festival. A unique pair keeps the same Band. An **ambiguous name cluster** is skipped (other names still apply; sync exits non-zero). Laptop `seed:bands:sync` only — not **Remote lineup sync**.
+_Avoid_: Slot match, remote lineup sync, fuzzy match (beyond that normalize), auto-merge, first slot wins, phone name-match
+
+**Ambiguous name cluster**:
+Two or more announced **Bands** sharing a normalized name, or two or more official slots sharing that name, in the same Festival. **Name match** does not pick a winner. Sync reports the cluster, skips it, applies the rest, and fails the exit code.
+_Avoid_: Auto-merge, duplicate picks onto both slots, abort entire apply
+
+**Official-only slot**:
+A complete slot in the **Lineup wiki** (day, time, stage) with no matching announced **Band**. Laptop sync **INSERT**s a new Band with zero picks. Not a leftover (that is live-without-wiki).
+_Avoid_: Skip until announced, dummy announced row
+
+**Lineup era**:
+Which of two Lineup states a **Festival** is in: **Announcement Lineup** or **Schedule Lineup**. Every Festival has a Lineup era — not only Wacken. A newly catalogued Festival starts in **Announcement Lineup** until a **Lineup era flip**. Wacken 2026 and Summer Breeze 2026 start in **Schedule Lineup**. Not a **Festival feature**, and not **Official running order**.
+_Avoid_: Festival feature (for this meaning), running-order flag (in product talk), official running order (for this meaning)
+
+**Announcement Lineup**:
+The Lineup era where the Festival has published **who** is playing (named **Bands**) but not trustworthy day, time, or stage. Vira-latas pick by name. Rumored days stay **Lineup wiki** footnotes — not on the Band, not in the app list.
+_Avoid_: Planning list, TBA schedule, untimed festival, announcement (the mural), rumored day as data
+
+**Schedule Lineup**:
+The Lineup era where the Festival has published day, time, and stage for **Bands**. Timed schedule, conflicts, and live/next use this era.
+_Avoid_: Official running order (the Wacken feed), timed festival (as the era name)
+
+**Trusted clock**:
+Day, time, and stage the app may use for live/next, conflicts, and map. Exists only in **Schedule Lineup**, and only for a **Band** that actually has those fields. In **Announcement Lineup**, clocks are untrusted even if the database already has times. `/now` live/next uses trusted clocks only — it is not the Announcement Lineup planning list (`/schedule` is).
+_Avoid_: Inferring from filled columns, “has start_time”, untimed (as the era name), planning `/now` (until a later phase)
+
+**Lineup wiki**:
+The committed wiki page for a Festival’s lineup. Human source of truth when building the seed script that updates live **Bands**. In **Announcement Lineup**, one normalized name per Festival — do not author duplicate announced rows. In **Schedule Lineup**, a Band missing day, time, or stage is omitted from the wiki and is not **added** to live. Distinct from **Official running order** (Wacken feed). The wiki does not auto-delete live rows that it no longer lists — those are **leftover Bands**.
+_Avoid_: Live database as the authoring source, script as the human SoT, wiki as a live wipe
+
+**Leftover Band**:
+A live **Band** that is not in the current **Lineup wiki** (typical: announced name with no slot after the Festival enters **Schedule Lineup**). Laptop sync **reports** it and never auto-deletes. Until an operator deletes it by hand, it stays name-only — no **trusted clock**. Picks stay. It still appears on Lineup, Popular, and My Picks (not slotted-only).
+_Avoid_: Auto-delete leftover, hide leftover, ghost band, schedule-only leftovers
+
+**Lineup era flip**:
+Godlike changing the **Active Festival** between **Announcement Lineup** and **Schedule Lineup** (either direction) in the PWA, online. The laptop seed script updates **Bands**; it does not flip era. Filling times does not enter Schedule Lineup. Flipping back to Announcement Lineup drops **trusted clock** even if old times remain in the database. Other vira-latas pick up the new era on the next **Festival cache version** check (pack + **Festival catalog** reload) — they may see the old era until then. Not Realtime.
+_Avoid_: Auto-flip on sync, script sets era, global app setting, one-way era, instant era for every phone
+
+**Official running order**:
+Wacken's live JSON feed (wacken.com) — authoritative source when building a remote lineup plan during the festival. Repo seed files may lag until **laptop reconcile**. A Wacken-only operator feed; it is not **Lineup era** and does not apply to every Festival.
+_Avoid_: Official lineup, Wacken feed (too generic), Schedule Lineup (for this meaning), running order (unqualified)
 
 **Active Festival pack**:
 The offline IndexedDB dataset for the **Active Festival**: bands, picks, mural, announcement reactions, missed bands, and ratings (the full core social pack). Cleared and reloaded when the Active Festival changes. Not a cache of every Festival the vira-lata has joined.
@@ -147,16 +199,13 @@ The live `/now` bucket listing vira-latas currently checked in at camping. Unrel
 _Avoid_: Campground, camp pin, GPS card
 
 **Remote lineup sync**:
-A godlike-only operator action in the PWA: fetch Wacken's official running order, preview a **lineup plan** against production `bands`, then apply after explicit confirm. Does not update git-tracked seed files.
-_Avoid_: Phone seed, mobile bands sync, remote seed
+A godlike-only operator action in the PWA: fetch Wacken's **Official running order**, preview a **lineup plan** against production `bands`, then apply after explicit confirm. Does not update git-tracked seed files. Requires the `remote_lineup` **Festival feature** (Wacken); it is not how a Festival enters **Schedule Lineup**. Matches by slot, never by **name match**.
+_Avoid_: Phone seed, mobile bands sync, remote seed, flipping Lineup era, phone name-match
 
 **Lineup plan**:
 The dry-run diff between the official running order and production `bands`, classified into UPDATE, MOVE, INSERT, and DELETE buckets with pick-impact counts. Preview is read-only; apply executes the plan and bumps `cache_version`.
 _Avoid_: Sync diff, bands diff, migration plan
 
-**Official running order**:
-Wacken's live JSON feed (wacken.com) — authoritative source when building a remote lineup plan during the festival. Repo seed files may lag until **laptop reconcile**.
-_Avoid_: Official lineup, Wacken feed (too generic)
 
 **Slot move**:
 A CONFIRMED band that Wacken relocated to a different `slot_id`. Picks and missed-band records follow the band, not the slot — repointed using a **move pick snapshot** (vira-lata `user_id`s on the source band at preview time). TBD / TDB MTB / ceremony slots are never auto-moved. When multiple moves ship in one plan, pick repoints and metadata updates finish before vacated slot rows are removed.
@@ -195,6 +244,9 @@ _Avoid_: Global cache_version as the only lineup invalidation once multiple Fest
 **Festival vs festival cycle / current festival year**:
 **Festival** = event instance (multi-festival product). **Festival cycle** / **current festival year** remain Wacken-badge-year language until the badge vest is redesigned. Do not use “festival cycle” to mean opting into Hellfest.
 
+**Lineup era vs Official running order vs Festival feature**:
+**Announcement Lineup** / **Schedule Lineup** = every Festival’s Lineup era (who is known vs day/time/stage known). **Official running order** = Wacken’s JSON feed only. **Festival features** = optional extras (map, duck, …). Do not say “running order” for any of these without the qualifier. **Trusted clock** follows Lineup era, not whether time columns are filled.
+
 **Friend (`is_friend`)**:
 Stays a **global** vira-lata flag for v1 (camping/Arrival/presence exclusions). Not modeled per **Festival**. Revisit if someone is Friend at one Festival and full crew at another.
 
@@ -206,6 +258,58 @@ Pre-multi-festival single app_config token. Superseded in product language by **
 **Dev:** Can Beto plan Hellfest and Wacken in the same app?
 
 **Expert:** Yes. Each is a **Festival**. He **Joins** both (**Festival membership**), then sets **Active Festival** to whichever he’s working on. Only that Festival’s **Active Festival pack** is on the phone offline.
+
+**Dev:** Hellfest posted band names but no times. Wacken already has stages. Same app?
+
+**Expert:** Same **Band** idea on both. Hellfest is in **Announcement Lineup** (we know **Bands**). Wacken is in **Schedule Lineup** (we know day, time, and stage). Every Festival has a **Lineup era**. Wacken’s **Official running order** feed is unrelated — that’s only remote lineup sync.
+
+**Dev:** Ops pasted Hellfest times into the database but left it in Announcement Lineup. Does `/now` show live sets?
+
+**Expert:** No. No **trusted clock** until the Festival is in **Schedule Lineup**. Filled columns do not override the era.
+
+**Dev:** Local Hero was announced and picked. The Schedule **Lineup wiki** dropped them — no slot. Does sync wipe them?
+
+**Expert:** No. That’s a **leftover Band**. Dry-run reports it. No auto-delete. Picks stay until someone deletes the row by hand.
+
+**Dev:** I applied Hellfest slots with the laptop script. Is `/now` live yet?
+
+**Expert:** No. **Lineup era flip** is godlike in the PWA on the **Active Festival**. The script does not flip era.
+
+**Dev:** Summer Breeze republished stages. Times in the DB are wrong.
+
+**Expert:** Godlike flips that **Active Festival** back to **Announcement Lineup**. No **trusted clock** until they flip to Schedule again. The script can fix rows later.
+
+**Dev:** Maria picked announced Gojira. Wiki later puts Gojira on FAS1. Same band?
+
+**Expert:** Yes — **name match**. One announced name, one official slot: same **Band**, her pick stays. `"  Gojira "` still matches.
+
+**Dev:** Official has Gojira twice. One announced Gojira with picks. What happens?
+
+**Expert:** **Ambiguous name cluster** — skip that name. Rest of the lineup still applies. Fix the wiki, re-run. Don’t copy her pick onto both slots.
+
+**Dev:** Bloodbath was never announced. Wiki now has them on a full slot.
+
+**Expert:** **Official-only slot** — INSERT a new **Band**, zero picks. Wiki had day, time, and stage, so it is a valid add.
+
+**Dev:** Press says Gojira is Sunday. Do we put day on the Band?
+
+**Expert:** No. Announcement Lineup is who, not when. Footnote the rumor in the **Lineup wiki**. The app list stays flat.
+
+**Dev:** I flipped Hellfest to Schedule Lineup. Beto still sees posters.
+
+**Expert:** Until his phone’s **Festival cache version** check reloads pack + catalog. Same lag as a lineup sync. No live era push.
+
+**Dev:** We just added Hellfest 2027. Timed UI?
+
+**Expert:** No — new Festivals start in **Announcement Lineup**. Wacken and Summer Breeze start in **Schedule Lineup**. Godlike flips when times are published.
+
+**Dev:** Hellfest is still announcement. Does Popular work?
+
+**Expert:** Yes. A **Pick** is still “I want this Band.” Popular is counts then name. My Picks lists them without times. `/now` does not become a second planning list.
+
+**Dev:** We flipped to Schedule Lineup. Local Hero never got a slot. Gone from Lineup?
+
+**Expert:** No. **Leftover Band** — still on Lineup as name-only, plus Popular and My Picks, until you delete by hand.
 
 **Dev:** Maria Left Hellfest. Do her Bloodbath picks still bump popular?
 

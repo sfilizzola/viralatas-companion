@@ -13,6 +13,7 @@ import {
   scenarioPresence,
   scenarioUser,
   SCENARIO_NOW,
+  SCENARIO_FESTIVAL,
   threeBandLiveFixture,
 } from './fixtures/liveNowScenarios';
 
@@ -144,6 +145,7 @@ describe('badge presence parity with /now', () => {
       users,
       [],
       festivalNow,
+      { festival: SCENARIO_FESTIVAL },
     );
 
     expect(fromGroups).toEqual(fromCompute);
@@ -162,9 +164,11 @@ describe('badge presence parity with /now', () => {
 
     const withoutTest = computeCrewLocationCounts([band], picks, users, [], festivalNow, {
       liveTestBandId: null,
+      festival: SCENARIO_FESTIVAL,
     });
     const withDisabledTest = computeCrewLocationCounts([band], picks, users, [], festivalNow, {
       liveTestBandId: resolveLiveTestBandId({ band_id: 'test-live', enabled: false }),
+      festival: SCENARIO_FESTIVAL,
     });
 
     expect(withDisabledTest).toEqual(withoutTest);
@@ -175,9 +179,12 @@ describe('badge presence parity with /now', () => {
     const users = [scenarioUser('watcher', 'Watcher')];
     const picks = [scenarioPick('watcher', 'test-live')];
 
-    const withoutTest = computeCrewLocationCounts([band], picks, users, [], festivalNow);
+    const withoutTest = computeCrewLocationCounts([band], picks, users, [], festivalNow, {
+      festival: SCENARIO_FESTIVAL,
+    });
     const withTest = computeCrewLocationCounts([band], picks, users, [], festivalNow, {
       liveTestBandId: resolveLiveTestBandId({ band_id: 'test-live', enabled: true }),
+      festival: SCENARIO_FESTIVAL,
     });
 
     expect(withoutTest.lost).toBe(1);

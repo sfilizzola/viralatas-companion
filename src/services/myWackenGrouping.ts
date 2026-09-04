@@ -1,27 +1,30 @@
 import type { Band } from '../types';
+import type { Festival } from '../types/festival';
 import { bandDay } from './bandTime';
+import { isTimedBand, type TimedBand } from './timedBand';
 
 export type MyWackenDayGroup = {
   dayKey: string;
-  upcoming: Band[];
-  ended: Band[];
+  upcoming: TimedBand[];
+  ended: TimedBand[];
   showDivider: boolean;
 };
 
+export function splitPicksForMyPicks(
+  bands: Band[],
+  pickedIds: ReadonlySet<string>,
+  festival: Festival | null | undefined,
+): { timed: TimedBand[]; untimed: Band[] } {
+  const picked = bands.filter((band) => pickedIds.has(band.id));
+  return {
+    timed: picked.filter((band) => isTimedBand(band, festival)),
+    untimed: picked.filter((band) => !isTimedBand(band, festival)),
+  };
+}
+
 /** Festival day key (YYYY-MM-DD, CEST) for an instant — same rules as `bandDay`. */
 export function festivalDayKeyFromNow(now: Date): string {
-  return bandDay({
-    id: '__now__',
-    festival_id: 'wacken-2026',
-    slot_id: '__now__',
-    name: '',
-    stage: '',
-    start_time: now.toISOString(),
-    end_time: now.toISOString(),
-    image_url: null,
-    genre: null,
-    category: null,
-  });
+  return bandDay(now.toISOString());
 }
 
 export function groupMyWackenByDay(
@@ -30,11 +33,18 @@ export function groupMyWackenByDay(
   now: Date,
 ): MyWackenDayGroup[] {
   const nowMs = now.getTime();
-  const byDay = new Map<string, { upcoming: Band[]; ended: Band[] }>();
+  const byDay = new Map<string, { upcoming: TimedBand[]; ended: TimedBand[] }>();
+  const usable = bands.filter(
+    (band): band is TimedBand =>
+      band.slot_id !== null &&
+      band.stage !== null &&
+      band.start_time !== null &&
+      band.end_time !== null,
+  );
 
-  for (const band of bands) {
+  for (const band of usable) {
     if (!pickedIds.has(band.id)) continue;
-    const day = bandDay(band);
+    const day = bandDay(band.start_time);
     const bucket = byDay.get(day) ?? { upcoming: [], ended: [] };
     if (new Date(band.end_time).getTime() < nowMs) {
       bucket.ended.push(band);
@@ -44,7 +54,8 @@ export function groupMyWackenByDay(
     byDay.set(day, bucket);
   }
 
-  const sortByStart = (a: Band, b: Band) => a.start_time.localeCompare(b.start_time);
+  const sortByStart = (a: TimedBand, b: TimedBand) =>
+    a.start_time.localeCompare(b.start_time);
 
   return [...byDay.entries()]
     .sort(([a], [b]) => a.localeCompare(b))

@@ -38,6 +38,29 @@ async function syncCatalog(): Promise<Festival[]> {
   return catalog;
 }
 
+async function setRunningOrder(festivalId: string, enabled: boolean): Promise<Festival> {
+  if (typeof navigator !== 'undefined' && !navigator.onLine) {
+    throw new Error('offline');
+  }
+  const catalog = await syncCatalog();
+  const current = catalog.find((festival) => festival.id === festivalId);
+  if (!current) throw new Error('Festival not in catalog');
+  const cache_version = new Date().toISOString();
+  const features = { ...current.features, running_order: enabled };
+  const { data, error } = await supabase
+    .from('festivals')
+    .update({ features, cache_version })
+    .eq('id', festivalId)
+    .select('*')
+    .single();
+  if (error) throw error;
+  const updated = asFestival(data as Record<string, unknown>);
+  const next = catalog.map((festival) => (festival.id === festivalId ? updated : festival));
+  await saveFestivalCatalog(next);
+  await setActiveFestivalCacheVersion(cache_version);
+  return updated;
+}
+
 /** Server `users.active_festival_id` — source of truth when online. */
 async function fetchServerActiveFestivalId(userId: string): Promise<string | null> {
   const { data, error } = await supabase
@@ -134,6 +157,7 @@ async function setActiveFestival(userId: string, festivalId: string): Promise<vo
 
 export const festivalsRepository = {
   syncCatalog,
+  setRunningOrder,
   syncMyMemberships,
   fetchServerActiveFestivalId,
   optIn,

@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { Band, CrewUser, UserPick, UserPresence } from '../types';
+import type { CrewUser, UserPick, UserPresence } from '../types';
 import {
   derivePresenceValue,
   findLivePlan,
@@ -10,24 +10,27 @@ import {
   type PresenceLocation,
 } from '../services/livePreview';
 import type { SocialSnapshot } from '../services/socialSnapshot';
+import type { Festival } from '../types/festival';
+import type { TimedBand } from '../services/timedBand';
 
 const DUCK_WINDOW_MS = 15 * 60 * 1000;
 
 type UseNowPlansParams = {
   social: SocialSnapshot;
-  bands: Band[];
+  bands: TimedBand[];
   picks: UserPick[];
   crewUsers: CrewUser[];
   presence: UserPresence[];
   userId: string | null;
   userDisplayName: string | null;
   now: Date;
+  festival: Festival | null | undefined;
 };
 
 export type NowPlans = {
   isMetalPlaceWindowActive: boolean;
   liveTestBandId: string | null;
-  liveTestBand: Band | null;
+  liveTestBand: TimedBand | null;
   myRawPlan: LivePlan;
   myPresence: UserPresence | undefined;
   isFriend: boolean;
@@ -48,6 +51,7 @@ export function useNowPlans({
   presence,
   userId,
   now,
+  festival,
 }: UseNowPlansParams): NowPlans {
   const isMetalPlaceWindowActive = social.metalPlaceWindowActive;
   const liveTestBandId = social.liveTestBandId;
@@ -63,9 +67,10 @@ export function useNowPlans({
       bands,
       new Set(picks.filter((pick) => pick.user_id === userId).map((pick) => pick.band_id)),
       now,
+      festival,
       liveTestBandId,
     );
-  }, [bands, picks, userId, now, liveTestBandId]);
+  }, [bands, picks, userId, now, festival, liveTestBandId]);
 
   const myPresence = useMemo(
     () => (userId ? presence.find((item) => item.user_id === userId) : undefined),

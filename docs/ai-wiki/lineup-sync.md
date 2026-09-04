@@ -2,9 +2,20 @@
 
 ## Purpose
 
-Diff `supabase/seed/bands.ts` against `public.bands` by stable `slot_id`, preview changes (UPDATE / INSERT / DELETE), and optionally apply them **without** wiping `user_picks` or `user_missed_bands`. Use for mid-festival lineup edits: name fixes, time shifts, genre/image updates, new slots, canceled slots.
+Diff the Festival’s seed / **Lineup wiki** against `public.bands` and optionally apply **without** wiping `user_picks` or `user_missed_bands`.
+
+- **Schedule Lineup (Wacken 2026 / timed slots):** match by stable `slot_id` (UPDATE / INSERT / DELETE). Wacken **Official running order** remote sync in the PWA is still `slot_id` — not name match.
+- **Announcement → Schedule (laptop only):** **name match** via `planNameMatches` / `normalizeBandName` for DB rows with `slot_id IS NULL`. Unique pair keeps the same Band id (picks stay). **Leftover Bands** are reported and **never deleted**. **Ambiguous name clusters** skip that name, apply the rest, **exit 1**. **Official-only slots** INSERT a new Band (zero picks).
 
 For catastrophic refresh (full table replace), use destructive `npm run seed:bands` or `npm run festival:reset -- --with-bands`.
+
+### Announcement Lineup wiki contract
+
+Committed `lineup.md` for an announced Festival (see [festivals/wacken-2027/lineup.md](festivals/wacken-2027/lineup.md) and siblings):
+
+- Flat table of unique **normalized names** (one name per Festival). Do not author duplicate announced rows.
+- **Rumored days** stay footnotes — not Band columns, not seeded.
+- When organizers publish day, time, and stage: rewrite the wiki as **day × stage** tables (omit incomplete Bands — do not add leftovers to the wiki), run laptop `seed:bands:sync`, then godlike **Lineup era flip** on the Active Festival. The seed never flips era.
 
 ### Remote sync (Phase 46 — phone)
 
@@ -25,7 +36,9 @@ npm run seed:bands:sync          # dry-run — should be empty
 |------|------|
 | `supabase/seed/lineup-check-official.ts` | CLI — fetch wacken.com JSON, diff vs `lineup.md`, optional apply |
 | `src/lib/lineup-official-source.ts` | Fetch/filter/map logic, diff, patch `lineup.md` + `bands.ts` |
-| `supabase/seed/bands-sync.ts` | Main sync tool — dry-run plan + `--apply` |
+| `supabase/seed/bands-sync.ts` | Main sync tool — slot_id plan + laptop name-match; dry-run / `--apply` |
+| `src/services/announcementMatch.ts` | `planNameMatches` — unique update / leftover / cluster skip / official-only INSERT |
+| `src/services/timedBand.ts` | `normalizeBandName` (NFKC, trim, collapse space, case-insensitive) |
 | `supabase/seed/bands-move.ts` | Pick transfer when band relocates slot (`--from` / `--to`) |
 | `supabase/seed/bands.ts` | Seed source of truth; exports `assertSeedIntegrity`, `bands`, `SLOT_ID_RE` |
 | `supabase/seed/bands-backfill-slot-id.ts` | One-time slot_id bootstrap — UPDATE only, picks preserved |
@@ -98,14 +111,15 @@ Requires `.env.local` with `VITE_SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (
 ## Execution Sequence (`seed:bands:sync`)
 
 1. Load env; fail if service role key missing.
-2. Run `assertSeedIntegrity(bands)` — 187 rows, unique `slot_id`, regex `^(HAR|FAS|LOU|WET|HBA|WAS|WAK|JUN)\d+$`.
-3. Load DB rows; abort if any `slot_id IS NULL` (remediation: `npm run seed:bands:backfill-slot-id -- --apply` — preserves picks).
-4. Build plan: INSERT (seed only), DELETE (DB only), UPDATE (field diffs on shared slots).
-5. Compute pick impact for DELETE bucket.
+2. Run `assertSeedIntegrity(bands)` (Wacken 2026 seed: unique `slot_id`, regex).
+3. Load DB rows for `--festival`. Rows **with** `slot_id` plan by slot (UPDATE shared, DELETE slotted-only-in-DB, INSERT seed-only-slot). Null `slot_id` is **not** an abort — those are announced Bands for name match.
+4. Unmatched seed slots + announced DB rows → `planNameMatches`: unique name → UPDATE (assign `slot_id` + fields); official-only → INSERT; leftover announced → report/keep; ambiguous cluster → skip that name.
+5. Compute pick impact for the **DELETE** bucket only (slotted removals). Leftovers are not deletes.
 6. Print plan (or JSON).
-7. If `--apply`: UPDATE → INSERT → DELETE with post-condition checks; bump `app_config.cache_version`.
+7. If `--apply`: UPDATE → INSERT → DELETE with post-condition checks; bump that Festival’s `cache_version`.
+8. If any skipped cluster: **exit 1** even after a successful apply of the rest.
 
-Bucket order minimizes risk: non-destructive updates first, additive inserts second, deletes last.
+Bucket order minimizes risk: non-destructive updates first, additive inserts second, slotted deletes last. Name-match leftovers never enter DELETE.
 
 ## Worked Examples
 
@@ -141,7 +155,7 @@ rtk npm run seed:bands:sync
 | Exit 0, **empty plan** (0 UPDATE / INSERT / DELETE) | DB matches `bands.ts` — schema + lineup aligned |
 | UPDATE rows listed | Seed differs from DB — review diffs; `--apply` updates in place (**picks preserved** on UPDATE) |
 | DELETE rows + pick impact > 0 | **Stop** — applying would wipe picks for those bands |
-| Abort: NULL `slot_id` | Run `seed:bands:backfill-slot-id -- --apply` first (not destructive seed) |
+| Abort: NULL `slot_id` | Phase 24 bootstrap only. Phase 49: null slots are announced Bands (name-match), not an abort |
 
 Optional machine output: `rtk npm run seed:bands:sync -- --json`
 
@@ -190,8 +204,11 @@ For future risky work, clone to a **staging Supabase project** with a separate `
 
 | Scenario | Behavior |
 |----------|----------|
-| NULL `slot_id` in DB | Sync aborts; run `seed:bands:backfill-slot-id -- --apply` (not destructive seed) |
-| Change `slot_id` in seed vs DB | Shows DELETE + INSERT (picks lost on old slot) — use `seed:bands:move` if picks should follow |
+| NULL `slot_id` in DB | Announced Band — laptop name-match; **not** an abort. Remote Wacken sync still requires `slot_id`. |
+| Leftover announced name | Reported; never auto-deleted; stays on `/schedule` after Schedule Lineup (name-only) |
+| Ambiguous name cluster | Skip cluster; apply other names; exit `1` |
+| Official-only slot | INSERT new Band, zero picks |
+| Change `slot_id` in seed vs DB (already slotted) | Shows DELETE + INSERT (picks lost on old slot) — use `seed:bands:move` if picks should follow |
 | User picked both source and destination in move | Dedup: delete source pick; user keeps destination pick |
 | Second `--apply` with no seed changes | Empty plan; no writes |
 | Partial apply failure | Post-condition abort; re-run is idempotent |
@@ -211,4 +228,4 @@ For future risky work, clone to a **staging Supabase project** with a separate `
 - CI-triggered sync deferred (service role in operator `.env.local` only).
 - No audit log of sync runs in v1.
 
-**Last updated:** 2026-07-07 — Phase 46 remote godlike sync cross-link; post-festival reconcile sequence with `lineup:check-official --complete`.
+**Last updated:** 2026-09-04 — Phase 49: laptop name-match; leftovers never deleted; skip cluster exit 1; official-only INSERT; Wacken remote still `slot_id`.

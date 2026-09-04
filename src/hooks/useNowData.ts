@@ -13,6 +13,9 @@ import { useSocialSnapshot } from './useSocialSnapshot';
 import { useSkipUndo } from './useSkipUndo';
 import { usePresenceAutoSync } from './usePresenceAutoSync';
 import { useDuckQuack } from './useDuckQuack';
+import { useActiveFestival } from './useActiveFestival';
+import { timedBands, type TimedBand } from '../services/timedBand';
+import type { Festival } from '../types/festival';
 
 export type NowData = {
   userId: string | null;
@@ -33,7 +36,7 @@ export type NowData = {
   isMetalPlaceWindowActive: boolean;
   presenceValue: PresenceLocation;
   myPlan: LivePlan;
-  nextBand: Band | null;
+  nextBand: TimedBand | null;
   crewPlans: CrewLivePlan[];
   crewGroups: CrewLiveGroup[];
   handleSkip: () => Promise<void>;
@@ -44,8 +47,10 @@ export type NowData = {
   duckCooldownUntil: number | null;
 };
 
-export function useNowData(): NowData {
+export function useNowData(festivalOverride?: Festival | null): NowData {
   const { session, user } = useAuth();
+  const { festival: contextFestival } = useActiveFestival();
+  const festival = festivalOverride === undefined ? contextFestival : festivalOverride;
   const userId = session?.user?.id ?? null;
   const userDisplayName =
     (user?.user_metadata?.['display_name'] as string | undefined) ?? user?.email ?? null;
@@ -58,10 +63,10 @@ export function useNowData(): NowData {
     picks,
     bands: rawBands,
     loading: socialLoading,
-  } = useSocialSnapshot(now);
+  } = useSocialSnapshot(now, festival);
   const bands = useMemo(
-    () => rawBands.slice().sort((a, b) => a.start_time.localeCompare(b.start_time)),
-    [rawBands],
+    () => timedBands(rawBands, festival).sort((a, b) => a.start_time.localeCompare(b.start_time)),
+    [rawBands, festival],
   );
   const metalPlaceConfig = useMetalPlaceConfig();
   const liveBandTestConfig = useLiveBandTestConfig();
@@ -104,6 +109,7 @@ export function useNowData(): NowData {
     userId,
     userDisplayName,
     now,
+    festival,
   });
 
   const { undoState, handleSkip, handleUndo } = useSkipUndo(myPlan, userId);
@@ -133,7 +139,7 @@ export function useNowData(): NowData {
     const upcomingBands = picks
       .filter((pick) => pick.user_id === userId)
       .map((pick) => bands.find((b) => b.id === pick.band_id))
-      .filter((b): b is Band => b !== undefined && b.start_time > now.toISOString())
+      .filter((b): b is TimedBand => b !== undefined && b.start_time > now.toISOString())
       .sort((a, b) => a.start_time.localeCompare(b.start_time));
     return upcomingBands[0] ?? null;
   }, [picks, bands, myPlan.status, userId, now]);

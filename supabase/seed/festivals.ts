@@ -8,7 +8,8 @@
  *     --features '{}'
  *
  * Requires .env.local with VITE_SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY.
- * Service-role only — festivals have no client insert/update policies.
+ * Catalog INSERT/DELETE stay service-role / laptop. Authenticated clients may
+ * SELECT; godlike may UPDATE `features` + `cache_version` only (Phase 49).
  */
 
 import { createServiceClient, isSelfInvoked } from './seed-shared';

@@ -1,5 +1,6 @@
 import type { Festival, FestivalMembership } from '../../types';
 import { getDB } from './connection';
+import { FESTIVAL_CATALOG_CHANGED_EVENT } from './events';
 import type { ViralatasDB } from './types';
 
 const ACTIVE_FESTIVAL_ID_KEY = 'active_festival_id';
@@ -74,6 +75,9 @@ export async function clearActiveFestivalPack(): Promise<void> {
 export async function saveFestivalCatalog(catalog: Festival[]): Promise<void> {
   const db = await getDB();
   await db.put('meta', { festival_catalog: catalog }, FESTIVAL_CATALOG_KEY);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event(FESTIVAL_CATALOG_CHANGED_EVENT));
+  }
 }
 
 export async function loadFestivalCatalog(): Promise<Festival[]> {

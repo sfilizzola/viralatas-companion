@@ -131,4 +131,4 @@ Use **caveman** skill for token savings when possible.
 | `CLAUDE.md` | Always-on rules + § Artifact layout |
 | `.cursor/rules/artifact-layout.mdc` | Cursor always-apply rule (same paths) |
 | `docs/ai-wiki/index.md` | Architecture wiki entry |
-| `PHASES.md` | Current phase acceptance criteria |
+| `PHASES.md` | Current phase **50** (`/now` planning mode) acceptance criteria; 51 queued |

@@ -26,7 +26,7 @@ import {
   type RatingStatsSnapshot,
 } from './ratingStats';
 import type { UserBandRating } from '../types';
-
+import type { Festival } from '../types/festival';
 export type FestivalWrapPersonal = {
   bandsPicked: number;
   bandsSeen: number;
@@ -120,8 +120,11 @@ function modeFromSeenBands(
   return best;
 }
 
-function countConflictPairs(pickedBands: Band[]): { hard: number; soft: number } {
-  const overlaps = computeBandOverlaps(pickedBands);
+function countConflictPairs(
+  pickedBands: Band[],
+  festival: Festival | null | undefined,
+): { hard: number; soft: number } {
+  const overlaps = computeBandOverlaps(pickedBands, festival ?? null);
   const seenHard = new Set<string>();
   const seenSoft = new Set<string>();
 
@@ -155,7 +158,7 @@ function computeCrewWrapStats(
     .sort((a, b) => {
       const countDelta = (allPickCounts.get(b.id) ?? 0) - (allPickCounts.get(a.id) ?? 0);
       if (countDelta !== 0) return countDelta;
-      return a.start_time.localeCompare(b.start_time);
+      return a.name.localeCompare(b.name);
     })[0] ?? null;
 
   const activeViraLatas = new Set(allPicks.map((p) => p.user_id)).size;
@@ -230,6 +233,7 @@ export function buildFestivalWrapStats(
   authUser: AuthUser,
   social?: SocialSnapshot,
   allRatings: UserBandRating[] = [],
+  festival?: Festival | null,
 ): FestivalWrapStats {
   const currentNow = now();
   const userPickBandIds = snap.userPicks.map((p) => p.band_id);
@@ -262,11 +266,11 @@ export function buildFestivalWrapStats(
   }
 
   const earned = getEarnedBadges(ctx);
-  const { hard, soft } = countConflictPairs(ctx.pickedBands as Band[]);
+  const { hard, soft } = countConflictPairs(ctx.pickedBands as Band[], festival);
   const weakSkips = getWeakSkipCount(authUser.user_metadata);
 
   const bandsSkipped = ctx.pickedBands.filter(
-    (b) => new Date(b.end_time) < currentNow && ctx.missedBandIds.has(b.id),
+    (b) => b.end_time && new Date(b.end_time) < currentNow && ctx.missedBandIds.has(b.id),
   ).length;
 
   const stageDiversity = new Set(ctx.seenBands.map((b) => b.stage)).size;
