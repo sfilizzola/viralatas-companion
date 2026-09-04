@@ -12,8 +12,18 @@ import {
   type CrewLivePlan,
 } from '../services/livePreview';
 import type { Band, CrewUser, UserPick, UserPresence } from '../types';
+import type { Festival } from '../types/festival';
+import type { TimedBand } from '../services/timedBand';
 
-function band(id: string, start: string, end: string, overrides: Partial<Band> = {}): Band {
+const FESTIVAL_ON = { features: { running_order: true } } as Festival;
+const FESTIVAL_OFF = { features: {} } as Festival;
+
+function band(
+  id: string,
+  start: string,
+  end: string,
+  overrides: Partial<TimedBand> = {},
+): TimedBand {
   return {
     id,
     festival_id: 'wacken-2026',
@@ -34,13 +44,13 @@ describe('applyLiveBandTestOverride', () => {
 
   it('returns the bands array unchanged when no override is active', () => {
     const bands = [band('a', '2026-07-29T15:00:00Z', '2026-07-29T16:00:00Z')];
-    expect(applyLiveBandTestOverride(bands, null, NOW)).toBe(bands);
-    expect(applyLiveBandTestOverride(bands, undefined, NOW)).toBe(bands);
+    expect(applyLiveBandTestOverride(bands, null, NOW, FESTIVAL_ON)).toBe(bands);
+    expect(applyLiveBandTestOverride(bands, undefined, NOW, FESTIVAL_ON)).toBe(bands);
   });
 
   it('returns the bands array unchanged when the test band is not in the list', () => {
     const bands = [band('a', '2026-07-29T15:00:00Z', '2026-07-29T16:00:00Z')];
-    expect(applyLiveBandTestOverride(bands, 'missing', NOW)).toBe(bands);
+    expect(applyLiveBandTestOverride(bands, 'missing', NOW, FESTIVAL_ON)).toBe(bands);
   });
 
   it('shifts the test band start to (now - 5min) and preserves duration', () => {
@@ -50,7 +60,7 @@ describe('applyLiveBandTestOverride', () => {
       band('b', '2026-07-30T10:00:00Z', '2026-07-30T11:30:00Z'),
     ];
 
-    const result = applyLiveBandTestOverride(bands, 'b', NOW);
+    const result = applyLiveBandTestOverride(bands, 'b', NOW, FESTIVAL_ON);
 
     expect(result).not.toBe(bands);
     const shifted = result.find((x) => x.id === 'b')!;
@@ -66,8 +76,13 @@ describe('applyLiveBandTestOverride', () => {
   it('does not mutate the input bands array', () => {
     const original = band('b', '2026-07-30T10:00:00Z', '2026-07-30T11:30:00Z');
     const bands = [original];
-    applyLiveBandTestOverride(bands, 'b', NOW);
+    applyLiveBandTestOverride(bands, 'b', NOW, FESTIVAL_ON);
     expect(bands[0]).toEqual(original);
+  });
+
+  it('returns bands unchanged when the override target is untimed', () => {
+    const bands = [band('b', '2026-07-30T10:00:00Z', '2026-07-30T11:30:00Z')];
+    expect(applyLiveBandTestOverride(bands, 'b', NOW, FESTIVAL_OFF)).toBe(bands);
   });
 });
 
@@ -78,10 +93,10 @@ describe('findLivePlan with liveTestBandId', () => {
     const bands = [band('b', '2026-07-30T10:00:00Z', '2026-07-30T11:30:00Z')];
     const picked = new Set(['b']);
 
-    const without = findLivePlan(bands, picked, NOW);
+    const without = findLivePlan(bands, picked, NOW, FESTIVAL_ON);
     expect(without.status).toBe('next');
 
-    const withOverride = findLivePlan(bands, picked, NOW, 'b');
+    const withOverride = findLivePlan(bands, picked, NOW, FESTIVAL_ON, 'b');
     expect(withOverride.status).toBe('current');
     expect(withOverride.band?.id).toBe('b');
   });
@@ -90,8 +105,16 @@ describe('findLivePlan with liveTestBandId', () => {
     const bands = [band('b', '2026-07-30T10:00:00Z', '2026-07-30T11:30:00Z')];
     const noPicks = new Set<string>();
 
-    const result = findLivePlan(bands, noPicks, NOW, 'b');
+    const result = findLivePlan(bands, noPicks, NOW, FESTIVAL_ON, 'b');
     expect(result.status).toBe('empty');
+  });
+
+  it('ignores a picked current window when running order is off', () => {
+    const bands = [band('b', '2026-07-29T19:00:00Z', '2026-07-29T21:00:00Z')];
+    expect(findLivePlan(bands, new Set(['b']), NOW, FESTIVAL_OFF)).toEqual({
+      status: 'empty',
+      band: null,
+    });
   });
 });
 
@@ -111,7 +134,7 @@ describe('mapCrewLivePlans with liveTestBandId', () => {
     ];
     const presence: UserPresence[] = [];
 
-    const plans = mapCrewLivePlans(bands, picks, users, presence, NOW, 'b');
+    const plans = mapCrewLivePlans(bands, picks, users, presence, NOW, FESTIVAL_ON, 'b');
     const picker = plans.find((p) => p.id === 'u1')!;
     const nonPicker = plans.find((p) => p.id === 'u2')!;
 
@@ -267,7 +290,9 @@ describe('computeCrewLocationCounts', () => {
 
   it('counts crew without presence rows as lost (matches /now Lost card)', () => {
     const users = Array.from({ length: 15 }, (_, i) => crewUser(`u${i}`));
-    const counts = computeCrewLocationCounts([], [], users, [], festivalNow);
+    const counts = computeCrewLocationCounts([], [], users, [], festivalNow, {
+      festival: FESTIVAL_ON,
+    });
     expect(counts.lost).toBe(15);
     expect(counts.camping).toBe(0);
   });
@@ -282,7 +307,9 @@ describe('computeCrewLocationCounts', () => {
     const picks: UserPick[] = [
       { user_id: 'watcher', band_id: 'live', festival_id: 'wacken-2026', created_at: festivalNow.toISOString() },
     ];
-    const counts = computeCrewLocationCounts([liveBand], picks, users, [], festivalNow);
+    const counts = computeCrewLocationCounts([liveBand], picks, users, [], festivalNow, {
+      festival: FESTIVAL_ON,
+    });
     expect(counts.lost).toBe(2);
   });
 
@@ -291,7 +318,9 @@ describe('computeCrewLocationCounts', () => {
     const presence: UserPresence[] = [
       { user_id: 'camper', is_camping: true, is_at_metal_place: false, updated_at: '' },
     ];
-    const counts = computeCrewLocationCounts([], [], users, presence, festivalNow);
+    const counts = computeCrewLocationCounts([], [], users, presence, festivalNow, {
+      festival: FESTIVAL_ON,
+    });
     expect(counts.camping).toBe(1);
     expect(counts.lost).toBe(1);
   });

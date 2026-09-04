@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { buildStageScheduleSnapshot } from '../services/stageSchedule';
 import type { Band } from '../types';
+import type { Festival } from '../types/festival';
+
+const FESTIVAL_ON = { features: { running_order: true } } as Festival;
+const FESTIVAL_OFF = { features: {} } as Festival;
 
 function band(
   id: string,
@@ -20,7 +24,7 @@ describe('buildStageScheduleSnapshot', () => {
     const bands: Band[] = [
       band('1', 'Iron Maiden', 'Faster', '2026-07-30T19:00:00Z', '2026-07-30T21:00:00Z'),
     ];
-    const result = buildStageScheduleSnapshot(bands, NOW);
+    const result = buildStageScheduleSnapshot(bands, NOW, FESTIVAL_ON);
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
       stage: 'Faster',
@@ -33,7 +37,7 @@ describe('buildStageScheduleSnapshot', () => {
     const bands: Band[] = [
       band('1', 'Slayer', 'Harder', '2026-07-30T21:00:00Z', '2026-07-30T23:00:00Z'),
     ];
-    const result = buildStageScheduleSnapshot(bands, NOW);
+    const result = buildStageScheduleSnapshot(bands, NOW, FESTIVAL_ON);
     expect(result).toHaveLength(1);
     expect(result[0]).toEqual({
       stage: 'Harder',
@@ -46,12 +50,12 @@ describe('buildStageScheduleSnapshot', () => {
     const bands: Band[] = [
       band('1', 'Metallica', 'Louder', '2026-07-30T17:00:00Z', '2026-07-30T19:00:00Z'),
     ];
-    const result = buildStageScheduleSnapshot(bands, NOW);
+    const result = buildStageScheduleSnapshot(bands, NOW, FESTIVAL_ON);
     expect(result).toHaveLength(0);
   });
 
   it('returns empty array for empty input', () => {
-    expect(buildStageScheduleSnapshot([], NOW)).toEqual([]);
+    expect(buildStageScheduleSnapshot([], NOW, FESTIVAL_ON)).toEqual([]);
   });
 
   it('handles multiple stages independently', () => {
@@ -60,7 +64,7 @@ describe('buildStageScheduleSnapshot', () => {
       band('2', 'Slayer', 'Harder', '2026-07-30T21:00:00Z', '2026-07-30T23:00:00Z'),        // next
       band('3', 'Judas Priest', 'Louder', '2026-07-30T17:00:00Z', '2026-07-30T19:00:00Z'), // ended → excluded
     ];
-    const result = buildStageScheduleSnapshot(bands, NOW);
+    const result = buildStageScheduleSnapshot(bands, NOW, FESTIVAL_ON);
     expect(result).toHaveLength(2);
     const stages = result.map((e) => e.stage);
     expect(stages).toContain('Faster');
@@ -76,7 +80,7 @@ describe('buildStageScheduleSnapshot', () => {
       band('2', 'Band A', 'Faster', '2026-07-30T19:30:00Z', '2026-07-30T21:00:00Z'),
       band('3', 'Band M', 'Harder', '2026-07-30T19:00:00Z', '2026-07-30T21:00:00Z'),
     ];
-    const result = buildStageScheduleSnapshot(bands, NOW);
+    const result = buildStageScheduleSnapshot(bands, NOW, FESTIVAL_ON);
     const stages = result.map((e) => e.stage);
     expect(stages).toEqual([...stages].sort());
   });
@@ -85,7 +89,7 @@ describe('buildStageScheduleSnapshot', () => {
     // Shouldn't happen in production, but the function must be deterministic
     const earlier = band('1', 'Opener', 'Faster', '2026-07-30T18:00:00Z', '2026-07-30T21:00:00Z');
     const later   = band('2', 'Headliner', 'Faster', '2026-07-30T19:30:00Z', '2026-07-30T21:30:00Z');
-    const result = buildStageScheduleSnapshot([earlier, later], NOW);
+    const result = buildStageScheduleSnapshot([earlier, later], NOW, FESTIVAL_ON);
     expect(result).toHaveLength(1);
     expect(result[0].band.id).toBe('2');
     expect(result[0].status).toBe('current');
@@ -94,9 +98,20 @@ describe('buildStageScheduleSnapshot', () => {
   it('picks the closest next band when multiple upcoming exist on a stage', () => {
     const sooner = band('1', 'First Up', 'Harder', '2026-07-30T21:00:00Z', '2026-07-30T22:00:00Z');
     const later  = band('2', 'Second Up', 'Harder', '2026-07-30T23:00:00Z', '2026-07-31T00:00:00Z');
-    const result = buildStageScheduleSnapshot([sooner, later], NOW);
+    const result = buildStageScheduleSnapshot([sooner, later], NOW, FESTIVAL_ON);
     expect(result).toHaveLength(1);
     expect(result[0].band.id).toBe('1');
     expect(result[0].status).toBe('next');
+  });
+
+  it('does not create stage tiles when running order is off', () => {
+    const current = band(
+      '1',
+      'Iron Maiden',
+      'Faster',
+      '2026-07-30T19:00:00Z',
+      '2026-07-30T21:00:00Z',
+    );
+    expect(buildStageScheduleSnapshot([current], NOW, FESTIVAL_OFF)).toEqual([]);
   });
 });

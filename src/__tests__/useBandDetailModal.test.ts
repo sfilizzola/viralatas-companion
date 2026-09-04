@@ -1,13 +1,16 @@
 import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import type { Band } from '../types';
 import type { BandAttendee } from '../services/attendees';
 import { useBandDetailModal } from '../hooks/useBandDetailModal';
+import type { Festival } from '../types/festival';
+import type { TimedBand } from '../services/timedBand';
+
+const FESTIVAL = { features: { running_order: true } } as Festival;
 
 const userId = 'user-1';
 const otherUserId = 'user-2';
 
-const bandA: Band = {
+const bandA: TimedBand = {
   id: 'band-a',
     festival_id: 'wacken-2026',
   slot_id: 'slot-a',
@@ -20,7 +23,7 @@ const bandA: Band = {
   category: 'band',
 };
 
-const bandB: Band = {
+const bandB: TimedBand = {
   id: 'band-b',
     festival_id: 'wacken-2026',
   slot_id: 'slot-b',
@@ -42,7 +45,7 @@ const attendee = (id: string, label: string): BandAttendee => ({
   label,
 });
 
-const endedBand: Band = {
+const endedBand: TimedBand = {
   ...bandA,
   id: 'band-ended',
   end_time: '2026-07-29T11:00:00Z',
@@ -76,6 +79,7 @@ function buildParams(overrides: Partial<Parameters<typeof useBandDetailModal>[0]
     userRatingByBand: {},
     toggleRating: vi.fn().mockResolvedValue(undefined),
     clearRating: vi.fn().mockResolvedValue(undefined),
+    festival: FESTIVAL,
     ...overrides,
   };
 }

@@ -12,6 +12,8 @@ import { usePickCounts } from '../hooks/usePickCounts';
 import { useNow } from '../hooks/useNow';
 import { useI18n } from '../lib/i18n';
 import { formatRatingAvg, sortBandsByRating } from '../services/bandRatings';
+import { isTimedBand } from '../services/timedBand';
+import { useActiveFestival } from '../hooks/useActiveFestival';
 import BottomNav from '../components/BottomNav';
 import BandCard from '../components/BandCard';
 import Icon from '../components/icons/Icon';
@@ -24,6 +26,7 @@ const STORAGE_KEY = 'popularSortMode';
 export default function PopularPage() {
   const { t } = useI18n('PopularPage');
   const { session } = useAuth();
+  const { festival } = useActiveFestival();
   const userId = session?.user?.id ?? null;
 
   const { bands, loading } = useBands();
@@ -61,7 +64,7 @@ export default function PopularPage() {
         .sort((a, b) => {
           const countDelta = (pickCounts[b.id] ?? 0) - (pickCounts[a.id] ?? 0);
           if (countDelta !== 0) return countDelta;
-          return a.start_time.localeCompare(b.start_time);
+          return a.name.localeCompare(b.name);
         }),
     [bands, pickCounts],
   );
@@ -92,7 +95,7 @@ export default function PopularPage() {
     [bands, pickedIds],
   );
 
-  const bandConflicts = useBandConflicts(pickedBands);
+  const bandConflicts = useBandConflicts(pickedBands, festival);
   const { openBand, modalProps } = useBandDetailModal({
     bands,
     pickedIds,
@@ -106,6 +109,7 @@ export default function PopularPage() {
     userRatingByBand,
     toggleRating,
     clearRating,
+    festival,
   });
 
   const headerSortedKey = sortMode === 'rating' ? 'headerSortedRating' : 'headerSortedPicks';
@@ -156,7 +160,8 @@ export default function PopularPage() {
         {displayBands.map((band, index) => {
           const attendees = attendeesByBand[band.id] ?? [];
           const count = pickCounts[band.id] ?? 0;
-          const ended = new Date(band.end_time) < currentNow;
+          const showScheduleChrome = isTimedBand(band, festival);
+          const ended = showScheduleChrome && new Date(band.end_time) < currentNow;
           const aggregate = aggregates[band.id];
           const userScore = userRatingByBand[band.id];
 
@@ -176,6 +181,7 @@ export default function PopularPage() {
               isBandEnded={ended}
               missedCount={ended ? (missedCountsByBand[band.id] ?? 0) : undefined}
               showDayLabel
+              showScheduleChrome={showScheduleChrome}
               ratingStats={
                 sortMode === 'rating' && aggregate
                   ? {

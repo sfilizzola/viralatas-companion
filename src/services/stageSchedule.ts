@@ -1,21 +1,25 @@
 import type { Band } from '../types';
+import type { Festival } from '../types/festival';
+import { timedBands, type TimedBand } from './timedBand';
 
 export type StageScheduleEntry = {
   stage: string;
-  band: Band;
+  band: TimedBand;
   status: 'current' | 'next';
 };
 
 export function buildStageScheduleSnapshot(
   bands: Band[],
   now: Date,
+  festival: Festival | null | undefined,
 ): StageScheduleEntry[] {
+  const usable = timedBands(bands, festival);
   const nowMs = now.getTime();
-  const stages = [...new Set(bands.map((b) => b.stage))];
+  const stages = [...new Set(usable.map((b) => b.stage))];
   const entries: StageScheduleEntry[] = [];
 
   for (const stage of stages) {
-    const stageBands = bands
+    const stageBands = usable
       .filter((b) => b.stage === stage)
       .sort((a, b) => a.start_time.localeCompare(b.start_time));
 

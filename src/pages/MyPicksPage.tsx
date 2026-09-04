@@ -19,7 +19,9 @@ import {
   countUpcomingLeftToday,
   festivalDayKeyFromNow,
   groupMyWackenByDay,
+  splitPicksForMyPicks,
 } from '../services/myWackenGrouping';
+import { useActiveFestival } from '../hooks/useActiveFestival';
 import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BandCard from '../components/BandCard';
@@ -32,6 +34,7 @@ export default function MyPicksPage() {
   const { t } = useI18n('MyPicksPage');
   const { t: tSchedule } = useI18n('SchedulePage');
   const { session } = useAuth();
+  const { festival } = useActiveFestival();
   const userId = session?.user?.id ?? null;
   const displayName =
     (session?.user?.user_metadata?.['display_name'] as string | undefined) ??
@@ -44,10 +47,7 @@ export default function MyPicksPage() {
   const collapseContextRef = useRef<string | null>(null);
   const { bands: rawBands, loading } = useBands();
   const { allMissed, missedBandIds, missedCountsByBand, toggleMissed } = useMissedBands(userId);
-  const bands = useMemo(
-    () => rawBands.slice().sort((a, b) => a.start_time.localeCompare(b.start_time)),
-    [rawBands],
-  );
+  const bands = rawBands;
   const { pickedIds, picksReady, togglePick } = usePickActions(userId);
   const { userRatingByBand, toggleRating, clearRating } = useBandRatings(userId);
   const attendeesByBand = useBandAttendees();
@@ -55,9 +55,17 @@ export default function MyPicksPage() {
   const currentNow = useNow(60_000);
   const pendingBandIds = useOfflinePendingBandIds();
 
+  const splitPicks = useMemo(
+    () => splitPicksForMyPicks(bands, pickedIds, festival),
+    [bands, pickedIds, festival],
+  );
   const myBands = useMemo(
-    () => bands.filter((band) => pickedIds.has(band.id)),
-    [bands, pickedIds],
+    () => [...splitPicks.timed, ...splitPicks.untimed],
+    [splitPicks],
+  );
+  const untimedBands = useMemo(
+    () => splitPicks.untimed.slice().sort((a, b) => a.name.localeCompare(b.name)),
+    [splitPicks.untimed],
   );
 
   const festivalStarted = isFestivalActive(currentNow);
@@ -66,8 +74,8 @@ export default function MyPicksPage() {
   const todayKey = useMemo(() => festivalDayKeyFromNow(currentNow), [currentNow]);
 
   const dayGroups = useMemo(
-    () => groupMyWackenByDay(bands, pickedIds, currentNow),
-    [bands, pickedIds, currentNow],
+    () => groupMyWackenByDay(splitPicks.timed, pickedIds, currentNow),
+    [splitPicks.timed, pickedIds, currentNow],
   );
 
   const upcomingBands = useMemo(
@@ -108,7 +116,7 @@ export default function MyPicksPage() {
     return next;
   }, [autoCollapsedDays, collapseFlipDays]);
 
-  const conflicts = useBandConflicts(upcomingBands);
+  const conflicts = useBandConflicts(upcomingBands, festival);
   const { openBand, modalProps } = useBandDetailModal({
     bands,
     pickedIds,
@@ -122,6 +130,7 @@ export default function MyPicksPage() {
     userRatingByBand,
     toggleRating,
     clearRating,
+    festival,
   });
 
   const hardConflictBands = useMemo(() => {
@@ -228,6 +237,22 @@ export default function MyPicksPage() {
     );
   }
 
+  function renderUntimedBand(band: Band) {
+    return (
+      <BandCard
+        key={band.id}
+        band={band}
+        isPicked={pickedIds.has(band.id)}
+        count={pickCounts[band.id] ?? 0}
+        onToggle={() => togglePick(band.id)}
+        onClick={() => openBand(band.id)}
+        variant="schedule"
+        pending={pendingBandIds.has(band.id)}
+        showScheduleChrome={false}
+      />
+    );
+  }
+
   return (
     <div className={styles.page}>
       <OfflineBanner />
@@ -321,6 +346,7 @@ export default function MyPicksPage() {
             </section>
           );
         })}
+        {untimedBands.map(renderUntimedBand)}
       </main>
 
       <BandDetailModalHost modalProps={modalProps} />

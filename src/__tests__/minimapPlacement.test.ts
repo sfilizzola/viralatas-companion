@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { buildPlacements } from '../services/minimapPlacement';
 import { MINIMAP_ZONES, type ZoneId } from '../components/map/minimapZones';
 import type { CrewLiveGroup, CrewLivePlan } from '../services/livePreview';
-import type { Band } from '../types';
+import type { TimedBand } from '../services/timedBand';
 
 function member(id: string, overrides: Partial<CrewLivePlan> = {}): CrewLivePlan {
   return {
@@ -19,7 +19,7 @@ function member(id: string, overrides: Partial<CrewLivePlan> = {}): CrewLivePlan
   };
 }
 
-function band(stage: string): Band {
+function band(stage: string): TimedBand {
   return {
     id: `band-${stage}`,
     festival_id: 'wacken-2026',

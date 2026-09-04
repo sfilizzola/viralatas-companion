@@ -199,6 +199,56 @@ describe('festivalsRepository.syncCatalog', () => {
   });
 });
 
+describe('festivalsRepository.setRunningOrder', () => {
+  beforeEach(() => {
+    Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
+  });
+
+  it('merges running_order, bumps cache_version, saves catalog', async () => {
+    const remoteRow = {
+      ...FESTIVAL,
+      features: { ...FESTIVAL.features, running_order: true },
+      cache_version: 'cv-new',
+    };
+    const catalogSelect = vi.fn().mockResolvedValue({ data: [FESTIVAL], error: null });
+    const single = vi.fn().mockResolvedValue({ data: remoteRow, error: null });
+    const select = vi.fn().mockReturnValue({ single });
+    const eq = vi.fn().mockReturnValue({ select });
+    const update = vi.fn().mockReturnValue({ eq });
+    let festivalCall = 0;
+    mocks.mockFrom.mockImplementation((table: string) => {
+      if (table === 'festivals' && festivalCall++ === 0) {
+        return { select: catalogSelect };
+      }
+      if (table === 'festivals') return { update };
+      return chainResolved({ data: null, error: null });
+    });
+
+    await festivalsRepository.setRunningOrder(FESTIVAL_ID, true);
+
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        features: expect.objectContaining({ metal_place: true, running_order: true }),
+        cache_version: expect.any(String),
+      }),
+    );
+    expect(eq).toHaveBeenCalledWith('id', FESTIVAL_ID);
+    expect(mocks.mockSaveFestivalCatalog).toHaveBeenLastCalledWith([remoteRow]);
+    expect(mocks.mockSetActiveFestivalCacheVersion).toHaveBeenCalledWith(expect.any(String));
+  });
+
+  it('rejects when navigator.onLine is false', async () => {
+    Object.defineProperty(navigator, 'onLine', { value: false, configurable: true });
+
+    await expect(
+      festivalsRepository.setRunningOrder(FESTIVAL_ID, true),
+    ).rejects.toThrow(/offline/i);
+
+    expect(mocks.mockFrom).not.toHaveBeenCalled();
+    Object.defineProperty(navigator, 'onLine', { value: true, configurable: true });
+  });
+});
+
 describe('festivalsRepository.syncMyMemberships', () => {
   it('returns memberships for the given userId', async () => {
     const eq = vi.fn().mockResolvedValue({ data: [MEMBERSHIP], error: null });

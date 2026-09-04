@@ -13,7 +13,12 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/components/FestivalGate.tsx` — Membership gate + `FeatureRoute` (Phase 47)
 - `src/components/FestivalSwitcher.tsx` — Active Festival switcher on `/now` (Phase 47)
 - `src/pages/FestivalsPage.tsx` — Festival catalog Join/Leave/Activate (Phase 47)
-- `src/lib/festivalFeatures.ts` — Feature gate helpers (Phase 47)
+- `src/lib/festivalFeatures.ts` — Feature gate helpers + `hasRunningOrder` (Phase 47/49)
+- `src/services/timedBand.ts` — `isTimedBand` / `timedBands` trusted-clock hard wall (Phase 49)
+- `src/components/AnnouncementPosterGrid.tsx` — `/schedule` B2 when Announcement Lineup
+- `src/services/announcementLineup.ts` — poster sort + hero split (`sortAnnouncementBands`, `splitAnnouncementHero`)
+- `src/components/profile/RunningOrderSection.tsx` — godlike Lineup era flip
+- `src/lib/db/events.ts` — includes `FESTIVAL_CATALOG_CHANGED_EVENT`
 - `src/lib/festivalCacheVersion.ts` — Per-Festival pack invalidation (Phase 47)
 - `src/lib/db/festivals.ts` — Active Festival meta + `clearActiveFestivalPack()` (Phase 47)
 - `src/repositories/festivals.ts` — Catalog, memberships, switch + pack load (Phase 47)
@@ -93,10 +98,10 @@ Components are organized by concern:
 
 **Key Pages:**
 - `/festivals` (FestivalsPage) — Festival catalog: Join / Leave / Activate (Phase 47); no `FestivalGate`
-- `/now` (RightNowPage) — Live band display, **Festival crew** attendance, conflict detection; `FestivalSwitcher` when ≥1 membership; `UpcomingBandCard` (Phase 37)
-- `/schedule` (LineupPage) — Active Festival lineup with filters (stage, genre, day, time); Phase 38.A per-crew-member filter
-- `/my-picks` (MyPicksPage) — User's picks by festival day (upcoming → divider → ended inline)
-- `/popular` (PopularPage) — Bands sorted by membership-gated pick count
+- `/now` (RightNowPage) — Live band display when Schedule Lineup + `isTimedBand`; Announcement Lineup is empty-safe (no fake live); `FestivalSwitcher` when ≥1 membership; `UpcomingBandCard` (Phase 37)
+- `/schedule` (LineupPage) — Lineup chrome from **Lineup era**, not empty columns. Announcement Lineup: B2 `AnnouncementPosterGrid`. Schedule Lineup: day/stage filters. Leftover Bands stay listed (name-only). Trusted clock = `hasRunningOrder` + `isTimedBand`.
+- `/my-picks` (MyPicksPage) — Timed picks by festival day (upcoming → divider → ended inline); untimed leftover/announcement picks listed name-only
+- `/popular` (PopularPage) — Bands sorted by membership-gated pick count; schedule chrome only when `isTimedBand`
 - `/announcements` (AnnouncementsPage) — Active Festival mural; Phase 43 reactions; Phase 45 `CampHqCard` when camp feature on
 - `/profile` (ProfilePage) — User info, role controls, godlike admin (no FestivalGate — reachable with zero memberships)
 - `/wrap` (WrapPage) — Post-festival recap; gated by `FeatureRoute feature="wrap"`
@@ -123,7 +128,7 @@ Switch Active Festival (online only):
 
 **Sync scoping** — `runReconnectSync` and domain sync methods take Active Festival id; pulls/flushes are Festival-scoped. `CacheVersionCheck` uses `festivals.cache_version` for the Active Festival only (`shouldInvalidatePack`).
 
-**Feature gates** — `hasFestivalFeature` / `canShow*` helpers; Presence UI requires camp or metal_place; duck/camp/map/wrap/remote_lineup similarly gated. Core schedule / picks / mural / `/now` always on for every Festival. **Lineup era** (Announcement Lineup vs Schedule Lineup) is not a Festival feature — every Festival has one; Phase 49 stores it as `features.running_order`. **Official running order** remains the Wacken JSON feed only. In Announcement Lineup, `/now` stays empty-safe (no fake live from untrusted times); planning picks are `/schedule`. Phase 50 is a dedicated planning `/now`.
+**Feature gates** — `hasFestivalFeature` / `canShow*` helpers; Presence UI requires camp or metal_place; duck/camp/map/wrap/remote_lineup similarly gated. Core schedule / picks / mural / `/now` always on for every Festival. **Lineup era** (Announcement Lineup vs Schedule Lineup) is not a Festival feature — every Festival has one; storage key `features.running_order`. **Official running order** remains the Wacken JSON feed only. Lineup chrome and trusted clocks follow the era flag (`isTimedBand`), not whether slot columns are filled. In Announcement Lineup, `/now` stays empty-safe (no fake live from untrusted times); planning picks are `/schedule`. Phase 50 is a dedicated planning `/now`.
 
 ### Viralatas App Pack (Phase 22–23)
 
@@ -521,7 +526,7 @@ INSERT into user_picks
 | `presenceRepository` | `setCampingStatus()`, `setMetalPlaceStatus()`, `syncCrewFromRemote()`, `flushOfflineQueue()`, `saveMetalPlaceConfigRemote()`, `syncMetalPlaceConfig()`, `subscribeToRealtime()`, `subscribeToMetalPlaceConfigRealtime()` | Pure I/O: writes IndexedDB, enqueues offline — no business logic (Phase 42.A) |
 | `usersRepository` | `syncCrew()`, `ensureCrewUsers()`, `fetchUserRolesMap()`, `fetchAllUsers()`, `setUserRole()`, `fetchBlockedPosters*()`, `blockUser()`, `unblockUser()`, `subscribeToRealtime()`, `subscribeToMembershipRealtime()` | Writes `crew_users` IDB incl. `special_badges`; hydrates auth metadata on reconnect; membership realtime refreshes roster; pick-path `ensureCrewUsers` fills late joiners; admin ops network-only |
 | `missedRepository` | `toggle()`, `flushOfflineQueue()`, `subscribeToRealtime()` | Writes IndexedDB, enqueues offline |
-| `bandsRepository` | `checkAndApplyCacheVersion()`, `loadBands()` | Wipes IDB if cache version changes |
+| `bandsRepository` | `checkAndApplyCacheVersion()`, `loadBands()` | On version mismatch: `syncCatalog` then clear Active pack |
 | `badgeHistoryRepository` | `loadLocal()`, `syncFromRemote()`, `consolidateYear()`, `seedLocalPreview()`, `clearLocalPreview()` | Writes `user_badge_history` IDB; pull from Supabase; godlike consolidate via Edge Function |
 | `campLocationRepository` | `loadCampLocation()`, `syncCampLocation()`, `saveCampLocationRemote()`, `clearCampLocationRemote()` | Reads/writes IDB `camp_location`; godlike save/clear updates `app_settings`; no offline queue (Phase 45) |
 
@@ -618,8 +623,9 @@ Display path: no supabase.from('users') in vest hooks
 
 1. `App.tsx` mounts `<SyncOrchestration />` (includes `BandSync`, `CacheVersionCheck`, etc.)
 2. Fetches bands from Supabase (if online), overwrites IndexedDB
-3. `CacheVersionCheck` — compares local cache version with server
-   - If mismatch: `wipeAllLocalData()` (forces fresh sync)
+3. `CacheVersionCheck` — compares Active Festival `festivals.cache_version` with the local pack marker
+   - If mismatch: `festivalsRepository.syncCatalog()` **first** (catalog is not in the pack; Lineup era lives on `features`) → `clearActiveFestivalPack()` → `loadActivePack()`
+   - Listeners on `FESTIVAL_CATALOG_CHANGED_EVENT` refresh Active Festival context so `hasRunningOrder` updates
 4. `ReconnectSync` — `runReconnectSync()`: flush all offline queues, pull remote crew data, emit `viralatas:sync-complete` if items flushed
 
 ### On `'online'` Event
@@ -696,4 +702,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-08-11 — Phase 47 multi-festival: Active Festival pack, sync scoping, feature gates, Festival catalog/switcher.
+**Last updated:** 2026-09-04 — Phase 49 close-out: `/now` empty-safe; My Picks/Popular untimed chrome.

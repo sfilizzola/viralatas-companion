@@ -12,6 +12,7 @@ import styles from './BandFilters.module.css';
 type DayOption = { date: string; label: string };
 
 type Props = {
+  mode?: 'schedule' | 'announcement';
   value: BandFilterValue;
   onChange: (next: BandFilterValue) => void;
   days: DayOption[];
@@ -37,6 +38,7 @@ function trimDisplayName(name: string, maxLen = DISPLAY_NAME_MAX): string {
 }
 
 export default function BandFilters({
+  mode = 'schedule',
   value,
   onChange,
   days,
@@ -119,6 +121,54 @@ export default function BandFilters({
   }
 
   const sortedGenres = sortFilterGenres(genres);
+
+  if (mode === 'announcement') {
+    return (
+      <div className={styles.announcementFilters}>
+        <div className={styles.announcementSearchWrap}>
+          <input
+            className={styles.announcementSearch}
+            type="search"
+            placeholder={t('searchPlaceholder')}
+            value={value.query}
+            onChange={(event) => update('query', event.target.value)}
+            aria-label={t('searchPlaceholder')}
+          />
+          {value.query.trim().length > 0 && (
+            <button
+              className={styles.searchClear}
+              type="button"
+              aria-label={t('limpar')}
+              onClick={() => update('query', '')}
+            >
+              ×
+            </button>
+          )}
+        </div>
+        <div className={styles.announcementGenres} aria-label={t('genero')}>
+          <button
+            className={`${styles.announcementGenre} ${value.genre === null ? styles.announcementGenreOn : ''}`}
+            type="button"
+            aria-pressed={value.genre === null}
+            onClick={() => update('genre', null)}
+          >
+            {t('todos')}
+          </button>
+          {sortedGenres.map((genre) => (
+            <button
+              key={genre}
+              className={`${styles.announcementGenre} ${value.genre === genre ? styles.announcementGenreOn : ''}`}
+              type="button"
+              aria-pressed={value.genre === genre}
+              onClick={() => update('genre', genre)}
+            >
+              {genre}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   function clearAll() {
     onChange({

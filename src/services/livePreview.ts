@@ -1,11 +1,13 @@
 import type { Band, CrewUser, LiveBandTestConfig, UserPick, UserPresence } from '../types';
+import type { Festival } from '../types/festival';
+import { isTimedBand, timedBands, type TimedBand } from './timedBand';
 
 export type LivePlanStatus = 'current' | 'next' | 'empty' | 'lost';
 
 export type LivePlan = {
   status: LivePlanStatus;
-  band: Band | null;
-  nextBand?: Band | null;
+  band: TimedBand | null;
+  nextBand?: TimedBand | null;
 };
 
 export type CrewLivePlan = CrewUser & {
@@ -19,7 +21,7 @@ export type CrewLivePlan = CrewUser & {
 export type CrewLiveGroup =
   | {
       kind: 'band';
-      band: Band;
+      band: TimedBand;
       members: CrewLivePlan[];
     }
   | {
@@ -51,9 +53,22 @@ export function resolveLiveTestBandId(
  * is not found.
  */
 export function applyLiveBandTestOverride(
+  bands: TimedBand[],
+  liveTestBandId: string | null | undefined,
+  now: Date,
+  festival: Festival | null | undefined,
+): TimedBand[];
+export function applyLiveBandTestOverride(
   bands: Band[],
   liveTestBandId: string | null | undefined,
   now: Date,
+  festival: Festival | null | undefined,
+): Band[];
+export function applyLiveBandTestOverride(
+  bands: Band[],
+  liveTestBandId: string | null | undefined,
+  now: Date,
+  festival: Festival | null | undefined,
 ): Band[] {
   if (!liveTestBandId) return bands;
 
@@ -61,6 +76,7 @@ export function applyLiveBandTestOverride(
   if (idx === -1) return bands;
 
   const original = bands[idx];
+  if (!isTimedBand(original, festival)) return bands;
   const durationMs =
     new Date(original.end_time).getTime() - new Date(original.start_time).getTime();
   const FIVE_MIN_MS = 5 * 60 * 1000;
@@ -82,9 +98,15 @@ export function findLivePlan(
   bands: Band[],
   pickedBandIds: Set<string>,
   now: Date,
+  festival: Festival | null | undefined,
   liveTestBandId?: string | null,
 ): LivePlan {
-  const effectiveBands = applyLiveBandTestOverride(bands, liveTestBandId, now);
+  const effectiveBands = applyLiveBandTestOverride(
+    timedBands(bands, festival),
+    liveTestBandId,
+    now,
+    festival,
+  );
   const pickedBands = effectiveBands
     .filter((band) => pickedBandIds.has(band.id))
     .sort((a, b) => a.start_time.localeCompare(b.start_time));
@@ -153,9 +175,15 @@ export function mapCrewLivePlans(
   users: CrewUser[],
   presence: UserPresence[],
   now: Date,
+  festival: Festival | null | undefined,
   liveTestBandId?: string | null,
 ): CrewLivePlan[] {
-  const effectiveBands = applyLiveBandTestOverride(bands, liveTestBandId, now);
+  const effectiveBands = applyLiveBandTestOverride(
+    timedBands(bands, festival),
+    liveTestBandId,
+    now,
+    festival,
+  );
   const picksByUser = new Map<string, Set<string>>();
   for (const pick of picks) {
     const bandIds = picksByUser.get(pick.user_id) ?? new Set<string>();
@@ -183,7 +211,12 @@ export function mapCrewLivePlans(
       const isCamping = presence?.is_camping ?? false;
       const isAtMetalPlace = presence?.is_at_metal_place ?? false;
       const isFriend = user.is_friend === true;
-      const plan = findLivePlan(effectiveBands, picksByUser.get(user.id) ?? new Set(), now);
+      const plan = findLivePlan(
+        effectiveBands,
+        picksByUser.get(user.id) ?? new Set(),
+        now,
+        festival,
+      );
       return {
         ...user,
         isCamping,
@@ -315,7 +348,11 @@ export function computeCrewLocationCounts(
   users: CrewUser[],
   presence: UserPresence[],
   now: Date,
-  options?: { metalPlaceWindowActive?: boolean; liveTestBandId?: string | null },
+  options?: {
+    metalPlaceWindowActive?: boolean;
+    liveTestBandId?: string | null;
+    festival?: Festival | null;
+  },
 ): Record<'camping' | 'metal_place' | 'lost', number> {
   const crewPlans = mapCrewLivePlans(
     bands,
@@ -323,6 +360,7 @@ export function computeCrewLocationCounts(
     users,
     presence,
     now,
+    options?.festival,
     options?.liveTestBandId,
   );
   const groups = groupCrewLivePlans(crewPlans, {

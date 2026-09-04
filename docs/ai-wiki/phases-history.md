@@ -1121,6 +1121,44 @@ Complete record of every development phase for Viralatas Metaleiros, in order of
 
 ---
 
+### Phase 49 — Announcement Lineup
+**Status:** ✅ Complete
+
+**Completed:** 2026-09-04
+
+**Branch:** `phase-49-announcement-lineup`
+
+**Goal:** Every Festival has a Lineup era — Announcement Lineup (named Bands only) or Schedule Lineup (day, time, and stage). While the Active Festival is in Announcement Lineup, `/schedule` is the B2 planning grid with no stage, time, day grouping, or conflicts. Picks survive on `bands.id` when slots are filled later.
+
+**Deliverables shipped:**
+- `supabase/migrations/20260904000000_announcement_lineup.sql` — nullable Band slot columns; partial unique `(festival_id, slot_id)`; godlike `features` + `cache_version` UPDATE; Wacken 2026 / Summer Breeze 2026 `running_order: true`
+- `src/services/timedBand.ts` — `isTimedBand` / `timedBands` trusted-clock hard wall
+- `src/components/AnnouncementPosterGrid.tsx` — B2 crew billboard on `/schedule` when era is off/missing
+- `src/components/profile/RunningOrderSection.tsx` — godlike Lineup era toggle; pack bump `syncCatalog` then reload
+- Laptop name-match `seed:bands:sync`; leftovers reported, never auto-deleted
+- `supabase/seed/announcement-festivals-2027.ts` — create-only 2027 Announcement Lineup catalog seed
+- Empty-safe remaining clock call sites (`/now`, Popular, My Picks list; no Phase 50/51 planning UI)
+- Wiki contract + ADRs 0002–0007; DS §05 / changelog v3.12
+
+**Acceptance criteria (all met):**
+- [x] Announcement Lineup `/schedule` is B2 (hero + 2-col posters; search + genre; pick + counts; no stage/time/day/conflict)
+- [x] Picks persist after name-match slot fill and godlike flip to Schedule Lineup
+- [x] Godlike flips era either direction; others see it after `cache_version` pack and catalog reload
+- [x] No trusted clock → no live / conflict / map; leftover Bands stay on `/schedule` after Schedule Lineup
+- [x] Wacken 2026 and Summer Breeze 2026 start Schedule Lineup; new Festivals start Announcement Lineup
+- [x] Offline announcement Lineup from IDB after first load
+- [x] Wiki + changelog + DS synced
+
+**Architectural notes:**
+- Era is the `features.running_order` flag, not empty columns (premature times must not leak into `/now`).
+- Pack bump must `syncCatalog` before reload; festival catalog is not in the pack.
+- Name match is laptop-only; Wacken remote lineup sync stays `slot_id`.
+- Planning `/now` and My Picks UIs are Phases 50–51.
+
+**Phase closed:** 2026-09-04 — build + 1037 tests green; wiki + DS synced; `PHASES.md` current is 50.
+
+---
+
 ### Phase 44 — Metal Place Multi-Window Configuration
 **Status:** ✅ Complete · **Released:** v1.3.18 on `main` (2026-06-25)
 

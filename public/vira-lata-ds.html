@@ -2709,7 +2709,7 @@
 <body>
 <script type="application/json" id="ds-manifest">
 {
-  "version": "3.7",
+  "version": "3.12",
   "file": "public/vira-lata-ds.html",
   "note": "Agent table of contents. Read this first to navigate the file. Anchors and section numbers are STABLE and referenced across docs/code — never renumber. Keep this manifest in sync when adding/renaming a section, token, or component.",
   "sections": [
@@ -2796,7 +2796,8 @@
     { "name": "CampPinIcon",           "sectionId": "camp-location" },
     { "name": "LineupSyncSection",     "sectionId": "ds-godlike-lineup-sync" },
     { "name": "FestivalSwitcher",      "sectionId": "multi-festival" },
-    { "name": "FestivalsPage",         "sectionId": "multi-festival" }
+    { "name": "FestivalsPage",         "sectionId": "multi-festival" },
+    { "name": "AnnouncementPosterGrid","sectionId": "layouts" }
   ]
 }
 </script>
@@ -5143,6 +5144,27 @@
       </div>
     </div>
 
+    <h3>Announcement Lineup · B2 vira-latas billboard</h3>
+    <div class="note">
+      When Lineup era is Announcement Lineup (<code>features.running_order</code> off/missing), <code>/schedule</code> uses
+      <code>AnnouncementPosterGrid</code>: a two-column <code>1fr 1fr</code> poster grid with an
+      8px gap. Sort by pick count descending, then Band name A–Z. The first filtered Band becomes
+      a full-width 16:9 hero only when its count is at least one; its 8px mono badge uses
+      <code>--signal-ok</code> and reads “Vira-latas favorite.” Remaining posters are 3:4.
+      Schedule Lineup still lists leftover Bands (no trusted clock) as name-only cards after timed rows.
+    </div>
+    <table>
+      <thead>
+        <tr><th>Element</th><th>Locked contract</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Poster</td><td><code>image_url</code> cover; two-letter initials fallback; noise overlay at 0.07 opacity; no stage color.</td></tr>
+        <tr><td>Pick stamp</td><td>Top-right circular count. Fill with <code>--accent</code> for the current user's pick. Stamp tap toggles without opening the sheet.</td></tr>
+        <tr><td>Band sheet</td><td>Name, genre, going list, and pick action only. Never show stage, time, conflict, missed, rating, or duck chrome.</td></tr>
+        <tr><td>Filtering</td><td>Search plus horizontal canonical genre pills only. Recompute hero inside the filtered result. All-zero results remain equal 3:4 tiles sorted A–Z.</td></tr>
+      </tbody>
+    </table>
+
     <div class="frames">
 
       <!-- /now -->
@@ -7337,6 +7359,12 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.12 — Announcement Lineup B2 · Sep 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§05 Layouts</b> — <code>AnnouncementPosterGrid</code> two-column billboard when Lineup era is Announcement Lineup; leftover Schedule Lineup Bands stay name-only after timed rows.</li>
+        </ul>
+      </div>
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.11 — SB stage colors muted · Aug 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">

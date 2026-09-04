@@ -15,8 +15,10 @@ import {
   type BadgeIdbSnapshot,
 } from '../services/badges/badgeContextBuilder';
 import type { Band, CrewUser } from '../types';
+import type { Festival } from '../types/festival';
 
 const AFTER_FESTIVAL = new Date('2026-08-10T00:00:00.000Z');
+const FESTIVAL_ON = { features: { running_order: true } } as Festival;
 
 vi.mock('../services/time', () => ({
   now: () => AFTER_FESTIVAL,
@@ -312,6 +314,40 @@ describe('buildFestivalWrapStats', () => {
     expect(stats.ratings!.crewTopRated?.name).toBe('Alpha');
     expect(stats.ratings!.crewLowestPick?.name).toBe('Beta');
     expect(stats.ratings!.userTopScore?.score).toBe(5);
+  });
+
+  it('counts conflict pairs only for a festival with a running order', () => {
+    const bands = [
+      band({ id: 'x', start_time: '2026-07-28T18:00:00.000Z', end_time: '2026-07-28T19:00:00.000Z' }),
+      band({
+        id: 'y',
+        slot_id: 'HAR1',
+        stage: 'Harder',
+        start_time: '2026-07-28T18:00:00.000Z',
+        end_time: '2026-07-28T19:00:00.000Z',
+      }),
+    ];
+    const snap = minimalSnapshot({
+      userPicks: bands.map((b) => ({ band_id: b.id })),
+      allPicks: bands.map((b) => ({
+        user_id: 'u1', band_id: b.id, festival_id: 'wacken-2026', created_at: '2026-07-01T00:00:00Z',
+      })),
+      bands,
+    });
+
+    const withRunningOrder = buildFestivalWrapStats(
+      snap,
+      'u1',
+      authUser(),
+      undefined,
+      [],
+      FESTIVAL_ON,
+    );
+    expect(withRunningOrder.personal.hardConflicts).toBe(1);
+
+    const withoutFestival = buildFestivalWrapStats(snap, 'u1', authUser());
+    expect(withoutFestival.personal.hardConflicts).toBe(0);
+    expect(withoutFestival.personal.softConflicts).toBe(0);
   });
 
   it('crew lowest null when fewer than two qualifying bands', () => {

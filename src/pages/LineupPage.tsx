@@ -13,13 +13,25 @@ import { useDuckEnabled } from '../contexts/DuckEnabledContext';
 import { useBandAttendees } from '../hooks/useBandAttendees';
 import { useI18n } from '../lib/i18n';
 import { useOfflinePendingBandIds } from '../hooks/useOfflinePendingBandIds';
+import { useMissedBands } from '../hooks/useMissedBands';
+import { useBandRatings } from '../hooks/useBandRatings';
+import { useBandDetailModal } from '../hooks/useBandDetailModal';
 import BottomNav from '../components/BottomNav';
 import OfflineBanner from '../components/OfflineBanner';
 import BandCard from '../components/BandCard';
 import BandFilters from '../components/BandFilters';
+import AnnouncementPosterGrid from '../components/AnnouncementPosterGrid';
+import { BandDetailModalHost } from '../components/BandDetailModalHost';
 import Icon from '../components/icons/Icon';
-import type { BandFilterValue } from '../components/bandFilterValue';
+import { EMPTY_FILTERS, type BandFilterValue } from '../components/bandFilterValue';
 import type { BandAttendee } from '../hooks/useBandAttendees';
+import { useActiveFestival } from '../hooks/useActiveFestival';
+import { isTimedBand, timedBands } from '../services/timedBand';
+import { hasRunningOrder } from '../lib/festivalFeatures';
+import {
+  sortAnnouncementBands,
+  splitAnnouncementHero,
+} from '../services/announcementLineup';
 import styles from './SchedulePage.module.css';
 
 /**
@@ -44,6 +56,7 @@ function DuckableBandCard({
   onClick: () => void;
   pending: boolean;
   isBandEnded: boolean;
+  showScheduleChrome?: boolean;
   showDayLabel?: boolean;
   sharedPick?: boolean;
 }) {
@@ -69,7 +82,9 @@ function DuckableBandCard({
 export default function LineupPage() {
   const { t } = useI18n('SchedulePage');
   const { session } = useAuth();
+  const { festival } = useActiveFestival();
   const userId = session?.user?.id ?? null;
+  const scheduleEra = hasRunningOrder(festival);
 
   const [filters, setFilters] = useState<BandFilterValue>(loadStoredFilters);
 
@@ -80,24 +95,40 @@ export default function LineupPage() {
   const currentTime = useNow();
   const pendingBandIds = useOfflinePendingBandIds();
   const attendeeMap = useBandAttendees();
+  const { allMissed, missedBandIds, toggleMissed } = useMissedBands(userId);
+  const { userRatingByBand, toggleRating, clearRating } = useBandRatings(userId);
+
+  const effectiveFilters = useMemo(
+    () =>
+      scheduleEra
+        ? filters
+        : { ...EMPTY_FILTERS, query: filters.query, genre: filters.genre },
+    [filters, scheduleEra],
+  );
 
   useEffect(() => {
-    if (loading || hashRestoredRef.current) return;
+    if (!scheduleEra || loading || hashRestoredRef.current) return;
     hashRestoredRef.current = true;
 
     const hashMatch = /^#day-(\d+)$/.exec(globalThis.location.hash);
     if (hashMatch) {
       const dayIdx = Number.parseInt(hashMatch[1], 10) - 1;
-      const uniqueDays = [...new Set(bands.map(bandDay))].sort();
+      const uniqueDays = [
+        ...new Set(timedBands(bands, festival).map((band) => bandDay(band.start_time))),
+      ].sort();
       if (uniqueDays[dayIdx]) {
         setFilters((prev) => ({ ...prev, day: uniqueDays[dayIdx] }));
       }
     }
-  }, [loading, bands]);
+  }, [scheduleEra, loading, bands, festival]);
 
   useEffect(() => {
-    saveStoredFilters(filters);
-  }, [filters]);
+    saveStoredFilters(
+      scheduleEra
+        ? filters
+        : { ...EMPTY_FILTERS, query: filters.query, genre: filters.genre },
+    );
+  }, [filters, scheduleEra]);
 
   const getDayLabel = useCallback(
     (dateStr: string): string => {
@@ -110,11 +141,16 @@ export default function LineupPage() {
   );
 
   const festivalDays = useMemo(() => {
-    const uniqueDays = [...new Set(bands.map(bandDay))].sort();
+    const uniqueDays = [
+      ...new Set(timedBands(bands, festival).map((band) => bandDay(band.start_time))),
+    ].sort();
     return uniqueDays.map((date) => ({ label: getDayLabel(date), date }));
-  }, [bands, getDayLabel]);
+  }, [bands, festival, getDayLabel]);
 
-  const stages = useMemo(() => [...new Set(bands.map((b) => b.stage))].sort(), [bands]);
+  const stages = useMemo(
+    () => [...new Set(timedBands(bands, festival).map((b) => b.stage))].sort(),
+    [bands, festival],
+  );
   const genres = useMemo(
     () =>
       [...new Set(bands.map((b) => b.genre).filter((g): g is string => Boolean(g)))].sort(),
@@ -154,16 +190,65 @@ export default function LineupPage() {
     return counts;
   }, [picksByUserId]);
 
-  const viewedUserPickIds = filters.userId ? (picksByUserId.get(filters.userId) ?? null) : null;
+  const viewedUserPickIds = effectiveFilters.userId
+    ? (picksByUserId.get(effectiveFilters.userId) ?? null)
+    : null;
 
-  const viewedUserPickCount = filters.userId
-    ? (picksByUserId.get(filters.userId)?.size ?? 0)
+  const viewedUserPickCount = effectiveFilters.userId
+    ? (picksByUserId.get(effectiveFilters.userId)?.size ?? 0)
     : 0;
 
-  const filtered = useMemo(
-    () => filterBands(bands, filters, currentTime, viewedUserPickIds ?? undefined),
-    [bands, filters, currentTime, viewedUserPickIds],
+  const announcementFiltered = useMemo(() => {
+    const query = effectiveFilters.query.trim().toLowerCase();
+    return bands.filter(
+      (band) =>
+        (!query || band.name.toLowerCase().includes(query)) &&
+        (!effectiveFilters.genre || band.genre === effectiveFilters.genre),
+    );
+  }, [bands, effectiveFilters.query, effectiveFilters.genre]);
+
+  const announcementSorted = useMemo(
+    () => sortAnnouncementBands(announcementFiltered, pickCounts),
+    [announcementFiltered, pickCounts],
   );
+  const announcementSplit = useMemo(
+    () => splitAnnouncementHero(announcementSorted, pickCounts),
+    [announcementSorted, pickCounts],
+  );
+
+  const scheduleFiltered = useMemo(
+    () => filterBands(bands, effectiveFilters, currentTime, viewedUserPickIds ?? undefined),
+    [bands, effectiveFilters, currentTime, viewedUserPickIds],
+  );
+  const timedFiltered = useMemo(
+    () => scheduleFiltered.filter((band) => isTimedBand(band, festival)),
+    [scheduleFiltered, festival],
+  );
+  const leftoverBands = useMemo(
+    () =>
+      scheduleFiltered
+        .filter((band) => !isTimedBand(band, festival))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    [scheduleFiltered, festival],
+  );
+  const filtered = scheduleEra ? scheduleFiltered : announcementSorted;
+
+  const conflicts = useMemo(() => new Map(), []);
+  const { openBand, modalProps } = useBandDetailModal({
+    bands,
+    pickedIds,
+    togglePick,
+    allMissed,
+    missedBandIds,
+    toggleMissed,
+    attendeesByBand: attendeeMap,
+    currentNow: currentTime,
+    conflicts,
+    userRatingByBand,
+    toggleRating,
+    clearRating,
+    festival,
+  });
 
   return (
     <div className={styles.page}>
@@ -171,13 +256,22 @@ export default function LineupPage() {
       <header className={styles.header}>
         <span className={styles.title}>{t('title')}</span>
         <div className={styles.summary}>
-          <span className={styles.summaryLine}>{t('headerBands', { count: bands.length })}</span>
-          <span className={styles.summaryLine}>{t('headerStages', { count: stages.length })}</span>
+          <span className={styles.summaryLine}>
+            {t('headerBands', { count: scheduleEra ? bands.length : filtered.length })}
+          </span>
+          {scheduleEra ? (
+            <span className={styles.summaryLine}>{t('headerStages', { count: stages.length })}</span>
+          ) : (
+            <span className={styles.summaryHighlight}>{t('eraNoRunningOrder')}</span>
+          )}
         </div>
       </header>
 
+      {!scheduleEra && <div className={styles.announcementBanner}>{t('announcementBanner')}</div>}
+
       <BandFilters
-        value={filters}
+        mode={scheduleEra ? 'schedule' : 'announcement'}
+        value={effectiveFilters}
         onChange={setFilters}
         days={festivalDays}
         stages={stages}
@@ -188,20 +282,34 @@ export default function LineupPage() {
         viewedUserPickCount={viewedUserPickCount}
       />
 
-      <main className={`${styles.list} ${styles.scheduleList}`}>
+      <main className={`${styles.list} ${styles.scheduleList} ${!scheduleEra ? styles.announcementList : ''}`}>
         {loading && <p className={styles.empty}>{t('loadingSchedule')}</p>}
         {!loading && filtered.length === 0 && (
           <div className={styles.emptyState}>
             <Icon name="search" size={24} aria-hidden />
-            {filters.userId ? t('noPicksForUser') : t('emptySchedule')}
+            {effectiveFilters.userId ? t('noPicksForUser') : t('emptySchedule')}
           </div>
         )}
-        {filtered.map((band) => {
+        {!loading && !scheduleEra && filtered.length > 0 && (
+          <AnnouncementPosterGrid
+            hero={announcementSplit.hero}
+            rest={announcementSplit.rest}
+            pickCounts={pickCounts}
+            pickedIds={pickedIds}
+            pendingBandIds={pendingBandIds}
+            heroBadge={t('heroBadge')}
+            onOpenBand={openBand}
+            onTogglePick={(bandId) => void togglePick(bandId)}
+          />
+        )}
+        {scheduleEra && [...timedFiltered, ...leftoverBands].map((band) => {
+          const showScheduleChrome = isTimedBand(band, festival);
           const isLive =
+            showScheduleChrome &&
             new Date(band.start_time) <= currentTime &&
             currentTime < new Date(band.end_time);
           const sharedPick =
-            filters.userId != null && pickedIds.has(band.id);
+            effectiveFilters.userId != null && pickedIds.has(band.id);
           return (
             <DuckableBandCard
               key={band.id}
@@ -211,15 +319,20 @@ export default function LineupPage() {
               userId={userId}
               count={pickCounts[band.id] ?? 0}
               onToggle={() => togglePick(band.id)}
-              onClick={() => togglePick(band.id)}
+              onClick={() =>
+                showScheduleChrome ? void togglePick(band.id) : openBand(band.id)
+              }
               pending={pendingBandIds.has(band.id)}
-              isBandEnded={new Date(band.end_time) < currentTime}
-              showDayLabel={filters.day === null}
+              isBandEnded={showScheduleChrome && new Date(band.end_time) < currentTime}
+              showDayLabel={effectiveFilters.day === null}
+              showScheduleChrome={showScheduleChrome}
               sharedPick={sharedPick}
             />
           );
         })}
       </main>
+
+      <BandDetailModalHost modalProps={modalProps} />
 
       <div className={styles.navSpacer} />
       <BottomNav />

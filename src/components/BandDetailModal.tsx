@@ -26,6 +26,7 @@ type Props = {
   canRate?: boolean;
   userScore?: BandRatingScore | null;
   onRate?: (score: BandRatingScore | null) => void;
+  showScheduleChrome?: boolean;
 };
 
 export default function BandDetailModal({
@@ -45,27 +46,31 @@ export default function BandDetailModal({
   canRate = false,
   userScore = null,
   onRate,
+  showScheduleChrome = true,
 }: Props) {
   const { t } = useI18n('SchedulePage');
-  const color = stageColor(band.stage);
+  const color = showScheduleChrome && band.stage ? stageColor(band.stage) : 'var(--accent)';
   const pickedCount = attendees.length;
   const sawAttendees = attendees.filter((a) => !missedUserIds?.has(a.id));
   const seenCount = isBandEnded ? sawAttendees.length : null;
-  const dateLabel = formatBandDate(band);
-  const timeLabel = `${formatTime(band.start_time)} - ${formatTime(band.end_time)}`;
+  const dateLabel = showScheduleChrome && band.start_time ? formatBandDate(band.start_time) : null;
+  const timeLabel =
+    showScheduleChrome && band.start_time && band.end_time
+      ? `${formatTime(band.start_time)} - ${formatTime(band.end_time)}`
+      : null;
 
   return (
     <Modal onClose={onClose} contentClassName={styles.modal}>
         <div className={styles.hero} style={{ background: color }} />
 
         <div className={styles.head}>
-          <div className={styles.stage} style={{ color }}>
+          {showScheduleChrome && <div className={styles.stage} style={{ color }}>
             {band.stage}
-          </div>
+          </div>}
           <h2 className={styles.name}>{band.name}</h2>
           <div className={styles.info}>
-            <span>{dateLabel}</span>
-            <span>{timeLabel}</span>
+            {dateLabel && <span>{dateLabel}</span>}
+            {timeLabel && <span>{timeLabel}</span>}
             {band.genre && <span>{band.genre}</span>}
           </div>
         </div>
@@ -76,16 +81,18 @@ export default function BandDetailModal({
               <div className={styles.statKey}>{t('pickedStat')}</div>
               <div className={styles.statValue}>{pickedCount}</div>
             </div>
-            <div className={styles.stat}>
-              <div className={styles.statKey}>{t('actuallySawStat')}</div>
-              <div className={styles.statValue}>
-                {seenCount ?? '--'}
-                {seenCount !== null && <small>/ {pickedCount}</small>}
+            {showScheduleChrome && (
+              <div className={styles.stat}>
+                <div className={styles.statKey}>{t('actuallySawStat')}</div>
+                <div className={styles.statValue}>
+                  {seenCount ?? '--'}
+                  {seenCount !== null && <small>/ {pickedCount}</small>}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
-          {isBandEnded ? (
+          {showScheduleChrome && isBandEnded ? (
             <CrewList
               title={t('whoSaw')}
               count={seenCount ?? 0}
@@ -97,7 +104,7 @@ export default function BandDetailModal({
             <CrewList title={t('whoPicked')} count={pickedCount} attendees={attendees} />
           )}
 
-          {conflictBands && conflictBands.length > 0 && isPicked && (
+          {showScheduleChrome && conflictBands && conflictBands.length > 0 && isPicked && (
             <div className={styles.conflictWarning}>
               <Icon name="conflict" size={18} strokeWidth={2.2} />
               {conflictBands.map((cb) => (
@@ -108,7 +115,7 @@ export default function BandDetailModal({
             </div>
           )}
 
-          {overlapBands && overlapBands.length > 0 && isPicked && (
+          {showScheduleChrome && overlapBands && overlapBands.length > 0 && isPicked && (
             <div className={styles.overlapWarning}>
               <Icon name="conflict" size={18} strokeWidth={2.2} />
               {overlapBands.map((ob) => (
@@ -119,9 +126,9 @@ export default function BandDetailModal({
             </div>
           )}
 
-          {children}
+          {showScheduleChrome && children}
 
-          {isPicked && isBandEnded && onToggleMissed && (
+          {showScheduleChrome && isPicked && isBandEnded && onToggleMissed && band.end_time && (
             <div className={styles.seenToggle}>
               <div className={styles.seenToggleLabel}>
                 {isMissed ? t('missedMarked') : t('missedToggle')}
@@ -139,7 +146,7 @@ export default function BandDetailModal({
             </div>
           )}
 
-          {canRate && onRate && (
+          {showScheduleChrome && canRate && onRate && (
             <BandRatingInput
               value={userScore}
               onChange={onRate}
@@ -217,7 +224,7 @@ function initials(label: string) {
   return label.slice(0, 2).toUpperCase();
 }
 
-function formatBandDate(band: Band) {
-  const [year, month, day] = bandDay(band).split('-');
+function formatBandDate(startTime: string) {
+  const [year, month, day] = bandDay(startTime).split('-');
   return `${day}/${month}/${year}`;
 }

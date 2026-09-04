@@ -11,6 +11,7 @@ import { buildSocialSnapshot } from '../services/socialSnapshot';
 import { computeCrewLocationCounts } from '../services/livePreview';
 import {
   SCENARIO_NOW,
+  SCENARIO_FESTIVAL,
   threeBandLiveFixture,
 } from './fixtures/liveNowScenarios';
 
@@ -25,6 +26,7 @@ describe('buildSocialSnapshot', () => {
       presence: [],
       metalPlaceConfig: null,
       liveBandTestConfig: null,
+      festival: SCENARIO_FESTIVAL,
       now: festivalNow,
     });
 
@@ -44,6 +46,7 @@ describe('buildSocialSnapshot', () => {
       presence: [],
       metalPlaceConfig: null,
       liveBandTestConfig: null,
+      festival: SCENARIO_FESTIVAL,
       now: festivalNow,
     });
 
@@ -53,6 +56,7 @@ describe('buildSocialSnapshot', () => {
       users,
       [],
       festivalNow,
+      { festival: SCENARIO_FESTIVAL },
     );
 
     expect(snap.crewLocationCounts).toEqual(fromCompute);

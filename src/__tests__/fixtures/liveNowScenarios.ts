@@ -9,8 +9,12 @@ import {
   mapCrewLivePlans,
   resolveFocusUserLivePlan,
 } from '../../services/livePreview';
+import type { Festival } from '../../types/festival';
 
 export const SCENARIO_NOW = '2026-07-29T20:00:00.000Z';
+export const SCENARIO_FESTIVAL = {
+  features: { running_order: true },
+} as Festival;
 
 export function scenarioBand(
   id: string,
@@ -143,6 +147,7 @@ export function runLiveNowScenario(input: LiveNowScenarioInput): LiveNowScenario
     input.users,
     input.presence,
     now,
+    SCENARIO_FESTIVAL,
     input.liveTestBandId,
   );
   const crewGroups = groupCrewLivePlans(crewPlans, { metalPlaceWindowActive });
@@ -151,7 +156,13 @@ export function runLiveNowScenario(input: LiveNowScenarioInput): LiveNowScenario
     input.picks.filter((pick) => pick.user_id === input.focusUserId).map((pick) => pick.band_id),
   );
   const myPresence = input.presence.find((item) => item.user_id === input.focusUserId);
-  const myRawPlan = findLivePlan(input.bands, focusPicks, now, input.liveTestBandId);
+  const myRawPlan = findLivePlan(
+    input.bands,
+    focusPicks,
+    now,
+    SCENARIO_FESTIVAL,
+    input.liveTestBandId,
+  );
   const myPlan = resolveFocusUserLivePlan(myRawPlan, myPresence, metalPlaceWindowActive);
   const presenceValue = derivePresenceValue(myPresence, myRawPlan, metalPlaceWindowActive);
   const userGroup = findUserCrewGroup(input.focusUserId, crewGroups);

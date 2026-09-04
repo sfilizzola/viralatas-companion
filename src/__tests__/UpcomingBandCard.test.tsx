@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import UpcomingBandCard from '../components/now/UpcomingBandCard';
-import type { Band } from '../types';
 import type { CrewLivePlan } from '../services/livePreview';
+import type { TimedBand } from '../services/timedBand';
 
 vi.mock('../lib/i18n', () => ({
   useI18n: () => ({ t: (key: string) => key }),
@@ -24,7 +24,7 @@ vi.mock('../components/QuackStrip', () => ({
   ),
 }));
 
-const mockBand: Band = {
+const mockBand: TimedBand = {
   id: 'band-1',
   festival_id: 'wacken-2026',
   name: 'Test Band',

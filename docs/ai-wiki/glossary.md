@@ -62,6 +62,9 @@ Physical adjacency between two stages that share interleaved ~15 min gaps. Paire
 ### Stage Schedule
 The grid of slot start/end times for a given stage and day. Lives in `docs/ai-wiki/stages.md`. Separate from band assignments (who plays each slot), which live in `docs/ai-wiki/lineup.md`.
 
+### Official running order
+Wacken's live JSON feed (wacken.com) — phone **Remote lineup sync** matches by `slot_id`. Not **Lineup era** and not `features.running_order`.
+
 ### Slot ID
 Unique identifier for a time slot, combining stage abbreviation + sequential number (e.g. `FAS1`, `HAR7`). Global across all days. Used to cross-reference slot times (in `stages.md`) with band assignments (in `lineup.md`).
 
@@ -508,10 +511,10 @@ See Database & Storage Terms. Each table has RLS enabled. Access rules are SQL p
 Supabase remote procedure call (`supabase.rpc('set_user_role', ...)`) used by managers/godlike to change another user's role. Implemented as a PostgreSQL function to bypass RLS (normal UPDATE on `users` is restricted to own row).
 
 ### wipeAllLocalData
-Function in `src/lib/db.ts` that clears all IndexedDB stores (except `session`). Called when `CacheVersionCheck` detects a cache version mismatch. Triggers full re-sync from Supabase on next app init.
+Function in `src/lib/db.ts` that clears IndexedDB stores (except `session`). Godlike “Clear local cache” still uses it. Festival pack invalidation uses `clearActiveFestivalPack()` instead — do not confuse the two.
 
 ### CacheVersionCheck
-`App.tsx` sync component. On login, fetches the `public.app_config` row with `key='cache_version'` from Supabase and compares its `value` to the locally-stored version (IndexedDB `meta` store). If mismatch, calls `wipeAllLocalData()` to force a fresh sync. Prevents stale band data after lineup changes or after a festival reset.
+`src/components/sync/CacheVersionCheck.tsx`. On login / Active Festival change, compares Active Festival `festivals.cache_version` to the local pack marker. On mismatch: `festivalsRepository.syncCatalog()` first (catalog is not in the pack; Lineup era lives on `features`) → `clearActiveFestivalPack()` → `loadActivePack()`. `FESTIVAL_CATALOG_CHANGED_EVENT` refreshes Active Festival context so `hasRunningOrder` updates. Does **not** call `wipeAllLocalData()` and does **not** use global `app_config.cache_version` for the pack.
 
 ### Festival Reset
 The `npm run festival:reset` operator script (`supabase/seed/festival-reset.ts`). One-shot pre-festival wipe: deletes every row in `public.announcements`, `public.blocked_posters`, and `public.user_presence`; clears `public.users.special_badges` for every user; strips `achieved_badge_slugs`, `crew_earned_badge_slugs`, and `location_visits` from `auth.users.raw_user_meta_data` via positive-strip; bumps `public.app_config.cache_version` so connected clients invalidate IndexedDB on next load. Optionally chains the bands re-seed via `--with-bands`. Flags: `--dry-run` (preview), `--force` (skip 5s countdown), `--with-bands` (cascade-replace lineup). Destructive, no undo. Full contract: `docs/ai-wiki/festival-reset.md`.
@@ -530,4 +533,4 @@ Navigation guide in the wiki index recommending which documents to read first ba
 
 ---
 
-**Last updated:** 2026-09-04 — Band is a named act (not a required slot); added Lineup era / Announcement Lineup / Schedule Lineup. Canonical product language: `CONTEXT.md`.
+**Last updated:** 2026-09-04 — Phase 49 Lineup era terms; CacheVersionCheck = Festival pack + `syncCatalog` (not `wipeAllLocalData`).

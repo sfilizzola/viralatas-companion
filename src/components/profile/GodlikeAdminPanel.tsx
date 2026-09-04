@@ -19,6 +19,7 @@ import TimeTravelSection from './TimeTravelSection';
 import TestBadgeSection from './TestBadgeSection';
 import ConsolidateBadgesSection from './ConsolidateBadgesSection';
 import CacheResetSection from './CacheResetSection';
+import RunningOrderSection from './RunningOrderSection';
 import LineupSyncSection from './LineupSyncSection';
 import FeatureFlagsSection from './FeatureFlagsSection';
 import MetalPlaceAdminSection from './MetalPlaceAdminSection';
@@ -161,6 +162,7 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
           <div className={styles.godlikeSectionContent}>
             {showRemoteLineup && <LineupSyncSection t={t} />}
             <CacheResetSection t={t} />
+            <RunningOrderSection t={t} />
             {showDuckAdmin && (
               <FeatureFlagsSection t={t} onDuckEnabledChange={setDuckFeatureEnabled} />
             )}

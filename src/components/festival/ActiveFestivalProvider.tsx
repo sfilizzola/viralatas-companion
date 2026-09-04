@@ -13,6 +13,7 @@ import {
   loadFestivalCatalog,
   loadFestivalMemberships,
 } from '../../lib/db/festivals';
+import { FESTIVAL_CATALOG_CHANGED_EVENT } from '../../lib/db/events';
 import { useAuth } from '../../hooks/useAuth';
 import { festivalsRepository } from '../../repositories/festivals';
 import type { Festival, FestivalFeatures, FestivalMembership } from '../../types';
@@ -121,6 +122,14 @@ export function ActiveFestivalProvider({ children }: Readonly<{ children: ReactN
       cancelled = true;
     };
   }, [userId, hydrate]);
+
+  useEffect(() => {
+    const refreshCatalog = () => {
+      void loadFestivalCatalog().then(setCatalog);
+    };
+    window.addEventListener(FESTIVAL_CATALOG_CHANGED_EVENT, refreshCatalog);
+    return () => window.removeEventListener(FESTIVAL_CATALOG_CHANGED_EVENT, refreshCatalog);
+  }, []);
 
   const setActive = useCallback(
     async (festivalId: string) => {

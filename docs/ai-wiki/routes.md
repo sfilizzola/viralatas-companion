@@ -14,7 +14,11 @@ Document all app routes, their purpose, access control, and key components.
 - `src/components/festival/ActiveFestivalProvider.tsx` — Active Festival context (Phase 47)
 - `src/components/FestivalSwitcher.tsx` — Active Festival switcher (Phase 47)
 - `src/components/BottomNav.tsx` — Navigation tabs
-- `src/pages/*.tsx` — Page components (incl. `/festivals`, `/wrap`)
+- `src/pages/LineupPage.tsx` — `/schedule` (Announcement Lineup B2 vs Schedule Lineup)
+- `src/components/AnnouncementPosterGrid.tsx` — B2 poster grid when `!hasRunningOrder`
+- `src/services/announcementLineup.ts` — poster sort + hero split
+- `src/pages/MyPicksPage.tsx` — `/my-picks` (timed day groups + untimed name-only list)
+- `src/components/profile/RunningOrderSection.tsx` — godlike Lineup era flip
 
 ---
 
@@ -154,10 +158,11 @@ Most festival social routes additionally wrap with `<FestivalGate>` (and optiona
 **Key Features**:
 - **Header (two-band)** — Masthead: title + festival clock. Toolbar: `FestivalSwitcher` (flex-grow, ellipsis) + Stages/Map actions (icon-only ≤420px). Festival name lives only on the switcher — no duplicate `{name} time` subtitle.
 - **FestivalSwitcher** — Shows Active Festival name; dropdown to switch among joined Festivals (online; need-signal toast offline)
-- **Current/Next band for user** — What the user picked that's happening now/next
+- **Current/Next band for user** — What the user picked that's happening now/next (**Schedule Lineup** + `isTimedBand` only)
+- **Announcement Lineup** — empty-safe: no fake live/next from stored times; plan on `/schedule`. Dedicated planning `/now` is Phase 50.
 - **Crew grid** — Where Festival crew is (camping vs. Metal Place when features enabled)
 - **Live attendance** — Other members watching the same band
-- **Conflict warnings** — If user picked overlapping bands
+- **Conflict warnings** — Overlapping timed picks only (`timedBands`)
 - **Time travel** (godlike only) — Jump to different festival day/time for testing
 - **Offline banner** — Show when offline
 - **Latest announcement banner** — Most recent mural post
@@ -183,10 +188,14 @@ Most festival social routes additionally wrap with `<FestivalGate>` (and optiona
 
 **Component**: `src/pages/LineupPage.tsx` (i18n namespace `SchedulePage`; CSS `SchedulePage.module.css`)
 
-**Purpose**: Browse full band lineup with filters
+**Purpose**: Browse the Active Festival lineup. Chrome follows **Lineup era** (`hasRunningOrder`), not empty slot columns.
 
-**Key Features**:
-- **Full band grid** — All bands across 4 days, 8 stages
+**Announcement Lineup** (`features.running_order` off/missing): B2 `AnnouncementPosterGrid` — name, image, genre, pick, counts. Search + genre only. No stage, time, day grouping, or conflicts. Band sheet omits trusted-clock chrome.
+
+**Schedule Lineup** (`running_order` true): day × stage grid with filters as below. **Leftover Bands** (no trusted clock) still list after timed rows — name-only cards, still pickable.
+
+**Key Features** (Schedule Lineup):
+- **Full band grid** — Timed Bands across days/stages; leftovers appended
 - **Filters**:
   - By stage (Faster, Harder, Louder, W.E.T., etc.)
   - By genre — 13 canonical labels as single-select pills (+ inline genre guide in filter drawer; see Phase 25)
@@ -194,31 +203,32 @@ Most festival social routes additionally wrap with `<FestivalGate>` (and optiona
   - By time (hour range)
   - By search (band name, substring)
 - **Band card** — Shows:
-  - Name, stage, time
+  - Name, stage, time (timed only)
   - Current attendance count
   - User's pick status (checked/unchecked)
-  - Stage color indicator
+  - Stage color indicator (timed only)
   - Pending chip if offline
 - **Band detail modal** — On tap:
   - Full band info
-  - Genre, stage, time window
+  - Genre, stage, time window (timed / Schedule Lineup only)
   - User's attendance
   - Crew attendance breakdown (avatars)
-  - Conflict warnings
+  - Conflict warnings (timed only)
   - "Não vi essa banda" toggle
 
 **Offline**: Fully functional (cached bands + cached attendance).
 
 ---
 
-### /my-picks (MyWackenPage)
+### /my-picks (MyPicksPage)
 
-**Component**: `src/pages/MyWackenPage.tsx` (i18n namespace `MyPicksPage`)
+**Component**: `src/pages/MyPicksPage.tsx` (i18n namespace `MyPicksPage`)
 
 **Purpose**: User's personal schedule (only bands they picked)
 
 **Key Features**:
-- **Grouped by day** — Upcoming → optional **already played today** divider → ended inline (A2); no Saw / Didn't See footer
+- **Grouped by day** — Timed picks (`isTimedBand`): upcoming → optional **already played today** divider → ended inline (A2); no Saw / Didn't See footer
+- **Untimed / leftover picks** — Announcement Lineup and leftover Bands stay listed name-only (A–Z) after day groups; still pickable. Phase 51 is a dedicated My Picks planning layout.
 - **Attendance** — Ended rows: Attended/Missed chip + teal/amber stripe; opt-out via band modal
 - **Conflict chips** — Upcoming rows only; header conflict/overlap counts exclude ended picks
 - **Conflict banner** — If 3+ upcoming conflicts, warning at top
@@ -241,6 +251,7 @@ Most festival social routes additionally wrap with `<FestivalGate>` (and optiona
 
 **Key Features**:
 - **Ranking** — Bands sorted by attendance count (descending)
+- **Schedule chrome** — Stage/time/day only when `isTimedBand`; Announcement Lineup and leftover Bands stay name-only (not hidden)
 - **Avatar clusters** — Show up to N users picking this band
   - Avatars grouped by crew member
   - Tooltip on hover with name + count
@@ -402,6 +413,7 @@ Most festival social routes additionally wrap with `<FestivalGate>` (and optiona
 - **Cache management**:
   - Button to "Clear local cache" (wipeAllLocalData)
   - Button to bump cache version (forces refresh)
+- **Lineup era** (`RunningOrderSection`) — godlike online toggle of Active Festival `features.running_order` (either direction); bumps `cache_version` so other clients `syncCatalog` then reload pack
 - **Badge consolidation** (Phase 29):
   - **`ConsolidateBadgesSection`** — year selector, force checkbox, gate until `isFestivalEnded()`
   - Confirm modal → `consolidate-year-badges` Edge Function
@@ -539,4 +551,4 @@ AnnouncementsPage (offline)
 
 ---
 
-**Last updated:** 2026-08-12 — `/now` header two-band layout (masthead + festival toolbar) for mobile; Phase 47: `/festivals`, `FestivalGate`, `FeatureRoute` for `/map` + `/wrap`, FestivalSwitcher on `/now`
+**Last updated:** 2026-09-04 — Phase 49 close-out: `/now` empty-safe; My Picks/Popular untimed lists; `MyPicksPage.tsx`.

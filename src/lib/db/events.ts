@@ -10,3 +10,4 @@ export const MISSED_CHANGED_EVENT = 'viralatas:missed-changed';
 export const RATINGS_CHANGED_EVENT = 'viralatas:ratings-changed';
 export const BLOCKED_POSTERS_CHANGED_EVENT = 'viralatas:blocked-posters-changed';
 export const BADGE_HISTORY_CHANGED_EVENT = 'viralatas:badge-history-changed';
+export const FESTIVAL_CATALOG_CHANGED_EVENT = 'viralatas:festival-catalog-changed';

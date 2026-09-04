@@ -51,6 +51,7 @@ function isEndedHighlightBand(
   aggregate: BandRatingAggregate | undefined,
 ): boolean {
   if (band.category === 'ceremony') return false;
+  if (!band.end_time) return false;
   if (new Date(band.end_time) >= now) return false;
   return aggregate !== undefined && aggregate.count >= 1;
 }
@@ -62,7 +63,9 @@ function compareByAvgThenStart(
 ): number {
   const avgDelta = direction === 'desc' ? b.avg - a.avg : a.avg - b.avg;
   if (avgDelta !== 0) return avgDelta;
-  return a.band.start_time.localeCompare(b.band.start_time);
+  return a.band.start_time && b.band.start_time
+    ? a.band.start_time.localeCompare(b.band.start_time)
+    : a.band.name.localeCompare(b.band.name);
 }
 
 function toHighlight(band: Band, aggregate: BandRatingAggregate): RatingHighlight {
@@ -159,7 +162,11 @@ export function buildRatingStatsSnapshot(input: RatingStatsInput): RatingStatsSn
 
     const fiveStar = ratedBands
       .filter((r) => r.score === 5)
-      .sort((a, b) => a.band.start_time.localeCompare(b.band.start_time));
+      .sort((a, b) =>
+        a.band.start_time && b.band.start_time
+          ? a.band.start_time.localeCompare(b.band.start_time)
+          : a.band.name.localeCompare(b.band.name),
+      );
 
     const pick =
       fiveStar.length > 0
@@ -167,7 +174,9 @@ export function buildRatingStatsSnapshot(input: RatingStatsInput): RatingStatsSn
         : [...ratedBands].sort((a, b) => {
             const scoreDelta = b.score - a.score;
             if (scoreDelta !== 0) return scoreDelta;
-            return a.band.start_time.localeCompare(b.band.start_time);
+            return a.band.start_time && b.band.start_time
+              ? a.band.start_time.localeCompare(b.band.start_time)
+              : a.band.name.localeCompare(b.band.name);
           })[0];
 
     userTopScore = {
@@ -206,6 +215,7 @@ export function buildRatingStatsInputFromPicks(
         (b) =>
           pickedBandIds.has(b.id) &&
           b.category !== 'ceremony' &&
+          b.end_time !== null &&
           new Date(b.end_time) < now &&
           !missedBandIds.has(b.id),
       )

@@ -1,8 +1,8 @@
 # Wacken Open Air 2026 — Band Lineup Reference
 
-> **WOA-only.** This page is the Wacken Open Air 2026 lineup. Summer Breeze Open Air 2026 lives under [festivals/summer-breeze-2026/](festivals/summer-breeze-2026/lineup.md) ([stages](festivals/summer-breeze-2026/stages.md)).
+> **WOA 2026 Schedule Lineup only.** Other Festival lineups live under `festivals/<slug>/`: [Summer Breeze 2026](festivals/summer-breeze-2026/lineup.md) ([stages](festivals/summer-breeze-2026/stages.md)); 2027 **Announcement Lineups** (named Bands, no invented slots) for [Wacken](festivals/wacken-2027/lineup.md), [ROCKHARZ](festivals/rockharz-2027/lineup.md), [Bangers Open Air](festivals/bangers-open-air-2027/lineup.md), and [Epic Fest](festivals/epic-fest-2027/lineup.md). Do not apply `lineup:check-official` or WOA 2026 timetable JSON to those pages.
 
-> **This file is the human-editable source of truth for band assignments.**
+> **This file is the human-editable source of truth for WOA 2026 band assignments.**
 > For stage schedules (slot times, stage colors, day codes, pairing rules), see [stages.md](stages.md).
 >
 > To update the lineup:
@@ -588,4 +588,4 @@ See [stages.md — How to Confirm a Slot's Official Time](stages.md#how-to-confi
 
 See [stages.md — How to Add a New Slot](stages.md#how-to-add-a-new-slot). Once the slot exists in stages.md, add the band row here referencing the new Slot ID.
 
-**Last updated:** 2026-07-24 — Day-4 LOU21 / WET30 / WAS24 promoted TBD→CONFIRMED; summary 200 CONFIRMED / 1 `TDB MTB` / 1 TBD (WAS32) / 203 total · seed 202.
+**Last updated:** 2026-09-04 — Banner links 2027 Announcement Lineups (WOA 2026 tables unchanged since 2026-07-24: 200 CONFIRMED / 1 `TDB MTB` / 1 TBD WAS32 / 203 total · seed 202).

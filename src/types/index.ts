@@ -37,11 +37,11 @@ export type BandCategory = 'band' | 'ceremony';
 export type Band = {
   id: string;
   festival_id: string;
-  slot_id: string;
+  slot_id: string | null;
   name: string;
-  stage: string;
-  start_time: string;
-  end_time: string;
+  stage: string | null;
+  start_time: string | null;
+  end_time: string | null;
   image_url: string | null;
   genre: string | null;
   category: BandCategory | null;

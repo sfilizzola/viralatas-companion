@@ -1,6 +1,6 @@
 # Viralatas Companion — Architectural Wiki
 
-**Last Updated**: 2026-08-12 (Ops: how to add a Festival via `seed:festival`)
+**Last Updated**: 2026-09-04 (Phase 49 Announcement Lineup + 2027 catalog)
 
 ## Purpose
 
@@ -50,10 +50,14 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 
 ### Festival Content
 - **[Stage Reference](stages.md)** — 8 stages: categories, colors, pairing rules, slot schedules (start/end times per slot per day)
-- **[Band Lineup](lineup.md)** — Band assignments by day and stage; cross-references stages.md via Slot IDs
-- **[Wacken Official Running Order (JSON)](lineup-official-source.md)** — Live JSON feeds, filter rules, agent checklist for lineup diffs
+- **[Band Lineup](lineup.md)** — Wacken Open Air 2026 Band assignments by day and stage; cross-references stages.md via Slot IDs
+- **[Wacken Official Running Order (JSON)](lineup-official-source.md)** — Live JSON feeds, filter rules, agent checklist for WOA 2026 lineup diffs (not 2027)
 - **[Summer Breeze 2026 — Stages](festivals/summer-breeze-2026/stages.md)** — 4 stages, \`slot_id\` prefixes (MAI/TST/TRB/CAM), calendar, seed scope
 - **[Summer Breeze 2026 — Lineup](festivals/summer-breeze-2026/lineup.md)** — Band tables by day/stage (135 slots); official PDF source
+- **[Wacken Open Air 2027 — Announcement Lineup](festivals/wacken-2027/lineup.md)** — 50 named Bands; no day/stage/time; WOA 2026 timetable feeds are not a 2027 schedule
+- **[ROCKHARZ 2027 — Announcement Lineup](festivals/rockharz-2027/lineup.md)** — 29 first-wave named Bands; no slots; aggregator-only acts excluded
+- **[Bangers Open Air 2027 — Announcement Lineup](festivals/bangers-open-air-2027/lineup.md)** — 11 named Bands; official day groups are wiki footnotes only (not stored slots)
+- **[Epic Fest 2027 — Announcement Lineup](festivals/epic-fest-2027/lineup.md)** — 22 current named Bands; cancelled Power Quest / Tungsten excluded
 
 ### Features & Mechanics
 - **[Badge System](badges.md)** — 22+ condition types, live vest + Previously Achieved archive, year consolidation, how to add badges
@@ -88,7 +92,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 ### Operational Tooling
 - **[Wacken Official Running Order (JSON)](lineup-official-source.md)** — Live JSON feeds, filter rules, `npm run lineup:check-official` (check → `--lineup` → `--complete`).
 - **[Lineup Sync](lineup-sync.md)** — Laptop CLI: `seed:bands:sync` and `seed:bands:move` (dry-run default; picks preserved). **At festival:** godlike [Remote Lineup Sync](flows/lineup-remote-sync.md) preview/apply from `/profile`.
-- **[Add Festival (Ops)](add-festival-ops.md)** — Create a Festival catalog row with `seed:festival`, seed bands with `--festival <slug>`, user Join/Active path; no in-app CRUD.
+- **[Add Festival (Ops)](add-festival-ops.md)** — Create a Festival catalog row with `seed:festival`, seed bands with `--festival <slug>`, or prepare 2027 Announcement Lineups with `seed:announcement-festivals-2027`; user Join/Active path; no in-app CRUD.
 - **[Festival Reset](festival-reset.md)** — `npm run festival:reset` one-shot script: state wipe (announcements, blocked_posters, user_presence, assigned + persistent badges, cache_version bump) with optional bands re-seed via `--with-bands`. Flag matrix, scope guard, edge cases. Festival-scoped via `--festival` (default `wacken-2026`).
 
 ---
@@ -233,7 +237,7 @@ window.addEventListener('viralatas:picks-changed', () => {
 | **App Shell** | `src/App.tsx` (route setup), `src/components/BottomNav.tsx`, `src/components/PrivateRoute.tsx` |
 | **PWA** | `vite.config.ts` (Workbox setup), `public/manifest.json`, Service Worker auto-generated |
 | **Stage Colors** | `src/services/stageColors.ts`, `src/index.css` (CSS custom properties) |
-| **Band Seed** | `supabase/seed/bands.ts`, `docs/ai-wiki/lineup.md`, `docs/ai-wiki/stages.md` |
+| **Band Seed** | `supabase/seed/bands.ts` (WOA 2026), `supabase/seed/announcement-festivals-2027.ts` (2027 Announcement Lineups), `docs/ai-wiki/lineup.md`, `docs/ai-wiki/festivals/` |
 | **Duck / Push** | `src/repositories/duck.ts`, `src/hooks/useDuckQuack.ts`, `src/hooks/useDuckNotifications.ts`, `src/lib/pushSubscription.ts`, `src/components/DuckButton.tsx`, `src/components/DuckToast.tsx`, `src/workers/sw.ts`, `supabase/functions/send-duck-push/index.ts`, `supabase/functions/send-test-push/index.ts` |
 | **App Pack integrations** | `src/components/PlaylistLaunchButton.tsx`, `src/components/profile/MoshSplitSection.tsx`, `src/lib/appSettings.ts` (`playlist_testing`) |
 | **Camp HQ geolocation** | `src/hooks/useCampLocation.ts`, `src/repositories/campLocation.ts`, `src/components/camp/`, `src/components/profile/CampingLocationAdminSection.tsx` |
@@ -244,7 +248,7 @@ window.addEventListener('viralatas:picks-changed', () => {
 
 ### Entities
 - **User**: Email, display name, role (normal/manager/godlike), Wacken years, country, arrival day
-- **Band**: Name, stage (string), time window, genre, image URL — stage is an attribute, not a foreign key
+- **Band**: Name, optional stage/time/`slot_id` (nullable in Announcement Lineup), genre, image URL — stage is an attribute, not a foreign key
 - **UserPick**: User → Band relationship (many-to-many)
 - **Announcement**: Text posts with author, creation time, soft-delete support
 - **UserPresence**: Camping status, Metal Place check-in status
@@ -488,6 +492,7 @@ Window events emitted from `src/lib/db.ts`:
 - `'viralatas:missed-changed'` — user_missed_bands or offline_missed_bands updated
 - `'viralatas:badge-history-changed'` — user_badge_history cache updated
 - `'viralatas:camp-location-changed'` — camp_location store updated (Phase 45)
+- `'viralatas:festival-catalog-changed'` — Festival catalog cache updated (`saveFestivalCatalog`)
 
 Window events dispatched by hooks/components (not from db.ts):
 - `'viralatas:duck-quack'` (CustomEvent `{ detail: { bandId: string } }`) — emitted by `useDuckNotifications` when a Realtime INSERT arrives on `duck_quacks`; consumed by `DuckToast`
@@ -495,4 +500,4 @@ Window events dispatched by hooks/components (not from db.ts):
 
 ---
 
-**Last edited**: 2026-06-26 — Phase 45 Camp HQ Geolocation; IndexedDB v14; camp-location flow link
+**Last edited**: 2026-09-04 — Phase 49 close-out: empty-safe `/now`, untimed My Picks/Popular, CacheVersionCheck glossary, DS v3.12

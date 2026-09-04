@@ -4,6 +4,7 @@ import { stageColor } from '../services/stageColors';
 import { formatTime } from '../services/bandTime';
 import { useI18n } from '../lib/i18n';
 import styles from './StageScheduleSheet.module.css';
+import type { Festival } from '../types/festival';
 
 type Props = {
   bands: Band[];
@@ -11,6 +12,7 @@ type Props = {
   previewTime?: Date | null;
   onClose: () => void;
   onBandSelect: (bandId: string) => void;
+  festival: Festival | null | undefined;
 };
 
 /** Stages where the stage color is bright enough to need dark ribbon text. */
@@ -20,9 +22,9 @@ function ribbonTextColor(stage: string): string {
   return DARK_RIBBON_TEXT.has(stage) ? '#111' : '#fff';
 }
 
-export default function StageScheduleSheet({ bands, now, previewTime, onClose, onBandSelect }: Props) {
+export default function StageScheduleSheet({ bands, now, previewTime, onClose, onBandSelect, festival }: Props) {
   const { t } = useI18n('StageScheduleSheet');
-  const entries = buildStageScheduleSnapshot(bands, now);
+  const entries = buildStageScheduleSnapshot(bands, now, festival);
   const isPreview = previewTime != null;
 
   function handleTileClick(bandId: string) {

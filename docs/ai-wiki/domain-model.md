@@ -9,8 +9,13 @@ Document the real-world entities, their relationships, business rules, and invar
 ## Relevant Source Files
 
 - `src/types/index.ts` — Shared type re-exports
-- `src/types/festival.ts` — `Festival`, `FestivalMembership`, `FestivalFeatureKey`
-- `src/lib/festivalFeatures.ts` — Feature gate helpers (`hasFestivalFeature`, `canShowMap`, …)
+- `src/types/festival.ts` — `Festival`, `FestivalMembership`, `FestivalFeatureKey` (includes storage key `running_order`)
+- `src/lib/festivalFeatures.ts` — Feature gate helpers (`hasFestivalFeature`, `canShowMap`, …, `hasRunningOrder`)
+- `src/services/timedBand.ts` — `isTimedBand` / `timedBands` / `normalizeBandName` (trusted-clock hard wall)
+- `src/services/announcementMatch.ts` — laptop name-match plan (`planNameMatches`)
+- `src/services/announcementLineup.ts` — `/schedule` B2 sort + hero split
+- `src/components/profile/RunningOrderSection.tsx` — godlike Lineup era flip
+- `supabase/migrations/20260904000000_announcement_lineup.sql` — nullable slots, partial unique, godlike festivals UPDATE
 - `src/lib/festivalCacheVersion.ts` — Per-Festival pack invalidation predicate
 - `src/lib/db/festivals.ts` — Active Festival id/cache meta + `clearActiveFestivalPack()`
 - `src/repositories/festivals.ts` — Catalog, memberships, Join/Leave, switch + pack load
@@ -57,7 +62,8 @@ Canonical product language: `CONTEXT.md` (Festival, Active Festival, Festival cr
 
 ```typescript
 type FestivalFeatureKey =
-  | 'metal_place' | 'map' | 'duck' | 'camp' | 'wrap' | 'remote_lineup';
+  | 'metal_place' | 'map' | 'duck' | 'camp' | 'wrap' | 'remote_lineup'
+  | 'running_order'; // storage key for Lineup era — not a Festival feature in product talk
 
 type FestivalFeatures = Partial<Record<FestivalFeatureKey, boolean>>;
 
@@ -73,17 +79,21 @@ type Festival = {
 };
 ```
 
-**Festival features** (optional): Metal Place, map, duck, camp, wrap, remote lineup. Core schedule / picks / `/now` / mural exist for every Festival. Wacken 2026 seeds all features `true`.
+**Festival features** (optional extras): Metal Place, map, duck, camp, wrap, remote lineup. Core schedule / picks / `/now` / mural exist for every Festival. Wacken 2026 seeds those extras `true`. **Lineup era is not a Festival feature** — every Festival has one. The JSON still stores it as `running_order` on the same `features` object.
 
-**Lineup era** (every Festival, not a Festival feature): **Announcement Lineup** (named Bands only) or **Schedule Lineup** (day, time, and stage). Distinct from **Official running order** (Wacken JSON feed / `remote_lineup`). Phase 49 stores era as `features.running_order` (`true` = Schedule Lineup; missing/false = Announcement Lineup) — implementation detail, not product language.
+**Lineup era** (every Festival): **Announcement Lineup** (named Bands only) or **Schedule Lineup** (day, time, and stage). Distinct from **Official running order** (Wacken JSON feed / `remote_lineup`). `features.running_order === true` → Schedule Lineup; missing/false → Announcement Lineup.
 
-**Trusted clock:** Live/next, conflicts, and map use a Band’s times only in **Schedule Lineup** and only when that Band has slot/stage/start/end. Announcement Lineup never trusts clocks, even if columns are filled. **Name match:** Laptop sync pairs one announced Band to one official slot by normalized name (same Band, picks stay). Ambiguous clusters and leftover Bands are reported, not auto-merged or auto-deleted.
+**Hard wall (`isTimedBand`):** live/next, conflicts, map, and schedule chrome require **both** Schedule Lineup **and** non-null `slot_id` / `stage` / `start_time` / `end_time`. Era is the flag — filled columns must not leak clocks in Announcement Lineup (including leftover Bands after a flip).
+
+**Trusted clock / name match:** Laptop `seed:bands:sync` pairs one announced Band to one official slot by `normalizeBandName` (same Band, picks stay). Ambiguous name clusters are skipped (apply the rest, exit 1). Leftover Bands are reported, never auto-deleted, and stay listed on Lineup. Official-only slots INSERT a new Band (zero picks). Name match is laptop-only; Wacken remote lineup sync stays `slot_id`.
 
 **Festival catalog**: Ops/seed-created list. Before membership, a vira-lata sees **metadata only** (name, dates, timezone) — not lineup, picks, or mural. How to add a Festival → [add-festival-ops.md](add-festival-ops.md).
 
 **Invariants:**
 - `slug` unique
-- Catalog SELECT open to all authenticated users; no client INSERT/UPDATE/DELETE (ops / service role)
+- Catalog SELECT open to all authenticated users
+- No client INSERT/DELETE (ops / service role)
+- **Godlike exception:** UPDATE `features` + `cache_version` only (column GRANT after table UPDATE revoke) — Lineup era flip either direction and pack invalidation
 - Godlike does **not** bypass membership for normal PWA reads/writes — must Join like anyone else
 
 **Lifecycle:**
@@ -210,17 +220,17 @@ See also: **Crew profile cache** in `CONTEXT.md`; Phase 31 in [architecture.md](
 
 ### Band
 
-**Essence**: A named act on a **Festival**’s lineup. Identity is the act (`id`), not a stage or time slot. In **Announcement Lineup** the Festival knows the Band; in **Schedule Lineup** it also knows day, time, and stage. Today's schema still requires slots (Schedule Lineup shape); Phase 49 makes slot fields optional.
+**Essence**: A named act on a **Festival**’s lineup. Identity is the act (`id`), not a stage or time slot. In **Announcement Lineup** the Festival knows the Band; in **Schedule Lineup** it also knows day, time, and stage. Slot fields are nullable (Phase 49).
 
 ```typescript
 type Band = {
   id: string;                  // uuid
   festival_id: string;         // FK → festivals (scoped lineup)
-  slot_id: string;             // unique per festival (festival_id, slot_id)
+  slot_id: string | null;      // unique per festival where not null
   name: string;                // "Slipknot", "Alestorm", etc.
-  stage: string;               // "Faster", "Harder", "W.E.T.", etc.
-  start_time: string;          // ISO 8601, e.g., "2026-07-29T18:30:00+02:00"
-  end_time: string;            // ISO 8601
+  stage: string | null;
+  start_time: string | null;   // ISO 8601 when scheduled
+  end_time: string | null;
   image_url: string | null;    // Thumbnail from wacken.com
   genre: string | null;        // One of 13 canonical labels (Phase 25 collapse)
 };
@@ -235,10 +245,10 @@ Full old→new mapping: **[genre-collapse-mapping.md](genre-collapse-mapping.md)
 **Party Metal** is locked to Alestorm + Airbourne only (badge condition unchanged).
 
 **Invariants:**
-- `(festival_id, slot_id)` unique
-- Band list mutable by godlike / remote lineup sync only
+- `(festival_id, slot_id)` unique **where `slot_id IS NOT NULL`** (partial unique index). Many announced Bands may share null `slot_id`.
+- Band list mutable by godlike / remote lineup sync / laptop seed only
 - RLS: SELECT only for Festival members (`is_festival_member(festival_id)`) — no godlike bypass
-- Performances don't overlap by stage within a Festival
+- Performances don't overlap by stage within a Festival (timed Bands only)
 
 **Stages** (Wacken 2026 — 8 total):
 ```
@@ -855,6 +865,7 @@ Computed in `useNowData()` using current time + user picks.
 - Control Metal Place check-in window
 - Time travel (test mode)
 - Assign special joke badges
+- Flip Active Festival **Lineup era** (`RunningOrderSection` — online; bumps `cache_version`)
 - Consolidate year-badges into archive (`ConsolidateBadgesSection`)
 - Configure live band test override
 - Set/clear shared campground GPS (`CampingLocationAdminSection`, Phase 45)
@@ -906,4 +917,4 @@ Computed in `useNowData()` using current time + user picks.
 
 ---
 
-**Last updated:** 2026-09-04 — Band essence + Lineup era (Announcement vs Schedule); Festival features still optional extras only.
+**Last updated:** 2026-09-04 — Phase 49: nullable Band slots, `isTimedBand` hard wall, name-match + B2 helpers.

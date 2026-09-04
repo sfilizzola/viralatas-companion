@@ -45,6 +45,18 @@
   color: var(--signal-ok);
 }
 
+.announcementBanner {
+  margin: var(--s-3) var(--s-4) 0;
+  padding: var(--s-2) 10px;
+  border: 1px dashed var(--border-strong);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.35;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
 .dayDivider {
   height: 1px;
   background: var(--border);
@@ -156,6 +168,11 @@
 
 .scheduleList {
   padding-inline: var(--s-4);
+}
+
+.announcementList {
+  padding-top: var(--s-3);
+  padding-bottom: var(--s-2);
 }
 
 .empty {

@@ -4,24 +4,32 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
-## 2026-09-04
+## 2026-09-04 (Phase 49 — Announcement Lineup)
+
+### Added
+- **Phase 49 — Announcement Lineup** — `features.running_order` (storage; product: **Lineup era**). Off/missing: `/schedule` B2 `AnnouncementPosterGrid` (no stage/time). `isTimedBand` hard wall. Godlike `RunningOrderSection` toggle. Laptop name-match `seed:bands:sync`.
+- Four official-source 2027 Festival pages: [Wacken Open Air](festivals/wacken-2027/lineup.md) (50 Bands), [ROCKHARZ](festivals/rockharz-2027/lineup.md) (29), [Bangers Open Air](festivals/bangers-open-air-2027/lineup.md) (11), and [Epic Fest](festivals/epic-fest-2027/lineup.md) (22). All are flat **Announcement Lineups** with no invented stage/time slots.
+- `supabase/seed/announcement-festivals-2027.ts` + `npm run seed:announcement-festivals-2027`: dry-run-first, one-Festival-at-a-time catalog/untimed-Band preparation. Apply is create-only and refuses to overwrite an existing lineup.
+- Runtime seed integrity checks lock Festival slugs, official snapshot counts, unique normalized Band names, date ranges, and Announcement Lineup flags before any database connection.
 
 ### Changed
-- Locked product language for Phase 49: every **Festival** has a **Lineup era** — **Announcement Lineup** (named **Bands**) or **Schedule Lineup** (day, time, and stage). Not a **Festival feature**. Not **Official running order** (Wacken JSON feed only). `CONTEXT.md`, glossary, domain-model, architecture, add-festival-ops.
-- **Trusted clock**: era is the wall — Announcement Lineup must not use stored times for live/conflict/map.
-- **Leftover Band**: wiki omits incomplete Schedule Lineup rows (do not add); laptop sync reports leftovers and never auto-deletes (`docs/adr/0003-leftover-bands-no-auto-delete.md`).
-- **Lineup era flip**: godlike in the PWA on the Active Festival; seed script never flips era (`docs/adr/0004-godlike-flips-lineup-era.md`).
-- **Name match**: one announced name ↔ one official slot keeps the same Band (`docs/adr/0005-name-match-keeps-band.md`).
-- **Ambiguous name cluster**: skip that name, apply the rest, exit non-zero (`docs/adr/0006-ambiguous-name-clusters-skipped.md`).
-- **Official-only slot**: INSERT new Band, zero picks (wiki add with day/time/stage).
+- `public.bands` slot columns nullable; partial unique `(festival_id, slot_id)` where `slot_id IS NOT NULL`.
+- Festivals: godlike may UPDATE `features` + `cache_version` (also unblocks cache reset). Column GRANT after REVOKE table UPDATE from authenticated. Wacken 2026 / Summer Breeze 2026 seeded `running_order: true`.
+- Locked product language: every **Festival** has a **Lineup era** — **Announcement Lineup** or **Schedule Lineup**. Not a **Festival feature**. Not **Official running order**. `CONTEXT.md`, glossary, domain-model, architecture, add-festival-ops, schema, routes, lineup-sync.
+- **Name match** is laptop `seed:bands:sync` only; leftover Bands stay on Lineup (reported, never auto-deleted); skip ambiguous cluster exit 1; official-only INSERT. Wacken remote lineup sync stays `slot_id`.
+- Festival index, Wacken 2026 lineup banner, and add-Festival runbook now link the four 2027 pages and their safe initial seed workflow.
+- Epic Fest's current 22-act list excludes cancelled Power Quest and Tungsten; official spelling noise is documented. ROCKHARZ excludes aggregator-only acts. Bangers day buckets remain wiki reference only and are not stored as slots.
 - Rumored days: **Lineup wiki** footnotes only; not stored on the Band in Announcement Lineup.
 - Phase 49 `/now`: empty-safe (no fake live); Announcement Lineup planning is `/schedule` (B2). Planning `/now` / My Picks UIs are Phases 50–51.
-- Announcement **Lineup wiki**: one normalized name per Festival; duplicates are an operator error, not an app merge.
-- **Lineup era flip** visibility: **Festival cache version** pack + catalog reload; no `festivals` Realtime.
-- **Name match** is laptop `seed:bands:sync` only; **Remote lineup sync** stays slot-based (Wacken) (`docs/adr/0007-name-match-laptop-only.md`).
-- New Festival default **Announcement Lineup**; Wacken 2026 and Summer Breeze 2026 start **Schedule Lineup**.
 - Phase 49 Popular / My Picks: still list announcement Picks (empty-safe); no hide; no Phase 51 layout.
-- **Leftover Band** still listed on Lineup (name-only) after Schedule Lineup, not slotted-only.
+- New Festival default **Announcement Lineup** (`{}` is enough); `demo-fest-2027` stays without `running_order`.
+- Close-out (same day): glossary `CacheVersionCheck` now matches pack `syncCatalog` (not `wipeAllLocalData` / `app_config`); routes `/now` empty-safe + `MyPicksPage.tsx`; live-now `timedBands` edge case; DS changelog v3.12. Phase 49 archived in `phases-history.md`; `PHASES.md` current is 50.
+
+### Architectural Notes
+- Era is the flag, not empty columns (premature times must not leak into `/now`).
+- Pack bump must `syncCatalog` so crew see the new feature (catalog is not in the pack). `FESTIVAL_CATALOG_CHANGED_EVENT` refreshes Active Festival context.
+- `seed:announcement-festivals-2027` is create-only. Later slot fills use laptop name-match; godlike flips era (either direction).
+- Bangers official day groups, ROCKHARZ historical stage names, and isolated Epic Fest slot rumors stay **Lineup wiki** footnotes — not stored on untimed Band rows.
 
 ---
 
