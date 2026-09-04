@@ -15,7 +15,37 @@ Portuguese: Stray dog, mutt. In this context, a member of the Viralatas Metaleir
 Annual metal music festival in northern Germany, July 29 - Aug 1, 2026. ~170k attendees across 8 stages.
 
 ### Band
-A musical act performing on one stage at one time slot. 78+ bands total. Each `Band` record carries its own `stage: string` field — there is no separate Stage entity in the database.
+A named act on a Festival's lineup. Identity is the act, not a stage or time slot. In **Announcement Lineup** the Festival knows the Band; in **Schedule Lineup** it also knows day, time, and stage. There is no separate Stage entity — when times exist they live on the Band row.
+
+### Lineup era
+Which of two Lineup states a Festival is in: **Announcement Lineup** (who is playing) or **Schedule Lineup** (day, time, and stage). Every Festival has a Lineup era — not only Wacken. Not a Festival feature. Not **Official running order** (Wacken's JSON feed).
+
+### Announcement Lineup
+Lineup era: named Bands are known; day/time/stage are not trustworthy. Vira-latas pick by name. Distinct from mural **announcements**. Rumored days are Lineup wiki footnotes only — not seeded.
+
+### Schedule Lineup
+Lineup era: Bands have published day, time, and stage. Timed schedule, conflicts, and live/next belong here.
+
+### Trusted clock
+Day, time, and stage the app may use for live/next, conflicts, and map. Only in **Schedule Lineup**, and only for a Band that has those fields. Announcement Lineup never trusts stored times.
+
+### Lineup wiki
+Committed wiki page for a Festival’s lineup. Human source of truth when building the seed script. Announcement Lineup: one normalized name per Festival. Schedule Lineup: incomplete Bands omitted (not added). Does not auto-delete live rows the wiki no longer lists.
+
+### Leftover Band
+A live Band not in the current Lineup wiki (typical: announced name with no slot after Schedule Lineup). Sync reports it; never auto-deletes. Stays name-only with picks on Lineup, Popular, and My Picks until an operator deletes by hand.
+
+### Lineup era flip
+Godlike changing the Active Festival between Announcement Lineup and Schedule Lineup in either direction (PWA, online). The laptop seed script does not flip era. Flip back drops trusted clock even if old times remain.
+
+### Name match
+Laptop sync pairing an announced Band to an official slot by normalized name (trim, collapse space, NFKC, case-insensitive) in one Festival. A unique pair is the same Band; picks stay. Wacken remote lineup sync stays slot-based.
+
+### Ambiguous name cluster
+Two+ announced Bands or two+ official slots with the same normalized name. Name match skips the cluster, applies other names, exits non-zero. No auto-merge.
+
+### Official-only slot
+Complete wiki slot with no matching announced Band. Sync INSERTs a new Band, zero picks.
 
 ### Band Assignment
 The mapping of a specific band name to a slot on a specific stage and day. Tracked in `docs/ai-wiki/lineup.md`. Separate from the slot schedule (start/end times), which lives in `docs/ai-wiki/stages.md`.
@@ -36,7 +66,7 @@ The grid of slot start/end times for a given stage and day. Lives in `docs/ai-wi
 Unique identifier for a time slot, combining stage abbreviation + sequential number (e.g. `FAS1`, `HAR7`). Global across all days. Used to cross-reference slot times (in `stages.md`) with band assignments (in `lineup.md`).
 
 ### Pick
-User's decision to watch a band. Not a commitment, just an interest marker.
+User's decision to watch a band. Not a commitment, just an interest marker. Same Pick in Announcement Lineup and Schedule Lineup; follows the Band, not the slot.
 
 ### Presence
 User's current location/state: camping (in the campground) or at_metal_place (at the festival).
@@ -500,4 +530,4 @@ Navigation guide in the wiki index recommending which documents to read first ba
 
 ---
 
-**Last updated:** 2026-05-18 — corrected the Cache Version / CacheVersionCheck entries to reference `public.app_config` (not the non-existent `public.meta`); added Festival Reset and Positive-Strip Pattern entries.
+**Last updated:** 2026-09-04 — Band is a named act (not a required slot); added Lineup era / Announcement Lineup / Schedule Lineup. Canonical product language: `CONTEXT.md`.

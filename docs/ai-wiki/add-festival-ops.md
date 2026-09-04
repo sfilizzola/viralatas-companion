@@ -62,15 +62,17 @@ npm run seed:festival -- \
 | `duck` | Duck quack UI |
 | `camp` | Camp HQ / camping Presence UI |
 | `wrap` | `/wrap` + wrap teaser |
-| `remote_lineup` | Godlike remote lineup sync UI |
+| `remote_lineup` | Godlike remote lineup sync UI (Wacken **Official running order** feed — not Lineup era) |
 
-Example Wacken-style pack:
+**Lineup era** (every Festival; **not** a Festival feature): **Announcement Lineup** (named Bands) vs **Schedule Lineup** (day, time, stage). New Festivals start Announcement Lineup (`running_order` omitted/false). Wacken / Summer Breeze stay Schedule Lineup (`true`) unless godlike flips. Phase 49 stores era in the same JSON as `running_order`. Do not call this **Official running order**.
+
+Example Wacken-style pack (Phase 49 also sets `"running_order":true`):
 
 ```bash
 --features '{"metal_place":true,"map":true,"duck":true,"camp":true,"wrap":true,"remote_lineup":true}'
 ```
 
-Core surfaces (schedule, picks, mural, `/now` social) exist for every Festival and are **not** feature-flagged.
+Core surfaces (schedule, picks, mural, `/now` social) exist for every Festival and are **not** Festival features. How `/schedule` looks follows **Lineup era**.
 
 Upsert is by `slug` (`onConflict: 'slug'`). Re-running with the same slug updates name/dates/tz/features; it does not wipe bands or memberships.
 

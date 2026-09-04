@@ -45,7 +45,7 @@ Viralatas Metaleiros is a small group (~20 people) of **vira-latas** who can opt
 13. **UserBandRating** — 1–5 concert score (Phase 32)
 14. **CampLocation** — Shared campground GPS (Phase 45; feature-gated)
 
-Canonical product language: `CONTEXT.md` (Festival, Active Festival, Festival crew, Leave, membership-gated counts, Festival features, Active Festival pack, Festival cache version).
+Canonical product language: `CONTEXT.md` (Festival, Active Festival, Festival crew, Leave, membership-gated counts, Festival features, Active Festival pack, Festival cache version, **Band**, **Lineup era**, **Announcement Lineup**, **Schedule Lineup**, **Official running order**).
 
 ---
 
@@ -74,6 +74,10 @@ type Festival = {
 ```
 
 **Festival features** (optional): Metal Place, map, duck, camp, wrap, remote lineup. Core schedule / picks / `/now` / mural exist for every Festival. Wacken 2026 seeds all features `true`.
+
+**Lineup era** (every Festival, not a Festival feature): **Announcement Lineup** (named Bands only) or **Schedule Lineup** (day, time, and stage). Distinct from **Official running order** (Wacken JSON feed / `remote_lineup`). Phase 49 stores era as `features.running_order` (`true` = Schedule Lineup; missing/false = Announcement Lineup) — implementation detail, not product language.
+
+**Trusted clock:** Live/next, conflicts, and map use a Band’s times only in **Schedule Lineup** and only when that Band has slot/stage/start/end. Announcement Lineup never trusts clocks, even if columns are filled. **Name match:** Laptop sync pairs one announced Band to one official slot by normalized name (same Band, picks stay). Ambiguous clusters and leftover Bands are reported, not auto-merged or auto-deleted.
 
 **Festival catalog**: Ops/seed-created list. Before membership, a vira-lata sees **metadata only** (name, dates, timezone) — not lineup, picks, or mural. How to add a Festival → [add-festival-ops.md](add-festival-ops.md).
 
@@ -206,7 +210,7 @@ See also: **Crew profile cache** in `CONTEXT.md`; Phase 31 in [architecture.md](
 
 ### Band
 
-**Essence**: An act performing at a specific stage and time on a **Festival**.
+**Essence**: A named act on a **Festival**’s lineup. Identity is the act (`id`), not a stage or time slot. In **Announcement Lineup** the Festival knows the Band; in **Schedule Lineup** it also knows day, time, and stage. Today's schema still requires slots (Schedule Lineup shape); Phase 49 makes slot fields optional.
 
 ```typescript
 type Band = {
@@ -902,4 +906,4 @@ Computed in `useNowData()` using current time + user picks.
 
 ---
 
-**Last updated:** 2026-08-11 — Phase 47 multi-festival: Festival, membership, Active Festival pack, features, membership-gated counts.
+**Last updated:** 2026-09-04 — Band essence + Lineup era (Announcement vs Schedule); Festival features still optional extras only.

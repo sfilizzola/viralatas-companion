@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-09-04
+
+### Changed
+- Locked product language for Phase 49: every **Festival** has a **Lineup era** — **Announcement Lineup** (named **Bands**) or **Schedule Lineup** (day, time, and stage). Not a **Festival feature**. Not **Official running order** (Wacken JSON feed only). `CONTEXT.md`, glossary, domain-model, architecture, add-festival-ops.
+- **Trusted clock**: era is the wall — Announcement Lineup must not use stored times for live/conflict/map.
+- **Leftover Band**: wiki omits incomplete Schedule Lineup rows (do not add); laptop sync reports leftovers and never auto-deletes (`docs/adr/0003-leftover-bands-no-auto-delete.md`).
+- **Lineup era flip**: godlike in the PWA on the Active Festival; seed script never flips era (`docs/adr/0004-godlike-flips-lineup-era.md`).
+- **Name match**: one announced name ↔ one official slot keeps the same Band (`docs/adr/0005-name-match-keeps-band.md`).
+- **Ambiguous name cluster**: skip that name, apply the rest, exit non-zero (`docs/adr/0006-ambiguous-name-clusters-skipped.md`).
+- **Official-only slot**: INSERT new Band, zero picks (wiki add with day/time/stage).
+- Rumored days: **Lineup wiki** footnotes only; not stored on the Band in Announcement Lineup.
+- Phase 49 `/now`: empty-safe (no fake live); Announcement Lineup planning is `/schedule` (B2). Planning `/now` / My Picks UIs are Phases 50–51.
+- Announcement **Lineup wiki**: one normalized name per Festival; duplicates are an operator error, not an app merge.
+- **Lineup era flip** visibility: **Festival cache version** pack + catalog reload; no `festivals` Realtime.
+- **Name match** is laptop `seed:bands:sync` only; **Remote lineup sync** stays slot-based (Wacken) (`docs/adr/0007-name-match-laptop-only.md`).
+- New Festival default **Announcement Lineup**; Wacken 2026 and Summer Breeze 2026 start **Schedule Lineup**.
+- Phase 49 Popular / My Picks: still list announcement Picks (empty-safe); no hide; no Phase 51 layout.
+- **Leftover Band** still listed on Lineup (name-only) after Schedule Lineup, not slotted-only.
+
+---
+
 ## 2026-08-12
 
 ### Added

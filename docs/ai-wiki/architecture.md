@@ -123,7 +123,7 @@ Switch Active Festival (online only):
 
 **Sync scoping** — `runReconnectSync` and domain sync methods take Active Festival id; pulls/flushes are Festival-scoped. `CacheVersionCheck` uses `festivals.cache_version` for the Active Festival only (`shouldInvalidatePack`).
 
-**Feature gates** — `hasFestivalFeature` / `canShow*` helpers; Presence UI requires camp or metal_place; duck/camp/map/wrap/remote_lineup similarly gated. Core schedule / picks / mural / `/now` always on for every Festival.
+**Feature gates** — `hasFestivalFeature` / `canShow*` helpers; Presence UI requires camp or metal_place; duck/camp/map/wrap/remote_lineup similarly gated. Core schedule / picks / mural / `/now` always on for every Festival. **Lineup era** (Announcement Lineup vs Schedule Lineup) is not a Festival feature — every Festival has one; Phase 49 stores it as `features.running_order`. **Official running order** remains the Wacken JSON feed only. In Announcement Lineup, `/now` stays empty-safe (no fake live from untrusted times); planning picks are `/schedule`. Phase 50 is a dedicated planning `/now`.
 
 ### Viralatas App Pack (Phase 22–23)
 
