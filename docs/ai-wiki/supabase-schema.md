@@ -808,7 +808,7 @@ Scripts to populate test data (in `supabase/seed/`):
 | Script | Purpose |
 |--------|---------|
 | `bands.ts` | Import Wacken 2026 lineup |
-| `announcement-festivals-2027.ts` | Create-only 2027 Announcement Lineup catalog + untimed Bands (`npm run seed:announcement-festivals-2027`) |
+| `announcement-festivals-2027.ts` | 2027 Announcement Lineup catalog + untimed Bands; matching re-run patches `image_url` (`npm run seed:announcement-festivals-2027`) |
 | `test-users.ts` | Create fake vira-latas for testing |
 | `live-now.ts` | Time-shift bands for live preview testing |
 | `festival-reset.ts` | One-shot pre-festival wipe (announcements, blocked_posters, user_presence, assigned + persistent badges) + `cache_version` bump; chains bands re-seed via `--with-bands`. See `docs/ai-wiki/festival-reset.md`. |

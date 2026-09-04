@@ -37,6 +37,10 @@ Official named Bands for **epic-fest-2027** before a timetable exists. This is a
 
 **Count:** 22.
 
+## Photos
+
+Epic Fest pages do not publish per-band photos. Seeded `image_url` values are curated stand-ins: Wikimedia Commons live shots where a clear band photo exists (including Hagane at Epic Fest 2026), MAGFest’s Owlbear promo, and Deezer artist artwork for the remaining acts.
+
 ## Naming and Cancellation Notes
 
 - `Edu Falaschi` corrects the live page's `Edu Falashi` typo.
@@ -58,7 +62,7 @@ npm run seed:announcement-festivals-2027 -- --festival epic-fest-2027
 npm run seed:announcement-festivals-2027 -- --festival epic-fest-2027 --apply
 ```
 
-Dry-run is default. Apply creates the Festival and inserts Bands only when its band set is empty. It never deletes or overwrites existing Bands.
+Dry-run is default. Apply creates the Festival and inserts Bands only when its band set is empty. A later `--apply` with the same names patches `image_url` only. It never deletes Bands.
 
 ## Promotion to Schedule Lineup
 

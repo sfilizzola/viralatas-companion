@@ -93,7 +93,7 @@ Wacken 2027, ROCKHARZ 2027, Bangers Open Air 2027, and Epic Fest 2027 use one cr
 - [Bangers Open Air 2027](festivals/bangers-open-air-2027/lineup.md)
 - [Epic Fest 2027](festivals/epic-fest-2027/lineup.md)
 
-The command creates the catalog row when absent and inserts untimed Bands (`slot_id` / `stage` / `start_time` / `end_time` all null) only if that Festival has no Bands. It never deletes rows or picks. It does **not** invent day, stage, or set times — including Bangers' official day groups, which stay wiki footnotes only.
+The command creates the catalog row when absent and inserts untimed Bands (`slot_id` / `stage` / `start_time` / `end_time` all null) only if that Festival has no Bands. If the normalized name set already matches, `--apply` patches `image_url` only and bumps `cache_version`. It never deletes rows or picks. It does **not** invent day, stage, or set times — including Bangers' official day groups, which stay wiki footnotes only.
 
 ```bash
 npm run seed:announcement-festivals-2027 -- --festival <slug>          # dry-run (no credentials)
@@ -113,7 +113,7 @@ Requires Phase 49's nullable Band slot migration. New catalog rows start in **An
 
 - If the Festival row already exists, metadata/features are left unchanged (not an upsert).
 - If the Festival is already **Schedule Lineup** (`running_order === true`), apply refuses.
-- If Bands already exist, apply is a no-op when the normalized name set matches; otherwise it refuses. Never use this script to add/remove acts later.
+- If Bands already exist, apply patches `image_url` when the normalized name set matches; otherwise it refuses. Never use this script to add/remove acts later.
 
 When organizers later publish a **Schedule Lineup** (day, time, stage), do **not** rerun this initial seed and do **not** expect it to flip Lineup era. Use the Phase 49 laptop name-match workflow (`seed:bands:sync`) so existing Band ids and picks survive, then godlike flips era on the Active Festival after verification. **Official running order** remains the Wacken JSON feed name — not Lineup era.
 
@@ -170,7 +170,7 @@ Default slug when `--festival` is omitted: **`wacken-2026`**.
 ## Safety
 
 - Production has **no PITR**. Prefer dry-run sync; never run destructive band/reset commands on prod without explicit operator OK in the same turn.
-- Creating a festival row alone is low risk (catalog upsert). `seed:announcement-festivals-2027 --apply` is also low risk (create-only untimed Bands; never deletes). Attaching bands with `--force` or `festival:reset --with-bands` is high risk for that Festival’s picks.
+- Creating a festival row alone is low risk (catalog upsert). `seed:announcement-festivals-2027 --apply` is also low risk (create-only untimed Bands, or `image_url` patch on a matching name set; never deletes). Attaching bands with `--force` or `festival:reset --with-bands` is high risk for that Festival’s picks.
 - Catalog INSERT/DELETE stay service-role / laptop. Godlike may UPDATE `features` and `cache_version` from the PWA (Lineup era flip either way + pack invalidation). Godlike still must Join to use a Festival in the app.
 
 ---
