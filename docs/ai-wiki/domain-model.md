@@ -17,6 +17,7 @@ Document the real-world entities, their relationships, business rules, and invar
 - `src/services/planningNow.ts` — planning newest-Band/countdown/roster/activity projections
 - `src/components/profile/RunningOrderSection.tsx` — godlike Lineup era flip
 - `supabase/migrations/20260904000000_announcement_lineup.sql` — nullable slots, partial unique, godlike festivals UPDATE
+- `supabase/migrations/20260905000000_bands_created_at.sql` — canonical Band announcement timestamp, null backfill, `DEFAULT now()`, `NOT NULL`
 - `src/lib/festivalCacheVersion.ts` — Per-Festival pack invalidation predicate
 - `src/lib/db/festivals.ts` — Active Festival id/cache meta + `clearActiveFestivalPack()`
 - `src/repositories/festivals.ts` — Catalog, memberships, Join/Leave, switch + pack load
@@ -252,7 +253,7 @@ Full old→new mapping: **[genre-collapse-mapping.md](genre-collapse-mapping.md)
 - Band list mutable by godlike / remote lineup sync / laptop seed only
 - RLS: SELECT only for Festival members (`is_festival_member(festival_id)`) — no godlike bypass
 - Performances don't overlap by stage within a Festival (timed Bands only)
-- PostgreSQL `category` is nullable. PostgreSQL `created_at` has `DEFAULT now()` but is not declared `NOT NULL`; generated Supabase/client pack typing treats freshly loaded rows as a required string
+- PostgreSQL `category` is nullable. PostgreSQL `created_at` is `NOT NULL DEFAULT now()`, matching the required generated/client pack string
 - Legacy IndexedDB rows may still omit/null `created_at`; `newestAnnouncedBands()` treats missing, null, or invalid timestamps as oldest rather than promoting them
 
 **Stages** (Wacken 2026 — 8 total):

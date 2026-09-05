@@ -11,6 +11,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - `usePlanningNowData.ts` composes Active Festival Bands, Picks, crew roster, auth, and override-aware time from existing IDB/event-backed hooks.
 - `PlanningNowView.tsx`, `PlanningMemberSheet.tsx`, and `PlanningNow.module.css` ship the Announcement Press planning home: bone pack slab, newest stacked Bands, optional peer activity, roster sheet, and existing Band detail modal reuse.
 - Unit/hook/component coverage for countdown boundaries, deterministic ordering, membership/activity filtering, Active Festival scoping, offline-only imports, era isolation, null Festival fail-closed behavior, empty/solo/TBA states, all locales, roster sheet, and Band modal reuse.
+- `20260905000000_bands_created_at.sql` makes the Phase 50 Band announcement timestamp canonical DDL, preserving existing values, backfilling only nulls, and enforcing `NOT NULL DEFAULT now()`.
 
 ### Changed
 - `RightNowPage.tsx` now selects `hasRunningOrder(festival) ? LiveNowView : PlanningNowView`; missing catalog data cannot mount trusted-clock/live hooks.
@@ -23,6 +24,7 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 - Planning `/now` uses `activeFestivalId` to scope cached Bands/Picks and the complete `crew_users` cache as its Festival-membership proxy; it does not use `loadFestivalMemberships()` for peer counts.
 - The planning branch never mounts `useNowData` or live presence/radar/map/stage/announcement/badge/duck hooks. Null Festival fails closed to planning with dates TBA.
 - Invalid or legacy-missing Band/Pick timestamps sort oldest; freshly packed Band rows require `created_at`.
+- The migration closes a schema-source drift found after release: wiki/client expected `bands.created_at`, but no tracked migration previously created it.
 - Phase close: focused 79 tests plus full verification — `rtk npm run build` green (490 app modules; service worker 82 modules; only existing chunk/dynamic-import warnings) and `rtk npm test` 110 files / 1099 tests. Device/browser visual confirmation of 390×844 fit and pre-Phase-50 live pixel parity remains outstanding.
 
 ---

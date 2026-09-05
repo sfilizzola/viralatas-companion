@@ -217,7 +217,7 @@ CREATE TABLE public.bands (
   image_url text,
   genre text,
   category text,
-  created_at timestamptz DEFAULT now()
+  created_at timestamptz NOT NULL DEFAULT now()
 );
 
 CREATE UNIQUE INDEX bands_festival_slot_id_uidx
@@ -228,9 +228,9 @@ CREATE INDEX idx_bands_stage ON public.bands(stage);
 CREATE INDEX idx_bands_start_time ON public.bands(start_time);
 ```
 
-`category` is nullable. `created_at` defaults to `now()` but the current DDL does not declare it `NOT NULL`; generated/client Band typing requires a string for freshly packed rows. Phase 50 persists that column in the Active Festival Band pack for newest-announcement ordering. Legacy cached rows with a missing/null/invalid timestamp are tolerated client-side and sort oldest.
+`category` is nullable. Migration `20260905000000_bands_created_at.sql` adds the canonical `created_at` column if missing, preserves existing timestamps, backfills only null values, and enforces `NOT NULL DEFAULT now()` to match the required client Band type. Phase 50 persists that column in the Active Festival Band pack for newest-announcement ordering. Legacy cached rows with a missing/null/invalid timestamp are tolerated client-side and sort oldest.
 
-**Realtime**: Enabled (rarely changes, but subscribed for test mode).
+**Realtime**: Disabled. Band changes reach clients through the existing Active Festival pack refresh/cache-version path.
 
 **RLS Policy** (select — Phase 47 members only; no godlike bypass):
 ```sql
