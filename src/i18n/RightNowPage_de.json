@@ -69,5 +69,22 @@
   "headingNextSection": "Geht als nächstes zu",
   "noUpcomingPicks": "keine weiteren Picks",
   "mapButton": "Karte",
-  "stagesButton": "Bühnen"
+  "stagesButton": "Bühnen",
+  "planningEra": "Angekündigtes Lineup",
+  "planningDays": "{count} Tage",
+  "planningToday": "Heute",
+  "planningDatesTba": "Termine folgen",
+  "planningGoing": "{count} vira-latas sind dabei",
+  "planningSolo": "Bisher nur du",
+  "planningMembersTitle": "Teilnehmende vira-latas",
+  "planningPackStatus": "Status der vira-latas",
+  "planningSeeAll": "Alle ansehen",
+  "planningJustAnnounced": "Neu angekündigt",
+  "planningNewNames": "{count} neue Namen",
+  "planningFirstWave": "Erste Welle",
+  "planningLineupEmpty": "Lineup noch nicht veröffentlicht",
+  "planningPackPicks": "Picks der vira-latas",
+  "planningPicked": "{name} wählte {band}",
+  "planningUnknownMember": "Vira-lata",
+  "planningClose": "Schließen"
 }

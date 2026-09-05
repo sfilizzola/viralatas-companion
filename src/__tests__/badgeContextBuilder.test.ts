@@ -38,6 +38,7 @@ const sampleBand: Band = {
   image_url: null,
   genre: 'Thrash',
   category: 'band',
+  created_at: '2026-01-01T00:00:00.000Z',
 };
 
 const brCrewUser: CrewUser = {

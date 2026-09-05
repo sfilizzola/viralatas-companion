@@ -4,6 +4,47 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-09-05 (Phase 50 — `/now` planning implementation)
+
+### Added
+- `planningNow.ts` pure projections: newest three announced Bands, festival-local countdown, deterministic full-roster ordering, and newest eligible peer Pick activity.
+- `usePlanningNowData.ts` composes Active Festival Bands, Picks, crew roster, auth, and override-aware time from existing IDB/event-backed hooks.
+- `PlanningNowView.tsx`, `PlanningMemberSheet.tsx`, and `PlanningNow.module.css` ship the Announcement Press planning home: bone pack slab, newest stacked Bands, optional peer activity, roster sheet, and existing Band detail modal reuse.
+- Unit/hook/component coverage for countdown boundaries, deterministic ordering, membership/activity filtering, Active Festival scoping, offline-only imports, era isolation, null Festival fail-closed behavior, empty/solo/TBA states, all locales, roster sheet, and Band modal reuse.
+
+### Changed
+- `RightNowPage.tsx` now selects `hasRunningOrder(festival) ? LiveNowView : PlanningNowView`; missing catalog data cannot mount trusted-clock/live hooks.
+- `Band` and generated Supabase types now carry packed `created_at`; the client Band contract also includes nullable `category`. Existing test fixtures were updated to match.
+- `public/vira-lata-ds.html` v3.14 updates §05 with the canonical dual-era `/now`, compact Announcement Press phone state (Band rows 60px / Pack Pick rows 52px), roster sheet, empty/solo/TBA states, touch targets, and explicitly absent live chrome. Local prototype path cited as nonessential provenance only.
+- Architecture, Live Now, Routes, Domain Model, Schema, and wiki index now describe shipped Phase 50 filenames, data boundaries, and nullability behavior. Routes `/now` Key Features and Realtime label festival clock, Stages/Map, current/next, crew grid, conflicts, time-travel chrome, latest announcement, and page subscriptions as live-tree-only; planning updates through Band/Pick/crew IDB events. `flows/live-now.md` is now framed dual-tree end to end (planning `useNow(60_000)` vs live `useNow(30_000)`).
+- Phase 50 close-out moved the completed phase to `phases-history.md` and made Phase 51 My Picks planning mode current in `PHASES.md` and the repository current-phase pointers.
+
+### Architectural Notes
+- Planning `/now` uses `activeFestivalId` to scope cached Bands/Picks and the complete `crew_users` cache as its Festival-membership proxy; it does not use `loadFestivalMemberships()` for peer counts.
+- The planning branch never mounts `useNowData` or live presence/radar/map/stage/announcement/badge/duck hooks. Null Festival fails closed to planning with dates TBA.
+- Invalid or legacy-missing Band/Pick timestamps sort oldest; freshly packed Band rows require `created_at`.
+- Phase close: focused 79 tests plus full verification — `rtk npm run build` green (490 app modules; service worker 82 modules; only existing chunk/dynamic-import warnings) and `rtk npm test` 110 files / 1099 tests. Device/browser visual confirmation of 390×844 fit and pre-Phase-50 live pixel parity remains outstanding.
+
+---
+
+## 2026-09-04 (Phase 50 — `/now` planning design)
+
+### Added
+- Locked Phase 50’s Announcement Lineup `/now`: compact pack-first home with an era/countdown chip, Active Festival member hero, three newest Bands, and three newest peer Picks.
+- Locked the visual language as **Announcement Press**: bone pack slab, red announcement ribbon, stacked Band rows (not a single ` · `-joined name line). Pick/band taps still reuse the existing Band detail modal.
+- Added the approved local design and detailed implementation plan under `docs/superpowers/` (gitignored workspace artifacts).
+
+### Changed
+- `PHASES.md` now contains Phase 50’s final acceptance criteria and local spec/plan references.
+- Architecture, Live Now, Routes, and wiki index pages now document the separate planning/live component trees and the offline data contract.
+
+### Architectural Notes
+- Planning `/now` reads IndexedDB only and never mounts live-plan, radar, stage, map, or presence-on-stage display logic.
+- Peer “going” comes from cached `crew_users`; `loadFestivalMemberships()` only lists Festivals joined by the current user.
+- `bands.created_at` must enter the client `Band` and offline pack so “just announced” remains deterministic offline.
+
+---
+
 ## 2026-09-04 (Phase 49 — Announcement Lineup)
 
 ### Added

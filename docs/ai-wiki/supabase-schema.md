@@ -228,6 +228,8 @@ CREATE INDEX idx_bands_stage ON public.bands(stage);
 CREATE INDEX idx_bands_start_time ON public.bands(start_time);
 ```
 
+`category` is nullable. `created_at` defaults to `now()` but the current DDL does not declare it `NOT NULL`; generated/client Band typing requires a string for freshly packed rows. Phase 50 persists that column in the Active Festival Band pack for newest-announcement ordering. Legacy cached rows with a missing/null/invalid timestamp are tolerated client-side and sort oldest.
+
 **Realtime**: Enabled (rarely changes, but subscribed for test mode).
 
 **RLS Policy** (select — Phase 47 members only; no godlike bypass):
@@ -864,4 +866,4 @@ npm run festival:reset -- --with-bands --force
 
 ---
 
-**Last updated:** 2026-09-04 — Phase 49: nullable slots; godlike `features`/`cache_version` GRANT; `seed:announcement-festivals-2027`.
+**Last updated:** 2026-09-05 — Phase 50: documented Band category/created_at nullability and offline pack contract.

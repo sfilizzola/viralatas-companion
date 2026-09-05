@@ -21,6 +21,7 @@ const bandA: TimedBand = {
   image_url: null,
   genre: 'Metal',
   category: 'band',
+  created_at: '2026-01-01T00:00:00.000Z',
 };
 
 const bandB: TimedBand = {
@@ -34,6 +35,7 @@ const bandB: TimedBand = {
   image_url: null,
   genre: 'Metal',
   category: 'band',
+  created_at: '2026-01-01T00:00:00.000Z',
 };
 
 const attendee = (id: string, label: string): BandAttendee => ({

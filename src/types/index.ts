@@ -45,6 +45,8 @@ export type Band = {
   image_url: string | null;
   genre: string | null;
   category: BandCategory | null;
+  /** Announcement timestamp — drives the `/now` planning "just announced" list. */
+  created_at: string;
 };
 
 export type UserPick = {

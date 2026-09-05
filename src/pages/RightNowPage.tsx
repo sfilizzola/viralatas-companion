@@ -26,10 +26,12 @@ import {
   canShowMetalPlace,
   canShowPresence,
   canShowWrap,
+  hasRunningOrder,
 } from '../lib/festivalFeatures';
 import { buildStageRadarSnapshot, type StageRadarEntry } from '../services/stageRadar';
 import styles from './RightNowPage.module.css';
 import { timedBands } from '../services/timedBand';
+import PlanningNowView from '../components/now/PlanningNowView';
 
 const DATE_LOCALES: Record<Language, string> = {
   br: 'pt-BR',
@@ -48,6 +50,11 @@ function nowLabel(date: Date, language: Language, timeZone: string) {
 }
 
 export default function RightNowPage() {
+  const { festival } = useActiveFestival();
+  return hasRunningOrder(festival) ? <LiveNowView /> : <PlanningNowView />;
+}
+
+function LiveNowView() {
   const { language, t } = useI18n('RightNowPage');
   const { festival } = useActiveFestival();
   const duckEnabled = useDuckEnabled();

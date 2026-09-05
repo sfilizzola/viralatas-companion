@@ -2,7 +2,14 @@
 
 ## Purpose
 
-Document how the app displays the current/next band for each crew member, including time-based band selection logic, conflict detection, crew grouping, presence states, and godlike test mode.
+Document both `/now` trees. `RightNowPage` is **dual-tree**: Schedule Lineup mounts the live view documented in most of this page (time-based band selection, conflict detection, crew grouping, presence states, godlike test mode), while Announcement Lineup mounts the Phase 50 planning view instead.
+
+| Tree | Gate | Data hook | Clock |
+|---|---|---|---|
+| `PlanningNowView` | `hasRunningOrder(festival)` false (or null Festival) | `usePlanningNowData()` — Active Festival IDB pack only | `useNow(60_000)` — countdown only |
+| `LiveNowView` | `hasRunningOrder(festival)` true | `useNowData(festival)` — plans, presence, radar | `useNow(30_000)` |
+
+Unless a section says otherwise, everything below the planning edge case describes the **live tree only**; none of it mounts in Announcement Lineup.
 
 ---
 
@@ -11,6 +18,10 @@ Document how the app displays the current/next band for each crew member, includ
 | File | Role |
 |---|---|
 | `src/pages/RightNowPage.tsx` | `/now` route shell |
+| `src/hooks/usePlanningNowData.ts` | Announcement Lineup composer — Active Festival IDB pack only; scopes Bands/Picks by `activeFestivalId` |
+| `src/services/planningNow.ts` | Pure planning projections: `newestAnnouncedBands`, `festivalCountdown`, `sortGoingMembers`, `buildPackPickActivity` |
+| `src/components/now/PlanningNowView.tsx` | Announcement Press planning UI + existing Band detail modal path |
+| `src/components/now/PlanningMemberSheet.tsx` | Full cached Festival crew roster sheet |
 | `src/hooks/useNowData.ts` | Thin composer — wires config, cache, plans, presence side effects, weak-skip commit timer (Phase 26.M); calculates `nextBand` and `timeDelta` (Phase 37) |
 | `src/services/weakSkips.ts` | Committed “I am weak” counter in `user_metadata.weak_skips_2026` |
 | `src/hooks/useNowCache.ts` | IDB cache load + window event listeners for picks/crew/presence/announcements |
@@ -31,9 +42,11 @@ Document how the app displays the current/next band for each crew member, includ
 
 ## Trigger
 
-1. **Page load** → `/now` route initializes
-2. **Every 30 seconds** → `useNow()` hook updates `now` state (via `setInterval`)
-3. **Time override changes** → Godlike adjusts test date via Profile admin panel
+1. **Page load** → `/now` route initializes and branches on `hasRunningOrder(festival)`
+2. **Every 30 seconds (live tree)** → `useNow(30_000)` updates `now` state (via `setInterval`)
+3. **Every 60 seconds (planning tree)** → `useNow(60_000)` refreshes only the gates countdown
+4. **Time override changes** → Godlike adjusts test date via Profile admin panel; both trees honor the override
+5. **IDB window events** → Band/Pick/crew cache changes re-render either tree without polling
 
 ---
 
@@ -61,11 +74,18 @@ function formatTime(iso: string): string {
 
 ## Happy Path (Online): User Loads /now Page
 
+This walkthrough is the **Schedule Lineup / live tree**. In Announcement Lineup the branch stops at the component boundary and renders `PlanningNowView` instead — see [Announcement Lineup / planning `/now`](#0-announcement-lineup--planning-now-phase-50).
+
 ```
 User taps /now route
                     │
                     ▼
         RightNowPage component mounts
+                    │
+                    ▼
+   hasRunningOrder(festival)?
+     false → PlanningNowView (usePlanningNowData, useNow(60_000)) — stop here
+     true  → LiveNowView, continue below
                     │
                     ▼
    useNowData() composes (Phase 26.M):
@@ -578,9 +598,29 @@ Other users' clients:
 
 ## Edge Cases
 
-### 0. Announcement Lineup / untimed Bands (Phase 49)
+### 0. Announcement Lineup / planning `/now` (Phase 50)
 
-`useNowData` and `livePreview` run on `timedBands(bands, festival)` only. **Announcement Lineup** (`features.running_order` off/missing) and leftover Bands without a trusted clock never become current/next. `/now` stays empty-safe; planning picks are `/schedule`. Live band test override also no-ops unless `isTimedBand`.
+`RightNowPage` branches at the component boundary:
+
+```
+hasRunningOrder(festival)
+  true  → `LiveNowView` (`useNowData`, plans, presence, radar)
+  false → `PlanningNowView` (`usePlanningNowData`, Active Festival pack only)
+```
+
+The planning tree is **Announcement Press** (compact, pack-first):
+1. Announcement-era line + festival-local days until `Festival.starts_at` (or dates TBA / today)
+2. Bone pack slab: cached `crew_users` count + avatars; tap opens the member sheet
+3. Accent ribbon + three newest Bands as stacked rows (`bands.created_at`)
+4. Three newest current Picks by other current members (section omitted when empty)
+
+It never mounts live-plan, radar, stage, map, or presence-on-stage display logic. Leftover Band times therefore cannot leak a fake current/next set. Band and activity taps reuse the existing Band detail/pick modal. If peer activity is empty, its section is omitted.
+
+`usePlanningNowData()` composes the event-backed `useBands()`, `useAllPicks()`, and `useCrewUsersCache()` hooks. It scopes Bands and Picks with `activeFestivalId`; the catalog `festival` row supplies only countdown metadata. The full cached `crew_users` roster is the membership proxy, including members with zero Picks. It deliberately does **not** call `loadFestivalMemberships()` because that loader describes only the signed-in user's joined Festivals, not peer attendance.
+
+`newestAnnouncedBands()` orders by packed `Band.created_at` descending, then name/id for stable ties. Invalid or legacy-missing timestamps rank oldest. `buildPackPickActivity()` orders Picks by `UserPick.created_at`, excludes self, leavers absent from `crew_users`, and unresolved Bands, then keeps three.
+
+The branch itself is the isolation boundary: when `hasRunningOrder(festival)` is false, none of `useNowData`, live-plan, presence, radar, map/stage, announcement-banner, badge, or duck hooks mount. A null catalog Festival also fails closed to this planning tree; `activeFestivalId` may still expose its correctly scoped cached pack, while countdown becomes dates TBA. With no Active Festival id, the projection returns empty Bands, Picks, and members.
 
 ### 1. Band Ends Exactly at `now`
 
@@ -702,7 +742,9 @@ Result: Alice moved to camping/lost group ✓
 
 ## Summary: State Machine
 
-### User's State at `/now` Page
+### User's State at `/now` Page (live tree)
+
+Announcement Lineup has no such machine — planning renders roster, newest Bands, and peer Picks with no location or plan status.
 
 ```
                    ┌─────────────────┐
@@ -773,7 +815,13 @@ useEffect(() => {
 
 ## Summary
 
-**Guarantees:**
+**Guarantees — both trees:**
+
+1. ✅ **Era branch**: `hasRunningOrder(festival)` picks exactly one tree; the other tree's hooks never mount
+2. ✅ **Fail closed**: null Festival renders planning with dates TBA, never a live/next view from leftover times
+3. ✅ **Time override**: godlike override applies to the live clock (`useNow(30_000)`) and the planning countdown (`useNow(60_000)`)
+
+**Guarantees — live tree (Schedule Lineup) only:**
 
 1. ✅ **Band selection logic**: Current (most recent start), then Next, then Empty
 2. ✅ **Conflict severity**: Hard (>15 min), Soft (≤15 min)
@@ -782,6 +830,12 @@ useEffect(() => {
 5. ✅ **Realtime updates**: ~3s latency for presence changes
 6. ✅ **Test mode**: Godlike can shift any band to `now`, affects UI only
 7. ✅ **Auto-checkout**: Metal Place window close → auto-clear flag
+
+**Guarantees — planning tree (Announcement Lineup) only:**
+
+1. ✅ **IDB only**: reads come from cached Bands, Picks, and `crew_users`, scoped by `activeFestivalId`
+2. ✅ **Deterministic order**: newest three Bands by `created_at`, newest three eligible peer Picks; invalid timestamps sort oldest
+3. ✅ **Full roster**: pack count and sheet include members with zero Picks
 
 **Known Limitations:**
 
@@ -799,4 +853,4 @@ useEffect(() => {
 
 ---
 
-**Last updated:** 2026-09-04 — Phase 49: `timedBands` / `isTimedBand` hard wall; Announcement Lineup `/now` empty-safe.
+**Last updated:** 2026-09-05 — Phase 50: dual-tree `/now` framing (planning `useNow(60_000)` vs live `useNow(30_000)`) plus shipped Announcement Press planning composition.

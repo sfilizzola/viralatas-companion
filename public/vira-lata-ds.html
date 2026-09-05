@@ -2704,12 +2704,35 @@
   .l5-patch-54-20{width:54px;height:54px;font-size:20px}
   .l5-patch-54-18{width:54px;height:54px;font-size:18px}
   .l5-border-bottom-0{border-bottom:0}
+  /* Phase 50 — compact Announcement Press /now canonical state. */
+  .p50-body{padding:10px 12px 70px;background:var(--bg);min-height:596px}
+  .p50-head{min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-bottom:1px solid var(--border)}
+  .p50-head strong{font:700 20px/1 var(--font-display);text-transform:uppercase}
+  .p50-switch{min-height:44px;padding:0 10px;display:flex;align-items:center;border:1px solid var(--border-strong);font:700 8px/1 var(--font-mono);letter-spacing:.08em;text-transform:uppercase}
+  .p50-era{min-height:32px;display:flex;align-items:center;justify-content:space-between;gap:8px;font:500 8px/1 var(--font-mono);letter-spacing:.12em;text-transform:uppercase}
+  .p50-era b{color:var(--accent-hover)} .p50-era b::before{content:"";display:inline-block;width:5px;height:5px;margin-right:6px;background:var(--accent)}
+  .p50-pack{position:relative;min-height:150px;padding:18px 14px;overflow:hidden;background:#e6d7ae;color:#12100c}
+  .p50-pack::after{content:attr(data-count);position:absolute;right:8px;top:-12px;color:rgba(18,16,12,.09);font:700 112px/.8 var(--font-display);letter-spacing:-.06em}
+  .p50-pack small,.p50-picks h4{font:700 8px/1 var(--font-mono);letter-spacing:.14em;text-transform:uppercase}
+  .p50-pack h3{position:relative;z-index:1;max-width:190px;margin-top:10px;font:700 29px/.92 var(--font-display);text-transform:uppercase}
+  .p50-pack-foot{position:absolute;z-index:1;left:14px;right:14px;bottom:14px;display:flex;align-items:center;justify-content:space-between;font:700 8px/1 var(--font-mono);text-transform:uppercase}
+  .p50-avatars{display:flex}.p50-av{width:30px;height:30px;margin-left:-7px;display:grid;place-items:center;border:2px solid #e6d7ae;border-radius:50%;background:var(--bg-elevated);color:var(--text);font:700 9px var(--font-mono)}.p50-av:first-child{margin-left:0}
+  .p50-ribbon{min-height:32px;margin-top:14px;padding:0 10px;display:flex;align-items:center;justify-content:space-between;background:var(--accent);color:#fff;font:700 8px/1 var(--font-mono);letter-spacing:.1em;text-transform:uppercase}
+  .p50-band{min-height:60px;padding:0 10px;display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-top:0;font:700 17px/1 var(--font-display);text-transform:uppercase}
+  .p50-band i{color:var(--text-faint);font:400 8px var(--font-mono)}
+  .p50-picks{margin-top:16px}.p50-picks h4{margin-bottom:8px;color:var(--text-muted)}
+  .p50-pick{min-height:52px;margin-top:6px;padding:0 8px;display:flex;align-items:center;gap:8px;border-left:2px solid var(--border-strong);background:var(--bg-surface);font-size:10px}.p50-pick time{margin-left:auto;color:var(--text-faint);font:400 8px var(--font-mono)}
+  .p50-sheet-demo{max-width:360px;margin-top:16px;border-top:2px solid var(--accent);background:var(--bg-elevated);padding:14px}
+  .p50-sheet-head{min-height:44px;display:flex;align-items:center;justify-content:space-between}.p50-sheet-head h4{font:700 19px/1 var(--font-display);text-transform:uppercase}.p50-close{min-height:44px;padding:0 12px;border:1px solid var(--border-strong);display:flex;align-items:center;font:500 8px var(--font-mono);text-transform:uppercase}
+  .p50-member{min-height:52px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--border);font-size:12px;font-weight:600}
+  .p50-state-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.p50-state{min-height:88px;padding:12px;border:1px solid var(--border);background:var(--bg-surface)}.p50-state b{display:block;margin-bottom:7px;font:700 13px var(--font-display);text-transform:uppercase}.p50-state p{font-size:11px;color:var(--text-muted)}
+  .p50-contract{margin:14px 0;padding:12px;border-left:3px solid var(--accent);background:var(--bg-surface);font-size:12px;color:var(--text-muted)}
 </style>
 </head>
 <body>
 <script type="application/json" id="ds-manifest">
 {
-  "version": "3.13",
+  "version": "3.14",
   "file": "public/vira-lata-ds.html",
   "note": "Agent table of contents. Read this first to navigate the file. Anchors and section numbers are STABLE and referenced across docs/code — never renumber. Keep this manifest in sync when adding/renaming a section, token, or component.",
   "sections": [
@@ -2717,7 +2740,7 @@
     { "num": "02", "id": "type",         "title": "Type",               "purpose": "Typographic scale and the three font families" },
     { "num": "03", "id": "space",        "title": "Spacing & Radius",   "purpose": "4px spacing scale and radius scale" },
     { "num": "04", "id": "components",   "title": "Components",         "purpose": "Core component anatomy and live demos (BandCard, modals, chips, inputs, badges, profile, etc.)" },
-    { "num": "05", "id": "layouts",      "title": "Page layouts",       "purpose": "Full-page compositions: Right Now, Schedule, My Picks, Popular" },
+    { "num": "05", "id": "layouts",      "title": "Page layouts",       "purpose": "Full-page compositions: dual-era /now (PlanningNowView + LiveNowView), Schedule, My Picks, Popular" },
     { "num": "06", "id": "icons",        "title": "Iconography",        "purpose": "Icon set and stroke conventions" },
     { "num": "07", "id": "motion",       "title": "Motion",             "purpose": "Animation/transition specifications" },
     { "num": "08", "id": "additional",   "title": "Additional Components", "purpose": "Later component specs: SyncToast, banners, UpcomingBandCard, BandFilters, ArrivalMap, admin panels" },
@@ -2800,7 +2823,13 @@
     { "name": "FestivalsPage",         "sectionId": "multi-festival" },
     { "name": "StageRadarSection",     "sectionId": "stage-radar" },
     { "name": "StageRadarSheet",       "sectionId": "stage-radar" },
-    { "name": "AnnouncementPosterGrid","sectionId": "layouts" }
+    { "name": "AnnouncementPosterGrid","sectionId": "layouts" },
+    { "name": "PlanningNowView",         "sectionId": "layouts", "note": "React component src/components/now/PlanningNowView.tsx" },
+    { "name": "PlanningMemberSheet",     "sectionId": "layouts", "note": "React component src/components/now/PlanningMemberSheet.tsx" },
+    { "name": "PlanningEraChip",         "sectionId": "layouts", "note": "Canonical region inside PlanningNowView (.eraLine/.era) — not a separate React module" },
+    { "name": "PlanningPackHero",        "sectionId": "layouts", "note": "Canonical region inside PlanningNowView (.packHero) — not a separate React module" },
+    { "name": "PlanningAnnouncedList",   "sectionId": "layouts", "note": "Canonical region inside PlanningNowView (.ribbon/.bandList) — not a separate React module" },
+    { "name": "PlanningPackPicksSection","sectionId": "layouts", "note": "Canonical region inside PlanningNowView (.picks/.pickList) — not a separate React module" }
   ]
 }
 </script>
@@ -5148,6 +5177,75 @@
       </div>
     </div>
 
+    <h3>Canonical /now · two isolated eras</h3>
+    <div class="note">
+      <code>RightNowPage.tsx</code> chooses <code>hasRunningOrder(festival) ? LiveNowView : PlanningNowView</code>.
+      Schedule Lineup retains the live layout shown below (festival clock, presence, current/next groups, optional radar,
+      Stages/Map, announcements, badges, duck). Announcement Lineup mounts only the compact
+      <code>PlanningNowView</code> shown here. A missing catalog Festival fails closed to planning with Dates TBA; it
+      never trusts leftover Band times. Visual provenance (local, gitignored, nonessential):
+      <code>docs/superpowers/prototypes/now-planning/announcement-press.html</code> — this DS is the canonical spec
+      and does not copy that prototype into <code>public/</code>.
+    </div>
+    <div class="frames">
+      <div>
+        <div class="phone"><div class="phone-screen">
+          <div class="status-bar"><span>10:16</span><span class="right">●●● Wi-Fi ◐</span></div>
+          <div class="p50-body">
+            <div class="p50-head"><strong>Right Now</strong><span class="p50-switch">Wacken 2027⌄</span></div>
+            <div class="p50-era"><b>Announcement lineup</b><span>326 days</span></div>
+            <div class="p50-pack" data-count="08">
+              <small>Pack status</small>
+              <h3>8 vira-latas going</h3>
+              <div class="p50-pack-foot"><span class="p50-avatars"><span class="p50-av">AN</span><span class="p50-av">BR</span><span class="p50-av">CA</span><span class="p50-av">DI</span><span class="p50-av">+4</span></span><span>See all →</span></div>
+            </div>
+            <div class="p50-ribbon"><b>Just announced</b><span>3 new names</span></div>
+            <div class="p50-band"><span>Crypta</span><i>01</i></div>
+            <div class="p50-band"><span>Amenra</span><i>02</i></div>
+            <div class="p50-band"><span>Kreator</span><i>03</i></div>
+            <div class="p50-picks"><h4>Pack picks</h4><div class="p50-pick"><span class="p50-av">BR</span><span>Bruno picked Amenra</span><time>30 min</time></div></div>
+          </div>
+          <nav class="nav-bar"><a class="navi on">●<br>Now</a><a class="navi">□<br>Sched</a><a class="navi">☆<br>Picks</a><a class="navi">▥<br>Popular</a><a class="navi">⌁<br>Mural</a><a class="navi">○<br>Me</a></nav>
+        </div></div>
+        <div class="frame-label">/now · <b>Announcement Lineup</b> · compact Announcement Press state</div>
+      </div>
+    </div>
+    <div class="p50-contract">
+      <b>Explicitly absent in planning:</b> festival clock, trusted day/time, current/next/live labels, PresenceToggle,
+      CrewGroupsSection, StageRadarSection, stage/map action chips, LatestAnnouncementBanner, UpcomingBandCard,
+      BadgesDisplay, Wrap teaser, duck controls, live test banner, and all stage/map/presence-on-stage chrome.
+      Band rows and peer Pick rows still open the existing Band detail/pick modal.
+    </div>
+
+    <h3>Planning regions and states</h3>
+    <p><b>Naming note:</b> the four <code>Planning*</code> names below are <b>canonical DS region names inside
+      <code>PlanningNowView.tsx</code></b>, not separate React modules. Only <code>PlanningNowView</code> and
+      <code>PlanningMemberSheet</code> exist as components; the regions are styled blocks in
+      <code>PlanningNow.module.css</code>. Copy shown here is the shipped <code>RightNowPage_{br,en,es,de}.json</code> copy.</p>
+    <table>
+      <thead><tr><th>Region</th><th>Canonical contract</th></tr></thead>
+      <tbody>
+        <tr><td><code>PlanningEraChip</code><br><span class="mono-11">.eraLine / .era</span></td><td>Red square + “Announcement lineup” (<code>planningEra</code>); festival-local calendar-day countdown from <code>starts_at</code>. Today/past = “Today”; invalid/missing = “Dates TBA” (muted).</td></tr>
+        <tr><td><code>PlanningPackHero</code><br><span class="mono-11">.packHero</span></td><td>Exact bone slab <code>#e6d7ae</code> / ink <code>#12100c</code>, ghost two-digit count from <code>data-count</code>, first four roster avatars plus <code>+N</code> overflow (8 members → 4 avatars + “+4”). Title is “{count} vira-latas going”, or “Just you so far” at one. Whole slab is a button opening the roster sheet.</td></tr>
+        <tr><td><code>PlanningAnnouncedList</code><br><span class="mono-11">.ribbon / .bandList</span></td><td>Accent ribbon “Just announced” + “{count} new names”, or “First wave” when the list is empty. At most three stacked 60px Band buttons, newest packed <code>created_at</code> first. Empty body reads “Lineup not posted yet” directly under the ribbon.</td></tr>
+        <tr><td><code>PlanningPackPicksSection</code><br><span class="mono-11">.picks / .pickList</span></td><td>“Pack picks” label + at most three 52px peer Pick buttons reading “{name} picked {band}” with relative time. Hide the complete section when no eligible peer activity exists.</td></tr>
+        <tr><td>Fallback name</td><td>Members without a display name render as “Vira-lata” (<code>planningUnknownMember</code>) in the hero avatars, Pack Picks rows, and roster sheet.</td></tr>
+        <tr><td>Touch/focus</td><td>Festival switcher and Close are at least 44px; Band rows 60px; Pick/member rows 52px; pack slab is fully tappable. Interactive rows use a visible accent focus ring.</td></tr>
+      </tbody>
+    </table>
+    <div class="p50-sheet-demo">
+      <div class="p50-sheet-head"><h4>Vira-latas going</h4><span class="p50-close">Close</span></div>
+      <div class="p50-member"><span class="p50-av">AN</span>Ana</div>
+      <div class="p50-member"><span class="p50-av">BR</span>Bruno</div>
+      <div class="p50-member"><span class="p50-av">VL</span>Vira-lata</div>
+    </div>
+    <div class="p50-state-grid">
+      <div class="p50-state"><b>Solo</b><p>Hero title reads “Just you so far”; roster remains tappable.</p></div>
+      <div class="p50-state"><b>Empty activity</b><p>Pack picks section is omitted; no placeholder card.</p></div>
+      <div class="p50-state"><b>Empty lineup</b><p>Ribbon reads “Just announced · First wave”; body reads “Lineup not posted yet”.</p></div>
+      <div class="p50-state"><b>TBA / missing Festival</b><p>Countdown reads “Dates TBA”. Null Festival remains planning, never live.</p></div>
+    </div>
+
     <h3>Announcement Lineup · B2 vira-latas billboard</h3>
     <div class="note">
       When Lineup era is Announcement Lineup (<code>features.running_order</code> off/missing), <code>/schedule</code> uses
@@ -7431,6 +7529,13 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.14 — Phase 50 Planning Now · Sep 5 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§05 Layouts</b> — canonical dual-era <code>/now</code>, compact Announcement Press state with shipped locale copy, member sheet, solo/empty/TBA behavior, touch targets, and explicitly absent live chrome.</li>
+          <li>Manifest maps <code>PlanningNowView</code>, <code>PlanningMemberSheet</code>, <code>PlanningEraChip</code>, <code>PlanningPackHero</code>, <code>PlanningAnnouncedList</code>, and <code>PlanningPackPicksSection</code> to §05; the last four are annotated as canonical regions inside <code>PlanningNowView</code>, not separate React modules.</li>
+        </ul>
+      </div>
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.13 — Stage Radar + Announcement Lineup · Sep 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">

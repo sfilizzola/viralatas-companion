@@ -69,5 +69,22 @@
   "headingNextSection": "Indo pra",
   "noUpcomingPicks": "sem próximas escolhas",
   "mapButton": "Mapa",
-  "stagesButton": "Palcos"
+  "stagesButton": "Palcos",
+  "planningEra": "Lineup anunciado",
+  "planningDays": "{count} dias",
+  "planningToday": "Hoje",
+  "planningDatesTba": "Datas a confirmar",
+  "planningGoing": "{count} vira-latas vão",
+  "planningSolo": "Só você por enquanto",
+  "planningMembersTitle": "Vira-latas que vão",
+  "planningPackStatus": "Status dos vira-latas",
+  "planningSeeAll": "Ver todos",
+  "planningJustAnnounced": "Recém-anunciadas",
+  "planningNewNames": "{count} novos nomes",
+  "planningFirstWave": "Primeira leva",
+  "planningLineupEmpty": "Lineup ainda não divulgado",
+  "planningPackPicks": "Escolhas dos vira-latas",
+  "planningPicked": "{name} escolheu {band}",
+  "planningUnknownMember": "Vira-lata",
+  "planningClose": "Fechar"
 }

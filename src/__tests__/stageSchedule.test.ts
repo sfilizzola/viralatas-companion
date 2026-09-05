@@ -13,7 +13,7 @@ function band(
   start: string,
   end: string,
 ): Band {
-  return { id, festival_id: 'wacken-2026', slot_id: id, name, stage, start_time: start, end_time: end, image_url: null, genre: null, category: null };
+  return { id, festival_id: 'wacken-2026', slot_id: id, name, stage, start_time: start, end_time: end, image_url: null, genre: null, category: null, created_at: '2026-01-01T00:00:00.000Z' };
 }
 
 // Reference point: 20:00 UTC on 2026-07-30

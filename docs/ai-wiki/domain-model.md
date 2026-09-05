@@ -14,6 +14,7 @@ Document the real-world entities, their relationships, business rules, and invar
 - `src/services/timedBand.ts` — `isTimedBand` / `timedBands` / `normalizeBandName` (trusted-clock hard wall)
 - `src/services/announcementMatch.ts` — laptop name-match plan (`planNameMatches`)
 - `src/services/announcementLineup.ts` — `/schedule` B2 sort + hero split
+- `src/services/planningNow.ts` — planning newest-Band/countdown/roster/activity projections
 - `src/components/profile/RunningOrderSection.tsx` — godlike Lineup era flip
 - `supabase/migrations/20260904000000_announcement_lineup.sql` — nullable slots, partial unique, godlike festivals UPDATE
 - `src/lib/festivalCacheVersion.ts` — Per-Festival pack invalidation predicate
@@ -233,6 +234,8 @@ type Band = {
   end_time: string | null;
   image_url: string | null;    // Thumbnail from wacken.com
   genre: string | null;        // One of 13 canonical labels (Phase 25 collapse)
+  category: BandCategory | null; // 'band' | 'ceremony'
+  created_at: string;          // Required in freshly packed client rows
 };
 ```
 
@@ -249,6 +252,8 @@ Full old→new mapping: **[genre-collapse-mapping.md](genre-collapse-mapping.md)
 - Band list mutable by godlike / remote lineup sync / laptop seed only
 - RLS: SELECT only for Festival members (`is_festival_member(festival_id)`) — no godlike bypass
 - Performances don't overlap by stage within a Festival (timed Bands only)
+- PostgreSQL `category` is nullable. PostgreSQL `created_at` has `DEFAULT now()` but is not declared `NOT NULL`; generated Supabase/client pack typing treats freshly loaded rows as a required string
+- Legacy IndexedDB rows may still omit/null `created_at`; `newestAnnouncedBands()` treats missing, null, or invalid timestamps as oldest rather than promoting them
 
 **Stages** (Wacken 2026 — 8 total):
 ```
@@ -259,7 +264,7 @@ Specialized (3):   Wasteland (dark blue), Wackinger (gray), Welcome to the Jungl
 
 **Lifecycle:**
 1. Godlike/ops seeds bands for a Festival (`npm run seed:bands` / sync / remote lineup)
-2. Active Festival pack caches bands to IndexedDB on Join/switch
+2. Active Festival pack caches complete Band rows, including `category` and `created_at`, to IndexedDB on Join/switch
 3. User references bands by id in picks (same `festival_id`)
 
 ---
@@ -917,4 +922,4 @@ Computed in `useNowData()` using current time + user picks.
 
 ---
 
-**Last updated:** 2026-09-04 — Phase 49: nullable Band slots, `isTimedBand` hard wall, name-match + B2 helpers.
+**Last updated:** 2026-09-05 — Phase 50: Band announcement timestamp contract and legacy ordering behavior.

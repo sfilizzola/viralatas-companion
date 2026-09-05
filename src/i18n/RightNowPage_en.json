@@ -69,5 +69,22 @@
   "headingNextSection": "Heading next",
   "noUpcomingPicks": "no upcoming picks",
   "mapButton": "Map",
-  "stagesButton": "Stages"
+  "stagesButton": "Stages",
+  "planningEra": "Announcement lineup",
+  "planningDays": "{count} days",
+  "planningToday": "Today",
+  "planningDatesTba": "Dates TBA",
+  "planningGoing": "{count} vira-latas going",
+  "planningSolo": "Just you so far",
+  "planningMembersTitle": "Vira-latas going",
+  "planningPackStatus": "Pack status",
+  "planningSeeAll": "See all",
+  "planningJustAnnounced": "Just announced",
+  "planningNewNames": "{count} new names",
+  "planningFirstWave": "First wave",
+  "planningLineupEmpty": "Lineup not posted yet",
+  "planningPackPicks": "Pack picks",
+  "planningPicked": "{name} picked {band}",
+  "planningUnknownMember": "Vira-lata",
+  "planningClose": "Close"
 }

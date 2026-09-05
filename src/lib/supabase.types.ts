@@ -119,6 +119,8 @@ export type Database = {
           end_time: string | null;
           image_url: string | null;
           genre: string | null;
+          category: string | null;
+          created_at: string;
         };
         Insert: {
           id?: string;
@@ -130,6 +132,8 @@ export type Database = {
           end_time: string | null;
           image_url?: string | null;
           genre?: string | null;
+          category?: string | null;
+          created_at?: string;
         };
         Update: {
           id?: string;
@@ -141,6 +145,8 @@ export type Database = {
           end_time?: string | null;
           image_url?: string | null;
           genre?: string | null;
+          category?: string | null;
+          created_at?: string;
         };
         Relationships: [];
       };

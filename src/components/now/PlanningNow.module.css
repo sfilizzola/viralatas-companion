@@ -1,0 +1,447 @@
+/* No page-level clipping: the FestivalSwitcher menu escapes the header band.
+   Only the pack slab clips, so its ghost numeral can bleed past the top edge. */
+.page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.header {
+  min-height: 56px;
+  padding: 6px var(--s-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.switcherSlot {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 190px;
+  justify-content: flex-end;
+}
+
+/* Matches FestivalSwitcher's trigger and its menu options by element, since
+   that component owns its own CSS Module class names. */
+.switcherSlot button {
+  min-height: 44px;
+}
+
+.switcherSlot button:focus-visible {
+  outline: 2px solid var(--accent-hover);
+  outline-offset: 2px;
+}
+
+/* The shared switcher menu is `left: 0` of its own root. This header slot
+   sits on the right of a 390px phone, so pin the listbox to the slot's
+   trailing edge instead. Lives here so live `/now` is unchanged. */
+.switcherSlot :global([role='listbox']) {
+  left: auto;
+  right: 0;
+}
+
+.title {
+  flex-shrink: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.main {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--s-4) var(--s-4) var(--s-5);
+}
+
+.eraLine {
+  min-height: 18px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.era {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--accent-hover);
+}
+
+.era::before {
+  width: 5px;
+  height: 5px;
+  content: '';
+  flex-shrink: 0;
+  background: var(--accent);
+}
+
+.countdown {
+  color: var(--text);
+}
+
+.countdownMuted {
+  color: var(--text-muted);
+}
+
+.loading {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* Bone slab literals come from the locked Announcement Press prototype
+   (docs/superpowers/prototypes/now-planning/announcement-press.html): bone
+   #e6d7ae printed with #12100c ink. Phase 50 adds no global color token, so
+   the pair is scoped to this slab and inherited by its avatar rings. */
+.packHero {
+  --planning-bone: #e6d7ae;
+  --planning-bone-ink: #12100c;
+
+  position: relative;
+  width: 100%;
+  min-height: 174px;
+  padding: var(--s-5) var(--s-4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--r-0);
+  background: var(--planning-bone);
+  color: var(--planning-bone-ink);
+  text-align: left;
+}
+
+.packHero::after {
+  position: absolute;
+  top: -14px;
+  right: 10px;
+  content: attr(data-count);
+  color: color-mix(in srgb, var(--planning-bone-ink) 9%, transparent);
+  font-family: var(--font-display);
+  font-size: 132px;
+  font-weight: 700;
+  line-height: 0.78;
+  letter-spacing: -0.06em;
+  pointer-events: none;
+}
+
+.heroKicker,
+.heroTitle,
+.heroFooter {
+  position: relative;
+  z-index: 1;
+}
+
+.heroKicker {
+  color: color-mix(in srgb, var(--planning-bone-ink) 68%, transparent);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  max-width: 240px;
+  margin-top: var(--s-3);
+  font-family: var(--font-display);
+  font-size: 33px;
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.008em;
+  text-transform: uppercase;
+}
+
+.heroFooter {
+  min-height: 40px;
+  margin-top: auto;
+  padding-top: var(--s-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+}
+
+.avatarStack {
+  display: flex;
+  align-items: center;
+}
+
+.heroAvatar {
+  margin-left: -9px;
+  border: 2px solid var(--planning-bone);
+  background: var(--bg-elevated);
+}
+
+.heroAvatar:first-child {
+  margin-left: 0;
+}
+
+.avatarOverflow {
+  width: 40px;
+  height: 40px;
+  margin-left: -9px;
+  display: grid;
+  place-items: center;
+  border: 2px dashed color-mix(in srgb, var(--planning-bone-ink) 72%, transparent);
+  border-radius: var(--r-pill);
+  color: color-mix(in srgb, var(--planning-bone-ink) 78%, transparent);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.seeAll {
+  color: color-mix(in srgb, var(--planning-bone-ink) 68%, transparent);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ribbon {
+  min-height: 36px;
+  margin-top: 18px;
+  padding: 0 11px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2);
+  background: var(--accent);
+  color: var(--text-white);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ribbon h2 {
+  font: inherit;
+}
+
+.ribbon span {
+  opacity: 0.72;
+}
+
+.bandList,
+.lineupEmpty {
+  border: 1px solid var(--border);
+  border-top: 0;
+}
+
+.bandRow {
+  width: 100%;
+  min-height: 60px;
+  padding: 0 var(--s-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  border: 0;
+  border-top: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+}
+
+.bandRow:first-child {
+  border-top: 0;
+}
+
+.bandRow:hover,
+.bandRow:active {
+  background: var(--bg-surface);
+}
+
+.bandName {
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: 0.005em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.bandIndex {
+  flex-shrink: 0;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+}
+
+.lineupEmpty {
+  padding: var(--s-5) var(--s-3);
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.picks {
+  margin-top: 22px;
+}
+
+.picksLabel {
+  margin-bottom: 10px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.pickList {
+  display: grid;
+  gap: 7px;
+}
+
+.pickRow {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 var(--s-3) 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-left: 2px solid var(--border-strong);
+  background: var(--bg-surface);
+  color: var(--text);
+  text-align: left;
+}
+
+.pickRow:hover,
+.pickRow:active {
+  border-left-color: var(--accent);
+  background: var(--bg-elevated);
+}
+
+.pickAvatar {
+  width: 28px;
+  height: 28px;
+  background: var(--bg-elevated);
+}
+
+.pickText {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 12.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pickTime {
+  margin-left: auto;
+  flex-shrink: 0;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+.packHero:focus-visible,
+.bandRow:focus-visible,
+.pickRow:focus-visible,
+.closeButton:focus-visible {
+  outline: 2px solid var(--accent-hover);
+  outline-offset: 2px;
+}
+
+.memberSheet {
+  width: 100%;
+  max-height: 82dvh;
+  padding: var(--s-4) var(--s-4) var(--s-5);
+  overflow-y: auto;
+  border-top: 2px solid var(--accent);
+  background: var(--bg-elevated);
+}
+
+.sheetHeader {
+  min-height: 44px;
+  margin-bottom: var(--s-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+}
+
+.sheetTitle {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.closeButton {
+  min-height: 44px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--border-strong);
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.memberList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.memberRow {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.memberRow:last-child {
+  border-bottom: 0;
+}
+
+.navSpacer {
+  height: 56px;
+  flex-shrink: 0;
+}
+
+@media (max-height: 760px) {
+  .packHero {
+    min-height: 156px;
+  }
+
+  .picks {
+    margin-top: var(--s-4);
+  }
+}

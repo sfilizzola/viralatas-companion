@@ -45,6 +45,7 @@ function band(partial: Partial<Band> & Pick<Band, 'id'>): Band {
     image_url: null,
     genre: 'Heavy Metal',
     category: 'band',
+    created_at: '2026-01-01T00:00:00.000Z',
     ...partial,
   };
 }

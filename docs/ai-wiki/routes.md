@@ -19,6 +19,10 @@ Document all app routes, their purpose, access control, and key components.
 - `src/services/announcementLineup.ts` — poster sort + hero split
 - `src/pages/MyPicksPage.tsx` — `/my-picks` (timed day groups + untimed name-only list)
 - `src/components/profile/RunningOrderSection.tsx` — godlike Lineup era flip
+- `src/pages/RightNowPage.tsx` — `/now` component-boundary era branch
+- `src/hooks/usePlanningNowData.ts` — IDB-only Announcement Lineup projection
+- `src/components/now/PlanningNowView.tsx` — Announcement Press planning home
+- `src/components/now/PlanningMemberSheet.tsx` — cached Festival roster sheet
 
 ---
 
@@ -151,36 +155,39 @@ Most festival social routes additionally wrap with `<FestivalGate>` (and optiona
 
 **Alias**: Landing page after login (default route)
 
-**Purpose**: Live view of what band is happening now, what the user and **Festival crew** are watching (Active Festival scoped)
+**Purpose**: Active Festival home. Schedule Lineup shows the live view; Announcement Lineup shows the Phase 50 planning home.
 
 **Access**: `PrivateRoute` + `FestivalGate`
 
 **Key Features**:
-- **Header (two-band)** — Masthead: title + festival clock. Toolbar: `FestivalSwitcher` (flex-grow, ellipsis) + Stages/Map actions (icon-only ≤420px). Festival name lives only on the switcher — no duplicate `{name} time` subtitle.
-- **FestivalSwitcher** — Shows Active Festival name; dropdown to switch among joined Festivals (online; need-signal toast offline)
-- **Current/Next band for user** — What the user picked that's happening now/next (**Schedule Lineup** + `isTimedBand` only)
-- **Announcement Lineup** — empty-safe: no fake live/next from stored times; plan on `/schedule`. Dedicated planning `/now` is Phase 50.
-- **Crew grid** — Where Festival crew is (camping vs. Metal Place when features enabled)
-- **Live attendance** — Other members watching the same band
-- **Conflict warnings** — Overlapping timed picks only (`timedBands`)
-- **Time travel** (godlike only) — Jump to different festival day/time for testing
-- **Offline banner** — Show when offline
-- **Latest announcement banner** — Most recent mural post
+- **FestivalSwitcher** — Both trees. Shows Active Festival name; dropdown to switch among joined Festivals (online; need-signal toast offline)
+- **Offline banner** — Both trees
+- **Announcement Lineup / planning tree (Phase 50)** — `PlanningNowView` only: compact header (title + switcher, no festival clock), era/countdown line, bone pack slab from cached Festival members, stacked newest-three Bands under an accent ribbon, optional newest-three peer Picks. No live/next, stage, map, radar, presence, announcement banner, badges, or duck chrome.
+- **Schedule Lineup / live tree only — Header (two-band)** — Masthead: title + festival clock. Toolbar: `FestivalSwitcher` (flex-grow, ellipsis) + Stages/Map actions (icon-only ≤420px). Festival name lives only on the switcher — no duplicate `{name} time` subtitle.
+- **Schedule Lineup / live tree only — Current/Next band** — What the user picked that's happening now/next (`isTimedBand` only)
+- **Schedule Lineup / live tree only — Crew grid** — Where Festival crew is (camping vs. Metal Place when features enabled)
+- **Schedule Lineup / live tree only — Live attendance** — Other members watching the same band
+- **Schedule Lineup / live tree only — Conflict warnings** — Overlapping timed picks only (`timedBands`)
+- **Schedule Lineup / live tree only — Time travel chrome** — Festival clock on this tree follows godlike `useNow()` override (set on `/profile`); planning has no clock (countdown still uses the same override)
+- **Schedule Lineup / live tree only — Latest announcement banner** — Most recent mural post (slot shared with UpcomingBandCard)
 
 **Camp HQ:** No camp location UI on `/now` (no `CampHqCard`, `CampMapDock`, or `useCampLocation`). Presence "camping" toggle is separate from shared campground GPS.
 
 **Data Flows**:
-- `useAuth()` — Current user
-- `useNow()` — Current time (with godlike override)
-- `useNowData()` — Current band for user + next
-- `usePickCounts()` — Live attendance per band
-- `useMyPicks()` — User's picks
-- `useBandConflicts()` — Overlapping bands
+- `hasRunningOrder(festival)` — component-level split; only the selected tree mounts its hooks
+- Schedule Lineup: `useNowData()` + live-plan, presence, radar, and announcement caches
+- Announcement Lineup: `usePlanningNowData()` composes event-backed `useBands()`, `useAllPicks()`, and `useCrewUsersCache()` plus override-aware `useNow()`; Bands/Picks are scoped by `activeFestivalId`
+- Planning “going” uses the complete cached `crew_users` Festival roster (membership proxy, including zero-Pick members), not `loadFestivalMemberships()` (the current user’s joined-Festival list)
+- `newestAnnouncedBands()` reads packed `Band.created_at`; invalid/legacy-missing timestamps sort oldest
+- Null catalog Festival fails closed to planning/TBA. If an Active Festival id remains, its cached pack stays scoped and visible; no Active id yields empty planning data
+- Band and activity rows open the existing `BandDetailModal`; hero opens `PlanningMemberSheet`
 
-**Realtime**:
+**Realtime** (**Schedule Lineup / live tree only**):
 - Subscribed to user_picks changes (attendance updates)
 - Subscribed to user_presence changes (crew location)
 - Subscribed to announcements changes (latest post)
+
+The planning tree opens no `/now`-level subscriptions. It re-renders from existing IndexedDB window events (`PICKS_CHANGED_EVENT`, `BANDS_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT`) via `useAllPicks` / `useBands` / `useCrewUsersCache`, so app-level `RealtimeSync` writes reach it through the cache rather than a page subscription.
 
 ---
 
@@ -551,4 +558,4 @@ AnnouncementsPage (offline)
 
 ---
 
-**Last updated:** 2026-09-04 — Phase 49 close-out: `/now` empty-safe; My Picks/Popular untimed lists; `MyPicksPage.tsx`.
+**Last updated:** 2026-09-05 — Phase 50: shipped dual-era `/now` route and Announcement Press planning home.

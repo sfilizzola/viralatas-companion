@@ -1,6 +1,6 @@
 # Viralatas Companion — Architectural Wiki
 
-**Last Updated**: 2026-09-04 (Phase 49 Announcement Lineup + 2027 catalog)
+**Last Updated**: 2026-09-05 (Phase 50 `/now` planning implementation)
 
 ## Purpose
 
@@ -65,7 +65,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 ### Flows & Behaviors
 - **[Flow: Picking a Band](flows/pick-band.md)** — Optimistic write, realtime update, offline fallback
 - **[Flow: Offline Pick Sync](flows/offline-pick-sync.md)** — Queue mechanics, deduplication (keepLast), worked example (5 toggles → 1 call), error recovery
-- **[Flow: Live Now](flows/live-now.md)** — Time-based band display, crew attendance, conflict detection
+- **[Flow: Live Now](flows/live-now.md)** — Dual-era `/now`: IDB-only Announcement Press planning home or isolated live band/presence view
 - **[Flow: Announcements](flows/announcements.md)** — Posting, realtime sync, moderation, soft-delete
 - **[Flow: Authentication](flows/authentication.md)** — Login, signup, trigger, session persistence, test users, RLS
 - **[Flow: Duck Quack](flows/duck.md)** — Duck button → cooldown → quack → Realtime in-app DuckToast + Web Push system notification; offline queuing; admin test flows
@@ -500,4 +500,4 @@ Window events dispatched by hooks/components (not from db.ts):
 
 ---
 
-**Last edited**: 2026-09-04 — Phase 49 close-out: empty-safe `/now`, untimed My Picks/Popular, CacheVersionCheck glossary, DS v3.12
+**Last edited**: 2026-09-05 — Phase 50: shipped dual-era `/now`, IDB planning composition, Announcement Press DS v3.14

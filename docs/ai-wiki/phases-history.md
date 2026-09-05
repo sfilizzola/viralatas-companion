@@ -1290,3 +1290,39 @@ _Phase 42.B — incrementLocationVisit extraction_
 - `previewTime` is purely ephemeral `useState` — never persisted to IndexedDB or Supabase.
 - `RightNowPage.tsx` callsite unaffected — prop is optional (`undefined != null → false`).
 - `formatTime` takes an ISO string; `previewTime.toISOString()` converts the `Date` at the callsite.
+
+---
+
+### Phase 50 — `/now` Planning Mode
+**Status:** ✅ Complete
+
+**Completed:** 2026-09-05
+
+**Goal:** Give Announcement Lineup Festivals a compact, pack-first `/now` planning home while preserving the existing Schedule Lineup live view unchanged.
+
+**Deliverables shipped:**
+- `src/services/planningNow.ts` — festival-local countdown, newest-Band ordering, full-roster sorting, and eligible peer Pick activity projections
+- `src/hooks/usePlanningNowData.ts` — Active Festival Bands, Picks, and `crew_users` composed exclusively from existing IndexedDB/event-backed hooks
+- `PlanningNowView`, `PlanningMemberSheet`, and `PlanningNow.module.css` — Announcement Press planning tree with roster sheet and existing Band detail/pick modal reuse
+- `RightNowPage.tsx` — hard component boundary between planning and live trees via `hasRunningOrder`
+- Packed `Band.created_at` contract in client and generated Supabase types
+- Four-locale planning copy, DS §05 v3.14, and architecture/flow/routes/schema documentation
+- Focused projection, hook, branch, live-regression, timed-Band, and Band repository coverage
+
+**Automated acceptance evidence:**
+- [x] Announcement Lineup never mounts live hooks or renders live/next, radar, stage, map, or presence-on-stage chrome, including with leftover timed Bands
+- [x] Schedule Lineup keeps the existing live tree
+- [x] Full cached roster includes zero-Pick members; peer activity excludes self, leavers, unresolved Bands, and other Festivals
+- [x] Countdown uses Festival-local calendar days with Today and Dates TBA fallbacks
+- [x] Newest three Bands use packed `created_at`; planning reads remain IndexedDB-first and event-backed
+- [x] Band/activity taps use the existing detail modal path; Pick actions retain optimistic IndexedDB-first behavior
+- [x] Focused verification green: 6 files, 79 tests
+- [x] `rtk npm run build` green (490 app modules; service worker 82 modules; only existing chunk/dynamic-import warnings)
+- [x] `rtk npm test` green — 110 files / 1099 tests
+
+**Architectural notes:**
+- The era flag is the hard boundary: `useNowData` and all live side effects exist only inside `LiveNowView`.
+- `crew_users` is the planning membership proxy; no direct membership or Supabase read was added.
+- Device/browser visual confirmation remains outstanding for exact 390×844 fit and pre-Phase-50 live pixel parity; CSS/DOM constraints cover the automated layout contract.
+
+**Phase closed:** 2026-09-05 — build + 1099 tests green; wiki + DS synced; `PHASES.md` current is 51.

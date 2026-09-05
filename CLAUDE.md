@@ -306,7 +306,7 @@ Full inventory and condition engine → `docs/ai-wiki/badges.md`.
 
 ## Phases at a glance
 
-**Current phase: 50** — `/now` planning mode. See `PHASES.md`. Upcoming: 51 My Picks planning mode.
+**Current phase: 51** — My Picks planning mode. See `PHASES.md`.
 
 **Full phase history** → `docs/ai-wiki/phases-history.md`
 
@@ -419,7 +419,7 @@ Only when **both the build and all tests are green** may you proceed with the co
 
 ## References
 
-- `PHASES.md` — Current phase **50** (`/now` planning mode): acceptance criteria, deliverables
+- `PHASES.md` — Current phase **51** (My Picks planning mode): draft acceptance criteria and next planning step
 - `docs/ai-wiki/` — Architecture wiki
 - `.claude/context/` — On-demand context: **skill-routing**, rtk-reference, **lineup-official-source**, **production-database**, llm-alerts, badges, auth-trigger, wiki-template, key-decisions
 - `.claude/agents/` — Specialized subagents (see Subagent locations above)

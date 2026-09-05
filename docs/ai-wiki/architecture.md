@@ -15,6 +15,9 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/pages/FestivalsPage.tsx` — Festival catalog Join/Leave/Activate (Phase 47)
 - `src/lib/festivalFeatures.ts` — Feature gate helpers + `hasRunningOrder` (Phase 47/49)
 - `src/services/timedBand.ts` — `isTimedBand` / `timedBands` trusted-clock hard wall (Phase 49)
+- `src/hooks/usePlanningNowData.ts` — Active Festival IDB-only planning composer (Phase 50)
+- `src/services/planningNow.ts` — pure newest-Band, countdown, roster, and peer-Pick projections (Phase 50)
+- `src/components/now/PlanningNowView.tsx`, `PlanningMemberSheet.tsx` — Announcement Press planning presentation (Phase 50)
 - `src/components/AnnouncementPosterGrid.tsx` — `/schedule` B2 when Announcement Lineup
 - `src/services/announcementLineup.ts` — poster sort + hero split (`sortAnnouncementBands`, `splitAnnouncementHero`)
 - `src/components/profile/RunningOrderSection.tsx` — godlike Lineup era flip
@@ -98,7 +101,7 @@ Components are organized by concern:
 
 **Key Pages:**
 - `/festivals` (FestivalsPage) — Festival catalog: Join / Leave / Activate (Phase 47); no `FestivalGate`
-- `/now` (RightNowPage) — Live band display when Schedule Lineup + `isTimedBand`; Announcement Lineup is empty-safe (no fake live); `FestivalSwitcher` when ≥1 membership; `UpcomingBandCard` (Phase 37)
+- `/now` (RightNowPage) — `hasRunningOrder(festival) ? LiveNowView : PlanningNowView`; Schedule Lineup keeps live behavior, while Announcement Lineup renders the IDB-only Announcement Press planning home. Null Festival fails closed to planning/TBA.
 - `/schedule` (LineupPage) — Lineup chrome from **Lineup era**, not empty columns. Announcement Lineup: B2 `AnnouncementPosterGrid`. Schedule Lineup: day/stage filters. Leftover Bands stay listed (name-only). Trusted clock = `hasRunningOrder` + `isTimedBand`.
 - `/my-picks` (MyPicksPage) — Timed picks by festival day (upcoming → divider → ended inline); untimed leftover/announcement picks listed name-only
 - `/popular` (PopularPage) — Bands sorted by membership-gated pick count; schedule chrome only when `isTimedBand`
@@ -128,7 +131,7 @@ Switch Active Festival (online only):
 
 **Sync scoping** — `runReconnectSync` and domain sync methods take Active Festival id; pulls/flushes are Festival-scoped. `CacheVersionCheck` uses `festivals.cache_version` for the Active Festival only (`shouldInvalidatePack`).
 
-**Feature gates** — `hasFestivalFeature` / `canShow*` helpers; Presence UI requires camp or metal_place; duck/camp/map/wrap/remote_lineup similarly gated. Core schedule / picks / mural / `/now` always on for every Festival. **Lineup era** (Announcement Lineup vs Schedule Lineup) is not a Festival feature — every Festival has one; storage key `features.running_order`. **Official running order** remains the Wacken JSON feed only. Lineup chrome and trusted clocks follow the era flag (`isTimedBand`), not whether slot columns are filled. In Announcement Lineup, `/now` stays empty-safe (no fake live from untrusted times); planning picks are `/schedule`. Phase 50 is a dedicated planning `/now`.
+**Feature gates** — `hasFestivalFeature` / `canShow*` helpers; Presence UI requires camp or metal_place; duck/camp/map/wrap/remote_lineup similarly gated. Core schedule / picks / mural / `/now` always on for every Festival. **Lineup era** (Announcement Lineup vs Schedule Lineup) is not a Festival feature — every Festival has one; storage key `features.running_order`. **Official running order** remains the Wacken JSON feed only. Lineup chrome and trusted clocks follow the era flag (`isTimedBand`), not whether slot columns are filled. Phase 50 branches `/now` at the component boundary: Schedule Lineup mounts `LiveNowView`; Announcement Lineup mounts `PlanningNowView` + `usePlanningNowData`. The latter composes event-backed Band/Pick/crew caches, scopes rows by `activeFestivalId`, and uses the complete `crew_users` roster as the membership proxy. It never calls `loadFestivalMemberships()` for peer counts and never mounts live-plan, presence, stage radar, map/stage, announcement-banner, badge, or duck hooks. Null Festival is fail-closed planning/TBA, never live.
 
 ### Viralatas App Pack (Phase 22–23)
 
@@ -192,6 +195,7 @@ Hooks encapsulate state logic and subscriptions. They:
 | `usePickCounts()` | Attendance per band | `useAllPicks()` shared cache → `countPicks()` |
 | `useBandAttendees(bandId)` | Users going to a band | `useAllPicks()` + `CREW_USERS_CHANGED_EVENT` |
 | `useNowData()` | Current/next band for user | `useSocialSnapshot` + slim `useNowCache` + `useNow()` (time) |
+| `usePlanningNowData()` | Announcement Lineup home | `useBands` + `useAllPicks` + `useCrewUsersCache` + `useNow`; IDB-backed hooks only |
 | `useBandConflicts(bandIds)` | Overlapping bands | Computed, no DB |
 | `useNow()` | Current time (with override) | localStorage + hook state |
 | `useBandDetailModal()` | Band detail modal state | Composes pick/missed/attendee inputs |
@@ -548,6 +552,7 @@ INSERT into user_picks
 | `badges/currentFestivalYear.ts` | `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()` — live vest year filter + consolidation gate | ✅ Yes |
 | `metalBattle.ts` | `getMetalBattleCountryFlag(slotId)` — static `slot_id`→ISO2 map → flag emoji; prefixes the `Metal Battle` genre label on `BandCard`; `null` when slot not in map (e.g. `WET23`) | ✅ Yes (static data, no IDB) |
 | `stageSchedule.ts` | `buildStageScheduleSnapshot(bands, now)` — pure fn; returns `StageScheduleEntry[]` (one per stage: `{ stage, band, status: 'current' \| 'next' }`); consumed by `StageScheduleSheet` | ✅ Yes (no IDB) |
+| `planningNow.ts` | `newestAnnouncedBands`, `festivalCountdown`, `sortGoingMembers`, `buildPackPickActivity`; invalid/missing timestamps rank oldest | ✅ Yes (IDB inputs only) |
 | `presencePolicy.ts` | Pure presence rules (no I/O): `isMetalPlaceWindowActive(config, nowDate)`, `resolvePresenceToggle(nextValue, context) → PresenceDecision`, `shouldAutoClearCamping(isCamping, planStatus)`, `shouldAutoCheckout(config, nowDate, presence)`; exports `PresenceDecision`, `PresenceToggleContext` types (Phase 42.A) | ✅ Yes |
 | `presenceService.ts` | Presence orchestration: `applyPresenceToggle`, `autoClearCampingOnCurrentBand`, `validateAndAutoCheckout`, `autoCheckoutAllUsers` — calls policy then repository; consumed by `useNowData`, admin sections (Phase 42.A) | Calls IDB + Supabase via repository |
 
@@ -702,4 +707,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-09-04 — Phase 49 close-out: `/now` empty-safe; My Picks/Popular untimed chrome.
+**Last updated:** 2026-09-05 — Phase 50: shipped isolated IDB-only planning `/now` architecture.
