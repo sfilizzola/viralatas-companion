@@ -22,6 +22,7 @@ import ManagerAdminPanel from '../components/profile/ManagerAdminPanel';
 import InstallAppProfileLink from '../components/InstallAppProfileLink';
 import { useActiveFestival } from '../hooks/useActiveFestival';
 import { canShowWrap } from '../lib/festivalFeatures';
+import { useBadgesEnabled } from '../contexts/BadgesEnabledContext';
 import styles from './ProfilePage.module.css';
 
 export default function ProfilePage() {
@@ -79,6 +80,7 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [avatarUrl, setAvatarUrl] = useState(initialAvatarUrl);
   const { festival } = useActiveFestival();
+  const badgesEnabled = useBadgesEnabled();
 
   const initial = displayName.charAt(0).toUpperCase();
   const savedCountry = (user.user_metadata?.['country'] as string | undefined) ?? null;
@@ -113,9 +115,11 @@ function ProfileForm({ user, displayName, avatarUrl: initialAvatarUrl, language,
 
       {showWrapTeaser && <WrapTeaserBanner />}
 
-      <section id="vest" className={styles.pfSection}>
-        <BadgesDisplay user={user} />
-      </section>
+      {badgesEnabled && (
+        <section id="vest" className={styles.pfSection}>
+          <BadgesDisplay user={user} />
+        </section>
+      )}
 
       <InstallAppProfileLink />
 

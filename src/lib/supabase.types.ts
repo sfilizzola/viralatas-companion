@@ -343,6 +343,7 @@ export type Database = {
           duck_enabled: boolean;
           playlist_testing: boolean;
           moshsplit_enabled: boolean;
+          badges_enabled: boolean;
           camping_latitude: number | null;
           camping_longitude: number | null;
           updated_at: string;
@@ -353,6 +354,7 @@ export type Database = {
           duck_enabled?: boolean;
           playlist_testing?: boolean;
           moshsplit_enabled?: boolean;
+          badges_enabled?: boolean;
           camping_latitude?: number | null;
           camping_longitude?: number | null;
           updated_at?: string;
@@ -363,6 +365,7 @@ export type Database = {
           duck_enabled?: boolean;
           playlist_testing?: boolean;
           moshsplit_enabled?: boolean;
+          badges_enabled?: boolean;
           camping_latitude?: number | null;
           camping_longitude?: number | null;
           updated_at?: string;

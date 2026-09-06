@@ -31,6 +31,33 @@ Not yet. Start with `/brainstorming`.
 
 ---
 
+## Phase 52 — Multi-festival badges (next; do not start)
+
+**Status:** Approved design/sketch; **do not implement** until Phase 51 is done and this phase has a detailed implementation plan.
+
+**Goal:** One badge engine. Catalog entries gain festival scope (`festivalId` on `BadgeConfig`). Live vest (when `badges_enabled`) = evergreen + badges for the **Active Festival**. Wacken 2026 year-tagged defs become Wacken-2026-scoped or archive-only — do not copy that vest onto other festivals. Consolidation per festival instance. Archive headings generalize to **Achieved in {festival name} {year}**. Keep `badges_enabled` as the app-wide live-vest killswitch.
+
+**Clarification (current unphased vs this sketch):** `getCurrentFestivalYear()` remains an archive/admin helper (registry max year). It is not the **Active Festival** and is not the live-vest selector. The exact matching predicate for “badges for the Active Festival” is finalized in this phase’s implementation plan.
+
+**Depends on:** Unphased-pass prerequisites `badges_enabled` + evergreen-only live listing. Phase 51 does not block the design; it blocks *starting* this phase.
+
+**Locked approach:** Single engine + `festivalId` on `BadgeConfig`. Rejected: per-festival registry files; badges as Postgres rows.
+
+**Out of scope unless reopened:** Postgres catalog, per-festival vest flags, persist/EF rewrite beyond new config fields, a second evaluator.
+
+**Optional local provenance (gitignored):** `docs/superpowers/specs/2026-09-05-badge-flag-and-multifestival-design.md`
+
+### Acceptance (draft — refine in `/writing-plans` when this phase starts)
+
+- [ ] Live vest = evergreen + Active Festival badges when flag ON
+- [ ] Switching Active Festival swaps festival-layer patches only
+- [ ] Wacken-grounds conditions are badge data, not global “app is Wacken”
+- [ ] Archive grouping names the festival, not a bare year
+- [ ] Offline vest from IDB + registry; consolidate still network-only
+- [ ] Wiki + DS + changelog
+
+---
+
 ## When completing a phase
 
 1. Append the phase entry to `docs/ai-wiki/phases-history.md` (not here, not in CLAUDE.md).

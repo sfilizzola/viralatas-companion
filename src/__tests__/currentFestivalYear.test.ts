@@ -4,6 +4,7 @@ import {
   getCurrentFestivalYear,
   isLiveVestBadge,
   filterLiveVestBadges,
+  filterFestivalYearBadges,
 } from '../services/badges/currentFestivalYear';
 
 describe('getCurrentFestivalYear', () => {
@@ -25,13 +26,11 @@ describe('isLiveVestBadge', () => {
     expect(isLiveVestBadge(evergreen!)).toBe(true);
   });
 
-  it('includes current festival year badges only', () => {
+  it('excludes every year-tagged badge including current festival year', () => {
     const currentYearBadge = BADGES.find((b) => b.year === getCurrentFestivalYear());
     expect(currentYearBadge).toBeDefined();
-    expect(isLiveVestBadge(currentYearBadge!)).toBe(true);
-  });
+    expect(isLiveVestBadge(currentYearBadge!)).toBe(false);
 
-  it('excludes past festival year badges when registry rolls forward', () => {
     const staleYearBadge = {
       slug: 'old-year',
       imagePath: '/badges/badge_old.png',
@@ -43,11 +42,22 @@ describe('isLiveVestBadge', () => {
     expect(isLiveVestBadge(staleYearBadge)).toBe(false);
   });
 
-  it('filterLiveVestBadges keeps evergreen + current year', () => {
+  it('filterLiveVestBadges keeps only evergreen badges', () => {
     const filtered = filterLiveVestBadges(BADGES);
-    expect(filtered.every((b) => b.year == null || b.year === getCurrentFestivalYear())).toBe(true);
+    expect(filtered.every((b) => b.year == null)).toBe(true);
     expect(filtered.length).toBeGreaterThan(0);
     expect(filtered.some((b) => b.year == null)).toBe(true);
-    expect(filtered.some((b) => b.year === getCurrentFestivalYear())).toBe(true);
+    expect(filtered.some((b) => b.year === getCurrentFestivalYear())).toBe(false);
+  });
+
+  it('keeps archive-year candidates independent from the evergreen live list', () => {
+    const festivalYear = getCurrentFestivalYear();
+    const live = filterLiveVestBadges(BADGES);
+    const archiveCandidates = filterFestivalYearBadges(BADGES, festivalYear);
+
+    expect(live.every((badge) => badge.year == null)).toBe(true);
+    expect(archiveCandidates.length).toBeGreaterThan(0);
+    expect(archiveCandidates.every((badge) => badge.year === festivalYear)).toBe(true);
+    expect(archiveCandidates.some((badge) => live.includes(badge))).toBe(false);
   });
 });

@@ -2,10 +2,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useFestivalWrapStats } from '../hooks/useFestivalWrapStats';
+import { useBadgesEnabled } from '../contexts/BadgesEnabledContext';
 import { loadPatchesBackground } from '../lib/patchesBackground';
 import { useI18n } from '../lib/i18n';
 import { BADGES } from '../services/badges/registry';
-import { badgeYearSuffix } from '../components/badges/PatchTile';
+import { filterLiveVestBadges } from '../services/badges/currentFestivalYear';
 import { buildStackPoses, stackStyle } from '../services/badges/stackLayout';
 import { stageColorVar } from '../services/stageColors';
 import { formatRatingAvg } from '../services/bandRatings';
@@ -71,6 +72,7 @@ export default function WrapPage() {
   const { t } = useI18n('WrapPage');
   const { t: tBadges } = useI18n('Badges');
   const { session } = useAuth();
+  const badgesEnabled = useBadgesEnabled();
   const userId = session?.user?.id ?? '';
   const { stats, loading } = useFestivalWrapStats(userId);
   const [activeSection, setActiveSection] = useState(0);
@@ -79,19 +81,22 @@ export default function WrapPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const patchesBg = loadPatchesBackground();
 
+  // Wrap's patch sections are live vest surfaces, so they follow the same
+  // evergreen-only rule as `BadgesDisplay`. Year-tagged wins stay in the archive.
   const earnedBadges = useMemo(() => {
     if (!stats?.hasPicks) return [];
     const slugs = new Set(stats.personal.earnedBadgeSlugs);
-    return BADGES.filter((b) => slugs.has(b.slug));
+    return filterLiveVestBadges(BADGES.filter((b) => slugs.has(b.slug)));
   }, [stats]);
 
   const assignedBadges = useMemo(() => {
     if (!stats?.hasPicks) return [];
     const slugs = new Set(stats.personal.assignedBadgeSlugs);
-    return BADGES.filter((b) => slugs.has(b.slug));
+    return filterLiveVestBadges(BADGES.filter((b) => slugs.has(b.slug)));
   }, [stats]);
 
-  const hasAssignedSection = assignedBadges.length > 0;
+  const hasAssignedSection = badgesEnabled && assignedBadges.length > 0;
+  const hasPatchesSection = badgesEnabled && earnedBadges.length > 0;
   const hasRatingsSection = Boolean(stats?.ratings?.hasCrewRatings);
 
   const sectionIndices = useMemo(() => {
@@ -103,10 +108,10 @@ export default function WrapPage() {
     const ratings = hasRatingsSection ? i++ : null;
     const crew = i++;
     const assigned = hasAssignedSection ? i++ : null;
-    const patches = i++;
+    const patches = hasPatchesSection ? i++ : null;
     const finale = i++;
     return { welcome, hero, personality, chaos, ratings, crew, assigned, patches, finale, total: i };
-  }, [hasRatingsSection, hasAssignedSection]);
+  }, [hasRatingsSection, hasAssignedSection, hasPatchesSection]);
 
   const stackPoses = useMemo(
     () => (earnedBadges.length > 0 ? buildStackPoses(earnedBadges, 42, new Set()) : new Map()),
@@ -337,19 +342,21 @@ export default function WrapPage() {
               </div>
               <span className={styles.meterValue}>{personal.hardConflicts}</span>
             </div>
+            {badgesEnabled && (
             <div className={styles.meterRow}>
               <span className={styles.meterLabel}>{t('chaosBadges')}</span>
               <div className={styles.meterTrack}>
                 <div
                   className={styles.meterFill}
                   style={{
-                    width: meterWidth(personal.badgesEarnedCount, BADGE_METER_MAX),
+                    width: meterWidth(earnedBadges.length, BADGE_METER_MAX),
                     ['--meter-delay' as string]: '0.2s',
                   }}
                 />
               </div>
-              <span className={styles.meterValue}>{personal.badgesEarnedCount}</span>
+              <span className={styles.meterValue}>{earnedBadges.length}</span>
             </div>
+            )}
             {personal.locationVisitsTotal !== null && personal.locationVisitsTotal > 0 && (
               <p className={styles.metaLine}>
                 {t('locationVisits', { count: personal.locationVisitsTotal })}
@@ -531,11 +538,6 @@ export default function WrapPage() {
                         className={styles.assignedImg}
                         draggable={false}
                       />
-                      {badge.year != null && (
-                        <span className={styles.assignedYear}>
-                          {badgeYearSuffix(badge.year)}
-                        </span>
-                      )}
                     </div>
                     <span className={styles.assignedLabel}>{tBadges(badge.labelKey)}</span>
                   </div>
@@ -546,48 +548,50 @@ export default function WrapPage() {
           </section>
         )}
 
-        <section
-          className={sectionClass(sectionIndices.patches)}
-          data-wrap-section
-          data-wrap-index={sectionIndices.patches}
-          aria-label={t('sectionPatches')}
-        >
-          <div className={styles.sectionFrame}>
-            <p className={styles.sectionEpigraph}>{t('patchesPhrase')}</p>
-            <div className={styles.card}>
-              <div className={styles.cardGlow} aria-hidden="true" />
-              <div className={styles.stageBar} />
-              <span className={styles.kicker}>{t('patchesKicker')}</span>
-              <p className={styles.patchesCount}>
-              {t('patchesCount', { count: personal.badgesEarnedCount })}
-            </p>
-            <div className={styles.vestFinale} data-bg={patchesBg}>
-              <div className={styles.vestMeadow}>
-                {earnedBadges.map((badge, index) => {
-                  const pose = stackPoses.get(badge.slug);
-                  if (!pose) return null;
-                  return (
-                    <img
-                      key={badge.slug}
-                      src={badge.imagePath}
-                      alt=""
-                      className={styles.vestPatch}
-                      style={{
-                        ...stackStyle(pose),
-                        ['--patch-i' as string]: index,
-                      }}
-                      draggable={false}
-                    />
-                  );
-                })}
+        {hasPatchesSection && sectionIndices.patches !== null && (
+          <section
+            className={sectionClass(sectionIndices.patches)}
+            data-wrap-section
+            data-wrap-index={sectionIndices.patches}
+            aria-label={t('sectionPatches')}
+          >
+            <div className={styles.sectionFrame}>
+              <p className={styles.sectionEpigraph}>{t('patchesPhrase')}</p>
+              <div className={styles.card}>
+                <div className={styles.cardGlow} aria-hidden="true" />
+                <div className={styles.stageBar} />
+                <span className={styles.kicker}>{t('patchesKicker')}</span>
+                <p className={styles.patchesCount}>
+                  {t('patchesCount', { count: earnedBadges.length })}
+                </p>
+                <div className={styles.vestFinale} data-bg={patchesBg}>
+                  <div className={styles.vestMeadow}>
+                    {earnedBadges.map((badge, index) => {
+                      const pose = stackPoses.get(badge.slug);
+                      if (!pose) return null;
+                      return (
+                        <img
+                          key={badge.slug}
+                          src={badge.imagePath}
+                          alt=""
+                          className={styles.vestPatch}
+                          style={{
+                            ...stackStyle(pose),
+                            ['--patch-i' as string]: index,
+                          }}
+                          draggable={false}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+                <Link to="/profile?vest=open#vest" className={styles.openVest}>
+                  {t('openVest')}
+                </Link>
               </div>
             </div>
-            <Link to="/profile?vest=open#vest" className={styles.openVest}>
-              {t('openVest')}
-            </Link>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         <section
           className={sectionClass(sectionIndices.finale)}

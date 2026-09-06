@@ -118,24 +118,28 @@ _Avoid_: Crew IDB, users cache, global roster cache
 A one-time, godlike-triggered snapshot that copies each vira-lata's earned year-specific badges into `user_badge_history` at the end of a festival cycle. Test vira-latas (`is_test_user = true`) are excluded.
 _Avoid_: Year freeze, badge freeze, historical badge migration
 
+**Live vest killswitch**:
+The app-wide `app_settings.badges_enabled` setting. Off by default and fail-hidden when unavailable. When off, the **Live vest** and its profile appearance controls are absent on `/now` and `/profile`, and `/wrap` omits its Chaos badge meter, live assigned/earned patch sections, and vest CTA. With the flag on, `/wrap` Assigned and Patches still omit when no evergreen rows remain after the live filter. **Previously Achieved** remains visible. This is global app behavior, not a **Festival feature**.
+_Avoid_: Badge Festival feature, per-Festival badges flag, archive flag
+
 **Live vest**:
-The vest patch display on `/profile` and `/now` — badges earned or persisted for the **current festival cycle** plus evergreen identity badges.
+The optional vest patch display on `/profile` and Schedule Lineup `/now`. It mounts only while the **Live vest killswitch** is on and currently contains **Evergreen badges** only (`BadgeConfig.year` omitted).
 _Avoid_: Active badges, current badges
 
 **Previously Achieved** (`Conquistas Anteriores`):
-A profile section showing frozen badges from past festival years, read from `user_badge_history`. The sole home for year-specific wins after consolidation and festival reset. Archived badges render in a read-only grid grouped by year; tap opens the same overlay patch modal as the live vest (label + year chip only — no description, no fullscreen zoom).
+A profile section showing frozen badges from past festival years, read from `user_badge_history`. The sole end-user profile home for archived year wins (godlike admin preview/testing on `/profile` is separate and not this surface). Archived badges render in a read-only grid grouped by year under the localized heading **Achieved in Wacken {year}**; tap opens the same overlay patch modal as the live vest (label + year chip only — no description, no fullscreen zoom). It is independent of the **Live vest killswitch**.
 _Avoid_: Historical badges, archived vest, badge history section
 
 **Evergreen badge**:
-A badge with no `year` field on `BadgeConfig` — identity or cross-year milestones (e.g. country, OG, 5-Wackens). Stays on the live vest every festival; never consolidated.
+A badge with no `year` field on `BadgeConfig` — identity or cross-year milestones (e.g. country, OG, 5-Wackens). Eligible for the live vest whenever its global killswitch is on; never consolidated.
 _Avoid_: Permanent badge, non-year badge
 
 **Year badge**:
-A badge with `BadgeConfig.year` set to a festival year (e.g. `2026`). Earned from picks, seen bands, location, or assignment during that Wacken. Consolidated into `user_badge_history` at cycle end; not shown on the live vest after reset.
+A badge with `BadgeConfig.year` set to a Wacken year (e.g. `2026`). Retained in the registry for evaluation, consolidation, and archive preview, but excluded from the live vest regardless of year. Its user-facing home is **Previously Achieved** after consolidation.
 _Avoid_: Festival badge, seasonal badge, historical badge
 
 **Registry rollover**:
-At each new Wacken cycle, year-badge entries keep the same slug but bump `BadgeConfig.year` (and conditions/artwork as needed). The live engine evaluates only evergreen badges plus entries where `year === CURRENT_FESTIVAL_YEAR`.
+Updating or adding year-tagged `BadgeConfig` definitions for a Wacken cycle so consolidation and archive tooling can evaluate that year. Registry rollover does not make those definitions live; `isLiveVestBadge()` remains evergreen-only.
 _Avoid_: Year-suffixed slugs, registry accumulation
 
 **Frozen badge snapshot**:
@@ -151,7 +155,7 @@ The client's copy of `user_badge_history` rows in IndexedDB. UI reads this store
 _Avoid_: Badge history IDB, offline badge archive
 
 **Social snapshot**:
-The derived social state for the **Active Festival** shared by `/now` and the live vest — **Festival crew** plans and groups, plus Wacken-grounds fields (Metal Place window, camping/lost) when those features apply. Built from IDB inputs for the Active Festival.
+The derived social state for the **Active Festival** shared by live `/now` and, when enabled, the live vest — **Festival crew** plans and groups, plus Wacken-grounds fields (Metal Place window, camping/lost) when those features apply. Built from IDB inputs for the Active Festival.
 _Avoid_: Live preview state, crew cache DTO
 
 **Metal Place**:
@@ -183,11 +187,11 @@ True for the **Active Festival** when the current instant is past the latest `en
 _Avoid_: Festival over, post-festival, any-festival-ended
 
 **Transition overlap**:
-Between consolidation and the next `festival:reset`, the same year-badge may appear on both the live vest and in Previously Achieved. This duplication is acceptable and requires no cross-store dedup logic.
-_Avoid_: Badge dedup, duplicate patch hiding
+There is no live/archive duplicate window now: year-tagged badges never enter the live vest, so consolidation can add them to **Previously Achieved** without cross-store deduplication.
+_Avoid_: Acceptable duplicate window, badge dedup, duplicate patch hiding
 
 **Current festival year**:
-The active Wacken cycle year, derived at runtime as the maximum `BadgeConfig.year` across the live badge registry. The live vest evaluates only evergreen badges (`year` omitted) plus year-badges matching this value.
+An archive/admin helper derived at runtime as the maximum `BadgeConfig.year` across the badge registry (currently 2026). Consolidation and `TestBadgeSection` use it to select one year’s definitions. It is not the **Active Festival**, and it does not decide live-vest contents.
 _Avoid_: CURRENT_FESTIVAL_YEAR constant, festival year config
 
 **Campground** (camp location):
@@ -242,7 +246,7 @@ _Avoid_: Global cache_version as the only lineup invalidation once multiple Fest
 ## Flagged ambiguities
 
 **Festival vs festival cycle / current festival year**:
-**Festival** = event instance (multi-festival product). **Festival cycle** / **current festival year** remain Wacken-badge-year language until the badge vest is redesigned. Do not use “festival cycle” to mean opting into Hellfest.
+**Festival** = event instance (multi-festival product). **Current festival year** remains Wacken archive/admin language and is not a live badge scope. Do not use “festival cycle” to mean opting into Hellfest.
 
 **Lineup era vs Official running order vs Festival feature**:
 **Announcement Lineup** / **Schedule Lineup** = every Festival’s Lineup era (who is known vs day/time/stage known). **Official running order** = Wacken’s JSON feed only. **Festival features** = optional extras (map, duck, …). Do not say “running order” for any of these without the qualifier. **Trusted clock** follows Lineup era, not whether time columns are filled.
@@ -325,8 +329,8 @@ Pre-multi-festival single app_config token. Superseded in product language by **
 
 **Dev:** Beto earned `dreamer` and `roots` at Wacken 2026. Consolidation ran in August. It's March 2027 — picks are empty and `festival:reset` cleared persist metadata. Where do those patches show?
 
-**Expert:** Only in **Previously Achieved**, under "Wacken 2026". The **live vest** shows evergreen badges plus whatever Beto earns for the 2027 cycle — not last year's year-badges. (Badge multi-Festival vest is not defined yet.)
+**Expert:** Only in **Previously Achieved**, under "Achieved in Wacken 2026". The 2026 registry definitions remain available for archive evaluation, but year-tagged badges never enter the **live vest**. If the global **Live vest killswitch** is on, the vest shows evergreen badges only.
 
 **Dev:** What about `pais-tropical`?
 
-**Expert:** That's an **evergreen badge** — still on the live vest every year. Consolidation ignores it.
+**Expert:** That's an **Evergreen badge** — eligible for the live vest whenever the global **Live vest killswitch** is on. Consolidation ignores it.

@@ -6,13 +6,15 @@ export type FlagKey =
   | 'registration_enabled'
   | 'duck_enabled'
   | 'playlist_testing'
-  | 'moshsplit_enabled';
+  | 'moshsplit_enabled'
+  | 'badges_enabled';
 
 const FLAG_DEFAULTS: Record<FlagKey, boolean> = {
   registration_enabled: true,  // fail-open: network failure never locks users out
   duck_enabled: true,          // fail-open: duck stays available offline
   playlist_testing: true,      // fail-safe: true = restricted mode
   moshsplit_enabled: false,    // fail-hidden: feature stays hidden on error
+  badges_enabled: false,       // fail-hidden: feature stays hidden on error
 };
 
 async function get(key: FlagKey): Promise<boolean> {
@@ -58,7 +60,7 @@ async function getAll(): Promise<Record<FlagKey, boolean>> {
   try {
     const { data, error } = await supabase
       .from('app_settings')
-      .select('registration_enabled, duck_enabled, playlist_testing, moshsplit_enabled')
+      .select('registration_enabled, duck_enabled, playlist_testing, moshsplit_enabled, badges_enabled')
       .limit(1)
       .single();
 
@@ -69,6 +71,7 @@ async function getAll(): Promise<Record<FlagKey, boolean>> {
       duck_enabled: data.duck_enabled ?? FLAG_DEFAULTS.duck_enabled,
       playlist_testing: data.playlist_testing ?? FLAG_DEFAULTS.playlist_testing,
       moshsplit_enabled: data.moshsplit_enabled ?? FLAG_DEFAULTS.moshsplit_enabled,
+      badges_enabled: data.badges_enabled ?? FLAG_DEFAULTS.badges_enabled,
     };
   } catch {
     return { ...FLAG_DEFAULTS };

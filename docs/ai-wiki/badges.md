@@ -26,6 +26,8 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 | `src/hooks/useSocialSnapshotSpecs.ts` | `useCrewUsersCache`, `usePresenceCache` cache keys + loaders |
 | `src/hooks/useBadgePersist.ts` | Persist-metadata writes only (`auth.updateUser` best-effort); display reads crew IDB |
 | `src/hooks/useBadgeContext.ts` | Composer — `useSocialSnapshot` + `useMissedBands` + `useBadgePersist` |
+| `src/contexts/BadgesEnabledContext.tsx` | App-wide `badges_enabled` reader; defaults/fails hidden, supports protected refresh, and applies confirmed writes locally |
+| `src/lib/featureFlags.ts`, `src/lib/appSettings.ts` | Global `app_settings.badges_enabled` access; default `false` |
 | `src/repositories/users.ts` | `syncCrew()` — writes **crew profile cache** incl. `special_badges`; hydrates auth metadata on reconnect |
 | `src/__tests__/badges.test.ts` | Condition engine + registry integration tests |
 | `src/__tests__/persistMetadata.test.ts` | Persist metadata merge/write tests |
@@ -40,7 +42,8 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 | `src/components/BadgesDisplay.tsx` | Vest-stack patches presentation (collapsed + expanded), detail modal, fullscreen zoom |
 | `src/components/BadgeHistorySection.tsx` | Collapsible Previously Achieved archive (U2), grouped by `festival_year` |
 | `src/components/profile/ConsolidateBadgesSection.tsx` | Godlike year consolidation panel + confirm modal |
-| `src/services/badges/currentFestivalYear.ts` | `getCurrentFestivalYear()`, `isLiveVestBadge()` — live vest year filter |
+| `src/components/profile/TestBadgeSection.tsx` | Godlike full-registry browser and archive preview; selects one archive year independently of the live filter |
+| `src/services/badges/currentFestivalYear.ts` | Registry max-year helper, evergreen live filter, and archive-year filter |
 | `src/repositories/badgeHistoryRepository.ts` | IDB read + Supabase pull; `consolidateYear()` Edge Function invoke |
 | `src/hooks/useUserBadgeHistory.ts` | IDB-first badge history; sync on profile mount / reconnect |
 | `src/lib/db/badgeHistory.ts` | IndexedDB replace-all for current user on sync |
@@ -54,7 +57,9 @@ Badges are a reward and identity system for vira-latas. They recognize achieveme
 
 ## Patches Vest Stack (Variant C)
 
-The patches UI uses a **collapsed vest stack** by default (fixed **112 px** height, max-width **480 px**) so large collections (15–22+ badges) do not dominate `/now` or `/profile`. Unified on both routes via `<BadgesDisplay user={user} />`; the deprecated `heading` prop is ignored — kicker + count render internally.
+The patches UI uses a **collapsed vest stack** by default (fixed **112 px** height, max-width **480 px**) so large collections (15–22+ badges) do not dominate `/profile` or Schedule Lineup `/now`. The same `<BadgesDisplay user={user} />` mounts on those two surfaces **only while** global fail-hidden `app_settings.badges_enabled` is on; Announcement Lineup planning `/now` never mounts it. `/wrap` also hides its Chaos badge meter, assigned-patch section, live patch pile, and **Open vest** CTA while the flag is off, and applies the same evergreen-only filter while it is on. The Patches section (pile, count, vest CTA) additionally omits when `earnedBadges.length === 0`, matching `BadgesDisplay` returning `null`. The deprecated `heading` prop is ignored — kicker + count render internally.
+
+The live vest is controlled by the app-wide `app_settings.badges_enabled` flag. `BadgesEnabledProvider` mounts after auth bootstrap around the route tree (including public and protected routes), reads the flag once, and defaults/fails to `false`, preventing an initial vest flash and hiding the feature for offline/read-error/null results. When off, `/now` and `/profile` do not mount `BadgesDisplay`, `/wrap` omits the Chaos badge meter, live patch sections, and vest CTA, and Edit profile hides the vest background/layout controls. The `Previously Achieved` archive remains visible because frozen history is not live-vest UI. After a godlike write succeeds, the known persisted value is applied directly to Context and invalidates older reads, so an offline/defaulted follow-up cannot hide a successful ON; protected manual refresh remains available. Other clients learn the non-Realtime setting on their next app mount/reload.
 
 ### Layout constants
 
@@ -169,10 +174,13 @@ After Wacken ends, godlike operators run **Consolidar badges YYYY** (Profile →
 
 | Surface | Badges shown |
 |---|---|
-| Live vest (`BadgesDisplay`) | Evergreen (`!year`) + `year === getCurrentFestivalYear()` |
+| Live vest (`BadgesDisplay`) | Evergreen only (`BadgeConfig.year == null`), and only while global `badges_enabled` is on |
+| Festival Wrap live badge surfaces | Evergreen only (`filterLiveVestBadges()`), and only while global `badges_enabled` is on. Chaos earned-badge meter follows the flag; Assigned mounts with ≥1 evergreen assigned patch; Patches pile/count/CTA mounts with ≥1 evergreen earned badge (no empty chrome) |
 | Previously Achieved (`BadgeHistorySection`) | Frozen rows from `user_badge_history` by year desc |
 
-After consolidation + `festival:reset`, year-badges appear **only** in Previously Achieved — not on the live vest.
+`isLiveVestBadge()` is deliberately year-agnostic: every year-tagged registry entry is excluded. The 2026 rows remain in `BADGES` so consolidation, archive preview, and historical evaluation can still reproduce that year, but they are archive-only and never live patches.
+
+`getCurrentFestivalYear()` still returns the maximum `BadgeConfig.year` in the registry (currently **2026**). It is an archive/consolidation/test helper, not the live-vest selector. `TestBadgeSection` separately calls `filterFestivalYearBadges(BADGES, festivalYear)` before evaluation, so its archive-year candidate set is independent of `isLiveVestBadge()` and remains available while year-tagged badges are absent from the live vest.
 
 ### Consolidation window
 
@@ -182,7 +190,7 @@ Run after `isFestivalEnded()` and before the next `npm run festival:reset`. Godl
 
 `/profile` → `useUserBadgeHistory` → IDB first → Supabase pull when online → `BadgeHistorySection` (hidden when empty). Tap archive patch → `BadgeDetailModal` with `showDescription={false}` `showZoom={false}`.
 
-**U2 layout (locked):** Flat `repeat(4, 48px)` grid per year — no denim vest shell. Mono collapsible header + Oswald `Wacken {year}` headings. Patches at 88% opacity (trophy shelf, not live vest). Year chip: red enamel diamond (24 px @ 48 px patch), same language as live `.yearChip`. Reference: `docs/superpowers/prototypes/badge-history/index.html` scenario U2 (local).
+**U2 layout (locked):** Flat `repeat(4, 48px)` grid per year — no denim vest shell. Mono collapsible header + Oswald `Achieved in Wacken {year}` headings (localized). Patches at 88% opacity (trophy shelf, not live vest). Year chip: red enamel diamond (24 px @ 48 px patch) — archive historical treatment, not a live vest `.yearChip`.
 
 **Godlike archive preview (dev):** Godlike Powers → Test Badges → *Archive preview (local)*. Seeds IndexedDB only; per-device flag pauses history sync until *Clear preview*.
 
@@ -252,10 +260,10 @@ type BadgeConfig = {
 - Example: `{ type: 'country_is', country: 'br' }`
 
 **year** (Optional)
-- Wacken edition year (e.g., `2026`)
-- Displayed as a small year pill in badge grid
-- Use for festival-specific badges (memorial badges, location badges, "saw X band in 2026")
-- Omit for permanent/historical badges (country badges, veteran badges)
+- Marks a year-scoped / archived historical definition (Wacken edition, e.g. `2026`)
+- Excluded from the current evergreen-only live vest (`isLiveVestBadge` requires `year == null`)
+- Shown in archive and detail historical treatment (Previously Achieved heading + enamel year chip; detail modal year chip) — not on the live vest grid
+- Omit for evergreen identity / cross-year milestones (country badges, veteran badges)
 
 **persist** (Optional, default false)
 - If `true`, badge slug is permanently recorded in `user.user_metadata.achieved_badge_slugs`
@@ -1200,4 +1208,4 @@ Godlike assigns a badge by adding the **slug** to `users.special_badges[]`.
 
 ---
 
-**Last updated:** 2026-05-28 — Phase 31: `useSocialSnapshot`, crew profile cache (`special_badges`), IDB-only vest display.
+**Last updated:** 2026-09-05 — Unphased badge live-vest flag (Schedule Lineup `/now`, `/profile`, and `/wrap`) and evergreen-only filter.

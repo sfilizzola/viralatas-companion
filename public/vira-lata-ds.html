@@ -2732,7 +2732,7 @@
 <body>
 <script type="application/json" id="ds-manifest">
 {
-  "version": "3.14",
+  "version": "3.15",
   "file": "public/vira-lata-ds.html",
   "note": "Agent table of contents. Read this first to navigate the file. Anchors and section numbers are STABLE and referenced across docs/code — never renumber. Keep this manifest in sync when adding/renaming a section, token, or component.",
   "sections": [
@@ -2773,7 +2773,9 @@
     { "name": "LocationCard",          "sectionId": "components" },
     { "name": "BandDetailModal",       "sectionId": "components" },
     { "name": "AlertBanner",           "sectionId": "components" },
-    { "name": "BadgesDisplay",         "sectionId": "components" },
+    { "name": "BadgesDisplay",         "sectionId": "components", "note": "Global app_settings.badges_enabled gate; evergreen BadgeConfig rows only" },
+    { "name": "BadgeHistorySection",   "sectionId": "components", "note": "Previously Achieved archive; independent of live-vest flag" },
+    { "name": "TestBadgeSection",      "sectionId": "components", "note": "Godlike full-registry browser and archive-year preview" },
     { "name": "AnnouncementCard",      "sectionId": "components" },
     { "name": "ReactionBar",           "sectionId": "components" },
     { "name": "EmojiPicker",           "sectionId": "components" },
@@ -2792,7 +2794,7 @@
     { "name": "BandRatingInput",       "sectionId": "components" },
     { "name": "ProfileHeader",         "sectionId": "components" },
     { "name": "UserManagementSection", "sectionId": "components" },
-    { "name": "WrapPage",              "sectionId": "components" },
+    { "name": "WrapPage",              "sectionId": "components", "note": "Assigned/Patches mount only when badges_enabled and evergreen rows exist; vest CTA lives in Patches" },
     { "name": "MoshSplitSection",      "sectionId": "components" },
     { "name": "PlaylistLaunchButton",  "sectionId": "components" },
     { "name": "ClusterRow",            "sectionId": "components" },
@@ -3652,8 +3654,8 @@
 
     <!-- BADGE -->
     <div class="subhead">BadgesDisplay &middot; vest stack · <code>src/components/BadgesDisplay.tsx</code></div>
-        <p class="t-small ann-lead">Earned patches on <code>/now</code> and <code>/profile</code>. Collapsed vest: fixed <b>112px</b> tall. Default <b>chaotic</b> scatter (48px patches, ±55° rotation, reseed on close) or opt-in <b>neat</b> horizontal chip row (<code>PatchesLayoutToggle</code> in Edit profile). Expanded = 4-column grid with 42ms stagger. Background textures via <code>data-bg</code>: none · grid · steel · indigo · leather.</p>
-    <p class="t-small ann-lead text-faint">Grid demo below (expanded spread). Live vest uses <b>patches on a metal vest</b>, not entries in a settings list. The default state is image-only — no captions visible. Tap any patch to open the detail modal with name, description, and (if historical) the Wacken year chip.</p>
+        <p class="t-small ann-lead">Evergreen earned patches on Schedule Lineup <code>/now</code> and <code>/profile</code>, mounted only while global <code>app_settings.badges_enabled</code> is on. The flag defaults/fails hidden; the archive remains visible. Collapsed vest: fixed <b>112px</b> tall. Default <b>chaotic</b> scatter (48px patches, ±55° rotation, reseed on close) or opt-in <b>neat</b> horizontal chip row (<code>PatchesLayoutToggle</code> in Edit profile). Expanded = 4-column grid with 42ms stagger. Background textures via <code>data-bg</code>: none · grid · steel · indigo · leather.</p>
+    <p class="t-small ann-lead text-faint">Grid demo below (expanded spread). Live vest uses <b>patches on a metal vest</b>, not entries in a settings list. The default state is image-only — no captions visible. Live patches have no year chip because <code>isLiveVestBadge()</code> accepts only <code>year == null</code>; year chips remain for archive/admin contexts.</p>
 
     <div class="demo">
       <div class="demo-stage">
@@ -4620,7 +4622,7 @@
         </div>
 
       <div class="subhead">Festival Wrap — `/wrap` + Teaser <span class="mono-11">WrapPage · WrapTeaserBanner</span></div>
-        <p><strong>A2 Vest Chronicle</strong> (<code>WrapPage.tsx</code>): welcome gate + stat sections + closing thanks gate with CTA to <code>/now</code> (<strong>7–9</strong> scroll sections depending on optional Ratings + Assigned) with <code>scroll-snap-type: y mandatory</code>; fixed progress bar (<code>WrapProgress</code>, <strong>7–9</strong> dots) driven by <code>IntersectionObserver</code>. Document root sets dynamic <code>--stage</code> from user's top stage (<code>stageColorVar</code>).</p>
+        <p><strong>A2 Vest Chronicle</strong> (<code>WrapPage.tsx</code>): welcome gate + stat sections + closing thanks gate with CTA to <code>/now</code>. Optional Ratings is independent of the badge flag. Chaos's earned-badge meter mounts while global <code>app_settings.badges_enabled</code> is on. Assigned mounts only with the flag <em>and</em> ≥1 evergreen assigned patch; Patches (pile, count, Open vest) only with the flag <em>and</em> ≥1 evergreen earned badge — no empty chrome. Progress dots = mounted sections (typically <strong>6–9</strong>), not a count fixed by the flag. Document root sets dynamic <code>--stage</code> from user's top stage (<code>stageColorVar</code>).</p>
         <table class="dstbl">
           <thead>
             <tr class="dstbl-hr">
@@ -4632,12 +4634,12 @@
             <tr><td class="dstbl-cell">0 Welcome</td><td class="dstbl-cell">Poster gate — title, phrase, scroll hint (no card)</td></tr>
             <tr><td class="dstbl-cell">1 Hero</td><td class="dstbl-cell">Giant bands seen; row: picked · skipped · stages</td></tr>
             <tr><td class="dstbl-cell">2 Personality</td><td class="dstbl-cell">Top genre + stage; stage pill with visit count</td></tr>
-            <tr><td class="dstbl-cell">3 Chaos</td><td class="dstbl-cell">Horizontal meters: weak skips, hard conflicts, badges</td></tr>
+            <tr><td class="dstbl-cell">3 Chaos</td><td class="dstbl-cell">Horizontal meters: weak skips, hard conflicts; earned-badge meter only while <code>badges_enabled</code> — counts visible evergreen patches, not the full <code>badgesEarnedCount</code></td></tr>
             <tr><td class="dstbl-cell">4 Ratings (conditional)</td><td class="dstbl-cell"><strong>C · Popular Echo</strong> — personal strip (or zero copy); nested crew top/low cards (paw + avg hero + count footer); your top score row. Hidden when zero crew ratings or <code>!hasPicks</code>. Prototype: <code>docs/superpowers/prototypes/wrap-ratings/index.html</code> § C</td></tr>
             <tr><td class="dstbl-cell">4/5 Vira-latas</td><td class="dstbl-cell">Pick-twin spotlight portrait (twin only, name below); stats in card</td></tr>
-            <tr><td class="dstbl-cell">5/6 Assigned (conditional)</td><td class="dstbl-cell">Godlike hand-picked patches grid; only when <code>assignedBadgeSlugs.length &gt; 0</code></td></tr>
-            <tr><td class="dstbl-cell">6–7/7–8 Patches</td><td class="dstbl-cell">Decorative <code>buildStackPoses</code> pile; CTA Open vest → /profile?vest=open#vest</td></tr>
-            <tr><td class="dstbl-cell">7–8/8–9 Thanks</td><td class="dstbl-cell">Closing gate — thanks + Wacken 2027 (Rain or Shine); CTA Back to the App → /now</td></tr>
+            <tr><td class="dstbl-cell">5/6 Assigned (conditional)</td><td class="dstbl-cell">Godlike hand-picked patches grid — evergreen assigned rows only; year-tagged assigned patches (and the year chip) never render here. Shown when <code>badges_enabled</code> and ≥1 evergreen assigned patch.</td></tr>
+            <tr><td class="dstbl-cell">6–8 Patches (conditional)</td><td class="dstbl-cell">Mounts only when <code>badges_enabled</code> <em>and</em> ≥1 evergreen earned badge after <code>filterLiveVestBadges()</code>. Decorative pile + matching count; CTA Open vest → /profile?vest=open#vest. Flag off, read error, or zero evergreen earned: whole section, count, and vest link absent.</td></tr>
+            <tr><td class="dstbl-cell">Thanks (index shifts)</td><td class="dstbl-cell">Closing gate — thanks + Wacken 2027 (Rain or Shine); CTA Back to the App → /now. Index follows omitted Ratings / Assigned / Patches.</td></tr>
           </tbody>
         </table>
         <p>Stat sections (hero → patches, plus optional assigned): <strong>4px</strong> top bar <code>background: var(--stage)</code> (fallback <code>var(--accent)</code>); shimmer + glow on reveal. Typography: Oswald display, IBM Plex body, JetBrains Mono kickers. Per-section <strong>epigraph</strong> (<code>.sectionEpigraph</code>) sits <em>above</em> the card in <code>.sectionFrame</code> — editorial voice against ambient orbs; card holds stats only. Welcome and thanks finale are poster gates (no card).</p>
@@ -4645,7 +4647,7 @@
         <p><strong>WrapTeaserBanner Variant B</strong> (<code>/now</code>, <code>/profile</code>): full-width bar on <code>--bg-surface</code>; <strong>4px</strong> solid <code>var(--accent)</code> top strip; decorative 3-patch pile (18×18 stage colors); Oswald headline + mono CTA; dismiss column 44px touch target. Gated post-festival only; not in bottom nav.</p>
 
       <div class="subhead">BadgesDisplay <span class="mono-11">src/components/BadgesDisplay.tsx</span></div>
-        <p>Earned patches on <code>/now</code> and <code>/profile</code>. <strong>Variant C — Vest Stack:</strong> collapsed vest (fixed <strong>112 px</strong> tall, max-width 480 px). Default <strong>chaotic</strong> mode: meadow scatter with <strong>48 px</strong> patches; opt-in <strong>neat</strong> mode: horizontal chip stack (all badges, scaled). <em>Open vest</em> expands into a 4-column grid; <em>Close vest</em> reshuffles chaotic pile only.</p>
+        <p>Evergreen earned patches on Schedule Lineup <code>/now</code> and <code>/profile</code>. The live surface mounts only when global <code>app_settings.badges_enabled</code> is true; database/client default is false and read failures stay hidden. <strong>Variant C — Vest Stack:</strong> collapsed vest (fixed <strong>112 px</strong> tall, max-width 480 px). Default <strong>chaotic</strong> mode: meadow scatter with <strong>48 px</strong> patches; opt-in <strong>neat</strong> mode: horizontal chip stack (all badges, scaled). <em>Open vest</em> expands into a 4-column grid; <em>Close vest</em> reshuffles chaotic pile only.</p>
         <p><strong>Collapsed chaotic:</strong> <code>buildStackPoses()</code> — center-out golden spiral, <code>scatterSeed</code>, rotation ±55°, max 50% overlap. <strong>Collapsed neat:</strong> <code>buildNeatStackPoses()</code> — scale-down row, 0°–5° rotation, no reseed. Layout toggle in Edit profile (<code>PatchesLayoutToggle</code>, icon-only) beside fabric swatches; preference in <code>patchesLayout.ts</code>.</p>
         <table class="dstbl">
           <thead>
@@ -4656,6 +4658,8 @@
           </thead>
           <tbody class="c-888">
             <tr><td class="dstbl-cell"><code>user</code></td><td class="dstbl-cell">Supabase auth user — badge context built offline-first (two-phase load).</td></tr>
+            <tr><td class="dstbl-cell">Global gate</td><td class="dstbl-cell"><code>BadgesEnabledContext</code> · false while loading/error · hides vest and Edit profile vest controls; archive stays mounted</td></tr>
+            <tr><td class="dstbl-cell">Registry filter</td><td class="dstbl-cell"><code>isLiveVestBadge()</code> accepts evergreen rows only (<code>BadgeConfig.year == null</code>); 2026 rows are archive/evaluation definitions</td></tr>
             <tr><td class="dstbl-cell">Collapsed chaotic</td><td class="dstbl-cell"><code>.vestStack</code> + <code>.vestStackMeadow</code> · 48 px · scatter · reseed on close</td></tr>
             <tr><td class="dstbl-cell">Collapsed neat</td><td class="dstbl-cell"><code>.vestStack.vestNeat</code> · scaled px · horizontal row · <code>patchesLayout.ts</code></td></tr>
             <tr><td class="dstbl-cell">Expanded</td><td class="dstbl-cell"><code>.vestSpread.patchesGrid</code> 4 cols · 48 px · <code>settlePatch</code> stagger 42 ms · i18n <em>Close vest</em></td></tr>
@@ -4734,9 +4738,9 @@
         </div>
 
       <div class="subhead">Previously Achieved + Consolidation <span class="mono-11">Phase 29 · U2</span></div>
-        <p><strong>Previously Achieved</strong> (<code>BadgeHistorySection.tsx</code>) — collapsible archive below live vest on <code>/profile</code>. Hidden when IndexedDB history empty. Locked layout: <strong>U2</strong> from <code>docs/superpowers/prototypes/badge-history/index.html</code> (local) — flat 4×48 px grid per year (no denim vest shell), Oswald year headings, mono section title, muted patch opacity. Tap → overlay <code>BadgeDetailModal</code> (M2: label + year chip only; no description; no zoom).</p>
-        <p><strong>Live vest filter</strong> — <code>isLiveVestBadge()</code>: evergreen + <code>year === getCurrentFestivalYear()</code> only. After reset, year-badges live in archive only.</p>
-        <p><strong>Godlike consolidate</strong> (<code>ConsolidateBadgesSection</code>) — year selector, force checkbox, gate until <code>isFestivalEnded()</code>, confirm modal, inline result. <strong>Archive preview (dev)</strong> — Test Badges panel seeds local IDB without Supabase.</p>
+        <p><strong>Previously Achieved</strong> (<code>BadgeHistorySection.tsx</code>) — collapsible archive on <code>/profile</code>, independent of <code>badges_enabled</code> and hidden only when IndexedDB history is empty. Locked U2 implementation: flat 4×48 px grid per year (no denim vest shell), Oswald <em>Achieved in Wacken {year}</em> headings, mono section title, muted patch opacity. Tap → overlay <code>BadgeDetailModal</code> (M2: label + year chip only; no description; no zoom).</p>
+        <p><strong>Live vest filter</strong> — <code>isLiveVestBadge()</code> accepts evergreen rows only (<code>year == null</code>). Retained 2026 registry rows remain available for archive/consolidation evaluation but are not live. There is no live/archive duplicate interval.</p>
+        <p><strong>Godlike consolidate</strong> (<code>ConsolidateBadgesSection</code>) — year selector, force checkbox, gate until <code>isFestivalEnded()</code>, confirm modal, inline result. <code>getCurrentFestivalYear()</code> remains the registry maximum (currently 2026) for consolidate/test defaults; it has no live-filter role. <strong>Archive preview (dev)</strong> — <code>TestBadgeSection</code> selects that archive year with <code>filterFestivalYearBadges()</code> and seeds local IDB without Supabase, independently of <code>isLiveVestBadge()</code>.</p>
         <table class="dstbl">
           <thead>
             <tr class="dstbl-hr">
@@ -4747,9 +4751,9 @@
           <tbody class="c-888">
             <tr><td class="dstbl-cell">Section shell</td><td class="dstbl-cell">max-width 400 px · centered · opacity ~0.94 · no bordered collapsible card</td></tr>
             <tr><td class="dstbl-cell">Header</td><td class="dstbl-cell">Mono 10 px title + count · chevron + expand/collapse hint</td></tr>
-            <tr><td class="dstbl-cell">Year heading</td><td class="dstbl-cell">Oswald 14 px uppercase · <em>Wacken {year}</em></td></tr>
+            <tr><td class="dstbl-cell">Year heading</td><td class="dstbl-cell">Oswald 14 px uppercase · localized <em>Achieved in Wacken {year}</em></td></tr>
             <tr><td class="dstbl-cell">Grid</td><td class="dstbl-cell"><code>repeat(4, 48px)</code> · gap 10 px · frozen <code>image_path</code></td></tr>
-            <tr><td class="dstbl-cell">Patch</td><td class="dstbl-cell">48 px · opacity 0.88 → 1 hover · red enamel diamond year chip (24 px, same as live vest · scaled from 29 px @ 58 px)</td></tr>
+            <tr><td class="dstbl-cell">Patch</td><td class="dstbl-cell">48 px · opacity 0.88 → 1 hover · archive historical year chip (red enamel diamond, 24 px, scaled from 29 px @ 58 px)</td></tr>
           </tbody>
         </table>
         <div class="component-demo cdemo--history">
@@ -4783,7 +4787,7 @@
               <span class="ds-bh-title">Conquistas Anteriores<span class="ds-bh-count">· 11</span></span>
               <span><span class="ds-bh-hint">recolher</span><span class="c-888">▾</span></span>
             </div>
-            <div class="ds-bh-year">Wacken 2027</div>
+            <div class="ds-bh-year">Achieved in Wacken 2027</div>
             <div class="ds-bh-grid">
               <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'27</span></span></div>
               <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'27</span></span></div>
@@ -4791,7 +4795,7 @@
               <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'27</span></span></div>
               <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'27</span></span></div>
             </div>
-            <div class="ds-bh-year">Wacken 2026</div>
+            <div class="ds-bh-year">Achieved in Wacken 2026</div>
             <div class="ds-bh-grid">
               <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'26</span></span></div>
               <div class="ds-bh-patch"><span class="ds-bh-patch-wrap"><div class="ds-bd-patch"></div><span class="ds-bh-chip">'26</span></span></div>
@@ -7529,6 +7533,13 @@ buildStageScheduleSnapshot(bands: Band[], now: Date): StageScheduleEntry[]
     </div>
 
     <div style="display:flex;flex-direction:column;gap:var(--s-6)">
+      <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.15 — Badge live-vest gating · Sep 5 2026</div>
+        <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">
+          <li><b>§04 Patches/archive</b> — documented the fail-hidden global <code>badges_enabled</code> gate, evergreen-only live filter, independent archive-year admin tooling, localized <em>Achieved in Wacken {year}</em> headings, and flag-gated Wrap Chaos badge meter / optional Assigned &amp; Patches (progress dots follow mounted sections).</li>
+          <li>Manifest registers <code>BadgeHistorySection</code> and <code>TestBadgeSection</code> on §04 (new component entries) and keeps <code>BadgesDisplay</code> there; no section numbers changed.</li>
+        </ul>
+      </div>
       <div style="border-left:2px solid var(--accent);padding-left:var(--s-4);margin-bottom:var(--s-4)">
         <div style="font-family:var(--font-mono);font-size:10px;color:var(--accent);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:var(--s-2)">v3.14 — Phase 50 Planning Now · Sep 5 2026</div>
         <ul style="font-size:13px;color:var(--text-muted);line-height:1.7;list-style:disc inside">

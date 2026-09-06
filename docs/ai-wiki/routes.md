@@ -162,7 +162,8 @@ Most festival social routes additionally wrap with `<FestivalGate>` (and optiona
 **Key Features**:
 - **FestivalSwitcher** — Both trees. Shows Active Festival name; dropdown to switch among joined Festivals (online; need-signal toast offline)
 - **Offline banner** — Both trees
-- **Announcement Lineup / planning tree (Phase 50)** — `PlanningNowView` only: compact header (title + switcher, no festival clock), era/countdown line, bone pack slab from cached Festival members, stacked newest-three Bands under an accent ribbon, optional newest-three peer Picks. No live/next, stage, map, radar, presence, announcement banner, badges, or duck chrome.
+- **Announcement Lineup / planning tree (Phase 50)** — `PlanningNowView` only: compact header (title + switcher, no festival clock), era/countdown line, bone pack slab from cached Festival members, stacked newest-three Bands under an accent ribbon, optional newest-three peer Picks. No live/next, stage, map, radar, presence, announcement banner, badges, or duck chrome. The live vest is never mounted here — `useBadgesEnabled()` is not called on this tree.
+- **Schedule Lineup / live tree only — Live vest** — `BadgesDisplay` mounts only while global fail-hidden `app_settings.badges_enabled` is on; listing is evergreen-only (`isLiveVestBadge`: `year == null`). Flag off → no vest on `/now`.
 - **Schedule Lineup / live tree only — Header (two-band)** — Masthead: title + festival clock. Toolbar: `FestivalSwitcher` (flex-grow, ellipsis) + Stages/Map actions (icon-only ≤420px). Festival name lives only on the switcher — no duplicate `{name} time` subtitle.
 - **Schedule Lineup / live tree only — Current/Next band** — What the user picked that's happening now/next (`isTimedBand` only)
 - **Schedule Lineup / live tree only — Crew grid** — Where Festival crew is (camping vs. Metal Place when features enabled)
@@ -333,7 +334,7 @@ The planning tree opens no `/now`-level subscriptions. It re-renders from existi
 
 **Component**: `src/pages/WrapPage.tsx`
 
-**Purpose**: Post-festival personal recap — A2 Vest Chronicle (welcome + stat sections + optional assigned patches + vest pile + thanks finale; 7–8 scroll sections)
+**Purpose**: Post-festival personal recap — A2 Vest Chronicle (welcome + stat sections + optional flag-gated assigned patches/vest pile + thanks finale)
 
 **Access**: `PrivateRoute` + `FestivalGate` + `FeatureRoute feature="wrap"`. **No** `isFestivalEnded()` route gate — reachable whenever the Active Festival enables wrap.
 
@@ -341,7 +342,7 @@ The planning tree opens no `/now`-level subscriptions. It re-renders from existi
 
 **Discovery**: `WrapTeaserBanner` on `/now` and `/profile` after festival ends.
 
-**Exit**: Finale section CTA **Back to the App** → `/now`; patches section **Open vest** → `/profile?vest=open#vest`.
+**Exit**: Finale section CTA **Back to the App** → `/now`. While global `badges_enabled` is on, Chaos includes the earned-badge meter. **Patches** (pile, count, **Open vest** → `/profile?vest=open#vest`) mounts only with ≥1 evergreen earned badge; **Assigned** only with ≥1 evergreen assigned patch. Year-tagged wins stay in Previously Achieved. Progress dots = mounted sections (core ± Ratings ± Assigned ± Patches), not a count fixed by the flag.
 
 **Flow wiki**: `docs/ai-wiki/flows/festival-wrap.md`
 
@@ -373,14 +374,15 @@ The planning tree opens no `/now`-level subscriptions. It re-renders from existi
 - Arrival day picker
 
 #### Patches (Live Vest)
-- **`BadgesDisplay`** — collapsed vest stack (chaotic scatter or neat row) + expanded 4-col grid
-- Live badges only: evergreen + current festival year (`isLiveVestBadge()`)
+- Global fail-hidden `app_settings.badges_enabled` gates the live vest **and** Edit profile vest/patch preferences. Default `false`; read errors stay hidden.
+- **`BadgesDisplay`** mounts only when the flag is on — collapsed vest stack (chaotic scatter or neat row) + expanded 4-col grid
+- Live listing is evergreen-only (`isLiveVestBadge()`: `BadgeConfig.year == null`). Year-tagged registry rows (including 2026) are not live.
 - Tap expanded patch → detail modal + fullscreen zoom
-- Per-device vest color + layout preferences (localStorage)
+- Per-device vest color + layout preferences (localStorage) — hidden with the vest when the flag is off
 
 #### Previously Achieved (Phase 29)
-- **`BadgeHistorySection`** — collapsible archive below live vest; hidden when IDB history empty
-- U2 layout: flat `repeat(4, 48px)` grid per year, Oswald `Wacken {year}` headings, red enamel diamond year chips (24 px)
+- **`BadgeHistorySection`** — collapsible archive; **unaffected** by `badges_enabled` (still hidden when IDB history empty)
+- U2 layout: flat `repeat(4, 48px)` grid per year, Oswald localized **Achieved in Wacken {year}** headings, archive historical year chips (24 px enamel diamond)
 - Tap archive patch → `BadgeDetailModal` (label + year chip only; no description/zoom)
 - Offline after first profile sync (`useUserBadgeHistory` → IDB first)
 
@@ -558,4 +560,4 @@ AnnouncementsPage (offline)
 
 ---
 
-**Last updated:** 2026-09-05 — Phase 50: shipped dual-era `/now` route and Announcement Press planning home.
+**Last updated:** 2026-09-05 — Unphased: flag-gated evergreen live vest on `/profile` and Schedule Lineup `/now`, plus flag-gated live patch sections on `/wrap`.

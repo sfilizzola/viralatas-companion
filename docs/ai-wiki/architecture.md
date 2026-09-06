@@ -8,7 +8,7 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 
 ## Relevant Source Files
 
-- `src/App.tsx` — App shell, route setup, providers (`ActiveFestivalProvider`, `FestivalGate`, `FeatureRoute`)
+- `src/App.tsx` — App shell, route setup, providers (`ActiveFestivalProvider`, `BadgesEnabledProvider`, `FestivalGate`, `FeatureRoute`)
 - `src/components/festival/ActiveFestivalProvider.tsx` — Active Festival context (Phase 47)
 - `src/components/FestivalGate.tsx` — Membership gate + `FeatureRoute` (Phase 47)
 - `src/components/FestivalSwitcher.tsx` — Active Festival switcher on `/now` (Phase 47)
@@ -42,7 +42,10 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/components/profile/MoshSplitSection.tsx` — MoshSplit balance section (Phase 23 Part 2 — real API via Vercel proxy)
 - `src/components/BadgesDisplay.tsx` — Vest-stack patches UI (presentation)
 - `src/components/BadgeHistorySection.tsx` — Previously Achieved archive (U2 layout)
+- `src/contexts/BadgesEnabledContext.tsx` — App-wide `badges_enabled` state; false/fail-hidden reads, confirmed-value setter, protected refresh
+- `src/lib/featureFlags.ts`, `src/lib/appSettings.ts` — Global `app_settings` access and per-flag failure defaults
 - `src/components/profile/ConsolidateBadgesSection.tsx` — Godlike year consolidation panel
+- `src/components/profile/TestBadgeSection.tsx` — Full registry test UI and archive-year preview independent of the live filter
 - `src/hooks/useBadgeContext.ts` — composes `useSocialSnapshot` + `useBadgePersist`; IDB-only vest display
 - `src/hooks/useSocialSnapshot.ts` — shared IDB load + `buildSocialSnapshot()` derivation for `/now` and live vest (Phase 31)
 - `src/hooks/useSocialSnapshotSpecs.ts` — `useCrewUsersCache`, `usePresenceCache` cache keys + loaders (Phase 31)
@@ -50,7 +53,8 @@ Document the 4-layer React architecture, offline-first patterns, realtime mechan
 - `src/hooks/useUserBadgeHistory.ts` — IDB-first badge history; sync on profile mount / reconnect
 - `src/repositories/badgeHistoryRepository.ts` — IDB read + Supabase pull; `consolidateYear()` Edge Function invoke
 - `src/lib/db/badgeHistory.ts` — IndexedDB replace-all for current user on sync
-- `src/services/badges/currentFestivalYear.ts` — `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()`
+- `src/services/badges/currentFestivalYear.ts` — registry max-year helper plus independent live/archive filters
+- `src/services/time.ts` — `isFestivalEnded()` consolidation/window timing gate
 - `supabase/functions/consolidate-year-badges/` — Server-side year-badge snapshot (Deno badge engine copies)
 - `src/pages/MapPage.tsx` — `/map` live minimap; derives placements via `useSocialSnapshot` + `buildPlacements` (Phase 35); `CampMapDock` below minimap (Phase 45)
 - `src/components/camp/CampNavStrip.tsx`, `CampHqCard.tsx`, `CampMapDock.tsx`, `CampLocationSheet.tsx` — Camp HQ consumer UI (Phase 45)
@@ -132,6 +136,8 @@ Switch Active Festival (online only):
 **Sync scoping** — `runReconnectSync` and domain sync methods take Active Festival id; pulls/flushes are Festival-scoped. `CacheVersionCheck` uses `festivals.cache_version` for the Active Festival only (`shouldInvalidatePack`).
 
 **Feature gates** — `hasFestivalFeature` / `canShow*` helpers; Presence UI requires camp or metal_place; duck/camp/map/wrap/remote_lineup similarly gated. Core schedule / picks / mural / `/now` always on for every Festival. **Lineup era** (Announcement Lineup vs Schedule Lineup) is not a Festival feature — every Festival has one; storage key `features.running_order`. **Official running order** remains the Wacken JSON feed only. Lineup chrome and trusted clocks follow the era flag (`isTimedBand`), not whether slot columns are filled. Phase 50 branches `/now` at the component boundary: Schedule Lineup mounts `LiveNowView`; Announcement Lineup mounts `PlanningNowView` + `usePlanningNowData`. The latter composes event-backed Band/Pick/crew caches, scopes rows by `activeFestivalId`, and uses the complete `crew_users` roster as the membership proxy. It never calls `loadFestivalMemberships()` for peer counts and never mounts live-plan, presence, stage radar, map/stage, announcement-banner, badge, or duck hooks. Null Festival is fail-closed planning/TBA, never live.
+
+**Global app behavior** — `app_settings` flags are separate from per-Festival features. `badges_enabled` is an app-wide live-vest killswitch with database/client default `false`. `BadgesEnabledProvider` mounts inside `ActiveFestivalProvider` after auth bootstrap and wraps the complete route tree, including public routes. It reads the flag once and remains false while loading or for offline/read-error/null results. When true, the Schedule Lineup live tree on `/now` and the profile patches section mount `BadgesDisplay`, profile vest preferences are exposed, and `/wrap` may render its Chaos badge meter; Assigned and the earned-patch pile/vest CTA additionally require evergreen rows after `filterLiveVestBadges()`. The planning `/now` tree never consumes the Context. `BadgeHistorySection` is outside this gate, so **Previously Achieved** remains available. Because `app_settings` is not Realtime, a successful godlike write applies its known value directly to the provider and invalidates older reads; protected refresh remains available, while other clients update on remount/reload.
 
 ### Viralatas App Pack (Phase 22–23)
 
@@ -504,6 +510,7 @@ INSERT into user_picks
 | `usePickActions()` | `{ pickedIds, refresh, togglePick, pickBand, unpickBand }` | `PICKS_CHANGED_EVENT` | SchedulePage, MyPicksPage, PopularPage, ConflictSection, useNowData |
 | `useMissedBands()` | `{ allMissed, missedBandIds, missedCountsByBand, mark, unmark, toggleMissed, refresh }` | `MISSED_CHANGED_EVENT` | MyPicksPage, PopularPage, `useBadgeContext` |
 | `useBadgeContext(user)` | `{ ctx, loading }` | `useSocialSnapshot` child events + auth `USER_UPDATED` (persist only) | BadgesDisplay, ProfilePage |
+| `useBadgesEnabled()` | `boolean` (false while unknown/error) | `app_settings.badges_enabled` provider read; confirmed writes apply locally; protected refresh; no Realtime | LiveNowView, ProfilePage, EditProfileForm, WrapPage |
 | `useSocialSnapshot(now)` | `{ snapshot, crewUsers, presence, picks, bands, loading }` | `PICKS_CHANGED_EVENT`, `PRESENCE_CHANGED_EVENT`, `CREW_USERS_CHANGED_EVENT`, `BANDS_CHANGED_EVENT` | `useNowData`, `useBadgeContext`, `useFestivalWrapStats` |
 | `useUserBadgeHistory(userId)` | `{ rows, loading }` | `BADGE_HISTORY_CHANGED_EVENT`, `online` | BadgeHistorySection |
 | `useBandDetailModal()` | `{ activeBand, openBand, closeBand, modalProps }` | None (local state + composed inputs) | MyPicksPage, PopularPage |
@@ -549,7 +556,7 @@ INSERT into user_picks
 | `scheduleFilterStorage.ts` | `loadStoredFilters()` / `saveStoredFilters()` — localStorage persistence for schedule filter state; search `query` is session-only | ✅ Yes |
 | `attendees.ts` | `computeAttendees(picks, crewUsers)` — maps raw picks to hydrated `BandAttendee[]` per band; exports `BandAttendee` and `AttendeeMap` types | ✅ Yes |
 | `weakSkips.ts` | `getWeakSkipCount()`, `recordCommittedSkip()` — committed “I am weak” skips in `user_metadata.weak_skips_2026` via best-effort `auth.updateUser` (same pattern as `location_visits` in `presenceRepository`) | Auth metadata only |
-| `badges/currentFestivalYear.ts` | `getCurrentFestivalYear()`, `isLiveVestBadge()`, `isFestivalEnded()` — live vest year filter + consolidation gate | ✅ Yes |
+| `badges/currentFestivalYear.ts` | `isLiveVestBadge()` / `filterLiveVestBadges()` keep evergreen definitions only; `getCurrentFestivalYear()` (registry max, currently 2026) and `filterFestivalYearBadges()` support consolidation/archive testing | ✅ Yes |
 | `metalBattle.ts` | `getMetalBattleCountryFlag(slotId)` — static `slot_id`→ISO2 map → flag emoji; prefixes the `Metal Battle` genre label on `BandCard`; `null` when slot not in map (e.g. `WET23`) | ✅ Yes (static data, no IDB) |
 | `stageSchedule.ts` | `buildStageScheduleSnapshot(bands, now)` — pure fn; returns `StageScheduleEntry[]` (one per stage: `{ stage, band, status: 'current' \| 'next' }`); consumed by `StageScheduleSheet` | ✅ Yes (no IDB) |
 | `planningNow.ts` | `newestAnnouncedBands`, `festivalCountdown`, `sortGoingMembers`, `buildPackPickActivity`; invalid/missing timestamps rank oldest | ✅ Yes (IDB inputs only) |
@@ -570,14 +577,17 @@ useUserBadgeHistory ──► badgeHistoryRepository.loadLocal()  [IDB first]
                               │
 BadgeHistorySection ◄─────────┘  (hidden when empty; U2 flat grid by festival_year desc)
 
-Live vest (BadgesDisplay): isLiveVestBadge() → evergreen + current festival year only
+Global badges_enabled ── true ──► BadgesDisplay
+                              └─ isLiveVestBadge() → evergreen only (year == null)
+
+getCurrentFestivalYear() → registry max (2026) for consolidate/test selection, not live display
 ```
 
-Consolidation is **network-only** (no offline queue). Archive reads are fully offline after first profile sync. `festival:reset` never touches `user_badge_history`. See [Badge System — Year-Badge Archive](badges.md#year-badge-archive--consolidation-phase-29).
+The retained 2026 year-tagged registry rows are available to consolidation and `TestBadgeSection` via `filterFestivalYearBadges()`, but never enter the live vest. Consolidation is **network-only** (no offline queue). Archive reads are fully offline after first profile sync. `festival:reset` and the live-vest flag never hide or delete `user_badge_history`. See [Badge System — Year-Badge Archive](badges.md#year-badge-archive--consolidation-phase-29).
 
 ### Social snapshot flow (Phase 31)
 
-`/now` and the live vest share one derivation path — no duplicate `mapCrewLivePlans` / `groupCrewLivePlans` runs in hooks.
+Schedule Lineup `/now` and the live vest share one derivation path when the global vest flag is enabled — no duplicate `mapCrewLivePlans` / `groupCrewLivePlans` runs in hooks.
 
 ```
 IDB inputs (bands, picks, crew_users, presence, config)
@@ -589,7 +599,7 @@ useSocialSnapshot(now) ──► buildSocialSnapshot() ──► SocialSnapshot
     │
     └─ useBadgeContext ──► buildBadgeContextFromSocialSnapshot()
                               │
-BadgesDisplay ◄───────────────┘  (assigned badges + is_friend from crew_users IDB)
+BadgesDisplay ◄───────────────┘  (only when badges_enabled; evergreen definitions only)
 
 crew_users sync: usersRepository.syncCrew() on reconnect + after godlike badge assign/revoke
 Display path: no supabase.from('users') in vest hooks
@@ -707,4 +717,4 @@ for (const { all, last } of groups.values()) {
 
 ---
 
-**Last updated:** 2026-09-05 — Phase 50: shipped isolated IDB-only planning `/now` architecture.
+**Last updated:** 2026-09-05 — Unphased global badge gate and evergreen-only live-vest flow.

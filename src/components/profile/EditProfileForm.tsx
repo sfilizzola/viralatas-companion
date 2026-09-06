@@ -8,6 +8,7 @@ import PatchesBackgroundPicker from './PatchesBackgroundPicker';
 import PatchesLayoutToggle from './PatchesLayoutToggle';
 import pickerStyles from './PatchesBackgroundPicker.module.css';
 import styles from '../../pages/ProfilePage.module.css';
+import { useBadgesEnabled } from '../../contexts/BadgesEnabledContext';
 
 const DECADE_GROUPS: { label: string; years: number[] }[] = [
   { label: '2000s', years: [2005, 2006, 2007, 2008, 2009] },
@@ -150,6 +151,7 @@ export default function EditProfileForm({
   onAvatarChange,
   t,
 }: Readonly<EditProfileFormProps>) {
+  const badgesEnabled = useBadgesEnabled();
   const [newName, setNewName] = useState(displayName);
   const [newLanguage, setNewLanguage] = useState<Language>(language);
   const [newAvatarUrl, setNewAvatarUrl] = useState(currentAvatarUrl);
@@ -293,13 +295,15 @@ export default function EditProfileForm({
           />
         </div>
 
-        <div className={styles.label}>
-          {t('patchesBackground')}
-          <div className={pickerStyles.vestPrefsRow}>
-            <PatchesBackgroundPicker t={t} />
-            <PatchesLayoutToggle t={t} />
+        {badgesEnabled && (
+          <div className={styles.label}>
+            {t('patchesBackground')}
+            <div className={pickerStyles.vestPrefsRow}>
+              <PatchesBackgroundPicker t={t} />
+              <PatchesLayoutToggle t={t} />
+            </div>
           </div>
-        </div>
+        )}
 
         <label className={styles.label}>
           {t('photo')}

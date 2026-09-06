@@ -2,6 +2,7 @@ import { useI18n, type Language } from '../lib/i18n';
 import { useNowData } from '../hooks/useNowData';
 import { useActiveFestival } from '../hooks/useActiveFestival';
 import { useDuckEnabled } from '../contexts/DuckEnabledContext';
+import { useBadgesEnabled } from '../contexts/BadgesEnabledContext';
 import { useDuckQuack } from '../hooks/useDuckQuack';
 import type { CrewLiveGroup } from '../services/livePreview';
 import { useMemo, useState } from 'react';
@@ -58,6 +59,7 @@ function LiveNowView() {
   const { language, t } = useI18n('RightNowPage');
   const { festival } = useActiveFestival();
   const duckEnabled = useDuckEnabled();
+  const badgesEnabled = useBadgesEnabled();
   const navigate = useNavigate();
   const [activeGroup, setActiveGroup] = useState<CrewLiveGroup | null>(null);
   const [activeRadarEntry, setActiveRadarEntry] = useState<StageRadarEntry | null>(null);
@@ -234,7 +236,7 @@ function LiveNowView() {
               />
             ) : null}
 
-            {user && <BadgesDisplay user={user} />}
+            {badgesEnabled && user && <BadgesDisplay user={user} />}
 
             <h2 className={styles.sectionTitle}>{t('crewNow')}</h2>
             <CrewGroupsSection

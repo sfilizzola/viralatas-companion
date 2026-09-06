@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   festival: null as Festival | null,
   planningData: null as PlanningNowData | null,
   useNowData: vi.fn(),
+  useBadgesEnabled: vi.fn(() => true),
 }));
 
 vi.mock('../hooks/useActiveFestival', () => ({
@@ -57,6 +58,10 @@ vi.mock('../contexts/DuckEnabledContext', () => ({
   useDuckEnabled: () => false,
 }));
 
+vi.mock('../contexts/BadgesEnabledContext', () => ({
+  useBadgesEnabled: mocks.useBadgesEnabled,
+}));
+
 vi.mock('../hooks/useDuckQuack', () => ({
   useDuckQuack: () => ({ quack: vi.fn(), cooldownUntil: null }),
 }));
@@ -70,7 +75,9 @@ vi.mock('../components/FestivalSwitcher', () => ({
   default: () => <button type="button">Wacken Open Air 2027</button>,
 }));
 vi.mock('../components/BottomNav', () => ({ default: () => <nav data-testid="bottom-nav" /> }));
-vi.mock('../components/BadgesDisplay', () => ({ default: () => null }));
+vi.mock('../components/BadgesDisplay', () => ({
+  default: () => <div data-testid="badges-display" />,
+}));
 vi.mock('../components/PresenceToggle', () => ({ default: () => <div>Where am I?</div> }));
 vi.mock('../components/now/LatestAnnouncementBanner', () => ({ default: () => null }));
 vi.mock('../components/now/UpcomingBandCard', () => ({ default: () => <div>Next pick</div> }));
@@ -177,6 +184,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.festival = ANNOUNCEMENT_FESTIVAL;
   mocks.planningData = planningData();
+  mocks.useBadgesEnabled.mockReturnValue(true);
   mocks.useNowData.mockReturnValue({
     user: null,
     userId: null,
@@ -218,6 +226,8 @@ describe('/now planning branch', () => {
     expect(screen.queryByText('Stages')).not.toBeInTheDocument();
     expect(screen.queryByText('Map')).not.toBeInTheDocument();
     expect(screen.queryByText('Leftover Stage')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('badges-display')).not.toBeInTheDocument();
+    expect(mocks.useBadgesEnabled).not.toHaveBeenCalled();
   });
 
   it('keeps the live tree isolated from planning', () => {
@@ -228,6 +238,29 @@ describe('/now planning branch', () => {
     expect(mocks.useNowData).toHaveBeenCalledTimes(1);
     expect(screen.queryByTestId('planning-now')).not.toBeInTheDocument();
     expect(screen.queryByText('Pack status')).not.toBeInTheDocument();
+  });
+
+  it('gates the vest only inside the live tree', () => {
+    mocks.festival = LIVE_FESTIVAL;
+    mocks.useNowData.mockReturnValue({
+      ...mocks.useNowData(),
+      user: { id: 'self', user_metadata: {} },
+      userId: 'self',
+    });
+    mocks.useBadgesEnabled.mockReturnValue(false);
+
+    const { rerender } = renderPage();
+    expect(screen.queryByTestId('badges-display')).not.toBeInTheDocument();
+
+    mocks.useBadgesEnabled.mockReturnValue(true);
+    rerender(
+      <I18nContext.Provider value={{ language: 'en', setLanguage: vi.fn() }}>
+        <MemoryRouter>
+          <RightNowPage />
+        </MemoryRouter>
+      </I18nContext.Provider>,
+    );
+    expect(screen.getByTestId('badges-display')).toBeInTheDocument();
   });
 
   it('shows solo and honest empty lineup states while omitting empty activity', () => {

@@ -163,9 +163,11 @@ export default function GodlikeAdminPanel({ userId }: GodlikeAdminPanelProps) {
             {showRemoteLineup && <LineupSyncSection t={t} />}
             <CacheResetSection t={t} />
             <RunningOrderSection t={t} />
-            {showDuckAdmin && (
-              <FeatureFlagsSection t={t} onDuckEnabledChange={setDuckFeatureEnabled} />
-            )}
+            <FeatureFlagsSection
+              t={t}
+              onDuckEnabledChange={setDuckFeatureEnabled}
+              showDuckToggle={showDuckAdmin}
+            />
             {showMetalPlaceAdmin && <MetalPlaceAdminSection t={t} />}
             {showCampAdmin && <CampingLocationAdminSection t={t} />}
             <LiveBandTestAdminSection t={t} />

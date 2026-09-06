@@ -1,12 +1,15 @@
 import { useMemo, useState } from 'react';
 import type { User as AuthUser } from '@supabase/supabase-js';
-import { BADGES, evaluateBadge, isLiveVestBadge } from '../../services/badges';
+import { BADGES, evaluateBadge } from '../../services/badges';
 import type { BadgeConfig } from '../../services/badges/types';
 import {
   buildEarnedYearPreviewRows,
   buildSamplePreviewRows,
 } from '../../services/badges/archivePreviewSeed';
-import { getCurrentFestivalYear } from '../../services/badges/currentFestivalYear';
+import {
+  filterFestivalYearBadges,
+  getCurrentFestivalYear,
+} from '../../services/badges/currentFestivalYear';
 import { isArchivePreviewActive } from '../../lib/archivePreviewMode';
 import { useBadgeContext } from '../../hooks/useBadgeContext';
 import { badgeHistoryRepository } from '../../repositories/badgeHistoryRepository';
@@ -40,10 +43,13 @@ export default function TestBadgeSection({ t, user }: TestBadgeSectionProps) {
 
   const festivalYear = getCurrentFestivalYear();
   const earnedYearBadges = useMemo(
-    () => BADGES.filter((badge) => isLiveVestBadge(badge) && evaluateBadge(badge, ctx)),
-    [ctx],
+    () =>
+      filterFestivalYearBadges(BADGES, festivalYear).filter((badge) =>
+        evaluateBadge(badge, ctx),
+      ),
+    [ctx, festivalYear],
   );
-  const earnedYearCount = earnedYearBadges.filter((badge) => badge.year === festivalYear).length;
+  const earnedYearCount = earnedYearBadges.length;
   const previewActive = isArchivePreviewActive(user.id);
 
   const trigger = <h4 className={profileStyles.liveBandTestSectionTitle}>🎖️ Test Badges</h4>;

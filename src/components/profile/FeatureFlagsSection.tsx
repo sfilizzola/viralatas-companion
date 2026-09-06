@@ -8,13 +8,19 @@ import {
   setPlaylistTesting,
   getMoshSplitEnabled,
   setMoshSplitEnabled,
+  getBadgesEnabled,
+  setBadgesEnabled,
 } from '../../lib/appSettings';
 import { useRefreshDuckEnabled } from '../../contexts/DuckEnabledContext';
+import { useSetBadgesEnabled } from '../../contexts/BadgesEnabledContext';
 import styles from '../../pages/ProfilePage.module.css';
 
 type FeatureFlagsSectionProps = {
   t: (key: string, values?: Record<string, string | number>) => string;
   onDuckEnabledChange?: (enabled: boolean) => void;
+  // Duck is festival-scoped, so the caller decides whether the row belongs here.
+  // Defaults to hidden: a caller that never opts in never fetches duck_enabled.
+  showDuckToggle?: boolean;
 };
 
 type FlagRowProps = {
@@ -54,7 +60,11 @@ function FlagRow({ label, hint, isOn, isLoading, error, onToggle }: FlagRowProps
   );
 }
 
-export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureFlagsSectionProps) {
+export default function FeatureFlagsSection({
+  t,
+  onDuckEnabledChange,
+  showDuckToggle = false,
+}: FeatureFlagsSectionProps) {
   const [registrationEnabled, setRegistrationEnabledState] = useState(true);
   const [registrationLoading, setRegistrationLoading] = useState(false);
   const [registrationError, setRegistrationError] = useState<string | null>(null);
@@ -72,18 +82,56 @@ export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureF
   const [moshSplitFeatureLoading, setMoshSplitFeatureLoading] = useState(false);
   const [moshSplitFeatureError, setMoshSplitFeatureError] = useState<string | null>(null);
 
+  // Fail-hidden default, matching BadgesEnabledContext: never show the pill as ON
+  // before the real value is known.
+  const [badgesFeatureEnabled, setBadgesFeatureEnabledState] = useState(false);
+  // Starts true so the pill is disabled until the initial read settles. Toggling
+  // off an unknown value would write the negation of the placeholder `false`
+  // rather than of the stored flag.
+  const [badgesFeatureLoading, setBadgesFeatureLoading] = useState(true);
+  const [badgesFeatureError, setBadgesFeatureError] = useState<string | null>(null);
+  const applyBadgesEnabled = useSetBadgesEnabled();
+
   useEffect(() => {
     getRegistrationEnabled().then(setRegistrationEnabledState).catch(console.error);
   }, []);
 
   useEffect(() => {
+    if (!showDuckToggle) return;
+    let cancelled = false;
     getDuckEnabled()
       .then((enabled) => {
+        if (cancelled) return;
         setDuckFeatureEnabledState(enabled);
         onDuckEnabledChange?.(enabled);
       })
       .catch(console.error);
-  }, [onDuckEnabledChange]);
+    return () => {
+      cancelled = true;
+    };
+  }, [onDuckEnabledChange, showDuckToggle]);
+
+  useEffect(() => {
+    let cancelled = false;
+    getBadgesEnabled()
+      .then(
+        (enabled) => {
+          if (cancelled) return;
+          setBadgesFeatureEnabledState(enabled);
+          setBadgesFeatureLoading(false);
+        },
+        (err) => {
+          console.error(err);
+          if (cancelled) return;
+          // Fail-hidden: leave the flag false, but release the pill so the admin
+          // can still turn badges on.
+          setBadgesFeatureLoading(false);
+        },
+      );
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     getPlaylistTesting().then(setPlaylistTestingEnabledState).catch(console.error);
@@ -155,10 +203,36 @@ export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureF
     }
   }, [moshSplitFeatureEnabled, t]);
 
+  const handleToggleBadgesFeature = useCallback(async () => {
+    setBadgesFeatureLoading(true);
+    setBadgesFeatureError(null);
+    try {
+      const newValue = !badgesFeatureEnabled;
+      await setBadgesEnabled(newValue);
+      setBadgesFeatureEnabledState(newValue);
+      // The write already confirms the value. Apply it directly so a failed
+      // follow-up read cannot replace a successful ON with fail-hidden false.
+      applyBadgesEnabled(newValue);
+    } catch {
+      setBadgesFeatureError(t('badgesToggleError'));
+      setTimeout(() => setBadgesFeatureError(null), 3000);
+    } finally {
+      setBadgesFeatureLoading(false);
+    }
+  }, [applyBadgesEnabled, badgesFeatureEnabled, t]);
+
   return (
     <div className={styles.ffCard}>
       <p className={styles.ffCardTitle}>{t('featureFlagsTitle')}</p>
       <div className={styles.ffList}>
+        <FlagRow
+          label={t('badgesToggle')}
+          hint={t('badgesToggleDescription')}
+          isOn={badgesFeatureEnabled}
+          isLoading={badgesFeatureLoading}
+          error={badgesFeatureError}
+          onToggle={handleToggleBadgesFeature}
+        />
         <FlagRow
           label={t('registrationToggle')}
           hint={t('registrationToggleDescription')}
@@ -167,14 +241,16 @@ export default function FeatureFlagsSection({ t, onDuckEnabledChange }: FeatureF
           error={registrationError}
           onToggle={handleToggleRegistration}
         />
-        <FlagRow
-          label={t('duckToggle')}
-          hint={t('duckToggleDescription')}
-          isOn={duckFeatureEnabled}
-          isLoading={duckFeatureLoading}
-          error={duckFeatureError}
-          onToggle={handleToggleDuckFeature}
-        />
+        {showDuckToggle && (
+          <FlagRow
+            label={t('duckToggle')}
+            hint={t('duckToggleDescription')}
+            isOn={duckFeatureEnabled}
+            isLoading={duckFeatureLoading}
+            error={duckFeatureError}
+            onToggle={handleToggleDuckFeature}
+          />
+        )}
         <FlagRow
           label={t('playlistToggle')}
           hint={t('playlistToggleDescription')}

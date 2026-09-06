@@ -30,6 +30,8 @@ Document the real-world entities, their relationships, business rules, and invar
 - `src/repositories/ratings.ts` — Rating writes, offline queue, reconnect sync, Realtime
 - `src/lib/db/ratings.ts` — IndexedDB `user_band_ratings` + `offline_band_ratings` stores
 - `src/hooks/useBandRatings.ts` — UI hook over crew-wide IDB snapshot
+- `src/contexts/BadgesEnabledContext.tsx` — App-wide, fail-hidden live-vest gate
+- `src/services/badges/currentFestivalYear.ts` — Evergreen live filter plus independent archive-year selection
 
 ---
 
@@ -743,16 +745,18 @@ type UserBadgeHistoryRow = {
 **Business Rules:**
 - Godlike-only consolidation via `consolidate-year-badges` Edge Function
 - Run after `isFestivalEnded()` and before next `festival:reset` (force bypass available)
-- Live vest shows only evergreen + `year === getCurrentFestivalYear()`; archived years appear in **Previously Achieved** on `/profile`
+- Live vest is an app-wide optional surface: it mounts only when `app_settings.badges_enabled` is true and shows only evergreen definitions (`BadgeConfig.year == null`)
+- Every year-tagged definition, including the retained 2026 registry rows, is excluded from the live vest; frozen year rows appear in **Previously Achieved** on `/profile`
+- `getCurrentFestivalYear()` remains the registry maximum (currently 2026) for consolidation and archive-test selection; it does not make that year live
 - Client reads IDB first; Supabase pull on profile mount / reconnect (no offline queue)
 
 **Lifecycle:**
-1. Vira-lata earns year-badges during festival (live vest)
+1. Year-tagged registry definitions remain available for badge-engine evaluation, consolidation, and godlike archive preview, but never render in the live vest
 2. After festival ends, godlike runs **Consolidar badges YYYY**
 3. Edge Function evaluates badge engine per non-test user; upserts frozen rows to Supabase
 4. Client `useUserBadgeHistory` syncs rows into IndexedDB `user_badge_history` store
-5. `BadgeHistorySection` renders U2 flat grid grouped by `festival_year` desc
-6. After `festival:reset`, year-badges visible only in archive — not on live vest
+5. `BadgeHistorySection` renders the frozen rows in **Previously Achieved**, grouped by `festival_year` descending with localized `Achieved in Wacken {year}` headings
+6. `festival:reset` leaves archive rows untouched; toggling the live-vest flag also leaves the archive visible
 
 **Relevant source files:**
 - `supabase/migrations/20260527000001_user_badge_history.sql`
@@ -923,4 +927,4 @@ Computed in `useNowData()` using current time + user picks.
 
 ---
 
-**Last updated:** 2026-09-05 — Phase 50: Band announcement timestamp contract and legacy ordering behavior.
+**Last updated:** 2026-09-05 — Unphased flag-gated evergreen live vest and archived year-badge lifecycle.

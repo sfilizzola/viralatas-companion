@@ -60,7 +60,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[Epic Fest 2027 — Announcement Lineup](festivals/epic-fest-2027/lineup.md)** — 22 current named Bands; cancelled Power Quest / Tungsten excluded
 
 ### Features & Mechanics
-- **[Badge System](badges.md)** — 22+ condition types, live vest + Previously Achieved archive, year consolidation, how to add badges
+- **[Badge System](badges.md)** — Global live-vest killswitch, evergreen-only live listing, Previously Achieved archive, year consolidation, how to add badges
 
 ### Flows & Behaviors
 - **[Flow: Picking a Band](flows/pick-band.md)** — Optimistic write, realtime update, offline fallback
@@ -71,7 +71,7 @@ A festival companion PWA for ~20 metal vira-latas attending Wacken Open Air 2026
 - **[Flow: Duck Quack](flows/duck.md)** — Duck button → cooldown → quack → Realtime in-app DuckToast + Web Push system notification; offline queuing; admin test flows
 - **[Flow: Playlist Launch](flows/playlist-launch.md)** — `/my-picks` strip → Setlist Vira-Latas deep-link; `playlist_testing` feature flag; godlike admin toggle
 - **[Flow: MoshSplit Balance](flows/moshsplit.md)** — `/profile` balance section → MoshSplit deep-link; Part 1 mock (hidden), Part 2 API (blocked)
-- **[Flow: Festival Wrap](flows/festival-wrap.md)** — Post-festival `/wrap` recap (7–8 scroll sections); IDB-only stats; teaser banner + godlike D+1 QA
+- **[Flow: Festival Wrap](flows/festival-wrap.md)** — Post-festival `/wrap` recap (progress dots = mounted sections, typically 6–9); IDB-only stats; teaser banner + godlike D+1 QA
 - **[Flow: Camp HQ Geolocation](flows/camp-location.md)** — Godlike sets shared campground GPS; Mural C+ strip + map D1 dock; IDB cache; Google Maps deep-link
 - **[Flow: Remote Lineup Sync](flows/lineup-remote-sync.md)** — Godlike phone preview/apply of official Wacken feed vs production `bands`; partial apply; post-festival laptop reconcile
 

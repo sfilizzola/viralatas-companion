@@ -679,6 +679,8 @@ CREATE TABLE public.app_settings (
   registration_enabled boolean DEFAULT true NOT NULL,
   duck_enabled boolean DEFAULT true NOT NULL,
   playlist_testing boolean DEFAULT true NOT NULL,
+  moshsplit_enabled boolean DEFAULT false NOT NULL,
+  badges_enabled boolean DEFAULT false NOT NULL,
   camping_latitude double precision NULL,
   camping_longitude double precision NULL,
   updated_at timestamptz DEFAULT now() NOT NULL
@@ -693,6 +695,8 @@ INSERT INTO public.app_settings DEFAULT VALUES;
 - `registration_enabled` — when `false`, the registration screen is closed; only existing vira-latas can log in. Read by `/register` to render the closed state.
 - `duck_enabled` (Phase 21) — when `false`, the duck/quack button is not rendered anywhere in the app. Fetched once at app boot via `getDuckEnabled()` and exposed via `DuckEnabledProvider`. See `docs/ai-wiki/flows/duck.md` for full behavior.
 - `playlist_testing` (Phase 22 Part 1) — feature-flag for the Playlist Launch button on `/my-picks`. When `true` (default), the button is shown only to `godlike`/`manager` roles (testing mode). When `false`, the button is visible to all vira-latas. The button is always hidden when the user has 0 picks. Read by `PlaylistLaunchButton` on mount via `getPlaylistTesting()` / `setPlaylistTesting()` from `src/lib/appSettings.ts`.
+- `moshsplit_enabled` (Phase 23) — app-wide MoshSplit profile integration flag; default `false`.
+- `badges_enabled` (unphased 2026-09-05) — app-wide live-vest killswitch. `false` by database and client default; offline/read-error/null results fail hidden. When off, live patches and their Edit profile controls are not mounted on Schedule Lineup `/now` or `/profile`, and `/wrap` omits the Chaos badge meter, assigned/live patch sections, and vest CTA; `Previously Achieved` remains visible. Added by `20260905000001_app_settings_badges_enabled.sql`.
 - `camping_latitude` / `camping_longitude` (Phase 45) — nullable decimal GPS for the vira-latas' shared campground. Both null = camp UI hidden. Godlike sets via `CampingLocationAdminSection`; all vira-latas read via `campLocationRepository.syncCampLocation()`. Cached in IndexedDB `camp_location` store. See `docs/ai-wiki/flows/camp-location.md`.
 
 **IndexedDB mirror** (IDB v14): store `camp_location` (key `'current'` → `{ lat, lng }`); no offline queue.
@@ -702,7 +706,9 @@ INSERT INTO public.app_settings DEFAULT VALUES;
 - `app_settings_select` — `using (true)` — anyone can read.
 - `app_settings_update` — `using (auth.jwt() ->> 'email' = 'sfilizzola@gmail.com')` — only the godlike user can update. Applies to all columns.
 
-**Not realtime**. State is fetched once per page mount (not at app boot); the `PlaylistLaunchButton` reads the flag directly on mount. Mid-session admin changes require a page navigation or reload to propagate.
+The `badges_enabled` migration adds no policy: it inherits these existing table-level RLS policies.
+
+**Not realtime**. Flags propagate through explicit reads, not a Postgres subscription. `BadgesEnabledProvider` mounts after auth bootstrap around the complete route tree (public and protected) and fetches `badges_enabled`. After a successful godlike write, the known value is applied directly to Context and invalidates older reads; protected refresh remains available. Other open clients do not receive the change and need a remount/reload. Other `app_settings` consumers retain their own mount-time read behavior.
 
 ---
 
@@ -866,4 +872,4 @@ npm run festival:reset -- --with-bands --force
 
 ---
 
-**Last updated:** 2026-09-05 — Phase 50: documented Band category/created_at nullability and offline pack contract.
+**Last updated:** 2026-09-05 — Unphased badge live-vest flag schema and propagation.

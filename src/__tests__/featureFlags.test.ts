@@ -42,6 +42,27 @@ describe('featureFlags.get()', () => {
     await expect(featureFlags.get('moshsplit_enabled')).resolves.toBe(false);
   });
 
+  it('returns FLAG_DEFAULT (false) for badges_enabled when Supabase errors', async () => {
+    mocks.mockSingle.mockResolvedValueOnce({ data: null, error: { message: 'network' } });
+    await expect(featureFlags.get('badges_enabled')).resolves.toBe(false);
+  });
+
+  it('returns FLAG_DEFAULT (false) for badges_enabled when Supabase throws', async () => {
+    mocks.mockSingle.mockRejectedValueOnce(new Error('offline'));
+    await expect(featureFlags.get('badges_enabled')).resolves.toBe(false);
+  });
+
+  it('returns the stored value for badges_enabled when the row resolves successfully', async () => {
+    mocks.mockSingle.mockResolvedValueOnce({ data: { badges_enabled: true }, error: null });
+    await expect(featureFlags.get('badges_enabled')).resolves.toBe(true);
+    expect(mocks.mockSelect).toHaveBeenCalledWith('badges_enabled');
+  });
+
+  it('returns FLAG_DEFAULT (false) when badges_enabled is null', async () => {
+    mocks.mockSingle.mockResolvedValueOnce({ data: { badges_enabled: null }, error: null });
+    await expect(featureFlags.get('badges_enabled')).resolves.toBe(false);
+  });
+
   it('returns FLAG_DEFAULT (true) for duck_enabled when Supabase throws', async () => {
     mocks.mockSingle.mockRejectedValueOnce(new Error('offline'));
     await expect(featureFlags.get('duck_enabled')).resolves.toBe(true);
@@ -92,6 +113,7 @@ describe('featureFlags.getAll()', () => {
         duck_enabled: false,
         playlist_testing: true,
         moshsplit_enabled: true,
+        badges_enabled: true,
       },
       error: null,
     });
@@ -103,6 +125,7 @@ describe('featureFlags.getAll()', () => {
       duck_enabled: false,
       playlist_testing: true,
       moshsplit_enabled: true,
+      badges_enabled: true,
     });
     expect(mocks.mockFrom).toHaveBeenCalledTimes(1);
   });
@@ -115,6 +138,7 @@ describe('featureFlags.getAll()', () => {
       duck_enabled: true,
       playlist_testing: true,
       moshsplit_enabled: false,
+      badges_enabled: false,
     });
   });
 
@@ -125,6 +149,7 @@ describe('featureFlags.getAll()', () => {
         duck_enabled: null,
         playlist_testing: null,
         moshsplit_enabled: null,
+        badges_enabled: null,
       },
       error: null,
     });
@@ -132,5 +157,25 @@ describe('featureFlags.getAll()', () => {
     expect(result.duck_enabled).toBe(true);       // null → default true
     expect(result.playlist_testing).toBe(true);   // null → default true
     expect(result.moshsplit_enabled).toBe(false);  // null → default false
+    expect(result.badges_enabled).toBe(false);     // null → default false
+  });
+
+  it('selects badges_enabled in the single getAll fetch', async () => {
+    mocks.mockSingle.mockResolvedValueOnce({
+      data: {
+        registration_enabled: true,
+        duck_enabled: true,
+        playlist_testing: true,
+        moshsplit_enabled: false,
+        badges_enabled: false,
+      },
+      error: null,
+    });
+
+    await featureFlags.getAll();
+
+    expect(mocks.mockSelect).toHaveBeenCalledWith(
+      expect.stringContaining('badges_enabled'),
+    );
   });
 });

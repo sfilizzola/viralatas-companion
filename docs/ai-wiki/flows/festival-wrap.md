@@ -19,9 +19,10 @@ After Wacken ends, each vira-lata gets a private scrollable recap at `/wrap` —
 2. User taps teaser banner (or navigates to `/wrap` directly).
 3. `useFestivalWrapStats` composes `useSocialSnapshot` + `useAllRatingsCache` (same IDB cells as `/now` and live vest; no Supabase stats reads).
 4. `buildFestivalWrapStats()` delegates to `buildBadgeContextFromSocialSnapshot` + `buildRatingStatsSnapshot` + `getEarnedBadges` + crew helpers.
-5. `WrapPage` renders a welcome gate, stat sections (optional **Ratings** after Chaos, optional assigned-patches section), patches vest pile, and a closing thanks gate — **7–9** full-viewport scroll sections with progress dots.
-6. **Patches** section CTA **Open vest** links to `/profile?vest=open#vest` where `BadgesDisplay` shows the full collection.
-7. **Finale** thanks section signs off with Wacken 2027 (Rain or Shine) and CTA **Back to the App** → `/now`.
+5. `WrapPage` renders a welcome gate, stat sections (optional **Ratings** after Chaos), and a closing thanks gate. Progress dots match **actually mounted** sections — not the flag alone. Core six (welcome, hero, personality, chaos, crew, finale) always; **Ratings** is independent of badges; **Assigned** mounts only when the flag is on **and** ≥1 evergreen assigned patch; **Patches** mounts only when the flag is on **and** ≥1 evergreen earned badge (same no-empty-chrome as `BadgesDisplay`). Typical range **6–9**.
+6. Every Wrap live badge surface applies `filterLiveVestBadges()` to the slugs from `buildFestivalWrapStats`, so the pile, the assigned grid, the Chaos meter, and the `patchesCount` header show **evergreen badges only** — the same rule as `BadgesDisplay`. Year-tagged wins (including 2026 assigned patches) never render here; their home is **Previously Achieved**. The **Open vest** CTA lives inside the Patches section, so it is absent when that section is omitted. When the CTA is present it links to `/profile?vest=open#vest`.
+7. With badges disabled/defaulted hidden, Chaos omits the badge meter, Assigned/Patches and the vest CTA are omitted, and progress indices close around them.
+8. **Finale** thanks section signs off with Wacken 2027 (Rain or Shine) and CTA **Back to the App** → `/now`.
 
 ---
 
@@ -51,8 +52,9 @@ After Wacken ends, each vira-lata gets a private scrollable recap at `/wrap` —
 | `src/hooks/useSocialSnapshot.ts` | Shared IDB load + `buildSocialSnapshot()` (Phase 31) |
 | `src/hooks/useWrapTeaserVisible.ts` | Teaser gate: `isFestivalEnded(now(), bands)` + dismiss |
 | `src/lib/wrapDismiss.ts` | `viralatas:wrap-dismissed-2026` helpers |
-| `src/pages/WrapPage.tsx` | Welcome + stat sections + patches + finale thanks; scroll-snap; IntersectionObserver progress |
-| `src/components/wrap/WrapProgress.tsx` | Fixed progress dots (7–9 depending on optional Ratings + Assigned) |
+| `src/pages/WrapPage.tsx` | Welcome + stat sections + optional evergreen Assigned/Patches (flag + rows) + finale thanks; scroll-snap; IntersectionObserver progress |
+| `src/services/badges/currentFestivalYear.ts` | `filterLiveVestBadges()` — evergreen-only rule shared by Wrap live surfaces and `BadgesDisplay` |
+| `src/components/wrap/WrapProgress.tsx` | Progress dots = mounted section count (core ± Ratings ± Assigned ± Patches) |
 | `src/components/wrap/WrapTeaserBanner.tsx` | Variant B discovery bar |
 | `src/pages/RightNowPage.tsx` / `ProfilePage.tsx` | Teaser mount + time-override reactivity |
 | `src/components/profile/TimeTravelSection.tsx` | Godlike wrap QA disclaimer |
@@ -98,6 +100,10 @@ Teaser path:
 | Godlike D+1 time travel | Teaser appears without reload; `/wrap` always open |
 | Dismiss teaser | `viralatas:wrap-dismissed-2026` suppresses banner only |
 | Ceremony picks | Excluded from picked/seen stats (badge engine parity) |
+| `badges_enabled` false/offline/read error/null | Chaos omits the badge meter; Assigned, Patches, and `/profile?vest=open#vest` CTA are absent; other wrap stats still render. Progress dots = core 6, or 7 with Ratings. |
+| Flag on, earned wins are all year-tagged | Patches section, `patchesCount`, and vest CTA omitted (`earnedBadges.length === 0`); Chaos meter may still show `0`; archive keeps those wins |
+| Flag on, assigned wins are all year-tagged | Assigned section omitted; Patches still mounts if any evergreen earned badge exists |
+| `badgesEarnedCount` vs visible patches | Stats keep the full earned total; Wrap live surfaces display the evergreen subset, so the Chaos value can be lower than `badgesEarnedCount` |
 
 ---
 
@@ -115,6 +121,7 @@ Teaser path:
 |---------|----------------------------------|-------|
 | Teaser on `/now`, `/profile` | **Yes** | Plus `!isWrapDismissed()` |
 | Route `/wrap` | **No** | Direct URL always when logged in |
+| Live badge surfaces inside `/wrap` | N/A | Flag gates Chaos badge meter. Assigned mounts only with ≥1 evergreen assigned patch; Patches pile/count/CTA only with ≥1 evergreen earned badge (`filterLiveVestBadges()`). Archive elsewhere is unaffected |
 
 ---
 
@@ -128,7 +135,7 @@ Teaser path:
 
 ## Acceptance Criteria (Phase 30)
 
-- [x] A2 scroll-snap recap: welcome gate + stat sections (epigraphs) + optional assigned patches + patches vest + finale thanks (7–8 sections, 7–9 progress dots)
+- [x] A2 scroll-snap recap: welcome gate + stat sections (epigraphs) + optional Assigned/Patches (flag + evergreen rows) + finale thanks; progress dots = mounted sections (typically 6–9)
 - [x] Teaser Variant B on `/now` and `/profile`
 - [x] Stats match badge engine semantics
 - [x] Offline after first IDB load
@@ -137,9 +144,9 @@ Teaser path:
 - [x] **vira-latas** copy in all locales (user-approved section phrases)
 - [x] Friend users hide location stats
 - [x] Empty picks friendly state
-- [x] Open vest → `/profile?vest=open#vest`; finale CTA → `/now`
+- [x] When `badges_enabled` is on, live patch surfaces list evergreen badges only; Patches (and Open vest) omit when no evergreen earned badges. When off, Chaos badge meter, Assigned/Patches, and CTA are absent. Finale CTA → `/now`
 - [x] Design System documents wrap anatomy
 
 ---
 
-**Last updated:** 2026-05-28 — Phase 31: `useFestivalWrapStats` uses `useSocialSnapshot` (replaces `useBadgeCache`).
+**Last updated:** 2026-09-05 — Unphased: `/wrap` Patches is optional (flag + ≥1 evergreen earned badge); progress dots follow mounted sections.

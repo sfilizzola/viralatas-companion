@@ -4,6 +4,27 @@ All modifications to the AI-readable architectural wiki, discoveries, and correc
 
 ---
 
+## 2026-09-05 (Unphased — Badge live-vest gating)
+
+### Added
+- `app_settings.badges_enabled` app-wide live-vest killswitch, with database/client default `false`, fail-hidden reads, app-shell Context, godlike admin toggle, protected refresh, and direct same-session application of confirmed writes.
+- Dedicated `filterFestivalYearBadges()` archive/admin selection so `TestBadgeSection` can evaluate the retained 2026 definitions independently of live display rules.
+
+### Changed
+- `isLiveVestBadge()` and `filterLiveVestBadges()` now admit evergreen definitions only (`BadgeConfig.year == null`); all 2026 year-tagged registry rows remain for archive evaluation and consolidation but are not live patches.
+- `/now` (Schedule Lineup live tree only), `/profile`, Edit profile vest controls, and `/wrap` live badge surfaces (Chaos earned-badge meter, Assigned, patch pile, vest CTA) now mount only while the global flag is enabled. Announcement Lineup planning `/now` never mounts the vest. `Previously Achieved` remains outside the gate.
+- `/wrap` live badge surfaces now apply `filterLiveVestBadges()`, so the patch pile, assigned grid, Chaos meter, and pile count list evergreen badges only — matching `BadgesDisplay`. The Patches section (pile, count, vest CTA) mounts only when the flag is on **and** ≥1 evergreen earned badge; Assigned is the same for evergreen assigned rows. Progress dots follow mounted sections rather than a count fixed by the flag. `badgesEarnedCount` remains the full earned total in `FestivalWrapStats`.
+- Badge archive headings now use localized **Achieved in Wacken {year}** copy.
+- Badge, Domain Model, Architecture, Routes, Supabase Schema, and `CONTEXT.md` documentation now distinguish the live killswitch/filter from registry-max year tooling. Design system v3.15 updates the existing patches/archive area and component manifest without renumbering sections.
+
+### Architectural Notes
+- `badges_enabled` is global app behavior, not a per-Festival feature. `app_settings` is not Realtime: the toggling godlike session applies the known successful write directly and invalidates older reads; other clients update on remount/reload.
+- `getCurrentFestivalYear()` remains the registry maximum (currently 2026) for consolidation and test/archive defaults only; it does not select live patches.
+- Year-tagged definitions never share the live vest with their frozen archive rows, so there is no live/archive duplication interval.
+- This work is unphased. Phase 52 remains a future multi-Festival badge sketch and is not shipped by these changes.
+
+---
+
 ## 2026-09-05 (Phase 50 — `/now` planning implementation)
 
 ### Added

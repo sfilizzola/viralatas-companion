@@ -21,6 +21,7 @@ import DuckToast from './components/DuckToast';
 import { SyncOrchestration } from './components/sync';
 import { ActiveFestivalProvider } from './components/festival/ActiveFestivalProvider';
 import { DuckEnabledProvider } from './contexts/DuckEnabledContext';
+import { BadgesEnabledProvider } from './contexts/BadgesEnabledContext';
 import { useAuth } from './hooks/useAuth';
 
 function AppRoutes() {
@@ -32,6 +33,7 @@ function AppRoutes() {
 
   return (
     <ActiveFestivalProvider>
+      <BadgesEnabledProvider>
       <DuckEnabledProvider>
         <SyncOrchestration />
         <SyncToast />
@@ -135,6 +137,7 @@ function AppRoutes() {
           <Route path="*" element={<Navigate to="/now" replace />} />
         </Routes>
       </DuckEnabledProvider>
+      </BadgesEnabledProvider>
     </ActiveFestivalProvider>
   );
 }

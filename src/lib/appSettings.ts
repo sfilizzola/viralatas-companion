@@ -21,3 +21,7 @@ export const setPlaylistTesting = (v: boolean) =>
 export const getMoshSplitEnabled = () => featureFlags.get('moshsplit_enabled');
 export const setMoshSplitEnabled = (v: boolean) =>
   featureFlags.set('moshsplit_enabled', v).then(() => true as const);
+
+export const getBadgesEnabled = () => featureFlags.get('badges_enabled');
+export const setBadgesEnabled = (v: boolean) =>
+  featureFlags.set('badges_enabled', v).then(() => true as const);
